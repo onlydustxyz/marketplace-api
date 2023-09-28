@@ -10,6 +10,7 @@
         <module>marketplace-api-contract</module>
         <module>domain</module>
         <module>coverage</module>
+        <module>infrastructure/postgres-adapter</module>
     </modules>
 
     <parent>
@@ -20,7 +21,7 @@
     </parent>
 
     <groupId>onlydust.com.marketplace.api</groupId>
-    <artifactId>marketplace-api-parent</artifactId>
+    <artifactId>marketplace-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>marketplace-api</name>
     <packaging>pom</packaging>

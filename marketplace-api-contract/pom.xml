@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>marketplace-api-parent</artifactId>
+        <artifactId>marketplace-api</artifactId>
         <groupId>onlydust.com.marketplace.api</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
@@ -113,8 +113,8 @@
                             <inputSpec>${project.basedir}/${contract.path}</inputSpec>
                             <generatorName>spring</generatorName>
                             <configHelp>false</configHelp>
-                            <apiPackage>io.symeo.monolithic.backend.data.processing.contract.api</apiPackage>
-                            <modelPackage>io.symeo.monolithic.backend.data.processing.contract.api.model</modelPackage>
+                            <apiPackage>onlydust.com.marketplace.api.contract</apiPackage>
+                            <modelPackage>onlydust.com.marketplace.api.contract.model</modelPackage>
                             <configOptions>
                                 <java8>true</java8>
                                 <library>spring-boot</library>

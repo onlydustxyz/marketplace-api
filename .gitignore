@@ -49,3 +49,5 @@ buildNumber.properties
 ### MacOS ###
 .DS_Store
 
+### Env ###
+.env
