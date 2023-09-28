@@ -10,7 +10,6 @@
         <module>marketplace-api-contract</module>
         <module>domain</module>
         <module>coverage</module>
-        <module>infrastructure/postgres-adapter</module>
     </modules>
 
     <parent>
@@ -30,26 +29,41 @@
     <properties>
         <java.version>17</java.version>
         <spring-boot-starter-web.version>2.7.3</spring-boot-starter-web.version>
+        <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
         <jackson.version>2.12.7.1</jackson.version>
-        <start-class>io.symeo.monolithic.backend.bootstrap.SymeoMonolithicBackendApplication</start-class>
-        <assertj-core.version>3.22.0</assertj-core.version>
-        <javafaker.version>1.0.2</javafaker.version>
+        <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
         <liquibase-core.version>4.10.0</liquibase-core.version>
         <auth0-spring-security-api.version>1.5.1</auth0-spring-security-api.version>
-        <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
-        <wiremock-jre8.version>2.33.2</wiremock-jre8.version>
-        <reactor-netty.version>1.0.21</reactor-netty.version>
-        <jjwt-jackson.version>0.11.5</jjwt-jackson.version>
-        <test-container.version>1.17.3</test-container.version>
-        <sendgrid-java.version>4.9.3</sendgrid-java.version>
         <logback-classic.version>1.2.9</logback-classic.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
+        <jjwt-jackson.version>0.11.5</jjwt-jackson.version>
         <hibernate-types.version>2.19.2</hibernate-types.version>
+        <assertj-core.version>3.22.0</assertj-core.version>
+        <javafaker.version>1.0.2</javafaker.version>
+        <wiremock-jre8.version>2.33.2</wiremock-jre8.version>
+        <reactor-netty.version>1.0.21</reactor-netty.version>
+        <test-container.version>1.17.3</test-container.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!--  Sub modules     -->
+            <dependency>
+                <groupId>onlydust.com.marketplace.api</groupId>
+                <artifactId>domain</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>onlydust.com.marketplace.api</groupId>
+                <artifactId>postgres-adapter</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>onlydust.com.marketplace.api</groupId>
+                <artifactId>rest-api-adapter</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
@@ -84,11 +98,6 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>com.sendgrid</groupId>
-                <artifactId>sendgrid-java</artifactId>
-                <version>${sendgrid-java.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback-classic.version}</version>
@@ -103,6 +112,7 @@
                 <artifactId>hibernate-types-55</artifactId>
                 <version>${hibernate-types.version}</version>
             </dependency>
+
 
             <!-- Test -->
             <dependency>
@@ -187,13 +197,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

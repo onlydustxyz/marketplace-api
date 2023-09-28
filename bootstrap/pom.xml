@@ -10,7 +10,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>onlydust.com.marketplace.api</groupId>
     <artifactId>bootstrap</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>

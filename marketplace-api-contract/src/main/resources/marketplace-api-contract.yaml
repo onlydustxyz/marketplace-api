@@ -399,13 +399,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectResponse'
+                $ref: '#/components/schemas/ShortProjectResponse'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
           $ref: '#/components/responses/ProjectNotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/slug/{slug}:
+    get:
+      security:
+        - {}
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project details
+      operationId: getProjectBySlug
+      description: |
+        Get the project if it is visible to the caller.
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'The project'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortProjectResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/ProjectNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
 
   /api/v1/projects/{projectId}/contributors:
     get:
@@ -1219,7 +1252,7 @@ components:
         technologies:
           $ref: '#/components/schemas/Technologies'
 
-    ProjectMinimalistResponse:
+    ShortProjectResponse:
       type: object
       required:
         - id
@@ -1543,7 +1576,7 @@ components:
 #            - $ref: '#/components/schemas/PullRequest'
 #            - $ref: '#/components/schemas/CodeReview'
         project:
-          $ref: '#/components/schemas/ProjectMinimalistResponse'
+          $ref: '#/components/schemas/ShortProjectResponse'
         contributor:
           $ref: '#/components/schemas/UserMinimalistResponse'
         linkedRewardCount:

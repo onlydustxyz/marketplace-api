@@ -10,7 +10,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>onlydust.com.marketplace.api</groupId>
     <artifactId>application</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
