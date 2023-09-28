@@ -9,12 +9,9 @@ spring:
   liquibase:
     enabled: false
   datasource:
-#    url: ${DATABASE_URL}
-#    username: ${DATABASE_USERNAME}
-#    password: ${DATABASE_PASSWORD}
-    url: jdbc:postgresql://localhost:5432/marketplace_db
-    username: postgres
-    password: postgres
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       connectionTimeout: 10000
