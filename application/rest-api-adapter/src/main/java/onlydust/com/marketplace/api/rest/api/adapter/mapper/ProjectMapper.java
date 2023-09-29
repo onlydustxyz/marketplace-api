@@ -8,7 +8,7 @@ import java.util.*;
 
 public interface ProjectMapper {
 
-    static ShortProjectResponse projectToResponse(Project project) {
+    static ShortProjectResponse projectToResponse(final Project project) {
         final ShortProjectResponse projectResponse = new ShortProjectResponse();
         projectResponse.setId(project.getId());
         projectResponse.setName(project.getName());
@@ -19,21 +19,25 @@ public interface ProjectMapper {
         return projectResponse;
     }
 
-    static ProjectListResponse projectViewsToProjectListResponse(Page<ProjectView> projectViewPage) {
+    static ProjectListResponse projectViewsToProjectListResponse(final Page<ProjectView> projectViewPage) {
         final ProjectListResponse projectListResponse = new ProjectListResponse();
         final List<ProjectListItemResponse> projectListItemResponses = new ArrayList<>();
+        final Set<String> sponsorsNames = new HashSet<>();
+        final Set<String> technologies = new HashSet<>();
         for (ProjectView projectView : projectViewPage.getContent()) {
             final ProjectListItemResponse projectListItemResponse = mapProject(projectView);
             mapProjectLead(projectView, projectListItemResponse);
-            mapSponsors(projectView, projectListItemResponse);
-            projectListItemResponse.setTechnologies(repositoriesToTechnologies(projectView.getRepositories().stream().toList()));
+            mapSponsors(projectView, projectListItemResponse, sponsorsNames);
+            projectListItemResponse.setTechnologies(repositoriesToTechnologies(projectView.getRepositories().stream().toList(), technologies));
             projectListItemResponses.add(projectListItemResponse);
         }
         projectListResponse.setProjects(projectListItemResponses);
+        projectListResponse.setTechnologies(technologies.stream().toList());
+        projectListResponse.setSponsors(sponsorsNames.stream().toList());
         return projectListResponse;
     }
 
-    private static ProjectListItemResponse mapProject(ProjectView projectView) {
+    private static ProjectListItemResponse mapProject(final ProjectView projectView) {
         final ProjectListItemResponse projectListItemResponse = new ProjectListItemResponse();
         projectListItemResponse.setId(projectView.getId());
         projectListItemResponse.setName(projectView.getName());
@@ -46,17 +50,21 @@ public interface ProjectMapper {
         return projectListItemResponse;
     }
 
-    private static void mapSponsors(ProjectView projectView, ProjectListItemResponse projectListItemResponse) {
+    private static void mapSponsors(final ProjectView projectView,
+                                    final ProjectListItemResponse projectListItemResponse,
+                                    final Set<String> sponsorsNames) {
         for (SponsorView sponsorView : projectView.getSponsors()) {
             final SponsorResponse sponsorResponse = new SponsorResponse();
             sponsorResponse.setId(sponsorView.getId());
             sponsorResponse.setName(sponsorView.getName());
+            sponsorsNames.add(sponsorView.getName());
             sponsorResponse.setLogoUrl(sponsorView.getLogoUrl());
             projectListItemResponse.addSponsorsItem(sponsorResponse);
         }
     }
 
-    private static void mapProjectLead(ProjectView projectView, ProjectListItemResponse projectListItemResponse) {
+    private static void mapProjectLead(final ProjectView projectView,
+                                       final ProjectListItemResponse projectListItemResponse) {
         for (ProjectLeadView projectLeadView : projectView.getProjectLeadViews()) {
             final RegisteredUserMinimalistResponse registeredUserMinimalistResponse =
                     new RegisteredUserMinimalistResponse();
@@ -67,7 +75,8 @@ public interface ProjectMapper {
         }
     }
 
-    static Map<String, Integer> repositoriesToTechnologies(List<RepositoryView> repositoryViews) {
+    static Map<String, Integer> repositoriesToTechnologies(final List<RepositoryView> repositoryViews,
+                                                           final Set<String> technologiesNames) {
         final Map<String, Integer> technologies = new HashMap<>();
         for (RepositoryView repositoryView : repositoryViews) {
             repositoryView.getTechnologies().forEach((key, value) -> {
@@ -75,6 +84,7 @@ public interface ProjectMapper {
                     technologies.replace(key, technologies.get(key) + value);
                 } else {
                     technologies.put(key, value);
+                    technologiesNames.add(key);
                 }
             });
         }

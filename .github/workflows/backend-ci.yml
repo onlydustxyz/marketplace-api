@@ -6,7 +6,8 @@ on:
   push:
     branches:
       - "main"
-      - "hotfix/**"
+      - "e-*"
+      - "b-*"
   workflow_dispatch:
     inputs:
       debug_enabled:

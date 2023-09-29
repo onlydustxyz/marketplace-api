@@ -1143,6 +1143,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectListItemResponse'
+        technologies:
+          type: array
+          items:
+            type: string
+        sponsors:
+          type: array
+          items:
+            type: string
 
     ProjectListItemResponse:
       type: object

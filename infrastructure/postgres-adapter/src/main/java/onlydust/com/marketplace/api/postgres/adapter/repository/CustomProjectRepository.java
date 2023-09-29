@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.view.ProjectViewEntity;
 
@@ -13,6 +14,7 @@ import java.util.*;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
+@Slf4j
 public class CustomProjectRepository {
 
     protected static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
@@ -64,7 +66,7 @@ public class CustomProjectRepository {
                                                                              final String search,
                                                                              final ProjectView.SortBy sort) {
         final String query = buildQuery(technologies, sponsor, userId, search, sort);
-        System.out.println(query);
+        LOGGER.debug(query);
         final List<ProjectViewEntity> rows =
                 entityManager.createNativeQuery(query, ProjectViewEntity.class).getResultList();
         final Map<UUID, ProjectView> projectViewMap = new LinkedHashMap<>();
