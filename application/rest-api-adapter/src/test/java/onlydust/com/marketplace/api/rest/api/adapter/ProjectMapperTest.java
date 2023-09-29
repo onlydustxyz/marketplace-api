@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
 import onlydust.com.marketplace.api.domain.view.RepositoryView;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.repositoriesToTechnologies;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProjectMapperTest {
 
@@ -24,14 +27,18 @@ public class ProjectMapperTest {
                         "Java", 1, "Python", 10
                 ))
                 .build();
+        final Set<String> technologiesNames = new HashSet<>();
 
         // When
         final Map<String, Integer> technologies = repositoriesToTechnologies(List.of(repositoryView1,
-                repositoryView2));
+                repositoryView2), technologiesNames);
 
         // Then
-        Assertions.assertEquals(technologies.get("Java"), 6);
-        Assertions.assertEquals(technologies.get("Rust"), 3);
-        Assertions.assertEquals(technologies.get("Python"), 10);
+        assertEquals(technologies.get("Java"), 6);
+        assertEquals(technologies.get("Rust"), 3);
+        assertEquals(technologies.get("Python"), 10);
+        assertTrue(technologiesNames.contains("Java"));
+        assertTrue(technologiesNames.contains("Rust"));
+        assertTrue(technologiesNames.contains("Python"));
     }
 }
