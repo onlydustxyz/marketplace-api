@@ -16,7 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CustomProjectRepository {
 
-    private static final String FIND_PROJECTS_BASE_QUERY = "select * from (" +
+    private static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
+            "search_project.project_id), search_project.* from (" +
             "select p.project_id," +
             "       p.hiring," +
             "       p.logo_url," +
@@ -47,7 +48,7 @@ public class CustomProjectRepository {
             "        left join (select count(github_user_id) contributors_count, project_id" +
             "                   from projects_contributors" +
             "                   group by project_id) as contributors_count on contributors_count.project_id = " +
-            "p.project_id"+
+            "p.project_id" +
             ") as search_project order by search_project.project_id";
 
 
@@ -83,7 +84,6 @@ public class CustomProjectRepository {
             addSponsorToProject(entity, projectView);
             addRepositoryToProject(entity, projectView);
         }
-
         return Page.<ProjectView>builder()
                 .content(projectViewMap.values().stream().toList())
                 .build();
