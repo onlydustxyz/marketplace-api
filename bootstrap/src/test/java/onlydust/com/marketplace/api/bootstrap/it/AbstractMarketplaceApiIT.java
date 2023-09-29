@@ -1,0 +1,95 @@
+package onlydust.com.marketplace.api.bootstrap.it;
+
+import com.github.javafaker.Faker;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.net.URI;
+import java.util.Map;
+
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.testcontainers.utility.MountableFile.forClasspathResource;
+
+
+@ActiveProfiles({"it"})
+@AutoConfigureWebTestClient(timeout = "36000")
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@Testcontainers
+@Slf4j
+@DirtiesContext
+public class AbstractMarketplaceApiIT {
+
+    @Container
+    static PostgreSQLContainer postgresSQLContainer =
+            new PostgreSQLContainer<>("postgres:14.3-alpine")
+                    .withDatabaseName("marketplace_db")
+                    .withUsername("test")
+                    .withPassword("test")
+                    .withCopyFileToContainer(
+                            forClasspathResource("db_init_script/"),"/docker-entrypoint-initdb.d");
+
+
+    @DynamicPropertySource
+    static void updateProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.password", postgresSQLContainer::getPassword);
+        registry.add("spring.datasource.username", postgresSQLContainer::getUsername);
+    }
+
+    @LocalServerPort
+    int port;
+
+    @Autowired
+    WebTestClient client;
+
+    protected static final Faker FAKER = new Faker();
+
+    protected URI getApiURI(final String path) {
+        return UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(port)
+                .path(path)
+                .build()
+                .toUri();
+    }
+
+    protected URI getApiURI(final String path, String paramName, String paramValue) {
+        return UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(port)
+                .path(path)
+                .queryParam(paramName, paramValue)
+                .build()
+                .toUri();
+    }
+
+    protected URI getApiURI(final String path, final Map<String, String> params) {
+        final UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(port)
+                .path(path);
+        params.forEach(uriComponentsBuilder::queryParam);
+        return uriComponentsBuilder
+                .build()
+                .toUri();
+    }
+
+    protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
+
+}

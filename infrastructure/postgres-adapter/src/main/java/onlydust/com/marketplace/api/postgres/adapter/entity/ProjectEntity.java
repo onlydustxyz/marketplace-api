@@ -35,7 +35,7 @@ public class ProjectEntity {
     Boolean hiring;
     @Column(name = "rank")
     Integer rank;
-    @Column(name = "key")
+    @Column(name = "key", insertable = false)
     String key;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
