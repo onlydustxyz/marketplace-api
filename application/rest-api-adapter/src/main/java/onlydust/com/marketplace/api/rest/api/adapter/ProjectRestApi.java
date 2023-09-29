@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.projectToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.projectViewsToProjectListResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
 
 @RestController
 @Tags(@Tag(name = "Projects"))
@@ -45,8 +44,8 @@ public class ProjectRestApi implements ProjectsApi {
                                                            final List<String> sponsor, final String ownership,
                                                            final String search) {
         final Page<ProjectView> projectViewPage =
-                projectFacadePort.getByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor, ownership,
-                        search, sort);
+                projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
+                        search, mapSortByParameter(sort));
         return ResponseEntity.ok(projectViewsToProjectListResponse(projectViewPage));
     }
 

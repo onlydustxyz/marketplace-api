@@ -26,10 +26,10 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ProjectView> getByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology,
-                                                                            List<String> sponsor, String ownership,
-                                                                            String search, String sort) {
-        return projectStoragePort.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor, ownership,
+    public Page<ProjectView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
+                                                                            List<String> sponsor, UUID userId,
+                                                                            String search, ProjectView.SortBy sort) {
+        return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, userId,
                 search, sort);
     }
 }

@@ -32,6 +32,8 @@ public class ProjectViewEntity {
     Boolean hiring;
     @Column(name = "key", insertable = false)
     String key;
+    @Column(name = "rank", insertable = false)
+    Integer rank;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")

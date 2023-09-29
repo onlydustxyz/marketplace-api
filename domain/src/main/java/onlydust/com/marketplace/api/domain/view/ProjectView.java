@@ -33,7 +33,11 @@ public class ProjectView {
         this.getSponsors().add(sponsorView);
     }
 
-    public void addRepository(final RepositoryView repositoryView){
+    public void addRepository(final RepositoryView repositoryView) {
         this.getRepositories().add(repositoryView);
+    }
+
+    public enum SortBy {
+        CONTRIBUTORS_COUNT, REPOS_COUNT, RANK, NAME;
     }
 }

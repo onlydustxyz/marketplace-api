@@ -4,10 +4,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface ProjectMapper {
 
@@ -82,5 +79,23 @@ public interface ProjectMapper {
             });
         }
         return technologies;
+    }
+
+    static ProjectView.SortBy mapSortByParameter(final String sort) {
+        if (Objects.nonNull(sort)) {
+            if (sort.equals("RANK")) {
+                return ProjectView.SortBy.RANK;
+            }
+            if (sort.equals("NAME")) {
+                return ProjectView.SortBy.NAME;
+            }
+            if (sort.equals("REPO_COUNT")) {
+                return ProjectView.SortBy.REPOS_COUNT;
+            }
+            if (sort.equals("CONTRIBUTOR_COUNT")) {
+                return ProjectView.SortBy.CONTRIBUTORS_COUNT;
+            }
+        }
+        return null;
     }
 }

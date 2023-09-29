@@ -51,10 +51,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology,
-                                                                             List<String> sponsor, String ownership,
-                                                                             String search, String sort) {
+    public Page<ProjectView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
+                                                                             List<String> sponsor, UUID userId,
+                                                                             String search, ProjectView.SortBy sort) {
         return customProjectRepository.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor,
-                ownership, search, sort);
+                userId, search, sort);
     }
 }

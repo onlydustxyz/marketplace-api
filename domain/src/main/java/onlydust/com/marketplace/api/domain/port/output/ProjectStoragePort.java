@@ -12,6 +12,6 @@ public interface ProjectStoragePort {
 
     Project getBySlug(String slug);
 
-    Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology, List<String> sponsor,
-                                                                      String ownership, String search, String sort);
+    Page<ProjectView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
+                                                                   UUID userId, String search, ProjectView.SortBy sort);
 }

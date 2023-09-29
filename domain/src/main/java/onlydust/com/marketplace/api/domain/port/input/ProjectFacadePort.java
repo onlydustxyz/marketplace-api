@@ -12,6 +12,6 @@ public interface ProjectFacadePort {
 
     Project getBySlug(String slug);
 
-    Page<ProjectView> getByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology, List<String> sponsor,
-                                                                     String ownership, String search, String sort);
+    Page<ProjectView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
+                                                                     UUID userId, String search, ProjectView.SortBy sort);
 }

@@ -8,15 +8,14 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.view.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class CustomProjectRepository {
 
-    private static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
+    protected static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
             "search_project.project_id), search_project.* from (" +
             "select p.project_id," +
             "       p.hiring," +
@@ -25,6 +24,7 @@ public class CustomProjectRepository {
             "       p.name," +
             "       p.short_description," +
             "       p.visibility," +
+            "       p.rank," +
             "       cast(gr.languages as text)," +
             "       gr.id repository_id," +
             "       u.id                   p_lead_id," +
@@ -34,7 +34,7 @@ public class CustomProjectRepository {
             "       s.logo_url sponsor_logo_url," +
             "       s.id sponsor_id," +
             "       repo_count.repo_count," +
-            "       contributors_count.contributors_count" +
+            "       coalesce(contributors_count.contributors_count,0) contributors_count" +
             " from project_details p" +
             "         left join projects_sponsors ps on ps.project_id = p.project_id" +
             "         left join sponsors s on s.id = ps.sponsor_id" +
@@ -49,7 +49,7 @@ public class CustomProjectRepository {
             "                   from projects_contributors" +
             "                   group by project_id) as contributors_count on contributors_count.project_id = " +
             "p.project_id" +
-            ") as search_project order by search_project.project_id";
+            ") as search_project";
 
 
     private final EntityManager entityManager;
@@ -58,27 +58,18 @@ public class CustomProjectRepository {
             = new TypeReference<>() {
     };
 
-    public Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology,
-                                                                             List<String> sponsor, String ownership,
-                                                                             String search, String sort) {
-
-        final List<ProjectViewEntity> rows = entityManager.createNativeQuery(FIND_PROJECTS_BASE_QUERY,
-                ProjectViewEntity.class).getResultList();
-        final Map<UUID, ProjectView> projectViewMap = new HashMap<>();
+    public Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(final List<String> technologies,
+                                                                             final List<String> sponsor,
+                                                                             final UUID userId,
+                                                                             final String search,
+                                                                             final ProjectView.SortBy sort) {
+        final String query = buildQuery(technologies, sponsor, userId, search, sort);
+        System.out.println(query);
+        final List<ProjectViewEntity> rows =
+                entityManager.createNativeQuery(query, ProjectViewEntity.class).getResultList();
+        final Map<UUID, ProjectView> projectViewMap = new LinkedHashMap<>();
         for (ProjectViewEntity entity : rows) {
-            if (!projectViewMap.containsKey(entity.getId())) {
-                final ProjectView projectView = ProjectView.builder()
-                        .id(entity.getId())
-                        .name(entity.getName())
-                        .logoUrl(entity.getLogoUrl())
-                        .hiring(entity.getHiring())
-                        .slug(entity.getKey())
-                        .shortDescription(entity.getShortDescription())
-                        .contributorCount(entity.getContributorsCount())
-                        .repositoryCount(entity.getRepoCount())
-                        .build();
-                projectViewMap.put(entity.getId(), projectView);
-            }
+            entityToProjectView(entity, projectViewMap);
             final ProjectView projectView = projectViewMap.get(entity.getId());
             addProjectLeadToProject(entity, projectView);
             addSponsorToProject(entity, projectView);
@@ -87,6 +78,22 @@ public class CustomProjectRepository {
         return Page.<ProjectView>builder()
                 .content(projectViewMap.values().stream().toList())
                 .build();
+    }
+
+    private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectView> projectViewMap) {
+        if (!projectViewMap.containsKey(entity.getId())) {
+            final ProjectView projectView = ProjectView.builder()
+                    .id(entity.getId())
+                    .name(entity.getName())
+                    .logoUrl(entity.getLogoUrl())
+                    .hiring(entity.getHiring())
+                    .slug(entity.getKey())
+                    .shortDescription(entity.getShortDescription())
+                    .contributorCount(entity.getContributorsCount())
+                    .repositoryCount(entity.getRepoCount())
+                    .build();
+            projectViewMap.put(entity.getId(), projectView);
+        }
     }
 
     private static void addRepositoryToProject(ProjectViewEntity entity, ProjectView projectView) {
@@ -119,5 +126,40 @@ public class CustomProjectRepository {
                 .login(entity.getProjectLeadLogin())
                 .build();
         projectView.addProjectLead(projectLeadView);
+    }
+
+
+    protected static String buildQuery(final List<String> technologies,
+                                       final List<String> sponsors, final UUID userId,
+                                       final String search, final ProjectView.SortBy sort) {
+        final List<String> whereConditions = new ArrayList<>();
+        Optional<String> orderByCondition = Optional.empty();
+        if (nonNull(search) && !search.isEmpty()) {
+            whereConditions.add(
+                    "search_project.short_description like '%" + search + "%' or search_project.name like '%" + search +
+                            "%'");
+        }
+        if (nonNull(sort)) {
+            switch (sort) {
+                case CONTRIBUTORS_COUNT ->
+                        orderByCondition = Optional.of(" order by search_project.contributors_count desc");
+                case NAME -> orderByCondition = Optional.of(" order by search_project.name asc");
+                case RANK -> orderByCondition = Optional.of(" order by search_project.rank desc");
+                case REPOS_COUNT -> orderByCondition = Optional.of(" order by search_project.repo_count desc");
+            }
+        }
+        if (nonNull(userId)) {
+            whereConditions.add("search_project.pl_user_id = '" + userId + "'");
+        }
+        if (nonNull(sponsors) && !sponsors.isEmpty()) {
+            whereConditions.add("search_project.sponsor_name in (" + String.join(",", sponsors.stream().map(s ->
+                    "'" + s + "'").toList()) + ")");
+        }
+        if (nonNull(technologies) && !technologies.isEmpty()) {
+            whereConditions.add("search_project.languages like " + String.join(" or search_project" +
+                    ".languages like ", technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
+        }
+        return FIND_PROJECTS_BASE_QUERY + (whereConditions.isEmpty() ? "" : " where " + String.join(" and ",
+                whereConditions.stream().map(s -> "(" + s + ")").toList())) + orderByCondition.orElse("");
     }
 }
