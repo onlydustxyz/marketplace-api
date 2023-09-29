@@ -365,6 +365,33 @@ paths:
               - NAME
               - REPO_COUNT
               - CONTRIBUTOR_COUNT
+        - in: query
+          name: technology
+          description: Technology filter
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: sponsor
+          description: Sponsor filter
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: ownership
+          description: Ownership filter
+          schema:
+            type: string
+            enum:
+              - ALL
+              - MINE
+        - in: query
+          name: search
+          description: Full text search
+          schema:
+            type: string
       responses:
         "200":
           description: 'List of projects'

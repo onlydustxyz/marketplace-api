@@ -3,19 +3,24 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.api.domain.view.Page;
+import onlydust.com.marketplace.api.domain.view.ProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private final ProjectRepository projectRepository;
+    private final CustomProjectRepository customProjectRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Project getById(UUID projectId) {
         final ProjectEntity projectEntity = projectRepository.getById(projectId);
         return Project.builder()
@@ -30,7 +35,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Project getBySlug(String slug) {
         final ProjectEntity projectEntity = projectRepository.findByKey(slug).orElseThrow();
         return Project.builder()
@@ -42,5 +47,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(List<String> technology,
+                                                                             List<String> sponsor, String ownership,
+                                                                             String search, String sort) {
+        return customProjectRepository.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor,
+                ownership, search, sort);
     }
 }
