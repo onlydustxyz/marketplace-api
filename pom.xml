@@ -38,7 +38,6 @@
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <jjwt-jackson.version>0.11.5</jjwt-jackson.version>
         <hibernate-types.version>2.19.2</hibernate-types.version>
-        <assertj-core.version>3.22.0</assertj-core.version>
         <javafaker.version>1.0.2</javafaker.version>
         <wiremock-jre8.version>2.33.2</wiremock-jre8.version>
         <reactor-netty.version>1.0.21</reactor-netty.version>
@@ -173,10 +172,6 @@
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
         </dependency>
     </dependencies>
 
