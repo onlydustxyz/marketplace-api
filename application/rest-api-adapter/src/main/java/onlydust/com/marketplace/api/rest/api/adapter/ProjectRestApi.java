@@ -40,6 +40,7 @@ public class ProjectRestApi implements ProjectsApi {
         projectResponse.setLogoUrl(project.getLogoUrl());
         projectResponse.setShortDescription(project.getShortDescription());
         projectResponse.setPrettyId(project.getSlug());
+        projectResponse.setVisibility(ShortProjectResponse.VisibilityEnum.PUBLIC);
         return projectResponse;
     }
 }
