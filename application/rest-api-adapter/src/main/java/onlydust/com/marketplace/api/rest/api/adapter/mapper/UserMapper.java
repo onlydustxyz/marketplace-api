@@ -27,7 +27,6 @@ public interface UserMapper {
         userProfileResponse.setCreatedAt(toZoneDateTime(userProfile.getCreateAt()));
         userProfileResponse.setLastSeenAt(toZoneDateTime(userProfile.getLastSeenAt()));
         userProfileResponse.setLocation(userProfile.getLocation());
-        userProfileResponse.setUpdatedAt(toZoneDateTime(userProfile.getUpdatedAt()));
         userProfileResponse.setContacts(contactInformationsToResponse(userProfile.getContactInformations()));
         userProfileResponse.setStats(userStatsToResponse(userProfile.getProfileStats()));
         userProfileResponse.setProjects(userProjectsToResponse(userProfile.getProjectsStats()));
@@ -56,6 +55,7 @@ public interface UserMapper {
         userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
         userProfileStats.setTotalEarned(profileStats.getTotalEarned());
         userProfileStats.setLeadedProjectCount(profileStats.getLeadedProjectCount());
+        userProfileStats.setContributionCount(profileStats.getContributionCount());
         userProfileStats.setContributionCountPerWeeks(
                 profileStats.getContributionStats()
                         .stream()
@@ -87,11 +87,12 @@ public interface UserMapper {
     }
 
     private static UserProfileResponse.CoverEnum coverToUserProfileResponse(final UserProfile.Cover cover) {
-        return switch (cover) {
-            case BLUE -> UserProfileResponse.CoverEnum.BLUE;
-            case CYAN -> UserProfileResponse.CoverEnum.CYAN;
-            case MAGENTA -> UserProfileResponse.CoverEnum.MAGENTA;
-            case YELLOW -> UserProfileResponse.CoverEnum.YELLOW;
-        };
+        return isNull(cover) ? null :
+                switch (cover) {
+                    case BLUE -> UserProfileResponse.CoverEnum.BLUE;
+                    case CYAN -> UserProfileResponse.CoverEnum.CYAN;
+                    case MAGENTA -> UserProfileResponse.CoverEnum.MAGENTA;
+                    case YELLOW -> UserProfileResponse.CoverEnum.YELLOW;
+                };
     }
 }

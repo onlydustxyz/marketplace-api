@@ -20,8 +20,12 @@ public class UserProfile {
     String htmlUrl;
     Date createAt;
     Date lastSeenAt;
-    Date updatedAt;
     String location;
+    String twitter;
+    String linkedin;
+    String github;
+    String telegram;
+    String discord;
     Map<String, Integer> technologies;
     Cover cover;
     ProfileStats profileStats;

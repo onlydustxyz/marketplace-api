@@ -952,10 +952,6 @@ components:
               type: string
               format: date-time
               description: When the user signed up on OnlyDust
-            updatedAt:
-              type: string
-              format: date-time
-              description: When user profile was last updated
             lastSeenAt:
               type: string
               format: date-time
