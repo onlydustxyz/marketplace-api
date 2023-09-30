@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.view.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
 import java.util.*;

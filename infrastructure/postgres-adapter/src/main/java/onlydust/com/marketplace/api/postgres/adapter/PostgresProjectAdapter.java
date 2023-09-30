@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,10 +1,10 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.view;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

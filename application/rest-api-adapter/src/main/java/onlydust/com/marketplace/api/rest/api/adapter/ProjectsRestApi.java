@@ -21,7 +21,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper
 @RestController
 @Tags(@Tag(name = "Projects"))
 @AllArgsConstructor
-public class ProjectRestApi implements ProjectsApi {
+public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
 

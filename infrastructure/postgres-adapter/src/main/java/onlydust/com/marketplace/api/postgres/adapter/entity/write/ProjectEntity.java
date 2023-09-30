@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;

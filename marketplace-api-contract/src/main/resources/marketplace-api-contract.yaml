@@ -975,69 +975,76 @@ components:
             projects:
               type: array
               items:
-                properties:
-                  id:
-                    $ref: '#/components/schemas/ProjectId'
-                  name:
-                    type: string
-                    example: Verkle Tries
-                  logoUrl:
-                    type: string
-                    format: url
-                    description: Direct URL to project's logo image
-                    example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
-                  contributorCount:
-                    type: integer
-                    description: Total number of contributors within the project
-                    example: 163
-                  totalGranted:
-                    type: number
-                    description: Total USD-equivalent amount of all rewards granted on this project
-                    example: 25400
-                  userContributionCount:
-                    type: integer
-                    description: Number of contributions made by the user on this project
-                    example: 34
-                  userLastContributedAt:
-                    type: string
-                    format: date-time
-                    description: The last time the user contributed to this project
+                $ref: '#/components/schemas/UserProfileProjects'
             stats:
-              type: object
-              properties:
-                contributedProjectCount:
-                  type: integer
-                  description: Number of projects on which the user contributed
-                  example: 2
-                leadedProjectCount:
-                  type: integer
-                  description: Number of projects the user leads
-                  example: 1
-                totalEarned:
-                  type: number
-                  description: Total USD-equivalent amount the user earned from rewards
-                  example: 4000
-                contributionCount:
-                  type: integer
-                  description: Total number of contributions made by the user within OnlyDust projects
-                  example: 104
-                contributionCountPerWeeks:
-                  type: array
-                  items:
-                    properties:
-                      year:
-                        type: integer
-                        example: 2023
-                      week:
-                        type: integer
-                        example: 34
-                      codeReviewCount:
-                        type: integer
-                      issueCount:
-                        type: integer
-                      pullRequestCount:
-                        type: integer
-
+              $ref: '#/components/schemas/UserProfileStats'
+    UserProfileStats:
+      type: object
+      properties:
+        contributedProjectCount:
+          type: integer
+          description: Number of projects on which the user contributed
+          example: 2
+        leadedProjectCount:
+          type: integer
+          description: Number of projects the user leads
+          example: 1
+        totalEarned:
+          type: number
+          description: Total USD-equivalent amount the user earned from rewards
+          example: 4000
+        contributionCount:
+          type: integer
+          description: Total number of contributions made by the user within OnlyDust projects
+          example: 104
+        contributionCountPerWeeks:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserContributionStats'
+    UserContributionStats:
+      type: object
+      properties:
+        year:
+          type: integer
+          example: 2023
+        week:
+          type: integer
+          example: 34
+        codeReviewCount:
+          type: integer
+        issueCount:
+          type: integer
+        pullRequestCount:
+          type: integer
+    UserProfileProjects:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectId'
+        name:
+          type: string
+          example: Verkle Tries
+        logoUrl:
+          type: string
+          format: url
+          description: Direct URL to project's logo image
+          example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
+        contributorCount:
+          type: integer
+          description: Total number of contributors within the project
+          example: 163
+        totalGranted:
+          type: number
+          description: Total USD-equivalent amount of all rewards granted on this project
+          example: 25400
+        userContributionCount:
+          type: integer
+          description: Number of contributions made by the user on this project
+          example: 34
+        userLastContributedAt:
+          type: string
+          format: date-time
+          description: The last time the user contributed to this project
     ContactInformation:
       type: object
       required:
