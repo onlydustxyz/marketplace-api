@@ -2,7 +2,8 @@ application:
   web:
     cors:
       hosts: ${FRONTEND_CORS_HOSTS}
-
+    hasura:
+      secret: ${HASURA_GRAPHQL_JWT_SECRET}
 spring:
   application:
     name: marketplace-api
