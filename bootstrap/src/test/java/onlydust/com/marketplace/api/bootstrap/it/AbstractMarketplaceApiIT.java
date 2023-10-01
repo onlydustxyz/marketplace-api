@@ -91,5 +91,6 @@ public class AbstractMarketplaceApiIT {
     }
 
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
+    protected static final String ME_GET = "/api/v1/me";
 
 }

@@ -25,12 +25,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        LOGGER.info(authorization);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            SecurityContextHolder.getContext().setAuthentication(hasuraJwtService.getAuthenticationFromJWT(authorization));
+            SecurityContextHolder.getContext().setAuthentication(hasuraJwtService.getAuthenticationFromJwt(authorization));
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
-
     }
 
 }
