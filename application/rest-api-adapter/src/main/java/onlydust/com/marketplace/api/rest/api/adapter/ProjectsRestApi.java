@@ -7,11 +7,9 @@ import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectListResponse;
 import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectView;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,8 +34,6 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ShortProjectResponse> getProjectBySlug(final String slug) {
-        final AuthenticationService authenticationService = new AuthenticationService();
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final Project project = projectFacadePort.getBySlug(slug);
         final ShortProjectResponse projectResponse = projectToResponse(project);
         return ResponseEntity.ok(projectResponse);

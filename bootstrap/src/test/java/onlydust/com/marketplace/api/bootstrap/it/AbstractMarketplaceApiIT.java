@@ -55,7 +55,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     WebTestClient client;
 
-    protected static final Faker FAKER = new Faker();
+    protected static final Faker faker = new Faker();
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()

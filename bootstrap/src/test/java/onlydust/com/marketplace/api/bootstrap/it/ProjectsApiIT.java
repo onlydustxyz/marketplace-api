@@ -19,12 +19,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final ProjectEntity projectEntity = projectRepository.save(ProjectEntity.builder()
                 .id(UUID.randomUUID())
-                .name(FAKER.name().name())
-                .longDescription(FAKER.name().fullName())
-                .shortDescription(FAKER.name().lastName())
+                .name(faker.name().name())
+                .longDescription(faker.name().fullName())
+                .shortDescription(faker.name().lastName())
                 .visibility(ProjectEntity.Visibility.PUBLIC)
                 .hiring(Boolean.FALSE)
-                .logoUrl("https://logo-url-test/" + FAKER.pokemon().name())
+                .logoUrl("https://logo-url-test/" + faker.pokemon().name())
                 .rank(10)
                 .build());
 

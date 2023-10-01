@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.Data;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationConfiguration;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -29,8 +27,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationService authenticationService() {
-        return new AuthenticationService();
+    public AuthenticationContext authenticationContext() {
+        return new SpringAuthenticationContext();
+    }
+
+    @Bean
+    public AuthenticationService authenticationService(final AuthenticationContext authenticationContext) {
+        return new AuthenticationService(authenticationContext);
     }
 
     @Bean

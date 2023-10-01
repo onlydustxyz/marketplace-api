@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
 
 import java.net.URI;
@@ -94,5 +95,14 @@ public interface UserMapper {
                     case MAGENTA -> UserProfileResponse.CoverEnum.MAGENTA;
                     case YELLOW -> UserProfileResponse.CoverEnum.YELLOW;
                 };
+    }
+
+    public static GetMeResponse userToGetMeResponse(User authenticatedUser) {
+        final GetMeResponse getMeResponse = new GetMeResponse();
+        getMeResponse.setId(authenticatedUser.getId().toString());
+        getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
+        getMeResponse.setAvatarUrl(authenticatedUser.getAvatarUrl());
+        getMeResponse.setLogin(authenticatedUser.getLogin());
+        return getMeResponse;
     }
 }

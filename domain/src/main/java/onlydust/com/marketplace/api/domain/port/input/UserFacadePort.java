@@ -7,4 +7,5 @@ import java.util.UUID;
 public interface UserFacadePort {
 
     UserProfile getProfileById(UUID userId);
+
 }

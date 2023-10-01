@@ -16,4 +16,5 @@ public class UserService implements UserFacadePort {
     public UserProfile getProfileById(UUID userId) {
         return userStoragePort.getProfileById(userId);
     }
+
 }

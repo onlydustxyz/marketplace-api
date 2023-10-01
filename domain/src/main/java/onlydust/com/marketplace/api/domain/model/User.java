@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class User {
     UUID id;
     List<String> permissions;
