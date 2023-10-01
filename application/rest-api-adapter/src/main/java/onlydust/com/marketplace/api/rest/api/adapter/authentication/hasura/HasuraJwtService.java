@@ -3,123 +3,69 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtHeader;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
+import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
 import org.apache.commons.codec.digest.HmacUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 
+import java.io.IOException;
 import java.util.Base64;
-import java.util.Collection;
 
 @AllArgsConstructor
 @Slf4j
 public class HasuraJwtService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private final HasuraProperties hasuraProperties;
+    private final JwtSecret jwtSecret;
 
-    public Authentication getAuthenticationFromJwt(final String authorizationBearer) {
-        try {
-            final String[] chunks = authorizationBearer.split("\\.");
-            final String payload = chunks[1];
-            final String header = chunks[0];
-            String tokenWithoutSignature = header + "." + payload;
-            String signature = chunks[2];
-
-            final JwtSecret jwtSecret = objectMapper.readValue(hasuraProperties.getSecret(), JwtSecret.class);
-
-            if (!Base64.getUrlDecoder().decode(header).equals("HS256")) {
-
-            }
-            final String expectedSignature =
-                    new HmacUtils("HmacSHA256", jwtSecret.getKey()).hmacHex(tokenWithoutSignature);
-            if (signature.equals(expectedSignature)) {
-                LOGGER.info("Token is valid");
-                final HasuraJwtPayload hasuraJwtPayload =
-                        objectMapper.readValue(Base64.getUrlDecoder().decode(payload),
-                                HasuraJwtPayload.class);
-                if (!hasuraJwtPayload.getIss().equals(jwtSecret.getIssuer())) {
-
-                }
-
-                return new Authentication() {
-                    @Override
-                    public Collection<? extends GrantedAuthority> getAuthorities() {
-                        return null;
-                    }
-
-                    @Override
-                    public Object getCredentials() {
-                        return hasuraJwtPayload;
-                    }
-
-                    @Override
-                    public Object getDetails() {
-                        return hasuraJwtPayload.getClaims();
-                    }
-
-                    @Override
-                    public Object getPrincipal() {
-                        return hasuraJwtPayload.getSub();
-                    }
-
-                    @Override
-                    public boolean isAuthenticated() {
-                        return true;
-                    }
-
-                    @Override
-                    public void setAuthenticated(boolean b) throws IllegalArgumentException {
-
-                    }
-
-                    @Override
-                    public String getName() {
-                        return hasuraJwtPayload.getSub();
-                    }
-                };
-            }
-        } catch (Exception exception) {
-            return unauthenticated();
+    public HasuraAuthentication getAuthenticationFromJwt(final String authorizationBearer) {
+        final String[] chunks = authorizationBearer.split("\\.");
+        if (chunks.length != 3) {
+            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_FORMAT, "Invalid Jwt format");
         }
-        return unauthenticated();
+        final String payload = chunks[1];
+        final String header = chunks[0];
+        String tokenWithoutSignature = header + "." + payload;
+        String signature = chunks[2];
+
+        JwtHeader jwtHeader;
+        try {
+            jwtHeader = objectMapper.readValue(Base64.getUrlDecoder().decode(header), JwtHeader.class);
+        } catch (Exception e) {
+            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_HEADER_FORMAT,
+                    "Invalid Jwt " + "header format");
+        }
+        if (!jwtHeader.getAlg().equals("HS256")) {
+            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_ALGO_TYPE, "Invalid Jwt " +
+                    "algorithm type");
+        }
+        final String expectedSignature = new HmacUtils("HmacSHA256", jwtSecret.getKey()).hmacHex(tokenWithoutSignature);
+        if (signature.equals(expectedSignature)) {
+            final HasuraJwtPayload hasuraJwtPayload;
+            try {
+                hasuraJwtPayload = objectMapper.readValue(Base64.getUrlDecoder().decode(payload),
+                        HasuraJwtPayload.class);
+            } catch (IOException e) {
+                return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.UNABLE_TO_DESERIALIZE_JWT_TOKEN,
+                        "Unable to deserialize Jwt token");
+            }
+            if (!hasuraJwtPayload.getIss().equals(jwtSecret.getIssuer())) {
+
+            }
+
+            return HasuraAuthentication.builder().credentials(hasuraJwtPayload).isAuthenticated(true)
+                    .claims(hasuraJwtPayload.getClaims()).principal(hasuraJwtPayload.getSub()).build();
+        } else {
+            return HasuraAuthentication.builder().isAuthenticated(false)
+                    .onlydustException(OnlydustException.builder()
+                            .code(RestApiExceptionCode.INVALID_JWT_SIGNATURE)
+                            .message(String.format("Invalid JWT signature %s", signature))
+                            .build()).build();
+        }
     }
 
-    private Authentication unauthenticated() {
-        return new Authentication() {
-            @Override
-            public Collection<? extends GrantedAuthority> getAuthorities() {
-                return null;
-            }
-
-            @Override
-            public Object getCredentials() {
-                return null;
-            }
-
-            @Override
-            public Object getDetails() {
-                return null;
-            }
-
-            @Override
-            public Object getPrincipal() {
-                return null;
-            }
-
-            @Override
-            public boolean isAuthenticated() {
-                return false;
-            }
-
-            @Override
-            public void setAuthenticated(boolean b) throws IllegalArgumentException {
-
-            }
-
-            @Override
-            public String getName() {
-                return null;
-            }
-        };
+    private static HasuraAuthentication getUnauthenticatedWithExceptionFor(final String code, final String message) {
+        return HasuraAuthentication.builder().onlydustException(OnlydustException.builder().code(code).message(message).build()).build();
     }
+
 }

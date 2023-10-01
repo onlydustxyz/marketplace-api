@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticati
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraProperties;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +19,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public HasuraJwtService hasuraJwtService(final HasuraProperties hasuraProperties) {
-        return new HasuraJwtService(hasuraProperties);
+    public HasuraJwtService hasuraJwtService(final JwtSecret jwtSecret) {
+        return new HasuraJwtService(jwtSecret);
     }
 
     @Bean
@@ -45,8 +45,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("application.web.hasura")
-    public HasuraProperties hasuraProperties() {
-        return new HasuraProperties();
+    @ConfigurationProperties("application.web.hasura.secret")
+    public JwtSecret jwtSecret() {
+        return new JwtSecret();
     }
 }

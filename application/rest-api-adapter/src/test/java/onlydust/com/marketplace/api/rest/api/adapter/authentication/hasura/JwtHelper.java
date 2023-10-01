@@ -20,9 +20,14 @@ public class JwtHelper {
         return headerAndPayload + "." + signature;
     }
 
-    public static HasuraProperties buildHasuraPropertiesFromSecret(final JwtSecret jwtSecret) throws JsonProcessingException {
-        final HasuraProperties hasuraProperties = new HasuraProperties();
-        hasuraProperties.setSecret(OBJECT_MAPPER.writeValueAsString(jwtSecret));
-        return hasuraProperties;
+    public static String generateValidJwtFor(final JwtSecret jwtSecret, final String payloadStr) throws JsonProcessingException {
+        final String header =
+                Base64.getUrlEncoder().encodeToString(OBJECT_MAPPER.writeValueAsBytes(JwtHeader.builder().alg("HS256").build()));
+        final String payload = Base64.getUrlEncoder().encodeToString(payloadStr.getBytes());
+        final String headerAndPayload = header + "." + payload;
+        final String signature = new HmacUtils("HmacSHA256", jwtSecret.getKey()).hmacHex(headerAndPayload);
+        return headerAndPayload + "." + signature;
     }
+
+
 }
