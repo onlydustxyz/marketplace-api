@@ -43,14 +43,14 @@ paths:
       summary: Get caller profile
       operationId: getMyProfile
       description: |
-        Get the whole user profile (including private data)
+        Get the whole user profile
       responses:
         "200":
           description: 'Profile'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfileResponse'
+                $ref: '#/components/schemas/GetMeResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1636,5 +1636,16 @@ components:
         - COMPLETED
         - CANCELLED
 
-
-
+    GetMeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          pattern: uuid
+        githubUserId:
+          type: integer
+        login:
+          type: string
+        avatarUrl:
+          type: string
+          pattern: uri

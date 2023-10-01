@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @AllArgsConstructor
-public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationFilter authenticationFilter;
 

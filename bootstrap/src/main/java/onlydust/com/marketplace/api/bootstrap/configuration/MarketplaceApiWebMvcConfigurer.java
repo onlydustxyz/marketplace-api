@@ -8,10 +8,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MarketplaceApiWebMvcConfigurer implements WebMvcConfigurer {
 
-    private final WebSecurityPropertiesConfiguration.WebCorsProperties webCorsProperties;
+    private final WebSecurityConfiguration.WebCorsProperties webCorsProperties;
 
     @Autowired
-    public MarketplaceApiWebMvcConfigurer(WebSecurityPropertiesConfiguration.WebCorsProperties webCorsProperties) {
+    public MarketplaceApiWebMvcConfigurer(WebSecurityConfiguration.WebCorsProperties webCorsProperties) {
         this.webCorsProperties = webCorsProperties;
     }
 
