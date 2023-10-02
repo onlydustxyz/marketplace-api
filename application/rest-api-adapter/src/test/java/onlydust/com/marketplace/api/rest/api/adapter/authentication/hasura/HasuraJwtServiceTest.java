@@ -62,7 +62,7 @@ public class HasuraJwtServiceTest {
                 "HS256").build();
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
         final String jwtToken =
-                faker.cat().name() + "." + faker.pokemon().name() + "." + faker.rickAndMorty().character();
+                faker.cat().name() + "." + faker.pokemon().name() + "." + faker.pokemon().name();
 
         // When
         final HasuraAuthentication hasuraAuthentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
@@ -80,7 +80,7 @@ public class HasuraJwtServiceTest {
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
-        final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, faker.rickAndMorty().character());
+        final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, faker.pokemon().name());
 
         // When
         final HasuraAuthentication hasuraAuthentication =
