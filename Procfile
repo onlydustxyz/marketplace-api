@@ -1,0 +1,1 @@
+web: java -jar bootstrap/target/marketplace-api.jar
