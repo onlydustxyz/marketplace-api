@@ -1,16 +1,20 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtHeader;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
-import org.apache.commons.codec.digest.HmacUtils;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.util.Base64;
+
+import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 
 @AllArgsConstructor
 @Slf4j
@@ -25,8 +29,8 @@ public class HasuraJwtService {
         }
         final String payload = chunks[1];
         final String header = chunks[0];
-        String tokenWithoutSignature = header + "." + payload;
-        String signature = chunks[2];
+        final String tokenWithoutSignature = header + "." + payload;
+        final String signature = chunks[2];
 
         JwtHeader jwtHeader;
         try {
@@ -39,8 +43,14 @@ public class HasuraJwtService {
             return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_ALGO_TYPE, "Invalid Jwt " +
                     "algorithm type");
         }
-        final String expectedSignature = new HmacUtils("HmacSHA256", jwtSecret.getKey()).hmacHex(tokenWithoutSignature);
-        if (signature.equals(expectedSignature)) {
+
+        final SignatureAlgorithm sa = HS256;
+        final SecretKeySpec secretKeySpec = new SecretKeySpec(
+                jwtSecret.getKey().getBytes(), sa.getJcaName());
+
+
+        final DefaultJwtSignatureValidator validator = new DefaultJwtSignatureValidator(sa, secretKeySpec);
+        if (validator.isValid(tokenWithoutSignature, signature)) {
             final HasuraJwtPayload hasuraJwtPayload;
             try {
                 hasuraJwtPayload = objectMapper.readValue(Base64.getUrlDecoder().decode(payload),
