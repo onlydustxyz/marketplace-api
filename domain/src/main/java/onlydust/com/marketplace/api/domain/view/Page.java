@@ -12,4 +12,8 @@ public class Page<T> {
     List<T> content;
     int totalPageNumber;
     int totalItemNumber;
+
+    public enum SorDir {
+        ASC, DESC
+    }
 }

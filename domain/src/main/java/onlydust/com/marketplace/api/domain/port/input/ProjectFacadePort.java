@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.view.ContributorView;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectView;
 
@@ -13,5 +14,7 @@ public interface ProjectFacadePort {
     Project getBySlug(String slug);
 
     Page<ProjectView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
-                                                                     UUID userId, String search, ProjectView.SortBy sort);
+                                                                  UUID userId, String search, ProjectView.SortBy sort);
+
+    List<ContributorView> getContributors(UUID projectId, String sort, String dir, Boolean includePending);
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.api.domain.view.ContributorView;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectView;
 
@@ -27,9 +28,14 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<ProjectView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
-                                                                            List<String> sponsor, UUID userId,
-                                                                            String search, ProjectView.SortBy sort) {
+                                                                         List<String> sponsor, UUID userId,
+                                                                         String search, ProjectView.SortBy sort) {
         return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, userId,
                 search, sort);
+    }
+
+    @Override
+    public List<ContributorView> getContributors(UUID projectId, String sort, String dir, Boolean includePending) {
+        return projectStoragePort.getContributors(projectId, sort, dir, includePending);
     }
 }
