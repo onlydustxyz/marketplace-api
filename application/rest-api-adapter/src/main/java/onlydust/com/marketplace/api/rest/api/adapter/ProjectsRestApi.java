@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectListResponse;
 import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
@@ -21,6 +22,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper
 @RestController
 @Tags(@Tag(name = "Projects"))
 @AllArgsConstructor
+@Slf4j
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
@@ -43,10 +45,15 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technology,
                                                            final List<String> sponsor, final String ownership,
                                                            final String search) {
-        final Page<ProjectView> projectViewPage =
-                projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
-                        search, mapSortByParameter(sort));
-        return ResponseEntity.ok(projectViewsToProjectListResponse(projectViewPage));
+        try {
+            final Page<ProjectView> projectViewPage =
+                    projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
+                            search, mapSortByParameter(sort));
+            return ResponseEntity.ok(projectViewsToProjectListResponse(projectViewPage));
+        } catch (Exception e) {
+            LOGGER.error("Failed to get projects", e);
+            throw e;
+        }
     }
 
 
