@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -16,7 +13,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "project_details", schema = "public")
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
+//@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ProjectEntity {
     @Id
     @Column(name = "project_id", nullable = false)
@@ -37,10 +34,10 @@ public class ProjectEntity {
     Integer rank;
     @Column(name = "key", insertable = false)
     String key;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "project_visibility")
+//    @Enumerated(EnumType.STRING)
+//    @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
-    private Visibility visibility;
+    private String visibility;
 
 
     public enum Visibility {

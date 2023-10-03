@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -34,10 +34,10 @@ public class ProjectViewEntity {
     String key;
     @Column(name = "rank", insertable = false)
     Integer rank;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "project_visibility")
+//    @Enumerated(EnumType.STRING)
+//    @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
-    ProjectEntity.Visibility visibility;
+    String visibility;
     @Column(name = "p_lead_id", insertable = false)
     UUID projectLeadId;
     @Column(name = "p_lead_login", insertable = false)
