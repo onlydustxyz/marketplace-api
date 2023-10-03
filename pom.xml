@@ -9,6 +9,7 @@
         <module>infrastructure</module>
         <module>marketplace-api-contract</module>
         <module>domain</module>
+        <module>projectsmanagementcontext</module>
         <module>coverage</module>
     </modules>
 
@@ -159,6 +160,12 @@
 
         <!-- Test -->
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
@@ -172,6 +179,10 @@
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>
             <version>${javafaker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
         </dependency>
     </dependencies>
 
