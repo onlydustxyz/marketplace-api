@@ -2,18 +2,17 @@ package com.onlydust.shared.write.hexagon.models;
 
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.UUID;
 
 @EqualsAndHashCode
-public abstract class Entity {
+@Getter
+public abstract class Entity<T extends EntityId> {
 
-    protected final UUID id;
+    protected final T id;
 
-    public Entity(UUID id) {
+    public Entity(T id) {
         this.id = id;
-    }
-    public UUID getId() {
-        return id;
     }
 }

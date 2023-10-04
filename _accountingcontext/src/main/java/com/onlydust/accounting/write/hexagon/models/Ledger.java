@@ -5,27 +5,29 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
-public class Ledger extends AggregateRoot {
+public class Ledger extends AggregateRoot<LedgerId> {
 
-    private final UUID projectId;
+    private final ProjectId projectId;
 
     private final String currency;
 
 
-    public Ledger(UUID id, UUID projectId, String currency) {
+    public Ledger(LedgerId id, ProjectId projectId, String currency) {
         super(id);
         this.projectId = projectId;
         this.currency = currency;
     }
 
-    public RewardDemand demandReward(UUID rewardDemandId, BigDecimal amount, LocalDateTime now, BigDecimal remainingAmount) {
+    public RewardDemand demandReward(RewardDemandId rewardDemandId,
+                                     BigDecimal amount,
+                                     LocalDateTime now,
+                                     BigDecimal remainingAmount) {
         if (remainingAmount.compareTo(amount) < 0) {
             throw new IllegalStateException("Not enough allocation to allow reward");
         }
-        registerEvent(new RewardDemandedEvent(rewardDemandId, now, new RewardDemandedEventPayload(this.id, amount)));
+        registerEvent(new RewardDemandedEvent(now, new RewardDemandedEventPayload(this.id, rewardDemandId, amount)));
         return new RewardDemand(rewardDemandId, this.id, amount);
     }
 

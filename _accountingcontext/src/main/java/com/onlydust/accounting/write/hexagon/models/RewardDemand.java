@@ -1,18 +1,15 @@
 package com.onlydust.accounting.write.hexagon.models;
 
 import com.onlydust.shared.write.hexagon.models.AggregateRoot;
-import com.onlydust.shared.write.hexagon.models.Entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
 
-public class RewardDemand extends AggregateRoot {
-    private final UUID ledgerId;
+public class RewardDemand extends AggregateRoot<RewardDemandId> {
+    private final LedgerId ledgerId;
     private final BigDecimal amount;
 
-    public RewardDemand(UUID id, UUID ledgerId, BigDecimal amount) {
+    public RewardDemand(RewardDemandId id, LedgerId ledgerId, BigDecimal amount) {
         super(id);
         this.ledgerId = ledgerId;
         this.amount = amount;

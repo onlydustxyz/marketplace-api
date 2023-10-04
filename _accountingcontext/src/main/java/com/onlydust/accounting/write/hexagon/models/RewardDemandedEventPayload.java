@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-public record RewardDemandedEventPayload(UUID ledgerId, BigDecimal amount) {
+public record RewardDemandedEventPayload(LedgerId ledgerId, RewardDemandId rewardDemandId, BigDecimal amount) {
 }

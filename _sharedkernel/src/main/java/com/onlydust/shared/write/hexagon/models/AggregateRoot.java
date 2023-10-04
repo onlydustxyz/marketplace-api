@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
-public abstract class AggregateRoot extends Entity {
+public abstract class AggregateRoot<T extends EntityId> extends Entity<T> {
 
     @EqualsAndHashCode.Exclude
     private final List<DomainEvent<?>> domainEvents = new ArrayList<>();
 
-    public AggregateRoot(UUID id) {
+    public AggregateRoot(T id) {
         super(id);
     }
 

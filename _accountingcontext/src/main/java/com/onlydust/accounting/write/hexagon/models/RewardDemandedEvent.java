@@ -8,11 +8,11 @@ import java.util.UUID;
 
 public class RewardDemandedEvent extends DomainEvent<RewardDemandedEventPayload> {
 
-    public RewardDemandedEvent(UUID id, LocalDateTime occurredOn, RewardDemandedEventPayload payload) {
-        super(id, "REWARD_DEMANDED", payload, occurredOn);
+    public RewardDemandedEvent(LocalDateTime occurredOn, RewardDemandedEventPayload payload) {
+        super("REWARD_DEMANDED", payload, occurredOn);
     }
 
-    public RewardDemandedEvent(UUID id, LocalDateTime occurredOn, RewardDemandedEventPayload payload, DomainEventStatus status) {
-        super(id, "REWARD_DEMANDED", payload, occurredOn, status);
+    public RewardDemandedEvent(LocalDateTime occurredOn, RewardDemandedEventPayload payload, DomainEventStatus status) {
+        super("REWARD_DEMANDED", payload, occurredOn, status);
     }
 }

@@ -3,6 +3,7 @@ package com.onlydust.accounting.write.hexagon.usecases.rewarddemand;
 import com.onlydust.accounting.write.hexagon.gateways.repositories.LedgerRepository;
 import com.onlydust.accounting.write.hexagon.gateways.repositories.RewardDemandRepository;
 import com.onlydust.accounting.write.hexagon.models.RewardDemand;
+import com.onlydust.accounting.write.hexagon.models.RewardDemandId;
 import com.onlydust.shared.write.hexagon.gateways.dateprovision.DateProvider;
 import com.onlydust.shared.write.hexagon.gateways.repositories.DomainEventRepository;
 import com.onlydust.shared.write.hexagon.gateways.uuidgeneration.UuidGenerator;
@@ -33,7 +34,7 @@ public class DemandRewardCommandHandler {
         var ledger = ledgerRepository.byId(demandRewardCommand.ledgerId()).orElseThrow(() -> new IllegalArgumentException("Ledger not found"));
         var remainingAmount = ledgerRepository.getRemainingAmount(ledger.getId());
         RewardDemand rewardDemand = ledger.demandReward(
-                uuidGenerator.generate(),
+                new RewardDemandId(uuidGenerator.generate()),
                 demandRewardCommand.amount(),
                 dateProvider.now(), remainingAmount);
         rewardDemandRepository.save(rewardDemand);

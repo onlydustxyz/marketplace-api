@@ -3,7 +3,9 @@ package com.onlydust.accounting.write.hexagon.usecases.budget.allocation;
 import com.onlydust.accounting.write.hexagon.gateways.repositories.AllocationRepository;
 import com.onlydust.accounting.write.hexagon.gateways.repositories.LedgerRepository;
 import com.onlydust.accounting.write.hexagon.models.Allocation;
+import com.onlydust.accounting.write.hexagon.models.AllocationId;
 import com.onlydust.accounting.write.hexagon.models.Ledger;
+import com.onlydust.accounting.write.hexagon.models.LedgerId;
 import com.onlydust.shared.write.hexagon.gateways.uuidgeneration.UuidGenerator;
 
 public class AllocateBudgetCommandHandler {
@@ -21,11 +23,14 @@ public class AllocateBudgetCommandHandler {
         final var ledger =
                 ledgerRepository.byProjectIdAndCurrency(command.projectId(), command.currency())
                         .orElseGet(() -> {
-                            final var newLedger = new Ledger(uuidGenerator.generate(), command.projectId(), command.currency());
+                            final var newLedger = new Ledger(
+                                    new LedgerId(uuidGenerator.generate()),
+                                    command.projectId(), command.currency()
+                            );
                             ledgerRepository.save(newLedger);
                             return newLedger;
                         });
-        final var allocation = new Allocation(uuidGenerator.generate(), ledger.getId(), command.amount());
+        final var allocation = new Allocation(new AllocationId(uuidGenerator.generate()), ledger.getId(), command.amount());
         allocationRepository.save(allocation);
     }
 

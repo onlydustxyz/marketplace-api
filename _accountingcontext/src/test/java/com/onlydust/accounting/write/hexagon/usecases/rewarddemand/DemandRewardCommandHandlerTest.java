@@ -2,10 +2,7 @@ package com.onlydust.accounting.write.hexagon.usecases.rewarddemand;
 
 import com.onlydust.accounting.write.adapters.secondary.repositories.LedgerRepositoryStub;
 import com.onlydust.accounting.write.adapters.secondary.repositories.RewardDemandRepositoryStub;
-import com.onlydust.accounting.write.hexagon.models.Ledger;
-import com.onlydust.accounting.write.hexagon.models.RewardDemand;
-import com.onlydust.accounting.write.hexagon.models.RewardDemandedEvent;
-import com.onlydust.accounting.write.hexagon.models.RewardDemandedEventPayload;
+import com.onlydust.accounting.write.hexagon.models.*;
 import com.onlydust.shared.write.adapters.secondary.dateprovision.DeterministicDateProvider;
 import com.onlydust.shared.write.adapters.secondary.repositories.DomainEventRepositoryStub;
 import com.onlydust.shared.write.adapters.secondary.uuidgeneration.DeterministicUuidGenerator;
@@ -29,15 +26,15 @@ public class DemandRewardCommandHandlerTest {
     private final DeterministicUuidGenerator uuidGenerator = new DeterministicUuidGenerator();
     private final DeterministicDateProvider dateProvider = new DeterministicDateProvider();
 
-    private final UUID aLedgerId = UUID.fromString("f7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
-    private final UUID anotherLedgerId = UUID.fromString("bbbbe5d4-c3b2-11eb-b8bc-0242ac130003");
-    private final UUID aProjectId = UUID.fromString("a7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
-    private final UUID aRewardDemandId = UUID.fromString("d7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
+    private final LedgerId aLedgerId = new LedgerId("f7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
+    private final LedgerId anotherLedgerId = new LedgerId("bbbbe5d4-c3b2-11eb-b8bc-0242ac130003");
+    private final ProjectId aProjectId = new ProjectId("a7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
+    private final RewardDemandId aRewardDemandId = new RewardDemandId("d7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
     private final LocalDateTime dateNow = LocalDateTime.of(2021, 6, 1, 0, 0);
 
     @BeforeEach
     public void setup() {
-        uuidGenerator.addNextUuid(aRewardDemandId);
+        uuidGenerator.addNextUuid(aRewardDemandId.getId());
         dateProvider.setNow(dateNow);
         setExistingLedger(aLedgerId);
         setRemainingAllocation(aLedgerId, BigDecimal.valueOf(1000));
@@ -57,9 +54,8 @@ public class DemandRewardCommandHandlerTest {
         );
 
         assertSpawnedDomainEvents(new RewardDemandedEvent(
-                aRewardDemandId,
                 dateNow,
-                new RewardDemandedEventPayload(aLedgerId, BigDecimal.valueOf(120)),
+                new RewardDemandedEventPayload(aLedgerId, aRewardDemandId, BigDecimal.valueOf(120)),
                 DomainEventStatus.NEW
         ));
     }
@@ -96,7 +92,7 @@ public class DemandRewardCommandHandlerTest {
         assertSpawnedDomainEvents();
     }
 
-    private void setExistingLedger(UUID ledgerId) {
+    private void setExistingLedger(LedgerId ledgerId) {
         ledgerRepository.save(new Ledger(
                 ledgerId,
                 aProjectId,
@@ -104,7 +100,7 @@ public class DemandRewardCommandHandlerTest {
         ));
     }
 
-    private void setRemainingAllocation(UUID ledgerId, BigDecimal amount) {
+    private void setRemainingAllocation(LedgerId ledgerId, BigDecimal amount) {
         ledgerRepository.setRemainingAmount(
                 ledgerId,
                 amount

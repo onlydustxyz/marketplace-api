@@ -4,9 +4,9 @@ import com.onlydust.shared.write.hexagon.models.AggregateRoot;
 
 import java.util.UUID;
 
-public class Project extends AggregateRoot {
+public class Project extends AggregateRoot<ProjectId> {
 
-    public Project(UUID id) {
+    public Project(ProjectId id) {
         super(id);
     }
 }

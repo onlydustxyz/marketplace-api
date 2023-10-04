@@ -191,6 +191,15 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>sharedkernel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>sharedkernel</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
