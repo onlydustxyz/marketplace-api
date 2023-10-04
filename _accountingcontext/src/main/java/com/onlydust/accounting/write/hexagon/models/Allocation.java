@@ -18,5 +18,5 @@ public class Allocation extends AggregateRoot {
         this.ledgerId = ledgerId;
         this.amount = amount;
     }
-    
+
 }

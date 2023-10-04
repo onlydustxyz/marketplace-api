@@ -21,14 +21,20 @@ public class LedgerRepositoryStub implements LedgerRepository {
         return remainingAmounts.get(ledgerId);
     }
 
-    public List<Ledger> ledgers() {
-        return ledgers;
+    @Override
+    public Optional<Ledger> byProjectIdAndCurrency(UUID projectId, String currency) {
+        return ledgers.stream().filter(ledger -> ledger.getProjectId().equals(projectId) && ledger.getCurrency().equals(currency)).findFirst();
     }
 
-    public void feedWith(Ledger ledger) {
+    @Override
+    public void save(Ledger ledger) {
         ledgers.add(ledger);
     }
 
+    public List<Ledger> ledgers() {
+        return ledgers;
+    }
+    
     public void setRemainingAmount(UUID ledgerId, BigDecimal amount) {
         remainingAmounts.put(ledgerId, amount);
     }

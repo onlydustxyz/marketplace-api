@@ -1,11 +1,13 @@
 package com.onlydust.accounting.write.hexagon.models;
 
 import com.onlydust.shared.write.hexagon.models.AggregateRoot;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Getter
 public class Ledger extends AggregateRoot {
 
     private final UUID projectId;

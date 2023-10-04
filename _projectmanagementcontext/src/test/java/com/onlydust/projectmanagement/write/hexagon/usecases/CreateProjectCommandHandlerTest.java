@@ -21,7 +21,7 @@ public class CreateProjectCommandHandlerTest {
 
     @BeforeEach
     public void setup() {
-        uuidGenerator.setNextUuid(aProjectId);
+        uuidGenerator.addNextUuid(aProjectId);
     }
 
     @Test

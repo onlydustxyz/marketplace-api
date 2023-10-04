@@ -12,4 +12,7 @@ public interface LedgerRepository {
 
     BigDecimal getRemainingAmount(UUID ledgerId);
 
+    Optional<Ledger> byProjectIdAndCurrency(UUID id, String currency);
+
+    void save(Ledger ledger);
 }

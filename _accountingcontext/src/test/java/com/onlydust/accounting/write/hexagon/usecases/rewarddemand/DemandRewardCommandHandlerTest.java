@@ -37,7 +37,7 @@ public class DemandRewardCommandHandlerTest {
 
     @BeforeEach
     public void setup() {
-        uuidGenerator.setNextUuid(aRewardDemandId);
+        uuidGenerator.addNextUuid(aRewardDemandId);
         dateProvider.setNow(dateNow);
         setExistingLedger(aLedgerId);
         setRemainingAllocation(aLedgerId, BigDecimal.valueOf(1000));
@@ -97,7 +97,7 @@ public class DemandRewardCommandHandlerTest {
     }
 
     private void setExistingLedger(UUID ledgerId) {
-        ledgerRepository.feedWith(new Ledger(
+        ledgerRepository.save(new Ledger(
                 ledgerId,
                 aProjectId,
                 "EUR"

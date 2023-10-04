@@ -2,18 +2,20 @@ package com.onlydust.shared.write.adapters.secondary.uuidgeneration;
 
 import com.onlydust.shared.write.hexagon.gateways.uuidgeneration.UuidGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DeterministicUuidGenerator implements UuidGenerator {
 
-    private UUID nextUuid;
+    private final List<UUID> nextUuids = new ArrayList<>();
 
     @Override
     public UUID generate() {
-        return nextUuid;
+        return nextUuids.remove(0);
     }
 
-    public void setNextUuid(UUID uuid) {
-        this.nextUuid = uuid;
+    public void addNextUuid(UUID uuid) {
+        this.nextUuids.add(uuid);
     }
 }
