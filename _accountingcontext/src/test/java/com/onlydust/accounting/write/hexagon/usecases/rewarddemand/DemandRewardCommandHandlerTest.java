@@ -2,9 +2,12 @@ package com.onlydust.accounting.write.hexagon.usecases.rewarddemand;
 
 import com.onlydust.accounting.write.adapters.secondary.repositories.LedgerRepositoryStub;
 import com.onlydust.accounting.write.adapters.secondary.repositories.RewardDemandRepositoryStub;
+import com.onlydust.accounting.write.hexagon.models.Ledger;
+import com.onlydust.accounting.write.hexagon.models.RewardDemand;
+import com.onlydust.accounting.write.hexagon.models.RewardDemandedEvent;
+import com.onlydust.accounting.write.hexagon.models.RewardDemandedEventPayload;
 import com.onlydust.shared.write.adapters.secondary.dateprovision.DeterministicDateProvider;
 import com.onlydust.shared.write.adapters.secondary.repositories.DomainEventRepositoryStub;
-import com.onlydust.accounting.write.hexagon.models.*;
 import com.onlydust.shared.write.adapters.secondary.uuidgeneration.DeterministicUuidGenerator;
 import com.onlydust.shared.write.hexagon.models.DomainEvent;
 import com.onlydust.shared.write.hexagon.models.DomainEventStatus;
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DemandRewardCommandHandlerTest {
 
@@ -35,6 +39,7 @@ public class DemandRewardCommandHandlerTest {
         uuidGenerator.setNextUuid(aRewardDemandId);
         dateProvider.setNow(dateNow);
         setExistingLedger(aLedgerId);
+        setRemainingAllocation(aLedgerId, BigDecimal.valueOf(1000));
     }
 
     @Test
@@ -58,6 +63,22 @@ public class DemandRewardCommandHandlerTest {
         ));
     }
 
+    @Test
+    void should_reject_a_reward_demand_when_not_enough_remaining_allocation() {
+        assertThatThrownBy(() -> {
+            demandReward(new DemandRewardCommand(
+                    aLedgerId,
+                    BigDecimal.valueOf(1200)
+            ));
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Not enough allocation to allow reward");
+
+
+        assertExistingRewardsDemands();
+
+        assertSpawnedDomainEvents();
+    }
+
     private void setExistingLedger(UUID ledgerId) {
         ledgerRepository.feedWith(new Ledger(
                 ledgerId,
@@ -66,6 +87,12 @@ public class DemandRewardCommandHandlerTest {
         ));
     }
 
+    private void setRemainingAllocation(UUID ledgerId, BigDecimal amount) {
+        ledgerRepository.setRemainingAmount(
+                ledgerId,
+                amount
+        );
+    }
 
     private void demandReward(DemandRewardCommand demandRewardCommand) {
         new DemandRewardCommandHandler(
