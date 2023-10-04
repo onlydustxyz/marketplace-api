@@ -33,5 +33,4 @@ public class LedgerRepositoryStub implements LedgerRepository {
         remainingAmounts.put(ledgerId, amount);
     }
 
-
 }
