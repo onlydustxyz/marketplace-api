@@ -114,6 +114,11 @@
                 <artifactId>hibernate-types-55</artifactId>
                 <version>${hibernate-types.version}</version>
             </dependency>
+            <dependency>
+                <groupId>onlydust.com.marketplace.api</groupId>
+                <artifactId>sharedkernel</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
 
 
             <!-- Test -->
