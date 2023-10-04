@@ -9,8 +9,10 @@
         <module>infrastructure</module>
         <module>marketplace-api-contract</module>
         <module>domain</module>
-        <module>projectsmanagementcontext</module>
+        <module>_projectmanagementcontext</module>
+        <module>_accountingcontext</module>
         <module>coverage</module>
+        <module>_sharedkernel</module>
     </modules>
 
     <parent>
@@ -183,6 +185,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wealcome</groupId>
+            <artifactId>sharedkernel</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
