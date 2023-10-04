@@ -30,6 +30,7 @@ public class DemandRewardCommandHandlerTest {
     private final DeterministicDateProvider dateProvider = new DeterministicDateProvider();
 
     private final UUID aLedgerId = UUID.fromString("f7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
+    private final UUID anotherLedgerId = UUID.fromString("bbbbe5d4-c3b2-11eb-b8bc-0242ac130003");
     private final UUID aProjectId = UUID.fromString("a7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
     private final UUID aRewardDemandId = UUID.fromString("d7f6e5d4-c3b2-11eb-b8bc-0242ac130003");
     private final LocalDateTime dateNow = LocalDateTime.of(2021, 6, 1, 0, 0);
@@ -72,6 +73,22 @@ public class DemandRewardCommandHandlerTest {
             ));
         }).isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Not enough allocation to allow reward");
+
+
+        assertExistingRewardsDemands();
+
+        assertSpawnedDomainEvents();
+    }
+
+    @Test
+    void should_reject_a_reward_demand_on_a_ledger_that_does_not_exist() {
+        assertThatThrownBy(() -> {
+            demandReward(new DemandRewardCommand(
+                    anotherLedgerId,
+                    BigDecimal.valueOf(120)
+            ));
+        }).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Ledger not found");
 
 
         assertExistingRewardsDemands();

@@ -30,15 +30,14 @@ public class DemandRewardCommandHandler {
     }
 
     public void handle(DemandRewardCommand demandRewardCommand) {
-        ledgerRepository.byId(demandRewardCommand.ledgerId()).ifPresent(ledger -> {
-            var remainingAmount = ledgerRepository.getRemainingAmount(ledger.getId());
-            RewardDemand rewardDemand = ledger.demandReward(
-                    uuidGenerator.generate(),
-                    demandRewardCommand.amount(),
-                    dateProvider.now(), remainingAmount);
-            rewardDemandRepository.save(rewardDemand);
-            ledger.getRegisteredDomainEvents().forEach(domainEventRepository::save);
-        });
+        var ledger = ledgerRepository.byId(demandRewardCommand.ledgerId()).orElseThrow(() -> new IllegalArgumentException("Ledger not found"));
+        var remainingAmount = ledgerRepository.getRemainingAmount(ledger.getId());
+        RewardDemand rewardDemand = ledger.demandReward(
+                uuidGenerator.generate(),
+                demandRewardCommand.amount(),
+                dateProvider.now(), remainingAmount);
+        rewardDemandRepository.save(rewardDemand);
+        ledger.getRegisteredDomainEvents().forEach(domainEventRepository::save);
     }
 
 }
