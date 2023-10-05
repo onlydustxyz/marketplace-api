@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
-import onlydust.com.marketplace.api.domain.view.ProjectView;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,7 +46,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                            final List<String> sponsor, final String ownership,
                                                            final String search) {
         try {
-            final Page<ProjectView> projectViewPage =
+            final Page<ProjectCardView> projectViewPage =
                     projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
                             search, mapSortByParameter(sort));
             return ResponseEntity.ok(projectViewsToProjectListResponse(projectViewPage));

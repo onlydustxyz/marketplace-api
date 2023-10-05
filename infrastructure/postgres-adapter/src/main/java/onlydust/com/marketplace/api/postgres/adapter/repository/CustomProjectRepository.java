@@ -5,7 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.api.domain.view.Page;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectLeadView;
+import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
@@ -52,39 +55,15 @@ public class CustomProjectRepository {
             "                   group by project_id) as contributors_count on contributors_count.project_id = " +
             "p.project_id" +
             ") as search_project";
-
-
-    private final EntityManager entityManager;
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
     };
+    private final EntityManager entityManager;
 
-    public Page<ProjectView> findByTechnologiesSponsorsOwnershipSearchSortBy(final List<String> technologies,
-                                                                             final List<String> sponsor,
-                                                                             final UUID userId,
-                                                                             final String search,
-                                                                             final ProjectView.SortBy sort) {
-        final String query = buildQuery(technologies, sponsor, userId, search, sort);
-        LOGGER.debug(query);
-        final List<ProjectViewEntity> rows =
-                entityManager.createNativeQuery(query, ProjectViewEntity.class).getResultList();
-        final Map<UUID, ProjectView> projectViewMap = new LinkedHashMap<>();
-        for (ProjectViewEntity entity : rows) {
-            entityToProjectView(entity, projectViewMap);
-            final ProjectView projectView = projectViewMap.get(entity.getId());
-            addProjectLeadToProject(entity, projectView);
-            addSponsorToProject(entity, projectView);
-            addRepositoryToProject(entity, projectView);
-        }
-        return Page.<ProjectView>builder()
-                .content(projectViewMap.values().stream().toList())
-                .build();
-    }
-
-    private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectView> projectViewMap) {
+    private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectCardView> projectViewMap) {
         if (!projectViewMap.containsKey(entity.getId())) {
-            final ProjectView projectView = ProjectView.builder()
+            final ProjectCardView projectCardView = ProjectCardView.builder()
                     .id(entity.getId())
                     .name(entity.getName())
                     .logoUrl(entity.getLogoUrl())
@@ -92,48 +71,44 @@ public class CustomProjectRepository {
                     .slug(entity.getKey())
                     .shortDescription(entity.getShortDescription())
                     .contributorCount(entity.getContributorsCount())
-                    .repositoryCount(entity.getRepoCount())
+                    .repoCount(entity.getRepoCount())
                     .build();
-            projectViewMap.put(entity.getId(), projectView);
+            projectViewMap.put(entity.getId(), projectCardView);
         }
     }
 
-    private static void addRepositoryToProject(ProjectViewEntity entity, ProjectView projectView) {
+    private static void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         try {
             final HashMap<String, Integer> technologies =
                     objectMapper.readValue(entity.getRepositoryLanguages(), typeRef);
-            final RepositoryView repositoryView = RepositoryView.builder()
-                    .id(entity.getRepositoryId())
-                    .technologies(technologies)
-                    .build();
-            projectView.addRepository(repositoryView);
+            projectCardView.addTechnologies(technologies);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void addSponsorToProject(ProjectViewEntity entity, ProjectView projectView) {
+
+    private static void addSponsorToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         final SponsorView sponsorView = SponsorView.builder()
                 .logoUrl(entity.getSponsorLogoUrl())
                 .name(entity.getSponsorName())
                 .id(entity.getSponsorId())
                 .build();
-        projectView.addSponsor(sponsorView);
+        projectCardView.addSponsor(sponsorView);
     }
 
-    private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectView projectView) {
+    private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         final ProjectLeadView projectLeadView = ProjectLeadView.builder()
                 .avatarUrl(entity.getProjectLeadAvatarUrl())
                 .id(entity.getProjectLeadId())
                 .login(entity.getProjectLeadLogin())
                 .build();
-        projectView.addProjectLead(projectLeadView);
+        projectCardView.addProjectLead(projectLeadView);
     }
-
 
     protected static String buildQuery(final List<String> technologies,
                                        final List<String> sponsors, final UUID userId,
-                                       final String search, final ProjectView.SortBy sort) {
+                                       final String search, final ProjectCardView.SortBy sort) {
         final List<String> whereConditions = new ArrayList<>();
         Optional<String> orderByCondition = Optional.empty();
         if (nonNull(search) && !search.isEmpty()) {
@@ -163,5 +138,27 @@ public class CustomProjectRepository {
         }
         return FIND_PROJECTS_BASE_QUERY + (whereConditions.isEmpty() ? "" : " where " + String.join(" and ",
                 whereConditions.stream().map(s -> "(" + s + ")").toList())) + orderByCondition.orElse("");
+    }
+
+    public Page<ProjectCardView> findByTechnologiesSponsorsOwnershipSearchSortBy(final List<String> technologies,
+                                                                                 final List<String> sponsor,
+                                                                                 final UUID userId,
+                                                                                 final String search,
+                                                                                 final ProjectCardView.SortBy sort) {
+        final String query = buildQuery(technologies, sponsor, userId, search, sort);
+        LOGGER.debug(query);
+        final List<ProjectViewEntity> rows =
+                entityManager.createNativeQuery(query, ProjectViewEntity.class).getResultList();
+        final Map<UUID, ProjectCardView> projectViewMap = new LinkedHashMap<>();
+        for (ProjectViewEntity entity : rows) {
+            entityToProjectView(entity, projectViewMap);
+            final ProjectCardView projectCardView = projectViewMap.get(entity.getId());
+            addProjectLeadToProject(entity, projectCardView);
+            addSponsorToProject(entity, projectCardView);
+            addRepoTechnologiesToProject(entity, projectCardView);
+        }
+        return Page.<ProjectCardView>builder()
+                .content(projectViewMap.values().stream().toList())
+                .build();
     }
 }

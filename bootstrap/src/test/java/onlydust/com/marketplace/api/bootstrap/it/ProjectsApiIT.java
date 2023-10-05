@@ -22,7 +22,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .name(faker.name().name())
                 .longDescription(faker.name().fullName())
                 .shortDescription(faker.name().lastName())
-                .visibility("public")
+                .visibility(ProjectEntity.Visibility.PUBLIC)
                 .hiring(Boolean.FALSE)
                 .logoUrl("https://logo-url-test/" + faker.pokemon().name())
                 .rank(10)

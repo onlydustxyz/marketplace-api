@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
-import onlydust.com.marketplace.api.domain.view.ProjectView;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
@@ -51,9 +51,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
-                                                                             List<String> sponsor, UUID userId,
-                                                                             String search, ProjectView.SortBy sort) {
+    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
+                                                                              List<String> sponsor, UUID userId,
+                                                                              String search, ProjectCardView.SortBy sort) {
         return customProjectRepository.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor,
                 userId, search, sort);
     }

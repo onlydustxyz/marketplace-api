@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.view.ProjectView;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class CustomProjectRepositoryTest {
     @Test
     void should_build_query_given_a_contributors_count_sort() {
         // Given
-        final ProjectView.SortBy sort = ProjectView.SortBy.CONTRIBUTORS_COUNT;
+        final ProjectCardView.SortBy sort = ProjectCardView.SortBy.CONTRIBUTORS_COUNT;
 
         // When
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
@@ -58,7 +58,7 @@ public class CustomProjectRepositoryTest {
     @Test
     void should_build_query_given_a_repo_count_sort() {
         // Given
-        final ProjectView.SortBy sort = ProjectView.SortBy.REPOS_COUNT;
+        final ProjectCardView.SortBy sort = ProjectCardView.SortBy.REPOS_COUNT;
 
         // When
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
@@ -72,7 +72,7 @@ public class CustomProjectRepositoryTest {
     @Test
     void should_build_query_given_a_name_sort() {
         // Given
-        final ProjectView.SortBy sort = ProjectView.SortBy.NAME;
+        final ProjectCardView.SortBy sort = ProjectCardView.SortBy.NAME;
 
         // When
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
@@ -86,7 +86,7 @@ public class CustomProjectRepositoryTest {
     @Test
     void should_build_query_given_a_rank_sort() {
         // Given
-        final ProjectView.SortBy sort = ProjectView.SortBy.RANK;
+        final ProjectCardView.SortBy sort = ProjectCardView.SortBy.RANK;
 
         // When
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
