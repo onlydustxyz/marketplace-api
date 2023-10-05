@@ -1,0 +1,52 @@
+package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
+
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.PgEnumType;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Map;
+import java.util.UUID;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Data
+@Builder
+@Table(name = "user_profile_info", schema = "public")
+@TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@TypeDef(name = "weekly_allocated_time", typeClass = PgEnumType.class)
+public class UserProfileInfoEntity {
+
+    @Id
+    @Column(name = "id")
+    UUID id;
+    @Column(name = "bio")
+    String bio;
+    @Column(name = "location")
+    String location;
+    @Column(name = "website")
+    String website;
+    @Column(name = "looking_for_a_job", nullable = false)
+    Boolean isLookingForAJob;
+    @Column(name = "avatar_url")
+    String avatarUrl;
+    @Column(name = "weekly_allocated_time", nullable = false)
+    @Type(type = "weekly_allocated_time")
+    AllocatedTimeEntityEnum allocatedTime;
+    @Type(type = "profile_cover")
+    @Column(name = "cover")
+    ProfileCoverEnumEntity cover;
+    @Type(type = "jsonb")
+    @Column(name = "languages", columnDefinition = "jsonb")
+    Map<String, Integer> languages;
+}

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,12 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     BudgetRepository budgetRepository;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    WorkItemRepository workItemRepository;
+    @Autowired
+    ApplicationRepository applicationRepository;
+    @Autowired
+    UserProfileInfoRepository userProfileInfoRepository;
 
     @Test
     void should_create_onboarding() {
@@ -100,9 +107,59 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         assertIsSaved(expected, paymentRequestRepository);
     }
 
-    private <T> void assertIsSaved(T expected, JpaRepository<T, UUID> repository) {
+    @Test
+    void should_create_work_item() {
+        // Given
+        final WorkItemEntity expected = WorkItemEntity
+                .builder()
+                .workItemId(WorkItemIdEntity.builder()
+                        .repoId(faker.number().randomDigit())
+                        .number(faker.number().randomDigit())
+                        .paymentId(UUID.randomUUID())
+                        .build())
+                .id(faker.pokemon().location())
+                .contributionType(ContributionTypeEnumEntity.pull_request)
+                .projectId(UUID.randomUUID())
+                .recipientId(faker.number().randomDigit())
+                .build();
+
+        assertIsSaved(expected, workItemRepository);
+    }
+
+    @Test
+    void should_create_application() {
+        // Given
+        final ApplicationEntity expected = ApplicationEntity.builder()
+                .applicantId(UUID.randomUUID())
+                .projectId(UUID.randomUUID())
+                .receivedAt(new Date())
+                .id(UUID.randomUUID())
+                .build();
+
+        assertIsSaved(expected, applicationRepository);
+    }
+
+    @Test
+    void should_create_user_profile_info() {
+        // Given
+        final UserProfileInfoEntity expected = UserProfileInfoEntity.builder()
+                .allocatedTime(AllocatedTimeEntityEnum.ONE_TO_THREE_DAYS)
+                .avatarUrl(faker.pokemon().name())
+                .bio(faker.hacker().abbreviation())
+                .cover(ProfileCoverEnumEntity.yellow)
+                .isLookingForAJob(false)
+                .website(faker.harryPotter().location())
+                .location(faker.rickAndMorty().location())
+                .languages(Map.of(faker.rickAndMorty().location(), 5, faker.hacker().adjective(), 10))
+                .id(UUID.randomUUID())
+                .build();
+
+        assertIsSaved(expected, userProfileInfoRepository);
+    }
+
+    private <Entity, ID> void assertIsSaved(Entity expected, JpaRepository<Entity, ID> repository) {
         // When
-        final T result = repository.save(expected);
+        final Entity result = repository.save(expected);
 
         // Then
         assertEquals(1, repository.findAll().size());
