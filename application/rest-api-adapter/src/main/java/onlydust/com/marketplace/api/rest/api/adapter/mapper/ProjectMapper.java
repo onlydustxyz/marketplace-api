@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectLeadView;
+import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 
 import java.util.*;
@@ -69,12 +69,12 @@ public interface ProjectMapper {
 
     private static void mapProjectLead(final ProjectCardView projectCardView,
                                        final ProjectListItemResponse projectListItemResponse) {
-        for (ProjectLeadView projectLeadView : projectCardView.getProjectLeadViews()) {
+        for (ProjectLeaderLinkView projectLeaderLinkView : projectCardView.getLeaders()) {
             final RegisteredUserMinimalistResponse registeredUserMinimalistResponse =
                     new RegisteredUserMinimalistResponse();
             registeredUserMinimalistResponse.setId(projectCardView.getId());
-            registeredUserMinimalistResponse.setAvatarUrl(projectLeadView.getAvatarUrl());
-            registeredUserMinimalistResponse.setLogin(projectLeadView.getLogin());
+            registeredUserMinimalistResponse.setAvatarUrl(projectLeaderLinkView.getAvatarUrl());
+            registeredUserMinimalistResponse.setLogin(projectLeaderLinkView.getLogin());
             projectListItemResponse.addLeadersItem(registeredUserMinimalistResponse);
         }
     }

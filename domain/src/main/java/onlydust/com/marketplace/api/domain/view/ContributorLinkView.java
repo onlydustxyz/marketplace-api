@@ -7,10 +7,10 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ProjectLeadView {
+public class ContributorLinkView {
     UUID id;
-    String login;
     Integer githubUserId;
-    String url;
+    String login;
     String avatarUrl;
+    String url;
 }

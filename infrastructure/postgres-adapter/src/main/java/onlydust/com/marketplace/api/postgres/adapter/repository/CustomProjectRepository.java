@@ -5,9 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectLeadView;
+import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
@@ -68,6 +69,7 @@ public class CustomProjectRepository {
                     .name(entity.getName())
                     .logoUrl(entity.getLogoUrl())
                     .hiring(entity.getHiring())
+                    .visibility(ProjectVisibility.valueOf(entity.getVisibility()))
                     .slug(entity.getKey())
                     .shortDescription(entity.getShortDescription())
                     .contributorCount(entity.getContributorsCount())
@@ -98,12 +100,12 @@ public class CustomProjectRepository {
     }
 
     private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
-        final ProjectLeadView projectLeadView = ProjectLeadView.builder()
+        final ProjectLeaderLinkView projectLeaderLinkView = ProjectLeaderLinkView.builder()
                 .avatarUrl(entity.getProjectLeadAvatarUrl())
                 .id(entity.getProjectLeadId())
                 .login(entity.getProjectLeadLogin())
                 .build();
-        projectCardView.addProjectLead(projectLeadView);
+        projectCardView.addProjectLeader(projectLeaderLinkView);
     }
 
     protected static String buildQuery(final List<String> technologies,
