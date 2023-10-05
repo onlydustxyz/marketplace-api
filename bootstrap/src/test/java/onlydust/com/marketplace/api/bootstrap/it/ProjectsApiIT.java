@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
