@@ -69,7 +69,7 @@ public class CustomProjectRepository {
                     .name(entity.getName())
                     .logoUrl(entity.getLogoUrl())
                     .hiring(entity.getHiring())
-                    .visibility(ProjectVisibility.valueOf(entity.getVisibility()))
+                    .visibility(ProjectVisibility.valueOf(entity.getVisibility().name()))
                     .slug(entity.getKey())
                     .shortDescription(entity.getShortDescription())
                     .contributorCount(entity.getContributorsCount())

@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
@@ -21,9 +21,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Project getById(UUID projectId) {
+    public ProjectDetailsView getById(UUID projectId) {
         final ProjectEntity projectEntity = projectRepository.getById(projectId);
-        return Project.builder()
+        return ProjectDetailsView.builder()
                 .id(projectEntity.getId())
                 .hiring(projectEntity.getHiring())
                 .logoUrl(projectEntity.getLogoUrl())
@@ -36,9 +36,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Project getBySlug(String slug) {
+    public ProjectDetailsView getBySlug(String slug) {
         final ProjectEntity projectEntity = projectRepository.findByKey(slug).orElseThrow();
-        return Project.builder()
+        return ProjectDetailsView.builder()
                 .id(projectEntity.getId())
                 .hiring(projectEntity.getHiring())
                 .logoUrl(projectEntity.getLogoUrl())

@@ -1,39 +1,47 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.view.Page;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.api.domain.view.SponsorView;
+import onlydust.com.marketplace.api.domain.view.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public interface ProjectMapper {
 
-    static ShortProjectResponse projectToResponse(final Project project) {
-        final ShortProjectResponse projectResponse = new ShortProjectResponse();
-        projectResponse.setId(project.getId());
-        projectResponse.setName(project.getName());
-        projectResponse.setLogoUrl(project.getLogoUrl());
-        projectResponse.setShortDescription(project.getShortDescription());
-        projectResponse.setPrettyId(project.getSlug());
-        projectResponse.setVisibility(ShortProjectResponse.VisibilityEnum.PUBLIC);
-        return projectResponse;
+    static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
+        final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
+
+        for (ProjectLeaderLinkView leader : project.getLeaders()) {
+            projectListItemResponse.addLeadersItem(mapProjectLead(leader));
+        }
+        for (SponsorView sponsor : project.getSponsors()) {
+            projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
+        }
+        projectListItemResponse.setTechnologies(project.getTechnologies());
+
+        return projectListItemResponse;
     }
 
-    static ProjectListResponse projectViewsToProjectListResponse(final Page<ProjectCardView> projectViewPage) {
+    private static ProjectResponse mapProjectDetailsMetadata(final ProjectDetailsView projectDetailsView) {
+        final var project = new ProjectResponse();
+        project.setId(projectDetailsView.getId());
+        project.setName(projectDetailsView.getName());
+        project.setLogoUrl(projectDetailsView.getLogoUrl());
+        project.setPrettyId(projectDetailsView.getSlug());
+        project.setHiring(projectDetailsView.getHiring());
+        project.setShortDescription(projectDetailsView.getShortDescription());
+        project.setContributorCount(projectDetailsView.getContributorCount());
+        project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
+        return project;
+    }
+
+    static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {
         final ProjectListResponse projectListResponse = new ProjectListResponse();
         final List<ProjectListItemResponse> projectListItemResponses = new ArrayList<>();
         final Set<String> sponsorsNames = new HashSet<>();
         final Set<String> technologies = new HashSet<>();
         for (ProjectCardView projectCardView : projectViewPage.getContent()) {
-            final ProjectListItemResponse projectListItemResponse = mapProject(projectCardView);
-            mapProjectLead(projectCardView, projectListItemResponse);
-            mapSponsors(projectCardView, projectListItemResponse, sponsorsNames);
-            projectListItemResponse.setTechnologies(projectCardView.getTechnologies());
-            technologies.addAll(projectCardView.getTechnologies().keySet());
-            projectListItemResponses.add(projectListItemResponse);
+            projectListItemResponses.add(mapProjectCard(projectCardView, sponsorsNames, technologies));
         }
         projectListResponse.setProjects(projectListItemResponses);
         projectListResponse.setTechnologies(technologies.stream().toList());
@@ -41,44 +49,65 @@ public interface ProjectMapper {
         return projectListResponse;
     }
 
-    private static ProjectListItemResponse mapProject(final ProjectCardView projectCardView) {
-        final ProjectListItemResponse projectListItemResponse = new ProjectListItemResponse();
-        projectListItemResponse.setId(projectCardView.getId());
-        projectListItemResponse.setName(projectCardView.getName());
-        projectListItemResponse.setLogoUrl(projectCardView.getLogoUrl());
-        projectListItemResponse.setPrettyId(projectCardView.getSlug());
-        projectListItemResponse.setHiring(projectCardView.getHiring());
-        projectListItemResponse.setShortDescription(projectCardView.getShortDescription());
-        projectListItemResponse.setContributorCount(projectCardView.getContributorCount());
-        projectListItemResponse.setRepoCount(projectCardView.getRepoCount());
+    private static ProjectListItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames, Set<String> technologies) {
+        final ProjectListItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
+
+        for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
+            projectListItemResponse.addLeadersItem(mapProjectLead(leader));
+        }
+
+        for (SponsorView sponsor : projectCardView.getSponsors()) {
+            projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
+        }
+        sponsorsNames.addAll(projectCardView.getSponsors().stream().map(SponsorView::getName).collect(Collectors.toSet()));
+
+        projectListItemResponse.setTechnologies(projectCardView.getTechnologies());
+        technologies.addAll(projectCardView.getTechnologies().keySet());
+
         return projectListItemResponse;
     }
 
-    private static void mapSponsors(final ProjectCardView projectCardView,
-                                    final ProjectListItemResponse projectListItemResponse,
-                                    final Set<String> sponsorsNames) {
-        for (SponsorView sponsorView : projectCardView.getSponsors()) {
-            final SponsorResponse sponsorResponse = new SponsorResponse();
-            sponsorResponse.setId(sponsorView.getId());
-            sponsorResponse.setName(sponsorView.getName());
-            sponsorsNames.add(sponsorView.getName());
-            sponsorResponse.setLogoUrl(sponsorView.getLogoUrl());
-            projectListItemResponse.addSponsorsItem(sponsorResponse);
-        }
+    private static ProjectListItemResponse mapProjectCardMetadata(final ProjectCardView projectCardView) {
+        final ProjectListItemResponse project = new ProjectListItemResponse();
+        project.setId(projectCardView.getId());
+        project.setName(projectCardView.getName());
+        project.setLogoUrl(projectCardView.getLogoUrl());
+        project.setPrettyId(projectCardView.getSlug());
+        project.setHiring(projectCardView.getHiring());
+        project.setShortDescription(projectCardView.getShortDescription());
+        project.setContributorCount(projectCardView.getContributorCount());
+        project.setRepoCount(projectCardView.getRepoCount());
+        project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
+        return project;
     }
 
-    private static void mapProjectLead(final ProjectCardView projectCardView,
-                                       final ProjectListItemResponse projectListItemResponse) {
-        for (ProjectLeaderLinkView projectLeaderLinkView : projectCardView.getLeaders()) {
-            final RegisteredUserMinimalistResponse registeredUserMinimalistResponse =
-                    new RegisteredUserMinimalistResponse();
-            registeredUserMinimalistResponse.setId(projectCardView.getId());
-            registeredUserMinimalistResponse.setAvatarUrl(projectLeaderLinkView.getAvatarUrl());
-            registeredUserMinimalistResponse.setLogin(projectLeaderLinkView.getLogin());
-            projectListItemResponse.addLeadersItem(registeredUserMinimalistResponse);
-        }
+    private static SponsorResponse mapSponsor(final SponsorView sponsor) {
+        final SponsorResponse sponsorResponse = new SponsorResponse();
+        sponsorResponse.setId(sponsor.getId());
+        sponsorResponse.setName(sponsor.getName());
+        sponsorResponse.setLogoUrl(sponsor.getLogoUrl());
+        return sponsorResponse;
     }
 
+    private static RegisteredUserMinimalistResponse mapProjectLead(final ProjectLeaderLinkView leader) {
+        final var userLink = new RegisteredUserMinimalistResponse();
+        userLink.setId(leader.getId());
+        userLink.setAvatarUrl(leader.getAvatarUrl());
+        userLink.setLogin(leader.getLogin());
+        return userLink;
+    }
+
+    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.api.domain.model.ProjectVisibility visibility) {
+        switch (visibility) {
+            case PUBLIC -> {
+                return ProjectVisibility.PUBLIC;
+            }
+            case PRIVATE -> {
+                return ProjectVisibility.PRIVATE;
+            }
+        }
+        throw new IllegalArgumentException("Could not map project visibility");
+    }
 
     static ProjectCardView.SortBy mapSortByParameter(final String sort) {
         if (Objects.nonNull(sort)) {

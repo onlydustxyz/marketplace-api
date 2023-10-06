@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -15,13 +16,12 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
+@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ProjectViewEntity {
 
     @Id
     @Column(name = "row_number", nullable = false)
     Integer rowNumber;
-    @Column(name = "project_id", nullable = false)
-    private UUID id;
     @Column(name = "name")
     String name;
     @Column(name = "short_description")
@@ -34,10 +34,10 @@ public class ProjectViewEntity {
     String key;
     @Column(name = "rank", insertable = false)
     Integer rank;
-//    @Enumerated(EnumType.STRING)
-//    @Type(type = "project_visibility")
+    @Enumerated(EnumType.STRING)
+    @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
-    String visibility;
+    Visibility visibility;
     @Column(name = "p_lead_id", insertable = false)
     UUID projectLeadId;
     @Column(name = "p_lead_login", insertable = false)
@@ -58,7 +58,10 @@ public class ProjectViewEntity {
     String repositoryLanguages;
     @Column(name = "repository_id", insertable = false)
     Integer repositoryId;
+    @Column(name = "project_id", nullable = false)
+    private UUID id;
 
-
-
+    public enum Visibility {
+        PRIVATE, PUBLIC;
+    }
 }
