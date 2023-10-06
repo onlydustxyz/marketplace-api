@@ -1,0 +1,1 @@
+bash -c "psql -d marketplace_db -U test -f /tmp/od_staging_dump.sql"

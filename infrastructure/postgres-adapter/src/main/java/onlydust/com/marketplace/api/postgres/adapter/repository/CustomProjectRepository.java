@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEnti
 import javax.persistence.EntityManager;
 import java.util.*;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
@@ -81,11 +82,14 @@ public class CustomProjectRepository {
 
     private static void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         try {
+            if (isNull(entity.getRepositoryLanguages())) {
+                return;
+            }
             final HashMap<String, Integer> technologies =
                     objectMapper.readValue(entity.getRepositoryLanguages(), typeRef);
             projectCardView.addTechnologies(technologies);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            LOGGER.warn("No technologies found", e);
         }
     }
 

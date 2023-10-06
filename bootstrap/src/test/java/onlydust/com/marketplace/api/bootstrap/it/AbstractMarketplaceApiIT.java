@@ -14,14 +14,15 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.MountableFile;
 
 import java.net.URI;
 import java.util.Map;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
 
 @ActiveProfiles({"it"})
@@ -39,7 +40,10 @@ public class AbstractMarketplaceApiIT {
                     .withUsername("test")
                     .withPassword("test")
                     .withCopyFileToContainer(
-                            forClasspathResource("db_init_script/"),"/docker-entrypoint-initdb.d");
+                            MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
+                    .withCopyFileToContainer(
+                            MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
+                    .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
 
 
     @DynamicPropertySource
@@ -91,6 +95,7 @@ public class AbstractMarketplaceApiIT {
     }
 
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
+    protected static final String PROJECTS_GET = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
 
 }
