@@ -27,7 +27,7 @@ public interface ProjectMapper {
         project.setId(projectDetailsView.getId());
         project.setName(projectDetailsView.getName());
         project.setLogoUrl(projectDetailsView.getLogoUrl());
-        project.setPrettyId(projectDetailsView.getSlug());
+        project.setSlug(projectDetailsView.getSlug());
         project.setHiring(projectDetailsView.getHiring());
         project.setShortDescription(projectDetailsView.getShortDescription());
         project.setContributorCount(projectDetailsView.getContributorCount());
@@ -72,7 +72,7 @@ public interface ProjectMapper {
         project.setId(projectCardView.getId());
         project.setName(projectCardView.getName());
         project.setLogoUrl(projectCardView.getLogoUrl());
-        project.setPrettyId(projectCardView.getSlug());
+        project.setSlug(projectCardView.getSlug());
         project.setHiring(projectCardView.getHiring());
         project.setShortDescription(projectCardView.getShortDescription());
         project.setContributorCount(projectCardView.getContributorCount());
