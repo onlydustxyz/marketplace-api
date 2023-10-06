@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,30 +24,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional(readOnly = true)
     public ProjectDetailsView getById(UUID projectId) {
         final ProjectEntity projectEntity = projectRepository.getById(projectId);
-        return ProjectDetailsView.builder()
-                .id(projectEntity.getId())
-                .hiring(projectEntity.getHiring())
-                .logoUrl(projectEntity.getLogoUrl())
-                .longDescription(projectEntity.getLongDescription())
-                .shortDescription(projectEntity.getShortDescription())
-                .slug(projectEntity.getKey())
-                .name(projectEntity.getName())
-                .build();
+        return ProjectMapper.mapToProjectDetailsView(projectEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug) {
         final ProjectEntity projectEntity = projectRepository.findByKey(slug).orElseThrow();
-        return ProjectDetailsView.builder()
-                .id(projectEntity.getId())
-                .hiring(projectEntity.getHiring())
-                .logoUrl(projectEntity.getLogoUrl())
-                .longDescription(projectEntity.getLongDescription())
-                .shortDescription(projectEntity.getShortDescription())
-                .slug(projectEntity.getKey())
-                .name(projectEntity.getName())
-                .build();
+
+        return ProjectMapper.mapToProjectDetailsView(projectEntity);
     }
 
     @Override

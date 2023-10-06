@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -41,7 +42,7 @@ public class ProjectEntity {
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
-    Visibility visibility;
+    ProjectVisibilityEnumEntity visibility;
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "projects_sponsors",
@@ -50,9 +51,4 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "sponsor_id")
     )
     List<SponsorEntity> sponsors;
-
-
-    public enum Visibility {
-        PRIVATE, PUBLIC;
-    }
 }

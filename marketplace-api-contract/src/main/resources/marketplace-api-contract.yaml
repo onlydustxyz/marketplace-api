@@ -778,7 +778,7 @@ components:
       description: OnlyDust reward ID
 
     # RESPONSES ==================================================================
-    UserMinimalistResponse:
+    UserLinkResponse:
       type: object
       required:
         - githubUserId
@@ -803,11 +803,11 @@ components:
           description: Direct URL to user's avatar image
           example: 'https://avatars.githubusercontent.com/u/595505?v=4'
 
-    RegisteredUserMinimalistResponse:
+    RegisteredUserLinkResponse:
       required:
         - id
       allOf:
-        - $ref: '#/components/schemas/UserMinimalistResponse'
+        - $ref: '#/components/schemas/UserLinkResponse'
 
     PersonIdentity:
       type: object
@@ -918,7 +918,7 @@ components:
 
     UserProfileResponse:
       allOf:
-        - $ref: '#/components/schemas/UserMinimalistResponse'
+        - $ref: '#/components/schemas/UserLinkResponse'
         - type: object
           properties:
             location:
@@ -1188,7 +1188,7 @@ components:
         leaders:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserMinimalistResponse'
+            $ref: '#/components/schemas/RegisteredUserLinkResponse'
         sponsors:
           type: array
           items:
@@ -1252,7 +1252,7 @@ components:
           description: The top 3 contributors (by contribution count) of this project
           maxItems: 3
           items:
-            $ref: '#/components/schemas/ContributorListItemResponse'
+            $ref: '#/components/schemas/UserLinkResponse'
         repos:
           type: array
           items:
@@ -1260,7 +1260,7 @@ components:
         leaders:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserMinimalistResponse'
+            $ref: '#/components/schemas/RegisteredUserLinkResponse'
         sponsors:
           type: array
           items:
@@ -1471,7 +1471,7 @@ components:
           type: string
           format: date-time
         author:
-          $ref: '#/components/schemas/UserMinimalistResponse'
+          $ref: '#/components/schemas/UserLinkResponse'
         repo:
           $ref: '#/components/schemas/GithubRepoResponse'
 
@@ -1502,7 +1502,7 @@ components:
         commentCount:
           type: integer
         author:
-          $ref: '#/components/schemas/UserMinimalistResponse'
+          $ref: '#/components/schemas/UserLinkResponse'
         repo:
           $ref: '#/components/schemas/GithubRepoResponse'
 
@@ -1514,7 +1514,7 @@ components:
         pullRequestId:
           $ref: '#/components/schemas/PullRequestId'
         reviewer:
-          $ref: '#/components/schemas/UserMinimalistResponse'
+          $ref: '#/components/schemas/UserLinkResponse'
         status:
           $ref: '#/components/schemas/CodeReviewStatus'
         outcome:
@@ -1597,7 +1597,7 @@ components:
         project:
           $ref: '#/components/schemas/ShortProjectResponse'
         contributor:
-          $ref: '#/components/schemas/UserMinimalistResponse'
+          $ref: '#/components/schemas/UserLinkResponse'
         linkedRewardCount:
           type: number
           description: Number of reward items where the purpose matches the content of this contribution.

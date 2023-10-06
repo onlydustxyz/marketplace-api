@@ -79,7 +79,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .hiring(false)
                 .id(projectId)
                 .rank(faker.number().randomDigit())
-                .visibility(ProjectEntity.Visibility.PUBLIC)
+                .visibility(ProjectVisibilityEnumEntity.PUBLIC)
                 .sponsors(sponsors)
                 .build();
 

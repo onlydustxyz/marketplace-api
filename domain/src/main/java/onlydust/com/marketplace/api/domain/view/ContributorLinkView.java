@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ContributorLinkView {
+public class ContributorLinkView implements UserLinkView {
     UUID id;
     Integer githubUserId;
     String login;

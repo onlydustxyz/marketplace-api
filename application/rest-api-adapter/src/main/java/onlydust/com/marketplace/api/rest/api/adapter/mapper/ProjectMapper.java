@@ -11,8 +11,11 @@ public interface ProjectMapper {
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
 
+        for (ContributorLinkView contributor : project.getTopContributors()) {
+            projectListItemResponse.addTopContributorsItem(mapUserLink(contributor));
+        }
         for (ProjectLeaderLinkView leader : project.getLeaders()) {
-            projectListItemResponse.addLeadersItem(mapProjectLead(leader));
+            projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
         }
         for (SponsorView sponsor : project.getSponsors()) {
             projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
@@ -25,13 +28,15 @@ public interface ProjectMapper {
     private static ProjectResponse mapProjectDetailsMetadata(final ProjectDetailsView projectDetailsView) {
         final var project = new ProjectResponse();
         project.setId(projectDetailsView.getId());
-        project.setName(projectDetailsView.getName());
-        project.setLogoUrl(projectDetailsView.getLogoUrl());
         project.setSlug(projectDetailsView.getSlug());
-        project.setHiring(projectDetailsView.getHiring());
+        project.setName(projectDetailsView.getName());
         project.setShortDescription(projectDetailsView.getShortDescription());
-        project.setContributorCount(projectDetailsView.getContributorCount());
+        project.setLongDescription(projectDetailsView.getLongDescription());
+        project.setLogoUrl(projectDetailsView.getLogoUrl());
+        project.setMoreInfoUrl(projectDetailsView.getMoreInfoUrl());
+        project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
+        project.setContributorCount(projectDetailsView.getContributorCount());
         return project;
     }
 
@@ -53,7 +58,7 @@ public interface ProjectMapper {
         final ProjectListItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
 
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
-            projectListItemResponse.addLeadersItem(mapProjectLead(leader));
+            projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
         }
 
         for (SponsorView sponsor : projectCardView.getSponsors()) {
@@ -89,11 +94,19 @@ public interface ProjectMapper {
         return sponsorResponse;
     }
 
-    private static RegisteredUserMinimalistResponse mapProjectLead(final ProjectLeaderLinkView leader) {
-        final var userLink = new RegisteredUserMinimalistResponse();
-        userLink.setId(leader.getId());
-        userLink.setAvatarUrl(leader.getAvatarUrl());
-        userLink.setLogin(leader.getLogin());
+    private static RegisteredUserLinkResponse mapUserLinkToRegisteredUserLink(final UserLinkView userLinkView) {
+        final var userLink = new RegisteredUserLinkResponse();
+        userLink.setId(userLinkView.getId());
+        userLink.setAvatarUrl(userLinkView.getAvatarUrl());
+        userLink.setLogin(userLinkView.getLogin());
+        return userLink;
+    }
+
+    private static UserLinkResponse mapUserLink(final UserLinkView userLinkView) {
+        final var userLink = new UserLinkResponse();
+        userLink.setId(userLinkView.getId());
+        userLink.setAvatarUrl(userLinkView.getAvatarUrl());
+        userLink.setLogin(userLinkView.getLogin());
         return userLink;
     }
 
