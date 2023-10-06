@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,6 +43,48 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     BankAccountRepository bankAccountRepository;
     @Autowired
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    @Autowired
+    SponsorRepository sponsorRepository;
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    ProjectIdRepository projectIdRepository;
+
+
+    @Test
+    void should_create_project() {
+        // Given
+        final List<SponsorEntity> sponsors = List.of(
+                SponsorEntity.builder()
+                        .id(UUID.randomUUID())
+                        .name(faker.name().name())
+                        .url(faker.rickAndMorty().location())
+                        .logoUrl(faker.rickAndMorty().character())
+                        .build(), SponsorEntity.builder()
+                        .id(UUID.randomUUID())
+                        .name(faker.name().name())
+                        .url(faker.rickAndMorty().location())
+                        .logoUrl(faker.rickAndMorty().character())
+                        .build()
+        );
+        sponsorRepository.saveAll(sponsors);
+        final UUID projectId = UUID.randomUUID();
+        projectIdRepository.save(ProjectIdEntity.builder().id(projectId).build());
+        final ProjectEntity expected = ProjectEntity.builder()
+                .key(faker.address().fullAddress())
+                .name(faker.name().name())
+                .longDescription(faker.pokemon().location())
+                .shortDescription(faker.pokemon().name())
+                .logoUrl(faker.rickAndMorty().location())
+                .hiring(false)
+                .id(projectId)
+                .rank(faker.number().randomDigit())
+                .visibility(ProjectEntity.Visibility.PUBLIC)
+                .sponsors(sponsors)
+                .build();
+
+        assertIsSaved(expected, projectRepository);
+    }
 
     @Test
     void should_create_onboarding() {
@@ -219,6 +263,18 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, cryptoUsdQuotesRepository);
+    }
+
+    @Test
+    void should_create_sponsor() {
+        // Given
+        final SponsorEntity expected = SponsorEntity.builder()
+                .logoUrl(faker.rickAndMorty().location())
+                .name(faker.hacker().abbreviation())
+                .id(UUID.randomUUID())
+                .build();
+
+        assertIsSaved(expected, sponsorRepository);
     }
 
     private <Entity, ID> void assertIsSaved(Entity expected, JpaRepository<Entity, ID> repository) {
