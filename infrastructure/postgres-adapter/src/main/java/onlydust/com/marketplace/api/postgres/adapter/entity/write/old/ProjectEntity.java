@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -18,6 +19,9 @@ import java.util.UUID;
 @Table(name = "project_details", schema = "public")
 @TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ProjectEntity {
+    @Id
+    @Column(name = "project_id", nullable = false)
+    UUID id;
     @Column(name = "name")
     String name;
     @Column(name = "short_description")
@@ -34,13 +38,18 @@ public class ProjectEntity {
     Integer rank;
     @Column(name = "key", insertable = false)
     String key;
-    @Id
-    @Column(name = "project_id", nullable = false)
-    private UUID id;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
-    private Visibility visibility;
+    Visibility visibility;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "projects_sponsors",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "sponsor_id")
+    )
+    List<SponsorEntity> sponsors;
 
 
     public enum Visibility {
