@@ -34,7 +34,7 @@ public class OnlydustExceptionRestHandler {
 
         int status;
         if (onlydustException.getCode().equals(RestApiExceptionCode.UNAUTHORIZED)) {
-            status = 403;
+            status = 401;
         } else if (onlydustException.isTechnical()) {
             status = 500;
         } else {
