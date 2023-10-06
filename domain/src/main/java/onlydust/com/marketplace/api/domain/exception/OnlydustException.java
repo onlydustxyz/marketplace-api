@@ -16,26 +16,18 @@ import java.util.Objects;
 public class OnlydustException extends RuntimeException {
 
     @NonNull
-    String code;
-    @NonNull
     String message;
+    @NonNull
+    Integer status;
     Exception rootException;
-
-    public Boolean isFunctional() {
-        return this.getCode().startsWith("F.");
-    }
-
-    public Boolean isTechnical() {
-        return this.getCode().startsWith("T.");
-    }
 
     @Override
     public String toString() {
         final String rootExceptionAsString = Objects.isNull(this.rootException) ?
                 "null" : getRootExceptionAsString();
         return "OnlydustException{" +
-                "code='" + code + '\'' +
                 ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
                 ", rootException=" + rootExceptionAsString +
                 '}';
     }
