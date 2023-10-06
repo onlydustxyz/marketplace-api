@@ -13,6 +13,17 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectRepository projectRepository;
 
+
+    @Test
+    void should_get_projects() {
+        client.get()
+                .uri(getApiURI(PROJECTS_GET))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
     @Order(1)
     @Test
     public void should_get_a_project_by_slug() {
