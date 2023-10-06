@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,6 +33,14 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     ApplicationRepository applicationRepository;
     @Autowired
     UserProfileInfoRepository userProfileInfoRepository;
+    @Autowired
+    ContactInformationRepository contactInformationRepository;
+    @Autowired
+    WalletRepository walletRepository;
+    @Autowired
+    BankAccountRepository bankAccountRepository;
+    @Autowired
+    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
 
     @Test
     void should_create_onboarding() {
@@ -143,7 +151,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     void should_create_user_profile_info() {
         // Given
         final UserProfileInfoEntity expected = UserProfileInfoEntity.builder()
-                .allocatedTime(AllocatedTimeEntityEnum.ONE_TO_THREE_DAYS)
+                .allocatedTime(AllocatedTimeEnumEntity.one_to_three_days)
                 .avatarUrl(faker.pokemon().name())
                 .bio(faker.hacker().abbreviation())
                 .cover(ProfileCoverEnumEntity.yellow)
@@ -155,6 +163,62 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, userProfileInfoRepository);
+    }
+
+    @Test
+    void should_create_contact_information() {
+        // Given
+        final ContactInformationEntity expected = ContactInformationEntity.builder()
+                .contact(faker.rickAndMorty().location())
+                .id(ContactInformationIdEntity.builder()
+                        .channel(ContactChanelEnumEntity.email)
+                        .userId(UUID.randomUUID())
+                        .build())
+                .isPublic(false)
+                .build();
+
+        assertIsSaved(expected, contactInformationRepository);
+    }
+
+    @Test
+    void should_create_wallet() {
+        // Given
+        final WalletEntity expected = WalletEntity.builder()
+                .id(
+                        WalletIdEntity.builder()
+                                .network(NetworkEnumEntity.ethereum)
+                                .userId(UUID.randomUUID())
+                                .build()
+                )
+                .address(faker.address().fullAddress())
+                .type(WalletTypeEnumEntity.address)
+                .build();
+
+        assertIsSaved(expected, walletRepository);
+    }
+
+    @Test
+    void should_create_bank_account() {
+        // Given
+        final BankAccountEntity expected = BankAccountEntity.builder()
+                .bic(faker.pokemon().location())
+                .userId(UUID.randomUUID())
+                .iban(faker.hacker().abbreviation())
+                .build();
+
+        assertIsSaved(expected, bankAccountRepository);
+    }
+
+    @Test
+    void should_create_crypto_usd_quotes() {
+        // Given
+        final CryptoUsdQuotesEntity expected = CryptoUsdQuotesEntity.builder()
+                .currency(CurrencyEnumEntity.usd)
+                .price(BigDecimal.ZERO)
+                .updatedAt(new Date())
+                .build();
+
+        assertIsSaved(expected, cryptoUsdQuotesRepository);
     }
 
     private <Entity, ID> void assertIsSaved(Entity expected, JpaRepository<Entity, ID> repository) {

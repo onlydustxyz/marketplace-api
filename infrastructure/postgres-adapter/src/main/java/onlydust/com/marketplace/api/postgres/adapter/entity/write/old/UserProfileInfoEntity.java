@@ -3,15 +3,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.PgEnumType;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,8 +20,8 @@ import java.util.UUID;
 @Builder
 @Table(name = "user_profile_info", schema = "public")
 @TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "weekly_allocated", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "weekly_allocated_time", typeClass = PgEnumType.class)
 public class UserProfileInfoEntity {
 
     @Id
@@ -41,10 +38,12 @@ public class UserProfileInfoEntity {
     @Column(name = "avatar_url")
     String avatarUrl;
     @Column(name = "weekly_allocated_time", nullable = false)
-    @Type(type = "weekly_allocated_time")
-    AllocatedTimeEntityEnum allocatedTime;
+    @Type(type = "weekly_allocated")
+    @Enumerated(EnumType.STRING)
+    AllocatedTimeEnumEntity allocatedTime;
     @Type(type = "profile_cover")
     @Column(name = "cover")
+    @Enumerated(EnumType.STRING)
     ProfileCoverEnumEntity cover;
     @Type(type = "jsonb")
     @Column(name = "languages", columnDefinition = "jsonb")
