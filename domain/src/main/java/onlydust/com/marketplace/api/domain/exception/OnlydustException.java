@@ -13,30 +13,13 @@ import java.util.Objects;
 @Data
 @Builder
 @Slf4j
-public class OnlydustException extends Exception {
+public class OnlydustException extends RuntimeException {
 
     @NonNull
     String code;
     @NonNull
     String message;
     Exception rootException;
-
-
-    public static OnlydustException getOnlydustException(final String message, final String code,
-                                                         final Exception rootException) {
-        return OnlydustException.builder()
-                .message(message)
-                .code(code)
-                .rootException(rootException)
-                .build();
-    }
-
-    public static OnlydustException getOnlydustException(final String message, final String code) {
-        return OnlydustException.builder()
-                .message(message)
-                .code(code)
-                .build();
-    }
 
     public Boolean isFunctional() {
         return this.getCode().startsWith("F.");

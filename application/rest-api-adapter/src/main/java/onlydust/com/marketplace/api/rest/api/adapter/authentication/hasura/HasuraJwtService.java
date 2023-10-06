@@ -75,7 +75,13 @@ public class HasuraJwtService {
     }
 
     private static HasuraAuthentication getUnauthenticatedWithExceptionFor(final String code, final String message) {
-        return HasuraAuthentication.builder().onlydustException(OnlydustException.builder().code(code).message(message).build()).build();
+        return HasuraAuthentication.builder()
+                .onlydustException(OnlydustException
+                        .builder()
+                        .code(code)
+                        .message(message)
+                        .build())
+                .build();
     }
 
 }

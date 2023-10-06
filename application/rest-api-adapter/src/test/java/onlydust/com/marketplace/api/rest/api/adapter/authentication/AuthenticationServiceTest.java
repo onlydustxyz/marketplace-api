@@ -22,7 +22,7 @@ public class AuthenticationServiceTest {
     private static final Faker faker = new Faker();
 
     @Test
-    void should_return_authenticated_user() throws OnlydustException {
+    void should_return_authenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
         final AuthenticationService authenticationService = new AuthenticationService(

@@ -16,7 +16,7 @@ public class AuthenticationService {
 
     private final AuthenticationContext authenticationContext;
 
-    public User getAuthenticatedUser() throws OnlydustException {
+    public User getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
             final OnlydustException unauthorized = OnlydustException.builder()
