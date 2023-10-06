@@ -44,15 +44,10 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technology,
                                                            final List<String> sponsor, final String ownership,
                                                            final String search) {
-        try {
-            final Page<ProjectCardView> projectViewPage =
-                    projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
-                            search, mapSortByParameter(sort));
-            return ResponseEntity.ok(mapProjectCards(projectViewPage));
-        } catch (Exception e) {
-            LOGGER.error("Failed to get projects", e);
-            throw e;
-        }
+        final Page<ProjectCardView> projectViewPage =
+                projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
+                        search, mapSortByParameter(sort));
+        return ResponseEntity.ok(mapProjectCards(projectViewPage));
     }
 
 
