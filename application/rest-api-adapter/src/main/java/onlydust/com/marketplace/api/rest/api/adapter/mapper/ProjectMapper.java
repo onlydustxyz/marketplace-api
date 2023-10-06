@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,19 +95,22 @@ public interface ProjectMapper {
         return sponsorResponse;
     }
 
-    private static RegisteredUserLinkResponse mapUserLinkToRegisteredUserLink(final UserLinkView userLinkView) {
+    private static RegisteredUserLinkResponse mapUserLinkToRegisteredUserLink(final ProjectLeaderLinkView projectLeader) {
         final var userLink = new RegisteredUserLinkResponse();
-        userLink.setId(userLinkView.getId());
-        userLink.setAvatarUrl(userLinkView.getAvatarUrl());
-        userLink.setLogin(userLinkView.getLogin());
+        userLink.setId(projectLeader.getId());
+        userLink.setGithubUserId(projectLeader.getGithubUserId());
+        userLink.setAvatarUrl(projectLeader.getAvatarUrl());
+        userLink.setLogin(projectLeader.getLogin());
+        userLink.setHtmlUrl(URI.create(projectLeader.getUrl()));
         return userLink;
     }
 
     private static UserLinkResponse mapUserLink(final UserLinkView userLinkView) {
         final var userLink = new UserLinkResponse();
-        userLink.setId(userLinkView.getId());
+        userLink.setGithubUserId(userLinkView.getGithubUserId());
         userLink.setAvatarUrl(userLinkView.getAvatarUrl());
         userLink.setLogin(userLinkView.getLogin());
+        userLink.setHtmlUrl(URI.create(userLinkView.getUrl()));
         return userLink;
     }
 

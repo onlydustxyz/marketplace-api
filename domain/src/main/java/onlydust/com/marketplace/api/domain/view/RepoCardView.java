@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class RepoCardView {
-    Integer githubRepoId;
+    Long githubRepoId;
     String owner;
     String name;
     String description;

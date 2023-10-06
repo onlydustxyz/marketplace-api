@@ -43,6 +43,7 @@ public class ProjectEntity {
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
+
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "projects_sponsors",

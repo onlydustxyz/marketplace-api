@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, JpaSpecificationExecutor<ProjectEntity> {
 
     Optional<ProjectEntity> findByKey(String key);
+
+
 }

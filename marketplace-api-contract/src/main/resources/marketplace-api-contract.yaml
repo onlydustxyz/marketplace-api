@@ -786,8 +786,6 @@ components:
         - htmlUrl
         - avatarUrl
       properties:
-        id:
-          $ref: '#/components/schemas/UserId'
         githubUserId:
           $ref: '#/components/schemas/GithubUserId'
         login:
@@ -808,6 +806,10 @@ components:
         - id
       allOf:
         - $ref: '#/components/schemas/UserLinkResponse'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UserId'
 
     PersonIdentity:
       type: object
@@ -921,6 +923,8 @@ components:
         - $ref: '#/components/schemas/UserLinkResponse'
         - type: object
           properties:
+            id:
+              $ref: '#/components/schemas/UserId'
             location:
               type: string
               description: User location as in Github profile

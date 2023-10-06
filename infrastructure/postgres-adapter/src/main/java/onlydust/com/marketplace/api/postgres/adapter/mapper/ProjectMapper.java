@@ -2,13 +2,20 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public interface ProjectMapper {
 
-    static ProjectDetailsView mapToProjectDetailsView(ProjectEntity projectEntity) {
-        return ProjectDetailsView.builder()
+    static ProjectDetailsView mapToProjectDetailsView(ProjectEntity projectEntity, List<GithubUserViewEntity> topContributors, Integer contributorCount, List<GithubRepoViewEntity> repos) {
+
+
+        final var project = ProjectDetailsView.builder()
                 .id(projectEntity.getId())
                 .hiring(projectEntity.getHiring())
                 .logoUrl(projectEntity.getLogoUrl())
@@ -17,8 +24,14 @@ public interface ProjectMapper {
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
                 .visibility(mapProjectVisibility(projectEntity.getVisibility()))
-
+                .topContributors(topContributors.stream().map(ContributorMapper::mapToContributorLinkView).collect(Collectors.toSet()))
+                .contributorCount(contributorCount)
+                .repos(repos.stream().map(RepoMapper::mapToRepoCardView).collect(Collectors.toSet()))
                 .build();
+        for (GithubRepoViewEntity repo : repos) {
+            project.addTechnologies(RepoMapper.mapLanguages(repo));
+        }
+        return project;
     }
 
     static ProjectVisibility mapProjectVisibility(ProjectVisibilityEnumEntity visibility) {

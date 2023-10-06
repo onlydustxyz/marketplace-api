@@ -5,9 +5,10 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomRepoRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,22 +18,29 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
+    private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
     private final CustomProjectRepository customProjectRepository;
+    private final CustomContributorRepository customContributorRepository;
+    private final CustomRepoRepository customRepoRepository;
 
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getById(UUID projectId) {
-        final ProjectEntity projectEntity = projectRepository.getById(projectId);
-        return ProjectMapper.mapToProjectDetailsView(projectEntity);
+//        final ProjectEntity projectEntity = projectRepository.getById(projectId);
+//        return ProjectMapper.mapToProjectDetailsView(projectEntity);
+        //TODO
+        return null;
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug) {
-        final ProjectEntity projectEntity = projectRepository.findByKey(slug).orElseThrow();
-
-        return ProjectMapper.mapToProjectDetailsView(projectEntity);
+        final var projectEntity = projectRepository.findByKey(slug).orElseThrow();
+        final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(), TOP_CONTRIBUTOR_COUNT);
+        final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
+        final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
+        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos);
     }
 
     @Override

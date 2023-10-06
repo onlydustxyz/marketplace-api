@@ -18,47 +18,32 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
-public class ProjectViewEntity {
+public class ProjectDetailsViewEntity {
 
     @Id
-    @Column(name = "row_number", nullable = false)
-    Integer rowNumber;
+    @Column(name = "project_id", nullable = false)
+    UUID id;
     @Column(name = "name")
     String name;
     @Column(name = "short_description")
     String shortDescription;
+    @Column(name = "long_description")
+    String longDescription;
+    @Column(name = "telegram_link")
+    String telegramLink;
     @Column(name = "logo_url")
     String logoUrl;
     @Column(name = "hiring")
     Boolean hiring;
+    @Column(name = "rank")
+    Integer rank;
     @Column(name = "key", insertable = false)
     String key;
-    @Column(name = "rank", insertable = false)
-    Integer rank;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
-    @Column(name = "p_lead_id", insertable = false)
-    UUID projectLeadId;
-    @Column(name = "p_lead_login", insertable = false)
-    String projectLeadLogin;
-    @Column(name = "p_lead_avatar_url", insertable = false)
-    String projectLeadAvatarUrl;
-    @Column(name = "sponsor_name", insertable = false)
-    String sponsorName;
-    @Column(name = "sponsor_logo_url", insertable = false)
-    String sponsorLogoUrl;
-    @Column(name = "sponsor_id", insertable = false)
-    UUID sponsorId;
-    @Column(name = "repo_count", insertable = false)
-    Integer repoCount;
+
     @Column(name = "contributors_count", insertable = false)
     Integer contributorsCount;
-    @Column(name = "languages", insertable = false)
-    String repositoryLanguages;
-    @Column(name = "repository_id", insertable = false)
-    Integer repositoryId;
-    @Column(name = "project_id", nullable = false)
-    private UUID id;
 }
