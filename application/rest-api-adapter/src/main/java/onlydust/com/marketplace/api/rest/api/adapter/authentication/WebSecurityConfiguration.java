@@ -1,15 +1,18 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 @EnableWebSecurity
 @AllArgsConstructor
-public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
+@Configuration
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationFilter authenticationFilter;
 
@@ -19,7 +22,11 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().cors()
-                .and().addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .and().authorizeRequests()
+                .antMatchers("/api/v1/me/**").hasAuthority("me")
+                .antMatchers(HttpMethod.GET, "/api/v1/projects/**").permitAll()
+                .anyRequest().authenticated()
+                .and().addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class);
     }
 
 }

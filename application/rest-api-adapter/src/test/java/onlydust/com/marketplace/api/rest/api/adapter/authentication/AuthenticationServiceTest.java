@@ -70,7 +70,7 @@ public class AuthenticationServiceTest {
 
         // Then
         assertNotNull(onlydustException);
-        assertEquals(401,onlydustException.getStatus());
+        assertEquals(401, onlydustException.getStatus());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class AuthenticationServiceTest {
 
         // Then
         assertNotNull(onlydustException);
-        assertEquals(401,onlydustException.getStatus());
+        assertEquals(401, onlydustException.getStatus());
         assertEquals("Unauthorized", onlydustException.getMessage());
     }
 

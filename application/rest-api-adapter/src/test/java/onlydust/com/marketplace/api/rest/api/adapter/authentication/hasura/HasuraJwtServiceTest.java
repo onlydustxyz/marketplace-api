@@ -7,6 +7,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecre
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class HasuraJwtServiceTest {
@@ -20,7 +22,15 @@ public class HasuraJwtServiceTest {
                 "HS256").build();
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
         final HasuraJwtPayload hasuraJwtPayload =
-                HasuraJwtPayload.builder().iss(jwtSecret.getIssuer()).sub(faker.rickAndMorty().character()).build();
+                HasuraJwtPayload.builder()
+                        .iss(jwtSecret.getIssuer())
+                        .sub(faker.rickAndMorty().character())
+                        .claims(
+                                HasuraJwtPayload.HasuraClaims.builder()
+                                        .userId(UUID.randomUUID())
+                                        .build()
+                        )
+                        .build();
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, hasuraJwtPayload);
 
         // When
