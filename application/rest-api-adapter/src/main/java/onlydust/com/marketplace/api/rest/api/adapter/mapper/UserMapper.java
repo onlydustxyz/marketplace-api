@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;
 import java.util.List;
@@ -13,29 +13,29 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.to
 
 public interface UserMapper {
 
-    static UserProfileResponse userProfileToResponse(UserProfile userProfile) {
+    static UserProfileResponse userProfileToResponse(UserProfileView userProfileView) {
         final UserProfileResponse userProfileResponse = new UserProfileResponse();
-        userProfileResponse.setGithubUserId(userProfile.getGithubId());
-        userProfileResponse.setBio(userProfile.getBio());
-        userProfileResponse.setAvatarUrl(userProfile.getAvatarUrl());
-        userProfileResponse.setId(userProfile.getId());
-        userProfileResponse.setLogin(userProfile.getLogin());
-        userProfileResponse.setAvatarUrl(userProfile.getAvatarUrl());
-        userProfileResponse.setWebsite(userProfile.getWebsite());
-        userProfileResponse.setHtmlUrl((isNull(userProfile.getHtmlUrl()) ? null :
-                URI.create(userProfile.getHtmlUrl())));
-        userProfileResponse.setCover(coverToUserProfileResponse(userProfile.getCover()));
-        userProfileResponse.setCreatedAt(toZoneDateTime(userProfile.getCreateAt()));
-        userProfileResponse.setLastSeenAt(toZoneDateTime(userProfile.getLastSeenAt()));
-        userProfileResponse.setLocation(userProfile.getLocation());
-        userProfileResponse.setContacts(contactInformationsToResponse(userProfile.getContactInformations()));
-        userProfileResponse.setStats(userStatsToResponse(userProfile.getProfileStats()));
-        userProfileResponse.setProjects(userProjectsToResponse(userProfile.getProjectsStats()));
-        userProfileResponse.setTechnologies(userProfile.getTechnologies());
+        userProfileResponse.setGithubUserId(userProfileView.getGithubId());
+        userProfileResponse.setBio(userProfileView.getBio());
+        userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
+        userProfileResponse.setId(userProfileView.getId());
+        userProfileResponse.setLogin(userProfileView.getLogin());
+        userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
+        userProfileResponse.setWebsite(userProfileView.getWebsite());
+        userProfileResponse.setHtmlUrl((isNull(userProfileView.getHtmlUrl()) ? null :
+                URI.create(userProfileView.getHtmlUrl())));
+        userProfileResponse.setCover(coverToUserProfileResponse(userProfileView.getCover()));
+        userProfileResponse.setCreatedAt(toZoneDateTime(userProfileView.getCreateAt()));
+        userProfileResponse.setLastSeenAt(toZoneDateTime(userProfileView.getLastSeenAt()));
+        userProfileResponse.setLocation(userProfileView.getLocation());
+        userProfileResponse.setContacts(contactInformationsToResponse(userProfileView.getContactInformations()));
+        userProfileResponse.setStats(userStatsToResponse(userProfileView.getProfileStats()));
+        userProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats()));
+        userProfileResponse.setTechnologies(userProfileView.getTechnologies());
         return userProfileResponse;
     }
 
-    static List<UserProfileProjects> userProjectsToResponse(Set<UserProfile.ProjectStats> projectStats) {
+    static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats) {
         return projectStats.stream()
                 .map(ps -> {
                     final UserProfileProjects userProfileProjects = new UserProfileProjects();
@@ -51,7 +51,7 @@ public interface UserMapper {
                 .toList();
     }
 
-    static UserProfileStats userStatsToResponse(UserProfile.ProfileStats profileStats) {
+    static UserProfileStats userStatsToResponse(final UserProfileView.ProfileStats profileStats) {
         final UserProfileStats userProfileStats = new UserProfileStats();
         userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
         userProfileStats.setTotalEarned(profileStats.getTotalEarned());
@@ -73,7 +73,7 @@ public interface UserMapper {
         return userProfileStats;
     }
 
-    static List<ContactInformation> contactInformationsToResponse(Set<UserProfile.ContactInformation> contactInformations) {
+    static List<ContactInformation> contactInformationsToResponse(final Set<UserProfileView.ContactInformation> contactInformations) {
         return contactInformations.stream()
                 .map(contactInformation -> {
                     final ContactInformation response = new ContactInformation();
@@ -87,7 +87,7 @@ public interface UserMapper {
                 }).toList();
     }
 
-    private static UserProfileResponse.CoverEnum coverToUserProfileResponse(final UserProfile.Cover cover) {
+    private static UserProfileResponse.CoverEnum coverToUserProfileResponse(final UserProfileView.Cover cover) {
         return isNull(cover) ? null :
                 switch (cover) {
                     case BLUE -> UserProfileResponse.CoverEnum.BLUE;
@@ -97,7 +97,7 @@ public interface UserMapper {
                 };
     }
 
-    public static GetMeResponse userToGetMeResponse(User authenticatedUser) {
+    static GetMeResponse userToGetMeResponse(final User authenticatedUser) {
         final GetMeResponse getMeResponse = new GetMeResponse();
         getMeResponse.setId(authenticatedUser.getId().toString());
         getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());

@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.model;
+package onlydust.com.marketplace.api.domain.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.util.*;
 
 @Data
 @Builder
-public class UserProfile {
+public class UserProfileView {
     UUID id;
     Long githubId;
     String bio;
@@ -56,6 +56,7 @@ public class UserProfile {
         BigDecimal totalGranted;
         Integer userContributionCount;
         Date userLastContributedAt;
+        Boolean isProjectLead;
     }
 
     @Data

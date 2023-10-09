@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort);
         final UUID userId = UUID.randomUUID();
-        final UserProfile userProfile = UserProfile.builder()
+        final UserProfileView userProfileView = UserProfileView.builder()
                 .id(userId)
                 .avatarUrl(faker.pokemon().name())
                 .githubId(faker.number().randomNumber())
@@ -31,10 +31,10 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getProfileById(userId))
-                .thenReturn(userProfile);
-        final UserProfile profileById = userService.getProfileById(userId);
+                .thenReturn(userProfileView);
+        final UserProfileView profileById = userService.getProfileById(userId);
 
         // Then
-        assertEquals(userProfile, profileById);
+        assertEquals(userProfileView, profileById);
     }
 }

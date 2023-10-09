@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.util.UUID;
 
 public interface UserStoragePort {
-    UserProfile getProfileById(UUID userId);
+    UserProfileView getProfileById(UUID userId);
 }
