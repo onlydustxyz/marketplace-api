@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,16 +26,18 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getById(UUID projectId) {
-//        final ProjectEntity projectEntity = projectRepository.getById(projectId);
-//        return ProjectMapper.mapToProjectDetailsView(projectEntity);
-        //TODO
-        return null;
+        final ProjectEntity projectEntity = projectRepository.getById(projectId);
+        return getProjectDetails(projectEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug) {
         final var projectEntity = projectRepository.findByKey(slug).orElseThrow();
+        return getProjectDetails(projectEntity);
+    }
+
+    private ProjectDetailsView getProjectDetails(ProjectEntity projectEntity) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(), TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
         final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
