@@ -4,9 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
-import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +22,15 @@ public class HasuraJwtServiceTest {
                 "HS256").build();
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
         final HasuraJwtPayload hasuraJwtPayload =
-                HasuraJwtPayload.builder().iss(jwtSecret.getIssuer()).sub(faker.rickAndMorty().character()).build();
+                HasuraJwtPayload.builder()
+                        .iss(jwtSecret.getIssuer())
+                        .sub(faker.rickAndMorty().character())
+                        .claims(
+                                HasuraJwtPayload.HasuraClaims.builder()
+                                        .userId(UUID.randomUUID())
+                                        .build()
+                        )
+                        .build();
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, hasuraJwtPayload);
 
         // When
@@ -50,8 +59,7 @@ public class HasuraJwtServiceTest {
         // Then
         final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
         assertNotNull(onlydustException);
-        assertEquals(RestApiExceptionCode.INVALID_JWT_FORMAT, onlydustException.getCode());
-        assertTrue(onlydustException.isTechnical());
+        assertEquals(401, onlydustException.getStatus());
     }
 
 
@@ -70,8 +78,7 @@ public class HasuraJwtServiceTest {
         // Then
         final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
         assertNotNull(onlydustException);
-        assertEquals(RestApiExceptionCode.INVALID_JWT_HEADER_FORMAT, onlydustException.getCode());
-        assertTrue(onlydustException.isTechnical());
+        assertEquals(401, onlydustException.getStatus());
     }
 
     @Test
@@ -89,7 +96,6 @@ public class HasuraJwtServiceTest {
         // Then
         final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
         assertNotNull(onlydustException);
-        assertEquals(RestApiExceptionCode.UNABLE_TO_DESERIALIZE_JWT_TOKEN, onlydustException.getCode());
-        assertTrue(onlydustException.isTechnical());
+        assertEquals(401, onlydustException.getStatus());
     }
 }

@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtHeader;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
-import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
+import org.springframework.http.HttpStatus;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class HasuraJwtService {
     public HasuraAuthentication getAuthenticationFromJwt(final String authorizationBearer) {
         final String[] chunks = authorizationBearer.split("\\.");
         if (chunks.length != 3) {
-            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_FORMAT, "Invalid Jwt format");
+            return getUnauthenticatedWithExceptionFor(HttpStatus.UNAUTHORIZED.value(), "Invalid Jwt format");
         }
         final String payload = chunks[1];
         final String header = chunks[0];
@@ -36,11 +36,11 @@ public class HasuraJwtService {
         try {
             jwtHeader = objectMapper.readValue(Base64.getUrlDecoder().decode(header), JwtHeader.class);
         } catch (Exception e) {
-            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_HEADER_FORMAT,
+            return getUnauthenticatedWithExceptionFor(HttpStatus.UNAUTHORIZED.value(),
                     "Invalid Jwt " + "header format");
         }
         if (!jwtHeader.getAlg().equals("HS256")) {
-            return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.INVALID_JWT_ALGO_TYPE, "Invalid Jwt " +
+            return getUnauthenticatedWithExceptionFor(HttpStatus.UNAUTHORIZED.value(), "Invalid Jwt " +
                     "algorithm type");
         }
 
@@ -56,7 +56,7 @@ public class HasuraJwtService {
                 hasuraJwtPayload = objectMapper.readValue(Base64.getUrlDecoder().decode(payload),
                         HasuraJwtPayload.class);
             } catch (IOException e) {
-                return getUnauthenticatedWithExceptionFor(RestApiExceptionCode.UNABLE_TO_DESERIALIZE_JWT_TOKEN,
+                return getUnauthenticatedWithExceptionFor(HttpStatus.UNAUTHORIZED.value(),
                         "Unable to deserialize Jwt token");
             }
             if (!hasuraJwtPayload.getIss().equals(jwtSecret.getIssuer())) {
@@ -68,14 +68,20 @@ public class HasuraJwtService {
         } else {
             return HasuraAuthentication.builder().isAuthenticated(false)
                     .onlydustException(OnlydustException.builder()
-                            .code(RestApiExceptionCode.INVALID_JWT_SIGNATURE)
+                            .status(HttpStatus.UNAUTHORIZED.value())
                             .message(String.format("Invalid JWT signature %s", signature))
                             .build()).build();
         }
     }
 
-    private static HasuraAuthentication getUnauthenticatedWithExceptionFor(final String code, final String message) {
-        return HasuraAuthentication.builder().onlydustException(OnlydustException.builder().code(code).message(message).build()).build();
+    private static HasuraAuthentication getUnauthenticatedWithExceptionFor(final int status, final String message) {
+        return HasuraAuthentication.builder()
+                .onlydustException(OnlydustException
+                        .builder()
+                        .status(status)
+                        .message(message)
+                        .build())
+                .build();
     }
 
 }

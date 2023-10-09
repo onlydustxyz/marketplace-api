@@ -5,8 +5,10 @@ import lombok.Value;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Value
 @Builder
@@ -20,7 +22,7 @@ public class HasuraAuthentication implements Authentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.claims.allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
     @Override

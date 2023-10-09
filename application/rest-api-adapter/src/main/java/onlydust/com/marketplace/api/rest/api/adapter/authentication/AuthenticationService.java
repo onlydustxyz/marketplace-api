@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
-import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -16,19 +15,19 @@ public class AuthenticationService {
 
     private final AuthenticationContext authenticationContext;
 
-    public User getAuthenticatedUser() throws OnlydustException {
+    public User getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
             final OnlydustException unauthorized = OnlydustException.builder()
-                    .message("Unauthorized")
-                    .code(RestApiExceptionCode.UNAUTHORIZED)
+                    .message(String.format("Unauthorized anonymous user %s", authentication))
+                    .status(401)
                     .build();
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!authentication.isAuthenticated()) {
             final OnlydustException unauthorized = OnlydustException.builder()
                     .message("Unauthorized")
-                    .code(RestApiExceptionCode.UNAUTHORIZED)
+                    .status(401)
                     .rootException(((HasuraAuthentication) authentication).getOnlydustException())
                     .build();
             LOGGER.warn(unauthorized.toString());

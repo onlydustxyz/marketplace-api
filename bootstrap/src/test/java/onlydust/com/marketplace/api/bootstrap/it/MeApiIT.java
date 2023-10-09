@@ -24,14 +24,18 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isUnauthorized()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.message").isEqualTo("UNAUTHORIZED")
+                .jsonPath("$.status").isEqualTo(401);
     }
 
     @Test
     void should_get_current_user_given_a_valid_hasura_jwt() throws JsonProcessingException {
         // Given
         final UUID userId = UUID.randomUUID();
-        final int githubUserId = faker.number().randomDigit();
+        final long githubUserId = faker.number().randomNumber();
         final String hasuraJwt = JwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
                 .sub(userId.toString())
                 .iss(jwtSecret.getIssuer())

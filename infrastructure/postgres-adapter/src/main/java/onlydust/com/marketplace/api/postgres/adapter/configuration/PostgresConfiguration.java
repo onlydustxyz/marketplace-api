@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +31,22 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public CustomContributorRepository customContributorRepository(final EntityManager entityManager) {
+        return new CustomContributorRepository(entityManager);
+    }
+
+    @Bean
+    public CustomRepoRepository customRepoRepository(final EntityManager entityManager) {
+        return new CustomRepoRepository(entityManager);
+    }
+
+    @Bean
     public PostgresProjectAdapter postgresProjectAdapter(final ProjectRepository projectRepository,
-                                                         final CustomProjectRepository customProjectRepository) {
-        return new PostgresProjectAdapter(projectRepository, customProjectRepository);
+                                                         final CustomProjectRepository customProjectRepository,
+                                                         final CustomContributorRepository customContributorRepository,
+                                                         final CustomRepoRepository customRepoRepository,
+                                                         final CustomUserRepository customUserRepository) {
+        return new PostgresProjectAdapter(projectRepository, customProjectRepository, customContributorRepository, customRepoRepository, customUserRepository);
     }
 
     @Bean

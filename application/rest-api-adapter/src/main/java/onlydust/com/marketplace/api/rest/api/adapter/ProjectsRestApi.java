@@ -6,11 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectListResponse;
-import onlydust.com.marketplace.api.contract.model.ShortProjectResponse;
-import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.contract.model.ProjectResponse;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
-import onlydust.com.marketplace.api.domain.view.ProjectView;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,16 +27,16 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ProjectFacadePort projectFacadePort;
 
     @Override
-    public ResponseEntity<ShortProjectResponse> getProject(final UUID projectId) {
-        final Project project = projectFacadePort.getById(projectId);
-        final ShortProjectResponse projectResponse = projectToResponse(project);
+    public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
+        final var project = projectFacadePort.getById(projectId);
+        final var projectResponse = mapProjectDetails(project);
         return ResponseEntity.ok(projectResponse);
     }
 
     @Override
-    public ResponseEntity<ShortProjectResponse> getProjectBySlug(final String slug) {
-        final Project project = projectFacadePort.getBySlug(slug);
-        final ShortProjectResponse projectResponse = projectToResponse(project);
+    public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug) {
+        final var project = projectFacadePort.getBySlug(slug);
+        final var projectResponse = mapProjectDetails(project);
         return ResponseEntity.ok(projectResponse);
     }
 
@@ -45,15 +44,10 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technology,
                                                            final List<String> sponsor, final String ownership,
                                                            final String search) {
-        try {
-            final Page<ProjectView> projectViewPage =
-                    projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
-                            search, mapSortByParameter(sort));
-            return ResponseEntity.ok(projectViewsToProjectListResponse(projectViewPage));
-        } catch (Exception e) {
-            LOGGER.error("Failed to get projects", e);
-            throw e;
-        }
+        final Page<ProjectCardView> projectViewPage =
+                projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
+                        search, mapSortByParameter(sort));
+        return ResponseEntity.ok(mapProjectCards(projectViewPage));
     }
 
 

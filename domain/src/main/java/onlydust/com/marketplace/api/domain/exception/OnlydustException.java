@@ -13,46 +13,21 @@ import java.util.Objects;
 @Data
 @Builder
 @Slf4j
-public class OnlydustException extends Exception {
+public class OnlydustException extends RuntimeException {
 
-    @NonNull
-    String code;
     @NonNull
     String message;
+    @NonNull
+    Integer status;
     Exception rootException;
-
-
-    public static OnlydustException getOnlydustException(final String message, final String code,
-                                                         final Exception rootException) {
-        return OnlydustException.builder()
-                .message(message)
-                .code(code)
-                .rootException(rootException)
-                .build();
-    }
-
-    public static OnlydustException getOnlydustException(final String message, final String code) {
-        return OnlydustException.builder()
-                .message(message)
-                .code(code)
-                .build();
-    }
-
-    public Boolean isFunctional() {
-        return this.getCode().startsWith("F.");
-    }
-
-    public Boolean isTechnical() {
-        return this.getCode().startsWith("T.");
-    }
 
     @Override
     public String toString() {
         final String rootExceptionAsString = Objects.isNull(this.rootException) ?
                 "null" : getRootExceptionAsString();
         return "OnlydustException{" +
-                "code='" + code + '\'' +
                 ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
                 ", rootException=" + rootExceptionAsString +
                 '}';
     }

@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
-import onlydust.com.marketplace.api.rest.api.adapter.exception.RestApiExceptionCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -22,13 +21,13 @@ public class AuthenticationServiceTest {
     private static final Faker faker = new Faker();
 
     @Test
-    void should_return_authenticated_user() throws OnlydustException {
+    void should_return_authenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
         final AuthenticationService authenticationService = new AuthenticationService(
                 authenticationContext);
         final UUID userId = UUID.randomUUID();
-        final int githubUserId = faker.number().randomDigit();
+        final long githubUserId = faker.number().randomNumber();
         final List<String> allowedRoles = List.of(faker.pokemon().name(), faker.pokemon().location());
         final HasuraJwtPayload.HasuraClaims hasuraClaims = HasuraJwtPayload.HasuraClaims.builder()
                 .githubUserId(githubUserId)
@@ -71,8 +70,7 @@ public class AuthenticationServiceTest {
 
         // Then
         assertNotNull(onlydustException);
-        assertEquals(RestApiExceptionCode.UNAUTHORIZED, onlydustException.getCode());
-        assertEquals("Unauthorized", onlydustException.getMessage());
+        assertEquals(401, onlydustException.getStatus());
     }
 
     @Test
@@ -95,7 +93,7 @@ public class AuthenticationServiceTest {
 
         // Then
         assertNotNull(onlydustException);
-        assertEquals(RestApiExceptionCode.UNAUTHORIZED, onlydustException.getCode());
+        assertEquals(401, onlydustException.getStatus());
         assertEquals("Unauthorized", onlydustException.getMessage());
     }
 

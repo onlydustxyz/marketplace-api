@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -22,13 +22,13 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(projectStoragePort);
 
         // When
-        final Project expectedProject = Project.builder()
+        final var expectedProject = ProjectDetailsView.builder()
                 .id(UUID.randomUUID())
                 .slug(slug)
                 .build();
         Mockito.when(projectStoragePort.getBySlug(slug))
                 .thenReturn(expectedProject);
-        final Project project = projectService.getBySlug(slug);
+        final var project = projectService.getBySlug(slug);
 
         // Then
         assertEquals(project, expectedProject);

@@ -32,7 +32,7 @@ public class HasuraJwtPayload {
         @JsonProperty("x-hasura-allowed-roles")
         List<String> allowedRoles;
         @JsonProperty("x-hasura-githubUserId")
-        Integer githubUserId;
+        Long githubUserId;
         @JsonProperty("x-hasura-odAdmin")
         Boolean isAnOnlydustAdmin;
         @JsonProperty("x-hasura-user-id")

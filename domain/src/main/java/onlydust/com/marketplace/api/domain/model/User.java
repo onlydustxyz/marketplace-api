@@ -11,7 +11,7 @@ import java.util.UUID;
 public class User {
     UUID id;
     List<String> permissions;
-    Integer githubUserId;
+    Long githubUserId;
     String avatarUrl;
     String login;
 }
