@@ -149,7 +149,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .amount(BigDecimal.ZERO)
                 .requestedAt(new Date())
                 .currency(CurrencyEnumEntity.usd)
-                .recipientId(faker.number().randomDigit())
+                .recipientId(faker.number().randomNumber())
                 .id(UUID.randomUUID())
                 .projectId(UUID.randomUUID())
                 .requestorId(UUID.randomUUID())
@@ -172,7 +172,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .id(faker.pokemon().location())
                 .contributionType(ContributionTypeEnumEntity.pull_request)
                 .projectId(UUID.randomUUID())
-                .recipientId(faker.number().randomDigit())
+                .recipientId(faker.number().randomNumber())
                 .build();
 
         assertIsSaved(expected, workItemRepository);

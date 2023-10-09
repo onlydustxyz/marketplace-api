@@ -35,7 +35,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     void should_get_current_user_given_a_valid_hasura_jwt() throws JsonProcessingException {
         // Given
         final UUID userId = UUID.randomUUID();
-        final int githubUserId = faker.number().randomDigit();
+        final long githubUserId = faker.number().randomNumber();
         final String hasuraJwt = JwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
                 .sub(userId.toString())
                 .iss(jwtSecret.getIssuer())

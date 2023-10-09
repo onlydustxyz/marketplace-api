@@ -28,14 +28,14 @@ public class PaymentRequestEntity {
     @Column(name = "requestor_id", nullable = false)
     UUID requestorId;
     @Column(name = "recipient_id", nullable = false)
-    Integer recipientId;
+    Long recipientId;
     @Column(name = "requested_at", nullable = false)
     Date requestedAt;
     @Column(name = "amount", nullable = false)
     BigDecimal amount;
     @Column(name = "invoice_received_at")
     Date invoiceReceivedAt;
-    @Column(name = "hours_worked",nullable = false)
+    @Column(name = "hours_worked", nullable = false)
     Integer hoursWorked;
     @Column(name = "project_id", nullable = false)
     UUID projectId;

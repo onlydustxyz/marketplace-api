@@ -14,7 +14,7 @@ public class CustomContributorRepository {
 
     protected static final String FIND_TOP_CONTRIBUTORS_BASE_QUERY = """
                 select
-                    (select count(*) from contributions where project_id = :projectId and github_user_id = gu.id and status = 'complete'::contribution_status) as contribution_count,
+                    (select count(*) from contributions where project_id = :projectId and github_user_id = gu.id and status = cast('complete' as contribution_status)) as contribution_count,
                     gu.*
                 from github_users gu
                 join projects_contributors pc on pc.github_user_id = gu.id and pc.project_id = :projectId

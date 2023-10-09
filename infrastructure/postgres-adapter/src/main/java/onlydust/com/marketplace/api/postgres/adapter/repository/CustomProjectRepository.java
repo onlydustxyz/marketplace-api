@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 
 import javax.persistence.EntityManager;
 import java.util.*;
@@ -21,6 +22,13 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 @Slf4j
 public class CustomProjectRepository {
+
+    protected static final String FIND_PROJECT_SPONSORS_QUERY = """
+                select
+                    s.*
+                from sponsors s
+                join projects_sponsors ps on ps.sponsor_id = s.id and ps.project_id = :projectId
+            """;
 
     protected static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
             "search_project.project_id), search_project.* from (" +
@@ -166,5 +174,12 @@ public class CustomProjectRepository {
         return Page.<ProjectCardView>builder()
                 .content(projectViewMap.values().stream().toList())
                 .build();
+    }
+
+    public List<SponsorEntity> getProjectSponsors(UUID projectId) {
+        return entityManager
+                .createNativeQuery(FIND_PROJECT_SPONSORS_QUERY, SponsorEntity.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
     }
 }

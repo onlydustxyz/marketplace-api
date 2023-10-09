@@ -25,7 +25,7 @@ public class UserServiceTest {
         final UserProfile userProfile = UserProfile.builder()
                 .id(userId)
                 .avatarUrl(faker.pokemon().name())
-                .githubId(faker.number().randomDigit())
+                .githubId(faker.number().randomNumber())
                 .login(faker.hacker().verb())
                 .build();
 

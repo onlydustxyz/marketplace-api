@@ -734,11 +734,13 @@ components:
 
     GithubUserId:
       type: integer
+      format: int64
       description: Github user ID (databaseId)
       example: 595505
 
     GithubRepoId:
       type: integer
+      format: int64
       description: Github repo ID (databaseId)
       example: 650626566
 
@@ -753,8 +755,8 @@ components:
       example: 1678794252
 
     CodeReviewId:
-      type: integer
-      description: Code review ID (databaseId)
+      type: string
+      description: Code review ID
       example: 2189e8dc91876fa1686e81b09de33ca7bdca08e80854d4cada02c8288cf03739
 
     ProjectId:
@@ -1455,6 +1457,7 @@ components:
           $ref: '#/components/schemas/PullRequestId'
         number:
           type: integer
+          format: int64
           description: Pull request number on Github
           example: 6
         title:
@@ -1486,6 +1489,7 @@ components:
           $ref: '#/components/schemas/IssueId'
         number:
           type: integer
+          format: int64
           description: Issue number on Github
           example: 6
         title:
@@ -1628,7 +1632,7 @@ components:
           type: string
           pattern: uuid
         githubUserId:
-          type: integer
+          $ref: '#/components/schemas/GithubUserId'
         login:
           type: string
         avatarUrl:

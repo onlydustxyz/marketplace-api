@@ -27,7 +27,7 @@ public class AuthenticationServiceTest {
         final AuthenticationService authenticationService = new AuthenticationService(
                 authenticationContext);
         final UUID userId = UUID.randomUUID();
-        final int githubUserId = faker.number().randomDigit();
+        final long githubUserId = faker.number().randomNumber();
         final List<String> allowedRoles = List.of(faker.pokemon().name(), faker.pokemon().location());
         final HasuraJwtPayload.HasuraClaims hasuraClaims = HasuraJwtPayload.HasuraClaims.builder()
                 .githubUserId(githubUserId)

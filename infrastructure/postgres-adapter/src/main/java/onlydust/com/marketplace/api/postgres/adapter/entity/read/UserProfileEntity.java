@@ -21,10 +21,8 @@ public class UserProfileEntity {
     @Id
     @Column(name = "row_number", nullable = false)
     Integer rowNumber;
-    @Column(name = "id", nullable = false)
-    private UUID id;
     @Column(name = "github_user_id", nullable = false)
-    Integer githubId;
+    Long githubId;
     @Column(name = "email")
     String email;
     @Column(name = "bio")
@@ -71,5 +69,7 @@ public class UserProfileEntity {
     Integer contributionsCount;
     @Column(name = "total_earned")
     BigDecimal totalEarned;
+    @Column(name = "id", nullable = false)
+    private UUID id;
 
 }

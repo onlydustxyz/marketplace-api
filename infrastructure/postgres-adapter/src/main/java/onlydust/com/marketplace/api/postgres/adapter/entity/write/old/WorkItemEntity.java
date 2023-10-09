@@ -26,7 +26,7 @@ public class WorkItemEntity {
     @Column(name = "id", nullable = false)
     String id;
     @Column(name = "recipient_id", nullable = false)
-    Integer recipientId;
+    Long recipientId;
     @Column(name = "project_id", nullable = false)
     UUID projectId;
     @Enumerated(EnumType.STRING)

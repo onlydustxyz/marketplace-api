@@ -58,7 +58,7 @@ public class ProjectViewEntity {
     @Column(name = "languages", insertable = false)
     String repositoryLanguages;
     @Column(name = "repository_id", insertable = false)
-    Integer repositoryId;
+    Long repositoryId;
     @Column(name = "project_id", nullable = false)
     private UUID id;
 }

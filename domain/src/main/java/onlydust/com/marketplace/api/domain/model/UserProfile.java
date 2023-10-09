@@ -12,7 +12,7 @@ import java.util.*;
 @Builder
 public class UserProfile {
     UUID id;
-    Integer githubId;
+    Long githubId;
     String bio;
     String avatarUrl;
     String login;

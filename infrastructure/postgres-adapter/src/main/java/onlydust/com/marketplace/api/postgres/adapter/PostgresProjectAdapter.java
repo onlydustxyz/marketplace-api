@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomRepoRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,6 +20,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final CustomRepoRepository customRepoRepository;
+    private final CustomUserRepository customUserRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,7 +38,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(), TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
         final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
-        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos);
+        final var leaders = customUserRepository.findProjectLeaders(projectEntity.getId());
+        final var sponsors = customProjectRepository.getProjectSponsors(projectEntity.getId());
+        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos, leaders, sponsors);
     }
 
     @Override

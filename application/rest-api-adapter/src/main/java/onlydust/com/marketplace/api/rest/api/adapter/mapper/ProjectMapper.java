@@ -11,18 +11,11 @@ public interface ProjectMapper {
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
-
-        for (ContributorLinkView contributor : project.getTopContributors()) {
-            projectListItemResponse.addTopContributorsItem(mapUserLink(contributor));
-        }
-        for (ProjectLeaderLinkView leader : project.getLeaders()) {
-            projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
-        }
-        for (SponsorView sponsor : project.getSponsors()) {
-            projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
-        }
+        projectListItemResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
+        projectListItemResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectListItemResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
+        projectListItemResponse.setRepos(project.getRepos().stream().map(ProjectMapper::mapRepo).collect(Collectors.toList()));
         projectListItemResponse.setTechnologies(project.getTechnologies());
-
         return projectListItemResponse;
     }
 
@@ -95,13 +88,28 @@ public interface ProjectMapper {
         return sponsorResponse;
     }
 
+    private static GithubRepoResponse mapRepo(final RepoCardView repo) {
+        final GithubRepoResponse repoResponse = new GithubRepoResponse();
+        repoResponse.setId(repo.getGithubRepoId());
+        repoResponse.setOwner(repo.getOwner());
+        repoResponse.setName(repo.getName());
+        repoResponse.setHtmlUrl(repo.getUrl());
+        repoResponse.setDescription(repo.getDescription());
+        repoResponse.setForkCount(repo.getForkCount());
+        repoResponse.setStars(repo.getStarCount());
+        repoResponse.setHasIssues(repo.getHasIssues());
+        return repoResponse;
+    }
+
     private static RegisteredUserLinkResponse mapUserLinkToRegisteredUserLink(final ProjectLeaderLinkView projectLeader) {
         final var userLink = new RegisteredUserLinkResponse();
         userLink.setId(projectLeader.getId());
         userLink.setGithubUserId(projectLeader.getGithubUserId());
         userLink.setAvatarUrl(projectLeader.getAvatarUrl());
         userLink.setLogin(projectLeader.getLogin());
-        userLink.setHtmlUrl(URI.create(projectLeader.getUrl()));
+        if (projectLeader.getUrl() != null) {
+            userLink.setHtmlUrl(URI.create(projectLeader.getUrl()));
+        }
         return userLink;
     }
 
@@ -110,7 +118,9 @@ public interface ProjectMapper {
         userLink.setGithubUserId(userLinkView.getGithubUserId());
         userLink.setAvatarUrl(userLinkView.getAvatarUrl());
         userLink.setLogin(userLinkView.getLogin());
-        userLink.setHtmlUrl(URI.create(userLinkView.getUrl()));
+        if (userLinkView.getUrl() != null) {
+            userLink.setHtmlUrl(URI.create(userLinkView.getUrl()));
+        }
         return userLink;
     }
 

@@ -9,16 +9,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-@Table(name = "github_users", schema = "public")
-public class GithubUserViewEntity {
+@Table(name = "registered_users", schema = "public")
+public class RegisteredUserViewEntity {
     @Id
     @Column(name = "id", nullable = false)
+    UUID id;
+    @Column(name = "github_user_id", nullable = false)
     Long githubId;
     @Column(name = "login", nullable = false)
     String login;
@@ -26,16 +30,10 @@ public class GithubUserViewEntity {
     String avatarUrl;
     @Column(name = "html_url", nullable = false)
     String htmlUrl;
-    @Column(name = "bio")
+    @Column(name = "email")
     String bio;
-    @Column(name = "location")
-    String location;
-    @Column(name = "website")
-    String website;
-    @Column(name = "twitter")
-    String twitter;
-    @Column(name = "linkedin")
-    String linkedin;
-    @Column(name = "telegram")
-    String telegram;
+    @Column(name = "last_seen")
+    LocalDateTime lastSeen;
+    @Column(name = "admin")
+    Boolean admin;
 }

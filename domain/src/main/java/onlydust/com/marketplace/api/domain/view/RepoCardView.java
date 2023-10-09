@@ -13,4 +13,5 @@ public class RepoCardView {
     Integer starCount;
     Integer forkCount;
     String url;
+    Boolean hasIssues;
 }

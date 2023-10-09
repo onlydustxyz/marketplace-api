@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ContributorLinkView implements UserLinkView {
-    Integer githubUserId;
+    Long githubUserId;
     String login;
     String avatarUrl;
     String url;

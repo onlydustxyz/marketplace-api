@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
 import javax.persistence.EntityManager;
 import java.util.HashMap;
@@ -19,6 +20,10 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 @Slf4j
 public class CustomUserRepository {
+
+    private static final String SELECT_PROJECT_LEADERS = """
+            select u.* from registered_users u join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
+            """;
 
     private static final String SELECT_USER_PROFILE_WHERE_ID = "select row_number() over (order by u.id) row_number," +
             "       u.id," +
@@ -92,16 +97,6 @@ public class CustomUserRepository {
     };
     private final EntityManager entityManager;
 
-    public UserProfile findProfileById(UUID userId) {
-        final String query = SELECT_USER_PROFILE_WHERE_ID.replace(
-                ":userId", userId.toString());
-        LOGGER.debug(query);
-        final List<UserProfileEntity> rows = entityManager.createNativeQuery(query, UserProfileEntity.class)
-                .getResultList();
-        final UserProfile userProfile = rowsToUserProfile(rows);
-        return userProfile;
-    }
-
     private static UserProfile rowsToUserProfile(List<UserProfileEntity> rows) {
         UserProfile userProfile = null;
         for (UserProfileEntity row : rows) {
@@ -160,5 +155,22 @@ public class CustomUserRepository {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<RegisteredUserViewEntity> findProjectLeaders(UUID projectId) {
+        return entityManager
+                .createNativeQuery(SELECT_PROJECT_LEADERS, RegisteredUserViewEntity.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
+    }
+
+    public UserProfile findProfileById(UUID userId) {
+        final String query = SELECT_USER_PROFILE_WHERE_ID.replace(
+                ":userId", userId.toString());
+        LOGGER.debug(query);
+        final List<UserProfileEntity> rows = entityManager.createNativeQuery(query, UserProfileEntity.class)
+                .getResultList();
+        final UserProfile userProfile = rowsToUserProfile(rows);
+        return userProfile;
     }
 }

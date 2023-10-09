@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 public interface UserLinkView {
 
-    Integer getGithubUserId();
+    Long getGithubUserId();
 
     String getLogin();
 

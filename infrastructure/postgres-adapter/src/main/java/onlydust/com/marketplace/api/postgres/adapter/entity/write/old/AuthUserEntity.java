@@ -22,7 +22,7 @@ public class AuthUserEntity {
     @Column(name = "id", nullable = false)
     UUID id;
     @Column(name = "github_user_id")
-    Integer githubUserId;
+    Long githubUserId;
     @Column(name = "email")
     String email;
     @Column(name = "last_seen")

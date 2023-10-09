@@ -9,7 +9,7 @@ import java.util.UUID;
 @Builder
 public class ProjectLeaderLinkView implements UserLinkView {
     UUID id;
-    Integer githubUserId;
+    Long githubUserId;
     String login;
     String avatarUrl;
     String url;

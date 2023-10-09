@@ -15,7 +15,7 @@ public class CustomRepoRepository {
     protected static final String FIND_PROJECT_REPOS_BASE_QUERY = """
                 select
                     r.*,
-                    r.languages::text as languages
+                    cast(r.languages as text) as languages
                 from github_repos r
                 join project_github_repos pr on pr.github_repo_id = r.id and pr.project_id = :projectId
             """;

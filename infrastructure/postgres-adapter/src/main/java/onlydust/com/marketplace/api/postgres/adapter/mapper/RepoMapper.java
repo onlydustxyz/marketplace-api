@@ -21,6 +21,7 @@ public interface RepoMapper {
                 .forkCount(repo.getForkCount())
                 .starCount(repo.getStarCount())
                 .url(repo.getHtmlUrl())
+                .hasIssues(repo.getHasIssues())
                 .build();
     }
 
