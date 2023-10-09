@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class WebSecurityConfiguration {
 
     @Bean
-    public AuthenticationConfiguration apiSecurityConfiguration(final AuthenticationFilter authenticationFilter) {
-        return new AuthenticationConfiguration(authenticationFilter);
+    public onlydust.com.marketplace.api.rest.api.adapter.authentication.WebSecurityConfiguration apiSecurityConfiguration(final AuthenticationFilter authenticationFilter) {
+        return new onlydust.com.marketplace.api.rest.api.adapter.authentication.WebSecurityConfiguration(authenticationFilter);
     }
 
     @Bean
