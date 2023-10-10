@@ -16,6 +16,7 @@
 
     <modules>
         <module>postgres-adapter</module>
+        <module>od-old-api-client-adapter</module>
     </modules>
 
     <properties>

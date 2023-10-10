@@ -1,0 +1,3 @@
+od-old-api-client-adapter:
+    base-url: "https://fake-url"
+    api-key: "fake-api-key"
