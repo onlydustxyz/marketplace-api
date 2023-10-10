@@ -57,8 +57,7 @@ public class CustomUserRepository {
                    (select count(distinct project_id)
                     from auth_users u
                              left join projects_contributors pc on pc.github_user_id = u.github_user_id
-                    where u.id = :userId
-                    group by (pc.project_id))                                 contributor_on_project,
+                    where u.id = :userId)                                 contributor_on_project,
                    (select sum(pr.amount)
                     from auth_users u
                              join payment_requests pr on pr.recipient_id = u.github_user_id
