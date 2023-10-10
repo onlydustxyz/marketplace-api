@@ -10,12 +10,12 @@ application:
     auth0:
       # trailing slash is important!
       jwks-url: https://onlydust-hackathon.eu.auth0.com/
-      
+
 spring:
   application:
     name: marketplace-api
   liquibase:
-    enabled: false
+    enabled: true
   datasource:
     url: ${JDBC_DATABASE_URL}
     username: ${DATABASE_USERNAME}

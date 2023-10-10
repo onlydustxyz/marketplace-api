@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt;
+package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,12 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JwtClaims {
-    String githubLogin;
-    Long githubUserId;
-    
-    Boolean isAnOnlydustAdmin;
+public class UserClaims {
     UUID userId;
+    String login;
+    Long githubUserId;
+    String avatarUrl;
+
+    Boolean isAnOnlydustAdmin;
     String projectsLeaded;
 }

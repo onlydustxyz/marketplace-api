@@ -11,7 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtClaims;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.UserClaims;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -23,8 +26,10 @@ import java.util.Base64;
 public class Auth0JwtService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JWTVerifier jwtVerifier;
+    private final UserFacadePort userFacadePort;
 
-    public Auth0JwtService(final String jwksUrl) {
+    public Auth0JwtService(final String jwksUrl, UserFacadePort userFacadePort) {
+        this.userFacadePort = userFacadePort;
         JwkProvider provider = new JwkProviderBuilder(jwksUrl)
                 .build();
 
@@ -49,7 +54,8 @@ public class Auth0JwtService {
         Algorithm algorithm = Algorithm.RSA256(keyProvider);
 
         this.jwtVerifier = JWT.require(algorithm)
-                //TODO .withClaimPresence("scope")
+                .withClaimPresence("nickname")
+                .withClaimPresence("picture")
                 .build();
     }
 
@@ -81,9 +87,21 @@ public class Auth0JwtService {
                     e);
         }
 
-        final JwtClaims claims = JwtClaims.builder()
+        final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
+        final User user = this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
+                .githubUserId(githubUserId)
                 .githubLogin(jwtClaims.getGithubLogin())
-                .githubUserId(Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", "")))
+                .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
+                .build());
+
+        final UserClaims claims = UserClaims.builder()
+                .userId(user.getId())
+                .login(user.getLogin())
+                .githubUserId(user.getGithubUserId())
+                .avatarUrl(user.getAvatarUrl())
+                //TODO
+//                .isAnOnlydustAdmin(user.getIsAnOnlydustAdmin())
+//                .projectsLeaded(user.getProjectsLeaded())
                 .build();
 
         return Auth0Authentication.builder()

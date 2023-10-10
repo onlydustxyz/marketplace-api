@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.it;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfiguration;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -21,9 +19,9 @@ import static org.testcontainers.utility.MountableFile.forClasspathResource;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = PostgresConfiguration.class)
 @Testcontainers
 @DirtiesContext
-@EnableAutoConfiguration(exclude = LiquibaseAutoConfiguration.class)
 public class AbstractPostgresIT {
 
+    protected final static Faker faker = new Faker();
     @Container
     static PostgreSQLContainer postgresSQLContainer =
             new PostgreSQLContainer<>("postgres:14.3-alpine")
@@ -33,14 +31,11 @@ public class AbstractPostgresIT {
                     .withCopyFileToContainer(
                             forClasspathResource("db_init_script/"), "/docker-entrypoint-initdb.d");
 
-
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgresSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.password", postgresSQLContainer::getPassword);
         registry.add("spring.datasource.username", postgresSQLContainer::getUsername);
     }
-
-    protected final static Faker faker = new Faker();
 
 }

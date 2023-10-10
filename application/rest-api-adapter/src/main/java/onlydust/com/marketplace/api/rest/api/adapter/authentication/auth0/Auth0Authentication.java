@@ -4,7 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtClaims;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.UserClaims;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,7 +14,7 @@ import java.util.Collection;
 @Builder
 public class Auth0Authentication implements Authentication {
     DecodedJWT credentials;
-    JwtClaims claims;
+    UserClaims claims;
     String principal;
     @Builder.Default
     Boolean isAuthenticated = false;
