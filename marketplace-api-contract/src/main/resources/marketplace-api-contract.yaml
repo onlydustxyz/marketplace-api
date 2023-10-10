@@ -344,6 +344,31 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+          - Projects
+      summary: Create project
+      operationId: createProject
+      description: |
+          Create new project. The caller must be a leader of the project.
+      requestBody:
+          content:
+              application/json:
+                  schema:
+                      $ref: '#/components/schemas/CreateProjectRequest'
+      responses:
+            "200":
+                description: 'Create Project response'
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateProjectResponse'
+            "401":
+                $ref: '#/components/responses/UnauthorizedError'
+            "500":
+                $ref: '#/components/responses/InternalServerError'
     get:
       security:
         - { }
@@ -619,6 +644,35 @@ paths:
           $ref: '#/components/responses/ProjectNotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/github-users:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Github
+      summary: Search Github user
+      operationId: searchGithubUser
+      description: |
+          Search Github user by login
+      parameters:
+        - in: query
+          name: search
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'Github user list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubUserListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 
 components:
@@ -1638,3 +1692,61 @@ components:
         avatarUrl:
           type: string
           pattern: uri
+
+    CreateProjectRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        shortDescription:
+          type: string
+        longDescription:
+          type: string
+        moreInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoreInfo'
+        isLookingForContributors:
+          type: boolean
+        inviteGithubUserIdsAsProjectLeads:
+          type: array
+          items:
+            type: integer
+        githubRepoIds:
+          type: array
+          items:
+            type: integer
+        image:
+          type: string
+          format: binary
+
+    CreateProjectResponse:
+      type: object
+      properties:
+        projectId:
+          type: string
+          pattern: uuid
+    MoreInfo:
+      type: object
+      properties:
+        url:
+          type: string
+        value:
+          type: string
+    GithubUserListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/GithubUserResponse'
+    GithubUserResponse:
+        type: object
+        properties:
+            id:
+              type: integer
+              format: int64
+            login:
+              type: string
+            avatarUrl:
+              type: string
+              format: url
+            isRegistered:
+              type: boolean
