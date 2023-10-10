@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticati
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.SpringAuthenticationContext;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,8 +21,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public Auth0JwtService auth0JwtService(final String jwksUrl) {
-        return new Auth0JwtService(jwksUrl);
+    public Auth0JwtService auth0JwtService(final Auth0Properties auth0Properties) {
+        return new Auth0JwtService(auth0Properties.getJwksUrl());
     }
 
     @Bean
@@ -52,9 +53,9 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("application.web.auth0.jwks-url")
-    public String jwksUrl() {
-        return "";
+    @ConfigurationProperties("application.web.auth0")
+    public Auth0Properties auth0Properties() {
+        return new Auth0Properties();
     }
 
     @Data

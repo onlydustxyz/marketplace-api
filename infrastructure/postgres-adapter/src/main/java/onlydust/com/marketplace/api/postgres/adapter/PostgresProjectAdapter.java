@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
@@ -53,5 +54,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                               String search, ProjectCardView.SortBy sort) {
         return customProjectRepository.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor,
                 userId, search, sort);
+    }
+
+    @Override
+    public void createProject(UUID projectId, String name, String shortDescription, String longDescription, Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos, List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, String imageUrl) {
+        
     }
 }

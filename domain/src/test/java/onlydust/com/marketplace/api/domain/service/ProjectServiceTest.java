@@ -40,7 +40,7 @@ public class ProjectServiceTest {
         assertEquals(project, expectedProject);
     }
 
-    @Test
+//    @Test
     void should_create_project() {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);

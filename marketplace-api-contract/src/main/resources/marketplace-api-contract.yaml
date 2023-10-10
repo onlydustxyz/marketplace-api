@@ -348,27 +348,27 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-          - Projects
+        - Projects
       summary: Create project
       operationId: createProject
       description: |
-          Create new project. The caller must be a leader of the project.
+        Create new project. The caller must be a leader of the project.
       requestBody:
-          content:
-              application/json:
-                  schema:
-                      $ref: '#/components/schemas/CreateProjectRequest'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
       responses:
-            "200":
-                description: 'Create Project response'
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateProjectResponse'
-            "401":
-                $ref: '#/components/responses/UnauthorizedError'
-            "500":
-                $ref: '#/components/responses/InternalServerError'
+        "200":
+          description: 'Create Project response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProjectResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     get:
       security:
         - { }
@@ -654,7 +654,7 @@ paths:
       summary: Search Github user
       operationId: searchGithubUser
       description: |
-          Search Github user by login
+        Search Github user by login
       parameters:
         - in: query
           name: search
@@ -673,6 +673,35 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/github-repos:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Github
+      summary: Get Github repositories
+      operationId: getGithubRepositoriesForInstallationId
+      description: |
+        Get Github Repository for installation Id
+      parameters:
+        - in: query
+          name: installationId
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123456
+      responses:
+        "200":
+          description: 'Github repo list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstalledGithubRepoListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 
 components:
@@ -1740,15 +1769,38 @@ components:
       items:
         $ref: '#/components/schemas/GithubUserResponse'
     GithubUserResponse:
-        type: object
-        properties:
-            id:
-              type: integer
-              format: int64
-            login:
-              type: string
-            avatarUrl:
-              type: string
-              format: url
-            isRegistered:
-              type: boolean
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        login:
+          type: string
+        avatarUrl:
+          type: string
+          format: url
+        isRegistered:
+          type: boolean
+
+    InstalledGithubRepoListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/InstalledGithubRepoResponse'
+      example:
+        - name: marketplace-backend
+          shortDescription: The backend of the OnlyDust marketplace
+          githubId: 650626566
+        - name: marketplace-frontend
+          shortDescription: The frontend of the OnlyDust marketplace
+          githubId: 650626568
+
+    InstalledGithubRepoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        shortDescription:
+          type: string
+        githubId:
+          type: integer
+          format: int64

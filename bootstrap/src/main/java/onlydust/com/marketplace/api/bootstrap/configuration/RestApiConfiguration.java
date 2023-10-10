@@ -42,7 +42,13 @@ public class RestApiConfiguration {
     }
 
     @Bean
+    public GithubRestApi githubRestApi() {
+        return new GithubRestApi();
+    }
+
+    @Bean
     public OnlydustExceptionRestHandler onlydustExceptionRestHandler() {
         return new OnlydustExceptionRestHandler();
     }
+
 }
