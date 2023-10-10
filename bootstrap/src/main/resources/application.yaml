@@ -7,22 +7,11 @@ application:
         type: ${HASURA_GRAPHQL_JWT_SECRET_TYPE}
         key: ${HASURA_GRAPHQL_JWT_SECRET_KEY}
         issuer: ${HASURA_GRAPHQL_JWT_SECRET_ISSUER}
+    auth0:
+      # trailing slash is important!
+      jwks-url: https://onlydust-hackathon.eu.auth0.com/
+      
 spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          auth0:
-            client-id: 62GDg2a6pCjnAln1FccD55eCKLJtj4T5
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          auth0:
-            # trailing slash is important!
-            issuer-uri: https://onlydust-hackathon.eu.auth0.com/
   application:
     name: marketplace-api
   liquibase:

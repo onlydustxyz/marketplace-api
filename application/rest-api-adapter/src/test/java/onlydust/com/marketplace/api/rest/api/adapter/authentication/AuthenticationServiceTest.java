@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtClaims;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -29,10 +29,10 @@ public class AuthenticationServiceTest {
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
         final List<String> allowedRoles = List.of(faker.pokemon().name(), faker.pokemon().location());
-        final Auth0JwtPayload.Claims claims = Auth0JwtPayload.Claims.builder()
+        final JwtClaims claims = JwtClaims.builder()
                 .githubUserId(githubUserId)
                 .userId(userId)
-                .allowedRoles(allowedRoles)
+                //.allowedRoles(allowedRoles)
                 .build();
 
         // When

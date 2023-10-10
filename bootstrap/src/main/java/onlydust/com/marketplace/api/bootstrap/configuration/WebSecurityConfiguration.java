@@ -20,8 +20,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public Auth0JwtService auth0JwtService(final JwtSecret jwtSecret) {
-        return new Auth0JwtService(jwtSecret);
+    public Auth0JwtService auth0JwtService(final String jwksUrl) {
+        return new Auth0JwtService(jwksUrl);
     }
 
     @Bean
@@ -49,6 +49,12 @@ public class WebSecurityConfiguration {
     @ConfigurationProperties("application.web.hasura.secret")
     public JwtSecret jwtSecret() {
         return new JwtSecret();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.auth0.jwks-url")
+    public String jwksUrl() {
+        return "";
     }
 
     @Data
