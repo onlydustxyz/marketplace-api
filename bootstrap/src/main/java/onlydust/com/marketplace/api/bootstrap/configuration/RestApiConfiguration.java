@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.rest.api.adapter.MeRestApi;
-import onlydust.com.marketplace.api.rest.api.adapter.ProjectsRestApi;
-import onlydust.com.marketplace.api.rest.api.adapter.UsersRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustExceptionRestHandler;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +24,21 @@ public class RestApiConfiguration {
     @Bean
     public MeRestApi meRestApi(final AuthenticationService authenticationService) {
         return new MeRestApi(authenticationService);
+    }
+
+    @Bean
+    public VersionRestApi versionRestApi() {
+        return new VersionRestApi();
+    }
+
+    @Bean
+    public TechnologiesRestApi technologiesRestApi() {
+        return new TechnologiesRestApi();
+    }
+
+    @Bean
+    public RewardsRestApi rewardsRestApi() {
+        return new RewardsRestApi();
     }
 
     @Bean
