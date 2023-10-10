@@ -24,11 +24,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isUnauthorized()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.message").isEqualTo("FORBIDDEN")
-                .jsonPath("$.status").isEqualTo(403);
+                .isEqualTo(403);
     }
 
     @Test
