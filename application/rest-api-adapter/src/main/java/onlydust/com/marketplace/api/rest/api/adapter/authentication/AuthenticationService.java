@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtClaims;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -33,7 +32,7 @@ public class AuthenticationService {
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         }
-        final JwtClaims claims = (JwtClaims) authentication.getDetails();
+        final UserClaims claims = (UserClaims) authentication.getDetails();
         return User.builder()
                 .id(claims.getUserId())
                 //TODO: .permissions(claims.getAllowedRoles())

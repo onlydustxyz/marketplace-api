@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.Data;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationContext;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
@@ -21,8 +22,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public Auth0JwtService auth0JwtService(final Auth0Properties auth0Properties) {
-        return new Auth0JwtService(auth0Properties.getJwksUrl());
+    public Auth0JwtService auth0JwtService(final Auth0Properties auth0Properties, final UserFacadePort userFacadePort) {
+        return new Auth0JwtService(auth0Properties.getJwksUrl(), userFacadePort);
     }
 
     @Bean
