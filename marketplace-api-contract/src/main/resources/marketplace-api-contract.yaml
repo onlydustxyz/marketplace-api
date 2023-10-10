@@ -1712,10 +1712,12 @@ components:
           type: array
           items:
             type: integer
+            format: int64
         githubRepoIds:
           type: array
           items:
             type: integer
+            format: int64
         image:
           type: string
           format: binary
@@ -1725,7 +1727,7 @@ components:
       properties:
         projectId:
           type: string
-          pattern: uuid
+          format: uuid
     MoreInfo:
       type: object
       properties:
