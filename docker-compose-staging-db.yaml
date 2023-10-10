@@ -1,0 +1,19 @@
+version: '3'
+services:
+  db:
+    image: "postgres:14.3-alpine"
+    container_name: "marketplace_db_with_staging_dump"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=marketplace_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./bootstrap/src/test/resources/staging_db/scripts:/docker-entrypoint-initdb.d
+      - ./bootstrap/src/test/resources/staging_db/dump:/tmp
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "marketplace_db", "-U", "test" ]
+      interval: 2s
+      timeout: 1s
+      retries: 20
