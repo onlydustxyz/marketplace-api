@@ -27,8 +27,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isUnauthorized()
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.message").isEqualTo("UNAUTHORIZED")
-                .jsonPath("$.status").isEqualTo(401);
+                .jsonPath("$.message").isEqualTo("FORBIDDEN")
+                .jsonPath("$.status").isEqualTo(403);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .claims(HasuraJwtPayload.HasuraClaims.builder()
                         .githubUserId(githubUserId)
                         .userId(userId)
-                        .allowedRoles(List.of(faker.pokemon().name()))
+                        .allowedRoles(List.of(faker.pokemon().name(), "me"))
                         .build())
                 .build());
 
