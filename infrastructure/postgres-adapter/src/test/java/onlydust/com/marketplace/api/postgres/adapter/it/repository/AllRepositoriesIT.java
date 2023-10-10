@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +51,21 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     ProjectRepository projectRepository;
     @Autowired
     ProjectIdRepository projectIdRepository;
+    @Autowired
+    UserRepository userRepository;
 
+
+    @Test
+    void should_create_user() {
+        final UserEntity expected = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber())
+                .githubLogin(faker.name().name())
+                .githubAvatarUrl(faker.internet().avatar())
+                .build();
+
+        assertIsSaved(expected, userRepository);
+    }
 
     @Test
     void should_create_project() {

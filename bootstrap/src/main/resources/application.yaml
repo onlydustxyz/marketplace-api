@@ -7,6 +7,10 @@ application:
         type: ${HASURA_GRAPHQL_JWT_SECRET_TYPE}
         key: ${HASURA_GRAPHQL_JWT_SECRET_KEY}
         issuer: ${HASURA_GRAPHQL_JWT_SECRET_ISSUER}
+    auth0:
+      # trailing slash is important!
+      jwks-url: https://onlydust-hackathon.eu.auth0.com/
+      
 spring:
   application:
     name: marketplace-api

@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtClaims;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -28,15 +28,15 @@ public class AuthenticationService {
             final OnlydustException unauthorized = OnlydustException.builder()
                     .message("Unauthorized")
                     .status(401)
-                    .rootException(((HasuraAuthentication) authentication).getOnlydustException())
+                    .rootException(((Auth0Authentication) authentication).getOnlydustException())
                     .build();
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         }
-        final HasuraJwtPayload.HasuraClaims claims = (HasuraJwtPayload.HasuraClaims) authentication.getDetails();
+        final JwtClaims claims = (JwtClaims) authentication.getDetails();
         return User.builder()
                 .id(claims.getUserId())
-                .permissions(claims.getAllowedRoles())
+                //TODO: .permissions(claims.getAllowedRoles())
                 .githubUserId(claims.getGithubUserId())
                 .build();
     }

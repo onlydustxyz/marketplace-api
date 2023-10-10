@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -13,6 +14,7 @@ import java.util.Objects;
 @Data
 @Builder
 @Slf4j
+@AllArgsConstructor
 public class OnlydustException extends RuntimeException {
 
     @NonNull

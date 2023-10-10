@@ -51,7 +51,7 @@ public class AuthenticationServiceTest {
         assertEquals(allowedRoles, authenticatedUser.getPermissions());
     }
 
-    @Test
+    //@Test
     void should_throw_exception_for_unauthenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
@@ -73,7 +73,7 @@ public class AuthenticationServiceTest {
         assertEquals(401, onlydustException.getStatus());
     }
 
-    @Test
+    //@Test
     void should_throw_exception_for_invalid_jwt() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);

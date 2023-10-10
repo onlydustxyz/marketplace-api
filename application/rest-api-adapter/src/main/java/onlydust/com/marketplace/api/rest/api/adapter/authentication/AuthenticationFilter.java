@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,14 +19,14 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
     public final static String BEARER_PREFIX = "Bearer ";
-    private final HasuraJwtService hasuraJwtService;
+    private final Auth0JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            SecurityContextHolder.getContext().setAuthentication(hasuraJwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, "")));
+            SecurityContextHolder.getContext().setAuthentication(jwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, "")));
         }
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }

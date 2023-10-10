@@ -55,8 +55,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository) {
-        return new PostgresUserAdapter(customUserRepository);
+    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository, final UserRepository userRepository) {
+        return new PostgresUserAdapter(customUserRepository, userRepository);
     }
 
 }
