@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
+import onlydust.com.marketplace.api.contract.model.CreateProjectRequest;
+import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectListResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectResponse;
+import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
@@ -48,6 +51,29 @@ public class ProjectsRestApi implements ProjectsApi {
                 projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
                         search, mapSortByParameter(sort));
         return ResponseEntity.ok(mapProjectCards(projectViewPage));
+    }
+
+    @Override
+    public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
+        final UUID projectId = projectFacadePort.createProject(
+                CreateProjectCommand.builder()
+                        .name(createProjectRequest.getName())
+                        .shortDescription(createProjectRequest.getShortDescription())
+                        .longDescription(createProjectRequest.getLongDescription())
+                        .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                        .githubRepoIds(createProjectRequest.getGithubRepoIds())
+                        .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
+                        .moreInfos(createProjectRequest.getMoreInfo().stream()
+                                .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
+                                        .url(moreInfo.getUrl())
+                                        .value(moreInfo.getValue())
+                                        .build())
+                                .toList())
+                        .build()
+        );
+        final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
+        createProjectResponse.setProjectId(projectId);
+        return ResponseEntity.ok(createProjectResponse);
     }
 
 

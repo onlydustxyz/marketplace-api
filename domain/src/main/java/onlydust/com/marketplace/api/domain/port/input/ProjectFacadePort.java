@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
+import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
@@ -14,4 +15,6 @@ public interface ProjectFacadePort {
 
     Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
                                                                       UUID userId, String search, ProjectCardView.SortBy sort);
+
+    UUID createProject(CreateProjectCommand createProjectCommand);
 }
