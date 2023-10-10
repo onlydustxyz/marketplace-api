@@ -30,41 +30,43 @@ public class CustomProjectRepository {
                 join projects_sponsors ps on ps.sponsor_id = s.id and ps.project_id = :projectId
             """;
 
-    protected static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
-            "search_project.project_id), search_project.* from (" +
-            "select p.project_id," +
-            "       p.hiring," +
-            "       p.logo_url," +
-            "       p.key," +
-            "       p.name," +
-            "       p.short_description," +
-            "       p.visibility," +
-            "       p.rank," +
-            "       cast(gr.languages as text)," +
-            "       gr.id repository_id," +
-            "       u.id                   p_lead_id," +
-            "       u.login_at_signup      p_lead_login," +
-            "       u.avatar_url_at_signup p_lead_avatar_url," +
-            "       s.name sponsor_name," +
-            "       s.logo_url sponsor_logo_url," +
-            "       s.id sponsor_id," +
-            "       repo_count.repo_count," +
-            "       coalesce(contributors_count.contributors_count,0) contributors_count" +
-            " from project_details p" +
-            "         left join projects_sponsors ps on ps.project_id = p.project_id" +
-            "         left join sponsors s on s.id = ps.sponsor_id" +
-            "         left join project_github_repos pgr on pgr.project_id = p.project_id" +
-            "         left join github_repos gr on gr.id = pgr.github_repo_id" +
-            "         left join project_leads pl on pl.project_id = p.project_id" +
-            "         left join auth_users u on u.id = pl.user_id" +
-            "         left join (select count(github_repo_id) repo_count, project_id" +
-            "                    from project_github_repos" +
-            "                    group by project_id) as repo_count on repo_count.project_id = p.project_id" +
-            "        left join (select count(github_user_id) contributors_count, project_id" +
-            "                   from projects_contributors" +
-            "                   group by project_id) as contributors_count on contributors_count.project_id = " +
-            "p.project_id" +
-            ") as search_project";
+    protected static final String FIND_PROJECTS_BASE_QUERY = """
+            select row_number() over (order by $order_by search_project.project_id), search_project.* from (
+                select
+                    p.project_id,
+                    p.hiring,
+                    p.logo_url,
+                    p.key,
+                    p.name,
+                    p.short_description,
+                    p.visibility,
+                    p.rank,
+                    cast(gr.languages as text),
+                    gr.id repository_id,
+                    u.id                   p_lead_id,
+                    u.login_at_signup      p_lead_login,
+                    u.avatar_url_at_signup p_lead_avatar_url,
+                    s.name sponsor_name,
+                    s.logo_url sponsor_logo_url,
+                    s.id sponsor_id,
+                    repo_count.repo_count,
+                    coalesce(contributors_count.contributors_count,0) contributors_count
+                from project_details p
+                left join projects_sponsors ps on ps.project_id = p.project_id
+                left join sponsors s on s.id = ps.sponsor_id
+                left join project_github_repos pgr on pgr.project_id = p.project_id
+                left join github_repos gr on gr.id = pgr.github_repo_id
+                left join project_leads pl on pl.project_id = p.project_id
+                left join auth_users u on u.id = pl.user_id
+                left join (select count(github_repo_id) repo_count, project_id
+                            from project_github_repos
+                            group by project_id) as repo_count on repo_count.project_id = p.project_id
+                left join (select count(github_user_id) contributors_count, project_id
+                            from projects_contributors
+                            group by project_id) as contributors_count on contributors_count.project_id = p.project_id
+                $where
+            ) as search_project
+            """;
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
@@ -124,20 +126,10 @@ public class CustomProjectRepository {
                                        final List<String> sponsors, final UUID userId,
                                        final String search, final ProjectCardView.SortBy sort) {
         final List<String> whereConditions = new ArrayList<>();
-        Optional<String> orderByCondition = Optional.empty();
         if (nonNull(search) && !search.isEmpty()) {
             whereConditions.add(
                     "search_project.short_description like '%" + search + "%' or search_project.name like '%" + search +
                             "%'");
-        }
-        if (nonNull(sort)) {
-            switch (sort) {
-                case CONTRIBUTORS_COUNT ->
-                        orderByCondition = Optional.of(" order by search_project.contributors_count desc");
-                case NAME -> orderByCondition = Optional.of(" order by search_project.name asc");
-                case RANK -> orderByCondition = Optional.of(" order by search_project.rank desc");
-                case REPOS_COUNT -> orderByCondition = Optional.of(" order by search_project.repo_count desc");
-            }
         }
         if (nonNull(userId)) {
             whereConditions.add("search_project.pl_user_id = '" + userId + "'");
@@ -150,8 +142,24 @@ public class CustomProjectRepository {
             whereConditions.add("search_project.languages like " + String.join(" or search_project" +
                     ".languages like ", technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
-        return FIND_PROJECTS_BASE_QUERY + (whereConditions.isEmpty() ? "" : " where " + String.join(" and ",
-                whereConditions.stream().map(s -> "(" + s + ")").toList())) + orderByCondition.orElse("");
+
+        Optional<String> orderByCondition = buildOrderByCondition(sort);
+        return FIND_PROJECTS_BASE_QUERY
+                .replaceFirst("\\$where", (whereConditions.isEmpty() ? "" : " where " + String.join(" and ", whereConditions.stream().map(s -> "(" + s + ")").toList())))
+                .replaceFirst("\\$order_by", orderByCondition.orElse(""));
+    }
+
+    private static Optional<String> buildOrderByCondition(ProjectCardView.SortBy sort) {
+        Optional<String> orderByCondition = Optional.empty();
+        if (nonNull(sort)) {
+            switch (sort) {
+                case CONTRIBUTORS_COUNT -> orderByCondition = Optional.of(" search_project.contributors_count desc,");
+                case NAME -> orderByCondition = Optional.of(" search_project.name asc,");
+                case RANK -> orderByCondition = Optional.of(" search_project.rank desc,");
+                case REPOS_COUNT -> orderByCondition = Optional.of(" search_project.repo_count desc,");
+            }
+        }
+        return orderByCondition;
     }
 
     public Page<ProjectCardView> findByTechnologiesSponsorsOwnershipSearchSortBy(final List<String> technologies,
