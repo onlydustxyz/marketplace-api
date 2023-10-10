@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtPayload;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -29,7 +29,7 @@ public class AuthenticationServiceTest {
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
         final List<String> allowedRoles = List.of(faker.pokemon().name(), faker.pokemon().location());
-        final HasuraJwtPayload.HasuraClaims hasuraClaims = HasuraJwtPayload.HasuraClaims.builder()
+        final Auth0JwtPayload.Claims claims = Auth0JwtPayload.Claims.builder()
                 .githubUserId(githubUserId)
                 .userId(userId)
                 .allowedRoles(allowedRoles)
@@ -37,10 +37,10 @@ public class AuthenticationServiceTest {
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(HasuraAuthentication.builder()
+                .thenReturn(Auth0Authentication.builder()
                         .isAuthenticated(true)
                         .claims(
-                                hasuraClaims
+                                claims
                         )
                         .build());
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
@@ -82,7 +82,7 @@ public class AuthenticationServiceTest {
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(HasuraAuthentication.builder()
+                .thenReturn(Auth0Authentication.builder()
                         .build());
         OnlydustException onlydustException = null;
         try {
