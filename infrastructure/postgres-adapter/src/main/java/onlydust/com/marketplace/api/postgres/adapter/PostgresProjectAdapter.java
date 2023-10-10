@@ -58,6 +58,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     public void createProject(UUID projectId, String name, String shortDescription, String longDescription, Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos, List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, String imageUrl) {
-        
+
     }
 }
