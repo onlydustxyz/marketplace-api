@@ -34,6 +34,14 @@ public class OnlydustException extends RuntimeException {
                 '}';
     }
 
+    public static OnlydustException internalServerError(final Exception exception) {
+        return OnlydustException.builder()
+                .message("INTERNAL_SERVER_ERROR")
+                .status(500)
+                .rootException(exception)
+                .build();
+    }
+
     private String getRootExceptionAsString() {
         try (StringWriter sw = new StringWriter()) {
             try (PrintWriter pw = new PrintWriter(sw)) {
