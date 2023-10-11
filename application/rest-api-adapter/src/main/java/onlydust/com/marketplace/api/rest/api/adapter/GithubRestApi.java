@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.GithubApi;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
 import onlydust.com.marketplace.api.contract.model.InstallationResponse;
-import onlydust.com.marketplace.api.contract.model.InstalledGithubOrganizationResponse;
-import onlydust.com.marketplace.api.contract.model.InstalledGithubRepoResponse;
+import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubInstallationMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,24 +19,16 @@ import java.util.List;
 @Tags(@Tag(name = "Github"))
 @AllArgsConstructor
 public class GithubRestApi implements GithubApi {
+    private final GithubInstallationFacadePort githubInstallationFacadePort;
 
     private final Faker faker = new Faker();
 
     @Override
     public ResponseEntity<InstallationResponse> getGithubInstallation(Long installationId) {
-        final InstallationResponse installationResponse = new InstallationResponse();
-        final InstalledGithubOrganizationResponse organization = new InstalledGithubOrganizationResponse();
-        organization.setName(faker.pokemon().name());
-        organization.setLogoUrl(faker.internet().url());
-        installationResponse.setOrganization(organization);
-        for (int i = 0; i < 5; i++) {
-            final InstalledGithubRepoResponse reposItem = new InstalledGithubRepoResponse();
-            reposItem.setName(faker.harryPotter().character());
-            reposItem.setGithubId(faker.number().randomNumber());
-            reposItem.setShortDescription(faker.rickAndMorty().location());
-            installationResponse.addReposItem(reposItem);
-        }
-        return ResponseEntity.ok(installationResponse);
+        return githubInstallationFacadePort.getAccountByInstallationId(installationId)
+                .map(GithubInstallationMapper::mapToInstallationResponse)
+                .map(ResponseEntity::ok)
+                .orElseThrow();
     }
 
     @Override

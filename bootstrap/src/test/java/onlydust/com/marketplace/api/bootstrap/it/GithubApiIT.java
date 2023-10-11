@@ -7,7 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GithubApiIT extends AbstractMarketplaceApiIT {
     private static final String ONLYDUST_ACCOUNT_JSON = """
             {
-              
+              "organization": {
+                "name": "onlydustxyz",
+                "logoUrl": "https://avatars.githubusercontent.com/u/98735558?v=4"
+              },
+              "repos": [{
+                "name": "marketplace-frontend",
+                "shortDescription": "Contributions marketplace backend services",
+                "githubId": 498695724
+              }]
             }
             """;
 
@@ -17,7 +25,7 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_github_account_from_installation_id() {
         client.get()
-                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/498695724"))
+                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/123456"))
                 .exchange()
                 // Then
                 .expectStatus()
