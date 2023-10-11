@@ -26,8 +26,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            SecurityContextHolder.getContext().setAuthentication(jwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, "")));
+            jwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, "")).ifPresent(authentication -> {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            });
         }
+
         filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 

@@ -26,36 +26,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(403);
+                .isEqualTo(401);
     }
-
-//    @Test
-//    void should_get_current_user_given_a_valid_hasura_jwt() throws JsonProcessingException {
-//        // Given
-//        final UUID userId = UUID.randomUUID();
-//        final long githubUserId = faker.number().randomNumber();
-//        final String hasuraJwt = JwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
-//                .sub(userId.toString())
-//                .iss(jwtSecret.getIssuer())
-//                .claims(HasuraJwtPayload.HasuraClaims.builder()
-//                        .githubUserId(githubUserId)
-//                        .userId(userId)
-//                        .allowedRoles(List.of(faker.pokemon().name(), "me"))
-//                        .build())
-//                .build());
-//
-//        // When
-//        client.get()
-//                .uri(getApiURI(ME_GET))
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + hasuraJwt)
-//                // Then
-//                .exchange()
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .jsonPath("$.id").isEqualTo(userId.toString())
-//                .jsonPath("$.githubUserId").isEqualTo(githubUserId);
-//    }
 
 
     @Test

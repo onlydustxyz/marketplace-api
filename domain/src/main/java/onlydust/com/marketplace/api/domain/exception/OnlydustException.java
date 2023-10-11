@@ -18,9 +18,9 @@ import java.util.Objects;
 public class OnlydustException extends RuntimeException {
 
     @NonNull
-    String message;
-    @NonNull
     Integer status;
+    @NonNull
+    String message;
     Exception rootException;
 
     @Override

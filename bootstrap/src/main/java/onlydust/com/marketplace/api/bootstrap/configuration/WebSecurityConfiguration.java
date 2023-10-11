@@ -11,13 +11,19 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecre
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 public class WebSecurityConfiguration {
 
     @Bean
-    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter) {
-        return new WebSecurityAdapter(authenticationFilter);
+    public DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint(final HandlerExceptionResolver handlerExceptionResolver) {
+        return new DelegatedAuthenticationEntryPoint(handlerExceptionResolver);
+    }
+
+    @Bean
+    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter, final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
+        return new WebSecurityAdapter(authenticationFilter, delegatedAuthenticationEntryPoint);
     }
 
     @Bean

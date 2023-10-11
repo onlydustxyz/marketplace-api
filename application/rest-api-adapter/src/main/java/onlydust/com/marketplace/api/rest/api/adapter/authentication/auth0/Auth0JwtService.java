@@ -8,11 +8,11 @@ import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,33 +41,33 @@ public class Auth0JwtService {
                 .build();
     }
 
-    public Auth0Authentication getAuthenticationFromJwt(final String jwt) {
-        final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
-        final Auth0JwtClaims jwtClaims;
+    public Optional<Auth0Authentication> getAuthenticationFromJwt(final String jwt) {
         try {
-            jwtClaims = objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
+            final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
+            final Auth0JwtClaims jwtClaims = objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
                     Auth0JwtClaims.class);
+            final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
+            final User user = this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
+                    .githubUserId(githubUserId)
+                    .githubLogin(jwtClaims.getGithubLogin())
+                    .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
+                    .build());
+
+            return Optional.of(Auth0Authentication.builder()
+                    .authorities(user.getPermissions().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                    .credentials(decodedJwt)
+                    .isAuthenticated(true)
+                    .user(user)
+                    .principal(decodedJwt.getSubject())
+                    .build());
         } catch (IOException e) {
-            return getUnauthenticatedWithExceptionFor(
-                    HttpStatus.UNAUTHORIZED.value(),
-                    "Unable to deserialize Jwt token",
-                    e);
+            LOGGER.error("Unable to deserialize Jwt token", e);
+            return Optional.empty();
+        } catch (Exception e) {
+            LOGGER.debug("Invalid Jwt token", e);
+            return Optional.empty();
         }
 
-        final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
-        final User user = this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
-                .githubUserId(githubUserId)
-                .githubLogin(jwtClaims.getGithubLogin())
-                .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
-                .build());
-
-        return Auth0Authentication.builder()
-                .authorities(user.getPermissions().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
-                .credentials(decodedJwt)
-                .isAuthenticated(true)
-                .user(user)
-                .principal(decodedJwt.getSubject())
-                .build();
     }
 
 }
