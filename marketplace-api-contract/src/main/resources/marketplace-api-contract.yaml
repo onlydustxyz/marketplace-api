@@ -673,16 +673,16 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github/installation:
+  /api/v1/github/installations:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Github
-      summary: Get Github repositories linked to installation Id
-      operationId: getGithubRepositoriesForInstallationId
+      summary: Get Github organization and repositories linked to installation Id
+      operationId: getGithubInstallation
       description: |
-        Get Github Repositories for installation Id
+        Get Github Organization and  Repositories for installation Id
       parameters:
         - in: query
           name: id
@@ -693,15 +693,11 @@ paths:
             example: 123456
       responses:
         "200":
-          description: 'Github repo list'
+          description: 'Github installation info'
           content:
             application/json:
               schema:
-                properties:
-                  organization:
-                    $ref: '#/components/schemas/InstalledGithubOrganizationResponse'
-                  repos:
-                    $ref: '#/components/schemas/InstalledGithubRepoListResponse'
+                $ref: '#/components/schemas/InstallationResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1785,6 +1781,14 @@ components:
           format: url
         isRegistered:
           type: boolean
+
+    InstallationResponse:
+      type: object
+      properties:
+        organization:
+          $ref: '#/components/schemas/InstalledGithubOrganizationResponse'
+        repos:
+          $ref: '#/components/schemas/InstalledGithubRepoListResponse'
 
     InstalledGithubRepoListResponse:
       type: array

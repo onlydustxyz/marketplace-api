@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.GithubApi;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
-import onlydust.com.marketplace.api.contract.model.InstalledGithubRepoResponse;
+import onlydust.com.marketplace.api.contract.model.InstallationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +17,8 @@ import java.util.List;
 public class GithubRestApi implements GithubApi {
 
     @Override
-    public ResponseEntity<List<InstalledGithubRepoResponse>> getGithubRepositoriesForInstallationId(Long installationId) {
-        return GithubApi.super.getGithubRepositoriesForInstallationId(installationId);
+    public ResponseEntity<InstallationResponse> getGithubInstallation(Long installationId) {
+        return GithubApi.super.getGithubInstallation(installationId);
     }
 
     @Override
