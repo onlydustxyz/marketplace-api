@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationContext;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.SpringAuthenticationContext;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
@@ -17,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class WebSecurityConfiguration {
 
     @Bean
-    public onlydust.com.marketplace.api.rest.api.adapter.authentication.WebSecurityConfiguration apiSecurityConfiguration(final AuthenticationFilter authenticationFilter) {
-        return new onlydust.com.marketplace.api.rest.api.adapter.authentication.WebSecurityConfiguration(authenticationFilter);
+    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter) {
+        return new WebSecurityAdapter(authenticationFilter);
     }
 
     @Bean
