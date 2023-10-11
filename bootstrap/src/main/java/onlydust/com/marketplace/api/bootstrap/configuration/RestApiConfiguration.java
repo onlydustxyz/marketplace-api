@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
@@ -42,8 +43,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public GithubRestApi githubRestApi() {
-        return new GithubRestApi();
+    public GithubRestApi githubRestApi(final GithubInstallationFacadePort githubInstallationFacadePort) {
+        return new GithubRestApi(githubInstallationFacadePort);
     }
 
     @Bean

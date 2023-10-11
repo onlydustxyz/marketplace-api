@@ -11,6 +11,11 @@ application:
       # trailing slash is important!
       jwks-url: https://onlydust-hackathon.eu.auth0.com/
       expires-at-leeway: 10
+  github:
+    installation:
+      retry:
+        retry-count: 5
+        retry-interval: 300
 
 spring:
   application:

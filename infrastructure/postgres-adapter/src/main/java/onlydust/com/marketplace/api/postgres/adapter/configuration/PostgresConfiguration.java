@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -47,6 +48,11 @@ public class PostgresConfiguration {
                                                          final CustomRepoRepository customRepoRepository,
                                                          final CustomUserRepository customUserRepository) {
         return new PostgresProjectAdapter(projectRepository, customProjectRepository, customContributorRepository, customRepoRepository, customUserRepository);
+    }
+
+    @Bean
+    public PostgresGithubAdapter postgresGithubAdapter(final GithubAccountRepository githubAccountRepository) {
+        return new PostgresGithubAdapter(githubAccountRepository);
     }
 
     @Bean

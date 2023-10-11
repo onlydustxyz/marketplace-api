@@ -42,6 +42,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String USERS_GET = "api/v1/users";
+    protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
 
     @Container
     static PostgreSQLContainer postgresSQLContainer =
