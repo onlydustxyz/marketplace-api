@@ -673,7 +673,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github/installations:
+  /api/v1/github/installations/{id}:
     get:
       security:
         - bearerAuth: [ ]
@@ -684,7 +684,7 @@ paths:
       description: |
         Get Github Organization and  Repositories for installation Id
       parameters:
-        - in: query
+        - in: path
           name: id
           required: true
           schema:
