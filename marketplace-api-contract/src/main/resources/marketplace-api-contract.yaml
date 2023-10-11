@@ -645,7 +645,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github-users:
+  /api/v1/github/users:
     get:
       security:
         - bearerAuth: [ ]
@@ -673,19 +673,19 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github-repos:
+  /api/v1/github/installation:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Github
-      summary: Get Github repositories
+      summary: Get Github repositories linked to installation Id
       operationId: getGithubRepositoriesForInstallationId
       description: |
-        Get Github Repository for installation Id
+        Get Github Repositories for installation Id
       parameters:
         - in: query
-          name: installationId
+          name: id
           required: true
           schema:
             type: integer
@@ -697,7 +697,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstalledGithubRepoListResponse'
+                properties:
+                  organization:
+                    $ref: '#/components/schemas/InstalledGithubOrganizationResponse'
+                  repos:
+                    $ref: '#/components/schemas/InstalledGithubRepoListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1804,3 +1808,15 @@ components:
         githubId:
           type: integer
           format: int64
+
+    InstalledGithubOrganizationResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        logoUrl:
+          type: string
+          format: url
+      example:
+        name: Kakarot
+        logoUrl: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
