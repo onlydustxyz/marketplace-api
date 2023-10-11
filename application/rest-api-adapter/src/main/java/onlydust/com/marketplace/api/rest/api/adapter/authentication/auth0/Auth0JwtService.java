@@ -31,9 +31,9 @@ public class Auth0JwtService {
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
 
-    public Auth0JwtService(final String jwksUrl, UserFacadePort userFacadePort) {
+    public Auth0JwtService(final Auth0Properties conf, UserFacadePort userFacadePort) {
         this.userFacadePort = userFacadePort;
-        JwkProvider provider = new JwkProviderBuilder(jwksUrl)
+        JwkProvider provider = new JwkProviderBuilder(conf.getJwksUrl())
                 .build();
 
         RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -57,6 +57,7 @@ public class Auth0JwtService {
         Algorithm algorithm = Algorithm.RSA256(keyProvider);
 
         this.jwtVerifier = JWT.require(algorithm)
+                .acceptExpiresAt(conf.getExpiresAtLeeway())
                 .withClaimPresence("nickname")
                 .withClaimPresence("picture")
                 .build();

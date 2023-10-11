@@ -23,7 +23,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public Auth0JwtService auth0JwtService(final Auth0Properties auth0Properties, final UserFacadePort userFacadePort) {
-        return new Auth0JwtService(auth0Properties.getJwksUrl(), userFacadePort);
+        return new Auth0JwtService(auth0Properties, userFacadePort);
     }
 
     @Bean

@@ -10,6 +10,7 @@ application:
     auth0:
       # trailing slash is important!
       jwks-url: https://onlydust-hackathon.eu.auth0.com/
+      expires-at-leeway: 10
 
 spring:
   application:
