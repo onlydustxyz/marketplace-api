@@ -3,12 +3,14 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,28 +21,26 @@ public class AuthenticationServiceTest {
 
     private static final Faker faker = new Faker();
 
-//    @Test
+    @Test
     void should_return_authenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(
-                authenticationContext);
+        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
-        final List<String> allowedRoles = List.of(faker.pokemon().name(), faker.pokemon().location());
-        final HasuraJwtPayload.HasuraClaims hasuraClaims = HasuraJwtPayload.HasuraClaims.builder()
+        final List<String> allowedRoles = List.of("me");
+        final UserClaims claims = UserClaims.builder()
                 .githubUserId(githubUserId)
                 .userId(userId)
-                .allowedRoles(allowedRoles)
+                .login(faker.name().username())
                 .build();
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(HasuraAuthentication.builder()
+                .thenReturn(Auth0Authentication.builder()
                         .isAuthenticated(true)
-                        .claims(
-                                hasuraClaims
-                        )
+                        .claims(claims)
+                        .authorities(allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                         .build());
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
@@ -50,12 +50,11 @@ public class AuthenticationServiceTest {
         assertEquals(allowedRoles, authenticatedUser.getPermissions());
     }
 
-    //@Test
+    @Test
     void should_throw_exception_for_unauthenticated_user() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(
-                authenticationContext);
+        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
@@ -72,17 +71,15 @@ public class AuthenticationServiceTest {
         assertEquals(401, onlydustException.getStatus());
     }
 
-    //@Test
+    @Test
     void should_throw_exception_for_invalid_jwt() {
         // Given
         final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticationService authenticationService = new AuthenticationService(
-                authenticationContext);
+        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
-                .thenReturn(HasuraAuthentication.builder()
-                        .build());
+                .thenReturn(Auth0Authentication.builder().build());
         OnlydustException onlydustException = null;
         try {
             authenticationService.getAuthenticatedUser();

@@ -16,11 +16,14 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.UserClaims;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class Auth0JwtService {
@@ -105,6 +108,8 @@ public class Auth0JwtService {
                 .build();
 
         return Auth0Authentication.builder()
+                //TODO add authorities from DB
+                .authorities(Stream.of("me").map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(decodedJwt)
                 .isAuthenticated(true)
                 .claims(claims)

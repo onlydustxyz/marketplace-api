@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0A
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @Slf4j
 public class AuthenticationService {
@@ -35,7 +37,7 @@ public class AuthenticationService {
         final UserClaims claims = (UserClaims) authentication.getDetails();
         return User.builder()
                 .id(claims.getUserId())
-                //TODO: .permissions(claims.getAllowedRoles())
+                .permissions(authentication.getAuthorities().stream().map(Object::toString).collect(Collectors.toList()))
                 .githubUserId(claims.getGithubUserId())
                 .build();
     }

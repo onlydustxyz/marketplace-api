@@ -2,14 +2,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity;
 
 
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.time.Instant;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +17,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "users", schema = "iam")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
     @Id
@@ -31,10 +30,10 @@ public class UserEntity {
     @Column(name = "github_avatar_url", nullable = false)
     String githubAvatarUrl;
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
-    @LastModifiedDate
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
+    private Date updatedAt;
 }

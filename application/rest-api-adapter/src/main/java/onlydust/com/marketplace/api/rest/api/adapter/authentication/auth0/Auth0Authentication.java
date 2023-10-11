@@ -16,15 +16,14 @@ public class Auth0Authentication implements Authentication {
     DecodedJWT credentials;
     UserClaims claims;
     String principal;
+    Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
     Boolean isAuthenticated = false;
     OnlydustException onlydustException;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //TODO
-        return null;
-        //return this.claims.allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return authorities;
     }
 
     @Override
