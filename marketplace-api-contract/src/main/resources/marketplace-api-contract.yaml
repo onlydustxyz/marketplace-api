@@ -455,7 +455,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -486,7 +486,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -534,7 +534,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -567,7 +567,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
     post:
@@ -603,7 +603,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -641,7 +641,7 @@ paths:
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
-          $ref: '#/components/responses/ProjectNotFoundError'
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -700,6 +700,8 @@ paths:
                 $ref: '#/components/schemas/InstallationResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -732,12 +734,12 @@ components:
             id: 4f7c660e-6cf1-4424-b240-e630c4c19069
           schema:
             $ref: '#/components/schemas/OnlyDustError'
-    ProjectNotFoundError:
-      description: Project not found
+    NotFoundError:
+      description: Requested resource not found
       content:
         application/problem+json:
           example:
-            message: Project not found
+            message: NOT_FOUND
             status: 404
             id: 4f7c660e-6cf1-4424-b240-e630c4c19069
           schema:

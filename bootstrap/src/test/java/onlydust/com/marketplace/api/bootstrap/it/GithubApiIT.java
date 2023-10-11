@@ -33,4 +33,18 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(ONLYDUST_ACCOUNT_JSON);
     }
+
+    @Test
+    void should_return_404_when_not_found() {
+        client.get()
+                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNotFound()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.message").isEqualTo("NOT_FOUND");
+    }
 }
