@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import com.auth0.jwt.interfaces.JWTVerifier;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,8 +21,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public Auth0JwtService auth0JwtService(final Auth0Properties auth0Properties, final UserFacadePort userFacadePort) {
-        return new Auth0JwtService(auth0Properties, userFacadePort);
+    public JWTVerifier jwtVerifier(final Auth0Properties auth0Properties) {
+        return new Auth0JwtVerifier(auth0Properties);
+    }
+
+    @Bean
+    public Auth0JwtService auth0JwtService(final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
+        return new Auth0JwtService(jwtVerifier, userFacadePort);
     }
 
     @Bean

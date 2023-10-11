@@ -3,11 +3,12 @@ package onlydust.com.marketplace.api.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,6 +70,7 @@ public class UserServiceTest {
                 .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
                 .githubUserId(githubUserIdentity.getGithubUserId())
                 .login(githubUserIdentity.getGithubLogin())
+                .permissions(List.of("me"))
                 .build(), userByGithubIdentity);
 
     }

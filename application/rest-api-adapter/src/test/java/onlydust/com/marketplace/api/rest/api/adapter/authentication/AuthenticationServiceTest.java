@@ -29,17 +29,18 @@ public class AuthenticationServiceTest {
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
         final List<String> allowedRoles = List.of("me");
-        final UserClaims claims = UserClaims.builder()
+        final User user = User.builder()
                 .githubUserId(githubUserId)
-                .userId(userId)
+                .id(userId)
                 .login(faker.name().username())
+                .permissions(List.of("me"))
                 .build();
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(Auth0Authentication.builder()
                         .isAuthenticated(true)
-                        .claims(claims)
+                        .user(user)
                         .authorities(allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                         .build());
         final User authenticatedUser = authenticationService.getAuthenticatedUser();

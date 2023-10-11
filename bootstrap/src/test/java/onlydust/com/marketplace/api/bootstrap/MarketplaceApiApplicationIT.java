@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap;
 
-import onlydust.com.marketplace.api.bootstrap.helper.ITAuthenticationContext;
+import com.auth0.jwt.interfaces.JWTVerifier;
+import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +17,8 @@ public class MarketplaceApiApplicationIT {
 
     @Bean
     @Primary
-    public ITAuthenticationContext authenticationContext() {
-        return new ITAuthenticationContext();
+    public JWTVerifier jwtVerifier() {
+        return new JwtVerifierStub();
     }
 
 }

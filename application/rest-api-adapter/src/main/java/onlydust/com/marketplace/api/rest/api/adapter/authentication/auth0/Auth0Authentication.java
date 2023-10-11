@@ -4,7 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.UserClaims;
+import onlydust.com.marketplace.api.domain.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,7 +14,7 @@ import java.util.Collection;
 @Builder
 public class Auth0Authentication implements Authentication {
     DecodedJWT credentials;
-    UserClaims claims;
+    User user;
     String principal;
     Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
@@ -33,7 +33,7 @@ public class Auth0Authentication implements Authentication {
 
     @Override
     public Object getDetails() {
-        return this.claims;
+        return this.user;
     }
 
     @Override
