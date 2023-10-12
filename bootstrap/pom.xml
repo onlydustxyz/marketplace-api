@@ -45,6 +45,11 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>aws-s3-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
@@ -90,7 +95,7 @@
         </dependency>
 
     </dependencies>
-    
+
     <build>
         <finalName>marketplace-api</finalName>
         <plugins>
