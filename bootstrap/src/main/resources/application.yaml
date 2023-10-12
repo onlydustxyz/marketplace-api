@@ -58,3 +58,9 @@ spring:
 
 server:
   port: ${PORT}
+infrastructure:
+  aws:
+    image-bucket: onlydust-app-images
+    region: eu-west-1
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
