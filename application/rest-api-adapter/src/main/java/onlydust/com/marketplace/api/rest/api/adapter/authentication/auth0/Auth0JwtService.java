@@ -4,7 +4,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
@@ -24,21 +23,6 @@ public class Auth0JwtService {
     public Auth0JwtService(JWTVerifier jwtVerifier, UserFacadePort userFacadePort) {
         this.userFacadePort = userFacadePort;
         this.jwtVerifier = jwtVerifier;
-    }
-
-
-    private static Auth0Authentication getUnauthenticatedWithExceptionFor(final int status,
-                                                                          final String message,
-                                                                          final Exception exception
-    ) {
-        return Auth0Authentication.builder()
-                .onlydustException(OnlydustException
-                        .builder()
-                        .status(status)
-                        .message(message)
-                        .rootException(exception)
-                        .build())
-                .build();
     }
 
     public Optional<Auth0Authentication> getAuthenticationFromJwt(final String jwt) {
