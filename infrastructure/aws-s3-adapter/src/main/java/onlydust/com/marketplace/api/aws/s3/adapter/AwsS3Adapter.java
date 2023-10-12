@@ -11,7 +11,9 @@ import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Base64;
 
 @AllArgsConstructor
@@ -22,11 +24,15 @@ public class AwsS3Adapter implements ImageStoragePort {
     private final AmazonS3 amazonS3;
 
     @Override
-    public String storeImage(String fileName, InputStream imageInputStream) {
-        return null;
+    public URL storeImage(String fileName, InputStream imageInputStream) {
+        try {
+            return uploadByteArrayToS3Bucket(imageInputStream.readAllBytes(), amazonS3Properties.getImageBucket(), fileName);
+        } catch (IOException e) {
+            throw new OnlydustException(400, "Failed to read image input stream", e);
+        }
     }
 
-    private void uploadByteArrayToS3Bucket(final byte[] byteArray, final String bucketName, final String bucketKey) {
+    private URL uploadByteArrayToS3Bucket(final byte[] byteArray, final String bucketName, final String bucketKey) {
         final String md5 = new String(Base64.getEncoder().encode(DigestUtils.md5(byteArray)));
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         try {
@@ -36,6 +42,7 @@ public class AwsS3Adapter implements ImageStoragePort {
                 LOGGER.error("Bucket {} {} md5 content is not equaled to file md5 content", bucketName, bucketKey);
                 throw OnlydustException.internalServerError(null);
             }
+            return amazonS3.getUrl(bucketName, bucketKey);
         } catch (SdkClientException sdkClientException) {
             LOGGER.error("A technical exception happened with AWS SDK Client", sdkClientException);
             throw OnlydustException.internalServerError(sdkClientException);
