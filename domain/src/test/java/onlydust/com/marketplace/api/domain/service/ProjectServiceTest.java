@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,15 +44,16 @@ public class ProjectServiceTest {
         assertEquals(project, expectedProject);
     }
 
-    //    @Test
-    void should_create_project() {
+    @Test
+    void should_create_project() throws MalformedURLException {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
         final InputStream imageInputStream = mock(InputStream.class);
-        final CreateProjectCommand createProjectCommand = CreateProjectCommand.builder()
+        final String imageUrl = faker.internet().image();
+        final CreateProjectCommand command = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())
                 .shortDescription(faker.lorem().sentence())
                 .longDescription(faker.lorem().paragraph())
@@ -61,19 +64,19 @@ public class ProjectServiceTest {
                 .image(imageInputStream)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
-        final String imageUrl = faker.internet().url();
 
         // When
+        when(imageStoragePort.storeImage(imageInputStream)).thenReturn(new URL(imageUrl));
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
-        final UUID projectId = projectService.createProject(createProjectCommand);
+        final UUID projectId = projectService.createProject(command);
 
         // Then
         assertNotNull(projectId);
-        verify(projectStoragePort, times(1)).createProject(expectedProjectId, createProjectCommand.getName(),
-                createProjectCommand.getShortDescription(),
-                createProjectCommand.getLongDescription(), createProjectCommand.getIsLookingForContributors(),
-                createProjectCommand.getMoreInfos(), createProjectCommand.getGithubRepoIds(),
-                createProjectCommand.getGithubUserIdsAsProjectLeads(),
+        verify(projectStoragePort, times(1)).createProject(expectedProjectId, command.getName(),
+                command.getShortDescription(),
+                command.getLongDescription(), command.getIsLookingForContributors(),
+                command.getMoreInfos(), command.getGithubRepoIds(),
+                command.getGithubUserIdsAsProjectLeads(),
                 imageUrl
         );
 

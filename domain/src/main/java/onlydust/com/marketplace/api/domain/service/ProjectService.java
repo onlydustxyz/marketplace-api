@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,8 +40,14 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public UUID createProject(CreateProjectCommand createProjectCommand) {
-        this.imageStoragePort.storeImage(createProjectCommand.getImage());
-        return null;
+    public UUID createProject(CreateProjectCommand command) {
+        final UUID projectId = uuidGeneratorPort.generate();
+        final URL imageUrl = this.imageStoragePort.storeImage(command.getImage());
+        this.projectStoragePort.createProject(projectId, command.getName(),
+                command.getShortDescription(), command.getLongDescription(),
+                command.getIsLookingForContributors(), command.getMoreInfos(),
+                command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeads(),
+                imageUrl.toString());
+        return projectId;
     }
 }
