@@ -8,8 +8,14 @@ import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,6 +26,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
+    private final ProjectIdRepository projectIdRepository;
+    private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
+    private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final CustomRepoRepository customRepoRepository;
@@ -80,6 +89,16 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .rank(0)
                 .build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
+
+        this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
+
+        this.projectRepoRepository.saveAll(githubRepoIds.stream()
+                .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                .toList());
+
+        this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
+                .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId))
+                .toList());
     }
 }
