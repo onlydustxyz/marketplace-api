@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
@@ -162,9 +165,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
-    //@Test
+    @Test
     public void should_create_a_new_project() {
-        client.post()
+        // When
+        CreateProjectResponse response = client.post()
                 .uri(getApiURI(PROJECTS_POST))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -185,12 +189,31 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                           "githubRepoIds": [
                             498695724, 698096830
                           ],
-                          "image": "string"
+                          "imageUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/148ae058283c177e13b788ee36ec2563.png"
                         }
                         """)
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful();
+                .is2xxSuccessful()
+                .expectBody(CreateProjectResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getProjectId()).isNotNull();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(response.getProjectId().toString())
+                .jsonPath("$.name").isEqualTo("Super Project")
+                .jsonPath("$.shortDescription").isEqualTo("This is a super project")
+                .jsonPath("$.hiring").isEqualTo(true)
+                .jsonPath("$.repos[0].name").isEqualTo("marketplace-frontend");
     }
 }

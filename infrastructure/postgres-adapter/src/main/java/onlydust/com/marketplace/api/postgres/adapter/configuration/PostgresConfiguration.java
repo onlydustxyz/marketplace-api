@@ -4,6 +4,9 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -43,11 +46,21 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresProjectAdapter postgresProjectAdapter(final ProjectRepository projectRepository,
+                                                         final ProjectIdRepository projectIdRepository,
+                                                         final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
+                                                         final ProjectRepoRepository projectRepoRepository,
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomRepoRepository customRepoRepository,
                                                          final CustomUserRepository customUserRepository) {
-        return new PostgresProjectAdapter(projectRepository, customProjectRepository, customContributorRepository, customRepoRepository, customUserRepository);
+        return new PostgresProjectAdapter(projectRepository,
+                projectIdRepository,
+                projectLeaderInvitationRepository,
+                projectRepoRepository,
+                customProjectRepository,
+                customContributorRepository,
+                customRepoRepository,
+                customUserRepository);
     }
 
     @Bean
