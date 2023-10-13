@@ -539,6 +539,43 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/search/contributors:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Search project contributors by login
+      operationId: searchProjectContributors
+      description: |
+        Get the list of all contributors of the project matching the input query.
+        If not enough results are found, the search is extended to the 5 best matching github users.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: login
+          description: login query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'List of project contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorSearchResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/projects/{projectId}/rewards:
     get:
@@ -1168,6 +1205,43 @@ components:
             - public
             - private
 
+    ContributorSearchResponse:
+      type: object
+      required:
+        - internalContributors
+        - externalContributors
+      properties:
+        internalContributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorSearchItemResponse'
+        externalContributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorSearchItemResponse'
+
+    ContributorSearchItemResponse:
+      type: object
+      required:
+        - githubUserId
+        - login
+        - avatarUrl
+        - isRegistered
+      properties:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: User's Github login
+          example: ofux
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        isRegistered:
+          type: boolean
+          description: True if the user is registered on OnlyDust
 
     ContributorListResponse:
       type: object

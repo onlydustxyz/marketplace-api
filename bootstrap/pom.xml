@@ -40,6 +40,11 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <artifactId>github-api-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>rest-api-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
@@ -93,7 +98,12 @@
             <artifactId>wiremock-jre8</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.maciejwalkowiak.spring</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
