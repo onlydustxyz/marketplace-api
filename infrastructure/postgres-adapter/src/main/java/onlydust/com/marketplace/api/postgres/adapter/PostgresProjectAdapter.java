@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.Contributor;
+import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
@@ -81,5 +85,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
         this.projectRepository.save(projectEntity);
+    }
+
+    @Override
+    public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
+        return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream()
+                .map(entity -> Contributor.builder()
+                        .id(GithubUserIdentity.builder()
+                                .githubUserId(entity.getGithubUserId())
+                                .githubLogin(entity.getLogin())
+                                .githubAvatarUrl(entity.getAvatarUrl())
+                                .build())
+                        .isRegistered(entity.getIsRegistered())
+                        .build())
+                .toList();
     }
 }
