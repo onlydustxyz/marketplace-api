@@ -14,7 +14,7 @@ application:
   github:
     installation:
       retry:
-        retry-count: 6
+        retry-count: 20
         retry-interval: 500
 
 spring:
