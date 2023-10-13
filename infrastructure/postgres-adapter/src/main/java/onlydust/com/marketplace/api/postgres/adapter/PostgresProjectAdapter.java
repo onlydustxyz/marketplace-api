@@ -77,6 +77,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .hiring(isLookingForContributors)
                 .logoUrl(imageUrl)
                 .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
+                .rank(0)
                 .build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
         this.projectRepository.save(projectEntity);
