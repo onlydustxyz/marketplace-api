@@ -346,6 +346,7 @@ paths:
   /api/v1/projects:
     post:
       security:
+        - { }
         - bearerAuth: [ ]
       tags:
         - Projects
@@ -645,6 +646,32 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/logos:
+    post:
+      security:
+        - { }
+      tags:
+        - Projects
+      summary: Upload a project logo
+      operationId: uploadProjectLogo
+      requestBody:
+        content:
+          image/*:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/github/users:
     get:
       security:
@@ -704,6 +731,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
 
 
 components:
@@ -1752,9 +1780,10 @@ components:
           items:
             type: integer
             format: int64
-        image:
+        logoUrl:
           type: string
-          format: binary
+          format: url
+          description: Direct URL to project's logo image
 
     CreateProjectResponse:
       type: object
@@ -1829,3 +1858,13 @@ components:
       example:
         name: Kakarot
         logoUrl: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+
+    UploadImageResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          description: The direct URL to the uploaded image
+      example:
+        url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png

@@ -9,6 +9,6 @@ import static java.util.Objects.isNull;
 public interface DateMapper {
 
     static ZonedDateTime toZoneDateTime(final Date date) {
-        return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
     }
 }

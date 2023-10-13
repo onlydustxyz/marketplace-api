@@ -40,6 +40,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_BY_ID = "/api/v1/projects";
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
     protected static final String PROJECTS_GET = "/api/v1/projects";
+    protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String USERS_GET = "api/v1/users";
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";

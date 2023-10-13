@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
@@ -159,5 +160,37 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(BRETZEL_OVERVIEW_JSON);
+    }
+
+    //@Test
+    public void should_create_a_new_project() {
+        client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Super Project",
+                          "shortDescription": "This is a super project",
+                          "longDescription": "This is a super awesome project with a nice description",
+                          "moreInfo": [
+                            {
+                              "url": "https://t.me/foobar",
+                              "value": "foobar"
+                            }
+                          ],
+                          "isLookingForContributors": true,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505, 43467246
+                          ],
+                          "githubRepoIds": [
+                            498695724, 698096830
+                          ],
+                          "image": "string"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
     }
 }

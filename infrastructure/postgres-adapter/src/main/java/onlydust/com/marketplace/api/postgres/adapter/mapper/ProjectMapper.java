@@ -28,7 +28,7 @@ public interface ProjectMapper {
                 .shortDescription(projectEntity.getShortDescription())
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
-                .visibility(mapProjectVisibility(projectEntity.getVisibility()))
+                .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
                 .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).collect(Collectors.toSet()))
                 .contributorCount(contributorCount)
                 .repos(repos.stream().map(RepoMapper::mapToRepoCardView).collect(Collectors.toSet()))
@@ -41,13 +41,25 @@ public interface ProjectMapper {
         return project;
     }
 
-    static ProjectVisibility mapProjectVisibility(ProjectVisibilityEnumEntity visibility) {
+    static ProjectVisibility projectVisibilityToDomain(ProjectVisibilityEnumEntity visibility) {
         switch (visibility) {
             case PUBLIC -> {
                 return ProjectVisibility.PUBLIC;
             }
             case PRIVATE -> {
                 return ProjectVisibility.PRIVATE;
+            }
+        }
+        throw new IllegalArgumentException("Could not map project visibility");
+    }
+
+    static ProjectVisibilityEnumEntity projectVisibilityToEntity(ProjectVisibility visibility) {
+        switch (visibility) {
+            case PUBLIC -> {
+                return ProjectVisibilityEnumEntity.PUBLIC;
+            }
+            case PRIVATE -> {
+                return ProjectVisibilityEnumEntity.PRIVATE;
             }
         }
         throw new IllegalArgumentException("Could not map project visibility");

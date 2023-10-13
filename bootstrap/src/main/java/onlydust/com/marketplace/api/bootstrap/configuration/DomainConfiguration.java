@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.service.GithubInstallationService;
 import onlydust.com.marketplace.api.domain.service.ProjectService;
@@ -28,8 +29,9 @@ public class DomainConfiguration {
 
     @Bean
     public ProjectFacadePort projectFacadePort(final PostgresProjectAdapter postgresProjectAdapter,
+                                               final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort) {
-        return new ProjectService(postgresProjectAdapter, uuidGeneratorPort);
+        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort);
     }
 
     @Bean

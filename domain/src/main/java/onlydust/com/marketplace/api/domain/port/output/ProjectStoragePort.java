@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
@@ -19,5 +20,5 @@ public interface ProjectStoragePort {
 
     void createProject(UUID projectId, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
-                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, String imageUrl);
+                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, ProjectVisibility visibility, String imageUrl);
 }
