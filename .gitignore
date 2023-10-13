@@ -50,3 +50,4 @@ buildNumber.properties
 
 ### Env ###
 .env
+bootstrap/src/main/resources/application-local.yaml

@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
@@ -107,18 +106,50 @@ public class CustomUserRepository {
                  order by c.closed_at desc
                  limit 1) last_contribution_date
             """;
+    private final static String GET_PROJECT_STATS_BY_USER = """
+            select p.project_id as                       project_id,
+                   (select count(distinct github_user_id)
+                    from projects_contributors
+                    where project_id = p.project_id)     contributors_count,
+                   (select distinct b.initial_amount - b.remaining_amount total_usd_granted
+                    from project_details pd
+                             left join project_leads pl on pl.project_id = pd.project_id
+                             left join projects_budgets pb on pb.project_id = pd.project_id
+                             left join budgets b on b.id = pb.budget_id
+                    where pd.project_id = p.project_id
+                      and b.currency = 'usd')            total_granted,
+                   (select count(distinct c.id)
+                    from project_github_repos pgr
+                             left join contributions c
+                                       on c.repo_id = pgr.github_repo_id and c.status = 'complete'
+                             left join auth_users au on au.github_user_id = c.user_id and au.id = :userId
+                    where pgr.project_id = p.project_id) user_contributions_count,
+                   (select c.closed_at
+                    from project_github_repos pgr
+                             left join contributions c
+                                       on c.repo_id = pgr.github_repo_id and c.status = 'complete'
+                            left join auth_users au on au.github_user_id = c.user_id and au.id = :userId
+                    where pgr.project_id = p.project_id
+                      and closed_at is not null
+                    order by c.closed_at desc
+                    limit 1)                             last_contribution_date,
+                   p.is_lead,
+                   p.name,
+                   p.logo_url
+            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url
+                   from auth_users u
+                            join contributions c on c.user_id = u.github_user_id
+                            join project_github_repos gpr on gpr.github_repo_id = c.repo_id
+                            join project_details pd on pd.project_id = gpr.project_id
+                   where u.id = :userId and c.status = 'complete')
+                  UNION
+                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url
+                   from auth_users u
+                            left join project_leads pl on pl.user_id = u.id
+                            left join project_details pd on pd.project_id = pl.project_id
+                   where u.id = :userId)) as p
+            order by p.is_lead desc""";
 
-    private final static String GET_PROJECT_IDS_BY_USER = """
-            select pd.project_id, true as is_lead, pd.name, pd.logo_url
-            from auth_users au
-                     left join projects_contributors pc on pc.github_user_id = au.github_user_id
-                     left join  project_details pd on pd.project_id = pc.project_id
-            where au.id = :userId
-            union
-            select pd.project_id, false as is_lead, pd.name, pd.logo_url
-            from project_leads pl
-            left join  project_details pd on pd.project_id = pl.project_id
-            where pl.user_id = :userId""";
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef
@@ -204,16 +235,9 @@ public class CustomUserRepository {
     }
 
     public List<ProjectIdsForUserEntity> getProjectIdsForUserId(final UUID userId) {
-        return entityManager.createNativeQuery(GET_PROJECT_IDS_BY_USER, ProjectIdsForUserEntity.class)
+        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectIdsForUserEntity.class)
                 .setParameter("userId", userId)
                 .getResultList();
     }
 
-    public ProjectStatsEntity getProjectStatsForProjectIdAndUserId(final UUID projectId, final Long githubUserId) {
-        return (ProjectStatsEntity) entityManager.createNativeQuery(GET_PROJECT_STATS, ProjectStatsEntity.class)
-                .setParameter("projectId", projectId)
-                .setParameter("userId", githubUserId)
-                .getResultList()
-                .get(0);
-    }
 }

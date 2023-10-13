@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
@@ -40,14 +39,12 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .map(userProfileView -> {
                     for (ProjectIdsForUserEntity projectIdsForUserEntity :
                             customUserRepository.getProjectIdsForUserId(userId)) {
-                        final ProjectStatsEntity projectStatsForProjectIdAndUserId =
-                                customUserRepository.getProjectStatsForProjectIdAndUserId(projectIdsForUserEntity.getId(), userProfileView.getGithubId());
                         userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
-                                .contributorCount(projectStatsForProjectIdAndUserId.getContributorsCount())
+                                .contributorCount(projectIdsForUserEntity.getContributorsCount())
                                 .isProjectLead(projectIdsForUserEntity.getIsLead())
-                                .totalGranted(projectStatsForProjectIdAndUserId.getTotalGranted())
-                                .userContributionCount(projectStatsForProjectIdAndUserId.getUserContributionsCount())
-                                .userLastContributedAt(projectStatsForProjectIdAndUserId.getLastContributionDate())
+                                .totalGranted(projectIdsForUserEntity.getTotalGranted())
+                                .userContributionCount(projectIdsForUserEntity.getUserContributionsCount())
+                                .userLastContributedAt(projectIdsForUserEntity.getLastContributionDate())
                                 .id(projectIdsForUserEntity.getId())
                                 .logoUrl(projectIdsForUserEntity.getLogoUrl())
                                 .name(projectIdsForUserEntity.getName())

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -26,4 +28,13 @@ public class ProjectIdsForUserEntity {
     String name;
     @Column(name = "logo_url")
     String logoUrl;
+    @Column(name = "contributors_count")
+    Integer contributorsCount;
+    @Column(name = "total_granted")
+    BigDecimal totalGranted;
+    @Column(name = "user_contributions_count")
+    Integer userContributionsCount;
+    @Column(name = "last_contribution_date")
+    Date lastContributionDate;
+
 }

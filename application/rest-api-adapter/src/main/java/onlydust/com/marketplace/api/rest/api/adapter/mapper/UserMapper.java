@@ -46,6 +46,7 @@ public interface UserMapper {
                     userProfileProjects.setLogoUrl(ps.getLogoUrl());
                     userProfileProjects.setContributorCount(ps.getContributorCount());
                     userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
+                    userProfileProjects.setIsLead(ps.getIsProjectLead());
                     return userProfileProjects;
                 })
                 .toList();

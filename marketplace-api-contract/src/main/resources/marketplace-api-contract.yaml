@@ -1097,6 +1097,9 @@ components:
         name:
           type: string
           example: Verkle Tries
+        isLead:
+          type: boolean
+          example: false
         logoUrl:
           type: string
           format: url
