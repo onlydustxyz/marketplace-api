@@ -36,7 +36,7 @@ class AwsS3AdapterTest {
                 new AwsS3Adapter(amazonS3Properties, amazonS3);
         final byte[] bytes = fakeImage();
         final PutObjectResult putObjectResultMock = mock(PutObjectResult.class);
-        final String expectedFileName = String.format("%s.%s", new String(DigestUtils.md5(bytes)), "jpeg");
+        final String expectedFileName = "79fb1604b4c2cd782205f37490162bc8.jpeg";
 
         // When
         when(amazonS3.doesBucketExistV2(eq(amazonS3Properties.getImageBucket()))).thenReturn(true);

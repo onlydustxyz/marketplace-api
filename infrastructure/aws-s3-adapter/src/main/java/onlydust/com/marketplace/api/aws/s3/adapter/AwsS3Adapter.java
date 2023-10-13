@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Iterator;
 
@@ -41,16 +40,15 @@ public class AwsS3Adapter implements ImageStoragePort {
     public URL storeImage(InputStream imageInputStream) {
         try {
             final byte[] imageBytes = imageInputStream.readAllBytes();
-            final byte[] md5 = DigestUtils.md5(imageBytes);
-            final String fileName = String.format("%s.%s", new String(md5, StandardCharsets.UTF_8), getImageFileExtension(imageBytes));
-            return uploadByteArrayToS3Bucket(imageBytes, md5, amazonS3Properties.getImageBucket(), fileName);
+            final String fileName = String.format("%s.%s", DigestUtils.md5Hex(imageBytes), getImageFileExtension(imageBytes));
+            return uploadByteArrayToS3Bucket(imageBytes, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
             throw new OnlydustException(400, "Failed to read image input stream", e);
         }
     }
 
-    private URL uploadByteArrayToS3Bucket(final byte[] byteArray, final byte[] md5, final String bucketName, final String bucketKey) {
-        final String base64Md5 = new String(Base64.getEncoder().encode(md5));
+    private URL uploadByteArrayToS3Bucket(final byte[] byteArray, final String bucketName, final String bucketKey) {
+        final String base64Md5 = new String(Base64.getEncoder().encode(DigestUtils.md5(byteArray)));
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         try {
             final String md5FromUploadedFile = putObjectToS3andGetContentFileUploadedMd5(bucketName, bucketKey,
