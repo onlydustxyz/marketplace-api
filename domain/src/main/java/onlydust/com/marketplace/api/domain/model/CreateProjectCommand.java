@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.domain.model;
 import lombok.Builder;
 import lombok.Data;
 
-import java.io.InputStream;
 import java.util.List;
 
 @Data
@@ -15,8 +14,8 @@ public class CreateProjectCommand {
     List<Long> githubUserIdsAsProjectLeads;
     List<Long> githubRepoIds;
     List<MoreInfo> moreInfos;
-    InputStream image;
     Boolean isLookingForContributors;
+    String imageUrl;
 
 
     @Data

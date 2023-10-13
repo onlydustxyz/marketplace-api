@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
@@ -57,7 +58,27 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public void createProject(UUID projectId, String name, String shortDescription, String longDescription, Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos, List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, String imageUrl) {
-
+    @Transactional
+    public void createProject(UUID projectId,
+                              String name,
+                              String shortDescription,
+                              String longDescription,
+                              Boolean isLookingForContributors,
+                              List<CreateProjectCommand.MoreInfo> moreInfos,
+                              List<Long> githubRepoIds,
+                              List<Long> githubUserIdsAsProjectLeads,
+                              ProjectVisibility visibility,
+                              String imageUrl) {
+        final ProjectEntity projectEntity = ProjectEntity.builder()
+                .id(projectId)
+                .name(name)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .hiring(isLookingForContributors)
+                .logoUrl(imageUrl)
+                .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
+                .build();
+        moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
+        this.projectRepository.save(projectEntity);
     }
 }

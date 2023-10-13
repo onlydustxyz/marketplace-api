@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
@@ -15,6 +16,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -51,7 +53,6 @@ public class ProjectServiceTest {
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
-        final InputStream imageInputStream = mock(InputStream.class);
         final String imageUrl = faker.internet().image();
         final CreateProjectCommand command = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())
@@ -61,12 +62,11 @@ public class ProjectServiceTest {
                 .moreInfos(List.of(CreateProjectCommand.MoreInfo.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
                 .githubUserIdsAsProjectLeads(List.of(faker.number().randomNumber()))
                 .githubRepoIds(List.of(faker.number().randomNumber()))
-                .image(imageInputStream)
+                .imageUrl(imageUrl)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
 
         // When
-        when(imageStoragePort.storeImage(imageInputStream)).thenReturn(new URL(imageUrl));
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
         final UUID projectId = projectService.createProject(command);
 
@@ -77,8 +77,26 @@ public class ProjectServiceTest {
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeads(),
+                ProjectVisibility.PUBLIC,
                 imageUrl
         );
+    }
 
+    @Test
+    void should_upload_logo() throws MalformedURLException {
+        // Given
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
+        final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
+        final InputStream imageInputStream = mock(InputStream.class);
+        final String imageUrl = faker.internet().image();
+
+        // When
+        when(imageStoragePort.storeImage(imageInputStream)).thenReturn(new URL(imageUrl));
+        final URL url = projectService.saveLogoImage(imageInputStream);
+
+        // Then
+        assertThat(url.toString()).isEqualTo(imageUrl);
     }
 }

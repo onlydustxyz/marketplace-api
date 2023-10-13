@@ -5,6 +5,8 @@ import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,4 +19,6 @@ public interface ProjectFacadePort {
                                                                       UUID userId, String search, ProjectCardView.SortBy sort);
 
     UUID createProject(CreateProjectCommand createProjectCommand);
+
+    URL saveLogoImage(InputStream imageInputStream);
 }
