@@ -6,11 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +33,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
+    private final ContributorFacadePort contributorFacadePort;
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
@@ -94,4 +98,11 @@ public class ProjectsRestApi implements ProjectsApi {
         response.url(imageUrl.toString());
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<ContributorSearchResponse> searchProjectContributors(UUID projectId, String login) {
+        final var contributors = contributorFacadePort.searchContributors(projectId, login);
+        return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
+    }
+
 }

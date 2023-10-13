@@ -1,0 +1,15 @@
+{
+  "request": {
+    "url": "/search/users?per_page=5&q=antho",
+    "method": "GET",
+    "headers": {
+      "Authorization": {
+        "contains": "Bearer GITHUB_PAT"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "search-antho.json"
+  }
+}

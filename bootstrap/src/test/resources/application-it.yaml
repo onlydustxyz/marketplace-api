@@ -1,3 +1,6 @@
+infrastructure:
+  github:
+    personal-access-token: "GITHUB_PAT"
 spring:
   main:
     allow-bean-definition-overriding: true

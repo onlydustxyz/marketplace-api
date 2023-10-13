@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
@@ -13,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class RestApiConfiguration {
 
     @Bean
-    public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort) {
-        return new ProjectsRestApi(projectFacadePort);
+    public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort, final ContributorFacadePort contributorFacadePort) {
+        return new ProjectsRestApi(projectFacadePort, contributorFacadePort);
     }
 
     @Bean

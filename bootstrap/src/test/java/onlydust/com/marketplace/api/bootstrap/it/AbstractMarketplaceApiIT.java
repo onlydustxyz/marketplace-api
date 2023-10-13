@@ -1,6 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.github.javafaker.Faker;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
@@ -34,12 +38,16 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Slf4j
 @DirtiesContext
 @Import(SwaggerConfiguration.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri")
+})
 public class AbstractMarketplaceApiIT {
 
     protected static final Faker faker = new Faker();
     protected static final String PROJECTS_GET_BY_ID = "/api/v1/projects";
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
     protected static final String PROJECTS_GET = "/api/v1/projects";
+    protected static final String PROJECTS_SEARCH_CONTRIBUTORS = "/api/v1/projects/%s/search/contributors";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String USERS_GET = "api/v1/users";
@@ -56,6 +64,8 @@ public class AbstractMarketplaceApiIT {
                     .withCopyFileToContainer(
                             MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
                     .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+    @InjectWireMock("github")
+    protected WireMockServer githubWireMockServer;
     @LocalServerPort
     int port;
     @Autowired
