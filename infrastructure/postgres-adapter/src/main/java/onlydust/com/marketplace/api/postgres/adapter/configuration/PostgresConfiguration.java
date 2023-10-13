@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -68,6 +69,9 @@ public class PostgresConfiguration {
                 customRepoRepository,
                 customUserRepository,
                 customProjectListRepository);
+                                                         final CustomUserRepository customUserRepository) {
+        return new PostgresProjectAdapter(projectRepository, customProjectRepository, customContributorRepository,
+                customRepoRepository, customUserRepository);
     }
 
     @Bean
@@ -81,6 +85,10 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
+                                                   final UserRepository userRepository,
+                                                   final UserPayoutInfoRepository userPayoutInfoRepository) {
+        return new PostgresUserAdapter(customUserRepository, userRepository, userPayoutInfoRepository);
     public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
                                                    final UserRepository userRepository) {
         return new PostgresUserAdapter(customUserRepository, userRepository);

@@ -986,10 +986,12 @@ components:
     UserPayoutInformation:
       type: object
       properties:
-        #        identity:
-        #          oneOf:
-        #            - $ref: '#/components/schemas/PersonIdentity'
-        #            - $ref: '#/components/schemas/CompanyIdentity'
+        person:
+          $ref: '#/components/schemas/PersonIdentity'
+        company:
+          $ref: '#/components/schemas/CompanyIdentity'
+        is_company:
+          type: boolean
         location:
           type: object
           properties:

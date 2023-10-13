@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.util.List;
@@ -38,4 +39,8 @@ public class UserService implements UserFacadePort {
         return userStoragePort.getProfileById(userId);
     }
 
+    @Override
+    public UserPayoutInformation getPayoutInformationForUserId(UUID id) {
+        return userStoragePort.getPayoutInformationById(id);
+    }
 }
