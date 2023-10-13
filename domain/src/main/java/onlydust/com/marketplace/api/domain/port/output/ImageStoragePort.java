@@ -5,5 +5,5 @@ import java.net.URL;
 
 public interface ImageStoragePort {
 
-    URL storeImage(String fileName, InputStream imageInputStream);
+    URL storeImage(InputStream imageInputStream);
 }

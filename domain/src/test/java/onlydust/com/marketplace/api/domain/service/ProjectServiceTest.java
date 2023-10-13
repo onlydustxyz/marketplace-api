@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
@@ -25,7 +26,8 @@ public class ProjectServiceTest {
         // Given
         final String slug = faker.pokemon().name();
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, mock(UUIDGeneratorPort.class));
+        final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, mock(UUIDGeneratorPort.class));
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
@@ -40,12 +42,13 @@ public class ProjectServiceTest {
         assertEquals(project, expectedProject);
     }
 
-//    @Test
+    //    @Test
     void should_create_project() {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, uuidGeneratorPort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
         final InputStream imageInputStream = mock(InputStream.class);
         final CreateProjectCommand createProjectCommand = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())

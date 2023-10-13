@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.Page;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ProjectService implements ProjectFacadePort {
 
     private final ProjectStoragePort projectStoragePort;
+    private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
 
     @Override
@@ -38,6 +40,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public UUID createProject(CreateProjectCommand createProjectCommand) {
+        this.imageStoragePort.storeImage(createProjectCommand.getImage());
         return null;
     }
 }

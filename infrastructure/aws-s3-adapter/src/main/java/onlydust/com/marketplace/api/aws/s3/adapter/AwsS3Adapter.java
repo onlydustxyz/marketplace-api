@@ -10,11 +10,16 @@ import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Iterator;
 
 @AllArgsConstructor
 @Slf4j
@@ -23,22 +28,34 @@ public class AwsS3Adapter implements ImageStoragePort {
     private final AmazonS3Properties amazonS3Properties;
     private final AmazonS3 amazonS3;
 
+    private static String getImageFileExtension(byte[] imageBytes) throws IOException {
+        ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes));
+        Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
+        if (!imageReaders.hasNext()) {
+            throw new OnlydustException(400, "Input stream is not an image", null);
+        }
+        return imageReaders.next().getFormatName().toLowerCase();
+    }
+
     @Override
-    public URL storeImage(String fileName, InputStream imageInputStream) {
+    public URL storeImage(InputStream imageInputStream) {
         try {
-            return uploadByteArrayToS3Bucket(imageInputStream.readAllBytes(), amazonS3Properties.getImageBucket(), fileName);
+            final byte[] imageBytes = imageInputStream.readAllBytes();
+            final byte[] md5 = DigestUtils.md5(imageBytes);
+            final String fileName = String.format("%s.%s", new String(md5, StandardCharsets.UTF_8), getImageFileExtension(imageBytes));
+            return uploadByteArrayToS3Bucket(imageBytes, md5, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
             throw new OnlydustException(400, "Failed to read image input stream", e);
         }
     }
 
-    private URL uploadByteArrayToS3Bucket(final byte[] byteArray, final String bucketName, final String bucketKey) {
-        final String md5 = new String(Base64.getEncoder().encode(DigestUtils.md5(byteArray)));
+    private URL uploadByteArrayToS3Bucket(final byte[] byteArray, final byte[] md5, final String bucketName, final String bucketKey) {
+        final String base64Md5 = new String(Base64.getEncoder().encode(md5));
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         try {
             final String md5FromUploadedFile = putObjectToS3andGetContentFileUploadedMd5(bucketName, bucketKey,
                     byteArrayInputStream);
-            if (!md5.equals(md5FromUploadedFile)) {
+            if (!base64Md5.equals(md5FromUploadedFile)) {
                 LOGGER.error("Bucket {} {} md5 content is not equaled to file md5 content", bucketName, bucketKey);
                 throw OnlydustException.internalServerError(null);
             }
