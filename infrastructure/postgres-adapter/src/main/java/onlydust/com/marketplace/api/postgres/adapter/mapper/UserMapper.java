@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
+
+import java.util.Arrays;
 
 public interface UserMapper {
 
@@ -34,6 +37,7 @@ public interface UserMapper {
                 .githubUserId(user.getGithubUserId())
                 .login(user.getGithubLogin())
                 .avatarUrl(user.getGithubAvatarUrl())
+                .roles(Arrays.stream(user.getRoles()).toList())
                 .build();
     }
 
@@ -43,6 +47,7 @@ public interface UserMapper {
                 .githubUserId(user.getGithubUserId())
                 .githubLogin(user.getLogin())
                 .githubAvatarUrl(user.getAvatarUrl())
+                .roles(user.getRoles() != null ? user.getRoles().toArray(UserRole[]::new) : new UserRole[0])
                 .build();
     }
 }

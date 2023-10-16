@@ -14,7 +14,7 @@ import java.util.UUID;
 public class User {
     UUID id;
     @Builder.Default
-    List<String> permissions = new ArrayList<>();
+    List<UserRole> roles = new ArrayList<>();
     Long githubUserId;
     String avatarUrl;
     String login;

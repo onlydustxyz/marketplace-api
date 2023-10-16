@@ -7,10 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class Auth0JwtService implements JwtService {
-    private final static String IMPERSONATION_PERMISSION = "impersonation";
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
@@ -41,7 +41,7 @@ public class Auth0JwtService implements JwtService {
             }
 
             return Optional.of(Auth0Authentication.builder()
-                    .authorities(user.getPermissions().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                    .authorities(user.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
                     .credentials(decodedJwt)
                     .isAuthenticated(true)
                     .user(user)
@@ -68,7 +68,7 @@ public class Auth0JwtService implements JwtService {
     }
 
     private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt, User impersonator, final String impersonationHeader) {
-        if (!impersonator.getPermissions().contains(IMPERSONATION_PERMISSION)) {
+        if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
             return Optional.empty();
         }
@@ -83,9 +83,9 @@ public class Auth0JwtService implements JwtService {
         final User impersonated = getUserFromClaims(claims);
 
         LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
-        
+
         return Optional.of(Auth0Authentication.builder()
-                .authorities(impersonated.getPermissions().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                .authorities(impersonated.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(decodedJwt)
                 .isAuthenticated(true)
                 .user(impersonated)

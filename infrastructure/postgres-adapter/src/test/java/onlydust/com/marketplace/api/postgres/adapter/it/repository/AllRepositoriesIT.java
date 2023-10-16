@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
@@ -62,6 +63,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .build();
 
         assertIsSaved(expected, userRepository);
