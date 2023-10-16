@@ -7,10 +7,12 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
@@ -27,18 +29,26 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    @Profile("!hasura_auth")
     public JWTVerifier jwtVerifier(final Auth0Properties auth0Properties) {
         return new Auth0JwtVerifier(auth0Properties);
     }
 
     @Bean
-    public Auth0JwtService auth0JwtService(final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
+    @Profile("!hasura_auth")
+    public JwtService jwtServiceAuth0(final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
         return new Auth0JwtService(jwtVerifier, userFacadePort);
     }
 
     @Bean
-    public AuthenticationFilter authenticationFilter(final Auth0JwtService auth0JwtService) {
-        return new AuthenticationFilter(auth0JwtService);
+    @Profile("hasura_auth")
+    public JwtService jwtServiceHasura(final JwtSecret jwtSecret) {
+        return new HasuraJwtService(jwtSecret);
+    }
+
+    @Bean
+    public AuthenticationFilter authenticationFilter(final JwtService jwtService) {
+        return new AuthenticationFilter(jwtService);
     }
 
     @Bean
@@ -58,12 +68,14 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    @Profile("hasura_auth")
     @ConfigurationProperties("application.web.hasura.secret")
     public JwtSecret jwtSecret() {
         return new JwtSecret();
     }
 
     @Bean
+    @Profile("!hasura_auth")
     @ConfigurationProperties("application.web.auth0")
     public Auth0Properties auth0Properties() {
         return new Auth0Properties();

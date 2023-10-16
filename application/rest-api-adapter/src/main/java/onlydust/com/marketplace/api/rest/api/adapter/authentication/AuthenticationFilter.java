@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,11 +19,13 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
     public final static String BEARER_PREFIX = "Bearer ";
-    private final Auth0JwtService jwtService;
+    private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest,
+                                    @NonNull HttpServletResponse httpServletResponse,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+        
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
             jwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, "")).ifPresent(authentication -> {

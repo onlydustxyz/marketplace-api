@@ -31,8 +31,16 @@ public class AuthenticationService {
                     .build();
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
+        } else if (!(authentication instanceof OnlyDustAuthentication)) {
+            final OnlydustException internalError = OnlydustException.builder()
+                    .message(String.format("Expected an OnlyDustAuthentication, got %s", authentication.getClass()))
+                    .status(500)
+                    .build();
+            LOGGER.error(internalError.toString());
+            throw internalError;
         }
-        return (User) authentication.getDetails();
+        
+        return ((OnlyDustAuthentication) authentication).getUser();
     }
 
 }

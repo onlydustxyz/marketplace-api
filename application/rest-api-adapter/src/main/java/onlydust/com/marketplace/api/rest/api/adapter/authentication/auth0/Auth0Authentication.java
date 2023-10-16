@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
-import org.springframework.security.core.Authentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
 @Value
 @Builder
-public class Auth0Authentication implements Authentication {
+public class Auth0Authentication implements OnlyDustAuthentication {
     DecodedJWT credentials;
     User user;
     String principal;

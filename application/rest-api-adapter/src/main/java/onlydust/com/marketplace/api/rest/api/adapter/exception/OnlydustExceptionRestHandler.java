@@ -55,6 +55,7 @@ public class OnlydustExceptionRestHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<OnlyDustError> internalError(final Exception exception) {
+        LOGGER.error("Internal error from unexpected runtime exception", exception);
         return handleOnlyDustException(new OnlydustException(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal error from unexpected runtime exception",
