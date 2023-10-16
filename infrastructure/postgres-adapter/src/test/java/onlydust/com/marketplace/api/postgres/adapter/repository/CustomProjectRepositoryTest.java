@@ -15,15 +15,19 @@ public class CustomProjectRepositoryTest {
 
     private final Faker faker = new Faker();
 
+    private static final String FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT = FIND_PROJECTS_BASE_QUERY.replace(
+            "%order_by%", "order by search_project" +
+                    ".project_id");
+
     @Test
     void should_build_query_given_empty_sort_search_order() {
         // Given
 
         // When
         final String query = buildQuery(List.of(), List.of(), null, null, null);
-
+        ;
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY, query);
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT, query);
     }
 
     @Test
@@ -35,7 +39,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), null, search, null);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT
                         + " where (search_project.short_description like '%" + search + "%' or search_project.name " +
                         "like '%" + search + "%')"
                 , query);
@@ -50,8 +54,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
-                        + " order by search_project.contributors_count desc"
+        assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.contributors_count desc")
                 , query);
     }
 
@@ -64,8 +67,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
-                        + " order by search_project.repo_count desc"
+        assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.repo_count desc")
                 , query);
     }
 
@@ -78,8 +80,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
-                        + " order by search_project.name asc"
+        assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.name")
                 , query);
     }
 
@@ -92,8 +93,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), null, null, sort);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
-                        + " order by search_project.rank desc"
+        assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.rank desc")
                 , query);
     }
 
@@ -106,7 +106,7 @@ public class CustomProjectRepositoryTest {
         final String query = buildQuery(List.of(), List.of(), userId, null, null);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT
                         + " where (search_project.pl_user_id = '" + userId + "')"
                 , query);
     }
@@ -121,9 +121,9 @@ public class CustomProjectRepositoryTest {
         final String query2 = buildQuery(List.of(), sponsors, null, null, null);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY + " where (search_project.sponsor_name in ('" + sponsors.get(0) + "'))",
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " where (search_project.sponsor_name in ('" + sponsors.get(0) + "'))",
                 query1);
-        assertEquals(FIND_PROJECTS_BASE_QUERY + " where (search_project.sponsor_name in ('" + sponsors.get(0) + "','" + sponsors.get(1) + "'))", query2);
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " where (search_project.sponsor_name in ('" + sponsors.get(0) + "','" + sponsors.get(1) + "'))", query2);
     }
 
     @Test
@@ -136,10 +136,10 @@ public class CustomProjectRepositoryTest {
         final String query2 = buildQuery(technologies, List.of(), null, null, null);
 
         // Then
-        assertEquals(FIND_PROJECTS_BASE_QUERY + " where (search_project.languages like '%\"" + technologies.get(0) +
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " where (search_project.languages like '%\"" + technologies.get(0) +
                         "\"%')",
                 query1);
-        assertEquals(FIND_PROJECTS_BASE_QUERY + " where (search_project.languages like '%\""
+        assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " where (search_project.languages like '%\""
                 + technologies.get(0) + "\"%' or" +
                 " search_project.languages like '%\"" + technologies.get(1) + "\"%')", query2);
     }

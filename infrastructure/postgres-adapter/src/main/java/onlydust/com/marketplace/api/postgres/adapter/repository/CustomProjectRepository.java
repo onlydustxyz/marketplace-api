@@ -31,41 +31,43 @@ public class CustomProjectRepository {
                 join projects_sponsors ps on ps.sponsor_id = s.id and ps.project_id = :projectId
             """;
 
-    protected static final String FIND_PROJECTS_BASE_QUERY = "select row_number() over (order by " +
-                                                             "search_project.project_id), search_project.* from (" +
-                                                             "select p.project_id," +
-                                                             "       p.hiring," +
-                                                             "       p.logo_url," +
-                                                             "       p.key," +
-                                                             "       p.name," +
-                                                             "       p.short_description," +
-                                                             "       p.visibility," +
-                                                             "       p.rank," +
-                                                             "       cast(gr.languages as text)," +
-                                                             "       gr.id repository_id," +
-                                                             "       u.id                   p_lead_id," +
-                                                             "       u.login_at_signup      p_lead_login," +
-                                                             "       u.avatar_url_at_signup p_lead_avatar_url," +
-                                                             "       s.name sponsor_name," +
-                                                             "       s.logo_url sponsor_logo_url," +
-                                                             "       s.id sponsor_id," +
-                                                             "       repo_count.repo_count," +
-                                                             "       coalesce(contributors_count.contributors_count,0) contributors_count" +
-                                                             " from project_details p" +
-                                                             "         left join projects_sponsors ps on ps.project_id = p.project_id" +
-                                                             "         left join sponsors s on s.id = ps.sponsor_id" +
-                                                             "         left join project_github_repos pgr on pgr.project_id = p.project_id" +
-                                                             "         left join github_repos gr on gr.id = pgr.github_repo_id" +
-                                                             "         left join project_leads pl on pl.project_id = p.project_id" +
-                                                             "         left join auth_users u on u.id = pl.user_id" +
-                                                             "         left join (select count(github_repo_id) repo_count, project_id" +
-                                                             "                    from project_github_repos" +
-                                                             "                    group by project_id) as repo_count on repo_count.project_id = p.project_id" +
-                                                             "        left join (select count(github_user_id) contributors_count, project_id" +
-                                                             "                   from projects_contributors" +
-                                                             "                   group by project_id) as contributors_count on contributors_count.project_id = " +
-                                                             "p.project_id" +
-                                                             ") as search_project";
+    protected static final String FIND_PROJECTS_BASE_QUERY = """
+            select row_number() over (%order_by%), search_project.*
+            from (select p.project_id,
+                         p.hiring,
+                         p.logo_url,
+                         p.key,
+                         p.name,
+                         p.short_description,
+                         p.visibility,
+                         p.rank,
+                         cast(gr.languages as text),
+                         gr.id                                              repository_id,
+                         u.id                                               p_lead_id,
+                         u.login_at_signup                                  p_lead_login,
+                         u.avatar_url_at_signup                             p_lead_avatar_url,
+                         s.name                                             sponsor_name,
+                         s.logo_url                                         sponsor_logo_url,
+                         s.id                                               sponsor_id,
+                         repo_count.repo_count,
+                         coalesce(contributors_count.contributors_count, 0) contributors_count
+                  from projects_budgets pb
+                           left join project_details p on p.project_id = pb.project_id
+                           left join projects_sponsors ps on ps.project_id = p.project_id
+                           left join sponsors s on s.id = ps.sponsor_id
+                           left join project_github_repos pgr on pgr.project_id = p.project_id
+                           left join github_repos gr on gr.id = pgr.github_repo_id
+                           left join project_leads pl on pl.project_id = p.project_id
+                           left join auth_users u on u.id = pl.user_id
+                           left join (select count(github_repo_id) repo_count, project_id
+                                      from project_github_repos
+                                      group by project_id) as repo_count on repo_count.project_id = p.project_id
+                           left join (select count(github_user_id) contributors_count, project_id
+                                      from projects_contributors
+                                      group by project_id) as contributors_count
+                                     on contributors_count.project_id = p.project_id) as search_project
+                        
+            """;
 
     protected static final String FIND_PROJECT_CONTRIBUTORS = """
             WITH users AS (
@@ -88,10 +90,11 @@ public class CustomProjectRepository {
                 pc.project_id = :projectId AND
                 gu.login ilike '%' || :login ||'%'
             """;
+
+    private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
     };
-    private final ObjectMapper objectMapper;
     private final EntityManager entityManager;
 
     private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectCardView> projectViewMap) {
@@ -110,6 +113,20 @@ public class CustomProjectRepository {
             projectViewMap.put(entity.getId(), projectCardView);
         }
     }
+
+    private static void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+        try {
+            if (isNull(entity.getRepositoryLanguages())) {
+                return;
+            }
+            final HashMap<String, Integer> technologies =
+                    objectMapper.readValue(entity.getRepositoryLanguages(), typeRef);
+            projectCardView.addTechnologies(technologies);
+        } catch (JsonProcessingException e) {
+            LOGGER.warn("No technologies found", e);
+        }
+    }
+
 
     private static void addSponsorToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         final SponsorView sponsorView = SponsorView.builder()
@@ -137,19 +154,16 @@ public class CustomProjectRepository {
         if (nonNull(search) && !search.isEmpty()) {
             whereConditions.add(
                     "search_project.short_description like '%" + search + "%' or search_project.name like '%" + search +
-                    "%'");
+                            "%'");
         }
         if (nonNull(sort)) {
             switch (sort) {
                 case CONTRIBUTORS_COUNT ->
-                        orderByCondition = Optional.of(" order by search_project.contributors_count desc");
-                case NAME -> orderByCondition = Optional.of(" order by search_project.name asc");
-                case RANK -> orderByCondition = Optional.of(" order by search_project.rank desc");
-                case REPOS_COUNT -> orderByCondition = Optional.of(" order by search_project.repo_count desc");
+                        orderByCondition = Optional.of("order by search_project.contributors_count desc");
+                case NAME -> orderByCondition = Optional.of("order by search_project.name");
+                case RANK -> orderByCondition = Optional.of("order by search_project.rank desc");
+                case REPOS_COUNT -> orderByCondition = Optional.of("order by search_project.repo_count desc");
             }
-        }
-        if (nonNull(userId)) {
-            whereConditions.add("search_project.pl_user_id = '" + userId + "'");
         }
         if (nonNull(sponsors) && !sponsors.isEmpty()) {
             whereConditions.add("search_project.sponsor_name in (" + String.join(",", sponsors.stream().map(s ->
@@ -157,23 +171,11 @@ public class CustomProjectRepository {
         }
         if (nonNull(technologies) && !technologies.isEmpty()) {
             whereConditions.add("search_project.languages like " + String.join(" or search_project" +
-                                                                               ".languages like ", technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
+                    ".languages like ", technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
-        return FIND_PROJECTS_BASE_QUERY + (whereConditions.isEmpty() ? "" : " where " + String.join(" and ",
-                whereConditions.stream().map(s -> "(" + s + ")").toList())) + orderByCondition.orElse("");
-    }
-
-    private void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
-        try {
-            if (isNull(entity.getRepositoryLanguages())) {
-                return;
-            }
-            final HashMap<String, Integer> technologies =
-                    objectMapper.readValue(entity.getRepositoryLanguages(), typeRef);
-            projectCardView.addTechnologies(technologies);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("No technologies found", e);
-        }
+        return FIND_PROJECTS_BASE_QUERY.replace("%order_by%", orderByCondition.orElse("order by search_project" +
+                ".project_id")) + (whereConditions.isEmpty() ? "" : " where " + String.join(" and ",
+                whereConditions.stream().map(s -> "(" + s + ")").toList()));
     }
 
     public Page<ProjectCardView> findByTechnologiesSponsorsOwnershipSearchSortBy(final List<String> technologies,
@@ -182,7 +184,6 @@ public class CustomProjectRepository {
                                                                                  final String search,
                                                                                  final ProjectCardView.SortBy sort) {
         final String query = buildQuery(technologies, sponsor, userId, search, sort);
-        LOGGER.debug(query);
         final List<ProjectViewEntity> rows =
                 entityManager.createNativeQuery(query, ProjectViewEntity.class).getResultList();
         final Map<UUID, ProjectCardView> projectViewMap = new LinkedHashMap<>();
