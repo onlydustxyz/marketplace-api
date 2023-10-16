@@ -72,8 +72,8 @@ public class HasuraJwtService implements JwtService {
                 .id(hasuraJwtPayload.getClaims().getUserId())
                 .githubUserId(hasuraJwtPayload.getClaims().getGithubUserId())
                 .permissions(hasuraJwtPayload.getClaims().getAllowedRoles())
-//                TODO    .avatarUrl(hasuraJwtPayload.getClaims().getAvatarUrl())
-//                TODO    .login(hasuraJwtPayload.getClaims().getLogin())
+                .avatarUrl(hasuraJwtPayload.getClaims().getAvatarUrl())
+                .login(hasuraJwtPayload.getClaims().getLogin())
                 .build();
 
         return Optional.of(HasuraAuthentication.builder()

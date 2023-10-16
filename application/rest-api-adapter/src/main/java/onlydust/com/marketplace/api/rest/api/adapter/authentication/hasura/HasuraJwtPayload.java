@@ -43,6 +43,10 @@ public class HasuraJwtPayload {
         String projectsLeaded;
         @JsonProperty("x-hasura-default-role")
         String defaultRole;
+        @JsonProperty("x-hasura-login")
+        String login;
+        @JsonProperty("x-hasura-avatarUrl")
+        String avatarUrl;
     }
 
 }
