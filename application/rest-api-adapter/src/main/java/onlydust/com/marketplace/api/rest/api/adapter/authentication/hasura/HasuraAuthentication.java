@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
-import org.springframework.security.core.Authentication;
+import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -12,9 +13,10 @@ import java.util.stream.Collectors;
 
 @Value
 @Builder
-public class HasuraAuthentication implements Authentication {
+public class HasuraAuthentication implements OnlyDustAuthentication {
     HasuraJwtPayload credentials;
     HasuraJwtPayload.HasuraClaims claims;
+    User user;
     String principal;
     @Builder.Default
     Boolean isAuthenticated = false;
@@ -32,7 +34,7 @@ public class HasuraAuthentication implements Authentication {
 
     @Override
     public Object getDetails() {
-        return this.claims;
+        return this.user;
     }
 
     @Override

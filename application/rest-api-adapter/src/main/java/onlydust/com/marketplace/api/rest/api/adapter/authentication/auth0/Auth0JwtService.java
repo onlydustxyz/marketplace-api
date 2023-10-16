@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
@@ -15,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class Auth0JwtService {
+public class Auth0JwtService implements JwtService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
@@ -25,7 +27,7 @@ public class Auth0JwtService {
         this.jwtVerifier = jwtVerifier;
     }
 
-    public Optional<Auth0Authentication> getAuthenticationFromJwt(final String jwt) {
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt) {
         try {
             final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
             final Auth0JwtClaims jwtClaims = objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),

@@ -2,14 +2,16 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.Authentication;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HasuraJwtServiceTest {
 
@@ -34,14 +36,18 @@ public class HasuraJwtServiceTest {
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, hasuraJwtPayload);
 
         // When
-        final Authentication authenticationFromJwt = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
 
         // Then
+        assertThat(authentication).isPresent();
+        final var authenticationFromJwt = authentication.get();
         assertTrue(authenticationFromJwt.isAuthenticated());
         assertEquals(authenticationFromJwt.getName(), hasuraJwtPayload.getSub());
         assertEquals(authenticationFromJwt.getPrincipal(), hasuraJwtPayload.getSub());
         assertEquals(authenticationFromJwt.getCredentials(), hasuraJwtPayload);
-        assertEquals(authenticationFromJwt.getDetails(), hasuraJwtPayload.getClaims());
+        assertEquals(authenticationFromJwt.getUser().getId(), hasuraJwtPayload.getClaims().getUserId());
+        assertEquals(authenticationFromJwt.getUser().getPermissions(), hasuraJwtPayload.getClaims().getAllowedRoles());
+        assertEquals(authenticationFromJwt.getUser().getGithubUserId(), hasuraJwtPayload.getClaims().getGithubUserId());
     }
 
 
@@ -53,13 +59,11 @@ public class HasuraJwtServiceTest {
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
 
         // When
-        final HasuraAuthentication hasuraAuthentication =
+        final Optional<OnlyDustAuthentication> authentication =
                 hasuraJwtService.getAuthenticationFromJwt(faker.chuckNorris().fact());
 
         // Then
-        final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
-        assertNotNull(onlydustException);
-        assertEquals(401, onlydustException.getStatus());
+        assertThat(authentication).isNotPresent();
     }
 
 
@@ -73,12 +77,10 @@ public class HasuraJwtServiceTest {
                 faker.cat().name() + "." + faker.pokemon().name() + "." + faker.pokemon().name();
 
         // When
-        final HasuraAuthentication hasuraAuthentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
 
         // Then
-        final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
-        assertNotNull(onlydustException);
-        assertEquals(401, onlydustException.getStatus());
+        assertThat(authentication).isNotPresent();
     }
 
     @Test
@@ -90,12 +92,10 @@ public class HasuraJwtServiceTest {
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, faker.pokemon().name());
 
         // When
-        final HasuraAuthentication hasuraAuthentication =
+        final Optional<OnlyDustAuthentication> authentication =
                 hasuraJwtService.getAuthenticationFromJwt(jwtToken);
 
         // Then
-        final OnlydustException onlydustException = hasuraAuthentication.getOnlydustException();
-        assertNotNull(onlydustException);
-        assertEquals(401, onlydustException.getStatus());
+        assertThat(authentication).isNotPresent();
     }
 }
