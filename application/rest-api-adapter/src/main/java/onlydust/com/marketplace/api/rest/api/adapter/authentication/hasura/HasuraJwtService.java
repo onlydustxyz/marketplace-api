@@ -24,8 +24,8 @@ public class HasuraJwtService implements JwtService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JwtSecret jwtSecret;
 
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String authorizationBearer) {
-        final String[] chunks = authorizationBearer.split("\\.");
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
+        final String[] chunks = jwt.split("\\.");
         if (chunks.length != 3) {
             LOGGER.warn("Invalid Jwt format");
             return Optional.empty();

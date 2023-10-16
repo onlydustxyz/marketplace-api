@@ -36,7 +36,7 @@ public class HasuraJwtServiceTest {
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, hasuraJwtPayload);
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, null);
 
         // Then
         assertThat(authentication).isPresent();
@@ -60,7 +60,7 @@ public class HasuraJwtServiceTest {
 
         // When
         final Optional<OnlyDustAuthentication> authentication =
-                hasuraJwtService.getAuthenticationFromJwt(faker.chuckNorris().fact());
+                hasuraJwtService.getAuthenticationFromJwt(faker.chuckNorris().fact(), null);
 
         // Then
         assertThat(authentication).isNotPresent();
@@ -77,7 +77,7 @@ public class HasuraJwtServiceTest {
                 faker.cat().name() + "." + faker.pokemon().name() + "." + faker.pokemon().name();
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, null);
 
         // Then
         assertThat(authentication).isNotPresent();
@@ -93,7 +93,7 @@ public class HasuraJwtServiceTest {
 
         // When
         final Optional<OnlyDustAuthentication> authentication =
-                hasuraJwtService.getAuthenticationFromJwt(jwtToken);
+                hasuraJwtService.getAuthenticationFromJwt(jwtToken, null);
 
         // Then
         assertThat(authentication).isNotPresent();

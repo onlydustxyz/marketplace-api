@@ -41,7 +41,7 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build());
         final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
-        final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt).orElseThrow();
+        final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, null).orElseThrow();
 
         assertTrue(authentication.isAuthenticated());
         assertEquals("github|31901905", authentication.getName());
@@ -74,7 +74,7 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build());
         final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
-        final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt);
+        final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, null);
 
         assertThat(authentication).isEmpty();
     }

@@ -27,7 +27,7 @@ public class Auth0JwtService implements JwtService {
         this.jwtVerifier = jwtVerifier;
     }
 
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt) {
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
         try {
             final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
             final Auth0JwtClaims jwtClaims = objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
