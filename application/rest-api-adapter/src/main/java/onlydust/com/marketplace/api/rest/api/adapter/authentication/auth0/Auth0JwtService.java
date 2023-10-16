@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class Auth0JwtService implements JwtService {
+    private final static String IMPERSONATION_PERMISSION = "impersonation";
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
@@ -67,7 +68,7 @@ public class Auth0JwtService implements JwtService {
     }
 
     private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt, User impersonator, final String impersonationHeader) {
-        if (!impersonator.getPermissions().contains("impersonation")) {
+        if (!impersonator.getPermissions().contains(IMPERSONATION_PERMISSION)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
             return Optional.empty();
         }

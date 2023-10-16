@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecre
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
@@ -22,10 +23,15 @@ import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 @AllArgsConstructor
 @Slf4j
 public class HasuraJwtService implements JwtService {
+    private final static String IMPERSONATION_PERMISSION = "impersonation";
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JwtSecret jwtSecret;
 
     private static User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
+        final List<String> permissions = claims.getAllowedRoles();
+        if (claims.getIsAnOnlydustAdmin() != null && claims.getIsAnOnlydustAdmin()) {
+            permissions.add(IMPERSONATION_PERMISSION);
+        }
         return User.builder()
                 .id(claims.getUserId())
                 .githubUserId(claims.getGithubUserId())
@@ -97,7 +103,7 @@ public class HasuraJwtService implements JwtService {
 
     private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(HasuraJwtPayload hasuraJwtPayload, User impersonator, final String impersonationHeader) {
 
-        if (!impersonator.getPermissions().contains("impersonation")) {
+        if (!impersonator.getPermissions().contains(IMPERSONATION_PERMISSION)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
             return Optional.empty();
         }

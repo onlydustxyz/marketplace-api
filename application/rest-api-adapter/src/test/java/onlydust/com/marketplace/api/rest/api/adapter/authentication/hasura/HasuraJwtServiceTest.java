@@ -118,7 +118,7 @@ public class HasuraJwtServiceTest {
                                         .userId(UUID.randomUUID())
                                         .login(faker.name().username())
                                         .isAnOnlydustAdmin(true)
-                                        .allowedRoles(List.of("me", "registered_user", "public", "impersonation"))
+                                        .allowedRoles(List.of("me", "registered_user", "public"))
                                         .build()
                         )
                         .build();
@@ -160,7 +160,7 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.getImpersonator()).isNotNull();
         final var impersonator = authenticationFromJwt.getImpersonator();
         assertThat(impersonator.getId()).isEqualTo(hasuraJwtPayload.getClaims().getUserId());
-        assertThat(impersonator.getPermissions()).isEqualTo(hasuraJwtPayload.getClaims().getAllowedRoles());
+        assertThat(impersonator.getPermissions()).containsExactlyInAnyOrder("me", "registered_user", "public", "impersonation");
         assertThat(impersonator.getGithubUserId()).isEqualTo(hasuraJwtPayload.getClaims().getGithubUserId());
     }
 
