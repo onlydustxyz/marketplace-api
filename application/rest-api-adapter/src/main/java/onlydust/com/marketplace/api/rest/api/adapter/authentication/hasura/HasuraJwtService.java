@@ -7,35 +7,38 @@ import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtHeader;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 
 @AllArgsConstructor
 @Slf4j
 public class HasuraJwtService implements JwtService {
-    private final static String IMPERSONATION_PERMISSION = "impersonation";
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JwtSecret jwtSecret;
 
     private static User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
-        final List<String> permissions = claims.getAllowedRoles();
+        final List<UserRole> roles = new ArrayList<>(List.of(UserRole.USER));
         if (claims.getIsAnOnlydustAdmin() != null && claims.getIsAnOnlydustAdmin()) {
-            permissions.add(IMPERSONATION_PERMISSION);
+            roles.add(UserRole.ADMIN);
         }
         return User.builder()
                 .id(claims.getUserId())
                 .githubUserId(claims.getGithubUserId())
-                .permissions(claims.getAllowedRoles())
+                .roles(roles)
                 .avatarUrl(claims.getAvatarUrl())
                 .login(claims.getLogin())
                 .build();
@@ -93,6 +96,7 @@ public class HasuraJwtService implements JwtService {
 
         return Optional.of(HasuraAuthentication.builder()
                 .user(user)
+                .authorities(user.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(hasuraJwtPayload)
                 .isAuthenticated(true)
                 .claims(hasuraJwtPayload.getClaims())
@@ -103,7 +107,7 @@ public class HasuraJwtService implements JwtService {
 
     private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(HasuraJwtPayload hasuraJwtPayload, User impersonator, final String impersonationHeader) {
 
-        if (!impersonator.getPermissions().contains(IMPERSONATION_PERMISSION)) {
+        if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
             return Optional.empty();
         }
@@ -121,6 +125,7 @@ public class HasuraJwtService implements JwtService {
 
         return Optional.of(HasuraAuthentication.builder()
                 .user(impersonated)
+                .authorities(impersonated.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(hasuraJwtPayload)
                 .isAuthenticated(true)
                 .claims(claims)

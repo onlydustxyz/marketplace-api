@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
@@ -22,8 +23,7 @@ public class UserService implements UserFacadePort {
                 .orElseGet(() -> {
                     final var user = User.builder()
                             .id(UUID.randomUUID())
-                            // TODO .permissions()
-                            .permissions(List.of("me"))
+                            .roles(List.of(UserRole.USER))
                             .githubUserId(githubUserIdentity.getGithubUserId())
                             .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .login(githubUserIdentity.getGithubLogin())

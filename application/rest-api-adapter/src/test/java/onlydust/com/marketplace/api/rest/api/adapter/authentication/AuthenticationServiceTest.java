@@ -3,10 +3,10 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,12 +28,12 @@ public class AuthenticationServiceTest {
         final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
         final UUID userId = UUID.randomUUID();
         final long githubUserId = faker.number().randomNumber();
-        final List<String> allowedRoles = List.of("me");
+        final List<UserRole> allowedRoles = List.of(UserRole.USER);
         final User user = User.builder()
                 .githubUserId(githubUserId)
                 .id(userId)
                 .login(faker.name().username())
-                .permissions(List.of("me"))
+                .roles(List.of(UserRole.USER))
                 .build();
 
         // When
@@ -41,14 +41,14 @@ public class AuthenticationServiceTest {
                 .thenReturn(Auth0Authentication.builder()
                         .isAuthenticated(true)
                         .user(user)
-                        .authorities(allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                        .authorities(allowedRoles.stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
                         .build());
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
         // Then
         assertEquals(userId, authenticatedUser.getId());
         assertEquals(githubUserId, authenticatedUser.getGithubUserId());
-        assertEquals(allowedRoles, authenticatedUser.getPermissions());
+        assertEquals(allowedRoles, authenticatedUser.getRoles());
     }
 
     @Test

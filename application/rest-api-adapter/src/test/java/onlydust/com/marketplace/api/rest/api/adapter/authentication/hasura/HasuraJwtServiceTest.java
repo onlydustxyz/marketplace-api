@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.getPrincipal()).isEqualTo(hasuraJwtPayload.getClaims().getLogin());
         assertThat(authenticationFromJwt.getCredentials()).isEqualTo(hasuraJwtPayload);
         assertThat(authenticationFromJwt.getUser().getId()).isEqualTo(hasuraJwtPayload.getClaims().getUserId());
-        assertThat(authenticationFromJwt.getUser().getPermissions()).isEqualTo(hasuraJwtPayload.getClaims().getAllowedRoles());
+        assertThat(authenticationFromJwt.getUser().getRoles()).containsExactlyInAnyOrder(UserRole.USER);
         assertThat(authenticationFromJwt.getUser().getGithubUserId()).isEqualTo(hasuraJwtPayload.getClaims().getGithubUserId());
         assertThat(authenticationFromJwt.isImpersonating()).isFalse();
         assertThat(authenticationFromJwt.getImpersonator()).isNull();
@@ -153,14 +154,14 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.getName()).isEqualTo("ofux");
         assertThat(authenticationFromJwt.getPrincipal()).isEqualTo("ofux");
         assertThat(authenticationFromJwt.getUser().getId().toString()).isEqualTo("50aa4318-141a-4027-8f74-c135d8d166b0");
-        assertThat(authenticationFromJwt.getUser().getPermissions()).containsExactlyInAnyOrder("me", "registered_user", "public");
+        assertThat(authenticationFromJwt.getUser().getRoles()).containsExactlyInAnyOrder(UserRole.USER);
         assertThat(authenticationFromJwt.getUser().getGithubUserId()).isEqualTo(595505L);
 
         assertThat(authenticationFromJwt.isImpersonating()).isTrue();
         assertThat(authenticationFromJwt.getImpersonator()).isNotNull();
         final var impersonator = authenticationFromJwt.getImpersonator();
         assertThat(impersonator.getId()).isEqualTo(hasuraJwtPayload.getClaims().getUserId());
-        assertThat(impersonator.getPermissions()).containsExactlyInAnyOrder("me", "registered_user", "public", "impersonation");
+        assertThat(impersonator.getRoles()).containsExactlyInAnyOrder(UserRole.ADMIN, UserRole.USER);
         assertThat(impersonator.getGithubUserId()).isEqualTo(hasuraJwtPayload.getClaims().getGithubUserId());
     }
 

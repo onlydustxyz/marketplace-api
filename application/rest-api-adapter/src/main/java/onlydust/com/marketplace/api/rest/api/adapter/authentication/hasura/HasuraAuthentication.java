@@ -5,16 +5,15 @@ import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Value
 @Builder
 public class HasuraAuthentication implements OnlyDustAuthentication {
     HasuraJwtPayload credentials;
     HasuraJwtPayload.HasuraClaims claims;
+    Collection<? extends GrantedAuthority> authorities;
     User user;
     String principal;
     @Builder.Default
@@ -25,7 +24,7 @@ public class HasuraAuthentication implements OnlyDustAuthentication {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.claims.allowedRoles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        return authorities;
     }
 
     @Override

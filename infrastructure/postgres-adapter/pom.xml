@@ -43,6 +43,10 @@
             <groupId>com.vladmihalcea</groupId>
             <artifactId>hibernate-types-55</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-55</artifactId>
+        </dependency>
 
 
         <!-- Test -->
