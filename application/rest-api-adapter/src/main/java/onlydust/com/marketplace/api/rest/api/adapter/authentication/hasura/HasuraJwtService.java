@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
@@ -23,6 +24,16 @@ import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 public class HasuraJwtService implements JwtService {
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final JwtSecret jwtSecret;
+
+    private static User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
+        return User.builder()
+                .id(claims.getUserId())
+                .githubUserId(claims.getGithubUserId())
+                .permissions(claims.getAllowedRoles())
+                .avatarUrl(claims.getAvatarUrl())
+                .login(claims.getLogin())
+                .build();
+    }
 
     public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
         final String[] chunks = jwt.split("\\.");
@@ -68,22 +79,45 @@ public class HasuraJwtService implements JwtService {
             return Optional.empty();
         }
 
-        User user = User.builder()
-                .id(hasuraJwtPayload.getClaims().getUserId())
-                .githubUserId(hasuraJwtPayload.getClaims().getGithubUserId())
-                .permissions(hasuraJwtPayload.getClaims().getAllowedRoles())
-                .avatarUrl(hasuraJwtPayload.getClaims().getAvatarUrl())
-                .login(hasuraJwtPayload.getClaims().getLogin())
-                .build();
+        User user = getUserFromClaims(hasuraJwtPayload.getClaims());
+
+        if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
+            return getAuthenticationFromImpersonationHeader(hasuraJwtPayload, user, impersonationHeader);
+        }
 
         return Optional.of(HasuraAuthentication.builder()
                 .user(user)
                 .credentials(hasuraJwtPayload)
                 .isAuthenticated(true)
                 .claims(hasuraJwtPayload.getClaims())
-                .principal(hasuraJwtPayload.getSub())
+                .principal(user.getLogin())
+                .impersonating(false)
                 .build());
-
     }
 
+    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(HasuraJwtPayload hasuraJwtPayload, User impersonator, final String impersonationHeader) {
+
+        if (!impersonator.getPermissions().contains("impersonation")) {
+            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
+            return Optional.empty();
+        }
+        final HasuraJwtPayload.HasuraClaims claims;
+        try {
+            claims = objectMapper.readValue(impersonationHeader, HasuraJwtPayload.HasuraClaims.class);
+        } catch (JsonProcessingException e) {
+            LOGGER.warn("Invalid impersonation header: {}", impersonationHeader);
+            return Optional.empty();
+        }
+
+        final User impersonated = getUserFromClaims(claims);
+        return Optional.of(HasuraAuthentication.builder()
+                .user(impersonated)
+                .credentials(hasuraJwtPayload)
+                .isAuthenticated(true)
+                .claims(claims)
+                .principal(impersonated.getLogin())
+                .impersonating(true)
+                .impersonator(impersonator)
+                .build());
+    }
 }
