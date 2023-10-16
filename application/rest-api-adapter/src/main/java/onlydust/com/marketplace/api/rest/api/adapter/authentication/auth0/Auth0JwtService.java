@@ -81,6 +81,9 @@ public class Auth0JwtService implements JwtService {
         }
 
         final User impersonated = getUserFromClaims(claims);
+
+        LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
+        
         return Optional.of(Auth0Authentication.builder()
                 .authorities(impersonated.getPermissions().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(decodedJwt)

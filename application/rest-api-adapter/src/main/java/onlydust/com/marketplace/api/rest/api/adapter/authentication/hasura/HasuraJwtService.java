@@ -116,6 +116,9 @@ public class HasuraJwtService implements JwtService {
         }
 
         final User impersonated = getUserFromClaims(claims);
+
+        LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
+
         return Optional.of(HasuraAuthentication.builder()
                 .user(impersonated)
                 .credentials(hasuraJwtPayload)
