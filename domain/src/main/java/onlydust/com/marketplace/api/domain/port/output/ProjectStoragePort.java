@@ -15,13 +15,17 @@ public interface ProjectStoragePort {
 
     ProjectDetailsView getBySlug(String slug);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
+    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
                                                                        UUID userId, String search,
-                                                                       ProjectCardView.SortBy sort);
+                                                                       ProjectCardView.SortBy sort, Boolean mine);
+
+    Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
+                                                                 String search, ProjectCardView.SortBy sort);
 
     void createProject(UUID projectId, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
-                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, ProjectVisibility visibility, String imageUrl);
+                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, ProjectVisibility visibility
+            , String imageUrl);
 
     List<Contributor> searchContributorsByLogin(UUID projectId, String login);
 }

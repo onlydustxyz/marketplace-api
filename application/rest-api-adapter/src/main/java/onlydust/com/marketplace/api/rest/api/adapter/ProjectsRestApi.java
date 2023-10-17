@@ -6,13 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
@@ -34,6 +36,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
     private final ContributorFacadePort contributorFacadePort;
+    private final AuthenticationService authenticationService;
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
@@ -50,13 +53,16 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technology,
-                                                           final List<String> sponsor, final String ownership,
+    public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technologies,
+                                                           final List<String> sponsors, final Boolean mine,
                                                            final String search) {
-        final Page<ProjectCardView> projectViewPage =
-                projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, null,
-                        search, mapSortByParameter(sort));
-        return ResponseEntity.ok(mapProjectCards(projectViewPage));
+        final Optional<User> optionalUser = authenticationService.tryGetAuthenticatedUser();
+        final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
+        final Page<ProjectCardView> projectCardViewPage =
+                optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
+                                sponsors, search, sortBy, user.getId(), mine))
+                .orElse(projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
+        return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
     }
 
     @Override

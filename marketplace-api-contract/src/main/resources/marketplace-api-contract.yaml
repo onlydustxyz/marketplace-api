@@ -392,7 +392,7 @@ paths:
               - REPO_COUNT
               - CONTRIBUTOR_COUNT
         - in: query
-          name: technology
+          name: technologies
           description: Technology filter
           schema:
             type: array
@@ -406,13 +406,10 @@ paths:
             items:
               type: string
         - in: query
-          name: ownership
-          description: Ownership filter
+          name: mine
+          description: Filter mine projects
           schema:
-            type: string
-            enum:
-              - ALL
-              - MINE
+            type: boolean
         - in: query
           name: search
           description: Full text search
@@ -1352,6 +1349,7 @@ components:
         - leaders
         - sponsors
         - technologies
+        - isInvitedAsProjectLead
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -1391,7 +1389,9 @@ components:
             $ref: '#/components/schemas/SponsorResponse'
         technologies:
           $ref: '#/components/schemas/Technologies'
-
+        isInvitedAsProjectLead:
+          type: boolean
+          default: false
 
     ProjectResponse:
       type: object

@@ -41,6 +41,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public CustomProjectListRepository customProjectListRepository(final EntityManager entityManager) {
+        return new CustomProjectListRepository(entityManager);
+    }
+
+    @Bean
     public CustomContributorRepository customContributorRepository(final EntityManager entityManager) {
         return new CustomContributorRepository(entityManager);
     }
@@ -58,7 +63,8 @@ public class PostgresConfiguration {
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomRepoRepository customRepoRepository,
-                                                         final CustomUserRepository customUserRepository) {
+                                                         final CustomUserRepository customUserRepository,
+                                                         final CustomProjectListRepository customProjectListRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -66,7 +72,8 @@ public class PostgresConfiguration {
                 customProjectRepository,
                 customContributorRepository,
                 customRepoRepository,
-                customUserRepository);
+                customUserRepository,
+                customProjectListRepository);
     }
 
     @Bean
@@ -80,7 +87,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository, final UserRepository userRepository) {
+    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
+                                                   final UserRepository userRepository) {
         return new PostgresUserAdapter(customUserRepository, userRepository);
     }
 
