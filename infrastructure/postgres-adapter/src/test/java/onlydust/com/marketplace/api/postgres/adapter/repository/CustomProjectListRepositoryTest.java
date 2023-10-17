@@ -18,7 +18,7 @@ public class CustomProjectListRepositoryTest {
     public class ForAuthenticatedUser {
         private static final String FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT =
                 FIND_PROJECTS_FOR_USER_BASE_QUERY.replace(
-                        "%order_by%", "order by search_project" +
+                        "%order_by%", "order by is_pending_project_lead desc,search_project" +
                                       ".project_id");
 
 
@@ -43,9 +43,9 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT
-                         + " and (search_project.short_description like CONCAT('%', :search, '%') or search_project" +
+                         + " and (search_project.short_description ilike CONCAT('%', :search, '%') or search_project" +
                          ".name " +
-                         "like CONCAT('%', :search, '%'))"
+                         "ilike CONCAT('%', :search, '%'))"
                     , query);
         }
 
@@ -59,7 +59,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "search_project.contributors_count " +
+                                                                                 "is_pending_project_lead desc,search_project.contributors_count " +
                                                                                  "desc")
                     , query);
         }
@@ -74,7 +74,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "search_project.repo_count desc")
+                                                                                 "is_pending_project_lead desc,search_project.repo_count desc")
                     , query);
         }
 
@@ -88,7 +88,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "search_project.name")
+                                                                                 "is_pending_project_lead desc,search_project.name")
                     , query);
         }
 
@@ -102,7 +102,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "search_project.rank desc")
+                                                                                 "is_pending_project_lead desc,search_project.rank desc")
                     , query);
         }
 
@@ -133,14 +133,14 @@ public class CustomProjectListRepositoryTest {
             final String query2 = buildQueryForUser(technologies, List.of(), null, null, false);
 
             // Then
-            assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages like " +
+            assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike " +
                          "'%\"" + technologies.get(0) +
                          "\"%')",
                     query1);
-            assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages like " +
+            assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike " +
                          "'%\""
                          + technologies.get(0) + "\"%' or" +
-                         " search_project.languages like '%\"" + technologies.get(1) + "\"%')", query2);
+                         " search_project.languages ilike '%\"" + technologies.get(1) + "\"%')", query2);
         }
 
         @Test
@@ -185,9 +185,9 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT
-                         + " and (search_project.short_description like CONCAT('%', :search, '%') or search_project" +
+                         + " and (search_project.short_description ilike CONCAT('%', :search, '%') or search_project" +
                          ".name " +
-                         "like CONCAT('%', :search, '%'))"
+                         "ilike CONCAT('%', :search, '%'))"
                     , query);
         }
 
@@ -269,12 +269,12 @@ public class CustomProjectListRepositoryTest {
             final String query2 = buildQuery(technologies, List.of(), null, null);
 
             // Then
-            assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages like '%\"" + technologies.get(0) +
+            assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike '%\"" + technologies.get(0) +
                          "\"%')",
                     query1);
-            assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages like '%\""
+            assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike '%\""
                          + technologies.get(0) + "\"%' or" +
-                         " search_project.languages like '%\"" + technologies.get(1) + "\"%')", query2);
+                         " search_project.languages ilike '%\"" + technologies.get(1) + "\"%')", query2);
         }
     }
 

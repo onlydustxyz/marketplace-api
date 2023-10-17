@@ -223,19 +223,18 @@ public class CustomProjectListRepository {
         Optional<String> orderByCondition = Optional.empty();
         if (nonNull(search) && !search.isEmpty()) {
             whereConditions.add(
-                    "search_project.short_description like " + getSearchSanitizedSqlValue() + " or search_project" +
-                    ".name like " + getSearchSanitizedSqlValue());
+                    "search_project.short_description ilike " + getSearchSanitizedSqlValue() + " or search_project" +
+                    ".name ilike " + getSearchSanitizedSqlValue());
         }
         if (mine) {
             whereConditions.add("(search_project.is_lead = true or search_project.is_pending_project_lead = true)");
         }
         if (nonNull(sort)) {
             switch (sort) {
-                case CONTRIBUTORS_COUNT ->
-                        orderByCondition = Optional.of("order by search_project.contributors_count desc");
-                case NAME -> orderByCondition = Optional.of("order by search_project.name");
-                case RANK -> orderByCondition = Optional.of("order by search_project.rank desc");
-                case REPOS_COUNT -> orderByCondition = Optional.of("order by search_project.repo_count desc");
+                case CONTRIBUTORS_COUNT -> orderByCondition = Optional.of("search_project.contributors_count desc");
+                case NAME -> orderByCondition = Optional.of("search_project.name");
+                case RANK -> orderByCondition = Optional.of("search_project.rank desc");
+                case REPOS_COUNT -> orderByCondition = Optional.of("search_project.repo_count desc");
             }
         }
         if (nonNull(sponsors) && !sponsors.isEmpty()) {
@@ -243,14 +242,15 @@ public class CustomProjectListRepository {
                     "'" + s + "'").toList()) + ")");
         }
         if (nonNull(technologies) && !technologies.isEmpty()) {
-            whereConditions.add("search_project.languages like " + String.join(" or search_project" +
-                                                                               ".languages like ",
+            whereConditions.add("search_project.languages ilike " + String.join(" or search_project" +
+                                                                                ".languages ilike ",
                     technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
-        return FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", orderByCondition.orElse("order by " +
-                                                                                               "search_project" +
-                                                                                               ".project_id")) + (whereConditions.isEmpty() ? "" : " and " + String.join(" and ",
-                whereConditions.stream().map(s -> "(" + s + ")").toList()));
+        return FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%",
+                "order by is_pending_project_lead desc," + orderByCondition
+                        .orElse("search_project.project_id")) + (whereConditions.isEmpty() ? "" :
+                " and " + String.join(" and ",
+                        whereConditions.stream().map(s -> "(" + s + ")").toList()));
     }
 
     private static String getSearchSanitizedSqlValue() {
@@ -264,8 +264,8 @@ public class CustomProjectListRepository {
         Optional<String> orderByCondition = Optional.empty();
         if (nonNull(search) && !search.isEmpty()) {
             whereConditions.add(
-                    "search_project.short_description like " + getSearchSanitizedSqlValue() + " or search_project" +
-                    ".name like " + getSearchSanitizedSqlValue());
+                    "search_project.short_description ilike " + getSearchSanitizedSqlValue() + " or search_project" +
+                    ".name ilike " + getSearchSanitizedSqlValue());
         }
         if (nonNull(sort)) {
             switch (sort) {
@@ -281,8 +281,8 @@ public class CustomProjectListRepository {
                     "'" + s + "'").toList()) + ")");
         }
         if (nonNull(technologies) && !technologies.isEmpty()) {
-            whereConditions.add("search_project.languages like " + String.join(" or search_project" +
-                                                                               ".languages like ",
+            whereConditions.add("search_project.languages ilike " + String.join(" or search_project" +
+                                                                                ".languages ilike ",
                     technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
         return FIND_PROJECTS_BASE_QUERY.replace("%order_by%", orderByCondition.orElse("order by search_project" +
