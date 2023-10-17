@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userToGetMeResponse;
 
 @RestController
-@Tags(@Tag(name = "Me"))
+@Tags(@Tag(name = "USER"))
 @AllArgsConstructor
 public class MeRestApi implements MeApi {
 

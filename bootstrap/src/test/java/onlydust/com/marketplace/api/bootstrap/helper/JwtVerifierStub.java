@@ -3,29 +3,31 @@ package onlydust.com.marketplace.api.bootstrap.helper;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
-import lombok.Setter;
 
 import java.util.Base64;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class JwtVerifierStub implements JWTVerifier {
 
-    @Setter
-    private DecodedJWT decodedJWT;
+    private final Map<String, DecodedJWT> decodedJWTPerToken = new java.util.HashMap<>();
 
     @Override
     public DecodedJWT verify(String token) throws JWTVerificationException {
-        return decodedJWT;
+        if (!decodedJWTPerToken.containsKey(token)) {
+            throw new JWTVerificationException("Invalid token");
+        }
+        return decodedJWTPerToken.get(token);
     }
 
     @Override
     public DecodedJWT verify(DecodedJWT jwt) throws JWTVerificationException {
-        return decodedJWT;
+        return verify(jwt.getToken());
     }
 
-    public void withJwtMock(Long githubUserId, String login, String avatarUrl) {
+    public void withJwtMock(String token, Long githubUserId, String login, String avatarUrl) {
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
         when(decodedJWT.getSubject()).thenReturn("github|" + githubUserId);
         when(decodedJWT.getPayload()).thenReturn(Base64.getUrlEncoder().encodeToString(String.format("""
@@ -43,6 +45,6 @@ public class JwtVerifierStub implements JWTVerifier {
                 }
                 """, login, avatarUrl, githubUserId).getBytes()));
 
-        setDecodedJWT(decodedJWT);
+        decodedJWTPerToken.put(token, decodedJWT);
     }
 }

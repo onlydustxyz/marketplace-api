@@ -11,6 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.UUID;
 
 public class ProjectContributorSearchIT extends AbstractMarketplaceApiIT {
+    final static String JWT_TOKEN = "fake-jwt";
     final static String login = "antho";
     final static UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"); // kaaper
     final static String PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE = """
@@ -65,7 +66,7 @@ public class ProjectContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setup() {
-        ((JwtVerifierStub) jwtVerifier).withJwtMock(githubUserId, login, avatarUrl);
+        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class ProjectContributorSearchIT extends AbstractMarketplaceApiIT {
     WebTestClient.ResponseSpec searchContributors(final UUID projectId, String login) {
         return client.get()
                 .uri(getApiURI(String.format(PROJECTS_SEARCH_CONTRIBUTORS, projectId), "login", login))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer fake-jwt")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange();
     }
 }

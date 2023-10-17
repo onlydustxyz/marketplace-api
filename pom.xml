@@ -30,13 +30,12 @@
         <java.version>17</java.version>
         <spring-boot-starter-web.version>2.7.3</spring-boot-starter-web.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
-        <jackson.version>2.12.7.1</jackson.version>
+        <jackson.version>2.12.7</jackson.version>
         <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
         <liquibase-core.version>4.10.0</liquibase-core.version>
         <auth0-spring-security-api.version>1.5.1</auth0-spring-security-api.version>
         <logback-classic.version>1.2.9</logback-classic.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
-        <jjwt-jackson.version>0.11.5</jjwt-jackson.version>
         <hibernate-types.version>2.21.1</hibernate-types.version>
         <hypersistence-utils.version>3.6.0</hypersistence-utils.version>
         <javafaker.version>1.0.2</javafaker.version>
@@ -46,7 +45,7 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <spring-boot-starter-security.version>2.7.3</spring-boot-starter-security.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <jjwt-impl.version>0.11.1</jjwt-impl.version>
+        <jjwt-impl.version>0.11.5</jjwt-impl.version>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +79,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
@@ -119,23 +123,12 @@
                 <artifactId>jwks-rsa</artifactId>
                 <version>0.22.1</version>
             </dependency>
-            <dependency>
-                <groupId>com.amazonaws</groupId>
-                <artifactId>aws-java-sdk-s3</artifactId>
-                <version>${aws-java-sdk-s3.version}</version>
-            </dependency>
 
             <!-- AWS Dependencies -->
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-s3</artifactId>
                 <version>${aws-java-sdk-s3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt-jackson</artifactId>
-                <version>${jjwt-jackson.version}</version>
-                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
@@ -250,12 +243,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

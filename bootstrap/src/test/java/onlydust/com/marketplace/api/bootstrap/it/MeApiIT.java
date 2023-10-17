@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
 public class MeApiIT extends AbstractMarketplaceApiIT {
+    final static String JWT_TOKEN = "fake-jwt";
     final Long githubUserId = faker.number().randomNumber();
     final String login = faker.name().username();
     final String avatarUrl = faker.internet().avatar();
@@ -17,7 +18,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setup() {
-        ((JwtVerifierStub) jwtVerifier).withJwtMock(githubUserId, login, avatarUrl);
+        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl);
     }
 
     @Test
@@ -39,7 +40,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer fake-jwt")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful()
