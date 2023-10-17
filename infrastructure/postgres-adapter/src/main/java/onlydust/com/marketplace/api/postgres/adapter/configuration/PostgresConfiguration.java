@@ -31,6 +31,11 @@ import javax.persistence.EntityManager;
 public class PostgresConfiguration {
 
     @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
     public CustomProjectRepository customProjectRepository(final EntityManager entityManager, final ObjectMapper objectMapper) {
         return new CustomProjectRepository(objectMapper, entityManager);
     }
