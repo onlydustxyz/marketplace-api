@@ -18,8 +18,7 @@ public class CustomProjectListRepositoryTest {
     public class ForAuthenticatedUser {
         private static final String FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT =
                 FIND_PROJECTS_FOR_USER_BASE_QUERY.replace(
-                        "%order_by%", "order by is_pending_project_lead desc,search_project" +
-                                      ".project_id");
+                        "%order_by%", "order by is_pending_project_lead desc,name");
 
 
         @Test
@@ -59,7 +58,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.contributors_count " +
+                                                                                 "is_pending_project_lead desc,name,search_project.contributors_count " +
                                                                                  "desc")
                     , query);
         }
@@ -74,7 +73,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.repo_count desc")
+                                                                                 "is_pending_project_lead desc,name,search_project.repo_count desc")
                     , query);
         }
 
@@ -88,7 +87,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.name")
+                                                                                 "is_pending_project_lead desc,name")
                     , query);
         }
 
@@ -102,7 +101,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.rank desc")
+                                                                                 "is_pending_project_lead desc,name,search_project.rank desc")
                     , query);
         }
 
@@ -162,7 +161,7 @@ public class CustomProjectListRepositoryTest {
 
         private static final String FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT = FIND_PROJECTS_BASE_QUERY.replace(
                 "%order_by%", "order by search_project" +
-                              ".project_id");
+                              ".name");
 
         @Test
         void should_build_query_given_empty_sort_search_order() {
@@ -201,7 +200,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.contributors_count " +
-                                                                        "desc")
+                                                                        "desc,name")
                     , query);
         }
 
@@ -214,7 +213,7 @@ public class CustomProjectListRepositoryTest {
             final String query = buildQuery(List.of(), List.of(), null, sort);
 
             // Then
-            assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.repo_count desc")
+            assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.repo_count desc,name")
                     , query);
         }
 
@@ -240,7 +239,7 @@ public class CustomProjectListRepositoryTest {
             final String query = buildQuery(List.of(), List.of(), null, sort);
 
             // Then
-            assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.rank desc")
+            assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.rank desc,name")
                     , query);
         }
 

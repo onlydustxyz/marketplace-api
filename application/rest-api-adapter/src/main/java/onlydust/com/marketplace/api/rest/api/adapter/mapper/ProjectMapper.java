@@ -43,12 +43,13 @@ public interface ProjectMapper {
             projectListItemResponses.add(mapProjectCard(projectCardView, sponsorsNames, technologies));
         }
         projectListResponse.setProjects(projectListItemResponses);
-        projectListResponse.setTechnologies(technologies.stream().toList());
-        projectListResponse.setSponsors(sponsorsNames.stream().toList());
+        projectListResponse.setTechnologies(technologies.stream().sorted().toList());
+        projectListResponse.setSponsors(sponsorsNames.stream().sorted().toList());
         return projectListResponse;
     }
 
-    private static ProjectListItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames, Set<String> technologies) {
+    private static ProjectListItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames,
+                                                          Set<String> technologies) {
         final ProjectListItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
 
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {

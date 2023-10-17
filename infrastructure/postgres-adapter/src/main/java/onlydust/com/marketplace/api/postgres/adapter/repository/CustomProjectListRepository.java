@@ -231,10 +231,9 @@ public class CustomProjectListRepository {
         }
         if (nonNull(sort)) {
             switch (sort) {
-                case CONTRIBUTORS_COUNT -> orderByCondition = Optional.of("search_project.contributors_count desc");
-                case NAME -> orderByCondition = Optional.of("search_project.name");
-                case RANK -> orderByCondition = Optional.of("search_project.rank desc");
-                case REPOS_COUNT -> orderByCondition = Optional.of("search_project.repo_count desc");
+                case CONTRIBUTORS_COUNT -> orderByCondition = Optional.of(",search_project.contributors_count desc");
+                case RANK -> orderByCondition = Optional.of(",search_project.rank desc");
+                case REPOS_COUNT -> orderByCondition = Optional.of(",search_project.repo_count desc");
             }
         }
         if (nonNull(sponsors) && !sponsors.isEmpty()) {
@@ -247,8 +246,8 @@ public class CustomProjectListRepository {
                     technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
         return FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%",
-                "order by is_pending_project_lead desc," + orderByCondition
-                        .orElse("search_project.project_id")) + (whereConditions.isEmpty() ? "" :
+                "order by is_pending_project_lead desc,name" + orderByCondition
+                        .orElse("")) + (whereConditions.isEmpty() ? "" :
                 " and " + String.join(" and ",
                         whereConditions.stream().map(s -> "(" + s + ")").toList()));
     }
@@ -270,10 +269,10 @@ public class CustomProjectListRepository {
         if (nonNull(sort)) {
             switch (sort) {
                 case CONTRIBUTORS_COUNT ->
-                        orderByCondition = Optional.of("order by search_project.contributors_count desc");
+                        orderByCondition = Optional.of("order by search_project.contributors_count desc,name");
                 case NAME -> orderByCondition = Optional.of("order by search_project.name");
-                case RANK -> orderByCondition = Optional.of("order by search_project.rank desc");
-                case REPOS_COUNT -> orderByCondition = Optional.of("order by search_project.repo_count desc");
+                case RANK -> orderByCondition = Optional.of("order by search_project.rank desc,name");
+                case REPOS_COUNT -> orderByCondition = Optional.of("order by search_project.repo_count desc,name");
             }
         }
         if (nonNull(sponsors) && !sponsors.isEmpty()) {
@@ -286,7 +285,7 @@ public class CustomProjectListRepository {
                     technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
         return FIND_PROJECTS_BASE_QUERY.replace("%order_by%", orderByCondition.orElse("order by search_project" +
-                                                                                      ".project_id")) + (whereConditions.isEmpty() ? "" : " and " + String.join(" and ",
+                                                                                      ".name")) + (whereConditions.isEmpty() ? "" : " and " + String.join(" and ",
                 whereConditions.stream().map(s -> "(" + s + ")").toList()));
     }
 
