@@ -227,7 +227,7 @@ public class CustomProjectListRepository {
                     ".name like " + getSearchSanitizedSqlValue());
         }
         if (mine) {
-            whereConditions.add("search_project.pl_user_id = :userId");
+            whereConditions.add("(search_project.is_lead = true or search_project.is_pending_project_lead = true)");
         }
         if (nonNull(sort)) {
             switch (sort) {

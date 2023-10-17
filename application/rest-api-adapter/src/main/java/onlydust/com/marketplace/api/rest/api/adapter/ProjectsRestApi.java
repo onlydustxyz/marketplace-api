@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
 
 @RestController
@@ -60,8 +61,9 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                                sponsors, search, sortBy, user.getId(), mine))
-                .orElse(projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
+                                sponsors, search, sortBy, user.getId(), isNull(mine) ? false : mine))
+                        .orElse(projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors,
+                                search, sortBy));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
     }
 
