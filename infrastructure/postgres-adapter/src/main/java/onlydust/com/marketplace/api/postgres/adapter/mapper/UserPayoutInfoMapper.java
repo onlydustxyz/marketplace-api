@@ -77,7 +77,7 @@ public interface UserPayoutInfoMapper {
 
         }
         if (nonNull(userPayoutInformation.getPayoutSettings())) {
-            userPayoutInfoEntity.set
+
         }
 
 
