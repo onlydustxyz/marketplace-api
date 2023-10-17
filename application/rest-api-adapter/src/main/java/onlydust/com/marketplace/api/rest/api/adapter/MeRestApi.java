@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
+import onlydust.com.marketplace.api.contract.model.UserPayoutInformationContract;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
@@ -32,10 +33,10 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<onlydust.com.marketplace.api.contract.model.UserPayoutInformation> getMyPayoutInfo() {
+    public ResponseEntity<UserPayoutInformationContract> getMyPayoutInfo() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final UserPayoutInformation view = userFacadePort.getPayoutInformationForUserId(authenticatedUser.getId());
-        final onlydust.com.marketplace.api.contract.model.UserPayoutInformation userPayoutInformation = userPayoutInformationToResponse(view);
+        final UserPayoutInformationContract userPayoutInformation = userPayoutInformationToResponse(view);
         return ResponseEntity.ok(userPayoutInformation);
     }
 

@@ -109,8 +109,8 @@ public interface UserMapper {
         return getMeResponse;
     }
 
-    static onlydust.com.marketplace.api.contract.model.UserPayoutInformation userPayoutInformationToResponse(UserPayoutInformation view) {
-        final onlydust.com.marketplace.api.contract.model.UserPayoutInformation userPayoutInformation = new onlydust.com.marketplace.api.contract.model.UserPayoutInformation();
+    static UserPayoutInformationContract userPayoutInformationToResponse(UserPayoutInformation view) {
+        final UserPayoutInformationContract userPayoutInformation = new UserPayoutInformationContract();
         final Boolean isACompany = view.getIsACompany();
         userPayoutInformation.setIsCompany(isACompany);
         if (isACompany) {
@@ -128,15 +128,16 @@ public interface UserMapper {
             person.setLastname(view.getPerson().getLastName());
             userPayoutInformation.setPerson(person);
         }
-        final UserPayoutInformationPayoutSettings payoutSettings = new UserPayoutInformationPayoutSettings();
+        final UserPayoutInformationContractPayoutSettings payoutSettings =
+                new UserPayoutInformationContractPayoutSettings();
         payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
         payoutSettings.setEthAddress(view.getPayoutSettings().getEthAddress());
         payoutSettings.setEthName(view.getPayoutSettings().getEthName());
         payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress());
         payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress());
         if (Objects.nonNull(view.getPayoutSettings().getSepaAccount())) {
-            final UserPayoutInformationPayoutSettingsSepaAccount sepaAccount =
-                    new UserPayoutInformationPayoutSettingsSepaAccount();
+            final UserPayoutInformationContractPayoutSettingsSepaAccount sepaAccount =
+                    new UserPayoutInformationContractPayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
             sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
             payoutSettings.setSepaAccount(sepaAccount);
@@ -144,13 +145,13 @@ public interface UserMapper {
         if (Objects.nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
             switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
                 case FIAT ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationPayoutSettings.UsdPreferredMethodEnum.SEPA);
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.SEPA);
                 case CRYPTO ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationPayoutSettings.UsdPreferredMethodEnum.USDC);
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.USDC);
             }
         }
         userPayoutInformation.setPayoutSettings(payoutSettings);
-        final UserPayoutInformationLocation location = new UserPayoutInformationLocation();
+        final UserPayoutInformationContractLocation location = new UserPayoutInformationContractLocation();
         location.setAddress(view.getLocation().getAddress());
         location.setCity(view.getLocation().getCity());
         location.setCountry(view.getLocation().getCountry());

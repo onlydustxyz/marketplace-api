@@ -96,7 +96,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformation'
+                $ref: '#/components/schemas/UserPayoutInformationContract'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -115,14 +115,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPayoutInformation'
+              $ref: '#/components/schemas/UserPayoutInformationContract'
       responses:
         "200":
           description: 'Payout information'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformation'
+                $ref: '#/components/schemas/UserPayoutInformationContract'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -983,7 +983,7 @@ components:
         owner:
           $ref: '#/components/schemas/PersonIdentity'
 
-    UserPayoutInformation:
+    UserPayoutInformationContract:
       type: object
       properties:
         person:

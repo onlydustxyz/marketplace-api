@@ -70,11 +70,4 @@ public class PostgresUserAdapter implements UserStoragePort {
         final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
         return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
     }
-
-    @Transactional
-    public void savePayoutInformationForUserId(final UUID userId, final UserPayoutInformation userPayoutInformation) {
-        final UserPayoutInfoEntity userPayoutInfoEntity =
-                UserPayoutInfoMapper.mapDomainToEntity(userPayoutInformation, userId);
-        userPayoutInfoRepository.save(userPayoutInfoEntity);
-    }
 }
