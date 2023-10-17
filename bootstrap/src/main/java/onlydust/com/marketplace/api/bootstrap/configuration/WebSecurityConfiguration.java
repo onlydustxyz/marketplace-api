@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
@@ -36,14 +37,14 @@ public class WebSecurityConfiguration {
 
     @Bean
     @Profile("!hasura_auth")
-    public JwtService jwtServiceAuth0(final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
-        return new Auth0JwtService(jwtVerifier, userFacadePort);
+    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
+        return new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
     }
 
     @Bean
     @Profile("hasura_auth")
-    public JwtService jwtServiceHasura(final JwtSecret jwtSecret) {
-        return new HasuraJwtService(jwtSecret);
+    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret) {
+        return new HasuraJwtService(objectMapper, jwtSecret);
     }
 
     @Bean

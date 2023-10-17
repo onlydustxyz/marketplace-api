@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
@@ -19,15 +20,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
+@AllArgsConstructor
 public class Auth0JwtService implements JwtService {
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
-
-    public Auth0JwtService(JWTVerifier jwtVerifier, UserFacadePort userFacadePort) {
-        this.userFacadePort = userFacadePort;
-        this.jwtVerifier = jwtVerifier;
-    }
 
     public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
         try {

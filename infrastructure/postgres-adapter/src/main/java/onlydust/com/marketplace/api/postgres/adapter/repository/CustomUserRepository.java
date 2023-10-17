@@ -149,15 +149,13 @@ public class CustomUserRepository {
                             left join project_details pd on pd.project_id = pl.project_id
                    where u.id = :userId)) as p
             order by p.is_lead desc""";
-
-
-    private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
     };
+    private final ObjectMapper objectMapper;
     private final EntityManager entityManager;
 
-    private static UserProfileView rowsToUserProfile(List<UserProfileEntity> rows) {
+    private UserProfileView rowsToUserProfile(List<UserProfileEntity> rows) {
         UserProfileView userProfileView = null;
         for (UserProfileEntity row : rows) {
             if (isNull(userProfileView)) {
@@ -208,7 +206,7 @@ public class CustomUserRepository {
         return userProfileView;
     }
 
-    private static HashMap<String, Integer> getTechnologies(UserProfileEntity row) {
+    private HashMap<String, Integer> getTechnologies(UserProfileEntity row) {
         if (isNull(row.getLanguages())) {
             return new HashMap<>();
         }

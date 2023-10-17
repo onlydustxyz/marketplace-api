@@ -30,7 +30,7 @@
         <java.version>17</java.version>
         <spring-boot-starter-web.version>2.7.3</spring-boot-starter-web.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
-        <jackson.version>2.12.7.1</jackson.version>
+        <jackson.version>2.12.7</jackson.version>
         <aws-java-sdk-s3.version>1.12.322</aws-java-sdk-s3.version>
         <liquibase-core.version>4.10.0</liquibase-core.version>
         <auth0-spring-security-api.version>1.5.1</auth0-spring-security-api.version>
@@ -80,6 +80,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>

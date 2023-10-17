@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
@@ -17,13 +18,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class HasuraJwtServiceTest {
 
     private final static Faker faker = new Faker();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void should_authenticate_given_a_valid_jwt() throws JsonProcessingException {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
         final HasuraJwtPayload hasuraJwtPayload =
                 HasuraJwtPayload.builder()
                         .iss(jwtSecret.getIssuer())
@@ -61,7 +63,7 @@ public class HasuraJwtServiceTest {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
 
         // When
         final Optional<OnlyDustAuthentication> authentication =
@@ -77,7 +79,7 @@ public class HasuraJwtServiceTest {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
         final String jwtToken =
                 faker.cat().name() + "." + faker.pokemon().name() + "." + faker.pokemon().name();
 
@@ -93,7 +95,7 @@ public class HasuraJwtServiceTest {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, faker.pokemon().name());
 
         // When
@@ -109,7 +111,7 @@ public class HasuraJwtServiceTest {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
         final HasuraJwtPayload hasuraJwtPayload =
                 HasuraJwtPayload.builder()
                         .iss(jwtSecret.getIssuer())
@@ -170,7 +172,7 @@ public class HasuraJwtServiceTest {
         // Given
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
-        final HasuraJwtService hasuraJwtService = new HasuraJwtService(jwtSecret);
+        final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret);
         final HasuraJwtPayload hasuraJwtPayload =
                 HasuraJwtPayload.builder()
                         .iss(jwtSecret.getIssuer())

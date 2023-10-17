@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
@@ -16,6 +17,7 @@ import static org.mockito.Mockito.when;
 class Auth0JwtServiceTest {
 
     private static final Long ONE_CENTURY = 3153600000L;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void should_authenticate_from_a_valid_jwt() {
@@ -40,7 +42,7 @@ class Auth0JwtServiceTest {
                 .jwksUrl("https://onlydust-hackathon.eu.auth0.com/")
                 .expiresAtLeeway(ONE_CENTURY)
                 .build());
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, null).orElseThrow();
@@ -79,7 +81,7 @@ class Auth0JwtServiceTest {
                 .jwksUrl("https://onlydust-hackathon.eu.auth0.com/")
                 .expiresAtLeeway(ONE_CENTURY)
                 .build());
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
         final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, null);
 
         assertThat(authentication).isEmpty();
@@ -130,7 +132,7 @@ class Auth0JwtServiceTest {
                 .roles(List.of(UserRole.USER))
                 .build());
 
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, impersonationHeader).orElseThrow();
@@ -196,7 +198,7 @@ class Auth0JwtServiceTest {
                 .roles(List.of(UserRole.USER))
                 .build());
 
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(jwtVerifier, userFacadePort);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, impersonationHeader);

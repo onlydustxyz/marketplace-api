@@ -27,7 +27,7 @@ import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 @AllArgsConstructor
 @Slf4j
 public class HasuraJwtService implements JwtService {
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final JwtSecret jwtSecret;
 
     private static User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
