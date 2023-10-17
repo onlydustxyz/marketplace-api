@@ -55,4 +55,8 @@ public class RestApiConfiguration {
         return new OnlydustExceptionRestHandler();
     }
 
+    @Bean
+    public AppRestApi appRestApi() {
+        return new AppRestApi();
+    }
 }
