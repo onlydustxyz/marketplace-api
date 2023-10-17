@@ -28,6 +28,7 @@ public interface ProjectMapper {
                 .shortDescription(projectEntity.getShortDescription())
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
+                .moreInfoUrl(projectEntity.getTelegramLink())
                 .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
                 .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).collect(Collectors.toSet()))
                 .contributorCount(contributorCount)
