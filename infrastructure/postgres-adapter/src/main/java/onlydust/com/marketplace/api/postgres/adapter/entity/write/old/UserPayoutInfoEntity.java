@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
@@ -11,6 +11,8 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -24,7 +26,7 @@ public class UserPayoutInfoEntity {
 
     @Id
     @Column(name = "user_id")
-    UUID id;
+    UUID userId;
     @Type(type = "preferred_type")
     @Enumerated(EnumType.STRING)
     @Column(name = "usd_preferred_method")
@@ -35,5 +37,15 @@ public class UserPayoutInfoEntity {
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     @Column(columnDefinition = "jsonb", name = "identity")
     private JsonNode identity;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @Builder.Default
+    Set<WalletEntity> wallets = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    BankAccountEntity bankAccount;
 
+    public void addWallets(final WalletEntity walletEntity) {
+        this.wallets.add(walletEntity);
+    }
 }

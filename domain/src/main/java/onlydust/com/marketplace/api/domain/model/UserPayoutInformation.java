@@ -14,7 +14,7 @@ public class UserPayoutInformation {
 
 
     @Data
-    @Builder
+    @Builder(toBuilder = true)
     public static class PayoutSettings {
         UsdPreferredMethodEnum usdPreferredMethodEnum;
         String ethAddress;

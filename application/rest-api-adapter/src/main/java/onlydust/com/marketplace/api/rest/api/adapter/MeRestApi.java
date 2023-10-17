@@ -17,7 +17,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.us
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userToGetMeResponse;
 
 @RestController
-@Tags(@Tag(name = "USER"))
+@Tags(@Tag(name = "Me"))
 @AllArgsConstructor
 public class MeRestApi implements MeApi {
 

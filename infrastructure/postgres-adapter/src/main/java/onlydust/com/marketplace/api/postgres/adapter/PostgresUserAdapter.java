@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
@@ -69,5 +69,12 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UserPayoutInformation getPayoutInformationById(UUID id) {
         final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
         return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
+    }
+
+    @Transactional
+    public void savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation) {
+        final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
+                userPayoutInformation);
+        userPayoutInfoRepository.save(userPayoutInfoEntity);
     }
 }

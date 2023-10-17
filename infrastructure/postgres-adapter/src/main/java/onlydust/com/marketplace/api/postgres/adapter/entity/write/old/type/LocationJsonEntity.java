@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read.old;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

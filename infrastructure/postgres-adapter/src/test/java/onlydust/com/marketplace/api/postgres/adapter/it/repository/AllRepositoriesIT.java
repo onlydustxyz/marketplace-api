@@ -333,7 +333,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .build())
                 .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                         .aptosAddress(faker.rickAndMorty().character())
-                        .ethAddress(faker.pokemon().location())
+                        .starknetAddress(faker.pokemon().location())
                         .ethName(faker.pokemon().name())
                         .optimismAddress(faker.pokemon().name())
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
