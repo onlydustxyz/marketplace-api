@@ -1,1 +1,1 @@
-web: java -jar bootstrap/target/marketplace-api.jar
+web: java -Dspring.profiles.active=hasura_auth -jar bootstrap/target/marketplace-api.jar
