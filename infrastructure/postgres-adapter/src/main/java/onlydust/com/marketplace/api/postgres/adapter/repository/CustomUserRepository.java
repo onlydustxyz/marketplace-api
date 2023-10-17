@@ -83,29 +83,6 @@ public class CustomUserRepository {
             where u.id = :userId
             """;
 
-
-    private static final String GET_PROJECT_STATS = """
-            select :projectId project_id, (select count(distinct github_user_id)
-                    from projects_contributors
-                    where project_id = :projectId) contributors_count,
-                (select distinct b.initial_amount - b.remaining_amount total_usd_granted
-                 from project_details pd
-                          left join project_leads pl on pl.project_id = pd.project_id
-                          left join projects_budgets pb on pb.project_id = pd.project_id
-                          left join budgets b on b.id = pb.budget_id
-                 where pd.project_id = :projectId
-                   and b.currency = 'usd') total_granted,
-                (select count(distinct c.id)
-                 from project_github_repos pgr
-                          left join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :userId
-                 where pgr.project_id = :projectId) user_contributions_count,
-                (select c.closed_at
-                 from project_github_repos pgr
-                          left join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :userId
-                 where pgr.project_id = :projectId and closed_at is not null
-                 order by c.closed_at desc
-                 limit 1) last_contribution_date
-            """;
     private final static String GET_PROJECT_STATS_BY_USER = """
             select p.project_id as                       project_id,
                    (select count(distinct github_user_id)
@@ -152,7 +129,7 @@ public class CustomUserRepository {
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
     };
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final EntityManager entityManager;
 
     private UserProfileView rowsToUserProfile(List<UserProfileEntity> rows) {

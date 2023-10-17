@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
-public class MeApiIT extends AbstractMarketplaceApiIT {
+public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     final static String JWT_TOKEN = "fake-jwt";
     final Long githubUserId = faker.number().randomNumber();
     final String login = faker.name().username();

@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -31,13 +30,8 @@ import javax.persistence.EntityManager;
 public class PostgresConfiguration {
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
-
-    @Bean
-    public CustomProjectRepository customProjectRepository(final EntityManager entityManager, final ObjectMapper objectMapper) {
-        return new CustomProjectRepository(objectMapper, entityManager);
+    public CustomProjectRepository customProjectRepository(final EntityManager entityManager) {
+        return new CustomProjectRepository(entityManager);
     }
 
     @Bean
@@ -82,8 +76,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomUserRepository customUserRepository(final EntityManager entityManager, final ObjectMapper objectMapper) {
-        return new CustomUserRepository(objectMapper, entityManager);
+    public CustomUserRepository customUserRepository(final EntityManager entityManager) {
+        return new CustomUserRepository(entityManager);
     }
 
     @Bean
