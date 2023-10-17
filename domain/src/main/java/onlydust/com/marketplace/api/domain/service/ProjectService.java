@@ -33,12 +33,20 @@ public class ProjectService implements ProjectFacadePort {
         return projectStoragePort.getBySlug(slug);
     }
 
+
     @Override
-    public Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
-                                                                             List<String> sponsor, UUID userId,
-                                                                             String search, ProjectCardView.SortBy sort) {
-        return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technology, sponsor, userId,
-                search, sort);
+    public Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
+                                                                             List<String> sponsors, String search,
+                                                                             ProjectCardView.SortBy sort, UUID userId
+            , Boolean mine) {
+        return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors, userId, search,
+                sort, mine);
+    }
+
+    @Override
+    public Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
+                                                                       String search, ProjectCardView.SortBy sort) {
+        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort);
     }
 
     @Override

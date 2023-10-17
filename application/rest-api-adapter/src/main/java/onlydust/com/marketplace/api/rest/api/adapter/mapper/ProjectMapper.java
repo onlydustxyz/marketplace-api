@@ -77,6 +77,7 @@ public interface ProjectMapper {
         project.setContributorCount(projectCardView.getContributorCount());
         project.setRepoCount(projectCardView.getRepoCount());
         project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
+        project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
         return project;
     }
 

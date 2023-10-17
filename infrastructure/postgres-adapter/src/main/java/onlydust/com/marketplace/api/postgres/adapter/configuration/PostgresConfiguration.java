@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -31,13 +30,13 @@ import javax.persistence.EntityManager;
 public class PostgresConfiguration {
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    public CustomProjectRepository customProjectRepository(final EntityManager entityManager) {
+        return new CustomProjectRepository(entityManager);
     }
 
     @Bean
-    public CustomProjectRepository customProjectRepository(final EntityManager entityManager, final ObjectMapper objectMapper) {
-        return new CustomProjectRepository(objectMapper, entityManager);
+    public CustomProjectListRepository customProjectListRepository(final EntityManager entityManager) {
+        return new CustomProjectListRepository(entityManager);
     }
 
     @Bean
@@ -58,7 +57,8 @@ public class PostgresConfiguration {
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomRepoRepository customRepoRepository,
-                                                         final CustomUserRepository customUserRepository) {
+                                                         final CustomUserRepository customUserRepository,
+                                                         final CustomProjectListRepository customProjectListRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -66,7 +66,8 @@ public class PostgresConfiguration {
                 customProjectRepository,
                 customContributorRepository,
                 customRepoRepository,
-                customUserRepository);
+                customUserRepository,
+                customProjectListRepository);
     }
 
     @Bean
@@ -75,12 +76,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomUserRepository customUserRepository(final EntityManager entityManager, final ObjectMapper objectMapper) {
-        return new CustomUserRepository(objectMapper, entityManager);
+    public CustomUserRepository customUserRepository(final EntityManager entityManager) {
+        return new CustomUserRepository(entityManager);
     }
 
     @Bean
-    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository, final UserRepository userRepository) {
+    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
+                                                   final UserRepository userRepository) {
         return new PostgresUserAdapter(customUserRepository, userRepository);
     }
 

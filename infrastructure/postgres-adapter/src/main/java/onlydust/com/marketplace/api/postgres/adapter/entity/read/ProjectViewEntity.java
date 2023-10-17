@@ -60,5 +60,7 @@ public class ProjectViewEntity {
     @Column(name = "repository_id", insertable = false)
     Long repositoryId;
     @Column(name = "project_id", nullable = false)
-    private UUID id;
+    UUID id;
+    @Column(name = "is_pending_project_lead", nullable = false)
+    Boolean isPendingProjectLead;
 }

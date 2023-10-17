@@ -24,6 +24,8 @@ public class ProjectCardView {
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
     @Builder.Default
     Map<String, Integer> technologies = new HashMap<>();
+    @Builder.Default
+    Boolean isInvitedAsProjectLead = false;
 
     public void addProjectLeader(final ProjectLeaderLinkView leader) {
         this.getLeaders().add(leader);

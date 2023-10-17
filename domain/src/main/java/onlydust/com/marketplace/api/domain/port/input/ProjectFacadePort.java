@@ -15,8 +15,13 @@ public interface ProjectFacadePort {
 
     ProjectDetailsView getBySlug(String slug);
 
-    Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology, List<String> sponsor,
-                                                                      UUID userId, String search, ProjectCardView.SortBy sort);
+    Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
+                                                                      String search, ProjectCardView.SortBy sort,
+                                                                      UUID userId, Boolean mine);
+
+    Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
+                                                                String search, ProjectCardView.SortBy sort);
+
 
     UUID createProject(CreateProjectCommand createProjectCommand);
 

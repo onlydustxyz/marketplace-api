@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Contributor;
-import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
@@ -37,6 +35,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomContributorRepository customContributorRepository;
     private final CustomRepoRepository customRepoRepository;
     private final CustomUserRepository customUserRepository;
+    private final CustomProjectListRepository customProjectListRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,70 +52,56 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     private ProjectDetailsView getProjectDetails(ProjectEntity projectEntity) {
-        final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(), TOP_CONTRIBUTOR_COUNT);
+        final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(),
+                TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
         final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
         final var leaders = customUserRepository.findProjectLeaders(projectEntity.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectEntity.getId());
-        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos, leaders, sponsors);
+        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos, leaders
+                , sponsors);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technology,
-                                                                              List<String> sponsor, UUID userId,
-                                                                              String search, ProjectCardView.SortBy sort) {
-        return customProjectRepository.findByTechnologiesSponsorsOwnershipSearchSortBy(technology, sponsor,
-                userId, search, sort);
+    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
+                                                                              List<String> sponsors, UUID userId,
+                                                                              String search,
+                                                                              ProjectCardView.SortBy sort,
+                                                                              Boolean mine) {
+        return customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors,
+                search, sort, userId, mine);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies,
+                                                                        List<String> sponsors, String search,
+                                                                        ProjectCardView.SortBy sort) {
+        return customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort);
     }
 
     @Override
     @Transactional
-    public void createProject(UUID projectId,
-                              String name,
-                              String shortDescription,
-                              String longDescription,
-                              Boolean isLookingForContributors,
-                              List<CreateProjectCommand.MoreInfo> moreInfos,
-                              List<Long> githubRepoIds,
-                              List<Long> githubUserIdsAsProjectLeads,
-                              ProjectVisibility visibility,
-                              String imageUrl) {
-        final ProjectEntity projectEntity = ProjectEntity.builder()
-                .id(projectId)
-                .name(name)
-                .shortDescription(shortDescription)
-                .longDescription(longDescription)
-                .hiring(isLookingForContributors)
-                .logoUrl(imageUrl)
-                .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
-                .rank(0)
-                .build();
+    public void createProject(UUID projectId, String name, String shortDescription, String longDescription,
+                              Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
+                              List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads,
+                              ProjectVisibility visibility, String imageUrl) {
+        final ProjectEntity projectEntity =
+                ProjectEntity.builder().id(projectId).name(name).shortDescription(shortDescription).longDescription(longDescription).hiring(isLookingForContributors).logoUrl(imageUrl).visibility(ProjectMapper.projectVisibilityToEntity(visibility)).rank(0).build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
 
-        this.projectRepoRepository.saveAll(githubRepoIds.stream()
-                .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                .toList());
+        this.projectRepoRepository.saveAll(githubRepoIds.stream().map(repoId -> new ProjectRepoEntity(projectId,
+                repoId)).toList());
 
-        this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
-                .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId))
-                .toList());
+        this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream().map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId)).toList());
     }
 
     @Override
     public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
-        return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream()
-                .map(entity -> Contributor.builder()
-                        .id(GithubUserIdentity.builder()
-                                .githubUserId(entity.getGithubUserId())
-                                .githubLogin(entity.getLogin())
-                                .githubAvatarUrl(entity.getAvatarUrl())
-                                .build())
-                        .isRegistered(entity.getIsRegistered())
-                        .build())
-                .toList();
+        return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
     }
 }

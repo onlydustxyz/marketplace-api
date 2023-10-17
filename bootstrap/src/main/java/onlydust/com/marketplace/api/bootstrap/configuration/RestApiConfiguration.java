@@ -14,8 +14,10 @@ import org.springframework.context.annotation.Configuration;
 public class RestApiConfiguration {
 
     @Bean
-    public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort, final ContributorFacadePort contributorFacadePort) {
-        return new ProjectsRestApi(projectFacadePort, contributorFacadePort);
+    public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
+                                          final ContributorFacadePort contributorFacadePort,
+                                          final AuthenticationService authenticationService) {
+        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService);
     }
 
     @Bean
