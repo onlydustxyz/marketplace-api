@@ -990,7 +990,7 @@ components:
           $ref: '#/components/schemas/PersonIdentity'
         company:
           $ref: '#/components/schemas/CompanyIdentity'
-        is_company:
+        isCompany:
           type: boolean
         location:
           type: object
