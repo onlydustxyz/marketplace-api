@@ -49,7 +49,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.isCompany").isEqualTo(false)
+                .jsonPath("$.is_company").isEqualTo(false)
                 .jsonPath("$.person.lastname").isEqualTo("BUISSET")
                 .jsonPath("$.person.firstname").isEqualTo("Anthony")
                 .jsonPath("$.location.address").isEqualTo("771 chemin de la sine")
@@ -57,6 +57,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.country").isEqualTo("France")
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
                 .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
-                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("USDC");
+                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("CRYPTO");
     }
 }
