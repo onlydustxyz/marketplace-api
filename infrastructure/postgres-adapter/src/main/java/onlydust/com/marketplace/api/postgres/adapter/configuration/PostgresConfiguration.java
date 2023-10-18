@@ -4,11 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -89,6 +85,11 @@ public class PostgresConfiguration {
                                                    final GlobalSettingsRepository globalSettingsRepository,
                                                    final RegisteredUserRepository registeredUserRepository,
                                                    final UserPayoutInfoRepository userPayoutInfoRepository) {
-        return new PostgresUserAdapter(customUserRepository, userRepository, userPayoutInfoRepository, userViewRepository, globalSettingsRepository, registeredUserRepository);
+        return new PostgresUserAdapter(customUserRepository,
+                userRepository,
+                userViewRepository,
+                globalSettingsRepository,
+                registeredUserRepository,
+                userPayoutInfoRepository);
     }
 }
