@@ -56,7 +56,8 @@ public class PostgresConfiguration {
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomRepoRepository customRepoRepository,
                                                          final CustomProjectListRepository customProjectListRepository,
-                                                         final CustomUserRepository customUserRepository) {
+                                                         final CustomUserRepository customUserRepository,
+                                                         final ProjectLeadViewRepository projectLeadViewRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -65,7 +66,8 @@ public class PostgresConfiguration {
                 customContributorRepository,
                 customRepoRepository,
                 customUserRepository,
-                customProjectListRepository);
+                customProjectListRepository,
+                projectLeadViewRepository);
     }
 
     @Bean

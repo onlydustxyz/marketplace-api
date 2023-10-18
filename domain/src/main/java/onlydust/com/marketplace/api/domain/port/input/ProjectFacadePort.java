@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.view.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
@@ -28,5 +28,12 @@ public interface ProjectFacadePort {
 
     URL saveLogoImage(InputStream imageInputStream);
 
-    Page<ProjectContributorsLinkView> getContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy);
+    Page<ProjectContributorsLinkView> getContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
+                                                      Integer pageIndex,
+                                                      Integer pageSize);
+
+    Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+                                                                      ProjectContributorsLinkView.SortBy sortBy,
+                                                                      UUID projectLeadId, Integer pageIndex,
+                                                                      Integer pageSize);
 }

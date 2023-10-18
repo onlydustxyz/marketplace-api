@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
 import java.net.URI;
 import java.util.*;
@@ -155,4 +156,6 @@ public interface ProjectMapper {
         }
         return null;
     }
+
+
 }

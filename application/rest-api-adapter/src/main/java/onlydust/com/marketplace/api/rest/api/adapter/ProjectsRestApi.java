@@ -11,9 +11,9 @@ import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.core.io.Resource;
@@ -28,6 +28,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
 
 @RestController
@@ -115,20 +118,17 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ContributorListResponse> getProjectContributors(UUID projectId, String sort,
-                                                                          Boolean includePending) {
-        final ProjectContributorsLinkView.SortBy sortBy = switch (sort) {
-            case "CONTRIBUTION_COUNT" -> ProjectContributorsLinkView.SortBy.contributionCount;
-            case "EARNED" -> ProjectContributorsLinkView.SortBy.earned;
-            case "REWARD_COUNT" -> ProjectContributorsLinkView.SortBy.rewardCount;
-            case "TO_REWARD_COUNT" -> ProjectContributorsLinkView.SortBy.toRewardCount;
-            default -> ProjectContributorsLinkView.SortBy.login;
-        };
+    public ResponseEntity<ContributorPageResponse> getProjectContributors(UUID projectId, Integer pageIndex,
+                                                                          Integer pageSize, String sort) {
 
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
         final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
-                projectFacadePort.getContributors(projectId, sortBy);
-        final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
-                projectFacadePort.getContributorsForProjectLead(projectId, sortBy);
-        return ProjectsApi.super.getProjectContributors(projectId, sort, includePending);
+                authenticationService.tryGetAuthenticatedUser().map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy, user.getId(), pageIndex,
+                sanitizedPageSize)).orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy, pageIndex,
+                        sanitizedPageSize));
+        return ResponseEntity.ok(mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage));
     }
+
+
 }

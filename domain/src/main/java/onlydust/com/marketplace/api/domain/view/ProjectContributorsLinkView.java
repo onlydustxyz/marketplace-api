@@ -9,11 +9,12 @@ import java.math.BigDecimal;
 @Builder
 public class ProjectContributorsLinkView implements UserLinkView {
 
-    Integer githubUserId;
+    Long githubUserId;
     String login;
     String avatarUrl;
     String url;
     BigDecimal earned;
+    Integer contributionCount;
     Integer rewards;
     Integer totalToReward;
     Integer pullRequestsToRewardCount;
