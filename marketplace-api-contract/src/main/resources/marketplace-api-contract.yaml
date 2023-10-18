@@ -79,6 +79,28 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Patch some caller info
+      operationId: patchMe
+      description: |
+        Patch onboarding info of the caller
+      requestBody:
+        description: 'Patched user info'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchMeContract'
+      responses:
+        "204":
+          description: 'The user was patched successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/payout-info:
     get:
@@ -1836,6 +1858,13 @@ components:
 
     GetMeResponse:
       type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - hasSeenOnboardingWizard
+        - hasAcceptedLatestTermsAndConditions
       properties:
         id:
           type: string
@@ -1853,6 +1882,17 @@ components:
         hasAcceptedLatestTermsAndConditions:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
+
+    PatchMeContract:
+      type: object
+      properties:
+        hasSeenOnboardingWizard:
+          type: boolean
+          description: True if the the onboarding process was displayed to the user
+        hasAcceptedTermsAndConditions:
+          type: boolean
+          description: True if the user has accepted the latest version of terms and conditions
+
 
     CreateProjectRequest:
       type: object

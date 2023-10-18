@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUs
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.UUID;
 
@@ -236,5 +237,51 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
         assertThat(result.hasSeenOnboardingWizard()).isFalse();
         assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
+    }
+
+    @Test
+    @Transactional
+    void should_update_onboarding_wizard_display_date() {
+        // Given
+        final var userId = UUID.randomUUID();
+        final OnboardingEntity onboarding = OnboardingEntity.builder()
+                .id(userId)
+                .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
+                .profileWizardDisplayDate(faker.date().birthday(0, 3))
+                .build();
+        onboardingRepository.save(onboarding);
+
+        final Date newDate = faker.date().birthday(0, 3);
+
+        // When
+        postgresUserAdapter.updateOnboardingWizardDisplayDate(userId, newDate);
+
+        // Then
+        final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
+        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate()).isEqualTo(newDate);
+        assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(onboarding.getTermsAndConditionsAcceptanceDate());
+    }
+
+    @Test
+    @Transactional
+    void should_update_onboarding_terms_and_conditions_acceptance_date() {
+        // Given
+        final var userId = UUID.randomUUID();
+        final OnboardingEntity onboarding = OnboardingEntity.builder()
+                .id(userId)
+                .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
+                .profileWizardDisplayDate(faker.date().birthday(0, 3))
+                .build();
+        onboardingRepository.save(onboarding);
+
+        final Date newDate = faker.date().birthday(0, 3);
+
+        // When
+        postgresUserAdapter.updateTermsAndConditionsAcceptanceDate(userId, newDate);
+
+        // Then
+        final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
+        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate()).isEqualTo(onboarding.getProfileWizardDisplayDate());
+        assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(newDate);
     }
 }

@@ -3,12 +3,14 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
+import onlydust.com.marketplace.api.gateways.RealDateProvider;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
@@ -53,8 +55,13 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter) {
-        return new UserService(postgresUserAdapter);
+    public DateProvider dateProvider() {
+        return new RealDateProvider();
+    }
+
+    @Bean
+    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter, final DateProvider dateProvider) {
+        return new UserService(postgresUserAdapter, dateProvider);
     }
 
     @Bean

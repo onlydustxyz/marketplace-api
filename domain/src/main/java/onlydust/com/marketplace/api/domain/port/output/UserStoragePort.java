@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,8 @@ public interface UserStoragePort {
     void createUser(User user);
 
     UserPayoutInformation getPayoutInformationById(UUID id);
+
+    void updateOnboardingWizardDisplayDate(UUID userId, Date date);
+
+    void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
 }

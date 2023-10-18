@@ -3,28 +3,26 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>onlydust.com.marketplace.api</groupId>
-        <artifactId>marketplace-api</artifactId>
+        <artifactId>infrastructure</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>infrastructure</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>postgres-adapter</module>
-        <module>github-api-adapter</module>
-        <module>aws-s3-adapter</module>
-        <module>gateways-adapter</module>
-    </modules>
+    <groupId>com.onlydust.marketplace.indexer</groupId>
+    <artifactId>gateways-adapter</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>domain</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

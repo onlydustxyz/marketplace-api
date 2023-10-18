@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
+
 public interface UserMapper {
 
     static ContributorLinkView mapToContributorLinkView(GithubUserViewEntity user) {
@@ -41,10 +43,11 @@ public interface UserMapper {
                 .login(user.getGithubLogin())
                 .avatarUrl(user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
-                .hasAcceptedLatestTermsAndConditions(user.getOnboarding() != null
+                .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
+                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
                                                      && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
-                .hasSeenOnboardingWizard(user.getOnboarding() != null
-                                         && user.getOnboarding().getProfileWizardDisplayDate() != null)
+                .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
+                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 
@@ -55,10 +58,11 @@ public interface UserMapper {
                 .login(user.getLogin())
                 .avatarUrl(user.getAvatarUrl())
                 .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) : List.of(UserRole.USER))
-                .hasAcceptedLatestTermsAndConditions(user.getOnboarding() != null
+                .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
+                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
                                                      && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
-                .hasSeenOnboardingWizard(user.getOnboarding() != null
-                                         && user.getOnboarding().getProfileWizardDisplayDate() != null)
+                .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
+                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 

@@ -14,4 +14,8 @@ public interface UserFacadePort {
     UserProfileView getProfileById(UUID userId);
 
     UserPayoutInformation getPayoutInformationForUserId(UUID id);
+
+    void markUserAsOnboarded(UUID userId);
+
+    void updateTermsAndConditionsAcceptanceDate(UUID userId);
 }

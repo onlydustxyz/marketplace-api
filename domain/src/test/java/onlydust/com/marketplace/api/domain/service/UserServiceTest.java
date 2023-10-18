@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
@@ -15,18 +16,18 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
 
     private final Faker faker = new Faker();
+    private final DeterministicDateProvider dateProvider = new DeterministicDateProvider();
 
     @Test
     void should_find_user_given_a_github_id() {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
                 .githubUserId(faker.number().randomNumber())
                 .githubAvatarUrl(faker.internet().avatar())
@@ -54,7 +55,7 @@ public class UserServiceTest {
     void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
                 .githubUserId(faker.number().randomNumber())
                 .githubAvatarUrl(faker.internet().avatar())
@@ -84,7 +85,7 @@ public class UserServiceTest {
     void should_find_user_profile_given_an_id() {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserProfileView userProfileView = UserProfileView.builder()
                 .id(userId)
@@ -100,5 +101,35 @@ public class UserServiceTest {
 
         // Then
         assertEquals(userProfileView, profileById);
+    }
+
+    @Test
+    void should_markUserAsOnboarded() {
+        // Given
+        dateProvider.setNow(faker.date().birthday(0, 1));
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+
+        // When
+        userService.markUserAsOnboarded(userId);
+
+        // Then
+        verify(userStoragePort, times(1)).updateOnboardingWizardDisplayDate(userId, dateProvider.now());
+    }
+
+    @Test
+    void should_updateTermsAndConditionsAcceptanceDate() {
+        // Given
+        dateProvider.setNow(faker.date().birthday(0, 1));
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+
+        // When
+        userService.updateTermsAndConditionsAcceptanceDate(userId);
+
+        // Then
+        verify(userStoragePort, times(1)).updateTermsAndConditionsAcceptanceDate(userId, dateProvider.now());
     }
 }
