@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
 
@@ -71,10 +73,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     }
                     return userProfileView;
                 })
-                .orElseThrow(() -> OnlyDustException.builder()
-                        .status(404)
-                        .message(String.format("User profile %s not found", userId))
-                        .build());
+                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", userId)));
 
     }
 

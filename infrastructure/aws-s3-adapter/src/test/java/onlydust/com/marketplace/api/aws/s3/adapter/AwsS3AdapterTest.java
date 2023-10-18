@@ -43,7 +43,7 @@ class AwsS3AdapterTest {
         when(amazonS3.putObject(eq(amazonS3Properties.getImageBucket()), eq(expectedFileName), any(), any())).thenReturn(putObjectResultMock);
         when(putObjectResultMock.getContentMd5()).thenReturn(new String(Base64.getEncoder().encode(DigestUtils.md5(bytes))));
         when(amazonS3.getUrl(eq(amazonS3Properties.getImageBucket()), eq(expectedFileName))).thenReturn(new URL("https://my-s3-bucket.com/my-file.jpeg"));
-        final URL imageUrl = AwsS3Adapter.storeImage(new ByteArrayInputStream(bytes));
+        AwsS3Adapter.storeImage(new ByteArrayInputStream(bytes));
 
         // Then
         verify(amazonS3, times(1)).putObject(any(), any(), any(), any());
@@ -63,9 +63,7 @@ class AwsS3AdapterTest {
         when(amazonS3.doesBucketExistV2(amazonS3Properties.getImageBucket())).thenReturn(true);
         when(amazonS3.putObject(anyString(), anyString(), any(), any())).thenThrow(new SdkClientException(faker.name().firstName()));
 
-        Assertions.assertThatThrownBy(() -> {
-            AwsS3Adapter.storeImage(new ByteArrayInputStream(bytes));
-        }).isInstanceOf(OnlyDustException.class);
+        Assertions.assertThatThrownBy(() -> AwsS3Adapter.storeImage(new ByteArrayInputStream(bytes))).isInstanceOf(OnlyDustException.class);
     }
 
     @Test
@@ -92,7 +90,7 @@ class AwsS3AdapterTest {
         // Then
         assertThat(exception).isNotNull();
         assertThat(exception.getStatus()).isEqualTo(500);
-        assertThat(exception.getMessage()).isEqualTo("INTERNAL_SERVER_ERROR");
+        assertThat(exception.getMessage()).contains("md5 differs from file md5");
     }
 
 
@@ -117,7 +115,7 @@ class AwsS3AdapterTest {
         // Then
         assertThat(exception).isNotNull();
         assertThat(exception.getStatus()).isEqualTo(500);
-        assertThat(exception.getMessage()).isEqualTo("INTERNAL_SERVER_ERROR");
+        assertThat(exception.getMessage()).contains("Failed to upload");
     }
 
 

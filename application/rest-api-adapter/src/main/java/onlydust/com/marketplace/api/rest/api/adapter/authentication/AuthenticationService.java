@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
 
+import static java.lang.String.format;
+
 @AllArgsConstructor
 @Slf4j
 public class AuthenticationService {
@@ -22,24 +24,15 @@ public class AuthenticationService {
     public User getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
-            final OnlyDustException unauthorized = OnlyDustException.builder()
-                    .message(String.format("Unauthorized anonymous user %s", authentication))
-                    .status(401)
-                    .build();
+            final OnlyDustException unauthorized = OnlyDustException.unauthorized(format("Unauthorized anonymous user %s", authentication));
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!authentication.isAuthenticated()) {
-            final OnlyDustException unauthorized = OnlyDustException.builder()
-                    .message("Unauthorized")
-                    .status(401)
-                    .build();
+            final OnlyDustException unauthorized = OnlyDustException.unauthorized("Unauthorized non-authenticated user");
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!(authentication instanceof OnlyDustAuthentication)) {
-            final OnlyDustException internalError = OnlyDustException.builder()
-                    .message(String.format("Expected an OnlyDustAuthentication, got %s", authentication.getClass()))
-                    .status(500)
-                    .build();
+            final OnlyDustException internalError = OnlyDustException.internalServerError(format("Expected an OnlyDustAuthentication, got %s", authentication.getClass()));
             LOGGER.error(internalError.toString());
             throw internalError;
         }

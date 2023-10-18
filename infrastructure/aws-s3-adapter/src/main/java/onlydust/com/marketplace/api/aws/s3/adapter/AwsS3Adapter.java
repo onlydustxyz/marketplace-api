@@ -56,7 +56,7 @@ public class AwsS3Adapter implements ImageStoragePort {
             final String md5FromUploadedFile = putObjectToS3andGetContentFileUploadedMd5(bucketName, bucketKey,
                     byteArrayInputStream);
             if (!base64Md5.equals(md5FromUploadedFile)) {
-                throw OnlyDustException.internalServerError(format("Bucket %s %s md5 content is not equaled to file md5 content", bucketName, bucketKey));
+                throw OnlyDustException.internalServerError(format("Bucket %s %s md5 differs from file md5", bucketName, bucketKey));
             }
             return amazonS3.getUrl(bucketName, bucketKey);
         } catch (SdkClientException sdkClientException) {
@@ -74,7 +74,7 @@ public class AwsS3Adapter implements ImageStoragePort {
                     byteArrayInputStream, metadata);
             return putObjectResult.getContentMd5();
         } else {
-            throw OnlyDustException.internalServerError(format("Failed to upload report %s to S3 bucket %s", bucketKeyId, bucketStorage));
+            throw OnlyDustException.internalServerError(format("Failed to upload %s to S3 bucket %s", bucketKeyId, bucketStorage));
         }
     }
 }

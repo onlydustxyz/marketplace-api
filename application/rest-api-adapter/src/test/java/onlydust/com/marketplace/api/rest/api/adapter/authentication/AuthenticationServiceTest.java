@@ -91,7 +91,7 @@ public class AuthenticationServiceTest {
         // Then
         assertNotNull(onlydustException);
         assertEquals(401, onlydustException.getStatus());
-        assertEquals("Unauthorized", onlydustException.getMessage());
+        assertEquals("Unauthorized non-authenticated user", onlydustException.getMessage());
     }
 
 

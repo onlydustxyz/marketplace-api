@@ -26,7 +26,7 @@ public class RetriedGithubInstallationFacade implements GithubInstallationFacade
             try {
                 Thread.sleep(config.retryInterval);
             } catch (InterruptedException e) {
-                throw OnlyDustException.builder().status(500).message("Error while retrying").build();
+                throw OnlyDustException.internalServerError("Error while retrying to get account by installation ID", e);
             }
         }
         return Optional.empty();
