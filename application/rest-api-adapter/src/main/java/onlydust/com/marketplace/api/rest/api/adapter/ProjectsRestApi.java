@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.core.io.Resource;
@@ -113,4 +114,21 @@ public class ProjectsRestApi implements ProjectsApi {
         return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
     }
 
+    @Override
+    public ResponseEntity<ContributorListResponse> getProjectContributors(UUID projectId, String sort,
+                                                                          Boolean includePending) {
+        final ProjectContributorsLinkView.SortBy sortBy = switch (sort) {
+            case "CONTRIBUTION_COUNT" -> ProjectContributorsLinkView.SortBy.contributionCount;
+            case "EARNED" -> ProjectContributorsLinkView.SortBy.earned;
+            case "REWARD_COUNT" -> ProjectContributorsLinkView.SortBy.rewardCount;
+            case "TO_REWARD_COUNT" -> ProjectContributorsLinkView.SortBy.toRewardCount;
+            default -> ProjectContributorsLinkView.SortBy.login;
+        };
+
+        final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
+                projectFacadePort.getContributors(projectId, sortBy);
+        final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
+                projectFacadePort.getContributorsForProjectLead(projectId, sortBy);
+        return ProjectsApi.super.getProjectContributors(projectId, sort, includePending);
+    }
 }
