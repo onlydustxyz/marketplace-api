@@ -690,7 +690,7 @@ paths:
       operationId: uploadProjectLogo
       requestBody:
         content:
-          image/*:
+          image/png:
             schema:
               type: string
               format: binary
