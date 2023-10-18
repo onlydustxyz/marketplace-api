@@ -92,5 +92,4 @@ public class PostgresConfiguration {
                 registeredUserRepository,
                 userPayoutInfoRepository);
     }
-
 }
