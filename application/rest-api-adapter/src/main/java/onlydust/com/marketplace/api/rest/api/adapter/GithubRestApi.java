@@ -11,6 +11,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubInstallationMa
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import static java.lang.String.format;
+
 @RestController
 @Tags(@Tag(name = "Github"))
 @AllArgsConstructor
@@ -23,6 +25,6 @@ public class GithubRestApi implements GithubApi {
         return githubInstallationFacadePort.getAccountByInstallationId(installationId)
                 .map(GithubInstallationMapper::mapToInstallationResponse)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> OnlyDustException.notFound("Installation not found"));
+                .orElseThrow(() -> OnlyDustException.notFound(format("Installation %d not found", installationId)));
     }
 }
