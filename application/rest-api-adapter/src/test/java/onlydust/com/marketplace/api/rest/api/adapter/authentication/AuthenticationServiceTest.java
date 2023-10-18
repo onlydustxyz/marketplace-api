@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
@@ -60,10 +60,10 @@ public class AuthenticationServiceTest {
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(mock(AnonymousAuthenticationToken.class));
-        OnlydustException onlydustException = null;
+        OnlyDustException onlydustException = null;
         try {
             authenticationService.getAuthenticatedUser();
-        } catch (OnlydustException e) {
+        } catch (OnlyDustException e) {
             onlydustException = e;
         }
 
@@ -81,10 +81,10 @@ public class AuthenticationServiceTest {
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(Auth0Authentication.builder().build());
-        OnlydustException onlydustException = null;
+        OnlyDustException onlydustException = null;
         try {
             authenticationService.getAuthenticatedUser();
-        } catch (OnlydustException e) {
+        } catch (OnlyDustException e) {
             onlydustException = e;
         }
 

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
@@ -30,7 +30,7 @@ public interface UserPayoutInfoMapper {
             userPayoutInformation = userPayoutInformation.toBuilder().payoutSettings(payoutSettings).build();
             return userPayoutInformation;
         } catch (JsonProcessingException e) {
-            throw OnlydustException.internalServerError(e);
+            throw OnlyDustException.internalServerError("Failed to map user payout info", e);
         }
     }
 

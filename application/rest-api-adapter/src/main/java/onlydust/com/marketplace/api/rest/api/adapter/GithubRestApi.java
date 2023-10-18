@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.GithubApi;
 import onlydust.com.marketplace.api.contract.model.InstallationResponse;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubInstallationMapper;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,6 @@ public class GithubRestApi implements GithubApi {
         return githubInstallationFacadePort.getAccountByInstallationId(installationId)
                 .map(GithubInstallationMapper::mapToInstallationResponse)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> OnlydustException.builder().status(HttpStatus.NOT_FOUND.value()).message("Installation not found").build());
+                .orElseThrow(() -> OnlyDustException.builder().status(HttpStatus.NOT_FOUND.value()).message("Installation not found").build());
     }
 }

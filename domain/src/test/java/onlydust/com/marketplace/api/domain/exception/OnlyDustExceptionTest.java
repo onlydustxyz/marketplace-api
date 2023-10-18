@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-public class OnlydustExceptionTest {
+public class OnlyDustExceptionTest {
     private static final Faker faker = new Faker();
 
     @Test
@@ -14,7 +14,7 @@ public class OnlydustExceptionTest {
         // Given
         final String message = faker.rickAndMorty().location();
         final int status = faker.number().randomDigit();
-        final OnlydustException symeoException = OnlydustException.builder()
+        final OnlyDustException symeoException = OnlyDustException.builder()
                 .rootException(new IOException())
                 .message(message)
                 .status(status)
@@ -27,7 +27,7 @@ public class OnlydustExceptionTest {
         Assertions.assertTrue(symeoExceptionToString.contains(String.format("message='%s'", message)));
         Assertions.assertTrue(symeoExceptionToString.contains(String.format("status='%s'", Integer.valueOf(status))));
         Assertions.assertTrue(symeoExceptionToString.contains(String.format("rootException=java.io.IOException\n" +
-                "\tat onlydust.com.marketplace.api.domain.exception.OnlydustExceptionTest" +
-                ".should_return_stack_trace_in_to_string_given_a_root_exception(OnlydustExceptionTest.java:")));
+                                                                            "\tat onlydust.com.marketplace.api.domain.exception.OnlydustExceptionTest" +
+                                                                            ".should_return_stack_trace_in_to_string_given_a_root_exception(OnlydustExceptionTest.java:")));
     }
 }

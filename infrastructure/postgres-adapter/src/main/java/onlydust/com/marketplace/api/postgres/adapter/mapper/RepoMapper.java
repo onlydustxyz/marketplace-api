@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.view.RepoCardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
 
@@ -37,7 +37,7 @@ public interface RepoMapper {
         try {
             return objectMapper.readValue(repo.getLanguages(), typeRef);
         } catch (JsonProcessingException e) {
-            throw new OnlydustException(500, "Failed to parse languages", e);
+            throw OnlyDustException.internalServerError("Failed to parse languages", e);
         }
     }
 }

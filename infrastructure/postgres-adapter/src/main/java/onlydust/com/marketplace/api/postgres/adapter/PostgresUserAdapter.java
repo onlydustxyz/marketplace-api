@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
@@ -36,7 +36,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
-        final var settings = globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> new OnlydustException(500, "No global settings found", null));
+        final var settings = globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         if (user.isPresent()) {
             return user.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
@@ -71,7 +71,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     }
                     return userProfileView;
                 })
-                .orElseThrow(() -> OnlydustException.builder()
+                .orElseThrow(() -> OnlyDustException.builder()
                         .status(404)
                         .message(String.format("User profile %s not found", userId))
                         .build());
