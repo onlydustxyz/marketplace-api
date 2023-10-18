@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
+import org.hibernate.annotations.Immutable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -18,6 +17,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "registered_users", schema = "public")
+@Immutable
 public class RegisteredUserViewEntity {
     @Id
     @Column(name = "id", nullable = false)
@@ -36,4 +36,8 @@ public class RegisteredUserViewEntity {
     LocalDateTime lastSeen;
     @Column(name = "admin")
     Boolean admin;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private OnboardingEntity onboarding;
 }

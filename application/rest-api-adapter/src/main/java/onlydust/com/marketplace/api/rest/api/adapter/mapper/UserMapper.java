@@ -106,6 +106,8 @@ public interface UserMapper {
         getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
         getMeResponse.setAvatarUrl(authenticatedUser.getAvatarUrl());
         getMeResponse.setLogin(authenticatedUser.getLogin());
+        getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
+        getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
         return getMeResponse;
     }
 

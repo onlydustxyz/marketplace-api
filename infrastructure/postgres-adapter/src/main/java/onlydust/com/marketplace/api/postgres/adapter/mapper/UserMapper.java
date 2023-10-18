@@ -4,11 +4,14 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public interface UserMapper {
 
@@ -31,13 +34,31 @@ public interface UserMapper {
                 .build();
     }
 
-    static User mapUserToDomain(UserEntity user) {
+    static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate) {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
                 .login(user.getGithubLogin())
                 .avatarUrl(user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
+                .hasAcceptedLatestTermsAndConditions(user.getOnboarding() != null
+                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                .hasSeenOnboardingWizard(user.getOnboarding() != null
+                                         && user.getOnboarding().getProfileWizardDisplayDate() != null)
+                .build();
+    }
+
+    static User mapUserToDomain(RegisteredUserViewEntity user, Date termsAndConditionsLatestVersionDate) {
+        return User.builder()
+                .id(user.getId())
+                .githubUserId(user.getGithubId())
+                .login(user.getLogin())
+                .avatarUrl(user.getAvatarUrl())
+                .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) : List.of(UserRole.USER))
+                .hasAcceptedLatestTermsAndConditions(user.getOnboarding() != null
+                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                .hasSeenOnboardingWizard(user.getOnboarding() != null
+                                         && user.getOnboarding().getProfileWizardDisplayDate() != null)
                 .build();
     }
 

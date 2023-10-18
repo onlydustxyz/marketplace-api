@@ -37,6 +37,8 @@ public class UserServiceTest {
                 .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
                 .githubUserId(githubUserIdentity.getGithubUserId())
                 .login(githubUserIdentity.getGithubLogin())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
                 .build();
 
         // When
@@ -49,7 +51,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void should_throw_when_user_with_github_id_doesnt_exist() {
+    void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort);
@@ -72,8 +74,9 @@ public class UserServiceTest {
                 .githubUserId(githubUserIdentity.getGithubUserId())
                 .login(githubUserIdentity.getGithubLogin())
                 .roles(List.of(UserRole.USER))
+                .hasAcceptedLatestTermsAndConditions(false)
+                .hasSeenOnboardingWizard(false)
                 .build(), userByGithubIdentity);
-
     }
 
 

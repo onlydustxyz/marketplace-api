@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(

@@ -6,8 +6,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
@@ -16,9 +18,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecre
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,19 +29,15 @@ import static io.jsonwebtoken.SignatureAlgorithm.HS256;
 public class HasuraJwtService implements JwtService {
     private final ObjectMapper objectMapper;
     private final JwtSecret jwtSecret;
+    private final UserFacadePort userFacadePort;
 
-    private static User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
-        final List<UserRole> roles = new ArrayList<>(List.of(UserRole.USER));
-        if (claims.getIsAnOnlydustAdmin() != null && claims.getIsAnOnlydustAdmin()) {
-            roles.add(UserRole.ADMIN);
-        }
-        return User.builder()
-                .id(claims.getUserId())
-                .githubUserId(claims.getGithubUserId())
-                .roles(roles)
-                .avatarUrl(claims.getAvatarUrl())
-                .login(claims.getLogin())
-                .build();
+    private User getUserFromClaims(HasuraJwtPayload.HasuraClaims claims) {
+        final Long githubUserId = claims.getGithubUserId();
+        return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
+                .githubUserId(githubUserId)
+                .githubLogin(claims.getLogin())
+                .githubAvatarUrl(claims.getAvatarUrl())
+                .build());
     }
 
     public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {

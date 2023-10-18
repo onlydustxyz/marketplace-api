@@ -1830,6 +1830,12 @@ components:
         avatarUrl:
           type: string
           pattern: uri
+        hasSeenOnboardingWizard:
+          type: boolean
+          description: True if the user has seen the onboarding process
+        hasAcceptedLatestTermsAndConditions:
+          type: boolean
+          description: True if the user has accepted the latest version of terms and conditions
 
     CreateProjectRequest:
       type: object

@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,4 +16,17 @@ public class User {
     Long githubUserId;
     String avatarUrl;
     String login;
+
+    @Getter(AccessLevel.NONE)
+    boolean hasAcceptedLatestTermsAndConditions;
+    @Getter(AccessLevel.NONE)
+    boolean hasSeenOnboardingWizard;
+
+    public boolean hasAcceptedLatestTermsAndConditions() {
+        return hasAcceptedLatestTermsAndConditions;
+    }
+
+    public boolean hasSeenOnboardingWizard() {
+        return hasSeenOnboardingWizard;
+    }
 }

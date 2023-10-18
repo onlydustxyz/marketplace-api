@@ -25,5 +25,4 @@ public class OnboardingEntity {
     Date termsAndConditionsAcceptanceDate;
     @Column(name = "profile_wizard_display_date")
     Date profileWizardDisplayDate;
-
 }

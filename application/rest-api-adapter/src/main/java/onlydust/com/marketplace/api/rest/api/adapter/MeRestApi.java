@@ -29,7 +29,6 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser);
         return ResponseEntity.ok(getMeResponse);
-
     }
 
     @Override

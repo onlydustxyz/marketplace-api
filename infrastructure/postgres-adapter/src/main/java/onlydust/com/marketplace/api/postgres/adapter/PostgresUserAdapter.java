@@ -7,11 +7,16 @@ import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +28,22 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     private final CustomUserRepository customUserRepository;
     private final UserRepository userRepository;
+    private final UserViewRepository userViewRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
+    private final RegisteredUserRepository registeredUserRepository;
     private final UserPayoutInfoRepository userPayoutInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
-        final var user = userRepository.findByGithubUserId(githubId);
-        return user.map(UserMapper::mapUserToDomain);
+        final var settings = globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> new OnlydustException(500, "No global settings found", null));
+        Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
+        if (user.isPresent()) {
+            return user.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
+        }
+        // Fallback on hasura auth user
+        Optional<RegisteredUserViewEntity> hasuraUser = registeredUserRepository.findByGithubId(githubId);
+        return hasuraUser.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
     }
 
     @Override
