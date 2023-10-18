@@ -114,7 +114,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public Page<ProjectContributorsLinkView> findContributors(UUID projectId,
                                                               ProjectContributorsLinkView.SortBy sortBy,
                                                               int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.countProjectContributorViewEntity(projectId);
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
                 customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
@@ -130,7 +130,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
                                                                             ProjectContributorsLinkView.SortBy sortBy
             , int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.countProjectContributorViewEntity(projectId);
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
                 customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)

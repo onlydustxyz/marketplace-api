@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserV
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
 import javax.persistence.EntityManager;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,26 +49,6 @@ public class CustomContributorRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    protected static final String COUNT_CONTRIBUTORS_FOR_PROJECT = """
-            select count(*)
-            from projects_contributors pc
-                     left join github_users gu on gu.id = pc.github_user_id
-                     left join auth_users au on au.github_user_id = gu.id
-                     left join (select count(distinct c.id)                                          total_count,
-                                       count(distinct c.id) filter ( where c.type = 'pull_request' ) pull_request_count,
-                                       count(distinct c.id) filter ( where c.type = 'code_review' )  code_review_count,
-                                       count(distinct c.id) filter ( where c.type = 'issue' )        issue_count,
-                                       c.user_id
-                                from project_github_repos pgr
-                                         left join contributions c on c.repo_id = pgr.github_repo_id
-                                         left join work_items wi on wi.id = c.details_id
-                                where pgr.project_id = :projectId
-                                  and c.status = 'complete'
-                                  and wi.id is null
-                                group by c.user_id) to_rewards_stats on to_rewards_stats.user_id = gu.id
-            where pc.project_id = :projectId
-            """;
-
     protected static final String GET_CONTRIBUTORS_FOR_PROJECT = """
             select gu.id,
                    gu.login,
@@ -94,7 +73,7 @@ public class CustomContributorRepository {
                    to_rewards_stats.issue_count issues_to_reward,
                    to_rewards_stats.code_review_count code_reviews_to_reward
             from projects_contributors pc
-                     left join github_users gu on gu.id = pc.github_user_id
+                     join github_users gu on gu.id = pc.github_user_id
                      left join auth_users au on au.github_user_id = gu.id
                      left join (select count(distinct c.id)                                          total_count,
                                        count(distinct c.id) filter ( where c.type = 'pull_request' ) pull_request_count,
@@ -121,13 +100,6 @@ public class CustomContributorRepository {
                         ProjectContributorViewEntity.class)
                 .setParameter("projectId", projectId)
                 .getResultList();
-    }
-
-    public Integer countProjectContributorViewEntity(final UUID projectId) {
-        final BigInteger id = (BigInteger) entityManager.createNativeQuery(COUNT_CONTRIBUTORS_FOR_PROJECT)
-                .setParameter("projectId", projectId)
-                .getSingleResult();
-        return id.intValue();
     }
 
     static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy,
