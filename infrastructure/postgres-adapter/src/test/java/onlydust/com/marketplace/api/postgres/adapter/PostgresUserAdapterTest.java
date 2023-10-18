@@ -60,8 +60,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getLoginAtSignup());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isTrue();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isTrue();
+        assertThat(result.hasSeenOnboardingWizard()).isTrue();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
 
     @Test
@@ -93,8 +93,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getLoginAtSignup());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isTrue();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isFalse();
+        assertThat(result.hasSeenOnboardingWizard()).isTrue();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -119,8 +119,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getLoginAtSignup());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isFalse();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isFalse();
+        assertThat(result.hasSeenOnboardingWizard()).isFalse();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -145,8 +145,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getLoginAtSignup());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER);
-        assertThat(result.isHasSeenOnboardingWizard()).isFalse();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isFalse();
+        assertThat(result.hasSeenOnboardingWizard()).isFalse();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -177,8 +177,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isTrue();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isTrue();
+        assertThat(result.hasSeenOnboardingWizard()).isTrue();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
 
     @Test
@@ -209,8 +209,8 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isTrue();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isFalse();
+        assertThat(result.hasSeenOnboardingWizard()).isTrue();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -234,7 +234,7 @@ class PostgresUserAdapterTest extends AbstractPostgresIT {
         assertThat(result.getLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.isHasSeenOnboardingWizard()).isFalse();
-        assertThat(result.isHasAcceptedLatestTermsAndConditions()).isFalse();
+        assertThat(result.hasSeenOnboardingWizard()).isFalse();
+        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 }

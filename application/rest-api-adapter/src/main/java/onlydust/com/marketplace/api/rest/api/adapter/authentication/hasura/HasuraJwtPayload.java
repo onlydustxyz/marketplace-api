@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -32,10 +33,12 @@ public class HasuraJwtPayload {
         @JsonProperty("x-hasura-allowed-roles")
         List<String> allowedRoles;
         @JsonProperty("x-hasura-githubUserId")
+        @NotNull
         Long githubUserId;
         @JsonProperty("x-hasura-odAdmin")
         Boolean isAnOnlydustAdmin;
         @JsonProperty("x-hasura-user-id")
+        @NotNull
         UUID userId;
         @JsonProperty("x-hasura-user-is-anonymous")
         Boolean isAnonymous;
@@ -44,8 +47,10 @@ public class HasuraJwtPayload {
         @JsonProperty("x-hasura-default-role")
         String defaultRole;
         @JsonProperty("x-hasura-login")
+        @NotNull
         String login;
         @JsonProperty("x-hasura-avatarUrl")
+        @NotNull
         String avatarUrl;
     }
 
