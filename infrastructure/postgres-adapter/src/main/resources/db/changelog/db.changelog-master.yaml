@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000000_init_schema.sql
+  - include:
+      file: db/changelog/changelogs/00000001_add_terms_and_conditions_version.sql
