@@ -38,7 +38,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
-        final var settings = globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
+        final var settings =
+                globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         if (user.isPresent()) {
             return user.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));

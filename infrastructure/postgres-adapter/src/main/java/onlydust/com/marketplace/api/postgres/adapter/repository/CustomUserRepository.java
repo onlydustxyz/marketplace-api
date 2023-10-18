@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
@@ -215,4 +216,9 @@ public class CustomUserRepository {
                 .getResultList();
     }
 
+    public UserPayoutInfoEntity getUserPayoutInfoById(UUID id) {
+        final List resultList = entityManager.createNativeQuery("select * from user_payout_info limit 1", UserPayoutInfoEntity.class)
+                .getResultList();
+        return (UserPayoutInfoEntity) resultList.get(0);
+    }
 }
