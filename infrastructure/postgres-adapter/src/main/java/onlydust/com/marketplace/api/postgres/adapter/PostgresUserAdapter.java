@@ -3,12 +3,16 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlydustException;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -19,6 +23,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     private final CustomUserRepository customUserRepository;
     private final UserRepository userRepository;
+    private final UserPayoutInfoRepository userPayoutInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -57,5 +62,19 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .message(String.format("User profile %s not found", userId))
                         .build());
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserPayoutInformation getPayoutInformationById(UUID id) {
+        final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
+        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
+    }
+
+    @Transactional
+    public void savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation) {
+        final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
+                userPayoutInformation);
+        userPayoutInfoRepository.save(userPayoutInfoEntity);
     }
 }

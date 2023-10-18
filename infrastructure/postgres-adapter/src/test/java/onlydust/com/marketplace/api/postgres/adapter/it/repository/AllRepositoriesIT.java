@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
@@ -11,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -20,6 +23,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Transactional
 public class AllRepositoriesIT extends AbstractPostgresIT {
 
     @Autowired
@@ -54,7 +58,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     ProjectIdRepository projectIdRepository;
     @Autowired
     UserRepository userRepository;
-
+    @Autowired
+    PostgresUserAdapter postgresUserAdapter;
 
     @Test
     void should_create_user() {
@@ -303,5 +308,49 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Then
         assertEquals(1, repository.findAll().size());
         assertEquals(expected, result);
+    }
+
+
+    @Test
+    void should_save_and_read_user_payout_info() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
+                .firstName(faker.name().firstName())
+                .lastName(faker.name().lastName())
+                .build();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .isACompany(true)
+                .company(UserPayoutInformation.Company.builder()
+                        .identificationNumber(faker.number().digit())
+                        .name(faker.name().name())
+                        .owner(person)
+                        .build())
+                .person(person)
+                .location(UserPayoutInformation.Location.builder()
+                        .country(faker.address().country())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().countryCode())
+                        .address(faker.address().fullAddress())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .aptosAddress(faker.rickAndMorty().character())
+                        .starknetAddress(faker.pokemon().location())
+                        .ethName(faker.pokemon().name())
+                        .optimismAddress(faker.pokemon().name())
+                        .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                                .bic(faker.hacker().abbreviation())
+                                .iban(faker.hacker().abbreviation())
+                                .build())
+                        .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO)
+                        .build())
+                .build();
+
+        // When
+        postgresUserAdapter.savePayoutInformationForUserId(userId, userPayoutInformation);
+        final UserPayoutInformation payoutInformationById = postgresUserAdapter.getPayoutInformationById(userId);
+
+        // Then
+        assertEquals(userPayoutInformation, payoutInformationById);
     }
 }

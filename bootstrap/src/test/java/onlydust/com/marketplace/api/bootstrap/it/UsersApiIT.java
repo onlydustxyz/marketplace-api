@@ -1,10 +1,45 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
 public class UsersApiIT extends AbstractMarketplaceApiIT {
+
+    @Test
+    void should_return_a_not_found_error() {
+        // Given
+        final UUID notExistingUserId = UUID.randomUUID();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET + "/" + notExistingUserId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(404);
+    }
+
+    @Test
+    void should_get_user_profile() {
+        // Given
+        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET + "/" + anthonyId))
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .json(GET_ANTHONY_PROFILE_JSON_RESPONSE);
+    }
+
+
+
 
     private static final String GET_ANTHONY_PROFILE_JSON_RESPONSE = """
             {
@@ -669,33 +704,4 @@ public class UsersApiIT extends AbstractMarketplaceApiIT {
                  ]
              }
             }""";
-
-    @Test
-    void should_return_a_not_found_error() {
-        // Given
-        final UUID notExistingUserId = UUID.randomUUID();
-
-        // When
-        client.get()
-                .uri(getApiURI(USERS_GET + "/" + notExistingUserId))
-                .exchange()
-                // Then
-                .expectStatus()
-                .isEqualTo(404);
-    }
-
-    @Test
-    void should_get_user_profile() {
-        // Given
-        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-
-        // When
-        client.get()
-                .uri(getApiURI(USERS_GET + "/" + anthonyId))
-                .exchange()
-                // Then
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .json(GET_ANTHONY_PROFILE_JSON_RESPONSE);
-    }
 }

@@ -2,10 +2,12 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
@@ -105,5 +107,56 @@ public interface UserMapper {
         getMeResponse.setAvatarUrl(authenticatedUser.getAvatarUrl());
         getMeResponse.setLogin(authenticatedUser.getLogin());
         return getMeResponse;
+    }
+
+    static UserPayoutInformationContract userPayoutInformationToResponse(UserPayoutInformation view) {
+        final UserPayoutInformationContract userPayoutInformation = new UserPayoutInformationContract();
+        final Boolean isACompany = view.getIsACompany();
+        userPayoutInformation.setIsCompany(isACompany);
+        if (isACompany) {
+            final CompanyIdentity company = new CompanyIdentity();
+            company.setName(view.getCompany().getName());
+            company.setIdentificationNumber(view.getCompany().getIdentificationNumber());
+            final PersonIdentity owner = new PersonIdentity();
+            owner.setFirstname(view.getCompany().getOwner().getFirstName());
+            owner.setLastname(view.getCompany().getOwner().getLastName());
+            company.setOwner(owner);
+            userPayoutInformation.setCompany(company);
+        } else {
+            final PersonIdentity person = new PersonIdentity();
+            person.setFirstname(view.getPerson().getFirstName());
+            person.setLastname(view.getPerson().getLastName());
+            userPayoutInformation.setPerson(person);
+        }
+        final UserPayoutInformationContractPayoutSettings payoutSettings =
+                new UserPayoutInformationContractPayoutSettings();
+        payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
+        payoutSettings.setEthAddress(view.getPayoutSettings().getEthAddress());
+        payoutSettings.setEthName(view.getPayoutSettings().getEthName());
+        payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress());
+        payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress());
+        if (Objects.nonNull(view.getPayoutSettings().getSepaAccount())) {
+            final UserPayoutInformationContractPayoutSettingsSepaAccount sepaAccount =
+                    new UserPayoutInformationContractPayoutSettingsSepaAccount();
+            sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
+            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
+            payoutSettings.setSepaAccount(sepaAccount);
+        }
+        if (Objects.nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
+            switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
+                case FIAT ->
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.SEPA);
+                case CRYPTO ->
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.USDC);
+            }
+        }
+        userPayoutInformation.setPayoutSettings(payoutSettings);
+        final UserPayoutInformationContractLocation location = new UserPayoutInformationContractLocation();
+        location.setAddress(view.getLocation().getAddress());
+        location.setCity(view.getLocation().getCity());
+        location.setCountry(view.getLocation().getCountry());
+        location.setPostalCode(view.getLocation().getPostalCode());
+        userPayoutInformation.setLocation(location);
+        return userPayoutInformation;
     }
 }

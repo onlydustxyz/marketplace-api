@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -57,8 +58,8 @@ public class PostgresConfiguration {
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomRepoRepository customRepoRepository,
-                                                         final CustomUserRepository customUserRepository,
-                                                         final CustomProjectListRepository customProjectListRepository) {
+                                                         final CustomProjectListRepository customProjectListRepository,
+                                                         final CustomUserRepository customUserRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -82,8 +83,8 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
-                                                   final UserRepository userRepository) {
-        return new PostgresUserAdapter(customUserRepository, userRepository);
+                                                   final UserRepository userRepository,
+                                                   final UserPayoutInfoRepository userPayoutInfoRepository) {
+        return new PostgresUserAdapter(customUserRepository, userRepository, userPayoutInfoRepository);
     }
-
 }
