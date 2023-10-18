@@ -8,7 +8,8 @@ import lombok.Data;
 public class UserPayoutInformation {
     Person person;
     Company company;
-    Boolean isACompany;
+    @Builder.Default
+    Boolean isACompany = false;
     Location location;
     PayoutSettings payoutSettings;
 

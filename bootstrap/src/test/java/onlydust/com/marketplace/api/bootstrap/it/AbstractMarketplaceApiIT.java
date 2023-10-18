@@ -50,8 +50,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_SEARCH_CONTRIBUTORS = "/api/v1/projects/%s/search/contributors";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
-    protected static final String USERS_GET = "api/v1/users";
-    protected static final String USERS_GET_PAYOUT_INFO = "api/v1/users/payout-info";
+    protected static final String ME_GET_PAYOUT_INFO = "/api/v1/me/payout-info";
+    protected static final String USERS_GET = "/api/v1/users";
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
 
     @Container
