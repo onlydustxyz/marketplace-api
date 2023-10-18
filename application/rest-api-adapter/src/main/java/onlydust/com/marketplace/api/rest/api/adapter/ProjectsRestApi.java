@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
@@ -98,7 +98,7 @@ public class ProjectsRestApi implements ProjectsApi {
         try {
             imageInputStream = image.getInputStream();
         } catch (IOException e) {
-            throw new OnlydustException(400, "Error while reading image data", e);
+            throw OnlyDustException.invalidInput("Error while reading image data", e);
         }
 
         final URL imageUrl = projectFacadePort.saveLogoImage(imageInputStream);

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,7 +25,7 @@ public class GithubHttpClient {
         try {
             return objectMapper.readValue(data, classType);
         } catch (IOException e) {
-            throw new OnlydustException(500, "Unable to deserialize github response", e);
+            throw OnlyDustException.internalServerError("Unable to deserialize github response", e);
         }
     }
 
@@ -35,7 +35,7 @@ public class GithubHttpClient {
             final var requestBuilder = HttpRequest.newBuilder().uri(uri).headers("Authorization", "Bearer " + config.personalAccessToken).GET();
             return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
         } catch (IOException | InterruptedException e) {
-            throw new OnlydustException(500, "Unable to fetch github API:" + uri, e);
+            throw OnlyDustException.internalServerError("Unable to fetch github API:" + uri, e);
         }
     }
 
@@ -44,7 +44,7 @@ public class GithubHttpClient {
         return switch (httpResponse.statusCode()) {
             case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
             case 403, 404 -> Optional.empty();
-            default -> throw new OnlydustException(500, "Unable to fetch github API: " + path, null);
+            default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
         };
     }
 

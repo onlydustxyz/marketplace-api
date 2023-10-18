@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.exception.OnlydustException;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -20,6 +20,8 @@ import java.net.URL;
 import java.util.Base64;
 import java.util.Iterator;
 
+import static java.lang.String.format;
+
 @AllArgsConstructor
 @Slf4j
 public class AwsS3Adapter implements ImageStoragePort {
@@ -31,7 +33,7 @@ public class AwsS3Adapter implements ImageStoragePort {
         ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes));
         Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
         if (!imageReaders.hasNext()) {
-            throw new OnlydustException(400, "Input stream is not an image", null);
+            throw OnlyDustException.invalidInput("Input stream is not an image", null);
         }
         return imageReaders.next().getFormatName().toLowerCase();
     }
@@ -40,10 +42,10 @@ public class AwsS3Adapter implements ImageStoragePort {
     public URL storeImage(InputStream imageInputStream) {
         try {
             final byte[] imageBytes = imageInputStream.readAllBytes();
-            final String fileName = String.format("%s.%s", DigestUtils.md5Hex(imageBytes), getImageFileExtension(imageBytes));
+            final String fileName = format("%s.%s", DigestUtils.md5Hex(imageBytes), getImageFileExtension(imageBytes));
             return uploadByteArrayToS3Bucket(imageBytes, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
-            throw new OnlydustException(400, "Failed to read image input stream", e);
+            throw OnlyDustException.invalidInput("Failed to read image input stream", e);
         }
     }
 
@@ -54,13 +56,11 @@ public class AwsS3Adapter implements ImageStoragePort {
             final String md5FromUploadedFile = putObjectToS3andGetContentFileUploadedMd5(bucketName, bucketKey,
                     byteArrayInputStream);
             if (!base64Md5.equals(md5FromUploadedFile)) {
-                LOGGER.error("Bucket {} {} md5 content is not equaled to file md5 content", bucketName, bucketKey);
-                throw OnlydustException.internalServerError(null);
+                throw OnlyDustException.internalServerError(format("Bucket %s %s md5 differs from file md5", bucketName, bucketKey));
             }
             return amazonS3.getUrl(bucketName, bucketKey);
         } catch (SdkClientException sdkClientException) {
-            LOGGER.error("A technical exception happened with AWS SDK Client", sdkClientException);
-            throw OnlydustException.internalServerError(sdkClientException);
+            throw OnlyDustException.internalServerError("Failed to upload data to S3", sdkClientException);
         }
     }
 
@@ -74,8 +74,7 @@ public class AwsS3Adapter implements ImageStoragePort {
                     byteArrayInputStream, metadata);
             return putObjectResult.getContentMd5();
         } else {
-            LOGGER.error("Failed to upload report {} to S3 bucket {}", bucketKeyId, bucketStorage);
-            throw OnlydustException.internalServerError(null);
+            throw OnlyDustException.internalServerError(format("Failed to upload %s to S3 bucket %s", bucketKeyId, bucketStorage));
         }
     }
 }
