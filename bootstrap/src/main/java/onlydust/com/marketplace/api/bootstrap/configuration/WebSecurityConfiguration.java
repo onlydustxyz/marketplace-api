@@ -43,8 +43,8 @@ public class WebSecurityConfiguration {
 
     @Bean
     @Profile("hasura_auth")
-    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret) {
-        return new HasuraJwtService(objectMapper, jwtSecret);
+    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret, final UserFacadePort userFacadePort) {
+        return new HasuraJwtService(objectMapper, jwtSecret, userFacadePort);
     }
 
     @Bean
