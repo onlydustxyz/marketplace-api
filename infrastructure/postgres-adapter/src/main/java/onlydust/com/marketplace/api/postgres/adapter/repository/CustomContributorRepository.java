@@ -13,13 +13,25 @@ import java.util.UUID;
 public class CustomContributorRepository {
 
     protected static final String FIND_TOP_CONTRIBUTORS_BASE_QUERY = """
-                select
-                    (select count(*) from contributions where project_id = :projectId and github_user_id = gu.id and status = cast('complete' as contribution_status)) as contribution_count,
-                    gu.*
-                from github_users gu
-                join projects_contributors pc on pc.github_user_id = gu.id and pc.project_id = :projectId
-                order by contribution_count desc
-                limit :limit
+            SELECT
+            	(
+            		SELECT
+            			count(*)
+            		FROM
+            			contributions c
+            			JOIN project_github_repos pgr ON pgr.project_id = :projectId
+            				AND pgr.github_repo_id = c.repo_id
+            		WHERE
+            			c.user_id = gu.id
+            			AND c.status = 'complete') AS contribution_count,
+            		gu.*
+            	FROM
+            		github_users gu
+            		JOIN projects_contributors pc ON pc.github_user_id = gu.id
+            			AND pc.project_id = :projectId
+            		ORDER BY
+            			contribution_count DESC
+            		LIMIT :limit
             """;
 
     protected static final String GET_CONTRIBUTOR_COUNT = """
