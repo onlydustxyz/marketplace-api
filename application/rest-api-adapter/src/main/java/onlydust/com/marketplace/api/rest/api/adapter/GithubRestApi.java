@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
-import com.github.javafaker.Faker;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GithubRestApi implements GithubApi {
     private final GithubInstallationFacadePort githubInstallationFacadePort;
 
-    private final Faker faker = new Faker();
 
     @Override
     public ResponseEntity<InstallationResponse> getGithubInstallation(Long installationId) {
