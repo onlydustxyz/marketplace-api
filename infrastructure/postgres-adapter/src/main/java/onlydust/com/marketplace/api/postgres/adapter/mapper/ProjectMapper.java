@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,8 @@ public interface ProjectMapper {
                                                       Integer contributorCount,
                                                       List<GithubRepoViewEntity> repos,
                                                       List<RegisteredUserViewEntity> leaders,
-                                                      List<SponsorEntity> sponsors) {
+                                                      List<SponsorEntity> sponsors,
+                                                      final BigDecimal remainingUsdBudget) {
         final var project = ProjectDetailsView.builder()
                 .id(projectEntity.getId())
                 .hiring(projectEntity.getHiring())
@@ -35,6 +37,7 @@ public interface ProjectMapper {
                 .repos(repos.stream().map(RepoMapper::mapToRepoCardView).collect(Collectors.toSet()))
                 .leaders(leaders.stream().map(UserMapper::mapToProjectLeaderLinkView).collect(Collectors.toSet()))
                 .sponsors(sponsors.stream().map(SponsorMapper::mapToSponsorView).collect(Collectors.toSet()))
+                .remainingUsdBudget(remainingUsdBudget)
                 .build();
         for (GithubRepoViewEntity repo : repos) {
             project.addTechnologies(RepoMapper.mapLanguages(repo));

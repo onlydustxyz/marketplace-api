@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Data
@@ -29,22 +30,7 @@ public class ProjectDetailsView {
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
     @Builder.Default
     Map<String, Integer> technologies = new HashMap<>();
-
-    public void addRepo(final RepoCardView repo) {
-        this.getRepos().add(repo);
-    }
-
-    public void addTopContributor(final ContributorLinkView contributor) {
-        this.getTopContributors().add(contributor);
-    }
-
-    public void addProjectLeader(final ProjectLeaderLinkView leader) {
-        this.getLeaders().add(leader);
-    }
-
-    public void addSponsor(final SponsorView sponsor) {
-        this.getSponsors().add(sponsor);
-    }
+    BigDecimal remainingUsdBudget;
 
     public void addTechnologies(final Map<String, Integer> technologiesToAdd) {
         technologiesToAdd.forEach((key, value) -> {

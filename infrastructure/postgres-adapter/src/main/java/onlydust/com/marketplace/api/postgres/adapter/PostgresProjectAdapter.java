@@ -24,6 +24,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeade
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,8 +64,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
         final var leaders = customUserRepository.findProjectLeaders(projectEntity.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectEntity.getId());
+        // TODO : migrate to multi-token
+        final BigDecimal remainingUsdBudget = customProjectRepository.getUSDBudget(projectEntity.getId());
         return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos, leaders
-                , sponsors);
+                , sponsors, remainingUsdBudget);
     }
 
     @Override

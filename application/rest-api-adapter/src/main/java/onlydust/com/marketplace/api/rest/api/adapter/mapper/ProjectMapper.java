@@ -32,6 +32,7 @@ public interface ProjectMapper {
         project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());
+        project.setRemainingUsdBudget(projectDetailsView.getRemainingUsdBudget());
         return project;
     }
 

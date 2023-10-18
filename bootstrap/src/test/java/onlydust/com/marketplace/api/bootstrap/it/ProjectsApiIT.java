@@ -137,7 +137,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "SCSS": 98360,
                 "JavaScript": 62717,
                 "HTML": 121906
-              }
+              },
+              "remainingUsdBudget": 99250.00
             }
             """;
     @Autowired

@@ -1429,6 +1429,7 @@ components:
         - leaders
         - sponsors
         - technologies
+        - remainingUsdBudget
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -1482,7 +1483,9 @@ components:
             $ref: '#/components/schemas/SponsorResponse'
         technologies:
           $ref: '#/components/schemas/Technologies'
-
+        remainingUsdBudget:
+          type: number
+          example: 20.0
     ShortProjectResponse:
       type: object
       required:
