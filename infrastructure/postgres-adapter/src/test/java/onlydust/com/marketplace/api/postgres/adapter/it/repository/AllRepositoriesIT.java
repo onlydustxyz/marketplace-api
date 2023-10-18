@@ -15,8 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;

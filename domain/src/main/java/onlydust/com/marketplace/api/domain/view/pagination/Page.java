@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.view;
+package onlydust.com.marketplace.api.domain.view.pagination;
 
 import lombok.Builder;
 import lombok.Value;

@@ -7,8 +7,9 @@ import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
-import onlydust.com.marketplace.api.domain.view.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 
 import java.io.InputStream;
@@ -22,6 +23,7 @@ public class ProjectService implements ProjectFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
+    private final PermissionService permissionService;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -64,5 +66,24 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public URL saveLogoImage(InputStream imageInputStream) {
         return this.imageStoragePort.storeImage(imageInputStream);
+    }
+
+    @Override
+    public Page<ProjectContributorsLinkView> getContributors(UUID projectId,
+                                                             ProjectContributorsLinkView.SortBy sortBy,
+                                                             Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findContributors(projectId, sortBy, pageIndex, pageSize);
+    }
+
+    @Override
+    public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+                                                                             ProjectContributorsLinkView.SortBy sortBy,
+                                                                             UUID projectLeadId, Integer pageIndex,
+                                                                             Integer pageSize) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
+        } else {
+            return projectStoragePort.findContributors(projectId, sortBy, pageIndex, pageSize);
+        }
     }
 }

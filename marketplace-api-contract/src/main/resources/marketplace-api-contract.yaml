@@ -517,18 +517,24 @@ paths:
               - CONTRIBUTION_COUNT
               - REWARD_COUNT
               - EARNED
+              - TO_REWARD_COUNT
         - in: query
-          name: includePending
-          description: Set to true to include pending contributors in the response
+          name: page_index
+          required: true
           schema:
-            type: boolean
+            type: integer
+        - in: query
+          name: page_size
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'List of project contributors'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributorListResponse'
+                $ref: '#/components/schemas/ContributorPageResponse'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
@@ -1242,11 +1248,15 @@ components:
           type: boolean
           description: True if the user is registered on OnlyDust
 
-    ContributorListResponse:
+    ContributorPageResponse:
       type: object
       required:
         - contributors
       properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
         contributors:
           type: array
           items:
@@ -1263,8 +1273,6 @@ components:
         - rewardCount
         - earned
       properties:
-        id:
-          $ref: '#/components/schemas/UserId'
         githubUserId:
           $ref: '#/components/schemas/GithubUserId'
         login:
@@ -1292,6 +1300,15 @@ components:
           type: integer
           description: Total number of contributions the contributor was not rewarded for on this project.
           example: 9
+        pullRequestToReward:
+          type: integer
+          example: 2
+        issueToReward:
+          type: integer
+          example: 4
+        codeReviewToReward:
+          type: integer
+          example: 3
 
     SponsorResponse:
       type: object

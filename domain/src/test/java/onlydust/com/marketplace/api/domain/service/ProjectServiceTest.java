@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,7 +32,8 @@ public class ProjectServiceTest {
         final String slug = faker.pokemon().name();
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, mock(UUIDGeneratorPort.class));
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+                mock(UUIDGeneratorPort.class), mock(PermissionService.class));
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
@@ -47,12 +49,13 @@ public class ProjectServiceTest {
     }
 
     @Test
-    void should_create_project() throws MalformedURLException {
+    void should_create_project() {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+                uuidGeneratorPort, mock(PermissionService.class));
         final String imageUrl = faker.internet().image();
         final CreateProjectCommand command = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())
@@ -88,7 +91,8 @@ public class ProjectServiceTest {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort, uuidGeneratorPort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+                uuidGeneratorPort, mock(PermissionService.class));
         final InputStream imageInputStream = mock(InputStream.class);
         final String imageUrl = faker.internet().image();
 
@@ -99,4 +103,52 @@ public class ProjectServiceTest {
         // Then
         assertThat(url.toString()).isEqualTo(imageUrl);
     }
+
+    @Test
+    void should_check_project_lead_permissions_when_getting_project_contributors_given_an_invalid_project_lead() {
+        // Given
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+        final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
+        final UUID projectLeadId = UUID.randomUUID();
+        final int pageIndex = 1;
+        final int pageSize = 1;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        projectService.getContributorsForProjectLeadId(projectId, sortBy, projectLeadId, pageIndex, pageSize);
+
+        // Then
+        verify(projectStoragePort, times(1)).findContributors(projectId, sortBy, pageIndex, pageSize);
+        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
+    }
+
+     @Test
+    void should_check_project_lead_permissions_when_getting_project_contributors_given_a_valid_project_lead() {
+        // Given
+         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+         final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+        final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
+        final UUID projectLeadId = UUID.randomUUID();
+        final int pageIndex = 1;
+        final int pageSize = 1;
+
+        // When
+         when(projectStoragePort.getProjectLeadIds(projectId))
+                 .thenReturn(List.of(UUID.randomUUID(),projectLeadId));
+        projectService.getContributorsForProjectLeadId(projectId, sortBy, projectLeadId, pageIndex, pageSize);
+
+        // Then
+        verify(projectStoragePort, times(0)).findContributors(projectId, sortBy, pageIndex, pageSize);
+        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
+    }
+
+
 }

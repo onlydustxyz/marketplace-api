@@ -6,13 +6,17 @@ import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.view.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -36,6 +40,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomRepoRepository customRepoRepository;
     private final CustomUserRepository customUserRepository;
     private final CustomProjectListRepository customProjectListRepository;
+    private final ProjectLeadViewRepository projectLeadViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -103,5 +108,44 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
         return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
+    }
+
+    @Override
+    public Page<ProjectContributorsLinkView> findContributors(UUID projectId,
+                                                              ProjectContributorsLinkView.SortBy sortBy,
+                                                              int pageIndex, int pageSize) {
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
+        final List<ProjectContributorsLinkView> projectContributorsLinkViews =
+                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
+                        .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
+                        .toList();
+        return Page.<ProjectContributorsLinkView>builder()
+                .content(projectContributorsLinkViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
+    }
+
+    @Override
+    public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
+                                                                            ProjectContributorsLinkView.SortBy sortBy
+            , int pageIndex, int pageSize) {
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
+        final List<ProjectContributorsLinkView> projectContributorsLinkViews =
+                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
+                        .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)
+                        .toList();
+        return Page.<ProjectContributorsLinkView>builder()
+                .content(projectContributorsLinkViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
+    }
+
+    @Override
+    public List<UUID> getProjectLeadIds(UUID projectId) {
+        return projectLeadViewRepository.findAllByProjectId(projectId).stream()
+                .map(ProjectLeadViewEntity::getUserId)
+                .toList();
     }
 }

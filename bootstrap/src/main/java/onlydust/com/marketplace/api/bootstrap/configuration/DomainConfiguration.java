@@ -33,8 +33,9 @@ public class DomainConfiguration {
     @Bean
     public ProjectFacadePort projectFacadePort(final PostgresProjectAdapter postgresProjectAdapter,
                                                final ImageStoragePort imageStoragePort,
-                                               final UUIDGeneratorPort uuidGeneratorPort) {
-        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort);
+                                               final UUIDGeneratorPort uuidGeneratorPort,
+                                               final PermissionService permissionService) {
+        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService);
     }
 
     @Bean
@@ -57,7 +58,9 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ContributorFacadePort contributorFacadePort(final ProjectStoragePort projectStoragePort, final GithubSearchPort githubSearchPort, final UserStoragePort userStoragePort) {
+    public ContributorFacadePort contributorFacadePort(final ProjectStoragePort projectStoragePort,
+                                                       final GithubSearchPort githubSearchPort,
+                                                       final UserStoragePort userStoragePort) {
         return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort);
     }
 
@@ -67,7 +70,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public GithubHttpClient githubHttpClient(final ObjectMapper objectMapper, final HttpClient httpClient, final GithubHttpClient.Config config) {
+    public GithubHttpClient githubHttpClient(final ObjectMapper objectMapper, final HttpClient httpClient,
+                                             final GithubHttpClient.Config config) {
         return new GithubHttpClient(objectMapper, httpClient, config);
     }
 
@@ -88,5 +92,10 @@ public class DomainConfiguration {
     @ConfigurationProperties("infrastructure.github")
     GithubHttpClient.Config githubConfig() {
         return new GithubHttpClient.Config();
+    }
+
+    @Bean
+    PermissionService permissionService(final ProjectStoragePort projectStoragePort) {
+        return new PermissionService(projectStoragePort);
     }
 }
