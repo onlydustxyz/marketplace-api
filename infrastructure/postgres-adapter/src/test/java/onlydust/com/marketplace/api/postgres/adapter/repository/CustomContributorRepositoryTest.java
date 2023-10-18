@@ -39,7 +39,7 @@ public class CustomContributorRepositoryTest {
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "contribution_count")
+                        .replace("%order_by%", "contribution_count desc")
                 , query);
     }
 
@@ -56,7 +56,7 @@ public class CustomContributorRepositoryTest {
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "earned")
+                        .replace("%order_by%", "earned desc")
                 , query);
     }
 
@@ -73,7 +73,7 @@ public class CustomContributorRepositoryTest {
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "to_reward_count")
+                        .replace("%order_by%", "to_reward_count desc")
                 , query);
     }
 
@@ -90,7 +90,7 @@ public class CustomContributorRepositoryTest {
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "reward_count")
+                        .replace("%order_by%", "reward_count desc")
                 , query);
     }
 

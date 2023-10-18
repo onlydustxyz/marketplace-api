@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserV
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
 import javax.persistence.EntityManager;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -123,19 +124,20 @@ public class CustomContributorRepository {
     }
 
     public Integer countProjectContributorViewEntity(final UUID projectId) {
-        return entityManager.createNativeQuery(COUNT_CONTRIBUTORS_FOR_PROJECT, Integer.class)
+        final BigInteger id = (BigInteger) entityManager.createNativeQuery(COUNT_CONTRIBUTORS_FOR_PROJECT)
                 .setParameter("projectId", projectId)
-                .getFirstResult();
+                .getSingleResult();
+        return id.intValue();
     }
 
     static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy,
                                        int pageIndex, int pageSize) {
         final String sortValue = Optional.ofNullable(sortBy).map(sort -> switch (sortBy) {
             case login -> "login";
-            case earned -> "earned";
-            case contributionCount -> "contribution_count";
-            case rewardCount -> "reward_count";
-            case toRewardCount -> "to_reward_count";
+            case earned -> "earned desc";
+            case contributionCount -> "contribution_count desc";
+            case rewardCount -> "reward_count desc";
+            case toRewardCount -> "to_reward_count desc";
         }).orElse("login");
         return GET_CONTRIBUTORS_FOR_PROJECT
                 .replace("%offset%",

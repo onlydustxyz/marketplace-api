@@ -16,6 +16,7 @@ public interface ProjectContributorsMapper {
                 .pullRequestsToRewardCount(contributorViewEntity.getPrsToReward())
                 .codeReviewToRewardCount(contributorViewEntity.getCodeReviewsToReward())
                 .contributionCount(contributorViewEntity.getContributionCount())
+                .githubUserId(contributorViewEntity.getGithubUserId())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public interface ProjectContributorsMapper {
                 .earned(contributorViewEntity.getEarned())
                 .rewards(contributorViewEntity.getRewards())
                 .contributionCount(contributorViewEntity.getContributionCount())
+                .githubUserId(contributorViewEntity.getGithubUserId())
                 .build();
     }
 
