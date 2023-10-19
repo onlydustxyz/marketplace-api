@@ -199,7 +199,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardListResponse'
+                $ref: '#/components/schemas/RewardPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -601,6 +601,37 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/budgets:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project budgets
+      operationId: getProjectBudgets
+      description: |
+        Get the list of all budgets from this project. Only project leaders can access this information.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'List of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectBudgetsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/rewards:
     get:
@@ -618,13 +649,33 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            type: string
+            enum:
+              - DATE
+              - CONTRIBUTION
+              - AMOUNT
+              - STATUS
+        - in: query
+          name: page_index
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: page_size
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'List of rewards'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardListResponse'
+                $ref: '#/components/schemas/RewardPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1595,49 +1646,95 @@ components:
         Go: 12388
         Java: 1233
 
-    RewardListResponse:
+    RewardPageResponse:
       type: object
       required:
         - rewards
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
       properties:
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/RewardResponse'
+            $ref: '#/components/schemas/RewardRowResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
 
     RewardResponse:
       type: object
       required:
         - id
-        - requestedAt
         - amount
         - currency
         - items
       properties:
-        id:
-          $ref: '#/components/schemas/RewardId'
         requestedAt:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
+#        shortReward:
+#          $ref: '#/components/schemas/ShortRewardResponse'
         amount:
-          type: number
-          description: Currency amount
-        currency:
-          $ref: '#/components/schemas/Currency'
-        items:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/RewardItemResponse'
-
+          $ref: '#/components/schemas/RewardAmountResponse'
+        status:
+          $ref: '#/components/schemas/RewardType'
+    RewardRowResponse:
+      type: object
+      required:
+        - status
+        - numberOfRewardedContributions
+        - rewardedUserLogin
+        - rewardedUserAvatar
+        - id
+      properties:
+        requestedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        amount:
+          $ref: '#/components/schemas/RewardAmountResponse'
+        numberOfRewardedContributions:
+          type: integer
+          example: 11
+        rewardedUserLogin:
+          type: string
+          example: PierreOucif
+        rewardedUserAvatar:
+          type: string
+          example: https://avatars.githubusercontent.com/u/16590657?v=4
+        id:
+          $ref: '#/components/schemas/RewardId'
     RewardType:
       type: string
       enum:
         - ISSUE
         - PULL_REQUEST
         - CODE_REVIEW
-
+    RewardStatus:
+      enum:
+        - PENDING_SIGNUP
+        - PROCESSING
+        - COMPLETE
+    RewardAmountResponse:
+      type: object
+      required:
+        - value
+        - currency
+      properties:
+        value:
+          type: number
+        currency:
+          $ref: '#/components/schemas/Currency'
+        dollarsEquivalent:
+          type: number
     RewardRequest:
       type: object
       required:
@@ -1670,19 +1767,6 @@ components:
     #            - $ref: '#/components/schemas/IssueId'
     #            - $ref: '#/components/schemas/CodeReviewId'
 
-    RewardItemResponse:
-      type: object
-      required:
-        - type
-      #        - purpose
-      properties:
-        type:
-          $ref: '#/components/schemas/RewardType'
-    #        purpose:
-    #          oneOf:
-    #            - $ref: '#/components/schemas/PullRequest'
-    #            - $ref: '#/components/schemas/Issue'
-    #            - $ref: '#/components/schemas/CodeReview'
 
     PullRequest:
       type: object
@@ -1794,16 +1878,15 @@ components:
         - CHANGE_REQUESTED
         - APPROVED
 
-    CIChecks:
-      type: string
-      enum:
-        - PASSED
-        - FAILED
-
     Currency:
       type: string
       description: Currency
-      example: USD, ETH, etc.
+      enum:
+        - USD
+        - ETH
+        - APT
+        - STARK
+        - OP
 
     ContributionListResponse:
       type: object
@@ -2010,3 +2093,35 @@ components:
           description: The direct URL to the uploaded image
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+
+    ProjectBudgetsResponse:
+      type: object
+      required:
+        - total
+        - remaining
+        - budgets
+      properties:
+        total:
+          type: number
+        remaining:
+          type: number
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetResponse'
+
+    BudgetResponse:
+      type: object
+      required:
+        - currency
+        - value
+        - remaining
+      properties:
+        currency:
+          $ref: '#/components/schemas/Currency'
+        total:
+          type: number
+        remaining:
+          type: number
+        dollarsEquivalent:
+          type: number
