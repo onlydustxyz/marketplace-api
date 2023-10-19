@@ -58,8 +58,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,name,search_project.contributors_count " +
-                                                                                 "desc")
+                                                                                 "is_pending_project_lead desc,search_project.contributors_count desc,name")
                     , query);
         }
 
@@ -73,7 +72,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,name,search_project.repo_count desc")
+                                                                                 "is_pending_project_lead desc,search_project.repo_count desc,name")
                     , query);
         }
 
@@ -101,7 +100,7 @@ public class CustomProjectListRepositoryTest {
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,name,search_project.rank desc")
+                                                                                 "is_pending_project_lead desc,search_project.rank desc,name")
                     , query);
         }
 

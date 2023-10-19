@@ -246,8 +246,8 @@ public class CustomProjectListRepository {
                     technologies.stream().map(s -> "'%\"" + s + "\"%'").toList()));
         }
         return FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%",
-                "order by is_pending_project_lead desc,name" + orderByCondition
-                        .orElse("")) + (whereConditions.isEmpty() ? "" :
+                "order by is_pending_project_lead desc" + orderByCondition
+                        .orElse("") + ",name") + (whereConditions.isEmpty() ? "" :
                 " and " + String.join(" and ",
                         whereConditions.stream().map(s -> "(" + s + ")").toList()));
     }
