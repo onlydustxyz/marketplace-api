@@ -115,7 +115,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
                   "name": "OGC Nissa Ineos",
-                  "url": null,
+                  "url": "https://www.ogcnice.com/fr/",
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
                 },
                 {

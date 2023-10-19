@@ -89,6 +89,7 @@ public interface ProjectMapper {
         sponsorResponse.setId(sponsor.getId());
         sponsorResponse.setName(sponsor.getName());
         sponsorResponse.setLogoUrl(sponsor.getLogoUrl());
+        sponsorResponse.setUrl(sponsor.getUrl());
         return sponsorResponse;
     }
 
