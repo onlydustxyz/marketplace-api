@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
-import onlydust.com.marketplace.api.gateways.RealDateProvider;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
@@ -21,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.http.HttpClient;
+import java.util.Date;
 import java.util.UUID;
 
 @Configuration
@@ -56,7 +56,7 @@ public class DomainConfiguration {
 
     @Bean
     public DateProvider dateProvider() {
-        return new RealDateProvider();
+        return Date::new;
     }
 
     @Bean

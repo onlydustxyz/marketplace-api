@@ -18,7 +18,6 @@
         <module>postgres-adapter</module>
         <module>github-api-adapter</module>
         <module>aws-s3-adapter</module>
-        <module>gateways-adapter</module>
     </modules>
 
     <properties>
