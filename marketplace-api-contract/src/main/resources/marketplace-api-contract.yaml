@@ -746,8 +746,8 @@ paths:
           schema:
             type: string
             enum:
-              - DATE
-              - CONTRIBUTION
+              - SENT_AT
+              - CONTRIBUTOR
               - AMOUNT
               - STATUS
         - in: query
@@ -1873,10 +1873,10 @@ components:
     RewardAmountResponse:
       type: object
       required:
-        - value
+        - total
         - currency
       properties:
-        value:
+        total:
           type: number
         currency:
           $ref: '#/components/schemas/Currency'

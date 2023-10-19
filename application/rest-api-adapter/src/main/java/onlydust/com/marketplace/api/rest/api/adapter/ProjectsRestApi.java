@@ -13,10 +13,12 @@ import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +34,8 @@ import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelp
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.getSortBy;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapProjectRewardPageToResponse;
 
 @RestController
 @Tags(@Tag(name = "Projects"))
@@ -65,31 +69,14 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                                sponsors, search, sortBy, user.getId(), isNull(mine) ? false : mine))
-                        .orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors,
-                                search, sortBy));
+                        sponsors, search, sortBy, user.getId(), isNull(mine) ? false : mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
     }
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
-        final UUID projectId = projectFacadePort.createProject(
-                CreateProjectCommand.builder()
-                        .name(createProjectRequest.getName())
-                        .shortDescription(createProjectRequest.getShortDescription())
-                        .longDescription(createProjectRequest.getLongDescription())
-                        .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
-                        .githubRepoIds(createProjectRequest.getGithubRepoIds())
-                        .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
-                        .moreInfos(createProjectRequest.getMoreInfo().stream()
-                                .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
-                                        .url(moreInfo.getUrl())
-                                        .value(moreInfo.getValue())
-                                        .build())
-                                .toList())
-                        .imageUrl(createProjectRequest.getLogoUrl())
-                        .build()
-        );
+        final UUID projectId =
+                projectFacadePort.createProject(CreateProjectCommand.builder().name(createProjectRequest.getName()).shortDescription(createProjectRequest.getShortDescription()).longDescription(createProjectRequest.getLongDescription()).githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads()).githubRepoIds(createProjectRequest.getGithubRepoIds()).isLookingForContributors(createProjectRequest.getIsLookingForContributors()).moreInfos(createProjectRequest.getMoreInfo().stream().map(moreInfo -> CreateProjectCommand.MoreInfo.builder().url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList()).imageUrl(createProjectRequest.getLogoUrl()).build());
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectId);
@@ -119,15 +106,34 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId, Integer pageIndex,
-                                                                          Integer pageSize, String sort) {
+                                                                           Integer pageSize, String sort) {
 
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
         final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
-                authenticationService.tryGetAuthenticatedUser().map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy, user.getId(), pageIndex,
-                sanitizedPageSize)).orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy, pageIndex,
-                        sanitizedPageSize));
-        return ResponseEntity.ok(mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage, pageIndex));
+                authenticationService.tryGetAuthenticatedUser().map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy, user.getId(), pageIndex, sanitizedPageSize)).orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy, pageIndex, sanitizedPageSize));
+        final ContributorsPageResponse contributorsPageResponse =
+                mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
+                pageIndex);
+        return contributorsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
+                ResponseEntity.ok(contributorsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
+                                                                 String sort) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ProjectRewardView.SortBy sortBy = getSortBy(sort);
+        Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), pageIndex,
+                sanitizedPageSize, sortBy);
+
+        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(pageIndex, page);
+
+        return rewardsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
+                ResponseEntity.ok(rewardsPageResponse);
     }
 
 
