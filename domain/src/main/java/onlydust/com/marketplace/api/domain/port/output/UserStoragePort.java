@@ -22,4 +22,6 @@ public interface UserStoragePort {
     void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
 
     void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
+
+    void createApplicationOnProject(UUID userId, UUID projectId);
 }

@@ -60,4 +60,9 @@ public class UserService implements UserFacadePort {
     public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
         userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
     }
+
+    @Override
+    public void applyOnProject(UUID userId, UUID projectId) {
+        userStoragePort.createApplicationOnProject(userId, projectId);
+    }
 }

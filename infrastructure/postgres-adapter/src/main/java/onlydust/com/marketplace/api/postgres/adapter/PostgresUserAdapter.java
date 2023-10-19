@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
@@ -39,6 +40,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
+    private final ApplicationRepository applicationRepository;
+    private final ProjectIdRepository projectIdRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -134,6 +137,24 @@ public class PostgresUserAdapter implements UserStoragePort {
 
         projectLeaderInvitationRepository.delete(invitation);
         projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
+    }
+
+    @Override
+    @Transactional
+    public void createApplicationOnProject(UUID userId, UUID projectId) {
+        projectIdRepository.findById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
+        applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
+                .ifPresentOrElse(applicationEntity -> {
+                            throw OnlyDustException.invalidInput(format("Application already exists for project %s and user %s", projectId, userId));
+                        },
+                        () -> applicationRepository.save(ApplicationEntity.builder()
+                                .applicantId(userId)
+                                .projectId(projectId)
+                                .id(UUID.randomUUID())
+                                .receivedAt(new Date())
+                                .build())
+                );
     }
 
     @Transactional

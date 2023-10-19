@@ -147,4 +147,19 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).acceptProjectLeaderInvitation(githubUserId, projectId);
     }
+
+    @Test
+    void should_apply_on_project() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID projectId = UUID.randomUUID();
+        final UUID userId = UUID.randomUUID();
+
+        // When
+        userService.applyOnProject(userId, projectId);
+
+        // Then
+        verify(userStoragePort, times(1)).createApplicationOnProject(userId, projectId);
+    }
 }

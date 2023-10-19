@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
+import onlydust.com.marketplace.api.contract.model.ApplicationRequest;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.contract.model.PatchMeContract;
 import onlydust.com.marketplace.api.contract.model.UserPayoutInformationContract;
@@ -58,6 +59,13 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         userFacadePort.acceptInvitationToLeadProject(authenticatedUser.getGithubUserId(), projectId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> applyOnProject(ApplicationRequest applicationRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.applyOnProject(authenticatedUser.getId(), applicationRequest.getProjectId());
         return ResponseEntity.noContent().build();
     }
 

@@ -89,7 +89,9 @@ public class PostgresConfiguration {
                                                    final UserPayoutInfoRepository userPayoutInfoRepository,
                                                    final OnboardingRepository onboardingRepository,
                                                    final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
-                                                   final ProjectLeadRepository projectLeadRepository) {
+                                                   final ProjectLeadRepository projectLeadRepository,
+                                                   final ApplicationRepository applicationRepository,
+                                                   final ProjectIdRepository projectIdRepository) {
         return new PostgresUserAdapter(customUserRepository,
                 userRepository,
                 userViewRepository,
@@ -98,6 +100,8 @@ public class PostgresConfiguration {
                 userPayoutInfoRepository,
                 onboardingRepository,
                 projectLeaderInvitationRepository,
-                projectLeadRepository);
+                projectLeadRepository,
+                applicationRepository,
+                projectIdRepository);
     }
 }

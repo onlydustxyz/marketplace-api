@@ -220,6 +220,30 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/applications:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Apply to become a project contributor
+      operationId: applyOnProject
+      description: |
+        Apply to become a project contributor
+      requestBody:
+        description: 'Application'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationRequest'
+      responses:
+        "204":
+          description: 'The application was sent successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -1977,6 +2001,13 @@ components:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
 
+    ApplicationRequest:
+      type: object
+      required:
+        - projectId
+      properties:
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
 
     CreateProjectRequest:
       type: object
