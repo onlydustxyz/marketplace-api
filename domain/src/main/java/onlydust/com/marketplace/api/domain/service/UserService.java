@@ -55,4 +55,9 @@ public class UserService implements UserFacadePort {
     public void updateTermsAndConditionsAcceptanceDate(UUID userId) {
         userStoragePort.updateTermsAndConditionsAcceptanceDate(userId, dateProvider.now());
     }
+
+    @Override
+    public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
+        userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
+    }
 }

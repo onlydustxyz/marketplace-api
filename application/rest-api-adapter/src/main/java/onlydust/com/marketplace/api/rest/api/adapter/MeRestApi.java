@@ -14,6 +14,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticati
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userPayoutInformationToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userToGetMeResponse;
 
@@ -49,6 +51,13 @@ public class MeRestApi implements MeApi {
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
             userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
         }
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.acceptInvitationToLeadProject(authenticatedUser.getGithubUserId(), projectId);
         return ResponseEntity.noContent().build();
     }
 

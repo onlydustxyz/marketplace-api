@@ -18,4 +18,6 @@ public interface UserFacadePort {
     void markUserAsOnboarded(UUID userId);
 
     void updateTermsAndConditionsAcceptanceDate(UUID userId);
+
+    void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
 }

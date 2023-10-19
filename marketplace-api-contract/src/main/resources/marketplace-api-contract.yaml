@@ -150,36 +150,29 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/leaded-projects:
-    get:
+  /api/v1/me/project-leader-invitations/{projectId}:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
         - Me
-      summary: Get projects leaded by the caller
-      operationId: getMyLeadedProjects
+      summary: Accept invitation to lead a project
+      operationId: acceptInvitationToLeadProject
       description: |
-        Get the list of all projects leaded by the caller.
+        Accept invitation to lead a project
       parameters:
-        - in: query
-          name: sort
-          description: Sort order
+        - in: path
+          name: projectId
+          required: true
           schema:
-            type: string
-            enum:
-              - RANK
-              - NAME
-              - REPO_COUNT
-              - CONTRIBUTOR_COUNT
+            $ref: '#/components/schemas/ProjectId'
       responses:
-        "200":
-          description: 'List of projects'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProjectListResponse'
+        "204":
+          description: 'The invitation was accepted successfully. The caller is now a leader of the project.'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -1683,8 +1676,8 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
-#        shortReward:
-#          $ref: '#/components/schemas/ShortRewardResponse'
+        #        shortReward:
+        #          $ref: '#/components/schemas/ShortRewardResponse'
         amount:
           $ref: '#/components/schemas/RewardAmountResponse'
         status:

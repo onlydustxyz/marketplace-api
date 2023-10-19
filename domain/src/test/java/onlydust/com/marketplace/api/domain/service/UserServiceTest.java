@@ -132,4 +132,19 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateTermsAndConditionsAcceptanceDate(userId, dateProvider.now());
     }
+
+    @Test
+    void should_accept_lead_invitation() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID projectId = UUID.randomUUID();
+        final Long githubUserId = faker.number().randomNumber();
+
+        // When
+        userService.acceptInvitationToLeadProject(githubUserId, projectId);
+
+        // Then
+        verify(userStoragePort, times(1)).acceptProjectLeaderInvitation(githubUserId, projectId);
+    }
 }

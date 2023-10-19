@@ -20,4 +20,6 @@ public interface UserStoragePort {
     void updateOnboardingWizardDisplayDate(UUID userId, Date date);
 
     void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
+
+    void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 }
