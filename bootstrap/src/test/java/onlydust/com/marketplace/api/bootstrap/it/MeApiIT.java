@@ -3,8 +3,10 @@ package onlydust.com.marketplace.api.bootstrap.it;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
@@ -34,6 +36,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     UserPayoutInfoRepository userPayoutInfoRepository;
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
+    @Autowired
+    ApplicationRepository applicationRepository;
 
     @Test
     void should_get_user_payout_info() throws JsonProcessingException {
@@ -231,5 +235,93 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", githubUserId)).doesNotExist();
+    }
+
+    @Test
+    void should_apply_to_project() throws JsonProcessingException {
+        // Given
+        final var githubUserId = faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final var userId = UUID.randomUUID();
+        final String jwt = newFakeUser(userId, githubUserId, login, avatarUrl);
+
+        final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "projectId": "%s"
+                        }
+                        """.formatted(projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
+    @Test
+    void should_not_be_able_to_apply_twice() throws JsonProcessingException {
+        // Given
+        final var githubUserId = faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final var userId = UUID.randomUUID();
+        final String jwt = newFakeUser(userId, githubUserId, login, avatarUrl);
+
+        final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
+
+        applicationRepository.save(ApplicationEntity.builder()
+                .id(UUID.randomUUID())
+                .projectId(UUID.fromString(projectId))
+                .applicantId(userId)
+                .receivedAt(new Date())
+                .build());
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "projectId": "%s"
+                        }
+                        """.formatted(projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is4xxClientError();
+    }
+
+    @Test
+    void should_not_be_able_to_apply_to_non_existing_project() throws JsonProcessingException {
+        // Given
+        final var githubUserId = faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final var userId = UUID.randomUUID();
+        final String jwt = newFakeUser(userId, githubUserId, login, avatarUrl);
+
+        final String projectId = "77777777-4444-4444-4444-61504d34fc56";
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "projectId": "%s"
+                        }
+                        """.formatted(projectId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNotFound();
     }
 }

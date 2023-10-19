@@ -20,4 +20,6 @@ public interface UserFacadePort {
     void updateTermsAndConditionsAcceptanceDate(UUID userId);
 
     void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
+
+    void applyOnProject(UUID id, UUID projectId);
 }
