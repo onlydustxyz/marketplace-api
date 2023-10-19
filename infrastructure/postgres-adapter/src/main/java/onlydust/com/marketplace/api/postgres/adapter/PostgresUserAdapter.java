@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
@@ -16,10 +17,12 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserReposi
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +37,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final GlobalSettingsRepository globalSettingsRepository;
     private final RegisteredUserRepository registeredUserRepository;
     private final UserPayoutInfoRepository userPayoutInfoRepository;
+    private final OnboardingRepository onboardingRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -83,6 +87,36 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UserPayoutInformation getPayoutInformationById(UUID id) {
         final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
         return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
+    }
+
+    @Override
+    public void updateOnboardingWizardDisplayDate(UUID userId, Date date) {
+        onboardingRepository.findById(userId)
+                .ifPresentOrElse(onboardingEntity -> {
+                    onboardingEntity.setProfileWizardDisplayDate(date);
+                    onboardingRepository.save(onboardingEntity);
+                }, () -> {
+                    final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
+                            .id(userId)
+                            .profileWizardDisplayDate(date)
+                            .build();
+                    onboardingRepository.save(onboardingEntity);
+                });
+    }
+
+    @Override
+    public void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date) {
+        onboardingRepository.findById(userId)
+                .ifPresentOrElse(onboardingEntity -> {
+                    onboardingEntity.setTermsAndConditionsAcceptanceDate(date);
+                    onboardingRepository.save(onboardingEntity);
+                }, () -> {
+                    final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
+                            .id(userId)
+                            .termsAndConditionsAcceptanceDate(date)
+                            .build();
+                    onboardingRepository.save(onboardingEntity);
+                });
     }
 
     @Transactional

@@ -9,9 +9,13 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.Hasur
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -58,5 +62,92 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
                 .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
                 .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("USDC");
+    }
+
+    @Test
+    void should_update_onboarding_state() throws JsonProcessingException {
+        // Given
+        final var githubUserId = faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final var userId = UUID.randomUUID();
+
+        final AuthUserEntity user = AuthUserEntity.builder()
+                .id(userId)
+                .githubUserId(githubUserId)
+                .loginAtSignup(login)
+                .avatarUrlAtSignup(avatarUrl)
+                .isAdmin(false)
+                .createdAt(new Date())
+                .build();
+        authUserRepository.save(user);
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(userId)
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(githubUserId)
+                        .avatarUrl(avatarUrl)
+                        .login(login)
+                        .build())
+                .build());
+
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
+
+        // When
+        client.patch()
+                .uri(ME_PATCH)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "hasSeenOnboardingWizard": true
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
+
+        // When
+        client.patch()
+                .uri(ME_PATCH)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "hasAcceptedTermsAndConditions": true
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true);
     }
 }

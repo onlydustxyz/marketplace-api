@@ -86,12 +86,14 @@ public class PostgresConfiguration {
                                                    final UserViewRepository userViewRepository,
                                                    final GlobalSettingsRepository globalSettingsRepository,
                                                    final RegisteredUserRepository registeredUserRepository,
-                                                   final UserPayoutInfoRepository userPayoutInfoRepository) {
+                                                   final UserPayoutInfoRepository userPayoutInfoRepository,
+                                                   final OnboardingRepository onboardingRepository) {
         return new PostgresUserAdapter(customUserRepository,
                 userRepository,
                 userViewRepository,
                 globalSettingsRepository,
                 registeredUserRepository,
-                userPayoutInfoRepository);
+                userPayoutInfoRepository,
+                onboardingRepository);
     }
 }

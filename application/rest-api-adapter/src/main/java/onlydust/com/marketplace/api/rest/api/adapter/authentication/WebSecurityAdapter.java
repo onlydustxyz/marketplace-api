@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,8 +26,9 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .and().cors()
                 .and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/me/**").hasAuthority("USER")
-                .antMatchers("/api/v1/projects/**").permitAll()
+                .antMatchers("/api/v1/me/**").hasAuthority(UserRole.USER.name())
+                .antMatchers(HttpMethod.POST, "/api/v1/projects/**").hasAuthority(UserRole.ADMIN.name())
+                .antMatchers(HttpMethod.GET, "/api/v1/projects/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/github/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()

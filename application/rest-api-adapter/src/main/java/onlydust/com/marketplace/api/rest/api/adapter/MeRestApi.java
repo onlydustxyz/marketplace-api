@@ -5,10 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
+import onlydust.com.marketplace.api.contract.model.PatchMeContract;
 import onlydust.com.marketplace.api.contract.model.UserPayoutInformationContract;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,5 +40,16 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.ok(userPayoutInformation);
     }
 
+    @Override
+    public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        if (Boolean.TRUE.equals(patchMeContract.getHasSeenOnboardingWizard())) {
+            userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
+        }
+        if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
+            userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
+        }
+        return ResponseEntity.noContent().build();
+    }
 
 }
