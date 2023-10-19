@@ -25,7 +25,7 @@ public class CustomContributorRepository {
             			contributions c
             		WHERE
             			c.user_id = gu.id
-            			AND c.repo_id = ANY ((select array(select pgr.github_repo_id from project_github_repos pgr where pgr.project_id = :projectId))::bigint[])
+            			AND c.repo_id = ANY ((select array(select pgr.github_repo_id from project_github_repos pgr where pgr.project_id = :projectId))\\:\\:bigint[])
             			AND c.status = 'complete') AS contribution_count,
             		gu.*
             	FROM
