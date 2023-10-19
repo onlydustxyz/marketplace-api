@@ -40,7 +40,7 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>com.onlydust.marketplace.api</groupId>
             <artifactId>github-api-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -55,7 +55,7 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>com.onlydust.marketplace.api</groupId>
             <artifactId>gateways-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
