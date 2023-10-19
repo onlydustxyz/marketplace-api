@@ -36,4 +36,11 @@ public class PaginationHelperTest {
         assertEquals(2, PaginationHelper.calculateTotalNumberOfPage(5, 9));
         assertEquals(1, PaginationHelper.calculateTotalNumberOfPage(5, 1));
     }
+
+    @Test
+    void should_has_more() {
+        assertEquals(false, PaginationHelper.hasMore(0, 1));
+        assertEquals(false, PaginationHelper.hasMore(1, 2));
+        assertEquals(true, PaginationHelper.hasMore(0, 2));
+    }
 }

@@ -1,9 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributorListItemResponse;
-import onlydust.com.marketplace.api.contract.model.ContributorPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import static java.util.Objects.isNull;
 
@@ -20,17 +21,19 @@ public interface ProjectContributorsMapper {
         return sortBy;
     }
 
-    static ContributorPageResponse mapProjectContributorsLinkViewPageToResponse(final Page<ProjectContributorsLinkView> page) {
-        final ContributorPageResponse contributorPageResponse = new ContributorPageResponse();
+    static ContributorsPageResponse mapProjectContributorsLinkViewPageToResponse(final Page<ProjectContributorsLinkView> page,
+                                                                                 final int pageIndex) {
+        final ContributorsPageResponse contributorPageResponse = new ContributorsPageResponse();
         contributorPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         contributorPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         contributorPageResponse.setContributors(page.getContent().stream()
                 .map(ProjectContributorsMapper::mapProjectContributorsLinkViewToResponse).toList());
+        contributorPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
         return contributorPageResponse;
     }
 
-    static ContributorListItemResponse mapProjectContributorsLinkViewToResponse(final ProjectContributorsLinkView projectContributorsLinkView) {
-        final ContributorListItemResponse response = new ContributorListItemResponse();
+    static ContributorPageItemResponse mapProjectContributorsLinkViewToResponse(final ProjectContributorsLinkView projectContributorsLinkView) {
+        final ContributorPageItemResponse response = new ContributorPageItemResponse();
         response.setAvatarUrl(projectContributorsLinkView.getAvatarUrl());
         response.setGithubUserId(projectContributorsLinkView.getGithubUserId());
         response.setLogin(projectContributorsLinkView.getLogin());
