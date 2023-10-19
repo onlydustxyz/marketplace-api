@@ -23,10 +23,9 @@ public class CustomContributorRepository {
             			count(*)
             		FROM
             			contributions c
-            			JOIN project_github_repos pgr ON pgr.project_id = :projectId
-            				AND pgr.github_repo_id = c.repo_id
             		WHERE
             			c.user_id = gu.id
+            			AND c.repo_id = ANY ((select array(select pgr.github_repo_id from project_github_repos pgr where pgr.project_id = :projectId))\\:\\:bigint[])
             			AND c.status = 'complete') AS contribution_count,
             		gu.*
             	FROM
@@ -43,24 +42,6 @@ public class CustomContributorRepository {
                 from projects_contributors pc
                 where pc.project_id = :projectId
             """;
-
-    private final EntityManager entityManager;
-
-    public List<GithubUserViewEntity> findProjectTopContributors(UUID projectId, int limit) {
-        return entityManager
-                .createNativeQuery(FIND_TOP_CONTRIBUTORS_BASE_QUERY, GithubUserViewEntity.class)
-                .setParameter("projectId", projectId)
-                .setParameter("limit", limit)
-                .getResultList();
-    }
-
-    public Integer getProjectContributorCount(UUID projectId) {
-        final var query = entityManager
-                .createNativeQuery(GET_CONTRIBUTOR_COUNT)
-                .setParameter("projectId", projectId);
-        return ((Number) query.getSingleResult()).intValue();
-    }
-
     protected static final String GET_CONTRIBUTORS_FOR_PROJECT = """
             select gu.id,
                    gu.login,
@@ -103,16 +84,7 @@ public class CustomContributorRepository {
             order by %order_by%
             offset %offset% limit %limit%
             """;
-
-
-    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId,
-                                                                              ProjectContributorsLinkView.SortBy sortBy,
-                                                                              int pageIndex, int pageSize) {
-        return entityManager.createNativeQuery(buildQuery(sortBy, pageIndex, pageSize),
-                        ProjectContributorViewEntity.class)
-                .setParameter("projectId", projectId)
-                .getResultList();
-    }
+    private final EntityManager entityManager;
 
     static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy,
                                        int pageIndex, int pageSize) {
@@ -129,5 +101,29 @@ public class CustomContributorRepository {
                 .replace("%limit%",
                         PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex).toString())
                 .replace("%order_by%", sortValue);
+    }
+
+    public List<GithubUserViewEntity> findProjectTopContributors(UUID projectId, int limit) {
+        return entityManager
+                .createNativeQuery(FIND_TOP_CONTRIBUTORS_BASE_QUERY, GithubUserViewEntity.class)
+                .setParameter("projectId", projectId)
+                .setParameter("limit", limit)
+                .getResultList();
+    }
+
+    public Integer getProjectContributorCount(UUID projectId) {
+        final var query = entityManager
+                .createNativeQuery(GET_CONTRIBUTOR_COUNT)
+                .setParameter("projectId", projectId);
+        return ((Number) query.getSingleResult()).intValue();
+    }
+
+    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId,
+                                                                              ProjectContributorsLinkView.SortBy sortBy,
+                                                                              int pageIndex, int pageSize) {
+        return entityManager.createNativeQuery(buildQuery(sortBy, pageIndex, pageSize),
+                        ProjectContributorViewEntity.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
     }
 }
