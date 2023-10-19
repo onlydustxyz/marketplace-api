@@ -199,7 +199,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardPageResponse'
+                $ref: '#/components/schemas/RewardsPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -556,7 +556,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributorPageResponse'
+                $ref: '#/components/schemas/ContributorsPageResponse'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
@@ -675,7 +675,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardPageResponse'
+                $ref: '#/components/schemas/RewardsPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1321,21 +1321,26 @@ components:
           type: boolean
           description: True if the user is registered on OnlyDust
 
-    ContributorPageResponse:
+    ContributorsPageResponse:
       type: object
       required:
         - contributors
+        - totalPageNumber
+        - totalItemNumber
+        - hasMore
       properties:
         totalPageNumber:
           type: integer
         totalItemNumber:
           type: integer
+        hasMore:
+          type: boolean
         contributors:
           type: array
           items:
-            $ref: '#/components/schemas/ContributorListItemResponse'
+            $ref: '#/components/schemas/ContributorPageItemResponse'
 
-    ContributorListItemResponse:
+    ContributorPageItemResponse:
       type: object
       required:
         - id
@@ -1646,7 +1651,7 @@ components:
         Go: 12388
         Java: 1233
 
-    RewardPageResponse:
+    RewardsPageResponse:
       type: object
       required:
         - rewards
@@ -1657,7 +1662,7 @@ components:
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/RewardRowResponse'
+            $ref: '#/components/schemas/RewardPageItemResponse'
         hasMore:
           type: boolean
           example: true
@@ -1684,7 +1689,7 @@ components:
           $ref: '#/components/schemas/RewardAmountResponse'
         status:
           $ref: '#/components/schemas/RewardType'
-    RewardRowResponse:
+    RewardPageItemResponse:
       type: object
       required:
         - status

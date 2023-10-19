@@ -15,8 +15,11 @@ public class PaginationHelper {
         return min(pageSize, MAXIMUM_PAGE_SIZE);
     }
 
-    public static int calculateTotalNumberOfPage(final Integer pageSize, final int count) {
+    public static int calculateTotalNumberOfPage(final int pageSize, final int count) {
         return count < pageSize ? 1 : round((float) count / pageSize);
     }
 
+    public static boolean hasMore(final int pageIndex, final int totalPageNumber) {
+        return (pageIndex + 1) < totalPageNumber;
+    }
 }

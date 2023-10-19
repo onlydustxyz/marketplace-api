@@ -118,7 +118,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ContributorPageResponse> getProjectContributors(UUID projectId, Integer pageIndex,
+    public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId, Integer pageIndex,
                                                                           Integer pageSize, String sort) {
 
         final int sanitizedPageSize = sanitizePageSize(pageSize);
@@ -127,7 +127,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 authenticationService.tryGetAuthenticatedUser().map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy, user.getId(), pageIndex,
                 sanitizedPageSize)).orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy, pageIndex,
                         sanitizedPageSize));
-        return ResponseEntity.ok(mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage));
+        return ResponseEntity.ok(mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage, pageIndex));
     }
 
 
