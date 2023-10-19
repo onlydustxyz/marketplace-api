@@ -87,13 +87,17 @@ public class PostgresConfiguration {
                                                    final GlobalSettingsRepository globalSettingsRepository,
                                                    final RegisteredUserRepository registeredUserRepository,
                                                    final UserPayoutInfoRepository userPayoutInfoRepository,
-                                                   final OnboardingRepository onboardingRepository) {
+                                                   final OnboardingRepository onboardingRepository,
+                                                   final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
+                                                   final ProjectLeadRepository projectLeadRepository) {
         return new PostgresUserAdapter(customUserRepository,
                 userRepository,
                 userViewRepository,
                 globalSettingsRepository,
                 registeredUserRepository,
                 userPayoutInfoRepository,
-                onboardingRepository);
+                onboardingRepository,
+                projectLeaderInvitationRepository,
+                projectLeadRepository);
     }
 }

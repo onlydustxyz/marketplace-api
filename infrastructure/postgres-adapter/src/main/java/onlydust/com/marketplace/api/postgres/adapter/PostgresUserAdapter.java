@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUs
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
@@ -17,9 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserReposi
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -38,6 +37,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final RegisteredUserRepository registeredUserRepository;
     private final UserPayoutInfoRepository userPayoutInfoRepository;
     private final OnboardingRepository onboardingRepository;
+    private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
+    private final ProjectLeadRepository projectLeadRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,6 +55,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional
     public void createUser(User user) {
         userRepository.save(UserMapper.mapUserToEntity(user));
     }
@@ -90,6 +92,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional
     public void updateOnboardingWizardDisplayDate(UUID userId, Date date) {
         onboardingRepository.findById(userId)
                 .ifPresentOrElse(onboardingEntity -> {
@@ -105,6 +108,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional
     public void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date) {
         onboardingRepository.findById(userId)
                 .ifPresentOrElse(onboardingEntity -> {
@@ -117,6 +121,19 @@ public class PostgresUserAdapter implements UserStoragePort {
                             .build();
                     onboardingRepository.save(onboardingEntity);
                 });
+    }
+
+    @Override
+    @Transactional
+    public void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
+        final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project leader invitation not found for project %s and user %d", projectId, githubUserId)));
+
+        final var user = getUserByGithubId(githubUserId)
+                .orElseThrow(() -> OnlyDustException.notFound(format("User with githubId %d not found", githubUserId)));
+
+        projectLeaderInvitationRepository.delete(invitation);
+        projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
     }
 
     @Transactional

@@ -109,11 +109,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
         return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProjectContributorsLinkView> findContributors(UUID projectId,
                                                               ProjectContributorsLinkView.SortBy sortBy,
                                                               int pageIndex, int pageSize) {
@@ -130,6 +132,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
                                                                             ProjectContributorsLinkView.SortBy sortBy
             , int pageIndex, int pageSize) {
@@ -146,6 +149,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UUID> getProjectLeadIds(UUID projectId) {
         return projectLeadViewRepository.findAllByProjectId(projectId).stream()
                 .map(ProjectLeadViewEntity::getUserId)
