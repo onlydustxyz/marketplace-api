@@ -22,4 +22,8 @@ public class PaginationHelper {
     public static boolean hasMore(final int pageIndex, final int totalPageNumber) {
         return (pageIndex + 1) < totalPageNumber;
     }
+
+    public static Integer nextPageIndex(final int pageIndex, final int totalPageNumber) {
+        return hasMore(pageIndex, totalPageNumber) ? pageIndex + 1 : pageIndex;
+    }
 }

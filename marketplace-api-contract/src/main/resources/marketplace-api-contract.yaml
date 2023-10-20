@@ -1344,6 +1344,7 @@ components:
         - contributors
         - totalPageNumber
         - totalItemNumber
+        - nextPageIndex
         - hasMore
       properties:
         totalPageNumber:
@@ -1352,6 +1353,9 @@ components:
           type: integer
         hasMore:
           type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
         contributors:
           type: array
           items:
@@ -1675,6 +1679,7 @@ components:
         - hasMore
         - totalPageNumber
         - totalItemNumber
+        - nextPageIndex
       properties:
         rewards:
           type: array
@@ -1687,7 +1692,9 @@ components:
           type: integer
         totalItemNumber:
           type: integer
-
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
     RewardResponse:
       type: object
       required:

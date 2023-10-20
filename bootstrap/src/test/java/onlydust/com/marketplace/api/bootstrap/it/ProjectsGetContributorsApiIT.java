@@ -108,6 +108,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 "totalPageNumber": 6,
                 "totalItemNumber": 17,
                 "hasMore": true,
+                "nextPageIndex": 1,
                 "contributors": [
                     {
                         "githubUserId": 43467246,
@@ -152,6 +153,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
             {
                 "totalPageNumber": 6,
                 "totalItemNumber": 17,
+                "nextPageIndex": 2,
                 "hasMore": true,
                 "contributors": [
                     {
@@ -198,6 +200,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 "totalPageNumber": 1,
                 "totalItemNumber": 17,
                 "hasMore": false,
+                "nextPageIndex": 0,
                 "contributors": [
                     {
                         "githubUserId": 43467246,
@@ -412,6 +415,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 "totalPageNumber": 1,
                 "totalItemNumber": 17,
                 "hasMore": false,
+                "nextPageIndex": 0,
                 "contributors": [
                     {
                         "githubUserId": 43467246,
