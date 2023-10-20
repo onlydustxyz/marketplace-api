@@ -1,47 +1,22 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+
+@ActiveProfiles({"hasura_auth"})
 public class UsersApiIT extends AbstractMarketplaceApiIT {
 
-    @Test
-    void should_return_a_not_found_error() {
-        // Given
-        final UUID notExistingUserId = UUID.randomUUID();
-
-        // When
-        client.get()
-                .uri(getApiURI(USERS_GET + "/" + notExistingUserId))
-                .exchange()
-                // Then
-                .expectStatus()
-                .isEqualTo(404);
-    }
-
-    @Test
-    void should_get_user_profile() {
-        // Given
-        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-
-        // When
-        client.get()
-                .uri(getApiURI(USERS_GET + "/" + anthonyId))
-                .exchange()
-                // Then
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .json(GET_ANTHONY_PROFILE_JSON_RESPONSE);
-    }
-
-
-
-
-    private static final String GET_ANTHONY_PROFILE_JSON_RESPONSE = """
+    private static final String GET_ANTHONY_PROFILE_WITHOUT_CONTACTS_JSON_RESPONSE = """
             {
              "githubUserId": 43467246,
              "login": "AnthonyBuisset",
@@ -70,28 +45,6 @@ public class UsersApiIT extends AbstractMarketplaceApiIT {
              "createdAt": "2022-12-12T08:51:58.48559Z",
              "lastSeenAt": "2023-10-05T17:06:50.034Z",
              "cover": "BLUE",
-             "contacts": [
-                 {
-                     "channel": "discord",
-                     "contact": "antho",
-                     "visibility": "public"
-                 },
-                 {
-                     "channel": "twitter",
-                     "contact": "https://twitter.com/abuisset",
-                     "visibility": "public"
-                 },
-                 {
-                     "channel": "email",
-                     "contact": "abuisset@gmail.com",
-                     "visibility": "public"
-                 },
-                 {
-                     "channel": "telegram",
-                     "contact": "https://t.me/abuisset",
-                     "visibility": "public"
-                 }
-             ],
              "projects": [
                  {
                      "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
@@ -704,4 +657,82 @@ public class UsersApiIT extends AbstractMarketplaceApiIT {
                  ]
              }
             }""";
+
+    @Autowired
+    JwtSecret jwtSecret;
+
+    @Test
+    void should_return_a_not_found_error() {
+        // Given
+        final UUID notExistingUserId = UUID.randomUUID();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET + "/" + notExistingUserId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(404);
+    }
+
+    @Test
+    void should_get_public_user_profile() {
+        // Given
+        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET + "/" + anthonyId))
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.allocatedTimeToContribute").doesNotExist()
+                .jsonPath("$.isLookingForAJob").doesNotExist()
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')]").doesNotExist()
+                .jsonPath("$.contacts[?(@.contact=='antho')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='antho')].channel").isEqualTo("DISCORD")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].channel").isEqualTo("TWITTER")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
+                .json(GET_ANTHONY_PROFILE_WITHOUT_CONTACTS_JSON_RESPONSE);
+    }
+
+    @Test
+    void should_get_private_user_profile() throws JsonProcessingException {
+        // Given
+        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(anthonyId)
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(43467246L)
+                        .avatarUrl("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp")
+                        .login("AnthonyBuisset")
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_PROFILE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.allocatedTimeToContribute").isEqualTo("NONE")
+                .jsonPath("$.isLookingForAJob").isEqualTo(false)
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("private")
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].channel").isEqualTo("EMAIL")
+                .jsonPath("$.contacts[?(@.contact=='antho')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='antho')].channel").isEqualTo("DISCORD")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].channel").isEqualTo("TWITTER")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
+                .json(GET_ANTHONY_PROFILE_WITHOUT_CONTACTS_JSON_RESPONSE);
+    }
 }

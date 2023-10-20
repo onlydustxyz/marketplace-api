@@ -1,22 +1,78 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface UserMapper {
 
-    static UserProfileResponse userProfileToResponse(UserProfileView userProfileView) {
-        final UserProfileResponse userProfileResponse = new UserProfileResponse();
+    static UserProfile userProfileRequestToDomain(final UserProfileRequest userProfileRequest) {
+        return UserProfile.builder()
+                .bio(userProfileRequest.getBio())
+                .website(userProfileRequest.getWebsite())
+                .location(userProfileRequest.getLocation())
+                .cover(coverToUserProfileDomain(userProfileRequest.getCover()))
+                .contacts(contactToDomain(userProfileRequest.getContacts()))
+                .technologies(userProfileRequest.getTechnologies())
+                .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
+                .build();
+    }
+
+    static List<Contact> contactToDomain(List<ContactInformation> contacts) {
+        return contacts.stream()
+                .map(contactInformation -> {
+                    final Contact.Visibility visibility = switch (contactInformation.getVisibility()) {
+                        case PUBLIC -> Contact.Visibility.PUBLIC;
+                        case PRIVATE -> Contact.Visibility.PRIVATE;
+                    };
+                    final Contact.Channel channel = switch (contactInformation.getChannel()) {
+                        case EMAIL -> Contact.Channel.EMAIL;
+                        case LINKEDIN -> Contact.Channel.LINKEDIN;
+                        case TWITTER -> Contact.Channel.TWITTER;
+                        case TELEGRAM -> Contact.Channel.TELEGRAM;
+                        case DISCORD -> Contact.Channel.DISCORD;
+                        case WHATSAPP -> Contact.Channel.WHATSAPP;
+                    };
+                    return Contact.builder()
+                            .contact(contactInformation.getContact())
+                            .channel(channel)
+                            .visibility(visibility)
+                            .build();
+                }).toList();
+    }
+
+    static UserProfileCover coverToUserProfileDomain(UserProfileCoverColor cover) {
+        return isNull(cover) ? UserProfileCover.BLUE :
+                switch (cover) {
+                    case BLUE -> UserProfileCover.BLUE;
+                    case CYAN -> UserProfileCover.CYAN;
+                    case MAGENTA -> UserProfileCover.MAGENTA;
+                    case YELLOW -> UserProfileCover.YELLOW;
+                };
+    }
+
+
+    static PublicUserProfileResponse userProfileToPublicResponse(UserProfileView userProfileView) {
+        final PrivateUserProfileResponse privateUserProfileResponse = userProfileToPrivateResponse(userProfileView);
+        privateUserProfileResponse.setIsLookingForAJob(null);
+        privateUserProfileResponse.setAllocatedTimeToContribute(null);
+        privateUserProfileResponse.setContacts(
+                privateUserProfileResponse.getContacts().stream().filter(contact -> contact.getVisibility() == ContactInformation.VisibilityEnum.PUBLIC).collect(Collectors.toList())
+        );
+        return privateUserProfileResponse;
+    }
+
+    static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {
+        final PrivateUserProfileResponse userProfileResponse = new PrivateUserProfileResponse();
         userProfileResponse.setGithubUserId(userProfileView.getGithubId());
         userProfileResponse.setBio(userProfileView.getBio());
         userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
@@ -30,11 +86,31 @@ public interface UserMapper {
         userProfileResponse.setCreatedAt(toZoneDateTime(userProfileView.getCreateAt()));
         userProfileResponse.setLastSeenAt(toZoneDateTime(userProfileView.getLastSeenAt()));
         userProfileResponse.setLocation(userProfileView.getLocation());
-        userProfileResponse.setContacts(contactInformationsToResponse(userProfileView.getContactInformations()));
+        userProfileResponse.setContacts(contactToResponse(userProfileView.getContacts()));
         userProfileResponse.setStats(userStatsToResponse(userProfileView.getProfileStats()));
         userProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats()));
         userProfileResponse.setTechnologies(userProfileView.getTechnologies());
+        userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
+        userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
         return userProfileResponse;
+    }
+
+    static AllocatedTime allocatedTimeToResponse(UserAllocatedTimeToContribute allocatedTimeToContribute) {
+        return switch (allocatedTimeToContribute) {
+            case NONE -> AllocatedTime.NONE;
+            case LESS_THAN_ONE_DAY -> AllocatedTime.LESS_THAN_ONE_DAY;
+            case ONE_TO_THREE_DAYS -> AllocatedTime.ONE_TO_THREE_DAYS;
+            case GREATER_THAN_THREE_DAYS -> AllocatedTime.GREATER_THAN_THREE_DAYS;
+        };
+    }
+
+    static UserAllocatedTimeToContribute allocatedTimeToDomain(AllocatedTime allocatedTimeToContribute) {
+        return switch (allocatedTimeToContribute) {
+            case NONE -> UserAllocatedTimeToContribute.NONE;
+            case LESS_THAN_ONE_DAY -> UserAllocatedTimeToContribute.LESS_THAN_ONE_DAY;
+            case ONE_TO_THREE_DAYS -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
+            case GREATER_THAN_THREE_DAYS -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
+        };
     }
 
     static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats) {
@@ -76,27 +152,34 @@ public interface UserMapper {
         return userProfileStats;
     }
 
-    static List<ContactInformation> contactInformationsToResponse(final Set<UserProfileView.ContactInformation> contactInformations) {
-        return contactInformations.stream()
+    static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {
+        return contacts.stream()
                 .map(contactInformation -> {
                     final ContactInformation response = new ContactInformation();
                     response.setContact(contactInformation.getContact());
-                    response.setChannel(contactInformation.getChannel());
-                    switch (contactInformation.getVisibility()) {
-                        case PUBLIC -> response.setVisibility(ContactInformation.VisibilityEnum.PUBLIC);
-                        case PRIVATE -> response.setVisibility(ContactInformation.VisibilityEnum.PRIVATE);
-                    }
+                    response.setChannel(switch (contactInformation.getChannel()) {
+                        case EMAIL -> ContactInformationChannel.EMAIL;
+                        case LINKEDIN -> ContactInformationChannel.LINKEDIN;
+                        case TWITTER -> ContactInformationChannel.TWITTER;
+                        case TELEGRAM -> ContactInformationChannel.TELEGRAM;
+                        case DISCORD -> ContactInformationChannel.DISCORD;
+                        case WHATSAPP -> ContactInformationChannel.WHATSAPP;
+                    });
+                    response.setVisibility(switch (contactInformation.getVisibility()) {
+                        case PUBLIC -> ContactInformation.VisibilityEnum.PUBLIC;
+                        case PRIVATE -> ContactInformation.VisibilityEnum.PRIVATE;
+                    });
                     return response;
                 }).toList();
     }
 
-    private static UserProfileResponse.CoverEnum coverToUserProfileResponse(final UserProfileView.Cover cover) {
-        return isNull(cover) ? null :
+    private static UserProfileCoverColor coverToUserProfileResponse(final UserProfileCover cover) {
+        return isNull(cover) ? UserProfileCoverColor.BLUE :
                 switch (cover) {
-                    case BLUE -> UserProfileResponse.CoverEnum.BLUE;
-                    case CYAN -> UserProfileResponse.CoverEnum.CYAN;
-                    case MAGENTA -> UserProfileResponse.CoverEnum.MAGENTA;
-                    case YELLOW -> UserProfileResponse.CoverEnum.YELLOW;
+                    case BLUE -> UserProfileCoverColor.BLUE;
+                    case CYAN -> UserProfileCoverColor.CYAN;
+                    case MAGENTA -> UserProfileCoverColor.MAGENTA;
+                    case YELLOW -> UserProfileCoverColor.YELLOW;
                 };
     }
 

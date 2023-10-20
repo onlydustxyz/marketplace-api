@@ -40,6 +40,50 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Me
+      summary: Get caller info
+      operationId: getMe
+      description: |
+        Get the caller info
+      responses:
+        "200":
+          description: 'Minimalist user info'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMeResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Patch some caller info
+      operationId: patchMe
+      description: |
+        Patch onboarding info of the caller
+      requestBody:
+        description: 'Patched user info'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchMeContract'
+      responses:
+        "204":
+          description: 'The user was patched successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/profile:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
       summary: Get caller profile
       operationId: getMyProfile
       description: |
@@ -50,7 +94,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetMeResponse'
+                $ref: '#/components/schemas/PrivateUserProfileResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -74,29 +118,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfileResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Patch some caller info
-      operationId: patchMe
-      description: |
-        Patch onboarding info of the caller
-      requestBody:
-        description: 'Patched user info'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchMeContract'
-      responses:
-        "204":
-          description: 'The user was patched successfully.'
+                $ref: '#/components/schemas/PrivateUserProfileResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -376,7 +398,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfileResponse'
+                $ref: '#/components/schemas/PublicUserProfileResponse'
         "404":
           $ref: '#/components/responses/UserNotFoundError'
         "500":
@@ -1153,19 +1175,39 @@ components:
         technologies:
           $ref: '#/components/schemas/Technologies'
         cover:
-          type: string
-          enum:
-            - MAGENTA
-            - CYAN
-            - BLUE
-            - YELLOW
-          description: The cover color chosen by the user
+          $ref: '#/components/schemas/UserProfileCoverColor'
         contacts:
           type: array
           items:
             $ref: '#/components/schemas/ContactInformation'
+        allocatedTimeToContribute:
+          $ref: '#/components/schemas/AllocatedTime'
 
-    UserProfileResponse:
+    UserProfileCoverColor:
+      type: string
+      enum:
+        - MAGENTA
+        - CYAN
+        - BLUE
+        - YELLOW
+      description: The cover color chosen by the user
+
+    PrivateUserProfileResponse:
+      allOf:
+        - $ref: '#/components/schemas/PublicUserProfileResponse'
+        - type: object
+          properties:
+            allocatedTimeToContribute:
+              $ref: '#/components/schemas/AllocatedTime'
+            isLookingForAJob:
+              type: boolean
+              description: Whether the user is looking for a job or not
+
+    PublicUserProfileResponse:
+      discriminator:
+        propertyName: type
+        mapping:
+          privateUserProfileResponse: '#/components/schemas/PrivateUserProfileResponse'
       allOf:
         - $ref: '#/components/schemas/UserLinkResponse'
         - type: object
@@ -1194,13 +1236,7 @@ components:
               format: date-time
               description: The last time the user signed in on OnlyDust
             cover:
-              type: string
-              enum:
-                - MAGENTA
-                - CYAN
-                - BLUE
-                - YELLOW
-              description: The cover color chosen by the user
+              $ref: '#/components/schemas/UserProfileCoverColor'
             contacts:
               type: array
               items:
@@ -1281,6 +1317,7 @@ components:
           type: string
           format: date-time
           description: The last time the user contributed to this project
+
     ContactInformation:
       type: object
       required:
@@ -1289,8 +1326,7 @@ components:
         - visibility
       properties:
         channel:
-          type: string
-          example: email
+          $ref: '#/components/schemas/ContactInformationChannel'
         contact:
           type: string
           example: foobar@gmail.com
@@ -1299,6 +1335,24 @@ components:
           enum:
             - public
             - private
+
+    ContactInformationChannel:
+      type: string
+      enum:
+        - EMAIL
+        - TELEGRAM
+        - TWITTER
+        - DISCORD
+        - LINKEDIN
+        - WHATSAPP
+
+    AllocatedTime:
+      type: string
+      enum:
+        - NONE
+        - LESS_THAN_ONE_DAY
+        - ONE_TO_THREE_DAYS
+        - GREATER_THAN_THREE_DAYS
 
     ContributorSearchResponse:
       type: object

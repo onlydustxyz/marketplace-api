@@ -5,6 +5,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
@@ -45,6 +48,8 @@ public class CustomUserRepository {
                    ci.contact,
                    upi.languages,
                    upi.cover,
+                   upi.looking_for_a_job,
+                   upi.weekly_allocated_time,
                    count.code_review_count,
                    count.issue_count,
                    count.pull_request_count,
@@ -153,20 +158,39 @@ public class CustomUserRepository {
                         .htmlUrl(row.getHtmlUrl())
                         .location(row.getLocation())
                         .cover(isNull(row.getCover()) ? null :
-                                UserProfileView.Cover.valueOf(row.getCover().toUpperCase()))
+                                switch (row.getCover()) {
+                                    case cyan -> UserProfileCover.CYAN;
+                                    case magenta -> UserProfileCover.MAGENTA;
+                                    case yellow -> UserProfileCover.YELLOW;
+                                    case blue -> UserProfileCover.BLUE;
+                                })
                         .website(row.getWebsite())
                         .technologies(getTechnologies(row))
                         .profileStats(profileStats)
+                        .isLookingForAJob(row.getIsLookingForAJob())
+                        .allocatedTimeToContribute(isNull(row.getAllocatedTimeToContribute()) ? null : switch (row.getAllocatedTimeToContribute()) {
+                            case none -> UserAllocatedTimeToContribute.NONE;
+                            case less_than_one_day -> UserAllocatedTimeToContribute.LESS_THAN_ONE_DAY;
+                            case one_to_three_days -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
+                            case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
+                        })
                         .build();
             }
             if ((nonNull(row.getContact()) && !row.getContact().isEmpty()) && nonNull(row.getContactChannel()) && nonNull(row.getContactPublic())) {
-                final UserProfileView.ContactInformation contactInformation =
-                        UserProfileView.ContactInformation.builder()
+                final Contact contactInformation =
+                        Contact.builder()
                                 .contact(row.getContact())
-                                .channel(row.getContactChannel())
+                                .channel(isNull(row.getContactChannel()) ? null : switch (row.getContactChannel()) {
+                                    case email -> Contact.Channel.EMAIL;
+                                    case telegram -> Contact.Channel.TELEGRAM;
+                                    case twitter -> Contact.Channel.TWITTER;
+                                    case discord -> Contact.Channel.DISCORD;
+                                    case linkedin -> Contact.Channel.LINKEDIN;
+                                    case whatsapp -> Contact.Channel.WHATSAPP;
+                                })
                                 .visibility(row.getContactPublic() ?
-                                        UserProfileView.ContactInformation.Visibility.PUBLIC :
-                                        UserProfileView.ContactInformation.Visibility.PRIVATE)
+                                        Contact.Visibility.PUBLIC :
+                                        Contact.Visibility.PRIVATE)
                                 .build();
                 userProfileView.addContactInformation(contactInformation);
             }

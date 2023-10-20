@@ -4,21 +4,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
-import onlydust.com.marketplace.api.contract.model.ApplicationRequest;
-import onlydust.com.marketplace.api.contract.model.GetMeResponse;
-import onlydust.com.marketplace.api.contract.model.PatchMeContract;
-import onlydust.com.marketplace.api.contract.model.UserPayoutInformationContract;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userPayoutInformationToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userToGetMeResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 
 @RestController
 @Tags(@Tag(name = "Me"))
@@ -29,7 +26,7 @@ public class MeRestApi implements MeApi {
     private final UserFacadePort userFacadePort;
 
     @Override
-    public ResponseEntity<GetMeResponse> getMyProfile() {
+    public ResponseEntity<GetMeResponse> getMe() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser);
         return ResponseEntity.ok(getMeResponse);
@@ -67,6 +64,22 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         userFacadePort.applyOnProject(authenticatedUser.getId(), applicationRequest.getProjectId());
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<PrivateUserProfileResponse> getMyProfile() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final UserProfileView userProfileView = userFacadePort.getProfileById(authenticatedUser.getId());
+        final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(userProfileView);
+        return ResponseEntity.ok(userProfileResponse);
+    }
+
+    @Override
+    public ResponseEntity<PrivateUserProfileResponse> setMyProfile(UserProfileRequest userProfileRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(), userProfileRequestToDomain(userProfileRequest));
+        final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
+        return ResponseEntity.ok(userProfileResponse);
     }
 
 }

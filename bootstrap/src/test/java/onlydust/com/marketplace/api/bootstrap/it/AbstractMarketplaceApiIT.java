@@ -52,6 +52,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String ME_PATCH = "/api/v1/me";
+    protected static final String ME_GET_PROFILE = "/api/v1/me/profile";
+    protected static final String ME_PATCH_PROFILE = "/api/v1/me/profile";
     protected static final String ME_GET_PAYOUT_INFO = "/api/v1/me/payout-info";
     protected static final String ME_ACCEPT_PROJECT_LEADER_INVITATION = "/api/v1/me/project-leader-invitations/%s";
     protected static final String ME_APPLY_TO_PROJECT = "/api/v1/me/applications";

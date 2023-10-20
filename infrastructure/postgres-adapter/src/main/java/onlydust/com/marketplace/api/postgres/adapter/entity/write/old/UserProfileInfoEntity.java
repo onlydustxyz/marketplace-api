@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,4 +49,8 @@ public class UserProfileInfoEntity {
     @Type(type = "jsonb")
     @Column(name = "languages", columnDefinition = "jsonb")
     Map<String, Integer> languages;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    List<ContactInformationEntity> contactInformations;
 }
