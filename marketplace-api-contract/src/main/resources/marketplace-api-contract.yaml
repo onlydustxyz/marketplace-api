@@ -230,13 +230,65 @@ paths:
       operationId: getMyContributions
       description: |
         Get contributions of the caller.
+      parameters:
+        - in: query
+          name: types
+          description: Contribution type filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionType'
+        - in: query
+          name: projects
+          description: Project filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: repositories
+          description: Repository filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: sort
+          description: Sorting field
+          schema:
+            type: string
+            default: CREATED_AT
+            enum:
+              - CREATED_AT
+              - PROJECT_REPO_NAME
+              - TITLE
+        - in: query
+          name: direction
+          description: Sort direction
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: page
+          description: Page number
+          schema:
+            type: number
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: number
+      
       responses:
         "200":
           description: 'Contribution list'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributionListResponse'
+                $ref: '#/components/schemas/ContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -788,7 +840,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributionListResponse'
+                $ref: '#/components/schemas/ContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1670,6 +1722,16 @@ components:
         visibility:
           $ref: '#/components/schemas/ProjectVisibility'
 
+    ShortProjectResponseWithRepos:
+      allOf:
+        - $ref: '#/components/schemas/ShortProjectResponse'
+        - type: object
+          properties:
+            repos:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubRepoResponse'
+
     ProjectVisibility:
       type: string
       enum:
@@ -1764,8 +1826,6 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
-        #        shortReward:
-        #          $ref: '#/components/schemas/ShortRewardResponse'
         amount:
           $ref: '#/components/schemas/RewardAmountResponse'
         status:
@@ -1806,6 +1866,7 @@ components:
         - CODE_REVIEW
     RewardStatus:
       enum:
+        - PENDING_INVOICE
         - PENDING_SIGNUP
         - PROCESSING
         - COMPLETE
@@ -1843,126 +1904,184 @@ components:
       type: object
       required:
         - type
-      #        - purposeId
       properties:
         type:
           $ref: '#/components/schemas/RewardType'
-    #        purposeId:
-    #          oneOf:
-    #            - $ref: '#/components/schemas/PullRequestId'
-    #            - $ref: '#/components/schemas/IssueId'
-    #            - $ref: '#/components/schemas/CodeReviewId'
 
 
-    PullRequest:
+    GithubPullRequest:
       type: object
+      required:
+        - id
+        - number
+        - title
+        - status
+        - createdAt
+        - htmlUrl
+        - author
+        - repository
+        - commentCount
+        - closingIssues
       properties:
         id:
           $ref: '#/components/schemas/PullRequestId'
         number:
           type: integer
           format: int64
-          description: Pull request number on Github
+          description: Issue number
           example: 6
         title:
           type: string
-        htmlUrl:
-          type: string
+          description: Issue or pull request title on Github
         status:
-          $ref: '#/components/schemas/PullRequestStatus'
-        draft:
-          type: boolean
+          $ref: '#/components/schemas/GithubPullRequestStatus'
         createdAt:
           type: string
           format: date-time
+          description: When the issue was created.
         mergedAt:
           type: string
           format: date-time
+          description: When the pull request was merged.
         closedAt:
           type: string
           format: date-time
+          description: When the issue was cancelled or closed.
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the issue.
+        body:
+          type: string
+          description: The body of the pull request.
         author:
           $ref: '#/components/schemas/UserLinkResponse'
-        repo:
+        repository:
           $ref: '#/components/schemas/GithubRepoResponse'
+        commentCount:
+          type: integer
+        closingIssues:
+          type: array
+          description: The list of issues resolved by this pull request.
+          items:
+            $ref: '#/components/schemas/GithubIssue'
 
-    Issue:
+    GithubIssue:
       type: object
+      description: Github issue
+      required:
+        - id
+        - number
+        - title
+        - status
+        - createdAt
+        - htmlUrl
+        - author
+        - repository
+        - commentCount
+        - closedPullRequests
       properties:
         id:
           $ref: '#/components/schemas/IssueId'
         number:
           type: integer
           format: int64
-          description: Issue number on Github
+          description: Issue number
           example: 6
         title:
           type: string
-        htmlUrl:
-          type: string
+          description: Issue or pull request title on Github
         status:
-          $ref: '#/components/schemas/IssueStatus'
+          $ref: '#/components/schemas/GithubIssueStatus'
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
+          description: When the issue was created.
         closedAt:
           type: string
           format: date-time
-        commentCount:
-          type: integer
+          description: When the issue was cancelled or closed.
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the issue.
+        body:
+          type: string
+          description: The body of the issue.
         author:
           $ref: '#/components/schemas/UserLinkResponse'
-        repo:
+        repository:
           $ref: '#/components/schemas/GithubRepoResponse'
+        commentCount:
+          type: integer
+        closingPullRequests:
+          type: array
+          description: The list of pull requests resolving this issue.
+          items:
+            $ref: '#/components/schemas/GithubPullRequest'
 
-    CodeReview:
+    GithubCodeReview:
       type: object
+      required:
+        - id
+        - pullRequest
+        - state
+        - author
+        - requestedAt
       properties:
         id:
           $ref: '#/components/schemas/CodeReviewId'
-        pullRequestId:
-          $ref: '#/components/schemas/PullRequestId'
-        reviewer:
-          $ref: '#/components/schemas/UserLinkResponse'
-        status:
-          $ref: '#/components/schemas/CodeReviewStatus'
-        outcome:
-          $ref: '#/components/schemas/CodeReviewOutcome'
+        pullRequest:
+          $ref: '#/components/schemas/GithubPullRequest'
+        state:
+          $ref: '#/components/schemas/GithubCodeReviewState'
+        requestedAt:
+          type: string
+          format: date-time
+          description: When the code review was requested.
         submittedAt:
           type: string
           format: date-time
-        repo:
-          $ref: '#/components/schemas/GithubRepoResponse'
+          description: When the code review was submitted.
+        author:
+          $ref: '#/components/schemas/UserLinkResponse'
 
-
-    PullRequestStatus:
+    ContributionType:
       type: string
       enum:
-        - OPEN
-        - MERGED
-        - CLOSED
+        - ISSUE
+        - PULL_REQUEST
+        - CODE_REVIEW
 
-    IssueStatus:
+    GithubIssueStatus:
       type: string
       enum:
         - OPEN
         - COMPLETED
         - CANCELLED
 
-    CodeReviewStatus:
+    GithubPullRequestStatus:
+      type: string
+      enum:
+        - OPEN
+        - CLOSED
+        - MERGED
+
+    GithubCodeReviewState:
       type: string
       enum:
         - PENDING
-        - COMPLETED
+        - COMMENTED
+        - APPROVED
+        - CHANGES_REQUESTED
+        - DISMISSED
 
-    CodeReviewOutcome:
+    ContributionStatus:
       type: string
       enum:
-        - CHANGE_REQUESTED
-        - APPROVED
+        - IN_PROGRESS
+        - COMPLETED
+        - CANCELLED
 
     Currency:
       type: string
@@ -1974,18 +2093,45 @@ components:
         - STARK
         - OP
 
-    ContributionListResponse:
+    ContributionPageResponse:
       type: object
       required:
         - contributions
+        - projects
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
       properties:
         contributions:
           type: array
           items:
-            $ref: '#/components/schemas/ContributionResponse'
+            $ref: '#/components/schemas/ContributionPageItemResponse'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortProjectResponseWithRepos'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
 
-    ContributionResponse:
+    ContributionPageItemResponse:
       type: object
+      required:
+        - id
+        - createdAt
+        - type
+        - status
+        - project
+        - contributor
+        - rewardIds
       properties:
         id:
           type: string
@@ -1993,40 +2139,30 @@ components:
         createdAt:
           type: string
           format: date-time
-        closedAt:
+          description: When the contribution was created
+        completedAt:
           type: string
           format: date-time
-        status:
-          $ref: '#/components/schemas/ContributionStatus'
+          description: When the contribution was completed
         type:
           $ref: '#/components/schemas/ContributionType'
-        #        content:
-        #          oneOf:
-        #            - $ref: '#/components/schemas/Issue'
-        #            - $ref: '#/components/schemas/PullRequest'
-        #            - $ref: '#/components/schemas/CodeReview'
+        status:
+          $ref: '#/components/schemas/ContributionStatus'
+        githubIssue:
+          $ref: '#/components/schemas/GithubIssue'
+        githubPullRequest:
+          $ref: '#/components/schemas/GithubPullRequest'
+        githubCodeReview:
+          $ref: '#/components/schemas/GithubCodeReview'
         project:
           $ref: '#/components/schemas/ShortProjectResponse'
         contributor:
           $ref: '#/components/schemas/UserLinkResponse'
-        linkedRewardCount:
-          type: number
-          description: Number of reward items where the purpose matches the content of this contribution.
-
-
-    ContributionType:
-      type: string
-      enum:
-        - ISSUE
-        - PULL_REQUEST
-        - CODE_REVIEW
-        -
-    ContributionStatus:
-      type: string
-      enum:
-        - IN_PROGRESS
-        - COMPLETED
-        - CANCELLED
+        rewardIds:
+          type: array
+          description: Rewards granted for this contribution
+          items:
+            $ref: '#/components/schemas/RewardId'
 
     GetMeResponse:
       type: object
