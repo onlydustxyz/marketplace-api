@@ -77,7 +77,17 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
         final UUID projectId =
-                projectFacadePort.createProject(CreateProjectCommand.builder().name(createProjectRequest.getName()).shortDescription(createProjectRequest.getShortDescription()).longDescription(createProjectRequest.getLongDescription()).githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads()).githubRepoIds(createProjectRequest.getGithubRepoIds()).isLookingForContributors(createProjectRequest.getIsLookingForContributors()).moreInfos(createProjectRequest.getMoreInfo().stream().map(moreInfo -> CreateProjectCommand.MoreInfo.builder().url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList()).imageUrl(createProjectRequest.getLogoUrl()).build());
+                projectFacadePort.createProject(CreateProjectCommand.builder()
+                        .name(createProjectRequest.getName())
+                        .shortDescription(createProjectRequest.getShortDescription())
+                        .longDescription(createProjectRequest.getLongDescription())
+                        .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                        .githubRepoIds(createProjectRequest.getGithubRepoIds())
+                        .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
+                        .moreInfos(createProjectRequest.getMoreInfo().stream()
+                                .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
+                                        .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
+                        .imageUrl(createProjectRequest.getLogoUrl()).build());
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectId);
