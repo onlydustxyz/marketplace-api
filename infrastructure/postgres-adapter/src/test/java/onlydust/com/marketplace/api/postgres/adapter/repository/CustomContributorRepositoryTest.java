@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository.GET_CONTRIBUTORS_FOR_PROJECT;
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CustomContributorRepositoryTest {
 
     private static final String GET_CONTRIBUTORS_FOR_PROJECT_WITH_DEFAULT_SORT =
-            GET_CONTRIBUTORS_FOR_PROJECT.replace("%order_by%", "login");
+            GET_CONTRIBUTORS_FOR_PROJECT.replace("%order_by%", "login asc");
 
     @Test
     void should_build_query_given_a_pagination() {
@@ -19,7 +20,7 @@ public class CustomContributorRepositoryTest {
         int pageSize = 50;
 
         // When
-        final String query = buildQuery(null, pageIndex, pageSize);
+        final String query = buildQuery(null, null, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT_WITH_DEFAULT_SORT.replace("%offset%",
@@ -34,12 +35,12 @@ public class CustomContributorRepositoryTest {
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.contributionCount;
 
         // When
-        final String query = buildQuery(sortBy, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "contribution_count desc")
+                        .replace("%order_by%", "contribution_count desc, login asc")
                 , query);
     }
 
@@ -51,12 +52,12 @@ public class CustomContributorRepositoryTest {
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.earned;
 
         // When
-        final String query = buildQuery(sortBy, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.asc, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "earned desc")
+                        .replace("%order_by%", "earned asc, login asc")
                 , query);
     }
 
@@ -68,12 +69,12 @@ public class CustomContributorRepositoryTest {
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.toRewardCount;
 
         // When
-        final String query = buildQuery(sortBy, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "to_reward_count desc")
+                        .replace("%order_by%", "to_reward_count desc, login asc")
                 , query);
     }
 
@@ -85,12 +86,12 @@ public class CustomContributorRepositoryTest {
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.rewardCount;
 
         // When
-        final String query = buildQuery(sortBy, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.asc, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "reward_count desc")
+                        .replace("%order_by%", "reward_count asc, login asc")
                 , query);
     }
 
@@ -103,12 +104,12 @@ public class CustomContributorRepositoryTest {
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
 
         // When
-        final String query = buildQuery(sortBy, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
 
         // Then
         assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
                                 Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "login")
+                        .replace("%order_by%", "login desc")
                 , query);
     }
 

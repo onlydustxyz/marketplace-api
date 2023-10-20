@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
@@ -86,15 +87,16 @@ public class CustomContributorRepository {
             """;
     private final EntityManager entityManager;
 
-    static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy,
+    static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy, SortDirection sortDirection,
                                        int pageIndex, int pageSize) {
+        final String direction = Optional.ofNullable(sortDirection).map(SortDirection::name).orElse("asc");
         final String sortValue = Optional.ofNullable(sortBy).map(sort -> switch (sortBy) {
-            case login -> "login";
-            case earned -> "earned desc";
-            case contributionCount -> "contribution_count desc";
-            case rewardCount -> "reward_count desc";
-            case toRewardCount -> "to_reward_count desc";
-        }).orElse("login");
+            case login -> "login " + direction;
+            case earned -> "earned " + direction + ", login asc";
+            case contributionCount -> "contribution_count " + direction + ", login asc";
+            case rewardCount -> "reward_count " + direction + ", login asc";
+            case toRewardCount -> "to_reward_count " + direction + ", login asc";
+        }).orElse("login " + direction);
         return GET_CONTRIBUTORS_FOR_PROJECT
                 .replace("%offset%",
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex).toString())
@@ -120,8 +122,9 @@ public class CustomContributorRepository {
 
     public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId,
                                                                               ProjectContributorsLinkView.SortBy sortBy,
+                                                                              SortDirection sortDirection,
                                                                               int pageIndex, int pageSize) {
-        return entityManager.createNativeQuery(buildQuery(sortBy, pageIndex, pageSize),
+        return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection, pageIndex, pageSize),
                         ProjectContributorViewEntity.class)
                 .setParameter("projectId", projectId)
                 .getResultList();

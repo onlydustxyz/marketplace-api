@@ -33,10 +33,12 @@ public interface ProjectStoragePort {
     List<Contributor> searchContributorsByLogin(UUID projectId, String login);
 
     Page<ProjectContributorsLinkView> findContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
+                                                       SortDirection sortDirection,
                                                        int pageIndex, int pageSize);
 
     Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
                                                                      ProjectContributorsLinkView.SortBy sortBy,
+                                                                     SortDirection sortDirection,
                                                                      int pageIndex, int pageSize);
 
     List<UUID> getProjectLeadIds(UUID projectId);
