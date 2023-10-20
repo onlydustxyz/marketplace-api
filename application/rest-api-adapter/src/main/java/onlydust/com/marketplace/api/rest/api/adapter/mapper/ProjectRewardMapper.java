@@ -5,6 +5,8 @@ import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import java.util.Objects;
+
 public interface ProjectRewardMapper {
 
     static RewardsPageResponse mapProjectRewardPageToResponse(Integer pageIndex, Page<ProjectRewardView> page) {
@@ -51,12 +53,12 @@ public interface ProjectRewardMapper {
 
 
     static ProjectRewardView.SortBy getSortBy(String sort) {
-        final ProjectRewardView.SortBy sortBy = switch (sort) {
+        sort = Objects.isNull(sort) ? "" : sort;
+        return switch (sort) {
             case "AMOUNT" -> ProjectRewardView.SortBy.amount;
-            case "SENT_AT" -> ProjectRewardView.SortBy.sentAt;
+            case "CONTRIBUTOR" -> ProjectRewardView.SortBy.contributor;
             case "STATUS" -> ProjectRewardView.SortBy.status;
-            default -> ProjectRewardView.SortBy.contributor;
+            default -> ProjectRewardView.SortBy.requestedAt;
         };
-        return sortBy;
     }
 }

@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
@@ -161,11 +162,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, int pageIndex,
+    public Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
+                                               SortDirection sortDirection, int pageIndex,
                                                int pageSize) {
         final Integer count = customProjectRewardRepository.getCount(projectId);
         final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
-                        sortBy, pageIndex, pageSize)
+                        sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
         return Page.<ProjectRewardView>builder()

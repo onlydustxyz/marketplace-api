@@ -710,7 +710,7 @@ paths:
             $ref: '#/components/schemas/ProjectId'
       responses:
         "200":
-          description: 'List of rewards'
+          description: 'List of budgets'
           content:
             application/json:
               schema:
@@ -744,12 +744,18 @@ paths:
           name: sort
           description: Sort order
           schema:
-            type: string
             enum:
-              - SENT_AT
+              - REQUESTED_AT
               - CONTRIBUTOR
               - AMOUNT
               - STATUS
+        - in: query
+          name: direction
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
         - in: query
           name: page_index
           required: true

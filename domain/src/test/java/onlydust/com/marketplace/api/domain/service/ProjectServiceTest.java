@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -164,14 +165,15 @@ public class ProjectServiceTest {
         final UUID projectLeadId = UUID.randomUUID();
         final int pageIndex = 1;
         final int pageSize = 1;
+        final SortDirection sortDirection = SortDirection.desc;
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewards(projectId, projectLeadId, pageIndex, pageSize, sortBy);
+        projectService.getRewards(projectId, projectLeadId, pageIndex, pageSize, sortBy, sortDirection);
 
         // Then
-        verify(projectStoragePort, times(1)).findRewards(projectId, sortBy, pageIndex, pageSize);
+        verify(projectStoragePort, times(1)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
     }
 
     @Test
@@ -184,19 +186,20 @@ public class ProjectServiceTest {
         final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contributor;
         final int pageIndex = 1;
         final int pageSize = 1;
+        final SortDirection sortDirection = SortDirection.asc;
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID()));
         OnlyDustException onlyDustException = null;
         try {
-            projectService.getRewards(projectId, UUID.randomUUID(), pageIndex, pageSize, sortBy);
+            projectService.getRewards(projectId, UUID.randomUUID(), pageIndex, pageSize, sortBy, sortDirection);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findRewards(projectId, sortBy, pageIndex, pageSize);
+        verify(projectStoragePort, times(0)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());

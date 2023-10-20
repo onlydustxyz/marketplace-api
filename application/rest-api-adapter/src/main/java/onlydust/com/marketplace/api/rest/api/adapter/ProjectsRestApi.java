@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,7 +115,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 authenticationService.tryGetAuthenticatedUser().map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy, user.getId(), pageIndex, sanitizedPageSize)).orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy, pageIndex, sanitizedPageSize));
         final ContributorsPageResponse contributorsPageResponse =
                 mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
-                pageIndex);
+                        pageIndex);
         return contributorsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
                 ResponseEntity.ok(contributorsPageResponse);
@@ -122,12 +123,12 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 String sort) {
+                                                                 String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
         Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), pageIndex,
-                sanitizedPageSize, sortBy);
+                sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
         final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(pageIndex, page);
 

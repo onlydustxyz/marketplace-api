@@ -33,6 +33,6 @@ public class ProjectRewardView {
     }
 
     public enum SortBy {
-        sentAt, status, contributor, amount
+        requestedAt, status, contributor, amount
     }
 }

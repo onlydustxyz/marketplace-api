@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,5 +41,6 @@ public interface ProjectStoragePort {
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
-    Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, int pageIndex, int pageSize);
+    Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+                                        int pageIndex, int pageSize);
 }

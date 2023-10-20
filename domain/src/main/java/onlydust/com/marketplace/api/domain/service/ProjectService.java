@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -91,9 +92,9 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<ProjectRewardView> getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize
-            , ProjectRewardView.SortBy sortBy) {
+            , ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findRewards(projectId, sortBy, pageIndex, pageSize);
+            return projectStoragePort.findRewards(projectId, sortBy,sortDirection, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
         }
