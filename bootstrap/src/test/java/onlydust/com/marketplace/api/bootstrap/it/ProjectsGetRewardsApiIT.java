@@ -216,7 +216,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 25,
                         "rewardedUserLogin": "PierreOucif",
@@ -229,7 +229,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 1,
                         "rewardedUserLogin": "PierreOucif",
@@ -251,7 +251,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 25,
                         "rewardedUserLogin": "PierreOucif",
@@ -264,7 +264,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 25,
                         "rewardedUserLogin": "PierreOucif",
@@ -277,7 +277,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 25,
                         "rewardedUserLogin": "PierreOucif",
@@ -290,7 +290,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "amount": {
                             "total": 1000,
                             "currency": "USD",
-                            "dollarsEquivalent": null
+                            "dollarsEquivalent": 1000000
                         },
                         "numberOfRewardedContributions": 25,
                         "rewardedUserLogin": "PierreOucif",
@@ -314,7 +314,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 1,
                          "rewardedUserLogin": "PierreOucif",
@@ -327,7 +327,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 25,
                          "rewardedUserLogin": "PierreOucif",
@@ -340,7 +340,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 25,
                          "rewardedUserLogin": "PierreOucif",
@@ -353,7 +353,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 25,
                          "rewardedUserLogin": "PierreOucif",
@@ -366,7 +366,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 25,
                          "rewardedUserLogin": "PierreOucif",
@@ -379,7 +379,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          "amount": {
                              "total": 1000,
                              "currency": "USD",
-                             "dollarsEquivalent": null
+                             "dollarsEquivalent": 1000000
                          },
                          "numberOfRewardedContributions": 25,
                          "rewardedUserLogin": "PierreOucif",
