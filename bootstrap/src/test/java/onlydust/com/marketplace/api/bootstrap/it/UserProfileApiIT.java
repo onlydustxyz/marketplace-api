@@ -14,7 +14,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @ActiveProfiles({"hasura_auth"})
-public class UsersApiIT extends AbstractMarketplaceApiIT {
+public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_ANTHONY_PROFILE_WITHOUT_CONTACTS_JSON_RESPONSE = """
             {

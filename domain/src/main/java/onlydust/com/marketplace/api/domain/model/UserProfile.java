@@ -1,0 +1,26 @@
+package onlydust.com.marketplace.api.domain.model;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Data
+@Builder(toBuilder = true)
+@ToString
+public class UserProfile {
+    private String location;
+    private String bio;
+    private String website;
+    @Builder.Default
+    private Map<String, Integer> technologies = new HashMap<>();
+    private UserProfileCover cover;
+    @Builder.Default
+    private List<Contact> contacts = new ArrayList<>();
+    private UserAllocatedTimeToContribute allocatedTimeToContribute;
+    private Boolean isLookingForAJob;
+}

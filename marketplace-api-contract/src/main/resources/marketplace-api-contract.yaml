@@ -1182,6 +1182,9 @@ components:
             $ref: '#/components/schemas/ContactInformation'
         allocatedTimeToContribute:
           $ref: '#/components/schemas/AllocatedTime'
+        isLookingForAJob:
+          type: boolean
+          description: Whether the user is looking for a job or not
 
     UserProfileCoverColor:
       type: string

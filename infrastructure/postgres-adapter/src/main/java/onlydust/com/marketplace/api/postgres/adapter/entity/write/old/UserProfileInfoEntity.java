@@ -51,6 +51,6 @@ public class UserProfileInfoEntity {
     Map<String, Integer> languages;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
 }

@@ -24,6 +24,7 @@ public interface UserMapper {
                 .contacts(contactToDomain(userProfileRequest.getContacts()))
                 .technologies(userProfileRequest.getTechnologies())
                 .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
+                .isLookingForAJob(userProfileRequest.getIsLookingForAJob())
                 .build();
     }
 
