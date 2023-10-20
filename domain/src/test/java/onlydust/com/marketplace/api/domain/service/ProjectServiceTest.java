@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
@@ -8,6 +9,8 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -127,11 +130,11 @@ public class ProjectServiceTest {
         verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
     }
 
-     @Test
+    @Test
     void should_check_project_lead_permissions_when_getting_project_contributors_given_a_valid_project_lead() {
         // Given
-         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-         final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService);
         final UUID projectId = UUID.randomUUID();
@@ -141,8 +144,8 @@ public class ProjectServiceTest {
         final int pageSize = 1;
 
         // When
-         when(projectStoragePort.getProjectLeadIds(projectId))
-                 .thenReturn(List.of(UUID.randomUUID(),projectLeadId));
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
         projectService.getContributorsForProjectLeadId(projectId, sortBy, projectLeadId, pageIndex, pageSize);
 
         // Then
@@ -151,4 +154,54 @@ public class ProjectServiceTest {
     }
 
 
+    @Test
+    void should_check_project_lead_permissions_when_getting_project_rewards_given_a_valid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contributor;
+        final UUID projectLeadId = UUID.randomUUID();
+        final int pageIndex = 1;
+        final int pageSize = 1;
+        final SortDirection sortDirection = SortDirection.desc;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+        projectService.getRewards(projectId, projectLeadId, pageIndex, pageSize, sortBy, sortDirection);
+
+        // Then
+        verify(projectStoragePort, times(1)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_getting_project_rewards_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contributor;
+        final int pageIndex = 1;
+        final int pageSize = 1;
+        final SortDirection sortDirection = SortDirection.asc;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.getRewards(projectId, UUID.randomUUID(), pageIndex, pageSize, sortBy, sortDirection);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());
+    }
 }

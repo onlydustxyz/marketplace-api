@@ -3,10 +3,12 @@ package onlydust.com.marketplace.api.domain.port.output;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,4 +40,7 @@ public interface ProjectStoragePort {
                                                                      int pageIndex, int pageSize);
 
     List<UUID> getProjectLeadIds(UUID projectId);
+
+    Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+                                        int pageIndex, int pageSize);
 }

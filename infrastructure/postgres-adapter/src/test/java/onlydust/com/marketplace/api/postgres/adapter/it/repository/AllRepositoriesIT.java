@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
+import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -168,15 +169,17 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         assertIsSaved(expected, authUserRepository);
     }
 
-    // TODO : manage jsonb
-//    @Test
+    @Test
     void should_create_payment() {
         // Given
         final PaymentEntity expected = PaymentEntity.builder()
                 .id(UUID.randomUUID())
                 .amount(BigDecimal.valueOf(faker.number().randomNumber()))
                 .currencyCode(faker.programmingLanguage().creator())
-                .receipt(faker.programmingLanguage().name())
+                .receipt(JacksonUtil.toJsonNode("""
+                        {
+                        "test": true
+                        }"""))
                 .processedAt(new Date())
                 .requestId(UUID.randomUUID())
                 .build();

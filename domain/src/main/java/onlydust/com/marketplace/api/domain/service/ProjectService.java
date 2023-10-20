@@ -1,16 +1,19 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -84,6 +87,16 @@ public class ProjectService implements ProjectFacadePort {
             return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
         } else {
             return projectStoragePort.findContributors(projectId, sortBy, pageIndex, pageSize);
+        }
+    }
+
+    @Override
+    public Page<ProjectRewardView> getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize
+            , ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.findRewards(projectId, sortBy,sortDirection, pageIndex, pageSize);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
         }
     }
 }

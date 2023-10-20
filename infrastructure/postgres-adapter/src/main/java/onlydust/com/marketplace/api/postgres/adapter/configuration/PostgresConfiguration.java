@@ -57,7 +57,8 @@ public class PostgresConfiguration {
                                                          final CustomRepoRepository customRepoRepository,
                                                          final CustomProjectListRepository customProjectListRepository,
                                                          final CustomUserRepository customUserRepository,
-                                                         final ProjectLeadViewRepository projectLeadViewRepository) {
+                                                         final ProjectLeadViewRepository projectLeadViewRepository,
+                                                         final CustomProjectRewardRepository customProjectRewardRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -67,7 +68,8 @@ public class PostgresConfiguration {
                 customRepoRepository,
                 customUserRepository,
                 customProjectListRepository,
-                projectLeadViewRepository);
+                projectLeadViewRepository,
+                customProjectRewardRepository);
     }
 
     @Bean
@@ -105,5 +107,10 @@ public class PostgresConfiguration {
                 applicationRepository,
                 projectIdRepository,
                 userProfileInfoRepository);
+    }
+
+    @Bean
+    public CustomProjectRewardRepository customProjectRewardRepository(final EntityManager entityManager) {
+        return new CustomProjectRewardRepository(entityManager);
     }
 }

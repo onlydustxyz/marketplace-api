@@ -9,8 +9,10 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
@@ -18,6 +20,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
@@ -42,6 +45,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomUserRepository customUserRepository;
     private final CustomProjectListRepository customProjectListRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
+    private final CustomProjectRewardRepository customProjectRewardRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -154,5 +158,22 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         return projectLeadViewRepository.findAllByProjectId(projectId).stream()
                 .map(ProjectLeadViewEntity::getUserId)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
+                                               SortDirection sortDirection, int pageIndex,
+                                               int pageSize) {
+        final Integer count = customProjectRewardRepository.getCount(projectId);
+        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
+                        sortBy, sortDirection, pageIndex, pageSize)
+                .stream().map(ProjectRewardMapper::mapEntityToDomain)
+                .toList();
+        return Page.<ProjectRewardView>builder()
+                .content(projectRewardViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
     }
 }
