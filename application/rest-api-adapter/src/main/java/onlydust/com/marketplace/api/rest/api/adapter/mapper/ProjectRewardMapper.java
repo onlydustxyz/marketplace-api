@@ -14,6 +14,7 @@ public interface ProjectRewardMapper {
         rewardsPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
         rewardsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         rewardsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
+        rewardsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex,page.getTotalPageNumber()));
         page.getContent().stream()
                 .map(ProjectRewardMapper::mapProjectRewardViewToResponse)
                 .forEach(rewardsPageResponse::addRewardsItem);

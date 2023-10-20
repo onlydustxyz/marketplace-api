@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +28,9 @@ public class PaymentEntity {
     BigDecimal amount;
     @Column(name = "currency_code", nullable = false)
     String currencyCode;
-    @Column(name = "receipt", nullable = false)
-    String receipt;
+    @Column(name = "receipt", nullable = false, columnDefinition = "jsonb")
+    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    JsonNode receipt;
     @Column(name = "request_id", nullable = false)
     UUID requestId;
     @Column(name = "processed_at", nullable = false)

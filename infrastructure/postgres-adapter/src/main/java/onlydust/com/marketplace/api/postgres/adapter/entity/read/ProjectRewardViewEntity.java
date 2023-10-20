@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -16,6 +13,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
@@ -39,8 +37,8 @@ public class ProjectRewardViewEntity {
     CurrencyEnumEntity currency;
     @Column(name = "contribution_count")
     Integer contributionCount;
-    @Column(name = "dollar_equivalent")
-    BigDecimal dollarEquivalent;
+    @Column(name = "dollars_equivalent")
+    BigDecimal dollarsEquivalent;
     @Column(name = "status")
     String status;
 }

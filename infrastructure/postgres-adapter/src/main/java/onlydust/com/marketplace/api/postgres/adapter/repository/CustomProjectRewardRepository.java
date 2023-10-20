@@ -27,11 +27,11 @@ public class CustomProjectRewardRepository {
                 select pr.requested_at,
                    gu.login,
                    gu.avatar_url,
-                   au.id,
+                   pr.id,
                    pr.amount,
                    pr.currency,
                    (select count(id) from work_items wi where wi.payment_id = pr.id) contribution_count,
-                   cuq.price * pr.amount                                             dollars_equivalent,
+                   coalesce(cuq.price, pr.amount) * pr.amount                                dollars_equivalent,
                    case
                        when au.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
