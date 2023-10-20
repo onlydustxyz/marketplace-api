@@ -29,6 +29,7 @@ public interface ProjectContributorsMapper {
         contributorPageResponse.setContributors(page.getContent().stream()
                 .map(ProjectContributorsMapper::mapProjectContributorsLinkViewToResponse).toList());
         contributorPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
+        contributorPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
         return contributorPageResponse;
     }
 

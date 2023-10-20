@@ -38,9 +38,12 @@ public class PaginationHelperTest {
     }
 
     @Test
-    void should_has_more() {
+    void should_has_more_and_next_page() {
         assertEquals(false, PaginationHelper.hasMore(0, 1));
+        assertEquals(0, PaginationHelper.nextPageIndex(0, 1));
         assertEquals(false, PaginationHelper.hasMore(1, 2));
+        assertEquals(1, PaginationHelper.nextPageIndex(1, 2));
         assertEquals(true, PaginationHelper.hasMore(0, 2));
+        assertEquals(1, PaginationHelper.nextPageIndex(0, 2));
     }
 }
