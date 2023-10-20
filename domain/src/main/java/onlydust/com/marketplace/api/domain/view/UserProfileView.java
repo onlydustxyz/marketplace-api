@@ -1,9 +1,10 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
+import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -27,23 +28,21 @@ public class UserProfileView {
     String telegram;
     String discord;
     Map<String, Integer> technologies;
-    Cover cover;
+    UserProfileCover cover;
     ProfileStats profileStats;
+    UserAllocatedTimeToContribute allocatedTimeToContribute;
+    Boolean isLookingForAJob;
     @Builder.Default
     Set<ProjectStats> projectsStats = new HashSet<>();
     @Builder.Default
-    Set<ContactInformation> contactInformations = new HashSet<>();
+    Set<Contact> contacts = new HashSet<>();
 
-    public void addContactInformation(final ContactInformation contactInformation) {
-        this.contactInformations.add(contactInformation);
+    public void addContactInformation(final Contact contact) {
+        this.contacts.add(contact);
     }
 
     public void addProjectStats(final ProjectStats projectStats) {
         this.projectsStats.add(projectStats);
-    }
-
-    public enum Cover {
-        MAGENTA, CYAN, BLUE, YELLOW
     }
 
     @Data
@@ -83,21 +82,4 @@ public class UserProfileView {
             Integer pullRequestCount;
         }
     }
-
-    @Data
-    @Builder
-    public static class ContactInformation {
-        String channel;
-        String contact;
-        Visibility visibility;
-
-        @AllArgsConstructor
-        @Getter
-        public enum Visibility {
-            PRIVATE("private"), PUBLIC("public");
-            final String value;
-        }
-    }
-
-
 }

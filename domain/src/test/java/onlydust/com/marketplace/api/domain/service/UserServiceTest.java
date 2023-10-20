@@ -2,15 +2,14 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -161,5 +160,47 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, times(1)).createApplicationOnProject(userId, projectId);
+    }
+
+    @Test
+    void should_update_profile() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+
+        final UserProfile profile = UserProfile.builder()
+                .bio(faker.lorem().sentence())
+                .website(faker.internet().url())
+                .location(faker.address().city())
+                .cover(UserProfileCover.CYAN)
+                .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(), faker.programmingLanguage().name(), faker.number().randomDigit()))
+                .contacts(List.of(
+                        Contact.builder()
+                                .contact(faker.internet().url())
+                                .channel(Contact.Channel.WHATSAPP)
+                                .visibility(Contact.Visibility.PUBLIC)
+                                .build(),
+                        Contact.builder()
+                                .contact(faker.internet().emailAddress())
+                                .channel(Contact.Channel.EMAIL)
+                                .visibility(Contact.Visibility.PRIVATE)
+                                .build()
+                ))
+                .build();
+
+        final UserProfileView userProfileView = UserProfileView.builder()
+                .id(userId)
+                .bio(profile.getBio())
+                .build();
+
+        // When
+        when(userStoragePort.getProfileById(userId))
+                .thenReturn(userProfileView);
+        final UserProfileView updatedUser = userService.updateProfile(userId, profile);
+
+        // Then
+        verify(userStoragePort, times(1)).saveProfile(userId, profile);
+        assertThat(updatedUser.getBio()).isEqualTo(userProfileView.getBio());
     }
 }

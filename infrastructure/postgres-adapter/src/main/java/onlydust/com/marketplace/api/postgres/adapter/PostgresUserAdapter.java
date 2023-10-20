@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserProfile;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
@@ -42,6 +43,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectLeadRepository projectLeadRepository;
     private final ApplicationRepository applicationRepository;
     private final ProjectIdRepository projectIdRepository;
+    private final UserProfileInfoRepository userProfileInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -85,6 +87,12 @@ public class PostgresUserAdapter implements UserStoragePort {
                 })
                 .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", userId)));
 
+    }
+
+    @Override
+    @Transactional
+    public void saveProfile(UUID userId, UserProfile userProfile) {
+        userProfileInfoRepository.save(UserMapper.mapUserProfileToEntity(userId, userProfile));
     }
 
     @Override

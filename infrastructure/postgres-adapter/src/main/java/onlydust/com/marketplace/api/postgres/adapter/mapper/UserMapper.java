@@ -1,18 +1,26 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public interface UserMapper {
@@ -44,10 +52,10 @@ public interface UserMapper {
                 .avatarUrl(user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
-                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                        && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
+                        && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
-                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                        && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 
@@ -59,10 +67,10 @@ public interface UserMapper {
                 .avatarUrl(user.getAvatarUrl())
                 .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) : List.of(UserRole.USER))
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
-                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                        && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
+                        && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
-                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                        && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 
@@ -74,5 +82,59 @@ public interface UserMapper {
                 .githubAvatarUrl(user.getAvatarUrl())
                 .roles(user.getRoles() != null ? user.getRoles().toArray(UserRole[]::new) : new UserRole[0])
                 .build();
+    }
+
+    static UserProfileInfoEntity mapUserProfileToEntity(UUID userId, UserProfile userProfile) {
+        return UserProfileInfoEntity.builder()
+                .bio(userProfile.getBio())
+                .location(userProfile.getLocation())
+                .website(userProfile.getWebsite())
+                .cover(mapCoverToEntity(userProfile.getCover()))
+                .contactInformations(mapContactInformationsToEntity(userId, userProfile.getContacts()))
+                .languages(userProfile.getTechnologies())
+                .allocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
+                .isLookingForAJob(userProfile.getIsLookingForAJob())
+                .id(userId)
+                .build();
+    }
+
+    static AllocatedTimeEnumEntity mapAllocatedTimeToEntity(UserAllocatedTimeToContribute allocatedTimeToContribute) {
+        return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
+            case NONE -> AllocatedTimeEnumEntity.none;
+            case LESS_THAN_ONE_DAY -> AllocatedTimeEnumEntity.less_than_one_day;
+            case ONE_TO_THREE_DAYS -> AllocatedTimeEnumEntity.one_to_three_days;
+            case GREATER_THAN_THREE_DAYS -> AllocatedTimeEnumEntity.greater_than_three_days;
+        };
+    }
+
+    static List<ContactInformationEntity> mapContactInformationsToEntity(UUID userId, List<Contact> contacts) {
+        return contacts.stream().map(contact -> ContactInformationEntity.builder()
+                .id(ContactInformationIdEntity.builder()
+                        .userId(userId)
+                        .channel(switch (contact.getChannel()) {
+                            case EMAIL -> ContactChanelEnumEntity.email;
+                            case TELEGRAM -> ContactChanelEnumEntity.telegram;
+                            case TWITTER -> ContactChanelEnumEntity.twitter;
+                            case DISCORD -> ContactChanelEnumEntity.discord;
+                            case LINKEDIN -> ContactChanelEnumEntity.linkedin;
+                            case WHATSAPP -> ContactChanelEnumEntity.whatsapp;
+                        })
+                        .build())
+                .contact(contact.getContact())
+                .isPublic(switch (contact.getVisibility()) {
+                    case PRIVATE -> false;
+                    case PUBLIC -> true;
+                })
+                .build()
+        ).collect(Collectors.toList());
+    }
+
+    static ProfileCoverEnumEntity mapCoverToEntity(UserProfileCover cover) {
+        return isNull(cover) ? null : switch (cover) {
+            case MAGENTA -> ProfileCoverEnumEntity.magenta;
+            case CYAN -> ProfileCoverEnumEntity.cyan;
+            case BLUE -> ProfileCoverEnumEntity.blue;
+            case YELLOW -> ProfileCoverEnumEntity.yellow;
+        };
     }
 }

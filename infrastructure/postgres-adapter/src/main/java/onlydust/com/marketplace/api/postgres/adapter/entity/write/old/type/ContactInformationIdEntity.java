@@ -22,9 +22,9 @@ import java.util.UUID;
 @Embeddable
 @TypeDef(name = "contact_channel", typeClass = PostgreSQLEnumType.class)
 public class ContactInformationIdEntity implements Serializable {
-    @Column(name = "user_id")
+    @Column(name = "user_id", updatable = false, nullable = false)
     UUID userId;
-    @Column(name = "channel")
+    @Column(name = "channel", updatable = false, nullable = false)
     @Enumerated(EnumType.STRING)
     @Type(type = "contact_channel")
     ContactChanelEnumEntity channel;

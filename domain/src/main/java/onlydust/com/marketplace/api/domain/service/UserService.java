@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
@@ -38,6 +35,12 @@ public class UserService implements UserFacadePort {
 
     @Override
     public UserProfileView getProfileById(UUID userId) {
+        return userStoragePort.getProfileById(userId);
+    }
+
+    @Override
+    public UserProfileView updateProfile(UUID userId, UserProfile userProfile) {
+        userStoragePort.saveProfile(userId, userProfile);
         return userStoragePort.getProfileById(userId);
     }
 
