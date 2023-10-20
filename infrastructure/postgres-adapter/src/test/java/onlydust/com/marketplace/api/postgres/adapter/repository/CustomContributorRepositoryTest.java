@@ -15,48 +15,36 @@ public class CustomContributorRepositoryTest {
 
     @Test
     void should_build_query_given_a_pagination() {
-        // Given
-        int pageIndex = 2;
-        int pageSize = 50;
-
         // When
-        final String query = buildQuery(null, null, pageIndex, pageSize);
+        final String query = buildQuery(null, null);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT_WITH_DEFAULT_SORT.replace("%offset%",
-                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize)), query);
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT_WITH_DEFAULT_SORT, query);
     }
 
     @Test
     void should_build_query_given_a_sort_by_contribution_count() {
         // Given
-        int pageIndex = 3;
-        int pageSize = 55;
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.contributionCount;
 
         // When
-        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
-                                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
-                        .replace("%order_by%", "contribution_count desc, login asc")
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%order_by%", "contribution_count desc, login asc")
                 , query);
     }
 
     @Test
     void should_build_query_given_a_sort_by_earned() {
         // Given
-        int pageIndex = 3;
-        int pageSize = 55;
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.earned;
 
         // When
-        final String query = buildQuery(sortBy, SortDirection.asc, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.asc);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
-                                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT
                         .replace("%order_by%", "earned asc, login asc")
                 , query);
     }
@@ -64,16 +52,13 @@ public class CustomContributorRepositoryTest {
     @Test
     void should_build_query_given_a_sort_by_to_reward_count() {
         // Given
-        int pageIndex = 3;
-        int pageSize = 55;
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.toRewardCount;
 
         // When
-        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
-                                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT
                         .replace("%order_by%", "to_reward_count desc, login asc")
                 , query);
     }
@@ -81,34 +66,27 @@ public class CustomContributorRepositoryTest {
     @Test
     void should_build_query_given_a_sort_by_reward_count() {
         // Given
-        int pageIndex = 3;
-        int pageSize = 55;
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.rewardCount;
 
         // When
-        final String query = buildQuery(sortBy, SortDirection.asc, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.asc);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
-                                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT
                         .replace("%order_by%", "reward_count asc, login asc")
                 , query);
     }
 
     @Test
     void should_build_query_given_a_sort_by_login() {
-
         // Given
-        int pageIndex = 3;
-        int pageSize = 55;
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
 
         // When
-        final String query = buildQuery(sortBy, SortDirection.desc, pageIndex, pageSize);
+        final String query = buildQuery(sortBy, SortDirection.desc);
 
         // Then
-        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT.replace("%offset%",
-                                Integer.toString(pageSize * pageIndex)).replace("%limit%", Integer.toString(pageSize))
+        assertEquals(GET_CONTRIBUTORS_FOR_PROJECT
                         .replace("%order_by%", "login desc")
                 , query);
     }
