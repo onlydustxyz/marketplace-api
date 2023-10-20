@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -52,4 +53,17 @@ public class ProjectEntity {
             inverseJoinColumns = @JoinColumn(name = "sponsor_id")
     )
     List<SponsorEntity> sponsors;
+
+    public Project toModel() {
+        return Project.builder()
+                .id(id)
+                .name(name)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .moreInfoUrl(telegramLink)
+                .logoUrl(logoUrl)
+                .hiring(hiring)
+                .slug(key)
+                .build();
+    }
 }

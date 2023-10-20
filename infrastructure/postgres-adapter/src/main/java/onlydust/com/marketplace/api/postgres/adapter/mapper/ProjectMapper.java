@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
@@ -67,5 +69,18 @@ public interface ProjectMapper {
             }
         }
         throw new IllegalArgumentException("Could not map project visibility");
+    }
+
+    static Project mapShortProjectViewToProject(ShortProjectViewEntity project) {
+        return Project.builder()
+                .id(project.getId())
+                .slug(project.getKey())
+                .name(project.getName())
+                .shortDescription(project.getShortDescription())
+                .longDescription(project.getLongDescription())
+                .logoUrl(project.getLogoUrl())
+                .hiring(project.getHiring())
+                .visibility(projectVisibilityToDomain(project.getVisibility()))
+                .build();
     }
 }

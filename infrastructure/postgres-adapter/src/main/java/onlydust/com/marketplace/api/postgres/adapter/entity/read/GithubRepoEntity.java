@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 @EqualsAndHashCode
@@ -24,4 +22,11 @@ public class GithubRepoEntity {
     String Description;
     Long starsCount;
     Long forksCount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "project_github_repos",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "github_repo_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id"))
+    ProjectEntity project;
 }
