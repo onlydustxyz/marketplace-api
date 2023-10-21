@@ -30,13 +30,13 @@ public class CustomProjectRewardRepository {
                    pr.id,
                    pr.amount,
                    pr.currency,
-                   (select count(id) from work_items wi where wi.payment_id = pr.id) contribution_count,
-                   coalesce(cuq.price, pr.amount) * pr.amount                                dollars_equivalent,
+                   (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
+                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
                    case
                        when au.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
                        else 'PROCESSING'
-                       end                                                           status
+                       end                                          status
             from payment_requests pr
                      join github_users gu on gu.id = pr.recipient_id
                      left join public.auth_users au on gu.id = au.github_user_id

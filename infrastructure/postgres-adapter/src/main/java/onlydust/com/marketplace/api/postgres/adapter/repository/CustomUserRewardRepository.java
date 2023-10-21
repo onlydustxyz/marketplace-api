@@ -30,8 +30,8 @@ public class CustomUserRewardRepository {
                    pr.id,
                    pr.amount,
                    pr.currency,
-                   (select count(id) from work_items wi where wi.payment_id = pr.id) contribution_count,
-                   cuq.price * pr.amount                                             dollars_equivalent,
+                   (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
+                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
                    case
                        when pr.invoice_received_at is null then 'PENDING_INVOICE'
                        when r.id is not null then 'COMPLETE'
