@@ -207,14 +207,41 @@ paths:
       summary: Get caller's rewards
       operationId: getMyRewards
       description: |
-        Get the list of all rewards where the recipient is the caller
+        Get the page of all rewards where the recipient is the caller
+      parameters:
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            enum:
+              - REQUESTED_AT
+              - CONTRIBUTION
+              - AMOUNT
+              - STATUS
+        - in: query
+          name: direction
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: page_index
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: page_size
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
-          description: 'List of rewards'
+          description: 'Page of rewards'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardsPageResponse'
+                $ref: '#/components/schemas/MyRewardsPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -753,7 +780,7 @@ paths:
           schema:
             enum:
               - REQUESTED_AT
-              - CONTRIBUTOR
+              - CONTRIBUTION
               - AMOUNT
               - STATUS
         - in: query
@@ -1827,6 +1854,30 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+    MyRewardsPageResponse:
+      type: object
+      required:
+        - rewards
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyRewardPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
     RewardResponse:
       type: object
       required:
@@ -1850,6 +1901,8 @@ components:
         - numberOfRewardedContributions
         - rewardedUserLogin
         - rewardedUserAvatar
+        - amount
+        - requestedAt
         - id
       properties:
         requestedAt:
@@ -1869,6 +1922,36 @@ components:
         rewardedUserAvatar:
           type: string
           example: https://avatars.githubusercontent.com/u/16590657?v=4
+        id:
+          $ref: '#/components/schemas/RewardId'
+    MyRewardPageItemResponse:
+      type: object
+      required:
+        - requestedAt
+        - status
+        - numberOfRewardedContributions
+        - amount
+        - rewardedOnProjectName
+        - rewardedOnProjectLogoUrl
+        - id
+      properties:
+        requestedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        amount:
+          $ref: '#/components/schemas/RewardAmountResponse'
+        numberOfRewardedContributions:
+          type: integer
+          example: 11
+        rewardedOnProjectName:
+          type: string
+          example: Bretzel
+        rewardedOnProjectLogoUrl:
+          type: string
+          example: https://onlydust.xyz/cdn-cgi/image/width=100/https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png
         id:
           $ref: '#/components/schemas/RewardId'
     RewardType:

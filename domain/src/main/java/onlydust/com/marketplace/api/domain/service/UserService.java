@@ -5,7 +5,10 @@ import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.List;
 import java.util.UUID;
@@ -67,5 +70,11 @@ public class UserService implements UserFacadePort {
     @Override
     public void applyOnProject(UUID userId, UUID projectId) {
         userStoragePort.createApplicationOnProject(userId, projectId);
+    }
+
+    @Override
+    public Page<UserRewardView> getRewardsForUserId(UUID userId, int pageIndex, int pageSize,
+                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+        return userStoragePort.findRewardsForUserId(userId, pageIndex, pageSize, sortBy, sortDirection);
     }
 }

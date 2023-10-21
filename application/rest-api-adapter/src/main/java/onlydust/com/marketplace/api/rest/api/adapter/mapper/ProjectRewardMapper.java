@@ -57,7 +57,7 @@ public interface ProjectRewardMapper {
         sort = Objects.isNull(sort) ? "" : sort;
         return switch (sort) {
             case "AMOUNT" -> ProjectRewardView.SortBy.amount;
-            case "CONTRIBUTOR" -> ProjectRewardView.SortBy.contributor;
+            case "CONTRIBUTION" -> ProjectRewardView.SortBy.contribution;
             case "STATUS" -> ProjectRewardView.SortBy.status;
             default -> ProjectRewardView.SortBy.requestedAt;
         };

@@ -66,7 +66,7 @@ public class CustomProjectRewardRepository {
         sortBy = isNull(sortBy) ? ProjectRewardView.SortBy.requestedAt : sortBy;
         final String sort = switch (sortBy) {
             case amount -> "dollars_equivalent " + sortDirection.name() + ", requested_at desc";
-            case contributor -> "login " + sortDirection.name();
+            case contribution -> "contribution_count " + sortDirection.name() + ", requested_at desc";
             case status -> "status " + sortDirection.name() + ", requested_at desc";
             default -> "requested_at " + sortDirection.name();
         };

@@ -27,7 +27,21 @@ public class PaginationHelperTest {
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
 
         // Then
-        assertEquals(100, sanitizedPageSize);
+        assertEquals(1000, sanitizedPageSize);
+    }
+
+    @Test
+    void should_sanitize_page_index() {
+        // Then
+        assertEquals(0, PaginationHelper.sanitizePageIndex(null));
+        assertEquals(0, PaginationHelper.sanitizePageIndex(0));
+        assertEquals(1, PaginationHelper.sanitizePageIndex(1));
+    }
+
+    @Test
+    void should_sanitize_page_size() {
+        // Then
+        assertEquals(50,PaginationHelper.sanitizePageSize(null));
     }
 
     @Test

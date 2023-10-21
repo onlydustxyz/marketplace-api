@@ -167,7 +167,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService);
         final UUID projectId = UUID.randomUUID();
-        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contributor;
+        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final UUID projectLeadId = UUID.randomUUID();
         final int pageIndex = 1;
         final int pageSize = 1;
@@ -189,7 +189,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService);
         final UUID projectId = UUID.randomUUID();
-        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contributor;
+        final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final int pageIndex = 1;
         final int pageSize = 1;
         final SortDirection sortDirection = SortDirection.asc;

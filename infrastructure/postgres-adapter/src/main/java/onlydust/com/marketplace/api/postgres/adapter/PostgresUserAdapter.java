@@ -7,6 +7,10 @@ import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
@@ -16,14 +20,13 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,6 +47,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ApplicationRepository applicationRepository;
     private final ProjectIdRepository projectIdRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
+    private final CustomUserRewardRepository customUserRewardRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -138,7 +142,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project leader invitation not found for project %s and user %d", projectId, githubUserId)));
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project leader invitation not found for project" +
+                                                                     " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("User with githubId %d not found", githubUserId)));
@@ -154,7 +159,8 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
-                            throw OnlyDustException.invalidInput(format("Application already exists for project %s and user %s", projectId, userId));
+                            throw OnlyDustException.invalidInput(format("Application already exists for project %s " +
+                                                                        "and user %s", projectId, userId));
                         },
                         () -> applicationRepository.save(ApplicationEntity.builder()
                                 .applicantId(userId)
@@ -170,5 +176,21 @@ public class PostgresUserAdapter implements UserStoragePort {
         final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
                 userPayoutInformation);
         userPayoutInfoRepository.save(userPayoutInfoEntity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserRewardView> findRewardsForUserId(UUID userId, int pageIndex, int pageSize,
+                                                     UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+        final Integer count = customUserRewardRepository.getCount(userId);
+        final List<UserRewardView> userRewardViews = customUserRewardRepository.getViewEntities(userId,
+                        sortBy, sortDirection, pageIndex, pageSize)
+                .stream().map(UserRewardMapper::mapEntityToDomain)
+                .toList();
+        return Page.<UserRewardView>builder()
+                .content(userRewardViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
     }
 }
