@@ -25,7 +25,7 @@ public class ProjectBudgetsViewTest {
                 .build();
 
         // Then
-        assertEquals(BigDecimal.valueOf(4000.0), projectBudgetsView.getTotalDollarsEquivalent());
+        assertEquals(BigDecimal.valueOf(4000.0), projectBudgetsView.getInitialDollarsEquivalent());
         assertEquals(BigDecimal.valueOf(2020.0), projectBudgetsView.getRemainingDollarsEquivalent());
     }
 
@@ -42,7 +42,7 @@ public class ProjectBudgetsViewTest {
                 .build();
 
         // Then
-        assertEquals(BigDecimal.valueOf(16000.0), projectBudgetsView.getTotalDollarsEquivalent());
+        assertEquals(BigDecimal.valueOf(16000.0), projectBudgetsView.getInitialDollarsEquivalent());
         assertEquals(BigDecimal.valueOf(2000.0), projectBudgetsView.getRemainingDollarsEquivalent());
     }
 
@@ -59,16 +59,16 @@ public class ProjectBudgetsViewTest {
                 .build();
 
         // Then
-        assertNull(projectBudgetsView.getTotalDollarsEquivalent());
+        assertNull(projectBudgetsView.getInitialDollarsEquivalent());
         assertNull(projectBudgetsView.getRemainingDollarsEquivalent());
     }
 
     private static BudgetView budgetStub(final Currency currency, final double total, final double remaining,
                                          final Double totalDollarsEquivalent, final Double remainingDollarsEquivalent) {
         return BudgetView.builder()
-                .total(BigDecimal.valueOf(total))
+                .initialAmount(BigDecimal.valueOf(total))
                 .remaining(BigDecimal.valueOf(remaining))
-                .totalDollarsEquivalent(isNull(totalDollarsEquivalent) ? null :
+                .initialDollarsEquivalent(isNull(totalDollarsEquivalent) ? null :
                         BigDecimal.valueOf(totalDollarsEquivalent))
                 .remainingDollarsEquivalent(isNull(remainingDollarsEquivalent) ? null :
                         BigDecimal.valueOf(remainingDollarsEquivalent))

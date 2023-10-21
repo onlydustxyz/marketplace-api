@@ -41,6 +41,33 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     JwtSecret jwtSecret;
 
     @Test
+    @Order(0)
+    void should_return_forbidden_status_when_getting_project_rewards_given_user_not_project_lead() throws JsonProcessingException {
+        // Given
+        final AuthUserEntity pierre = authUserRepository.findByGithubUserId(16590657L).orElseThrow();
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(pierre.getId())
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(pierre.getGithubUserId())
+                        .avatarUrl(pierre.getAvatarUrlAtSignup())
+                        .login(pierre.getLoginAtSignup())
+                        .build())
+                .build());
+        final UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_BUDGETS, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
     @Order(1)
     void should_get_projects_rewards() throws JsonProcessingException {
         // Given

@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -18,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.BudgetMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectRewardMapper;
@@ -46,6 +44,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectListRepository customProjectListRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
+    private final CustomProjectBudgetRepository customProjectBudgetRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -178,6 +177,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .content(projectRewardViews)
                 .totalItemNumber(count)
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ProjectBudgetsView findBudgets(UUID projectId) {
+        return ProjectBudgetsView.builder().budgets(customProjectBudgetRepository.findProjectBudgetByProjectId(projectId)
+                        .stream().map(BudgetMapper::entityToDomain)
+                        .toList())
                 .build();
     }
 }

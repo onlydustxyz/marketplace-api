@@ -2341,7 +2341,7 @@ components:
       required:
         - budgets
       properties:
-        totalDollarsEquivalent:
+        initialDollarsEquivalent:
           type: number
         remainingDollarsEquivalent:
           type: number
@@ -2354,14 +2354,16 @@ components:
       type: object
       required:
         - currency
-        - total
+        - initialAmount
         - remaining
       properties:
         currency:
           $ref: '#/components/schemas/CurrencyContract'
-        total:
+        initialAmount:
           type: number
         remaining:
           type: number
-        dollarsEquivalent:
+        remainingDollarsEquivalent:
+          type: number
+        initialDollarsEquivalent:
           type: number

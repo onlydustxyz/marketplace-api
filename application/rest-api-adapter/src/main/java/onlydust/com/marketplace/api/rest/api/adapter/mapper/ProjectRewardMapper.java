@@ -41,11 +41,11 @@ public interface ProjectRewardMapper {
     static RewardAmountResponse mapRewardAmountToResponse(ProjectRewardView view) {
         final RewardAmountResponse amount = new RewardAmountResponse();
         amount.setCurrency(switch (view.getAmount().getCurrency()) {
-            case Apt -> Currency.APT;
-            case Op -> Currency.OP;
-            case Eth -> Currency.ETH;
-            case Stark -> Currency.STARK;
-            case Usd -> Currency.USD;
+            case Apt -> CurrencyContract.APT;
+            case Op -> CurrencyContract.OP;
+            case Eth -> CurrencyContract.ETH;
+            case Stark -> CurrencyContract.STARK;
+            case Usd -> CurrencyContract.USD;
         });
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());

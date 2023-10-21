@@ -10,8 +10,17 @@ import java.math.BigDecimal;
 @Builder
 public class BudgetView {
     BigDecimal remaining;
-    BigDecimal total;
-    BigDecimal totalDollarsEquivalent;
+    BigDecimal initialAmount;
+    BigDecimal initialDollarsEquivalent;
     BigDecimal remainingDollarsEquivalent;
     Currency currency;
+
+    public BigDecimal getInitialDollarsEquivalent() {
+        return currency.equals(Currency.Usd) ? initialAmount : initialDollarsEquivalent;
+    }
+
+    public BigDecimal getRemainingDollarsEquivalent() {
+        return currency.equals(Currency.Usd) ? remaining : remainingDollarsEquivalent;
+    }
+
 }

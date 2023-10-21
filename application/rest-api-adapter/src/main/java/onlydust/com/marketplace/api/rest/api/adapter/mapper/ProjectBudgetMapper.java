@@ -11,12 +11,14 @@ public interface ProjectBudgetMapper {
     static ProjectBudgetsResponse mapProjectBudgetsViewToResponse(final ProjectBudgetsView projectBudgetsView) {
         final ProjectBudgetsResponse projectBudgetsResponse = new ProjectBudgetsResponse();
         projectBudgetsResponse.setRemainingDollarsEquivalent(projectBudgetsView.getRemainingDollarsEquivalent());
-        projectBudgetsResponse.setTotalDollarsEquivalent(projectBudgetsView.getTotalDollarsEquivalent());
+        projectBudgetsResponse.setInitialDollarsEquivalent(projectBudgetsView.getInitialDollarsEquivalent());
+        projectBudgetsResponse.setRemainingDollarsEquivalent(projectBudgetsView.getRemainingDollarsEquivalent());
         for (BudgetView budget : projectBudgetsView.getBudgets()) {
             projectBudgetsResponse.addBudgetsItem(new BudgetResponse()
                     .remaining(budget.getRemaining())
-                    .total(budget.getTotal())
-                    .dollarsEquivalent(budget.getDollarsEquivalent())
+                    .initialAmount(budget.getInitialAmount())
+                    .initialDollarsEquivalent(budget.getInitialDollarsEquivalent())
+                    .remainingDollarsEquivalent(budget.getRemainingDollarsEquivalent())
                     .currency(switch (budget.getCurrency()) {
                         case Eth -> CurrencyContract.ETH;
                         case Apt -> CurrencyContract.APT;
