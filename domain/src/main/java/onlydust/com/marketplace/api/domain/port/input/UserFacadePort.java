@@ -4,8 +4,9 @@ import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -32,4 +33,6 @@ public interface UserFacadePort {
     Page<UserRewardView> getRewardsForUserId(UUID userId, int pageIndex, int sanitizedPageSize,
                                              UserRewardView.SortBy sortBy,
                                              SortDirection sortDirection);
+
+    UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
 }

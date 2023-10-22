@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
@@ -70,5 +71,27 @@ public class CustomUserRewardRepository {
             default -> "requested_at " + sortDirection.name();
         };
         return FIND_USER_REWARDS_BY_ID.replace("%order_by%", sort);
+    }
+
+
+    private static final String FIND_USER_REWARD_TOTAL_AMOUNTS_BY_USER_ID = """
+            select row_number() over (order by pr.currency) id,
+                   pr.currency,
+                   sum(pr.amount) total,
+                   case
+                       when pr.currency = 'usd' then sum(pr.amount)
+                       else (select price from crypto_usd_quotes cuq where cuq.currency = pr.currency) *
+                            sum(pr.amount) end dollars_equivalent
+            from auth_users au
+                     join payment_requests pr
+                          on pr.recipient_id = au.github_user_id and au.id = :userId
+            group by pr.currency""";
+
+
+    public List<UserRewardTotalAmountEntity> getTotalAmountEntities(UUID userId) {
+        return entityManager.createNativeQuery(FIND_USER_REWARD_TOTAL_AMOUNTS_BY_USER_ID,
+                        UserRewardTotalAmountEntity.class)
+                .setParameter("userId", userId)
+                .getResultList();
     }
 }

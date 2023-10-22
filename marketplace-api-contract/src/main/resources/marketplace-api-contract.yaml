@@ -247,6 +247,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/rewards/amounts:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get caller's rewarded total amounts
+      operationId: getMyRewardTotalAmounts
+      description: |
+        Get caller's rewarded total amounts
+      responses:
+        "200":
+          description: 'My reward total amounts'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyRewardTotalAmountsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/contributions:
     get:
       security:
@@ -2450,3 +2472,26 @@ components:
           type: number
         initialDollarsEquivalent:
           type: number
+
+    MyRewardTotalAmountsResponse:
+      type: object
+      properties:
+        totalAmount:
+          type: number
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyRewardAmountResponse'
+
+    MyRewardAmountResponse:
+      type: object
+      required:
+        - totalAmount
+        - currency
+      properties:
+        totalAmount:
+          type: number
+        totalDollarsEquivalent:
+          type: number
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'

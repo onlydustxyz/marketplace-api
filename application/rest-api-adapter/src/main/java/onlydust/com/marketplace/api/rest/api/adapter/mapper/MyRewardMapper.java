@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -64,5 +66,23 @@ public interface MyRewardMapper {
             case "CONTRIBUTION" -> UserRewardView.SortBy.contribution;
             default -> UserRewardView.SortBy.requestedAt;
         };
+    }
+
+
+    static MyRewardTotalAmountsResponse mapUserRewardTotalAmountsToResponse(final UserRewardTotalAmountsView view) {
+        final MyRewardTotalAmountsResponse myRewardTotalAmountsResponse = new MyRewardTotalAmountsResponse();
+        myRewardTotalAmountsResponse.setTotalAmount(view.getTotalAmount());
+        for (UserTotalRewardView userTotalReward : view.getUserTotalRewards()) {
+            myRewardTotalAmountsResponse.addDetailsItem(new MyRewardAmountResponse().totalAmount(userTotalReward.getTotalAmount())
+                    .totalDollarsEquivalent(userTotalReward.getTotalDollarsEquivalent())
+                    .currency(switch (userTotalReward.getCurrency()) {
+                        case Apt -> CurrencyContract.APT;
+                        case Op -> CurrencyContract.OP;
+                        case Eth -> CurrencyContract.ETH;
+                        case Usd -> CurrencyContract.USD;
+                        case Stark -> CurrencyContract.STARK;
+                    }));
+        }
+        return myRewardTotalAmountsResponse;
     }
 }

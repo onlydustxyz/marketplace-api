@@ -8,10 +8,11 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -106,5 +107,12 @@ public class MeRestApi implements MeApi {
         return myRewardsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ResponseEntity.ok(myRewardsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<MyRewardTotalAmountsResponse> getMyRewardTotalAmounts() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
+                userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
     }
 }
