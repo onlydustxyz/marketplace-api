@@ -4,8 +4,10 @@ import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.service.RewardService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustExceptionRestHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +18,9 @@ public class RestApiConfiguration {
     @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
                                           final ContributorFacadePort contributorFacadePort,
-                                          final AuthenticationService authenticationService) {
-        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService);
+                                          final AuthenticationService authenticationService,
+                                          final RewardService<HasuraJwtPayload> rewardService) {
+        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService);
     }
 
     @Bean
@@ -59,4 +62,5 @@ public class RestApiConfiguration {
     public AppRestApi appRestApi() {
         return new AppRestApi();
     }
+
 }

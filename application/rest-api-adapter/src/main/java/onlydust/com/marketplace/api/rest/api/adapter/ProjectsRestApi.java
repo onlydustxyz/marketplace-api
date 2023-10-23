@@ -10,12 +10,14 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
@@ -48,6 +50,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ProjectFacadePort projectFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final AuthenticationService authenticationService;
+    private final RewardFacadePort<HasuraJwtPayload> rewardFacadePort;
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {

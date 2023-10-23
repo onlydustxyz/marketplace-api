@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -104,5 +105,10 @@ public class DomainConfiguration {
     @Bean
     PermissionService permissionService(final ProjectStoragePort projectStoragePort) {
         return new PermissionService(projectStoragePort);
+    }
+
+    @Bean
+    public RewardService<HasuraJwtPayload> rewardService(final RewardStoragePort<HasuraJwtPayload> rewardStoragePort){
+        return new RewardService<>(rewardStoragePort);
     }
 }
