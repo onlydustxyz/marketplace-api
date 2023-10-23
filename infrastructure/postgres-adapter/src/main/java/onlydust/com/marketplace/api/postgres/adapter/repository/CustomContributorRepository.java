@@ -57,7 +57,7 @@ public class CustomContributorRepository {
                    (select sum(pr.amount)
                     from payment_requests pr
                     where pr.project_id = :projectId
-                      and pr.recipient_id = gu.id)               earned,
+                      and pr.recipient_id = gu.id and pr.currency = 'usd')   earned,
                    (select count(distinct pr.id)
                     from payment_requests pr
                     where pr.project_id = :projectId

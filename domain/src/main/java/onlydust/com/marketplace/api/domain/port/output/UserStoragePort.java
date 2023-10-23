@@ -3,7 +3,11 @@ package onlydust.com.marketplace.api.domain.port.output;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.Date;
 import java.util.Optional;
@@ -27,4 +31,9 @@ public interface UserStoragePort {
     void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
     void createApplicationOnProject(UUID userId, UUID projectId);
+
+    Page<UserRewardView> findRewardsForUserId(UUID userId, int pageIndex, int pageSize, UserRewardView.SortBy sortBy,
+                                              SortDirection sortDirection);
+
+    UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId);
 }

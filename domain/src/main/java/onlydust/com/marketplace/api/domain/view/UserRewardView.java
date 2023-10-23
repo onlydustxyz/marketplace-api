@@ -10,12 +10,12 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ProjectRewardView {
+public class UserRewardView {
     UUID id;
     Integer numberOfRewardedContributions;
     Date requestedAt;
-    String rewardedUserLogin;
-    String rewardedUserAvatar;
+    String rewardedOnProjectName;
+    String rewardedOnProjectLogoUrl;
     RewardStatusView status;
     RewardAmountView amount;
 
@@ -29,7 +29,7 @@ public class ProjectRewardView {
     }
 
     public enum RewardStatusView {
-        pendingSignup, processing, complete
+        pendingInvoice, processing, complete
     }
 
     public enum SortBy {

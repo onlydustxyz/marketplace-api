@@ -5,6 +5,10 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.UUID;
 
@@ -25,4 +29,10 @@ public interface UserFacadePort {
     void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
 
     void applyOnProject(UUID id, UUID projectId);
+
+    Page<UserRewardView> getRewardsForUserId(UUID userId, int pageIndex, int sanitizedPageSize,
+                                             UserRewardView.SortBy sortBy,
+                                             SortDirection sortDirection);
+
+    UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
 }

@@ -9,12 +9,21 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 
 @RestController
@@ -77,9 +86,33 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<PrivateUserProfileResponse> setMyProfile(UserProfileRequest userProfileRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(), userProfileRequestToDomain(userProfileRequest));
+        final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(),
+                userProfileRequestToDomain(userProfileRequest));
         final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
         return ResponseEntity.ok(userProfileResponse);
     }
 
+    @Override
+    public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize, String sort,
+                                                              String direction) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final UserRewardView.SortBy sortBy = getSortBy(sort);
+        Page<UserRewardView> page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), sanitizedPageIndex,
+                sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
+
+        final MyRewardsPageResponse myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);
+
+        return myRewardsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
+                ResponseEntity.ok(myRewardsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<MyRewardTotalAmountsResponse> getMyRewardTotalAmounts() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
+                userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
+    }
 }

@@ -25,8 +25,8 @@ public class CustomProjectRewardRepositoryTest {
         assertEquals(FIND_PROJECT_REWARDS.replace("%order_by%", "requested_at desc"),
                 buildQuery(ProjectRewardView.SortBy.requestedAt,
                         SortDirection.desc));
-        assertEquals(FIND_PROJECT_REWARDS.replace("%order_by%", "login asc"),
-                buildQuery(ProjectRewardView.SortBy.contributor,
+        assertEquals(FIND_PROJECT_REWARDS.replace("%order_by%", "contribution_count asc, requested_at desc"),
+                buildQuery(ProjectRewardView.SortBy.contribution,
                         SortDirection.asc));
         assertEquals(FIND_PROJECT_REWARDS.replace("%order_by%", "dollars_equivalent asc, requested_at desc"),
                 buildQuery(ProjectRewardView.SortBy.amount,
