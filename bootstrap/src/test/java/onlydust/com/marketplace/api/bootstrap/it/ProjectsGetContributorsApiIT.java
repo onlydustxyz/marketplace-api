@@ -1,11 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
+import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -13,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,87 +17,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 @ActiveProfiles({"hasura_auth"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
-
-    @Autowired
-    AuthUserRepository authUserRepository;
-    @Autowired
-    JwtSecret jwtSecret;
-
-    @Test
-    void should_find_project_contributors_as_anonymous_user() {
-        // Given
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isEqualTo(HttpStatus.OK)
-                .expectBody()
-                .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS);
-    }
-
-
-    @Test
-    void should_find_project_with_pagination() {
-        // Given
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
-                .expectBody()
-                .json(GET_PROJECT_CONTRIBUTORS_PAGE_0);
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "1", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
-                .expectBody()
-                .json(GET_PROJECT_CONTRIBUTORS_PAGE_1);
-    }
-
-    @Test
-    void should_find_project_contributors_as_project_lead() throws JsonProcessingException {
-        // Given
-        final AuthUserEntity pierre = authUserRepository.findByGithubUserId(16590657L).orElseThrow();
-        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
-                .iss(jwtSecret.getIssuer())
-                .claims(HasuraJwtPayload.HasuraClaims.builder()
-                        .userId(pierre.getId())
-                        .allowedRoles(List.of("me"))
-                        .githubUserId(pierre.getGithubUserId())
-                        .avatarUrl(pierre.getAvatarUrlAtSignup())
-                        .login(pierre.getLoginAtSignup())
-                        .build())
-                .build());
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD);
-    }
-
 
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_0 = """
             {
@@ -149,7 +63,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     }
                 ]
             }""";
-
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_1 = """
             {
                 "totalPageNumber": 6,
@@ -195,7 +108,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     }
                 ]
             }""";
-
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD = """
             {
                 "totalPageNumber": 1,
@@ -410,7 +322,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 ]
             }
             """;
-
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS = """
             {
                 "totalPageNumber": 1,
@@ -625,4 +536,71 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 ]
             }
             """;
+
+    @Autowired
+    HasuraUserHelper userHelper;
+
+    @Test
+    void should_find_project_contributors_as_anonymous_user() {
+        // Given
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS);
+    }
+
+    @Test
+    void should_find_project_with_pagination() {
+        // Given
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("page_index", "0", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_PAGE_0);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("page_index", "1", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_PAGE_1);
+    }
+
+    @Test
+    void should_find_project_contributors_as_project_lead() throws JsonProcessingException {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD);
+    }
 }
