@@ -926,6 +926,18 @@ paths:
             schema:
               type: string
               format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
       responses:
         "200":
           description: 'Image uploaded'
