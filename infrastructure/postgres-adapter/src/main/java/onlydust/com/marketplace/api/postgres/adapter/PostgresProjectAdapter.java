@@ -42,7 +42,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomRepoRepository customRepoRepository;
     private final CustomUserRepository customUserRepository;
     private final CustomProjectListRepository customProjectListRepository;
-    private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
 
@@ -158,8 +157,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<UUID> getProjectLeadIds(UUID projectId) {
-        return projectLeadViewRepository.findAllByProjectId(projectId).stream()
-                .map(ProjectLeadViewEntity::getUserId)
+        return customProjectRepository.findProjectLeadsForProjectId(projectId)
+                .stream()
+                .map(ProjectLeadViewEntity::getId)
+                .map(ProjectLeadViewEntity.ProjectLeadIdEntity::getUserId)
                 .toList();
     }
 

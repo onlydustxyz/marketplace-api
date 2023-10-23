@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 
 import javax.persistence.EntityManager;
@@ -43,6 +44,10 @@ public class CustomProjectRepository {
                 gu.login ilike '%' || :login ||'%'
             """;
 
+    private static final String FIND_PROJECT_LEADS = """
+            select project_id, user_id from project_leads where project_id = :projectId
+            """;
+
     private final EntityManager entityManager;
 
     public List<SponsorEntity> getProjectSponsors(UUID projectId) {
@@ -70,5 +75,12 @@ public class CustomProjectRepository {
                 .getResultList();
         return budgets.isEmpty() ? null : (BigDecimal) budgets.get(0);
 
+    }
+
+    public List<ProjectLeadViewEntity> findProjectLeadsForProjectId(final UUID projectId) {
+        return entityManager
+                .createNativeQuery(FIND_PROJECT_LEADS, ProjectLeadViewEntity.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
     }
 }

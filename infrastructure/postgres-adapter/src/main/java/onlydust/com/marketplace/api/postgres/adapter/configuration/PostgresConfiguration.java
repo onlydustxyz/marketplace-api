@@ -57,7 +57,6 @@ public class PostgresConfiguration {
                                                          final CustomRepoRepository customRepoRepository,
                                                          final CustomProjectListRepository customProjectListRepository,
                                                          final CustomUserRepository customUserRepository,
-                                                         final ProjectLeadViewRepository projectLeadViewRepository,
                                                          final CustomProjectRewardRepository customProjectRewardRepository,
                                                          final CustomProjectBudgetRepository customProjectBudgetRepository) {
         return new PostgresProjectAdapter(projectRepository,
@@ -69,7 +68,6 @@ public class PostgresConfiguration {
                 customRepoRepository,
                 customUserRepository,
                 customProjectListRepository,
-                projectLeadViewRepository,
                 customProjectRewardRepository,
                 customProjectBudgetRepository);
     }
