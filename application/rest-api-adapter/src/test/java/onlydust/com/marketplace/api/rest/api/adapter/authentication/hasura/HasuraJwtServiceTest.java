@@ -93,7 +93,10 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.getUser().hasSeenOnboardingWizard()).isTrue();
         assertThat(authenticationFromJwt.getUser().hasAcceptedLatestTermsAndConditions()).isTrue();
         assertThat(authenticationFromJwt.isImpersonating()).isFalse();
+        assertThat(authenticationFromJwt.isImpersonating()).isFalse();
         assertThat(authenticationFromJwt.getImpersonator()).isNull();
+        assertThat(((HasuraAuthentication)authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
+        assertThat(((HasuraAuthentication)authenticationFromJwt).getImpersonationHeader()).isNull();
     }
 
 
@@ -101,7 +104,6 @@ public class HasuraJwtServiceTest {
     void should_throw_invalid_jwt_format_exception() {
         // Given
         final UserFacadePort userFacadePort = mock(UserFacadePort.class);
-        final User user = mockUserFacadePort(userFacadePort, false);
         final JwtSecret jwtSecret = JwtSecret.builder().key(faker.cat().name()).issuer(faker.cat().breed()).type(
                 "HS256").build();
         final HasuraJwtService hasuraJwtService = new HasuraJwtService(objectMapper, jwtSecret, userFacadePort);
@@ -222,6 +224,8 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.getUser().getId().toString()).isEqualTo("50aa4318-141a-4027-8f74-c135d8d166b0");
         assertThat(authenticationFromJwt.getUser().getRoles()).containsExactlyInAnyOrder(UserRole.USER);
         assertThat(authenticationFromJwt.getUser().getGithubUserId()).isEqualTo(595505L);
+        assertThat(((HasuraAuthentication)authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
+        assertThat(((HasuraAuthentication)authenticationFromJwt).getImpersonationHeader()).isEqualTo(impersonationHeader);
 
         assertThat(authenticationFromJwt.isImpersonating()).isTrue();
         assertThat(authenticationFromJwt.getImpersonator()).isNotNull();

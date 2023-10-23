@@ -2018,6 +2018,7 @@ components:
       properties:
         recipientId:
           type: integer
+          format: int64
           description: Github user id to reward
         amount:
           type: number

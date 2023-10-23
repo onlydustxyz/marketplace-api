@@ -40,7 +40,8 @@ public class HasuraJwtService implements JwtService {
                 .build());
     }
 
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt,
+                                                                     final String impersonationHeader) {
         final String[] chunks = jwt.split("\\.");
         if (chunks.length != 3) {
             LOGGER.warn("Invalid Jwt format");
@@ -87,7 +88,7 @@ public class HasuraJwtService implements JwtService {
         User user = getUserFromClaims(hasuraJwtPayload.getClaims());
 
         if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
-            return getAuthenticationFromImpersonationHeader(hasuraJwtPayload, user, impersonationHeader);
+            return getAuthenticationFromImpersonationHeader(hasuraJwtPayload, user, impersonationHeader, jwt);
         }
 
         return Optional.of(HasuraAuthentication.builder()
@@ -98,10 +99,12 @@ public class HasuraJwtService implements JwtService {
                 .claims(hasuraJwtPayload.getClaims())
                 .principal(user.getLogin())
                 .impersonating(false)
+                .jwt(jwt)
                 .build());
     }
 
-    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(HasuraJwtPayload hasuraJwtPayload, User impersonator, final String impersonationHeader) {
+    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(HasuraJwtPayload hasuraJwtPayload, User impersonator,
+                                                                                      final String impersonationHeader, final String jwt) {
 
         if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
@@ -128,6 +131,8 @@ public class HasuraJwtService implements JwtService {
                 .principal(impersonated.getLogin())
                 .impersonating(true)
                 .impersonator(impersonator)
+                .jwt(jwt)
+                .impersonationHeader(impersonationHeader)
                 .build());
     }
 }

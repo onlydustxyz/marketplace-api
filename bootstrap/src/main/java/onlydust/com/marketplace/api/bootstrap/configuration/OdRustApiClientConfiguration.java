@@ -2,7 +2,9 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiClientAdapter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,7 +12,18 @@ import org.springframework.context.annotation.Configuration;
 public class OdRustApiClientConfiguration {
 
     @Bean
-    public RewardStoragePort<HasuraJwtPayload> rewardStoragePort() {
-        return new OdRustApiClientAdapter();
+    @ConfigurationProperties(value = "infrastructure.od.api.client")
+    public OdRustApiHttpClient.Properties odRustApiHttpClientProperties() {
+        return new OdRustApiHttpClient.Properties();
+    }
+
+    @Bean
+    public OdRustApiHttpClient odRustApiHttpClient(final OdRustApiHttpClient.Properties odRustApiHttpClientProperties) {
+        return new OdRustApiHttpClient(odRustApiHttpClientProperties);
+    }
+
+    @Bean
+    public RewardStoragePort<HasuraAuthentication> rewardStoragePort(final OdRustApiHttpClient odRustApiHttpClient) {
+        return new OdRustApiClientAdapter(odRustApiHttpClient);
     }
 }

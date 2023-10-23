@@ -17,8 +17,9 @@ import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ProjectFacadePort projectFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final AuthenticationService authenticationService;
-    private final RewardFacadePort<HasuraJwtPayload> rewardFacadePort;
+    private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
@@ -158,6 +159,10 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> createReward(UUID projectId, RewardRequest rewardRequest) {
-        return ProjectsApi.super.createReward(projectId, rewardRequest);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+        rewardFacadePort.requestPayment(hasuraAuthentication, authenticatedUser.getId(),
+                RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
+        return ResponseEntity.ok().build();
     }
 }

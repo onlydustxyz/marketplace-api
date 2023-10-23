@@ -15,7 +15,7 @@ import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,7 +61,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter, final DateProvider dateProvider) {
+    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter,
+                                         final DateProvider dateProvider) {
         return new UserService(postgresUserAdapter, dateProvider);
     }
 
@@ -108,7 +109,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService<HasuraJwtPayload> rewardService(final RewardStoragePort<HasuraJwtPayload> rewardStoragePort){
-        return new RewardService<>(rewardStoragePort);
+    public RewardService<HasuraAuthentication> rewardService(final RewardStoragePort<HasuraAuthentication> rewardStoragePort,
+                                                             final PermissionService permissionService) {
+        return new RewardService<>(rewardStoragePort, permissionService);
     }
 }
