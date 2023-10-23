@@ -152,4 +152,9 @@ public class ProjectsRestApi implements ProjectsApi {
                 authenticatedUser.getId());
         return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
     }
+
+    @Override
+    public ResponseEntity<Void> createReward(UUID projectId, RewardRequest rewardRequest) {
+        return ProjectsApi.super.createReward(projectId, rewardRequest);
+    }
 }

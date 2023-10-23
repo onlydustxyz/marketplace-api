@@ -861,10 +861,6 @@ paths:
       responses:
         "200":
           description: 'Reward'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -2016,9 +2012,13 @@ components:
       type: object
       required:
         - amount
+        - recipientId
         - currency
         - items
       properties:
+        recipientId:
+          type: integer
+          description: Github user id to reward
         amount:
           type: number
           description: Currency amount
@@ -2034,9 +2034,20 @@ components:
       type: object
       required:
         - type
+        - id
+        - number
+        - repoId
       properties:
         type:
           $ref: '#/components/schemas/RewardType'
+        id:
+          type: string
+        number:
+          type: integer
+          format: int64
+        repoId:
+          type: integer
+          format: int64
 
 
     GithubPullRequest:
