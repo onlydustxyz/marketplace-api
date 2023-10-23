@@ -2495,3 +2495,4 @@ components:
           type: number
         currency:
           $ref: '#/components/schemas/CurrencyContract'
+
