@@ -11,6 +11,5 @@ public class AppRestApi {
     public RedirectView redirectRootPathToHealthCheck() {
         return new RedirectView("/actuator/health");
     }
-
-
+    
 }

@@ -4,7 +4,10 @@ import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfi
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+
+import java.util.Date;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -15,4 +18,9 @@ public class MarketplaceApiApplication {
         SpringApplication.run(MarketplaceApiApplication.class, args);
     }
 
+
+    @Bean()
+    public Date startingDate() {
+        return new Date();
+    }
 }

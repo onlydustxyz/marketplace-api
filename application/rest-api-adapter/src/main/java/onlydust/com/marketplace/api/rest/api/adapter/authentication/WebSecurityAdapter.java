@@ -36,6 +36,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/").permitAll()
                 .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/version").permitAll()
                 .anyRequest().authenticated()
                 .and().addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(delegatedAuthenticationEntryPoint);

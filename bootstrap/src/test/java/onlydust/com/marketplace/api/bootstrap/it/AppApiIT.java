@@ -19,4 +19,6 @@ public class AppApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.status", "UP");
     }
+
+
 }

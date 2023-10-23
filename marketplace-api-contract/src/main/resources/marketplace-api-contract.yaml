@@ -4,13 +4,13 @@ info:
   description: OnlyDust Marketplace API
   version: 1.0.0
 servers:
-  - url: 'http://localhost:8000'
+  - url: 'http://localhost:9999'
     description: Local
-  - url: 'https://develop-api.onlydust.xyz'
+  - url: 'https://develop-api.onlydust.com'
     description: Develop
-  - url: 'https://staging-api.onlydust.xyz'
+  - url: 'https://staging-api.onlydust.com'
     description: Staging
-  - url: 'https://api.onlydust.xyz'
+  - url: 'https://api.onlydust.com'
     description: Production
 
 paths:

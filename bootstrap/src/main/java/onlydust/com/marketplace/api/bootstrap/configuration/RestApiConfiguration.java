@@ -10,6 +10,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustException
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Date;
+
 @Configuration
 public class RestApiConfiguration {
 
@@ -31,8 +33,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public VersionRestApi versionRestApi() {
-        return new VersionRestApi();
+    public VersionRestApi versionRestApi(final Date startingDate) {
+        return new VersionRestApi(startingDate);
     }
 
     @Bean
