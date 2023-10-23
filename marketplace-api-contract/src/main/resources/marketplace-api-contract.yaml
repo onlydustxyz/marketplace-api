@@ -632,6 +632,13 @@ paths:
               - EARNED
               - TO_REWARD_COUNT
         - in: query
+          name: direction
+          schema:
+            type: string
+            enum:
+              - ASC
+              - DESC
+        - in: query
           name: page_index
           required: true
           schema:

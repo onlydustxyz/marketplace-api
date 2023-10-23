@@ -122,10 +122,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional(readOnly = true)
     public Page<ProjectContributorsLinkView> findContributors(UUID projectId,
                                                               ProjectContributorsLinkView.SortBy sortBy,
+                                                              SortDirection sortDirection,
                                                               int pageIndex, int pageSize) {
         final Integer count = customContributorRepository.getProjectContributorCount(projectId);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
+                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, sortDirection,
+                                pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
                         .toList();
         return Page.<ProjectContributorsLinkView>builder()
@@ -138,11 +140,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
-                                                                            ProjectContributorsLinkView.SortBy sortBy
-            , int pageIndex, int pageSize) {
+                                                                            ProjectContributorsLinkView.SortBy sortBy,
+                                                                            SortDirection sortDirection,
+                                                                            int pageIndex, int pageSize) {
         final Integer count = customContributorRepository.getProjectContributorCount(projectId);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, pageIndex, pageSize)
+                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, sortDirection,
+                                pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)
                         .toList();
         return Page.<ProjectContributorsLinkView>builder()

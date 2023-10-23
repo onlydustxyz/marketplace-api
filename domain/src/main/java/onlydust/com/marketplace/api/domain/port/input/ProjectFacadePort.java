@@ -31,11 +31,13 @@ public interface ProjectFacadePort {
     URL saveLogoImage(InputStream imageInputStream);
 
     Page<ProjectContributorsLinkView> getContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
+                                                      SortDirection sortDirection,
                                                       Integer pageIndex,
                                                       Integer pageSize);
 
     Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
                                                                       ProjectContributorsLinkView.SortBy sortBy,
+                                                                      SortDirection sortDirection,
                                                                       UUID projectLeadId, Integer pageIndex,
                                                                       Integer pageSize);
 

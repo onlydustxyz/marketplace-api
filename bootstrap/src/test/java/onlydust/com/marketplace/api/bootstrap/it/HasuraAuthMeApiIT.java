@@ -8,8 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepo
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +19,7 @@ import java.util.UUID;
 
 
 @ActiveProfiles({"hasura_auth"})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
 
     Long githubUserId;
@@ -43,6 +43,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(1)
     public void should_be_unauthorized() {
         // When
         client.get()
@@ -54,6 +55,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_get_current_user_given_a_valid_jwt() throws JsonProcessingException {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()
@@ -94,6 +96,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(3)
     void should_get_current_user_with_onboarding_data() throws JsonProcessingException {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()

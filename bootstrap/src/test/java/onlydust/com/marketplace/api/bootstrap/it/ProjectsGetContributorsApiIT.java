@@ -10,6 +10,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS);
     }
@@ -53,22 +54,22 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "3", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("page_index", "0", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PAGE_0);
 
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "1", "page_size", "3", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("page_index", "1", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PAGE_1);
     }

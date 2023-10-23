@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
@@ -75,7 +76,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_0);
 
@@ -86,7 +87,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_1);
     }
@@ -164,7 +165,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .jsonPath("$.rewards[0].id").isEqualTo("5b96ca1e-4ad2-41c1-8819-520b885d9223")
                 .jsonPath("$.rewards[0].status").isEqualTo("PROCESSING")

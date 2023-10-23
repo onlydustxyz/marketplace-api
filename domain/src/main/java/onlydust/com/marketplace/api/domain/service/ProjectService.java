@@ -74,19 +74,22 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public Page<ProjectContributorsLinkView> getContributors(UUID projectId,
                                                              ProjectContributorsLinkView.SortBy sortBy,
+                                                             SortDirection sortDirection,
                                                              Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findContributors(projectId, sortBy, pageIndex, pageSize);
+        return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
     }
 
     @Override
     public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
                                                                              ProjectContributorsLinkView.SortBy sortBy,
+                                                                             SortDirection sortDirection,
                                                                              UUID projectLeadId, Integer pageIndex,
                                                                              Integer pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, pageIndex, pageSize);
+            return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, sortDirection, pageIndex,
+                    pageSize);
         } else {
-            return projectStoragePort.findContributors(projectId, sortBy, pageIndex, pageSize);
+            return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
         }
     }
 
@@ -94,7 +97,7 @@ public class ProjectService implements ProjectFacadePort {
     public Page<ProjectRewardView> getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize
             , ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findRewards(projectId, sortBy,sortDirection, pageIndex, pageSize);
+            return projectStoragePort.findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
         }
