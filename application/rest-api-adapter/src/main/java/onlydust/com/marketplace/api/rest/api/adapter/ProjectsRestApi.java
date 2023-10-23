@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
@@ -32,6 +32,7 @@ import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
@@ -77,17 +78,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
         final UUID projectId =
-                projectFacadePort.createProject(CreateProjectCommand.builder()
-                        .name(createProjectRequest.getName())
-                        .shortDescription(createProjectRequest.getShortDescription())
-                        .longDescription(createProjectRequest.getLongDescription())
-                        .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
-                        .githubRepoIds(createProjectRequest.getGithubRepoIds())
-                        .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
-                        .moreInfos(createProjectRequest.getMoreInfo().stream()
-                                .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
-                                        .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
-                        .imageUrl(createProjectRequest.getLogoUrl()).build());
+                projectFacadePort.createProject(mapCreateProjectCommandToDomain(createProjectRequest));
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectId);
@@ -154,5 +145,11 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.ok(rewardsPageResponse);
     }
 
-
+    @Override
+    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ProjectBudgetsView projectBudgetsView = projectFacadePort.getBudgets(projectId,
+                authenticatedUser.getId());
+        return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
+    }
 }

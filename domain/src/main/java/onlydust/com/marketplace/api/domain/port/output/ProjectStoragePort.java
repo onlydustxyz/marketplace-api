@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.domain.port.output;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -45,4 +42,6 @@ public interface ProjectStoragePort {
 
     Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                         int pageIndex, int pageSize);
+
+    ProjectBudgetsView findBudgets(UUID projectId);
 }

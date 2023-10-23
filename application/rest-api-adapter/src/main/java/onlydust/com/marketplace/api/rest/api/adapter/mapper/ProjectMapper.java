@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -9,6 +10,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public interface ProjectMapper {
+    static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest) {
+        return CreateProjectCommand.builder()
+                .name(createProjectRequest.getName())
+                .shortDescription(createProjectRequest.getShortDescription())
+                .longDescription(createProjectRequest.getLongDescription())
+                .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                .githubRepoIds(createProjectRequest.getGithubRepoIds())
+                .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
+                .moreInfos(createProjectRequest.getMoreInfo().stream()
+                        .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
+                                .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
+                .imageUrl(createProjectRequest.getLogoUrl()).build();
+    }
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
@@ -158,6 +172,7 @@ public interface ProjectMapper {
         }
         return null;
     }
+
 
 
 }

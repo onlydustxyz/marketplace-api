@@ -210,4 +210,50 @@ public class ProjectServiceTest {
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());
     }
+
+
+    @Test
+    void should_check_project_lead_permissions_when_getting_project_budgets_given_a_valid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+        projectService.getBudgets(projectId, projectLeadId);
+
+        // Then
+        verify(projectStoragePort, times(1)).findBudgets(projectId);
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_getting_project_budgets_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService);
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.getBudgets(projectId, UUID.randomUUID());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can read budgets on their projects", onlyDustException.getMessage());
+    }
+
+
 }

@@ -1892,7 +1892,7 @@ components:
         total:
           type: number
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyContract'
         dollarsEquivalent:
           type: number
     RewardRequest:
@@ -1906,7 +1906,7 @@ components:
           type: number
           description: Currency amount
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyContract'
         items:
           type: array
           maxItems: 1
@@ -2096,7 +2096,7 @@ components:
         - COMPLETED
         - CANCELLED
 
-    Currency:
+    CurrencyContract:
       type: string
       description: Currency
       enum:
@@ -2339,13 +2339,11 @@ components:
     ProjectBudgetsResponse:
       type: object
       required:
-        - total
-        - remaining
         - budgets
       properties:
-        total:
+        initialDollarsEquivalent:
           type: number
-        remaining:
+        remainingDollarsEquivalent:
           type: number
         budgets:
           type: array
@@ -2356,14 +2354,16 @@ components:
       type: object
       required:
         - currency
-        - value
+        - initialAmount
         - remaining
       properties:
         currency:
-          $ref: '#/components/schemas/Currency'
-        total:
+          $ref: '#/components/schemas/CurrencyContract'
+        initialAmount:
           type: number
         remaining:
           type: number
-        dollarsEquivalent:
+        remainingDollarsEquivalent:
+          type: number
+        initialDollarsEquivalent:
           type: number

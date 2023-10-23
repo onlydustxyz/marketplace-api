@@ -8,10 +8,7 @@ import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -100,6 +97,15 @@ public class ProjectService implements ProjectFacadePort {
             return projectStoragePort.findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
+        }
+    }
+
+    @Override
+    public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.findBudgets(projectId);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read budgets on their projects");
         }
     }
 }
