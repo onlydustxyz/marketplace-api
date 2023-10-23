@@ -52,7 +52,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
 
     @Override
-    public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
+    public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
         final var project = projectFacadePort.getById(projectId);
         final var projectResponse = mapProjectDetails(project);
         return ResponseEntity.ok(projectResponse);
