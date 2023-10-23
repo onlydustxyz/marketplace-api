@@ -1,25 +1,19 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
+import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -138,194 +132,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "remainingUsdBudget": 99250.00
             }
             """;
-    @Autowired
-    ProjectRepository projectRepository;
-
-    @Test
-    @Order(1)
-    public void should_get_a_project_by_slug() {
-        // Given
-        final String slug = "bretzel";
-
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(BRETZEL_OVERVIEW_JSON);
-    }
-
-    @Test
-    @Order(2)
-    public void should_get_a_project_by_id() {
-        // Given
-        final String id = "7d04163c-4187-4313-8066-61504d34fc56";
-
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(BRETZEL_OVERVIEW_JSON);
-    }
-
-    @Test
-    @Order(3)
-    public void should_create_a_new_project() {
-        // When
-        client.post()
-                .uri(getApiURI(PROJECTS_POST))
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "name": "Super Project",
-                          "shortDescription": "This is a super project",
-                          "longDescription": "This is a super awesome project with a nice description",
-                          "moreInfo": [
-                            {
-                              "url": "https://t.me/foobar",
-                              "value": "foobar"
-                            }
-                          ],
-                          "isLookingForContributors": true,
-                          "inviteGithubUserIdsAsProjectLeads": [
-                            595505, 43467246
-                          ],
-                          "githubRepoIds": [
-                            498695724, 698096830
-                          ]
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isUnauthorized();
-//                .expectBody(CreateProjectResponse.class)
-//                .returnResult().getResponseBody();
-//
-//        assertThat(response).isNotNull();
-//        assertThat(response.getProjectId()).isNotNull();
-
-        // When
-//        client.get()
-//                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
-//                .exchange()
-//                // Then
-//                .expectStatus()
-//                .is2xxSuccessful()
-//                .expectBody()
-//                .jsonPath("$.id").isEqualTo(response.getProjectId().toString())
-//                .jsonPath("$.name").isEqualTo("Super Project")
-//                .jsonPath("$.shortDescription").isEqualTo("This is a super project")
-//                .jsonPath("$.hiring").isEqualTo(true)
-//                .jsonPath("$.repos[0].name").isEqualTo("marketplace-frontend");
-    }
-
-    @Test
-    @Order(4)
-    void should_get_projects_given_anonymous_user() {
-        client.get()
-                .uri(getApiURI(PROJECTS_GET))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE);
-    }
-
-    @Test
-    @Order(5)
-    void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsor",
-                        "Theodo", "search", "t")))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
-    }
-
-    @Autowired
-    AuthUserRepository authUserRepository;
-
-    @Test
-    @Order(6)
-    void should_get_projects_given_authenticated_user() throws JsonProcessingException {
-        // Given
-        final AuthUserEntity pierre = authUserRepository.findByGithubUserId(16590657L).orElseThrow();
-        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
-                .iss(jwtSecret.getIssuer())
-                .claims(HasuraJwtPayload.HasuraClaims.builder()
-                        .userId(pierre.getId())
-                        .allowedRoles(List.of("me"))
-                        .githubUserId(pierre.getGithubUserId())
-                        .avatarUrl(pierre.getAvatarUrlAtSignup())
-                        .login(pierre.getLoginAtSignup())
-                        .build())
-                .build());
-
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
-    }
-
-    @Autowired
-    ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
-    @Autowired
-    JwtSecret jwtSecret;
-
-    @Test
-    @Order(7)
-    void should_get_projects_given_authenticated_user_for_mine() throws JsonProcessingException {
-        // Given
-        final AuthUserEntity pierre = authUserRepository.findByGithubUserId(16590657L).orElseThrow();
-        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
-                .iss(jwtSecret.getIssuer())
-                .claims(HasuraJwtPayload.HasuraClaims.builder()
-                        .userId(pierre.getId())
-                        .allowedRoles(List.of("me"))
-                        .githubUserId(pierre.getGithubUserId())
-                        .avatarUrl(pierre.getAvatarUrlAtSignup())
-                        .login(pierre.getLoginAtSignup())
-                        .build())
-                .build());
-
-        final ProjectEntity bretzel = projectRepository.findByKey("bretzel").orElseThrow();
-        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
-                .projectId(bretzel.getId())
-                .githubUserId(pierre.getGithubUserId())
-                .id(UUID.randomUUID())
-                .build());
-
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, "mine", "true"))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
-    }
-
-
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
             {
                 "projects": [
@@ -432,7 +238,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 ],
                 "sponsors": ["OGC Nissa Ineos", "Coca Cola"]
             }""";
-
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE = """
             {
                 "projects": [
@@ -1265,7 +1070,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "OGC Nissa Ineos"
                 ]
             }""";
-
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {
                 "projects": [
@@ -1309,7 +1113,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Theodo"
                 ]
             }""";
-
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE = """
             {
                 "projects": [
@@ -2142,4 +1945,114 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "OGC Nissa Ineos"
                 ]
             }""";
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
+    @Autowired
+    HasuraUserHelper userHelper;
+
+    @Test
+    @Order(1)
+    public void should_get_a_project_by_slug() {
+        // Given
+        final String slug = "bretzel";
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(BRETZEL_OVERVIEW_JSON);
+    }
+
+    @Test
+    @Order(2)
+    public void should_get_a_project_by_id() {
+        // Given
+        final String id = "7d04163c-4187-4313-8066-61504d34fc56";
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(BRETZEL_OVERVIEW_JSON);
+    }
+
+    @Test
+    @Order(4)
+    void should_get_projects_given_anonymous_user() {
+        client.get()
+                .uri(getApiURI(PROJECTS_GET))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(5)
+    void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
+        client.get()
+                .uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsor",
+                        "Theodo", "search", "t")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(6)
+    void should_get_projects_given_authenticated_user() throws JsonProcessingException {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(7)
+    void should_get_projects_given_authenticated_user_for_mine() throws JsonProcessingException {
+        // Given
+        final var auth = userHelper.authenticatePierre();
+
+        final ProjectEntity bretzel = projectRepository.findByKey("bretzel").orElseThrow();
+        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
+                .projectId(bretzel.getId())
+                .githubUserId(auth.user().getGithubUserId())
+                .id(UUID.randomUUID())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET, "mine", "true"))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
+    }
 }

@@ -1,14 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
+import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -659,7 +656,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
             }""";
 
     @Autowired
-    JwtSecret jwtSecret;
+    HasuraUserHelper userHelper;
+
 
     @Test
     void should_return_a_not_found_error() {
@@ -702,18 +700,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_private_user_profile() throws JsonProcessingException {
         // Given
-        final UUID anthonyId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-
-        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
-                .iss(jwtSecret.getIssuer())
-                .claims(HasuraJwtPayload.HasuraClaims.builder()
-                        .userId(anthonyId)
-                        .allowedRoles(List.of("me"))
-                        .githubUserId(43467246L)
-                        .avatarUrl("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp")
-                        .login("AnthonyBuisset")
-                        .build())
-                .build());
+        final String jwt = userHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
