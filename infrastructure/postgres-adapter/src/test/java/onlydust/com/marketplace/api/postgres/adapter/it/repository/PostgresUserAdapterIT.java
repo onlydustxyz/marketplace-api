@@ -1,7 +1,8 @@
-package onlydust.com.marketplace.api.postgres.adapter;
+package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostgresUserAdapterTest extends AbstractPostgresIT {
+class PostgresUserAdapterIT extends AbstractPostgresIT {
 
     @Autowired
     UserRepository userRepository;
