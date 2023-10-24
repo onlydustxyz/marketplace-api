@@ -33,9 +33,9 @@ public interface RewardMapper {
                 .number(item.getNumber())
                 .repoId(item.getRepoId())
                 .type(switch (item.getType()) {
-                    case issue -> "Issue";
-                    case codeReview -> "CodeReview";
-                    case pullRequest -> "PullRequest";
+                    case issue -> "ISSUE";
+                    case codeReview -> "CODE_REVIEW";
+                    case pullRequest -> "PULL_REQUEST";
                 })
                 .build();
     }

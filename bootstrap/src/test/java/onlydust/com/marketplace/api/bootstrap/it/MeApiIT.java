@@ -63,7 +63,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         client.get()
                 .uri(getApiURI(ME_GET))
@@ -131,7 +131,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -167,7 +167,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -203,7 +203,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -230,7 +230,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -264,7 +264,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
-        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl).jwt();
+        final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "77777777-4444-4444-4444-61504d34fc56";
 
