@@ -28,7 +28,8 @@ public class OdRustApiHttpClient {
                                                     final Optional<String> optionalHasuraImpersonationHeader) {
         try {
             final HttpResponse<byte[]> httpResponse = httpClient.send(builderFromAuthorizations(jwt,
-                            optionalHasuraImpersonationHeader).uri(URI.create("http://api.onlydust.xyz/api/payments"))
+                            optionalHasuraImpersonationHeader).uri(URI.create(properties.getBaseUri() + "/api" +
+                                                                              "/payments"))
                             .POST(
                                     HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(request))).build(),
                     HttpResponse.BodyHandlers.ofByteArray());
@@ -62,6 +63,6 @@ public class OdRustApiHttpClient {
 
     @Data
     public static class Properties {
-        String baseUrl;
+        String baseUri;
     }
 }

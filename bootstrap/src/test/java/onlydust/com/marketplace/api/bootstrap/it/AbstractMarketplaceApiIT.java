@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
@@ -39,7 +40,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @DirtiesContext
 @Import(SwaggerConfiguration.class)
 @EnableWireMock({
-        @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri")
+        @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -49,7 +51,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET = "/api/v1/projects";
     protected static final String PROJECTS_SEARCH_CONTRIBUTORS = "/api/v1/projects/%s/search/contributors";
     protected static final String PROJECTS_GET_CONTRIBUTORS = "/api/v1/projects/%s/contributors";
-    protected static final String PROJECTS_GET_REWARDS = "/api/v1/projects/%s/rewards";
+    protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String ME_GET = "/api/v1/me";
@@ -77,6 +79,9 @@ public class AbstractMarketplaceApiIT {
                     .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
+    @InjectWireMock("rust-api")
+    protected WireMockServer rustApiWireMockServer;
+
     @LocalServerPort
     int port;
     @Autowired
@@ -121,5 +126,7 @@ public class AbstractMarketplaceApiIT {
                 .build()
                 .toUri();
     }
+
+    protected final ObjectMapper objectMapper = new ObjectMapper();
 
 }
