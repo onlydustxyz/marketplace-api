@@ -45,6 +45,8 @@ public interface ProjectContributorsMapper {
         response.setPullRequestToReward(projectContributorsLinkView.getPullRequestsToRewardCount());
         response.setCodeReviewToReward(projectContributorsLinkView.getCodeReviewToRewardCount());
         response.setIssueToReward(projectContributorsLinkView.getIssuesToRewardCount());
+        response.setIsRegistered(isNull(projectContributorsLinkView.getIsRegistered()) ? false :
+                projectContributorsLinkView.getIsRegistered());
         return response;
     }
 }

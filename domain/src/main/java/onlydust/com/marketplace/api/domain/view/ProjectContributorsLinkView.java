@@ -20,6 +20,7 @@ public class ProjectContributorsLinkView implements UserLinkView {
     Integer pullRequestsToRewardCount;
     Integer issuesToRewardCount;
     Integer codeReviewToRewardCount;
+    Boolean isRegistered;
 
     public enum SortBy {
         contributionCount, earned, login, rewardCount, toRewardCount

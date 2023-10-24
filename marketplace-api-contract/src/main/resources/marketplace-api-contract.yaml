@@ -1554,6 +1554,7 @@ components:
         - contributionCount
         - rewardCount
         - earned
+        - isRegistered
       properties:
         githubUserId:
           $ref: '#/components/schemas/GithubUserId'
@@ -1591,6 +1592,8 @@ components:
         codeReviewToReward:
           type: integer
           example: 3
+        isRegistered:
+          type: boolean
 
     SponsorResponse:
       type: object
