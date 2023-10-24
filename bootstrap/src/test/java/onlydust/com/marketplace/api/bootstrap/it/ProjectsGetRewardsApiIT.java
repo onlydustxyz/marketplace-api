@@ -249,7 +249,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDS, projectId), Map.of("page_index", "0", "page_size",
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("page_index", "0", "page_size",
                         "10000", "sort", "AMOUNT", "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -260,7 +260,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE);
 
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDS, projectId), Map.of("page_index", "0", "page_size",
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("page_index", "0", "page_size",
                         "4", "sort", "REQUESTED_AT", "direction", "ASC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -271,7 +271,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_0);
 
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDS, projectId), Map.of("page_index", "1", "page_size",
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("page_index", "1", "page_size",
                         "4", "sort", "REQUESTED_AT", "direction", "ASC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -332,7 +332,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDS, projectId), Map.of("page_index", "0", "page_size",
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("page_index", "0", "page_size",
                         "20", "sort", "AMOUNT", "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()

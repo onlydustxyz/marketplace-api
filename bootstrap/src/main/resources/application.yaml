@@ -68,3 +68,7 @@ infrastructure:
   github:
     personal-access-token: ${GITHUB_PAT}
     base-uri: ${GITHUB_BASE_URL}
+  od:
+    api:
+      client:
+        base-uri: ${RUST_API_BASE_URL}

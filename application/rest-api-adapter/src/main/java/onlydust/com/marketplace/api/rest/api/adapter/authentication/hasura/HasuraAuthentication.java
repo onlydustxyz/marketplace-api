@@ -18,6 +18,8 @@ public class HasuraAuthentication implements OnlyDustAuthentication {
     String principal;
     @Builder.Default
     Boolean isAuthenticated = false;
+    String jwt;
+    String impersonationHeader;
 
     User impersonator;
     boolean impersonating;

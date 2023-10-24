@@ -5,6 +5,8 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -94,5 +96,48 @@ public class AuthenticationServiceTest {
         assertEquals("Unauthorized non-authenticated user", onlydustException.getMessage());
     }
 
+    @Test
+    void should_return_hasura_authentication() {
+        // Given
+        final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
+        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
+        final HasuraAuthentication authentication = HasuraAuthentication.builder()
+                .isAuthenticated(true)
+                .claims(HasuraJwtPayload.HasuraClaims.builder().userId(UUID.randomUUID()).build())
+                .jwt(faker.name().name())
+                .impersonationHeader(faker.rickAndMorty().character())
+                .build();
 
+        // When
+        when(authenticationContext.getAuthenticationFromContext())
+                .thenReturn(authentication);
+        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+
+        // Then
+        assertEquals(authentication, hasuraAuthentication);
+    }
+
+    @Test
+    void should_throw_forbidden_exception_given_user_not_authenticate_with_hasura() {
+        // Given
+        final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
+        final AuthenticationService authenticationService = new AuthenticationService(authenticationContext);
+
+        // When
+        when(authenticationContext.getAuthenticationFromContext())
+                .thenReturn(HasuraAuthentication.builder()
+                        .build());
+
+        OnlyDustException onlydustException = null;
+        try {
+            authenticationService.getHasuraAuthentication();
+        } catch (OnlyDustException e) {
+            onlydustException = e;
+        }
+
+        // Then
+        assertNotNull(onlydustException);
+        assertEquals(403, onlydustException.getStatus());
+        assertEquals("User must be authenticated with hasura-auth", onlydustException.getMessage());
+    }
 }

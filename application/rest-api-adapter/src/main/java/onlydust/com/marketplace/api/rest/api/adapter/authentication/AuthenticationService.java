@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -24,15 +25,18 @@ public class AuthenticationService {
     public User getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
-            final OnlyDustException unauthorized = OnlyDustException.unauthorized(format("Unauthorized anonymous user %s", authentication));
+            final OnlyDustException unauthorized = OnlyDustException.unauthorized(format("Unauthorized anonymous user" +
+                                                                                         " %s", authentication));
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!authentication.isAuthenticated()) {
-            final OnlyDustException unauthorized = OnlyDustException.unauthorized("Unauthorized non-authenticated user");
+            final OnlyDustException unauthorized = OnlyDustException.unauthorized("Unauthorized non-authenticated " +
+                                                                                  "user");
             LOGGER.warn(unauthorized.toString());
             throw unauthorized;
         } else if (!(authentication instanceof OnlyDustAuthentication)) {
-            final OnlyDustException internalError = OnlyDustException.internalServerError(format("Expected an OnlyDustAuthentication, got %s", authentication.getClass()));
+            final OnlyDustException internalError = OnlyDustException.internalServerError(format("Expected an " +
+                                                                                                 "OnlyDustAuthentication, got %s", authentication.getClass()));
             LOGGER.error(internalError.toString());
             throw internalError;
         }
@@ -50,5 +54,15 @@ public class AuthenticationService {
             return Optional.of(((OnlyDustAuthentication) authentication).getUser());
         }
         return Optional.empty();
+    }
+
+    @Deprecated
+    public HasuraAuthentication getHasuraAuthentication() {
+        final Authentication authentication = authenticationContext.getAuthenticationFromContext();
+        if (authentication.isAuthenticated() && authentication instanceof HasuraAuthentication) {
+            return (HasuraAuthentication) authentication;
+        } else {
+            throw OnlyDustException.forbidden("User must be authenticated with hasura-auth");
+        }
     }
 }
