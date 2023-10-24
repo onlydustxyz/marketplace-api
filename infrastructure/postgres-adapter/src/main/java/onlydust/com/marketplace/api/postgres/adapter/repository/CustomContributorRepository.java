@@ -54,7 +54,7 @@ public class CustomContributorRepository {
                       and user_id = gu.id
                       and c.status = 'complete')                 contribution_count,
                    au.id is not null is_registered,
-                   (select sum(pr.amount)
+                   (select coalesce(sum(pr.amount),0)
                     from payment_requests pr
                     where pr.project_id = :projectId
                       and pr.recipient_id = gu.id and pr.currency = 'usd')   earned,
