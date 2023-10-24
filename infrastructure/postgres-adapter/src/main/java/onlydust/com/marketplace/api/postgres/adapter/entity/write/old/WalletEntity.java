@@ -21,11 +21,10 @@ public class WalletEntity {
 
     @EmbeddedId
     WalletIdEntity id;
-    @Column(name = "address",nullable = false)
+    @Column(name = "address", nullable = false)
     String address;
-    @Column(name = "type",nullable = false)
+    @Column(name = "type", nullable = false)
     @Type(type = "wallet_type")
     @Enumerated(EnumType.STRING)
     WalletTypeEnumEntity type;
-
 }

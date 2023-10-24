@@ -48,4 +48,10 @@ public class UserPayoutInfoEntity {
     public void addWallets(final WalletEntity walletEntity) {
         this.wallets.add(walletEntity);
     }
+
+    public void removeWallets(final WalletEntity walletEntity) {
+        if (this.wallets.contains(walletEntity)) {
+            this.wallets.remove(walletEntity);
+        }
+    }
 }

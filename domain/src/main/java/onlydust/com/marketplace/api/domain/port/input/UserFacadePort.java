@@ -35,4 +35,6 @@ public interface UserFacadePort {
                                              SortDirection sortDirection);
 
     UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
+
+    UserPayoutInformation updatePayoutInformation(UUID userId, UserPayoutInformation userPayoutInformation);
 }

@@ -54,6 +54,11 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    public UserPayoutInformation updatePayoutInformation(UUID userId, UserPayoutInformation userPayoutInformation) {
+        return userStoragePort.savePayoutInformationForUserId(userId, userPayoutInformation);
+    }
+
+    @Override
     public void markUserAsOnboarded(UUID userId) {
         userStoragePort.updateOnboardingWizardDisplayDate(userId, dateProvider.now());
     }

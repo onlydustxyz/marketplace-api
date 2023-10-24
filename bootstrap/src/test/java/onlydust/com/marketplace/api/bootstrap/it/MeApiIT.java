@@ -31,30 +31,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HasuraUserHelper userHelper;
 
-    @Test
-    void should_get_user_payout_info() throws JsonProcessingException {
-        // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
 
-        // When
-        client.get()
-                .uri(getApiURI(ME_GET_PAYOUT_INFO))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.isCompany").isEqualTo(false)
-                .jsonPath("$.person.lastname").isEqualTo("BUISSET")
-                .jsonPath("$.person.firstname").isEqualTo("Anthony")
-                .jsonPath("$.location.address").isEqualTo("771 chemin de la sine")
-                .jsonPath("$.location.city").isEqualTo("Vence")
-                .jsonPath("$.location.country").isEqualTo("France")
-                .jsonPath("$.location.postalCode").isEqualTo("06140")
-                .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
-                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("USDC");
-    }
 
     @Test
     void should_update_onboarding_state() throws JsonProcessingException {

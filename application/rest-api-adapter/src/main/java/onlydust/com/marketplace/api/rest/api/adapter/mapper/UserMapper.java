@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface UserMapper {
@@ -231,9 +232,9 @@ public interface UserMapper {
         if (Objects.nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
             switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
                 case FIAT ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.SEPA);
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.FIAT);
                 case CRYPTO ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.USDC);
+                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.CRYPTO);
             }
         }
         userPayoutInformation.setPayoutSettings(payoutSettings);
@@ -243,6 +244,63 @@ public interface UserMapper {
         location.setCountry(view.getLocation().getCountry());
         location.setPostalCode(view.getLocation().getPostalCode());
         userPayoutInformation.setLocation(location);
+        return userPayoutInformation;
+    }
+
+    static UserPayoutInformation userPayoutInformationToDomain(final UserPayoutInformationContract contract) {
+        UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder().build();
+        final Boolean isCompany = contract.getIsCompany();
+        if (isCompany) {
+            userPayoutInformation = userPayoutInformation.toBuilder().company(UserPayoutInformation.Company.builder()
+                            .identificationNumber(contract.getCompany().getIdentificationNumber())
+                            .name(contract.getCompany().getName())
+                            .owner(UserPayoutInformation.Person.builder()
+                                    .lastName(contract.getCompany().getOwner().getLastname())
+                                    .firstName(contract.getCompany().getOwner().getFirstname())
+                                    .build())
+                            .build())
+                    .build();
+        } else {
+            userPayoutInformation = userPayoutInformation.toBuilder().person(
+                            UserPayoutInformation.Person.builder()
+                                    .lastName(contract.getPerson().getLastname())
+                                    .firstName(contract.getPerson().getFirstname())
+                                    .build())
+                    .build();
+        }
+        userPayoutInformation = userPayoutInformation.toBuilder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .starknetAddress(contract.getPayoutSettings().getStarknetAddress())
+                        .aptosAddress(contract.getPayoutSettings().getAptosAddress())
+                        .optimismAddress(contract.getPayoutSettings().getOptimismAddress())
+                        .ethAddress(contract.getPayoutSettings().getEthAddress())
+                        .ethName(contract.getPayoutSettings().getEthName())
+                        .usdPreferredMethodEnum(switch (contract.getPayoutSettings().getUsdPreferredMethod()) {
+                            case FIAT -> UserPayoutInformation.UsdPreferredMethodEnum.FIAT;
+                            case CRYPTO -> UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO;
+                        })
+                        .build())
+                .build();
+        if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
+            userPayoutInformation = userPayoutInformation.toBuilder()
+                    .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
+                            .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                                    .bic(contract.getPayoutSettings().getSepaAccount().getBic())
+                                    .iban(contract.getPayoutSettings().getSepaAccount().getIban())
+                                    .build())
+                            .build())
+                    .build();
+        }
+        userPayoutInformation = userPayoutInformation.toBuilder()
+                .location(
+                        UserPayoutInformation.Location.builder()
+                                .address(contract.getLocation().getAddress())
+                                .country(contract.getLocation().getCountry())
+                                .city(contract.getLocation().getCity())
+                                .postalCode(contract.getLocation().getPostalCode())
+                                .build()
+                )
+                .build();
         return userPayoutInformation;
     }
 }
