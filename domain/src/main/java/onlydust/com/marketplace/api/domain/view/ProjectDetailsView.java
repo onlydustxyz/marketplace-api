@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
 import java.math.BigDecimal;
@@ -28,6 +29,8 @@ public class ProjectDetailsView {
     Set<SponsorView> sponsors = new HashSet<>();
     @Builder.Default
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
+    @Builder.Default
+    Set<ProjectLeaderLinkView> invitedLeaders = new HashSet<>();
     @Builder.Default
     Map<String, Integer> technologies = new HashMap<>();
     BigDecimal remainingUsdBudget;

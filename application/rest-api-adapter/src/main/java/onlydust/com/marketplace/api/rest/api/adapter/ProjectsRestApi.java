@@ -73,7 +73,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                        sponsors, search, sortBy, user.getId(), isNull(mine) ? false : mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
+                        sponsors, search, sortBy, user.getId(), !isNull(mine) && mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
     }
 

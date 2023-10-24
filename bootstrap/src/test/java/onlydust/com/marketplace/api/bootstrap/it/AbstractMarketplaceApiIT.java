@@ -56,6 +56,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
+    protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String ME_PATCH = "/api/v1/me";
     protected static final String ME_GET_PROFILE = "/api/v1/me/profile";

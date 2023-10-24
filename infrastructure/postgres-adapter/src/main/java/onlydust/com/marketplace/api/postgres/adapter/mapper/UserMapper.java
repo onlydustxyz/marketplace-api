@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
@@ -34,7 +35,7 @@ public interface UserMapper {
                 .build();
     }
 
-    static ProjectLeaderLinkView mapToProjectLeaderLinkView(RegisteredUserViewEntity user) {
+    static ProjectLeaderLinkView mapToProjectLeaderLinkView(ProjectLeadViewEntity user) {
         return ProjectLeaderLinkView.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubId())
@@ -52,10 +53,10 @@ public interface UserMapper {
                 .avatarUrl(user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
-                        && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
-                        && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
+                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
-                        && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 
@@ -65,12 +66,13 @@ public interface UserMapper {
                 .githubUserId(user.getGithubId())
                 .login(user.getLogin())
                 .avatarUrl(user.getAvatarUrl())
-                .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) : List.of(UserRole.USER))
+                .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) :
+                        List.of(UserRole.USER))
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
-                        && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
-                        && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                                                     && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
+                                                     && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
-                        && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                                         && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .build();
     }
 

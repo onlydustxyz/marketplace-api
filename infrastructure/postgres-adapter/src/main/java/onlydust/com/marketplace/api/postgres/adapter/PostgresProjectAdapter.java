@@ -41,6 +41,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectListRepository customProjectListRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
+    private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
 
     @Override
@@ -62,7 +63,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
         final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
-        final var leaders = customUserRepository.findProjectLeaders(projectEntity.getId());
+        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectEntity.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectEntity.getId());
         // TODO : migrate to multi-token
         final BigDecimal remainingUsdBudget = customProjectRepository.getUSDBudget(projectEntity.getId());
@@ -165,10 +166,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<UUID> getProjectLeadIds(UUID projectId) {
-        return customProjectRepository.findProjectLeadsForProjectId(projectId)
+        return projectLeadViewRepository.findProjectLeaders(projectId)
                 .stream()
                 .map(ProjectLeadViewEntity::getId)
-                .map(ProjectLeadViewEntity.ProjectLeadIdEntity::getUserId)
                 .toList();
     }
 

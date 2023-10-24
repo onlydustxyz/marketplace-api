@@ -29,6 +29,7 @@ public interface ProjectMapper {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
         projectListItemResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
         projectListItemResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectListItemResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
         projectListItemResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectListItemResponse.setRepos(project.getRepos().stream().map(ProjectMapper::mapRepo).collect(Collectors.toList()));
         projectListItemResponse.setTechnologies(project.getTechnologies());

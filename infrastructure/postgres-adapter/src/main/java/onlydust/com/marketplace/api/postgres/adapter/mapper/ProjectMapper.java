@@ -3,10 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
@@ -21,7 +21,7 @@ public interface ProjectMapper {
                                                       List<GithubUserViewEntity> topContributors,
                                                       Integer contributorCount,
                                                       List<GithubRepoViewEntity> repos,
-                                                      List<RegisteredUserViewEntity> leaders,
+                                                      List<ProjectLeadViewEntity> leaders,
                                                       List<SponsorEntity> sponsors,
                                                       final BigDecimal remainingUsdBudget) {
         final var project = ProjectDetailsView.builder()
@@ -37,7 +37,14 @@ public interface ProjectMapper {
                 .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).collect(Collectors.toSet()))
                 .contributorCount(contributorCount)
                 .repos(repos.stream().map(RepoMapper::mapToRepoCardView).collect(Collectors.toSet()))
-                .leaders(leaders.stream().map(UserMapper::mapToProjectLeaderLinkView).collect(Collectors.toSet()))
+                .leaders(leaders.stream()
+                        .filter(leader -> Boolean.TRUE.equals(leader.getHasAcceptedInvitation()))
+                        .map(UserMapper::mapToProjectLeaderLinkView)
+                        .collect(Collectors.toSet()))
+                .invitedLeaders(leaders.stream()
+                        .filter(leader -> Boolean.FALSE.equals(leader.getHasAcceptedInvitation()))
+                        .map(UserMapper::mapToProjectLeaderLinkView)
+                        .collect(Collectors.toSet()))
                 .sponsors(sponsors.stream().map(SponsorMapper::mapToSponsorView).collect(Collectors.toSet()))
                 .remainingUsdBudget(remainingUsdBudget)
                 .build();
