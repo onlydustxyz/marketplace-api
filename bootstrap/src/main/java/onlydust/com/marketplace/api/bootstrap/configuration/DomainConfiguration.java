@@ -69,8 +69,9 @@ public class DomainConfiguration {
     @Bean
     public ContributorFacadePort contributorFacadePort(final ProjectStoragePort projectStoragePort,
                                                        final GithubSearchPort githubSearchPort,
-                                                       final UserStoragePort userStoragePort) {
-        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort);
+                                                       final UserStoragePort userStoragePort,
+                                                       final ContributionStoragePort contributionStoragePort) {
+        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort);
     }
 
     @Bean

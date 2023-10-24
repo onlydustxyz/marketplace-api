@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import onlydust.com.marketplace.api.postgres.adapter.PostgresContributionAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -133,5 +134,10 @@ public class PostgresConfiguration {
     @Bean
     public CustomUserPayoutInfoRepository customUserPayoutInfoRepository(final EntityManager entityManager) {
         return new CustomUserPayoutInfoRepository(entityManager);
+    }
+
+    @Bean
+    public PostgresContributionAdapter postgresContributionAdapter(final ContributionRepository contributionRepository) {
+        return new PostgresContributionAdapter(contributionRepository);
     }
 }

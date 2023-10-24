@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.view.UserLinkView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;

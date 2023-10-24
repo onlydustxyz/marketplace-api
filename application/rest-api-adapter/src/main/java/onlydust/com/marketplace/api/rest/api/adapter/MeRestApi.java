@@ -7,17 +7,21 @@ import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
@@ -35,6 +39,7 @@ public class MeRestApi implements MeApi {
 
     private final AuthenticationService authenticationService;
     private final UserFacadePort userFacadePort;
+    private final ContributorFacadePort contributorFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -124,5 +129,46 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
                 userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
+    }
+
+    @Override
+    public ResponseEntity<ContributionPageResponse> getMyContributions(List<ContributionType> types,
+                                                                       List<UUID> projects,
+                                                                       List<Long> repositories,
+                                                                       ContributionSort sort,
+                                                                       String direction,
+                                                                       Integer page,
+                                                                       Integer pageSize) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(page);
+
+        final var filters = ContributionView.Filters.builder()
+                .projects(projects)
+                .repos(repositories)
+                .types(types.stream().map(ContributionMapper::mapContributionType).toList())
+                .build();
+
+        final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()
+                , filters);
+        final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.getGithubUserId(),
+                filters);
+
+        final var contributions = contributorFacadePort.contributions(
+                authenticatedUser.getGithubUserId(),
+                filters,
+                SortDirectionMapper.requestToDomain(direction),
+                sanitizedPageIndex,
+                sanitizedPageSize);
+
+        final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
+                sanitizedPageIndex,
+                contributedProjects,
+                contributedRepos,
+                contributions);
+
+        return contributionPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
+                : ResponseEntity.ok(contributionPageResponse);
     }
 }
