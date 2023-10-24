@@ -8,7 +8,6 @@ public record GithubAccount(
         String type,
         String htmlUrl,
         String avatarUrl,
-        Long installationId,
         List<GithubRepo> repos
 ) {
 }
