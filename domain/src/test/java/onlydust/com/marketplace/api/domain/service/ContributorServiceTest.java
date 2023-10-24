@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.ContributorFaker;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
@@ -21,7 +22,9 @@ public class ContributorServiceTest {
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final GithubSearchPort githubSearchPort = mock(GithubSearchPort.class);
     final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-    final ContributorService contributorService = new ContributorService(projectStoragePort, githubSearchPort, userStoragePort);
+    final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+    final ContributorService contributorService = new ContributorService(projectStoragePort, githubSearchPort,
+            userStoragePort, contributionStoragePort);
     private final ContributorFaker contributorFaker = new ContributorFaker();
     private final Faker faker = new Faker();
     private final UUID projectId = UUID.randomUUID();
@@ -73,7 +76,8 @@ public class ContributorServiceTest {
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
                 contributor -> when(userStoragePort.getUserByGithubId(contributor.getId().getGithubUserId()))
-                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder().build()) : Optional.empty()));
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder().build()) :
+                                Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, login);
 
         // Then
