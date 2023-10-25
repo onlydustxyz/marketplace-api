@@ -50,6 +50,14 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
+    public ResponseEntity<UserPayoutInformationContract> putMyPayoutInfo(UserPayoutInformationContract userPayoutInformationContract) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final UserPayoutInformation view = userFacadePort.updatePayoutInformation(authenticatedUser.getId(),
+                userPayoutInformationToDomain(userPayoutInformationContract));
+        return ResponseEntity.ok(userPayoutInformationToResponse(view));
+    }
+
+    @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         if (Boolean.TRUE.equals(patchMeContract.getHasSeenOnboardingWizard())) {

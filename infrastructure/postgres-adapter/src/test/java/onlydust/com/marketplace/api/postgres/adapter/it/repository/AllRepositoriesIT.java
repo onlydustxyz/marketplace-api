@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Transactional
 public class AllRepositoriesIT extends AbstractPostgresIT {
@@ -355,7 +356,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
 
     @Test
-    void should_save_and_read_user_payout_info() {
+    void should_save_and_read_and_update_user_payout_info() {
         // Given
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
@@ -395,5 +396,18 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         // Then
         assertEquals(userPayoutInformation, payoutInformationById);
+
+        final UserPayoutInformation userPayoutInformationUpdated =
+                postgresUserAdapter.savePayoutInformationForUserId(userId, userPayoutInformation.toBuilder()
+                        .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
+                                .ethAddress(null)
+                                .aptosAddress(null)
+                                .ethName(null)
+                                .sepaAccount(null)
+                                .build()).build());
+        assertNull(userPayoutInformationUpdated.getPayoutSettings().getEthAddress());
+        assertNull(userPayoutInformationUpdated.getPayoutSettings().getAptosAddress());
+        assertNull(userPayoutInformationUpdated.getPayoutSettings().getEthName());
+        assertNull(userPayoutInformationUpdated.getPayoutSettings().getSepaAccount());
     }
 }

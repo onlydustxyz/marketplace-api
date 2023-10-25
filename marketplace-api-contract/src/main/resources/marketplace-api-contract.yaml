@@ -151,7 +151,7 @@ paths:
       tags:
         - Me
       summary: Update caller payout info
-      operationId: setMyPayoutInfo
+      operationId: putMyPayoutInfo
       description: |
         Set payout info of the caller
       requestBody:
@@ -1196,8 +1196,8 @@ components:
             usdPreferredMethod:
               type: string
               enum:
-                - SEPA
-                - USDC
+                - CRYPTO
+                - FIAT
             sepaAccount:
               type: object
               properties:

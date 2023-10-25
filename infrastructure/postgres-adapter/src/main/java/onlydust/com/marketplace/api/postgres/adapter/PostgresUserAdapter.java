@@ -49,6 +49,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectIdRepository projectIdRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomUserRewardRepository customUserRewardRepository;
+    private final WalletRepository walletRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -173,10 +174,13 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Transactional
-    public void savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation) {
+    @Override
+    public UserPayoutInformation savePayoutInformationForUserId(UUID userId,
+                                                                UserPayoutInformation userPayoutInformation) {
         final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
                 userPayoutInformation);
-        userPayoutInfoRepository.save(userPayoutInfoEntity);
+        userPayoutInfoRepository.findById(userId).ifPresent(entity -> walletRepository.deleteByUserId(userId));
+        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoRepository.save(userPayoutInfoEntity));
     }
 
     @Override

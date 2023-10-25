@@ -2,6 +2,9 @@ package onlydust.com.marketplace.api.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+
+import static java.util.Objects.nonNull;
 
 @Data
 @Builder(toBuilder = true)
@@ -13,6 +16,28 @@ public class UserPayoutInformation {
     Location location;
     PayoutSettings payoutSettings;
 
+    public void validate() {
+        if (nonNull(this.payoutSettings)) {
+            if (nonNull(this.payoutSettings.aptosAddress)) {
+                validateWalletAddress(this.payoutSettings.aptosAddress);
+            }
+            if (nonNull(this.payoutSettings.starknetAddress)) {
+                validateWalletAddress(this.payoutSettings.starknetAddress);
+            }
+            if (nonNull(this.payoutSettings.ethAddress)) {
+                validateWalletAddress(this.payoutSettings.ethAddress);
+            }
+            if (nonNull(this.payoutSettings.optimismAddress)) {
+                validateWalletAddress(this.payoutSettings.optimismAddress);
+            }
+        }
+    }
+
+    private void validateWalletAddress(final String walletAddress) {
+        if (!walletAddress.startsWith("0x") && !walletAddress.startsWith("0X")) {
+            throw OnlyDustException.badRequest("Invalid wallet address format");
+        }
+    }
 
     @Data
     @Builder(toBuilder = true)
