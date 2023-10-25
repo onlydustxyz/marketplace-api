@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
@@ -8,11 +9,13 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "contributions", schema = "indexer_exp")
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributionViewEntity {
     @Id
     String id;
@@ -31,6 +34,9 @@ public class ContributionViewEntity {
     String projectName;
     String repoName;
 
+    @org.hibernate.annotations.Type(type = "jsonb")
+    List<ContributionLinkViewEntity> links;
+
     public ContributionView toView() {
         return ContributionView.builder()
                 .id(id)
@@ -44,6 +50,7 @@ public class ContributionViewEntity {
                 .githubBody(githubBody)
                 .projectName(projectName)
                 .repoName(repoName)
+                .links(links.stream().map(ContributionLinkViewEntity::toView).toList())
                 .build();
     }
 

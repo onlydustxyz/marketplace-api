@@ -15,7 +15,6 @@ public class ContributionLinkView {
     Date completedAt;
     ContributionType type;
     ContributionStatus status;
-    UserLinkView contributor;
     Long githubNumber;
     String githubTitle;
     String githubHtmlUrl;
