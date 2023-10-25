@@ -17,8 +17,10 @@ import static org.mockito.Mockito.mock;
 public class GithubInstallationServiceTest {
 
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
-    final RetriedGithubInstallationFacade.Config config = RetriedGithubInstallationFacade.Config.builder().retryCount(3).retryInterval(0).build();
-    final RetriedGithubInstallationFacade githubInstallationService = new RetriedGithubInstallationFacade(new GithubInstallationService(githubStoragePort), config);
+    final RetriedGithubInstallationFacade.Config config =
+            RetriedGithubInstallationFacade.Config.builder().retryCount(3).retryInterval(0).build();
+    final RetriedGithubInstallationFacade githubInstallationService =
+            new RetriedGithubInstallationFacade(new GithubInstallationService(githubStoragePort), config);
     private final Faker faker = new Faker();
     final Long installationId = (long) faker.number().numberBetween(1000, 2000);
 
@@ -32,7 +34,6 @@ public class GithubInstallationServiceTest {
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",
-                installationId,
                 List.of(new GithubRepo(
                         123446L,
                         "marketplace",
@@ -63,7 +64,6 @@ public class GithubInstallationServiceTest {
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",
-                installationId,
                 List.of(new GithubRepo(
                         123446L,
                         "marketplace",
