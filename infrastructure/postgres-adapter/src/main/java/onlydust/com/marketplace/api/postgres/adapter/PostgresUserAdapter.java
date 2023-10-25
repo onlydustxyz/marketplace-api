@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
@@ -50,6 +51,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomUserRewardRepository customUserRewardRepository;
     private final WalletRepository walletRepository;
+    private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -103,9 +105,11 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public UserPayoutInformation getPayoutInformationById(UUID id) {
-        final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
-        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
+    public UserPayoutInformation getPayoutInformationById(UUID userId) {
+        final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(userId);
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
+        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity, userPayoutInfoValidationEntity);
     }
 
     @Override
@@ -180,7 +184,10 @@ public class PostgresUserAdapter implements UserStoragePort {
         final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
                 userPayoutInformation);
         userPayoutInfoRepository.findById(userId).ifPresent(entity -> walletRepository.deleteByUserId(userId));
-        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoRepository.save(userPayoutInfoEntity));
+        final UserPayoutInfoEntity saved = userPayoutInfoRepository.save(userPayoutInfoEntity);
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
+        return UserPayoutInfoMapper.mapEntityToDomain(saved, userPayoutInfoValidationEntity);
     }
 
     @Override

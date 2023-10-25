@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
@@ -17,9 +18,14 @@ import static java.util.Objects.nonNull;
 public interface UserPayoutInfoMapper {
     ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    static UserPayoutInformation mapEntityToDomain(final UserPayoutInfoEntity userPayoutInfoEntity) {
+    static UserPayoutInformation mapEntityToDomain(final UserPayoutInfoEntity userPayoutInfoEntity,
+                                                   final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity) {
         try {
-            UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder().build();
+            UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                    .hasValidPerson(userPayoutInfoValidationEntity.getHasValidPerson())
+                    .hasValidCompany(userPayoutInfoValidationEntity.getHasValidCompany())
+                    .hasValidLocation(userPayoutInfoValidationEntity.getHasValidLocation())
+                    .build();
             userPayoutInformation = mapLocationToDomain(userPayoutInfoEntity, userPayoutInformation);
             userPayoutInformation = mapIdentityToDomain(userPayoutInfoEntity, userPayoutInformation);
             UserPayoutInformation.PayoutSettings payoutSettings =
@@ -27,6 +33,13 @@ public interface UserPayoutInfoMapper {
             payoutSettings = mapUsdPreferredToDomain(userPayoutInfoEntity, payoutSettings);
             payoutSettings = mapWalletsToDomain(userPayoutInfoEntity, payoutSettings);
             payoutSettings = mapBankingAccountToDomain(userPayoutInfoEntity, payoutSettings);
+            payoutSettings = payoutSettings.toBuilder()
+                    .hasMissingAptosWallet(!userPayoutInfoValidationEntity.getHasValidAptosWallet())
+                    .hasMissingEthWallet(!userPayoutInfoValidationEntity.getHasValidEthWallet())
+                    .hasMissingOptimismWallet(!userPayoutInfoValidationEntity.getHasValidOptimismWallet())
+                    .hasMissingStarknetWallet(!userPayoutInfoValidationEntity.getHasValidStarknetWallet())
+                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount())
+                    .build();
             userPayoutInformation = userPayoutInformation.toBuilder().payoutSettings(payoutSettings).build();
             return userPayoutInformation;
         } catch (JsonProcessingException e) {

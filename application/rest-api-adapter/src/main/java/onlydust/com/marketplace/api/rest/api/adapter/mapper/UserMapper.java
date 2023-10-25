@@ -6,12 +6,10 @@ import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface UserMapper {
@@ -194,115 +192,5 @@ public interface UserMapper {
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
         return getMeResponse;
-    }
-
-    static UserPayoutInformationContract userPayoutInformationToResponse(UserPayoutInformation view) {
-        final UserPayoutInformationContract userPayoutInformation = new UserPayoutInformationContract();
-        final Boolean isACompany = view.getIsACompany();
-        userPayoutInformation.setIsCompany(isACompany);
-        if (isACompany) {
-            final CompanyIdentity company = new CompanyIdentity();
-            company.setName(view.getCompany().getName());
-            company.setIdentificationNumber(view.getCompany().getIdentificationNumber());
-            final PersonIdentity owner = new PersonIdentity();
-            owner.setFirstname(view.getCompany().getOwner().getFirstName());
-            owner.setLastname(view.getCompany().getOwner().getLastName());
-            company.setOwner(owner);
-            userPayoutInformation.setCompany(company);
-        } else {
-            final PersonIdentity person = new PersonIdentity();
-            person.setFirstname(view.getPerson().getFirstName());
-            person.setLastname(view.getPerson().getLastName());
-            userPayoutInformation.setPerson(person);
-        }
-        final UserPayoutInformationContractPayoutSettings payoutSettings =
-                new UserPayoutInformationContractPayoutSettings();
-        payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
-        payoutSettings.setEthAddress(view.getPayoutSettings().getEthAddress());
-        payoutSettings.setEthName(view.getPayoutSettings().getEthName());
-        payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress());
-        payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress());
-        if (Objects.nonNull(view.getPayoutSettings().getSepaAccount())) {
-            final UserPayoutInformationContractPayoutSettingsSepaAccount sepaAccount =
-                    new UserPayoutInformationContractPayoutSettingsSepaAccount();
-            sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
-            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
-            payoutSettings.setSepaAccount(sepaAccount);
-        }
-        if (Objects.nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
-            switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
-                case FIAT ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.FIAT);
-                case CRYPTO ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.CRYPTO);
-            }
-        }
-        userPayoutInformation.setPayoutSettings(payoutSettings);
-        final UserPayoutInformationContractLocation location = new UserPayoutInformationContractLocation();
-        location.setAddress(view.getLocation().getAddress());
-        location.setCity(view.getLocation().getCity());
-        location.setCountry(view.getLocation().getCountry());
-        location.setPostalCode(view.getLocation().getPostalCode());
-        userPayoutInformation.setLocation(location);
-        return userPayoutInformation;
-    }
-
-    static UserPayoutInformation userPayoutInformationToDomain(final UserPayoutInformationContract contract) {
-        final Boolean isCompany = contract.getIsCompany();
-        UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .isACompany(isCompany)
-                .build();
-        if (isCompany) {
-            userPayoutInformation = userPayoutInformation.toBuilder().company(UserPayoutInformation.Company.builder()
-                            .identificationNumber(contract.getCompany().getIdentificationNumber())
-                            .name(contract.getCompany().getName())
-                            .owner(UserPayoutInformation.Person.builder()
-                                    .lastName(contract.getCompany().getOwner().getLastname())
-                                    .firstName(contract.getCompany().getOwner().getFirstname())
-                                    .build())
-                            .build())
-                    .build();
-        } else {
-            userPayoutInformation = userPayoutInformation.toBuilder().person(
-                            UserPayoutInformation.Person.builder()
-                                    .lastName(contract.getPerson().getLastname())
-                                    .firstName(contract.getPerson().getFirstname())
-                                    .build())
-                    .build();
-        }
-        userPayoutInformation = userPayoutInformation.toBuilder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .starknetAddress(contract.getPayoutSettings().getStarknetAddress())
-                        .aptosAddress(contract.getPayoutSettings().getAptosAddress())
-                        .optimismAddress(contract.getPayoutSettings().getOptimismAddress())
-                        .ethAddress(contract.getPayoutSettings().getEthAddress())
-                        .ethName(contract.getPayoutSettings().getEthName())
-                        .usdPreferredMethodEnum(switch (contract.getPayoutSettings().getUsdPreferredMethod()) {
-                            case FIAT -> UserPayoutInformation.UsdPreferredMethodEnum.FIAT;
-                            case CRYPTO -> UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO;
-                        })
-                        .build())
-                .build();
-        if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
-            userPayoutInformation = userPayoutInformation.toBuilder()
-                    .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
-                            .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                    .bic(contract.getPayoutSettings().getSepaAccount().getBic())
-                                    .iban(contract.getPayoutSettings().getSepaAccount().getIban())
-                                    .build())
-                            .build())
-                    .build();
-        }
-        userPayoutInformation = userPayoutInformation.toBuilder()
-                .location(
-                        UserPayoutInformation.Location.builder()
-                                .address(contract.getLocation().getAddress())
-                                .country(contract.getLocation().getCountry())
-                                .city(contract.getLocation().getCity())
-                                .postalCode(contract.getLocation().getPostalCode())
-                                .build()
-                )
-                .build();
-        return userPayoutInformation;
     }
 }

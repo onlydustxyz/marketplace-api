@@ -1,15 +1,21 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
@@ -18,11 +24,68 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     HasuraUserHelper userHelper;
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
 
     @Test
-    void should_get_user_payout_info() throws JsonProcessingException {
+    void should_get_user_payout_info() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final HasuraUserHelper.AuthenticatedUser anthony = userHelper.authenticateAnthony();
+        final String jwt = anthony.jwt();
+        paymentRequestRepository.saveAll(
+                List.of(
+                        PaymentRequestEntity.builder()
+                                .projectId(UUID.randomUUID())
+                                .recipientId(anthony.user().getGithubUserId())
+                                .id(UUID.randomUUID())
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .currency(CurrencyEnumEntity.usd)
+                                .hoursWorked(1)
+                                .requestorId(UUID.randomUUID())
+                                .build(),
+                        PaymentRequestEntity.builder()
+                                .projectId(UUID.randomUUID())
+                                .recipientId(anthony.user().getGithubUserId())
+                                .id(UUID.randomUUID())
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .currency(CurrencyEnumEntity.eth)
+                                .hoursWorked(1)
+                                .requestorId(UUID.randomUUID())
+                                .build(),
+                        PaymentRequestEntity.builder()
+                                .projectId(UUID.randomUUID())
+                                .recipientId(anthony.user().getGithubUserId())
+                                .id(UUID.randomUUID())
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .currency(CurrencyEnumEntity.apt)
+                                .hoursWorked(1)
+                                .requestorId(UUID.randomUUID())
+                                .build(),
+                        PaymentRequestEntity.builder()
+                                .projectId(UUID.randomUUID())
+                                .recipientId(anthony.user().getGithubUserId())
+                                .id(UUID.randomUUID())
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .currency(CurrencyEnumEntity.stark)
+                                .hoursWorked(1)
+                                .requestorId(UUID.randomUUID())
+                                .build(),
+                        PaymentRequestEntity.builder()
+                                .projectId(UUID.randomUUID())
+                                .recipientId(anthony.user().getGithubUserId())
+                                .id(UUID.randomUUID())
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .currency(CurrencyEnumEntity.op)
+                                .requestorId(UUID.randomUUID())
+                                .hoursWorked(1)
+                                .build()
+                )
+        );
 
         // When
         client.get()
@@ -41,15 +104,21 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.country").isEqualTo("France")
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
                 .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
-                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("CRYPTO");
+                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("CRYPTO")
+                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
+                .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 
 
     @Test
-    void should_update_user_payout_infos() throws JsonProcessingException {
+    void should_update_user_payout_infos() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
-        final UserPayoutInformationContract requestBody1 = new UserPayoutInformationContract();
+        final UserPayoutInformationRequest requestBody1 = new UserPayoutInformationRequest();
         requestBody1.company(
                         new CompanyIdentity()
                                 .identificationNumber(faker.number().digit())
@@ -61,36 +130,36 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 )
                 )
                 .isCompany(true)
-                .location(new UserPayoutInformationContractLocation()
+                .location(new UserPayoutInformationResponseLocation()
                         .address(faker.address().fullAddress())
                         .city(faker.address().city())
                         .country(faker.address().country())
                         .postalCode(faker.address().zipCode())
                 )
-                .payoutSettings(new UserPayoutInformationContractPayoutSettings()
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .aptosAddress("0x" + faker.crypto().md5())
-                        .sepaAccount(new UserPayoutInformationContractPayoutSettingsSepaAccount()
+                        .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.FIAT)
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
-        final UserPayoutInformationContract requestBody2 = new UserPayoutInformationContract();
+        final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
         requestBody2.company(null)
                 .person(new PersonIdentity()
                         .firstname(faker.name().firstName())
                         .lastname(faker.name().lastName()))
                 .isCompany(false)
-                .location(new UserPayoutInformationContractLocation()
+                .location(new UserPayoutInformationResponseLocation()
                         .address(faker.address().fullAddress())
                         .city(faker.address().city())
                         .country(faker.address().country())
                         .postalCode(faker.address().zipCode())
                 )
-                .payoutSettings(new UserPayoutInformationContractPayoutSettings()
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .ethAddress("0x" + faker.crypto().md5())
                         .optimismAddress("0x" + faker.crypto().md5())
-                        .usdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
 
@@ -103,7 +172,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(UserPayoutInformationContract.class).equals(requestBody1);
+                .expectBody().equals(requestToExpectedResponse(requestBody1, true, true, true, true, true));
 
         client.put()
                 .uri(getApiURI(ME_PAYOUT_INFO))
@@ -113,7 +182,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(UserPayoutInformationContract.class).equals(requestBody2);
+                .expectBody().equals(requestToExpectedResponse(requestBody2, true, true, true, true, true));
     }
 
     @Test
@@ -126,7 +195,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 userHelper.getImpersonationHeaderToImpersonatePierre();
 
         // When
-        final UserPayoutInformationContract requestBody = new UserPayoutInformationContract();
+        final UserPayoutInformationRequest requestBody = new UserPayoutInformationRequest();
         requestBody.company(
                         new CompanyIdentity()
                                 .identificationNumber(faker.number().digit())
@@ -138,19 +207,19 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 )
                 )
                 .isCompany(true)
-                .location(new UserPayoutInformationContractLocation()
+                .location(new UserPayoutInformationResponseLocation()
                         .address(faker.address().fullAddress())
                         .city(faker.address().city())
                         .country(faker.address().country())
                         .postalCode(faker.address().zipCode())
                 )
-                .payoutSettings(new UserPayoutInformationContractPayoutSettings()
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .aptosAddress("0x" + faker.crypto().md5())
-                        .sepaAccount(new UserPayoutInformationContractPayoutSettingsSepaAccount()
+                        .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationContractPayoutSettings.UsdPreferredMethodEnum.FIAT)
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
 
         // Then
@@ -163,7 +232,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(UserPayoutInformationContract.class).equals(requestBody);
+                .expectBody().equals(requestToExpectedResponse(requestBody, true, true, true, true, true));
 
         final String pierreJwt = userHelper.authenticatePierre().jwt();
 
@@ -174,6 +243,39 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .equals(requestBody);
+                .equals(requestToExpectedResponse(requestBody, true, true, true, true, true));
+    }
+
+    private static UserPayoutInformationResponse requestToExpectedResponse(final UserPayoutInformationRequest userPayoutInformationRequest,
+                                                                           final Boolean hasValidContactInfo,
+                                                                           final Boolean missingAptosWallet,
+                                                                           final Boolean missingEthWallet,
+                                                                           final Boolean missingStarknetWallet,
+                                                                           final Boolean missingOptimismWallet
+    ) {
+        return new UserPayoutInformationResponse()
+                .company(userPayoutInformationRequest.getCompany())
+                .location(userPayoutInformationRequest.getLocation())
+                .isCompany(userPayoutInformationRequest.getIsCompany())
+                .hasValidContactInfo(hasValidContactInfo)
+                .payoutSettings(new UserPayoutInformationResponsePayoutSettings()
+                        .aptosAddress(userPayoutInformationRequest.getPayoutSettings().getAptosAddress())
+                        .missingAptosWallet(missingAptosWallet)
+                        .ethAddress(userPayoutInformationRequest.getPayoutSettings().getEthAddress())
+                        .ethName(userPayoutInformationRequest.getPayoutSettings().getEthName())
+                        .missingEthWallet(missingEthWallet)
+                        .starknetAddress(userPayoutInformationRequest.getPayoutSettings().getStarknetAddress())
+                        .missingStarknetWallet(missingStarknetWallet)
+                        .optimismAddress(userPayoutInformationRequest.getPayoutSettings().getOptimismAddress())
+                        .missingOptimismWallet(missingOptimismWallet)
+                        .usdPreferredMethod(switch (userPayoutInformationRequest.getPayoutSettings().getUsdPreferredMethod()) {
+                            case FIAT -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT;
+                            case CRYPTO -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO;
+                        })
+                        .sepaAccount(isNull(userPayoutInformationRequest.getPayoutSettings().getSepaAccount()) ?
+                                null :
+                                new UserPayoutInformationResponsePayoutSettingsSepaAccount()
+                                        .bic(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getBic())
+                                        .iban(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getIban())));
     }
 }

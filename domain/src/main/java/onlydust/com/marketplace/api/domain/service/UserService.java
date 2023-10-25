@@ -49,8 +49,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserPayoutInformation getPayoutInformationForUserId(UUID id) {
-        return userStoragePort.getPayoutInformationById(id);
+    public UserPayoutInformation getPayoutInformationForUserId(UUID userId) {
+        return userStoragePort.getPayoutInformationById(userId);
     }
 
     @Override

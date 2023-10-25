@@ -15,6 +15,13 @@ public class UserPayoutInformation {
     Boolean isACompany = false;
     Location location;
     PayoutSettings payoutSettings;
+    Boolean hasValidPerson;
+    Boolean hasValidCompany;
+    Boolean hasValidLocation;
+
+    public Boolean getHasValidContactInfo() {
+        return (hasValidCompany || hasValidPerson) && hasValidLocation;
+    }
 
     public void validate() {
         if (nonNull(this.payoutSettings)) {
@@ -45,10 +52,19 @@ public class UserPayoutInformation {
         UsdPreferredMethodEnum usdPreferredMethodEnum;
         String ethAddress;
         String ethName;
+        Boolean hasMissingEthWallet;
         String optimismAddress;
+        Boolean hasMissingOptimismWallet;
         String aptosAddress;
+        Boolean hasMissingAptosWallet;
         String starknetAddress;
+        Boolean hasMissingStarknetWallet;
         SepaAccount sepaAccount;
+        Boolean hasMissingBankingAccount;
+
+        public Boolean isValid() {
+            return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount);
+        }
     }
 
     @Data
