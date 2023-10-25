@@ -797,10 +797,15 @@ paths:
           name: rewardId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectRewardResponse'
+            type: string
+            format: uuid
       responses:
         "200":
-          description: 'Reward'
+          description: 'Reward details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectRewardResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -2523,6 +2528,7 @@ components:
         - type
         - commitsCount
         - commentsCount
+        - status
       properties:
         title:
           type: string
@@ -2542,6 +2548,8 @@ components:
           type: integer
         commentsCount:
           type: integer
+        status:
+          $ref: '#/components/schemas/ContributionStatus'
 
 
 

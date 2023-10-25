@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -164,5 +167,35 @@ public class ProjectsRestApi implements ProjectsApi {
         rewardFacadePort.requestPayment(hasuraAuthentication, authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
         return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<ProjectRewardResponse> getProjectReward(UUID projectId, UUID rewardId) {
+        final ProjectRewardResponse projectRewardResponse = new ProjectRewardResponse().currency(CurrencyContract.OP)
+                .amount(BigDecimal.valueOf(47.0))
+                .createdAt(DateMapper.toZoneDateTime(new Date()))
+                .dollarsEquivalent(BigDecimal.valueOf(2023.24))
+                .addRewardItemsItem(new RewardItemResponse()
+                        .commentsCount(2)
+                        .createdAt(DateMapper.toZoneDateTime(new Date()))
+                        .lastUpdateAt(DateMapper.toZoneDateTime(new Date()))
+                        .repoName("repo-1")
+                        .githubUrl("https://github.com/onlydustxyz/marketplace-api/pull/51")
+                        .title("Test Hayden 1")
+                        .type(ContributionType.PULL_REQUEST)
+                        .status(ContributionStatus.COMPLETED)
+                )
+                .addRewardItemsItem(
+                        new RewardItemResponse()
+                                .commentsCount(2)
+                                .createdAt(DateMapper.toZoneDateTime(new Date()))
+                                .repoName("repo-1")
+                                .githubUrl("https://github.com/onlydustxyz/marketplace-api/pull/51")
+                                .title("Test Hayden 1")
+                                .type(ContributionType.ISSUE)
+                                .status(ContributionStatus.IN_PROGRESS)
+                );
+
+        return ResponseEntity.ok(projectRewardResponse);
     }
 }
