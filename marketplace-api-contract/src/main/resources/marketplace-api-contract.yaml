@@ -385,100 +385,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/rewards/{rewardId}:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Rewards
-      summary: Get reward details
-      operationId: getReward
-      description: |
-        Get all reward data. The caller must either be the recipient of the reward, or a leader of the reward's project.
-      parameters:
-        - in: path
-          name: rewardId
-          required: true
-          schema:
-            $ref: '#/components/schemas/RewardId'
-      responses:
-        "200":
-          description: 'Reward'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/RewardForbiddenError'
-        "404":
-          $ref: '#/components/responses/RewardNotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    put:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Rewards
-      summary: Update reward
-      operationId: updateReward
-      description: |
-        Update reward content. The caller must be a leader of the reward's project and the reward must not have been processed yet.
-      parameters:
-        - in: path
-          name: rewardId
-          required: true
-          schema:
-            $ref: '#/components/schemas/RewardId'
-      requestBody:
-        description: 'Updated reward'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RewardRequest'
-      responses:
-        "200":
-          description: 'Reward'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RewardResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/RewardForbiddenError'
-        "404":
-          $ref: '#/components/responses/RewardNotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-    delete:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Rewards
-      summary: Cancel reward
-      operationId: cancelReward
-      description: |
-        Cancel the reward. The caller must be a leader of the reward's project and the reward must not have been processed yet.
-      parameters:
-        - in: path
-          name: rewardId
-          required: true
-          schema:
-            $ref: '#/components/schemas/RewardId'
-      responses:
-        "204":
-          description: 'The reward was cancelled successfully.'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/RewardForbiddenError'
-        "404":
-          $ref: '#/components/responses/RewardNotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/users/{userId}:
     get:
       tags:
@@ -870,6 +776,38 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/rewards/{rewardId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project reward by reward Id
+      operationId: getProjectReward
+      description: |
+        Get reward details from this project. Only project leaders can access this information.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectRewardResponse'
+      responses:
+        "200":
+          description: 'Reward'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/RewardForbiddenError'
+        "404":
+          $ref: '#/components/responses/RewardNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/contributions:
     get:
@@ -1383,10 +1321,8 @@ components:
           type: integer
           description: Number of projects the user leads
           example: 1
-        totalEarned:
-          type: number
-          description: Total USD-equivalent amount the user earned from rewards
-          example: 4000
+        totalsEarned:
+          $ref: '#/components/schemas/MyRewardTotalAmountsResponse'
         contributionCount:
           type: integer
           description: Total number of contributions made by the user within OnlyDust projects
@@ -1942,6 +1878,7 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
+
         status:
           $ref: '#/components/schemas/RewardStatus'
         amount:
@@ -2522,4 +2459,71 @@ components:
           type: number
         currency:
           $ref: '#/components/schemas/CurrencyContract'
+
+
+    ProjectRewardResponse:
+      type: object
+      required:
+        - status
+        - amount
+        - currency
+        - from
+        - to
+        - createdAt
+        - rewardItems
+      properties:
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'
+        amount:
+          type: number
+        dollarsEquivalent:
+          type: number
+        status:
+          $ref: '#/components/schemas/RewardStatus'
+        from:
+          $ref: '#/components/schemas/GithubUserResponse'
+        to:
+          $ref: '#/components/schemas/GithubUserResponse'
+        createdAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        rewardItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardItemResponse'
+
+    RewardItemResponse:
+      type: object
+      required:
+        - title
+        - githubUrl
+        - createdAt
+        - repoName
+        - type
+        - commitsCount
+        - commentsCount
+      properties:
+        title:
+          type: string
+        githubUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastUpdateAt:
+          type: string
+          format: date-time
+        repoName:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        commitsCount:
+          type: integer
+        commentsCount:
+          type: integer
+
+
 

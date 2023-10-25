@@ -46,11 +46,6 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public RewardsRestApi rewardsRestApi() {
-        return new RewardsRestApi();
-    }
-
-    @Bean
     public GithubRestApi githubRestApi(final GithubInstallationFacadePort githubInstallationFacadePort) {
         return new GithubRestApi(githubInstallationFacadePort);
     }

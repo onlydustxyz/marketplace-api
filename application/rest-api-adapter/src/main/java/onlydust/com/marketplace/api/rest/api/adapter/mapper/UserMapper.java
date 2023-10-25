@@ -134,7 +134,7 @@ public interface UserMapper {
     static UserProfileStats userStatsToResponse(final UserProfileView.ProfileStats profileStats) {
         final UserProfileStats userProfileStats = new UserProfileStats();
         userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
-        userProfileStats.setTotalEarned(profileStats.getTotalEarned());
+//        userProfileStats.setTotalEarned(profileStats.getTotalEarned());
         userProfileStats.setLeadedProjectCount(profileStats.getLeadedProjectCount());
         userProfileStats.setContributionCount(profileStats.getContributionCount());
         userProfileStats.setContributionCountPerWeeks(
