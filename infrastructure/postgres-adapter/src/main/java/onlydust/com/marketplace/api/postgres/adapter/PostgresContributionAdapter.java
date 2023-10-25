@@ -38,7 +38,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 isNull(filters.getStatuses()) ? null :
                         filters.getStatuses().stream().map(ContributionViewEntity.Status::of).toList(),
                 PageRequest.of(page, pageSize, Sort.by(direction == SortDirection.asc ? Sort.Direction.ASC :
-                        Sort.Direction.DESC, "createdAt")));
+                        Sort.Direction.DESC, "created_at")));
 
         return Page.<ContributionView>builder()
                 .content(contributionPage.getContent().stream().map(ContributionViewEntity::toView).toList())
@@ -49,14 +49,16 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     public List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters) {
-        return contributionRepository.listProjectsByContributor(contributorId).stream()
+        return contributionRepository.listProjectsByContributor(contributorId, filters.getProjects(),
+                        filters.getRepos()).stream()
                 .map(ProjectMapper::mapShortProjectViewToProject)
                 .toList();
     }
 
     @Override
     public List<GithubRepo> listReposByContributor(Long contributorId, ContributionView.Filters filters) {
-        return contributionRepository.listReposByContributor(contributorId).stream()
+        return contributionRepository.listReposByContributor(contributorId, filters.getProjects(),
+                        filters.getRepos()).stream()
                 .map(GithubRepoMapper::map)
                 .toList();
     }

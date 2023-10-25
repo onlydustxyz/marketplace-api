@@ -31,12 +31,16 @@ public interface ContributionRepository extends JpaRepository<ContributionViewEn
             LEFT JOIN indexer_exp.github_pull_requests pr ON pr.id = pull_request_id
             LEFT JOIN indexer_exp.github_issues i ON i.id = issue_id
             LEFT JOIN indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
-            INNER JOIN indexer_exp.github_pull_requests cr_pr on cr_pr.id = cr.pull_request_id
-            INNER JOIN indexer_exp.github_repos r on r.id = cr_pr.repo_id
+            LEFT JOIN indexer_exp.github_pull_requests cr_pr on cr_pr.id = cr.pull_request_id
+            INNER JOIN indexer_exp.github_repos r on r.id = c.repo_id
             INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = r.id
             INNER JOIN public.project_details p on p.project_id = pgr.project_id        
             WHERE 
-                contributor_id = :contributorId     
+                contributor_id = :contributorId AND
+                (:projectIds IS NULL OR p.project_id IN :projectIds) AND
+                (:repoIds IS NULL OR r.id IN :repoIds) AND
+                (:types IS NULL OR c.type IN :types) AND
+                (:statuses IS NULL OR c.status IN :statuses)
             """, nativeQuery = true)
     Page<ContributionViewEntity> findContributionsForContributor(Long contributorId,
                                                                  List<UUID> projectIds,
@@ -58,10 +62,20 @@ public interface ContributionRepository extends JpaRepository<ContributionViewEn
             FROM 
                  indexer_exp.github_repos r
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
+            INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
             WHERE
-                EXISTS(SELECT 1 from indexer_exp.contributions c WHERE c.repo_id = r.id AND contributor_id = :contributorId) 
+                EXISTS(
+                    SELECT 1 
+                    FROM indexer_exp.contributions c 
+                    WHERE 
+                        c.repo_id = r.id AND contributor_id = :contributorId AND 
+                        (:projectIds IS NULL OR pgr.project_id IN :projectIds) AND
+                        (:repoIds IS NULL OR r.id IN :repoIds)
+                ) 
             """, nativeQuery = true)
-    List<GithubRepoViewEntity> listReposByContributor(Long contributorId);
+    List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
+                                                      List<UUID> projectIds,
+                                                      List<Long> repoIds);
 
     @Query(value = """
             SELECT
@@ -84,8 +98,12 @@ public interface ContributionRepository extends JpaRepository<ContributionViewEn
                 INNER JOIN indexer_exp.contributions c on c.repo_id = pgr.github_repo_id 
                 WHERE 
                     p.project_id = pgr.project_id AND
-                    contributor_id = :contributorId
+                    contributor_id = :contributorId AND 
+                    (:projectIds IS NULL OR p.project_id IN :projectIds) AND
+                    (:repoIds IS NULL OR pgr.github_repo_id IN :repoIds)
                 ) 
             """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId);
+    List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
+                                                           List<UUID> projectIds,
+                                                           List<Long> repoIds);
 }

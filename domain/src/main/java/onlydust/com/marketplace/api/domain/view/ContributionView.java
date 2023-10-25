@@ -29,9 +29,13 @@ public class ContributionView {
     @Value
     @Builder
     public static class Filters {
-        List<UUID> projects;
-        List<Long> repos;
-        List<ContributionType> types;
-        List<ContributionStatus> statuses;
+        @Builder.Default
+        List<UUID> projects = List.of();
+        @Builder.Default
+        List<Long> repos = List.of();
+        @Builder.Default
+        List<ContributionType> types = List.of();
+        @Builder.Default
+        List<ContributionStatus> statuses = List.of();
     }
 }
