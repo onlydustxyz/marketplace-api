@@ -20,7 +20,7 @@ public class GithubAccountEntity {
     String type;
     String htmlUrl;
     String avatarUrl;
-    Long installationId;
+    String name;
     @OneToMany(mappedBy = "owner")
     List<GithubRepoEntity> repos;
 }

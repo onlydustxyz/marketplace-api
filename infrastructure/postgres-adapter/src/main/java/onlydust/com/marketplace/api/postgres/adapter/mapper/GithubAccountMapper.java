@@ -13,7 +13,6 @@ public class GithubAccountMapper {
                 account.getType(),
                 account.getHtmlUrl(),
                 account.getAvatarUrl(),
-                account.getInstallationId(),
                 account.getRepos().stream().map(GithubRepoMapper::map).collect(Collectors.toList())
         );
     }
