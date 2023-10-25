@@ -248,8 +248,10 @@ public interface UserMapper {
     }
 
     static UserPayoutInformation userPayoutInformationToDomain(final UserPayoutInformationContract contract) {
-        UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder().build();
         final Boolean isCompany = contract.getIsCompany();
+        UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .isACompany(isCompany)
+                .build();
         if (isCompany) {
             userPayoutInformation = userPayoutInformation.toBuilder().company(UserPayoutInformation.Company.builder()
                             .identificationNumber(contract.getCompany().getIdentificationNumber())

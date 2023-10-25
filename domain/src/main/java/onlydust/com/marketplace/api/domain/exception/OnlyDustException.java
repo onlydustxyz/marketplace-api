@@ -85,6 +85,15 @@ public class OnlyDustException extends RuntimeException {
         return new OnlyDustException(403, message, cause);
     }
 
+    public static OnlyDustException badRequest(final String message) {
+        return new OnlyDustException(400, message);
+    }
+
+    public static OnlyDustException badRequest(final String message, final Throwable cause) {
+        return new OnlyDustException(400, message, cause);
+    }
+
+
     @Override
     public String toString() {
         return String.format("OnlyDustException{message='%s', status=%d, rootException=%s}",

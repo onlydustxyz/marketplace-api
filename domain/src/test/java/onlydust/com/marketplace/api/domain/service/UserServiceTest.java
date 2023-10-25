@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -174,7 +176,8 @@ public class UserServiceTest {
                 .website(faker.internet().url())
                 .location(faker.address().city())
                 .cover(UserProfileCover.CYAN)
-                .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(), faker.programmingLanguage().name(), faker.number().randomDigit()))
+                .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(),
+                        faker.programmingLanguage().name(), faker.number().randomDigit()))
                 .contacts(List.of(
                         Contact.builder()
                                 .contact(faker.internet().url())
@@ -202,5 +205,132 @@ public class UserServiceTest {
         // Then
         verify(userStoragePort, times(1)).saveProfile(userId, profile);
         assertThat(updatedUser.getBio()).isEqualTo(userProfileView.getBio());
+    }
+
+
+    @Test
+    void should_validate_user_payout_profile_before_updating_it_given_wrong_aptos_address() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .aptosAddress(faker.rickAndMorty().character())
+                        .build())
+                .build();
+
+        // When
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.updatePayoutInformation(userId, userPayoutInformation);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(400, onlyDustException.getStatus());
+        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_validate_user_payout_profile_before_updating_it_given_wrong_eth_address() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .ethAddress(faker.rickAndMorty().character())
+                        .build())
+                .build();
+
+        // When
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.updatePayoutInformation(userId, userPayoutInformation);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(400, onlyDustException.getStatus());
+        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_validate_user_payout_profile_before_updating_it_given_wrong_stark_address() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .starknetAddress(faker.rickAndMorty().character())
+                        .build())
+                .build();
+
+        // When
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.updatePayoutInformation(userId, userPayoutInformation);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(400, onlyDustException.getStatus());
+        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_validate_user_payout_info_before_updating_it_given_wrong_optimism_address() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .optimismAddress(faker.rickAndMorty().character())
+                        .build())
+                .build();
+
+        // When
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.updatePayoutInformation(userId, userPayoutInformation);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(400, onlyDustException.getStatus());
+        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_validate_user_payout_info_and_update_it_given_valid_wallet_addresses() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .optimismAddress("0x" + faker.crypto().md5())
+                        .starknetAddress("0X" + faker.random().hex())
+                        .ethName("0x" + faker.random().hex())
+                        .aptosAddress("0X" + faker.random().hex())
+                        .build())
+                .build();
+
+        // When
+        userService.updatePayoutInformation(userId, userPayoutInformation);
+
+        // Then
+        verify(userStoragePort, times(1)).savePayoutInformationForUserId(userId, userPayoutInformation);
     }
 }
