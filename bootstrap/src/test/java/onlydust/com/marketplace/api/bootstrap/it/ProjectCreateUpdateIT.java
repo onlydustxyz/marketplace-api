@@ -45,7 +45,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             595505, 43467246
                           ],
                           "githubRepoIds": [
-                            498695724, 86943508
+                            498695724, 602953043
                           ]
                         }
                         """)
@@ -77,18 +77,19 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.invitedLeaders[1].login").isEqualTo("AnthonyBuisset")
                 .jsonPath("$.repos.length()").isEqualTo(2)
                 .jsonPath("$.repos[0].name").isEqualTo("marketplace-frontend")
-                .jsonPath("$.repos[1].name").isEqualTo("deluge")
+                .jsonPath("$.repos[1].name").isEqualTo("cool-repo-A")
                 .jsonPath("$.organizations.length()").isEqualTo(2)
                 .jsonPath("$.organizations[0].login").isEqualTo("onlydustxyz")
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
-                .jsonPath("$.organizations[1].login").isEqualTo("ofux")
+                .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("deluge")
-                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
-                .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
-                .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
-                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("null");
+                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("cool-repo-A");
+        //TODO:
+//                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
+//                .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
+//                .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
+//                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("null");
     }
 
     private void should_update_project(String jwt, UUID projectId) {

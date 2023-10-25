@@ -1,18 +1,17 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Immutable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode
 @Entity
 @Table(schema = "indexer_exp", name = "github_accounts")
+@Immutable
 public class GithubAccountEntity {
     @Id
     Long id;
@@ -21,6 +20,6 @@ public class GithubAccountEntity {
     String htmlUrl;
     String avatarUrl;
     String name;
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     List<GithubRepoEntity> repos;
 }

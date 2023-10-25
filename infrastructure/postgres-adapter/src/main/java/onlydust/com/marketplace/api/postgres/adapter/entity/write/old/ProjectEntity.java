@@ -45,7 +45,7 @@ public class ProjectEntity {
     @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "projects_sponsors",
             schema = "public",

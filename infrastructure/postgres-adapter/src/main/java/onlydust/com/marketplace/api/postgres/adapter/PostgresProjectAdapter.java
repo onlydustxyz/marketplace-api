@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -26,18 +28,19 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.String.format;
+
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
+    private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
-    private final CustomRepoRepository customRepoRepository;
-    private final CustomUserRepository customUserRepository;
     private final CustomProjectListRepository customProjectListRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
@@ -47,27 +50,28 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getById(UUID projectId) {
-        final ProjectEntity projectEntity = projectRepository.getById(projectId);
+        final var projectEntity = projectViewRepository.findById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
         return getProjectDetails(projectEntity);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ProjectDetailsView getBySlug(String slug) {
-        final var projectEntity = projectRepository.findByKey(slug).orElseThrow();
+        final var projectEntity = projectViewRepository.findByKey(slug)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project '%s' not found", slug)));
         return getProjectDetails(projectEntity);
     }
 
-    private ProjectDetailsView getProjectDetails(ProjectEntity projectEntity) {
-        final var topContributors = customContributorRepository.findProjectTopContributors(projectEntity.getId(),
+    private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
+        final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);
-        final var contributorCount = customContributorRepository.getProjectContributorCount(projectEntity.getId());
-        final var repos = customRepoRepository.findProjectRepos(projectEntity.getId());
-        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectEntity.getId());
-        final var sponsors = customProjectRepository.getProjectSponsors(projectEntity.getId());
+        final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId());
+        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
+        final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
-        final BigDecimal remainingUsdBudget = customProjectRepository.getUSDBudget(projectEntity.getId());
-        return ProjectMapper.mapToProjectDetailsView(projectEntity, topContributors, contributorCount, repos, leaders
+        final BigDecimal remainingUsdBudget = customProjectRepository.getUSDBudget(projectView.getId());
+        return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders
                 , sponsors, remainingUsdBudget);
     }
 
@@ -105,7 +109,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .hiring(isLookingForContributors)
                         .logoUrl(imageUrl)
                         .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
-                        .rank(0).build();
+                        .rank(0)
+                        .build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));

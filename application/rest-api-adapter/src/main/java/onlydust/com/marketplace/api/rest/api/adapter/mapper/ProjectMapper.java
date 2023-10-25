@@ -25,15 +25,42 @@ public interface ProjectMapper {
                 .imageUrl(createProjectRequest.getLogoUrl()).build();
     }
 
-    static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
+    static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
         projectListItemResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
         projectListItemResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
         projectListItemResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
         projectListItemResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
-        projectListItemResponse.setRepos(project.getRepos().stream().map(ProjectMapper::mapRepo).collect(Collectors.toList()));
+        projectListItemResponse.setOrganizations(project.getOrganizations().stream()
+                .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos)).collect(Collectors.toList()));
         projectListItemResponse.setTechnologies(project.getTechnologies());
+
+        //TODO: this list is kept for backwards compatibility with the old API
+        final var repos = new ArrayList<GithubRepoResponse>();
+        for (ProjectOrganizationView organization : project.getOrganizations()) {
+            repos.addAll(organization.getRepos().stream()
+                    .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
+                    .map(ProjectMapper::mapRepo)
+                    .toList());
+        }
+        projectListItemResponse.setRepos(repos);
+
         return projectListItemResponse;
+    }
+
+    static ProjectGithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
+                                                             final boolean includeAllAvailableRepos) {
+        final var organization = new ProjectGithubOrganizationResponse();
+        organization.setId(projectOrganizationView.getId());
+        organization.setLogin(projectOrganizationView.getLogin());
+        organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
+        organization.setHtmlUrl(projectOrganizationView.getHtmlUrl());
+        organization.setName(projectOrganizationView.getName());
+        organization.setRepos(projectOrganizationView.getRepos().stream()
+                .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
+                .map(ProjectMapper::mapOrganizationRepo)
+                .toList());
+        return organization;
     }
 
     private static ProjectResponse mapProjectDetailsMetadata(final ProjectDetailsView projectDetailsView) {
@@ -109,16 +136,23 @@ public interface ProjectMapper {
         return sponsorResponse;
     }
 
-    private static GithubRepoResponse mapRepo(final RepoCardView repo) {
-        final GithubRepoResponse repoResponse = new GithubRepoResponse();
+    private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
+        final var organizationRepo = mapOrganizationRepo(repo);
+        organizationRepo.setIsIncludedInProject(null);
+        return organizationRepo;
+    }
+
+    private static ProjectGithubOrganizationRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
+        final ProjectGithubOrganizationRepoResponse repoResponse = new ProjectGithubOrganizationRepoResponse();
         repoResponse.setId(repo.getGithubRepoId());
         repoResponse.setOwner(repo.getOwner());
         repoResponse.setName(repo.getName());
         repoResponse.setHtmlUrl(repo.getUrl());
         repoResponse.setDescription(repo.getDescription());
-        repoResponse.setForkCount(repo.getForkCount());
-        repoResponse.setStars(repo.getStarCount());
+        repoResponse.setForkCount(Math.toIntExact(repo.getForkCount()));
+        repoResponse.setStars(Math.toIntExact(repo.getStarCount()));
         repoResponse.setHasIssues(repo.getHasIssues());
+        repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
         return repoResponse;
     }
 

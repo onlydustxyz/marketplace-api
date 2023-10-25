@@ -10,6 +10,8 @@ import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectListItemViewEntity;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
@@ -174,7 +176,8 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addRepoTechnologiesToProject(ProjectListItemViewEntity entity,
+                                                     ProjectCardView projectCardView) {
         try {
             if (isNull(entity.getRepositoryLanguages())) {
                 return;
@@ -187,7 +190,7 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addSponsorToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addSponsorToProject(ProjectListItemViewEntity entity, ProjectCardView projectCardView) {
         if (nonNull(entity.getSponsorId())) {
             final SponsorView sponsorView = SponsorView.builder()
                     .logoUrl(entity.getSponsorLogoUrl())
@@ -199,7 +202,7 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addProjectLeadToProject(ProjectListItemViewEntity entity, ProjectCardView projectCardView) {
         final ProjectLeaderLinkView projectLeaderLinkView = ProjectLeaderLinkView.builder()
                 .id(entity.getProjectLeadId())
                 .githubUserId(entity.getProjectLeadGithubUserId())
@@ -310,9 +313,9 @@ public class CustomProjectListRepository {
     }
 
     private Page<ProjectCardView> executeQueryAndMapResults(Query nativeQuery) {
-        final List<ProjectViewEntity> rows = nativeQuery.getResultList();
+        final List<ProjectListItemViewEntity> rows = nativeQuery.getResultList();
         final Map<UUID, ProjectCardView> projectViewMap = new LinkedHashMap<>();
-        for (ProjectViewEntity entity : rows) {
+        for (ProjectListItemViewEntity entity : rows) {
             entityToProjectView(entity, projectViewMap);
             final ProjectCardView projectCardView = projectViewMap.get(entity.getId());
             addProjectLeadToProject(entity, projectCardView);

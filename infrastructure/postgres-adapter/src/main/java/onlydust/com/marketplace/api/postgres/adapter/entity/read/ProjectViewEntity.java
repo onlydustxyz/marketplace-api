@@ -1,72 +1,68 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
+
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Entity
+@Builder
+@Table(name = "project_details", schema = "public")
 @TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
+@Immutable
 public class ProjectViewEntity {
-
     @Id
-    @Column(name = "row_number", nullable = false)
-    Integer rowNumber;
+    @Column(name = "project_id", nullable = false)
+    UUID id;
     @Column(name = "name")
     String name;
     @Column(name = "short_description")
     String shortDescription;
+    @Column(name = "long_description")
+    String longDescription;
+    @Column(name = "telegram_link")
+    String telegramLink;
     @Column(name = "logo_url")
     String logoUrl;
     @Column(name = "hiring")
     Boolean hiring;
+    @Column(name = "rank")
+    Integer rank;
     @Column(name = "key", insertable = false)
     String key;
-    @Column(name = "rank", insertable = false)
-    Integer rank;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
-    @Column(name = "p_lead_id", insertable = false)
-    UUID projectLeadId;
-    @Column(name = "p_lead_github_user_id", insertable = false)
-    Long projectLeadGithubUserId;
-    @Column(name = "p_lead_login", insertable = false)
-    String projectLeadLogin;
-    @Column(name = "p_lead_avatar_url", insertable = false)
-    String projectLeadAvatarUrl;
-    @Column(name = "p_lead_url", insertable = false)
-    String projectLeadUrl;
-    @Column(name = "sponsor_name", insertable = false)
-    String sponsorName;
-    @Column(name = "sponsor_logo_url", insertable = false)
-    String sponsorLogoUrl;
-    @Column(name = "sponsor_url", insertable = false)
-    String sponsorUrl;
-    @Column(name = "sponsor_id", insertable = false)
-    UUID sponsorId;
-    @Column(name = "repo_count", insertable = false)
-    Integer repoCount;
-    @Column(name = "contributors_count", insertable = false)
-    Integer contributorsCount;
-    @Column(name = "languages", insertable = false)
-    String repositoryLanguages;
-    @Column(name = "repository_id", insertable = false)
-    Long repositoryId;
-    @Column(name = "project_id", nullable = false)
-    UUID id;
-    @Column(name = "is_pending_project_lead", nullable = false)
-    Boolean isPendingProjectLead;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "projects_sponsors",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "sponsor_id")
+    )
+    List<SponsorEntity> sponsors;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "project_github_repos",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "github_repo_id")
+    )
+    List<GithubRepoEntity> repos;
 }
