@@ -157,6 +157,7 @@ public class MeRestApi implements MeApi {
         final var contributions = contributorFacadePort.contributions(
                 authenticatedUser.getGithubUserId(),
                 filters,
+                ContributionMapper.mapSort(sort),
                 SortDirectionMapper.requestToDomain(direction),
                 sanitizedPageIndex,
                 sanitizedPageSize);

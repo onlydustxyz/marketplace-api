@@ -34,11 +34,14 @@ public class ContributorService implements ContributorFacadePort {
     }
 
     @Override
-    public Page<ContributionView> contributions(Long contributorId, ContributionView.Filters filters,
-                                                SortDirection direction, Integer page,
+    public Page<ContributionView> contributions(Long contributorId,
+                                                ContributionView.Filters filters,
+                                                ContributionView.Sort sort,
+                                                SortDirection direction,
+                                                Integer page,
                                                 Integer pageSize) {
-        return contributionStoragePort.findContributionsForUser(contributorId, filters, direction, page,
-                pageSize);
+        return contributionStoragePort.findContributionsForUser(
+                contributorId, filters, sort, direction, page, pageSize);
     }
 
     @Override

@@ -26,9 +26,12 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ContributionView> findContributionsForUser(Long contributorId, ContributionView.Filters filters,
+    public Page<ContributionView> findContributionsForUser(Long contributorId,
+                                                           ContributionView.Filters filters,
+                                                           ContributionView.Sort sort,
                                                            SortDirection direction,
-                                                           Integer page, Integer pageSize) {
+                                                           Integer page,
+                                                           Integer pageSize) {
         final var contributionPage = contributionRepository.findContributionsForContributor(
                 contributorId,
                 filters.getProjects(),
@@ -37,14 +40,23 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                         filters.getTypes().stream().map(ContributionViewEntity.Type::of).toList(),
                 isNull(filters.getStatuses()) ? null :
                         filters.getStatuses().stream().map(ContributionViewEntity.Status::of).toList(),
-                PageRequest.of(page, pageSize, Sort.by(direction == SortDirection.asc ? Sort.Direction.ASC :
-                        Sort.Direction.DESC, "created_at")));
+                PageRequest.of(page, pageSize, Sort.by(
+                        direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                        sortBy(sort))));
 
         return Page.<ContributionView>builder()
                 .content(contributionPage.getContent().stream().map(ContributionViewEntity::toView).toList())
                 .totalItemNumber((int) contributionPage.getTotalElements())
                 .totalPageNumber(contributionPage.getTotalPages())
                 .build();
+    }
+
+    private String sortBy(ContributionView.Sort sort) {
+        return switch (sort) {
+            case CREATED_AT -> "createdAt";
+            case PROJECT_REPO_NAME -> "project_name, repo_name";
+            case GITHUB_NUMBER_TITLE -> "github_number, github_title";
+        };
     }
 
     @Override

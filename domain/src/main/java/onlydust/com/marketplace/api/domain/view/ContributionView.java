@@ -26,6 +26,10 @@ public class ContributionView {
     List<ContributionLinkView> links;
     List<UUID> rewardIds;
 
+    public enum Sort {
+        CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE
+    }
+
     @Value
     @Builder
     public static class Filters {

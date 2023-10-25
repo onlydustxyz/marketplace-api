@@ -14,7 +14,9 @@ import java.util.UUID;
 public interface ContributorFacadePort {
     Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, String login);
 
-    Page<ContributionView> contributions(Long contributorId, ContributionView.Filters filters,
+    Page<ContributionView> contributions(Long contributorId,
+                                         ContributionView.Filters filters,
+                                         ContributionView.Sort sort,
                                          SortDirection direction,
                                          Integer page, Integer pageSize);
 

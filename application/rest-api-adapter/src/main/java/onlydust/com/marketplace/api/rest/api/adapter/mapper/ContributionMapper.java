@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributionLinkResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionPageResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionStatus;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
@@ -84,6 +81,14 @@ public interface ContributionMapper {
             case CODE_REVIEW -> onlydust.com.marketplace.api.contract.model.ContributionType.CODE_REVIEW;
             case ISSUE -> onlydust.com.marketplace.api.contract.model.ContributionType.ISSUE;
             case PULL_REQUEST -> onlydust.com.marketplace.api.contract.model.ContributionType.PULL_REQUEST;
+        };
+    }
+
+    static ContributionView.Sort mapSort(ContributionSort sort) {
+        return switch (sort) {
+            case CREATED_AT -> ContributionView.Sort.CREATED_AT;
+            case PROJECT_REPO_NAME -> ContributionView.Sort.PROJECT_REPO_NAME;
+            case GITHUB_NUMBER_TITLE -> ContributionView.Sort.GITHUB_NUMBER_TITLE;
         };
     }
 
