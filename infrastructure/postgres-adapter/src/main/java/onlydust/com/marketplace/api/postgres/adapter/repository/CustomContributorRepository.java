@@ -62,7 +62,7 @@ public class CustomContributorRepository {
                     from payment_requests pr
                     where pr.project_id = :projectId
                       and pr.recipient_id = gu.id)               reward_count,
-                   to_rewards_stats.total_count to_reward_count,
+                   coalesce(to_rewards_stats.total_count,0) to_reward_count,
                    to_rewards_stats.pull_request_count prs_to_reward,
                    to_rewards_stats.issue_count issues_to_reward,
                    to_rewards_stats.code_review_count code_reviews_to_reward
