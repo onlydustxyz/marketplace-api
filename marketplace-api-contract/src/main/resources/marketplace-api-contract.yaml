@@ -385,7 +385,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/users/{githubLogin}:
+  /api/v1/users/{githubId}:
     get:
       tags:
         - Users
@@ -395,10 +395,11 @@ paths:
         Get the publicly available user profile (ie. all data except private data)
       parameters:
         - in: path
-          name: githubLogin
+          name: githubId
           required: true
           schema:
-            $ref: '#/components/schemas/UserId'
+            type: integer
+            format: int64
       responses:
         "200":
           description: 'User profile'
@@ -1170,6 +1171,8 @@ components:
           $ref: '#/components/schemas/CompanyIdentity'
         isCompany:
           type: boolean
+        hasValidContactInfo:
+          type: boolean
         location:
           type: object
           properties:
@@ -1188,6 +1191,8 @@ components:
         payoutSettings:
           type: object
           properties:
+            hasValidPayoutSettings:
+              type: boolean
             usdPreferredMethod:
               type: string
               enum:
@@ -1220,12 +1225,12 @@ components:
             aptosAddress:
               type: string
               example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
-            missingAddress:
+            missingAptosWallet:
               type: boolean
             starknetAddress:
               type: string
               example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
-            missingStarknet:
+            missingStarknetWallet:
               type: boolean
 
     UserProfileRequest:
