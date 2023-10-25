@@ -385,7 +385,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/users/{userId}:
+  /api/v1/users/{githubLogin}:
     get:
       tags:
         - Users
@@ -395,7 +395,7 @@ paths:
         Get the publicly available user profile (ie. all data except private data)
       parameters:
         - in: path
-          name: userId
+          name: githubLogin
           required: true
           schema:
             $ref: '#/components/schemas/UserId'
@@ -1202,21 +1202,31 @@ components:
                 iban:
                   type: string
                   example: FR5417569000301995586997O41
+                missingSepaAccount:
+                  type: boolean
             ethAddress:
               type: string
               example: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+            missingEthWallet:
+              type: boolean
             ethName:
               type: string
               example: vitalik.eth
             optimismAddress:
               type: string
               example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+            missingOptimismWallet:
+              type: boolean
             aptosAddress:
               type: string
               example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+            missingAddress:
+              type: boolean
             starknetAddress:
               type: string
               example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+            missingStarknet:
+              type: boolean
 
     UserProfileRequest:
       type: object
@@ -2272,6 +2282,9 @@ components:
         hasAcceptedLatestTermsAndConditions:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
+        hasValidPayoutInfos:
+          type: boolean
+          description: False if the user has invalid payout information
 
     PatchMeContract:
       type: object
