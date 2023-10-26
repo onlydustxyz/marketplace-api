@@ -135,10 +135,10 @@ public class CustomRewardRepository {
                                and c.author_id = pr.recipient_id)                                             user_commits_count,
                             issue.comments_count
             from payment_requests pr
-                     join public.work_items wi on pr.recipient_id = wi.recipient_id
-                     left join get_issue issue on cast(issue.id as text) = wi.id
-                     left join get_pr pull_request on cast(pull_request.id as text) = wi.id
-                     left join get_code_review code_review on code_review.id = wi.id
+                      join public.work_items wi on wi.payment_id = pr.id
+                      left join get_issue issue on wi.id ~ '^\\d+$' AND issue.id = cast(wi.id as bigint)
+                      left join get_pr pull_request on wi.id ~ '^\\d+$' AND pull_request.id = cast(wi.id as bigint)
+                      left join get_code_review code_review on code_review.id = wi.id
                       join public.contributions c on c.details_id =
                                                                   coalesce(cast(pull_request.id as text), cast(issue.id as text),
                                                                            cast(code_review.id as text))

@@ -266,52 +266,32 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "rewardItems": [
-                                {
-                                    "number": 1,
-                                    "id": "1449825806",
-                                    "title": "Adding gitguardian pre-commit",
-                                    "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1138",
-                                    "createdAt": "2023-07-26T07:04:28Z",
-                                    "lastUpdateAt": "2023-07-26T09:38:35Z",
-                                    "repoName": "marketplace-frontend",
-                                    "type": "PULL_REQUEST",
-                                    "commitsCount": 1,
-                                    "userCommitsCount": 1,
-                                    "commentsCount": null,
-                                    "status": "COMPLETED",
-                                    "githubAuthorId": 16590657,
-                                    "authorLogin": "PierreOucif",
-                                    "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                    "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                },
-                                {
-                                    "number": 16,
-                                    "id": "1442413635",
-                                    "title": "First API integration test",
-                                    "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
-                                    "createdAt": "2023-07-20T06:45:18Z",
-                                    "lastUpdateAt": "2023-07-21T11:00:05Z",
-                                    "repoName": "marketplace-frontend",
-                                    "type": "PULL_REQUEST",
-                                    "commitsCount": 39,
-                                    "userCommitsCount": 16,
-                                    "commentsCount": null,
-                                    "status": "COMPLETED",
-                                    "githubAuthorId": 43467246,
-                                    "authorLogin": "AnthonyBuisset",
-                                    "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                    "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
-                                }
-                            ],
-                            "hasMore": false,
-                            "totalPageNumber": 13,
-                            "totalItemNumber": 26,
-                            "nextPageIndex": 12
-                        }""");
+                           "rewardItems": [
+                             {
+                               "number": 16,
+                               "id": "1442413635",
+                               "title": "First API integration test",
+                               "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
+                               "createdAt": "2023-07-20T06:45:18Z",
+                               "lastUpdateAt": "2023-07-21T11:00:05Z",
+                               "repoName": "marketplace-frontend",
+                               "type": "PULL_REQUEST",
+                               "commitsCount": 39,
+                               "userCommitsCount": 16,
+                               "commentsCount": null,
+                               "status": "COMPLETED",
+                               "githubAuthorId": 43467246,
+                               "authorLogin": "AnthonyBuisset",
+                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                               "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                             }
+                           ],
+                           "hasMore": false,
+                           "totalPageNumber": 13,
+                           "totalItemNumber": 26,
+                           "nextPageIndex": 12
+                         }""");
     }
-
-    ;
 
 
 }

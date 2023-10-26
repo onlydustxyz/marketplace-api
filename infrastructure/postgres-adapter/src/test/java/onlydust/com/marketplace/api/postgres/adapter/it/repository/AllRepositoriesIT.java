@@ -158,6 +158,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Test
     void should_create_auth_user() {
         // Given
+        authUserRepository.deleteAll();
         final AuthUserEntity expected = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
                 .createdAt(new Date())
@@ -296,6 +297,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Test
     void should_create_wallet() {
         // Given
+        walletRepository.deleteAll();
         final WalletEntity expected = WalletEntity.builder()
                 .id(
                         WalletIdEntity.builder()
@@ -313,6 +315,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Test
     void should_create_bank_account() {
         // Given
+        bankAccountRepository.deleteAll();
         final BankAccountEntity expected = BankAccountEntity.builder()
                 .bic(faker.pokemon().location())
                 .userId(UUID.randomUUID())
