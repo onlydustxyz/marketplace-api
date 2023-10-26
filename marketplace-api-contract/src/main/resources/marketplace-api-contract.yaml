@@ -247,6 +247,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/rewards/pending-invoice:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get caller's rewards pending invoice
+      operationId: getMyRewardsPendingInvoice
+      description: |
+        Get the page of all rewards pending invoice where the recipient is the caller
+      responses:
+        "200":
+          description: 'Page of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyRewardsListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/rewards/amounts:
     get:
       security:
@@ -2019,7 +2041,15 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
-
+    MyRewardsListResponse:
+      type: object
+      required:
+        - rewards
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardPageItemResponse'
     RewardPageItemResponse:
       type: object
       required:
