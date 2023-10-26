@@ -136,8 +136,8 @@ public class CustomRewardRepository {
                             issue.comments_count
             from payment_requests pr
                       join public.work_items wi on wi.payment_id = pr.id
-                      left join get_issue issue on wi.id ~ '^\\d+$' AND issue.id = cast(wi.id as bigint)
-                      left join get_pr pull_request on wi.id ~ '^\\d+$' AND pull_request.id = cast(wi.id as bigint)
+                      left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
+                      left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                       left join get_code_review code_review on code_review.id = wi.id
                       join public.contributions c on c.details_id =
                                                                   coalesce(cast(pull_request.id as text), cast(issue.id as text),
