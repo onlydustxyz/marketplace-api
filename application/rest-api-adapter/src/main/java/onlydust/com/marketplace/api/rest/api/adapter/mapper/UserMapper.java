@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import org.springframework.beans.BeanUtils;
 
 import java.net.URI;
 import java.util.List;
@@ -68,7 +69,10 @@ public interface UserMapper {
         privateUserProfileResponse.setContacts(
                 privateUserProfileResponse.getContacts().stream().filter(contact -> contact.getVisibility() == ContactInformation.VisibilityEnum.PUBLIC).collect(Collectors.toList())
         );
-        return privateUserProfileResponse;
+        
+        final PublicUserProfileResponse publicUserProfileResponse = new PublicUserProfileResponse();
+        BeanUtils.copyProperties(privateUserProfileResponse, publicUserProfileResponse);
+        return publicUserProfileResponse;
     }
 
     static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {
@@ -97,7 +101,7 @@ public interface UserMapper {
     }
 
     static AllocatedTime allocatedTimeToResponse(UserAllocatedTimeToContribute allocatedTimeToContribute) {
-        return switch (allocatedTimeToContribute) {
+        return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
             case NONE -> AllocatedTime.NONE;
             case LESS_THAN_ONE_DAY -> AllocatedTime.LESS_THAN_ONE_DAY;
             case ONE_TO_THREE_DAYS -> AllocatedTime.ONE_TO_THREE_DAYS;
@@ -106,7 +110,7 @@ public interface UserMapper {
     }
 
     static UserAllocatedTimeToContribute allocatedTimeToDomain(AllocatedTime allocatedTimeToContribute) {
-        return switch (allocatedTimeToContribute) {
+        return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
             case NONE -> UserAllocatedTimeToContribute.NONE;
             case LESS_THAN_ONE_DAY -> UserAllocatedTimeToContribute.LESS_THAN_ONE_DAY;
             case ONE_TO_THREE_DAYS -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
