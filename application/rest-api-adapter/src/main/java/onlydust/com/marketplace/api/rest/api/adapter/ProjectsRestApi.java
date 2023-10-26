@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
@@ -169,5 +170,19 @@ public class ProjectsRestApi implements ProjectsApi {
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
         return ResponseEntity.ok(RewardMapper.projectRewardToResponse(rewardView));
+    }
+
+    @Override
+    public ResponseEntity<RewardItemsPageResponse> getProjectRewardsPage(UUID projectId, UUID rewardId,
+                                                                         Integer pageIndex, Integer pageSize) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final Page<RewardItemView> page = projectFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
+                authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
+        final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
+        return rewardItemsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
+                ResponseEntity.ok(rewardItemsPageResponse);
     }
 }

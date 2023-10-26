@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.RewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.UUID;
 
@@ -68,5 +71,45 @@ public interface RewardMapper {
                 })
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId());
+    }
+
+    static RewardItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {
+        final RewardItemsPageResponse rewardItemsPageResponse = new RewardItemsPageResponse();
+        rewardItemsPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
+        rewardItemsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
+        rewardItemsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
+        rewardItemsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        page.getContent().stream()
+                .map(RewardMapper::itemToResponse)
+                .forEach(rewardItemsPageResponse::addRewardItemsItem);
+        return rewardItemsPageResponse;
+    }
+
+    private static RewardItemResponse itemToResponse(final RewardItemView view) {
+        return new RewardItemResponse()
+                .id(view.getId())
+                .type(switch (view.getType()) {
+                    case ISSUE -> ContributionType.ISSUE;
+                    case CODE_REVIEW -> ContributionType.CODE_REVIEW;
+                    case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+                })
+                .status(switch (view.getStatus()) {
+                    case CANCELLED -> ContributionStatus.CANCELLED;
+                    case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
+                    case COMPLETED -> ContributionStatus.COMPLETED;
+                })
+                .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
+                .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
+                .commentsCount(view.getCommentsCount())
+                .commitsCount(view.getCommitsCount())
+                .userCommitsCount(view.getUserCommitsCount())
+                .number(view.getNumber())
+                .repoName(view.getRepoName())
+                .githubUrl(view.getGithubUrl())
+                .title(view.getTitle())
+                .githubAuthorId(view.getGithubAuthorId())
+                .authorAvatarUrl(view.getAuthorAvatarUrl())
+                .authorGithubUrl(view.getAuthorGithubUrl())
+                .authorLogin(view.getAuthorLogin());
     }
 }

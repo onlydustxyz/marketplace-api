@@ -831,6 +831,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: pageIndex
+          description: Page number
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: integer
       responses:
         "200":
           description: 'Reward details'
@@ -2731,10 +2741,21 @@ components:
           $ref: '#/components/schemas/ContributionType'
         commitsCount:
           type: integer
+        userCommitsCount:
+          type: integer
         commentsCount:
           type: integer
         status:
           $ref: '#/components/schemas/ContributionStatus'
+        githubAuthorId:
+          type: integer
+          format: int64
+        authorLogin:
+          type: string
+        authorAvatarUrl:
+          type: string
+        authorGithubUrl:
+          type: string
 
 
 

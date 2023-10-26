@@ -203,4 +203,20 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public RewardView getProjectReward(UUID rewardId) {
         return RewardMapper.projectRewardToDomain(customRewardRepository.findProjectRewardViewEntityByd(rewardId));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize) {
+        final Integer count = customRewardRepository.countRewardItemsForRewardId(rewardId);
+        final List<RewardItemView> rewardItemViews =
+                customRewardRepository.findRewardItemsByRewardId(rewardId, pageIndex, pageSize)
+                        .stream()
+                        .map(RewardMapper::itemToDomain)
+                        .toList();
+        return Page.<RewardItemView>builder()
+                .content(rewardItemViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
+    }
 }

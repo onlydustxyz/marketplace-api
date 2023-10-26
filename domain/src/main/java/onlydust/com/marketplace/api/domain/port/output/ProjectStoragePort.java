@@ -46,4 +46,6 @@ public interface ProjectStoragePort {
     ProjectBudgetsView findBudgets(UUID projectId);
 
     RewardView getProjectReward(UUID rewardId);
+
+    Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
 }

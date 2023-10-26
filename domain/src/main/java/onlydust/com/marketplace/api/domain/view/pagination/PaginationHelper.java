@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.domain.view.pagination;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 import static java.util.Objects.isNull;
 
 
@@ -23,7 +22,7 @@ public class PaginationHelper {
     }
 
     public static int calculateTotalNumberOfPage(final int pageSize, final int count) {
-        return count < pageSize ? 1 : round((float) count / pageSize);
+        return (count + pageSize - 1) / pageSize;
     }
 
     public static boolean hasMore(final int pageIndex, final int totalPageNumber) {
