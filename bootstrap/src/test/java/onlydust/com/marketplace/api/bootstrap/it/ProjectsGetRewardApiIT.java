@@ -178,7 +178,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_not_project_lead_to_get_reward_items() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
+        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
@@ -203,7 +203,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
-                        "pageIndex", "12")))
+                        "pageIndex", "0")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -257,7 +257,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                         }""");
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
-                        "pageIndex", "0")))
+                        "pageIndex", "12")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
