@@ -108,4 +108,13 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.forbidden("Only project leads can read budgets on their projects");
         }
     }
+
+    @Override
+    public RewardView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.getProjectReward(rewardId);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read reward on their projects");
+        }
+    }
 }

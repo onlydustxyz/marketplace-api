@@ -15,10 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.BudgetMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectRewardMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
@@ -44,6 +41,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectListRepository customProjectListRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
+    private final CustomRewardRepository customRewardRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -98,7 +96,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl) {
         final ProjectEntity projectEntity =
-                ProjectEntity.builder().id(projectId).name(name).shortDescription(shortDescription).longDescription(longDescription).hiring(isLookingForContributors).logoUrl(imageUrl).visibility(ProjectMapper.projectVisibilityToEntity(visibility)).rank(0).build();
+                ProjectEntity.builder()
+                        .id(projectId)
+                        .name(name)
+                        .shortDescription(shortDescription)
+                        .longDescription(longDescription)
+                        .hiring(isLookingForContributors)
+                        .logoUrl(imageUrl)
+                        .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
+                        .rank(0).build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
@@ -107,13 +113,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         this.projectRepoRepository.saveAll(githubRepoIds.stream().map(repoId -> new ProjectRepoEntity(projectId,
                 repoId)).toList());
 
-        this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream().map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId)).toList());
+        this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
+                .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId)).toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
-        return customProjectRepository.findProjectContributorsByLogin(projectId, login).stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
+        return customProjectRepository.findProjectContributorsByLogin(projectId, login)
+                .stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
     }
 
     @Override
@@ -188,5 +196,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .stream().map(BudgetMapper::entityToDomain)
                         .toList())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RewardView getProjectReward(UUID rewardId) {
+        return RewardMapper.projectRewardToDomain(customRewardRepository.findProjectRewardViewEntityByd(rewardId));
     }
 }
