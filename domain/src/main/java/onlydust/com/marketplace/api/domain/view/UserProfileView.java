@@ -10,6 +10,8 @@ import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.*;
 
 @Data
@@ -72,16 +74,40 @@ public class UserProfileView {
         TotalsEarned totalsEarned;
         Integer contributionCount;
         @Builder.Default
-        Set<ContributionStats> contributionStats = new HashSet<>();
+        List<ContributionStats> contributionStats = new ArrayList<>();
+
+        public int getContributionCountVariationSinceLastWeek() {
+            LocalDate currentWeek = LocalDate.now();
+            LocalDate previousWeek = LocalDate.now().minusWeeks(1);
+            final var currentWeekWithStats = contributionStats.stream()
+                    .filter(stats -> stats.getYear() == currentWeek.getYear() && stats.getWeek() == currentWeek.get(WeekFields.of(Locale.getDefault()).weekOfYear())).findFirst();
+            final var previousWeekWithStats = contributionStats.stream()
+                    .filter(stats -> stats.getYear() == previousWeek.getYear() && stats.getWeek() == previousWeek.get(WeekFields.of(Locale.getDefault()).weekOfYear())).findFirst();
+            final int currentWeekCount = currentWeekWithStats.map(ContributionStats::getTotalCount).orElse(0);
+            final int previousWeekCount = previousWeekWithStats.map(ContributionStats::getTotalCount).orElse(0);
+            return currentWeekCount - previousWeekCount;
+        }
 
         @Data
         @Builder
         public static class ContributionStats {
-            Integer year;
-            Integer week;
-            Integer codeReviewCount;
-            Integer issueCount;
-            Integer pullRequestCount;
+            int year;
+            int week;
+            int codeReviewCount;
+            int issueCount;
+            int pullRequestCount;
+
+            public int getTotalCount() {
+                return codeReviewCount + issueCount + pullRequestCount;
+            }
+        }
+
+        public static class ContributionStatsComparator implements Comparator<ContributionStats> {
+            @Override
+            public int compare(ContributionStats o1, ContributionStats o2) {
+                final int yearComparison = Integer.compare(o1.getYear(), o2.getYear());
+                return yearComparison == 0 ? Integer.compare(o1.getWeek(), o2.getWeek()) : yearComparison;
+            }
         }
     }
 

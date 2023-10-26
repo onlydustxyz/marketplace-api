@@ -105,7 +105,7 @@ public class CustomUserRepository {
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
             from public.auth_users u
-                     left join public.github_users gu on gu.id = u.github_user_id
+                     join public.github_users gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where u.id = :userId
             """;
@@ -217,14 +217,17 @@ public class CustomUserRepository {
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())
                         .contributionStats(row.getCounts().stream().map(weekCount ->
-                                UserProfileView.ProfileStats.ContributionStats.builder()
-                                        .codeReviewCount(weekCount.getCodeReviewCount())
-                                        .issueCount(weekCount.getIssueCount())
-                                        .pullRequestCount(weekCount.getPullRequestCount())
-                                        .week(weekCount.getWeek())
-                                        .year(weekCount.getYear())
-                                        .build()
-                        ).collect(Collectors.toSet()))
+                                                UserProfileView.ProfileStats.ContributionStats.builder()
+                                                        .codeReviewCount(weekCount.getCodeReviewCount())
+                                                        .issueCount(weekCount.getIssueCount())
+                                                        .pullRequestCount(weekCount.getPullRequestCount())
+                                                        .week(weekCount.getWeek())
+                                                        .year(weekCount.getYear())
+                                                        .build()
+                                        )
+                                        .sorted(new UserProfileView.ProfileStats.ContributionStatsComparator())
+                                        .collect(Collectors.toList())
+                        )
                         .build())
                 .isLookingForAJob(row.getIsLookingForAJob())
                 .allocatedTimeToContribute(isNull(row.getAllocatedTimeToContribute()) ? null :

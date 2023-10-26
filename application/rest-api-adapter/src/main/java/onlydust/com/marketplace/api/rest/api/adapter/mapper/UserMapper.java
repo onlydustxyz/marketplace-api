@@ -69,7 +69,7 @@ public interface UserMapper {
         privateUserProfileResponse.setContacts(
                 privateUserProfileResponse.getContacts().stream().filter(contact -> contact.getVisibility() == ContactInformation.VisibilityEnum.PUBLIC).collect(Collectors.toList())
         );
-        
+
         final PublicUserProfileResponse publicUserProfileResponse = new PublicUserProfileResponse();
         BeanUtils.copyProperties(privateUserProfileResponse, publicUserProfileResponse);
         return publicUserProfileResponse;
@@ -140,8 +140,8 @@ public interface UserMapper {
         final UserProfileStats userProfileStats = new UserProfileStats();
         userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
         userProfileStats.setTotalsEarned(totalsEarnedToResponse(profileStats.getTotalsEarned()));
-        //TODO userProfileStats.setContributionCountVariationSinceLastWeek(profileStats
-        // .getContributionCountVariationSinceLastWeek());
+        userProfileStats.setContributionCountVariationSinceLastWeek(profileStats
+                .getContributionCountVariationSinceLastWeek());
         userProfileStats.setLeadedProjectCount(profileStats.getLeadedProjectCount());
         userProfileStats.setContributionCount(profileStats.getContributionCount());
         userProfileStats.setContributionCountPerWeeks(
