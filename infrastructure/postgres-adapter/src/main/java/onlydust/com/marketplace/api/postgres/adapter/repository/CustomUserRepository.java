@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -283,12 +284,16 @@ public class CustomUserRepository {
     }
 
     public Optional<UserProfileView> findProfileById(final Long githubUserId) {
-        final UserProfileEntity row =
-                (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_ID,
-                                UserProfileEntity.class)
-                        .setParameter("githubUserId", githubUserId)
-                        .getSingleResult();
-        return Optional.ofNullable(rowToUserProfile(row));
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_ID,
+                                    UserProfileEntity.class)
+                            .setParameter("githubUserId", githubUserId)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     public List<ProjectStatsForUserEntity> getProjectsStatsForUser(final Long githubUserId) {
