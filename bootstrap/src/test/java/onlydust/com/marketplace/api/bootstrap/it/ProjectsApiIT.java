@@ -199,7 +199,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "HTML": 121906
               },
               "remainingUsdBudget": 99250,
-              "rewardSettings": null
+              "rewardSettings": {
+                "ignorePullRequests": true,
+                "ignoreIssues": true,
+                "ignoreCodeReviews": true,
+                "ignoreContributionsBefore": null
+              }
             }
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """

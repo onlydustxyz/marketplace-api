@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
@@ -59,7 +60,8 @@ public class ProjectService implements ProjectFacadePort {
                 command.getIsLookingForContributors(), command.getMoreInfos(),
                 command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeads(),
                 ProjectVisibility.PUBLIC,
-                command.getImageUrl());
+                command.getImageUrl(),
+                ProjectRewardSettings.defaultSettings());
         return projectId;
     }
 

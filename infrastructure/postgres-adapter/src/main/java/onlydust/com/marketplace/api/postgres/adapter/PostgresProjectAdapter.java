@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.Contributor;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -99,7 +96,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public void createProject(UUID projectId, String name, String shortDescription, String longDescription,
                               Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads,
-                              ProjectVisibility visibility, String imageUrl) {
+                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -109,6 +106,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .hiring(isLookingForContributors)
                         .logoUrl(imageUrl)
                         .visibility(ProjectMapper.projectVisibilityToEntity(visibility))
+                        .ignorePullRequests(rewardSettings.getIgnorePullRequests())
+                        .ignoreIssues(rewardSettings.getIgnoreIssues())
+                        .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
+                        .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
                         .rank(0)
                         .build();
         moreInfos.stream().findFirst().ifPresent(moreInfo -> projectEntity.setTelegramLink(moreInfo.getUrl()));

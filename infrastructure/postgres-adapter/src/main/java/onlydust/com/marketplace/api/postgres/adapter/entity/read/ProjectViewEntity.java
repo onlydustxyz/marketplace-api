@@ -10,6 +10,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +48,14 @@ public class ProjectViewEntity {
     @Type(type = "project_visibility")
     @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
+    @Column(name = "reward_ignore_pull_requests_by_default")
+    Boolean ignorePullRequests;
+    @Column(name = "reward_ignore_issues_by_default")
+    Boolean ignoreIssues;
+    @Column(name = "reward_ignore_code_reviews_by_default")
+    Boolean ignoreCodeReviews;
+    @Column(name = "reward_ignore_contributions_before_date_by_default")
+    Date ignoreContributionsBefore;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(

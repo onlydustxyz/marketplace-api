@@ -12,4 +12,13 @@ public class ProjectRewardSettings {
     Boolean ignoreIssues;
     Boolean ignoreCodeReviews;
     Date ignoreContributionsBefore;
+
+    public static ProjectRewardSettings defaultSettings() {
+        return ProjectRewardSettings.builder()
+                .ignorePullRequests(false)
+                .ignoreIssues(false)
+                .ignoreCodeReviews(false)
+                .ignoreContributionsBefore(null)
+                .build();
+    }
 }

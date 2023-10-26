@@ -2853,7 +2853,7 @@ components:
           description: Ignore code reviews by default
         ignoreContributionsBefore:
           type: string
-          format: date
+          format: date-time
           description: Ignore contributions before this date by default
 
     CreateProjectResponse:

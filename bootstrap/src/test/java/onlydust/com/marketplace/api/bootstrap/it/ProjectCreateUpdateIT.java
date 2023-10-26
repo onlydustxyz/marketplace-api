@@ -84,12 +84,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("cool-repo-A");
-        //TODO:
-//                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
-//                .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
-//                .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
-//                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("null");
+                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("cool-repo-A")
+                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
+                .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
+                .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
+                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo(null);
     }
 
     private void should_update_project(String jwt, UUID projectId) {

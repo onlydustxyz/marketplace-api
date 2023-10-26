@@ -10,6 +10,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+
 public interface ProjectMapper {
     static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest) {
         return CreateProjectCommand.builder()
@@ -22,7 +24,8 @@ public interface ProjectMapper {
                 .moreInfos(createProjectRequest.getMoreInfo().stream()
                         .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
-                .imageUrl(createProjectRequest.getLogoUrl()).build();
+                .imageUrl(createProjectRequest.getLogoUrl())
+                .build();
     }
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
@@ -76,7 +79,17 @@ public interface ProjectMapper {
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());
         project.setRemainingUsdBudget(projectDetailsView.getRemainingUsdBudget());
+        project.setRewardSettings(mapRewardSettings(projectDetailsView.getRewardSettings()));
         return project;
+    }
+
+    static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.api.domain.model.ProjectRewardSettings rewardSettings) {
+        final var projectRewardSettings = new ProjectRewardSettings();
+        projectRewardSettings.setIgnorePullRequests(rewardSettings.getIgnorePullRequests());
+        projectRewardSettings.setIgnoreIssues(rewardSettings.getIgnoreIssues());
+        projectRewardSettings.setIgnoreCodeReviews(rewardSettings.getIgnoreCodeReviews());
+        projectRewardSettings.setIgnoreContributionsBefore(toZoneDateTime(rewardSettings.getIgnoreContributionsBefore()));
+        return projectRewardSettings;
     }
 
     static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {
