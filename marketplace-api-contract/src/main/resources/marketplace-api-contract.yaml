@@ -263,7 +263,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MyRewardTotalAmountsResponse'
+                $ref: '#/components/schemas/RewardTotalAmountsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1453,7 +1453,7 @@ components:
           description: Number of projects the user leads
           example: 1
         totalsEarned:
-          $ref: '#/components/schemas/MyRewardTotalAmountsResponse'
+          $ref: '#/components/schemas/RewardTotalAmountsResponse'
         contributionCount:
           type: integer
           description: Total number of contributions made by the user within OnlyDust projects
@@ -1660,9 +1660,7 @@ components:
           description: Total number of rewards the contributor got on this project.
           example: 10
         earned:
-          type: number
-          description: Total money amount the contributor earned on this project.
-          example: 3500
+          $ref: '#/components/schemas/RewardTotalAmountsResponse'
         contributionToRewardCount:
           type: integer
           description: Total number of contributions the contributor was not rewarded for on this project.
@@ -2629,7 +2627,7 @@ components:
         initialDollarsEquivalent:
           type: number
 
-    MyRewardTotalAmountsResponse:
+    RewardTotalAmountsResponse:
       type: object
       properties:
         totalAmount:

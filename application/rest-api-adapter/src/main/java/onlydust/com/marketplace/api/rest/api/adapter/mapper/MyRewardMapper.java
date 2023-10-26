@@ -69,8 +69,8 @@ public interface MyRewardMapper {
     }
 
 
-    static MyRewardTotalAmountsResponse mapUserRewardTotalAmountsToResponse(final UserRewardTotalAmountsView view) {
-        final MyRewardTotalAmountsResponse myRewardTotalAmountsResponse = new MyRewardTotalAmountsResponse();
+    static RewardTotalAmountsResponse mapUserRewardTotalAmountsToResponse(final UserRewardTotalAmountsView view) {
+        final RewardTotalAmountsResponse myRewardTotalAmountsResponse = new RewardTotalAmountsResponse();
         myRewardTotalAmountsResponse.setTotalAmount(view.getTotalAmount());
         for (UserTotalRewardView userTotalReward : view.getUserTotalRewards()) {
             myRewardTotalAmountsResponse.addDetailsItem(new MyRewardAmountResponse().totalAmount(userTotalReward.getTotalAmount())

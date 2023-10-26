@@ -125,7 +125,7 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<MyRewardTotalAmountsResponse> getMyRewardTotalAmounts() {
+    public ResponseEntity<RewardTotalAmountsResponse> getMyRewardTotalAmounts() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         return ResponseEntity.ok(MyRewardMapper.mapUserRewardTotalAmountsToResponse(
                 userFacadePort.getRewardTotalAmountsForUserId(authenticatedUser.getId())));
