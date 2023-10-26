@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.view;
 import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
@@ -37,10 +38,6 @@ public class UserProfileView {
     @Builder.Default
     Set<Contact> contacts = new HashSet<>();
 
-    public void addContactInformation(final Contact contact) {
-        this.contacts.add(contact);
-    }
-
     public void addProjectStats(final ProjectStats projectStats) {
         this.projectsStats.add(projectStats);
     }
@@ -63,14 +60,10 @@ public class UserProfileView {
     public static class ProfileStats {
         Integer contributedProjectCount;
         Integer leadedProjectCount;
-        BigDecimal totalEarned;
+        TotalsEarned totalsEarned;
         Integer contributionCount;
         @Builder.Default
         Set<ContributionStats> contributionStats = new HashSet<>();
-
-        public void addContributionStat(final ContributionStats contributionStats) {
-            this.contributionStats.add(contributionStats);
-        }
 
         @Data
         @Builder
@@ -81,5 +74,20 @@ public class UserProfileView {
             Integer issueCount;
             Integer pullRequestCount;
         }
+    }
+
+    @Data
+    @Builder
+    public static class TotalsEarned {
+        BigDecimal totalDollarsEquivalent;
+        List<TotalEarnedPerCurrency> details;
+    }
+
+    @Data
+    @Builder
+    public static class TotalEarnedPerCurrency {
+        BigDecimal totalDollarsEquivalent;
+        BigDecimal totalAmount;
+        Currency currency;
     }
 }

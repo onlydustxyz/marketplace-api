@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.view.UserLinkView;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 
 import java.net.URI;
@@ -93,6 +92,7 @@ public interface UserMapper {
         userProfileResponse.setTechnologies(userProfileView.getTechnologies());
         userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
         userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
+        //TODO userProfileResponse.setFirstContributedAt(toZoneDateTime(userProfileView.getFirstContributedAt()));
         return userProfileResponse;
     }
 
@@ -126,6 +126,7 @@ public interface UserMapper {
                     userProfileProjects.setContributorCount(ps.getContributorCount());
                     userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
                     userProfileProjects.setIsLead(ps.getIsProjectLead());
+                    //TODO userProfileProjects.setSlug(ps.getSlug());
                     return userProfileProjects;
                 })
                 .toList();
@@ -134,7 +135,9 @@ public interface UserMapper {
     static UserProfileStats userStatsToResponse(final UserProfileView.ProfileStats profileStats) {
         final UserProfileStats userProfileStats = new UserProfileStats();
         userProfileStats.setContributedProjectCount(profileStats.getContributedProjectCount());
-//        userProfileStats.setTotalEarned(profileStats.getTotalEarned());
+        userProfileStats.setTotalsEarned(totalsEarnedToResponse(profileStats.getTotalsEarned()));
+        //TODO userProfileStats.setContributionCountVariationSinceLastWeek(profileStats
+        // .getContributionCountVariationSinceLastWeek());
         userProfileStats.setLeadedProjectCount(profileStats.getLeadedProjectCount());
         userProfileStats.setContributionCount(profileStats.getContributionCount());
         userProfileStats.setContributionCountPerWeeks(
@@ -151,6 +154,27 @@ public interface UserMapper {
                         }).toList()
         );
         return userProfileStats;
+    }
+
+    static MyRewardTotalAmountsResponse totalsEarnedToResponse(UserProfileView.TotalsEarned totalsEarned) {
+        final MyRewardTotalAmountsResponse response = new MyRewardTotalAmountsResponse();
+        response.setTotalAmount(totalsEarned.getTotalDollarsEquivalent());
+        for (UserProfileView.TotalEarnedPerCurrency totalEarnedPerCurrency : totalsEarned.getDetails()) {
+            final MyRewardAmountResponse myRewardAmountResponse = new MyRewardAmountResponse();
+            myRewardAmountResponse.setTotalAmount(totalEarnedPerCurrency.getTotalAmount());
+            myRewardAmountResponse.totalDollarsEquivalent(totalEarnedPerCurrency.getTotalDollarsEquivalent());
+            if (totalEarnedPerCurrency.getCurrency() != null) {
+                myRewardAmountResponse.setCurrency(switch (totalEarnedPerCurrency.getCurrency()) {
+                    case Apt -> CurrencyContract.APT;
+                    case Op -> CurrencyContract.OP;
+                    case Eth -> CurrencyContract.ETH;
+                    case Stark -> CurrencyContract.STARK;
+                    case Usd -> CurrencyContract.USD;
+                });
+            }
+            response.addDetailsItem(myRewardAmountResponse);
+        }
+        return response;
     }
 
     static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {

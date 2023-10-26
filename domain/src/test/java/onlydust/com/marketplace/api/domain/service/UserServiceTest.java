@@ -91,6 +91,24 @@ public class UserServiceTest {
     }
 
     @Test
+    void should_find_user_profile_given_a_github_id() {
+        // Given
+        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
+        final UUID userId = UUID.randomUUID();
+        final Long githubUserId = faker.number().randomNumber();
+        final UserProfileView userProfileView =
+                UserProfileView.builder().id(userId).avatarUrl(faker.pokemon().name()).githubId(githubUserId).login(faker.hacker().verb()).build();
+
+        // When
+        when(userStoragePort.getProfileById(githubUserId)).thenReturn(userProfileView);
+        final UserProfileView profileById = userService.getProfileById(githubUserId);
+
+        // Then
+        assertEquals(userProfileView, profileById);
+    }
+
+    @Test
     void should_markUserAsOnboarded() {
         // Given
         dateProvider.setNow(faker.date().birthday(0, 1));

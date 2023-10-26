@@ -78,24 +78,32 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public UserProfileView getProfileById(UUID userId) {
         return customUserRepository.findProfileById(userId)
-                .map(userProfileView -> {
-                    for (ProjectIdsForUserEntity projectIdsForUserEntity :
-                            customUserRepository.getProjectIdsForUserId(userId)) {
-                        userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
-                                .contributorCount(projectIdsForUserEntity.getContributorsCount())
-                                .isProjectLead(projectIdsForUserEntity.getIsLead())
-                                .totalGranted(projectIdsForUserEntity.getTotalGranted())
-                                .userContributionCount(projectIdsForUserEntity.getUserContributionsCount())
-                                .userLastContributedAt(projectIdsForUserEntity.getLastContributionDate())
-                                .id(projectIdsForUserEntity.getId())
-                                .logoUrl(projectIdsForUserEntity.getLogoUrl())
-                                .name(projectIdsForUserEntity.getName())
-                                .build());
-                    }
-                    return userProfileView;
-                })
+                .map(this::addProjectsStats)
                 .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", userId)));
+    }
 
+    @Override
+    public UserProfileView getProfileById(Long githubUserId) {
+        return customUserRepository.findProfileById(githubUserId)
+                .map(this::addProjectsStats)
+                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %d not found", githubUserId)));
+    }
+
+    private UserProfileView addProjectsStats(UserProfileView userProfileView) {
+        for (ProjectIdsForUserEntity projectIdsForUserEntity :
+                customUserRepository.getProjectIdsForUserId(userProfileView.getGithubId())) {
+            userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
+                    .contributorCount(projectIdsForUserEntity.getContributorsCount())
+                    .isProjectLead(projectIdsForUserEntity.getIsLead())
+                    .totalGranted(projectIdsForUserEntity.getTotalGranted())
+                    .userContributionCount(projectIdsForUserEntity.getUserContributionsCount())
+                    .userLastContributedAt(projectIdsForUserEntity.getLastContributionDate())
+                    .id(projectIdsForUserEntity.getId())
+                    .logoUrl(projectIdsForUserEntity.getLogoUrl())
+                    .name(projectIdsForUserEntity.getName())
+                    .build());
+        }
+        return userProfileView;
     }
 
     @Override
