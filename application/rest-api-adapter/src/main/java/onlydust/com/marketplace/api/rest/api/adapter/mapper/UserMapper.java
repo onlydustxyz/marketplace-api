@@ -160,8 +160,8 @@ public interface UserMapper {
         return userProfileStats;
     }
 
-    static MyRewardTotalAmountsResponse totalsEarnedToResponse(UserProfileView.TotalsEarned totalsEarned) {
-        final MyRewardTotalAmountsResponse response = new MyRewardTotalAmountsResponse();
+    static RewardTotalAmountsResponse totalsEarnedToResponse(UserProfileView.TotalsEarned totalsEarned) {
+        final RewardTotalAmountsResponse response = new RewardTotalAmountsResponse();
         response.setTotalAmount(totalsEarned.getTotalDollarsEquivalent());
         for (UserProfileView.TotalEarnedPerCurrency totalEarnedPerCurrency : totalsEarned.getDetails()) {
             final MyRewardAmountResponse myRewardAmountResponse = new MyRewardAmountResponse();
