@@ -252,7 +252,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                             ],
                             "hasMore": true,
                             "totalPageNumber": 13,
-                            "totalItemNumber": 26,
+                            "totalItemNumber": 25,
                             "nextPageIndex": 1
                         }""");
         client.get()
@@ -288,7 +288,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                            ],
                            "hasMore": false,
                            "totalPageNumber": 13,
-                           "totalItemNumber": 26,
+                           "totalItemNumber": 25,
                            "nextPageIndex": 12
                          }""");
     }

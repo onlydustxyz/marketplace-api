@@ -56,7 +56,7 @@ public class CustomRewardRepository {
     private static final String COUNT_REWARD_ITEMS = """
             select count(distinct wi.id)
             from payment_requests pr
-                     join public.work_items wi on pr.recipient_id = wi.recipient_id
+                     join public.work_items wi on wi.payment_id = pr.id
             where pr.id = :rewardId""";
 
     public Integer countRewardItemsForRewardId(UUID rewardId) {
