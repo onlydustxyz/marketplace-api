@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
@@ -40,10 +40,10 @@ public class CustomUserRepository {
                    u.created_at,
                    gu.login,
                    gu.html_url,
-                   coalesce(upi.bio, gu.bio)                    bio,
-                   coalesce(upi.location, gu.location)          location,
-                   coalesce(upi.website, gu.website)            website,
-                   coalesce(upi.avatar_url, gu.avatar_url)      avatar_url,
+                   coalesce(upi.bio, gu.bio)                        bio,
+                   coalesce(upi.location, gu.location)              location,
+                   coalesce(upi.website, gu.website)                website,
+                   coalesce(upi.avatar_url, gu.avatar_url)          avatar_url,
                    upi.languages,
                    upi.cover,
                    upi.looking_for_a_job,
@@ -55,7 +55,7 @@ public class CustomUserRepository {
                            'contact', ci.contact
                                      ))
                     FROM public.contact_informations ci
-                    WHERE u.id is not null and ci.user_id = u.id)                    contacts,
+                    WHERE u.id is not null and ci.user_id = u.id)   contacts,
                         
                    (SELECT jsonb_agg(jsonb_build_object(
                            'year', cc.year,
@@ -72,16 +72,16 @@ public class CustomUserRepository {
                           FROM contributions c
                           where c.status = 'complete'
                             and c.user_id = gu.id
-                          GROUP BY year, week) as cc)           counts,
+                          GROUP BY year, week) as cc)               counts,
                         
                         
                    (select count(pl.project_id)
                     from project_leads pl
-                    where u.id is not null and pl.user_id = u.id)                    leading_project_number,
+                    where u.id is not null and pl.user_id = u.id)   leading_project_number,
                         
                    (select count(distinct pc.project_id)
                     from projects_contributors pc
-                    where pc.github_user_id = gu.id) contributor_on_project,
+                    where pc.github_user_id = gu.id)                contributor_on_project,
                         
                    (select jsonb_build_object(
                                    'total_dollars_equivalent',
@@ -93,14 +93,14 @@ public class CustomUserRepository {
                                    'currency', pr.currency
                                                         )))
                     from payment_requests pr
-                             left join crypto_usd_quotes cuq on cuq.currency = pr.currency
-                    where pr.recipient_id = gu.id)   totals_earned,
+                    left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                    where pr.recipient_id = gu.id)                  totals_earned,
                         
                    (select count(distinct c.id)
                     from contributions c
                     where c.user_id = gu.id
-                      and c.status = 'complete')                contributions_count
-                      
+                      and c.status = 'complete')                    contributions_count
+                
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
@@ -118,10 +118,16 @@ public class CustomUserRepository {
             """;
 
     private final static String GET_PROJECT_STATS_BY_USER = """
-            select p.project_id as                       project_id,
+            select  p.project_id,
+                    p.key as slug,
+                    p.is_lead,
+                    p.name,
+                    p.logo_url,
+                        
                    (select count(distinct github_user_id)
                     from projects_contributors
                     where project_id = p.project_id)     contributors_count,
+                    
                    (select distinct b.initial_amount - b.remaining_amount total_usd_granted
                     from project_details pd
                              left join project_leads pl on pl.project_id = pd.project_id
@@ -129,27 +135,34 @@ public class CustomUserRepository {
                              left join budgets b on b.id = pb.budget_id
                     where pd.project_id = p.project_id
                       and b.currency = 'usd')            total_granted,
+                      
                    (select count(distinct c.id)
                     from project_github_repos pgr
                              join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :githubUserId
                     where pgr.project_id = p.project_id) user_contributions_count,
+                    
                    (select c.closed_at
                     from project_github_repos pgr
-                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :githubUserId
+                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
                     where pgr.project_id = p.project_id
-                      and closed_at is not null
                     order by c.closed_at desc
                     limit 1)                             last_contribution_date,
-                   p.is_lead,
-                   p.name,
-                   p.logo_url
-            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url
+                    
+                    
+                   (select c.closed_at
+                    from project_github_repos pgr
+                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
+                    where pgr.project_id = p.project_id
+                    order by c.closed_at asc
+                    limit 1)                             first_contribution_date                    
+                   
+            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url, pd.key
                    from contributions c
                             join project_github_repos gpr on gpr.github_repo_id = c.repo_id
                             join project_details pd on pd.project_id = gpr.project_id
                    where c.user_id = :githubUserId and c.status = 'complete')
                   UNION
-                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url
+                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url, pd.key
                    from auth_users u
                             join project_leads pl on pl.user_id = u.id
                             join project_details pd on pd.project_id = pl.project_id
@@ -275,8 +288,8 @@ public class CustomUserRepository {
         return Optional.ofNullable(rowToUserProfile(row));
     }
 
-    public List<ProjectIdsForUserEntity> getProjectIdsForUserId(final Long githubUserId) {
-        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectIdsForUserEntity.class)
+    public List<ProjectStatsForUserEntity> getProjectsStatsForUser(final Long githubUserId) {
+        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectStatsForUserEntity.class)
                 .setParameter("githubUserId", githubUserId)
                 .getResultList();
     }

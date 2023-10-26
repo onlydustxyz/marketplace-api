@@ -92,7 +92,7 @@ public interface UserMapper {
         userProfileResponse.setTechnologies(userProfileView.getTechnologies());
         userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
         userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
-        //TODO userProfileResponse.setFirstContributedAt(toZoneDateTime(userProfileView.getFirstContributedAt()));
+        userProfileResponse.setFirstContributedAt(toZoneDateTime(userProfileView.getFirstContributedAt()));
         return userProfileResponse;
     }
 
@@ -126,7 +126,7 @@ public interface UserMapper {
                     userProfileProjects.setContributorCount(ps.getContributorCount());
                     userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
                     userProfileProjects.setIsLead(ps.getIsProjectLead());
-                    //TODO userProfileProjects.setSlug(ps.getSlug());
+                    userProfileProjects.setSlug(ps.getSlug());
                     return userProfileProjects;
                 })
                 .toList();

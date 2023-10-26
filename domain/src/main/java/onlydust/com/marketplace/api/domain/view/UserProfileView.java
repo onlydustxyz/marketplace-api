@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.domain.view;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.Contact;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
@@ -22,6 +24,7 @@ public class UserProfileView {
     String htmlUrl;
     Date createAt;
     Date lastSeenAt;
+    Date firstContributedAt;
     String location;
     String twitter;
     String linkedin;
@@ -34,11 +37,15 @@ public class UserProfileView {
     UserAllocatedTimeToContribute allocatedTimeToContribute;
     Boolean isLookingForAJob;
     @Builder.Default
+    @Setter(AccessLevel.NONE)
     Set<ProjectStats> projectsStats = new HashSet<>();
     @Builder.Default
     Set<Contact> contacts = new HashSet<>();
 
     public void addProjectStats(final ProjectStats projectStats) {
+        if (projectStats.getUserFirstContributedAt() != null && (firstContributedAt == null || projectStats.getUserFirstContributedAt().before(firstContributedAt))) {
+            firstContributedAt = projectStats.getUserFirstContributedAt();
+        }
         this.projectsStats.add(projectStats);
     }
 
@@ -46,12 +53,14 @@ public class UserProfileView {
     @Builder
     public static class ProjectStats {
         UUID id;
+        String slug;
         String name;
         String logoUrl;
         Integer contributorCount;
         BigDecimal totalGranted;
         Integer userContributionCount;
         Date userLastContributedAt;
+        Date userFirstContributedAt;
         Boolean isProjectLead;
     }
 
