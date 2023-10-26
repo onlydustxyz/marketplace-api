@@ -34,7 +34,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
-    void should_update_onboarding_state() throws JsonProcessingException {
+    void should_update_onboarding_state() {
         // Given
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
@@ -49,7 +49,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
 
         // When
         client.patch()
@@ -73,7 +74,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
 
         // When
         client.patch()
@@ -97,12 +99,13 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true);
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
     }
 
 
     @Test
-    void should_accept_valid_project_leader_invitation() throws JsonProcessingException {
+    void should_accept_valid_project_leader_invitation() {
         // Given
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
@@ -138,7 +141,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_not_accept_project_leader_invitation_when_invitation_does_not_exist() throws JsonProcessingException {
+    void should_not_accept_project_leader_invitation_when_invitation_does_not_exist() {
         // Given
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
@@ -174,7 +177,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_apply_to_project() throws JsonProcessingException {
+    void should_apply_to_project() {
         // Given
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();

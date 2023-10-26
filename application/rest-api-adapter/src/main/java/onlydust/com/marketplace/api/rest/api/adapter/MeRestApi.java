@@ -25,6 +25,8 @@ import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelp
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutInformationToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutInformationToResponse;
 
 @RestController
 @Tags(@Tag(name = "Me"))
@@ -42,18 +44,18 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<UserPayoutInformationContract> getMyPayoutInfo() {
+    public ResponseEntity<UserPayoutInformationResponse> getMyPayoutInfo() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final UserPayoutInformation view = userFacadePort.getPayoutInformationForUserId(authenticatedUser.getId());
-        final UserPayoutInformationContract userPayoutInformation = userPayoutInformationToResponse(view);
+        final UserPayoutInformationResponse userPayoutInformation = userPayoutInformationToResponse(view);
         return ResponseEntity.ok(userPayoutInformation);
     }
 
     @Override
-    public ResponseEntity<UserPayoutInformationContract> putMyPayoutInfo(UserPayoutInformationContract userPayoutInformationContract) {
+    public ResponseEntity<UserPayoutInformationResponse> putMyPayoutInfo(UserPayoutInformationRequest userPayoutInformationRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final UserPayoutInformation view = userFacadePort.updatePayoutInformation(authenticatedUser.getId(),
-                userPayoutInformationToDomain(userPayoutInformationContract));
+                userPayoutInformationToDomain(userPayoutInformationRequest));
         return ResponseEntity.ok(userPayoutInformationToResponse(view));
     }
 

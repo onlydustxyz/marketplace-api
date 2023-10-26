@@ -140,7 +140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformationContract'
+                $ref: '#/components/schemas/UserPayoutInformationResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -159,14 +159,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPayoutInformationContract'
+              $ref: '#/components/schemas/UserPayoutInformationRequest'
       responses:
         "200":
           description: 'Payout information'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformationContract'
+                $ref: '#/components/schemas/UserPayoutInformationResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1167,7 +1167,7 @@ components:
         owner:
           $ref: '#/components/schemas/PersonIdentity'
 
-    UserPayoutInformationContract:
+    UserPayoutInformationResponse:
       type: object
       properties:
         person:
@@ -1212,8 +1212,8 @@ components:
                 iban:
                   type: string
                   example: FR5417569000301995586997O41
-                missingSepaAccount:
-                  type: boolean
+            missingSepaAccount:
+              type: boolean
             ethAddress:
               type: string
               example: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
@@ -1237,6 +1237,62 @@ components:
               example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
             missingStarknetWallet:
               type: boolean
+    UserPayoutInformationRequest:
+      type: object
+      properties:
+        person:
+          $ref: '#/components/schemas/PersonIdentity'
+        company:
+          $ref: '#/components/schemas/CompanyIdentity'
+        isCompany:
+          type: boolean
+        location:
+          type: object
+          properties:
+            country:
+              type: string
+              example: France
+            city:
+              type: string
+              example: Paris
+            postalCode:
+              type: string
+              example: 75001
+            address:
+              type: string
+              example: 33 rue de Rivoli
+        payoutSettings:
+          type: object
+          properties:
+            usdPreferredMethod:
+              type: string
+              enum:
+                - CRYPTO
+                - FIAT
+            sepaAccount:
+              type: object
+              properties:
+                bic:
+                  type: string
+                  example: DAAEFRPPCCT
+                iban:
+                  type: string
+                  example: FR5417569000301995586997O41
+            ethAddress:
+              type: string
+              example: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+            ethName:
+              type: string
+              example: vitalik.eth
+            optimismAddress:
+              type: string
+              example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+            aptosAddress:
+              type: string
+              example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+            starknetAddress:
+              type: string
+              example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
     UserProfileRequest:
       type: object
@@ -1294,6 +1350,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/UserLinkResponse'
         - type: object
+          required:
+            - id
           properties:
             id:
               $ref: '#/components/schemas/UserId'
@@ -1318,6 +1376,10 @@ components:
               type: string
               format: date-time
               description: The last time the user signed in on OnlyDust
+            firstContributedAt:
+              type: string
+              format: date-time
+              description: First contribution date to return if user not registered on OD
             cover:
               $ref: '#/components/schemas/UserProfileCoverColor'
             contacts:
@@ -1332,6 +1394,13 @@ components:
               $ref: '#/components/schemas/UserProfileStats'
     UserProfileStats:
       type: object
+      required:
+        - contributedProjectCount
+        - leadedProjectCount
+        - totalsEarned
+        - contributionCount
+        - contributionCountPerWeeks
+        - contributionCountVariationSinceLastWeek
       properties:
         contributedProjectCount:
           type: integer
@@ -1351,8 +1420,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserContributionStats'
+        contributionCountVariationSinceLastWeek:
+          type: integer
     UserContributionStats:
       type: object
+      required:
+        - year
+        - week
+        - codeReviewCount
+        - issueCount
+        - pullRequestCount
       properties:
         year:
           type: integer
@@ -1368,6 +1445,16 @@ components:
           type: integer
     UserProfileProjects:
       type: object
+      required:
+        - id
+        - name
+        - isLead
+        - logoUrl
+        - contributorCount
+        - totalGranted
+        - userContributionCount
+        - userLastContributedAt
+        - slug
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -1398,6 +1485,9 @@ components:
           type: string
           format: date-time
           description: The last time the user contributed to this project
+        slug:
+          type: string
+          description: Slug derived from project name
 
     ContactInformation:
       type: object
@@ -2494,7 +2584,11 @@ components:
         - to
         - createdAt
         - rewardItems
+        - id
       properties:
+        id:
+          type: string
+          format: uuid
         currency:
           $ref: '#/components/schemas/CurrencyContract'
         amount:
@@ -2526,10 +2620,14 @@ components:
         - createdAt
         - repoName
         - type
-        - commitsCount
-        - commentsCount
         - status
+        - number
+        - id
       properties:
+        number:
+          type: integer
+        id:
+          type: string
         title:
           type: string
         githubUrl:

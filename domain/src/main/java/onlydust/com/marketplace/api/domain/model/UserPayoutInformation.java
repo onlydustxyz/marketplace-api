@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Data
@@ -15,6 +16,21 @@ public class UserPayoutInformation {
     Boolean isACompany = false;
     Location location;
     PayoutSettings payoutSettings;
+    @Builder.Default
+    Boolean hasValidPerson = true;
+    @Builder.Default
+    Boolean hasValidCompany = true;
+    @Builder.Default
+    Boolean hasValidLocation = true;
+
+    public Boolean getHasValidContactInfo() {
+        return (hasValidCompany || hasValidPerson) && hasValidLocation;
+    }
+
+    public boolean isValid() {
+        return isNull(this.payoutSettings) ? this.getHasValidContactInfo() :
+                this.getHasValidContactInfo() && this.payoutSettings.isValid();
+    }
 
     public void validate() {
         if (nonNull(this.payoutSettings)) {
@@ -45,10 +61,24 @@ public class UserPayoutInformation {
         UsdPreferredMethodEnum usdPreferredMethodEnum;
         String ethAddress;
         String ethName;
+        @Builder.Default
+        Boolean hasMissingEthWallet = false;
         String optimismAddress;
+        @Builder.Default
+        Boolean hasMissingOptimismWallet = false;
         String aptosAddress;
+        @Builder.Default
+        Boolean hasMissingAptosWallet = false;
         String starknetAddress;
+        @Builder.Default
+        Boolean hasMissingStarknetWallet = false;
         SepaAccount sepaAccount;
+        @Builder.Default
+        Boolean hasMissingBankingAccount = false;
+
+        public Boolean isValid() {
+            return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount);
+        }
     }
 
     @Data

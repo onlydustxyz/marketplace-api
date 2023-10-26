@@ -65,6 +65,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
     }
 
@@ -100,6 +101,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
     }
 }

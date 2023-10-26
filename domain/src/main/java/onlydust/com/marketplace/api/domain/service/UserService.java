@@ -5,9 +5,9 @@ import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -24,6 +24,12 @@ public class UserService implements UserFacadePort {
     public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity) {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
+                .map(user -> {
+                    final UserPayoutInformation payoutInformationById =
+                            userStoragePort.getPayoutInformationById(user.getId());
+                    user.setHasValidPayoutInfos(payoutInformationById.isValid());
+                    return user;
+                })
                 .orElseGet(() -> {
                     final var user = User.builder()
                             .id(UUID.randomUUID())
@@ -49,8 +55,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserPayoutInformation getPayoutInformationForUserId(UUID id) {
-        return userStoragePort.getPayoutInformationById(id);
+    public UserPayoutInformation getPayoutInformationForUserId(UUID userId) {
+        return userStoragePort.getPayoutInformationById(userId);
     }
 
     @Override

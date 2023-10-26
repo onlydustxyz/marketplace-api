@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
@@ -50,12 +51,14 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomUserRewardRepository customUserRewardRepository;
     private final WalletRepository walletRepository;
+    private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
         final var settings =
-                globalSettingsRepository.findAll().stream().findFirst().orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
+                globalSettingsRepository.findAll().stream().findFirst()
+                        .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         if (user.isPresent()) {
             return user.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
@@ -103,9 +106,14 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public UserPayoutInformation getPayoutInformationById(UUID id) {
-        final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.getById(id);
-        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity);
+    public UserPayoutInformation getPayoutInformationById(UUID userId) {
+        final Optional<UserPayoutInfoEntity> userPayoutInfoEntity = userPayoutInfoRepository.findByUserId(userId);
+        final Optional<UserPayoutInfoValidationEntity> userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
+        return userPayoutInfoEntity.map(entity -> UserPayoutInfoMapper.mapEntityToDomain(entity,
+                userPayoutInfoValidationEntity.orElseGet(
+                        UserPayoutInfoValidationEntity::defaultValue
+                ))).orElseGet(() -> UserPayoutInformation.builder().build());
     }
 
     @Override
@@ -180,7 +188,11 @@ public class PostgresUserAdapter implements UserStoragePort {
         final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
                 userPayoutInformation);
         userPayoutInfoRepository.findById(userId).ifPresent(entity -> walletRepository.deleteByUserId(userId));
-        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoRepository.save(userPayoutInfoEntity));
+        final UserPayoutInfoEntity saved = userPayoutInfoRepository.save(userPayoutInfoEntity);
+        final Optional<UserPayoutInfoValidationEntity> userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
+        return UserPayoutInfoMapper.mapEntityToDomain(saved,
+                userPayoutInfoValidationEntity.orElseGet(UserPayoutInfoValidationEntity::defaultValue));
     }
 
     @Override

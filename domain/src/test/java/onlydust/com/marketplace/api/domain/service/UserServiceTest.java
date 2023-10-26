@@ -29,27 +29,30 @@ public class UserServiceTest {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
-        final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
-                .githubUserId(faker.number().randomNumber())
-                .githubAvatarUrl(faker.internet().avatar())
-                .githubLogin(faker.hacker().verb())
-                .build();
-        final User user = User.builder()
-                .id(UUID.randomUUID())
-                .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .login(githubUserIdentity.getGithubLogin())
-                .hasAcceptedLatestTermsAndConditions(true)
-                .hasSeenOnboardingWizard(true)
-                .build();
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+        final User user =
+                User.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).login(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
 
         // When
-        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId()))
-                .thenReturn(Optional.of(user));
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
+        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(
+                UserPayoutInformation.builder()
+                        .hasValidPerson(true)
+                        .hasValidCompany(false)
+                        .hasValidLocation(true)
+                        .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                                .hasMissingAptosWallet(false)
+                                .hasMissingEthWallet(false)
+                                .hasMissingStarknetWallet(false)
+                                .hasMissingOptimismWallet(false)
+                                .hasMissingBankingAccount(false)
+                                .build()).build());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity);
 
         // Then
         assertEquals(user, userByGithubIdentity);
+        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
     }
 
     @Test
@@ -57,28 +60,16 @@ public class UserServiceTest {
         // Given
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
-        final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
-                .githubUserId(faker.number().randomNumber())
-                .githubAvatarUrl(faker.internet().avatar())
-                .githubLogin(faker.hacker().verb())
-                .build();
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
 
         // When
-        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId()))
-                .thenReturn(Optional.empty());
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity);
 
         // Then
         assertThat(userByGithubIdentity.getId()).isNotNull();
-        assertEquals(User.builder()
-                .id(userByGithubIdentity.getId())
-                .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .login(githubUserIdentity.getGithubLogin())
-                .roles(List.of(UserRole.USER))
-                .hasAcceptedLatestTermsAndConditions(false)
-                .hasSeenOnboardingWizard(false)
-                .build(), userByGithubIdentity);
+        assertEquals(User.builder().id(userByGithubIdentity.getId()).avatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).login(githubUserIdentity.getGithubLogin()).roles(List.of(UserRole.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
     }
 
 
@@ -88,16 +79,11 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserProfileView userProfileView = UserProfileView.builder()
-                .id(userId)
-                .avatarUrl(faker.pokemon().name())
-                .githubId(faker.number().randomNumber())
-                .login(faker.hacker().verb())
-                .build();
+        final UserProfileView userProfileView =
+                UserProfileView.builder().id(userId).avatarUrl(faker.pokemon().name()).githubId(faker.number().randomNumber()).login(faker.hacker().verb()).build();
 
         // When
-        when(userStoragePort.getProfileById(userId))
-                .thenReturn(userProfileView);
+        when(userStoragePort.getProfileById(userId)).thenReturn(userProfileView);
         final UserProfileView profileById = userService.getProfileById(userId);
 
         // Then
@@ -171,35 +157,13 @@ public class UserServiceTest {
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
 
-        final UserProfile profile = UserProfile.builder()
-                .bio(faker.lorem().sentence())
-                .website(faker.internet().url())
-                .location(faker.address().city())
-                .cover(UserProfileCover.CYAN)
-                .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(),
-                        faker.programmingLanguage().name(), faker.number().randomDigit()))
-                .contacts(List.of(
-                        Contact.builder()
-                                .contact(faker.internet().url())
-                                .channel(Contact.Channel.WHATSAPP)
-                                .visibility(Contact.Visibility.PUBLIC)
-                                .build(),
-                        Contact.builder()
-                                .contact(faker.internet().emailAddress())
-                                .channel(Contact.Channel.EMAIL)
-                                .visibility(Contact.Visibility.PRIVATE)
-                                .build()
-                ))
-                .build();
+        final UserProfile profile =
+                UserProfile.builder().bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).cover(UserProfileCover.CYAN).technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(), faker.programmingLanguage().name(), faker.number().randomDigit())).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
 
-        final UserProfileView userProfileView = UserProfileView.builder()
-                .id(userId)
-                .bio(profile.getBio())
-                .build();
+        final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
 
         // When
-        when(userStoragePort.getProfileById(userId))
-                .thenReturn(userProfileView);
+        when(userStoragePort.getProfileById(userId)).thenReturn(userProfileView);
         final UserProfileView updatedUser = userService.updateProfile(userId, profile);
 
         // Then
@@ -214,11 +178,8 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .aptosAddress(faker.rickAndMorty().character())
-                        .build())
-                .build();
+        final UserPayoutInformation userPayoutInformation =
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(faker.rickAndMorty().character()).build()).build();
 
         // When
         OnlyDustException onlyDustException = null;
@@ -240,11 +201,8 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress(faker.rickAndMorty().character())
-                        .build())
-                .build();
+        final UserPayoutInformation userPayoutInformation =
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethAddress(faker.rickAndMorty().character()).build()).build();
 
         // When
         OnlyDustException onlyDustException = null;
@@ -266,11 +224,8 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .starknetAddress(faker.rickAndMorty().character())
-                        .build())
-                .build();
+        final UserPayoutInformation userPayoutInformation =
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().starknetAddress(faker.rickAndMorty().character()).build()).build();
 
         // When
         OnlyDustException onlyDustException = null;
@@ -292,11 +247,8 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .optimismAddress(faker.rickAndMorty().character())
-                        .build())
-                .build();
+        final UserPayoutInformation userPayoutInformation =
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().optimismAddress(faker.rickAndMorty().character()).build()).build();
 
         // When
         OnlyDustException onlyDustException = null;
@@ -318,14 +270,8 @@ public class UserServiceTest {
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .optimismAddress("0x" + faker.crypto().md5())
-                        .starknetAddress("0X" + faker.random().hex())
-                        .ethName("0x" + faker.random().hex())
-                        .aptosAddress("0X" + faker.random().hex())
-                        .build())
-                .build();
+        final UserPayoutInformation userPayoutInformation =
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().optimismAddress("0x" + faker.crypto().md5()).starknetAddress("0X" + faker.random().hex()).ethName("0x" + faker.random().hex()).aptosAddress("0X" + faker.random().hex()).build()).build();
 
         // When
         userService.updatePayoutInformation(userId, userPayoutInformation);
