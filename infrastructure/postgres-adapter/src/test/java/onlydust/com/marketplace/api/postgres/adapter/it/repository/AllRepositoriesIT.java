@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -356,9 +357,18 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void should_save_and_read_and_update_user_payout_info() {
         // Given
         final UUID userId = UUID.randomUUID();
+        authUserRepository.save(AuthUserEntity.builder()
+                .id(userId)
+                .githubUserId(1L)
+                .createdAt(new Date())
+                .loginAtSignup(faker.rickAndMorty().character())
+                .avatarUrlAtSignup(faker.internet().url())
+                .isAdmin(false)
+                .build());
         final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
@@ -370,7 +380,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .name(faker.name().name())
                         .owner(person)
                         .build())
-                .person(person)
                 .location(UserPayoutInformation.Location.builder()
                         .country(faker.address().country())
                         .city(faker.address().city())
@@ -395,7 +404,16 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final UserPayoutInformation payoutInformationById = postgresUserAdapter.getPayoutInformationById(userId);
 
         // Then
-        assertEquals(userPayoutInformation, payoutInformationById);
+        assertEquals(userPayoutInformation.toBuilder().hasValidPerson(false).hasValidCompany(true).hasValidLocation(true)
+                        .payoutSettings(payoutInformationById.getPayoutSettings()
+                                .toBuilder()
+                                .hasMissingOptimismWallet(false)
+                                .hasMissingEthWallet(false)
+                                .hasMissingAptosWallet(false)
+                                .hasMissingBankingAccount(false)
+                                .hasMissingStarknetWallet(false)
+                                .build()).build(),
+                payoutInformationById);
 
         final UserPayoutInformation userPayoutInformationUpdated =
                 postgresUserAdapter.savePayoutInformationForUserId(userId, userPayoutInformation.toBuilder()

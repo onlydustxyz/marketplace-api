@@ -142,7 +142,6 @@ public interface UserPayoutInfoMapper {
                         .build();
                 userPayoutInformation = userPayoutInformation.toBuilder()
                         .isACompany(true)
-                        .person(person)
                         .company(
                                 UserPayoutInformation.Company.builder()
                                         .owner(person)
