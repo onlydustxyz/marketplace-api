@@ -1,12 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.view.RewardView;
 import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import java.util.List;
 import java.util.Objects;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
@@ -84,5 +86,10 @@ public interface MyRewardMapper {
                     }));
         }
         return myRewardTotalAmountsResponse;
+    }
+
+    static MyRewardsListResponse listToResponse(final List<RewardView> views) {
+        return new MyRewardsListResponse()
+                .rewards(views.stream().map(RewardMapper::rewardToResponse).toList());
     }
 }

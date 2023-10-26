@@ -255,4 +255,10 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
     }
+
+    @Override
+    public List<RewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
+        return customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId)
+                .stream().map(UserRewardMapper::mapEntityToDomain).toList();
+    }
 }

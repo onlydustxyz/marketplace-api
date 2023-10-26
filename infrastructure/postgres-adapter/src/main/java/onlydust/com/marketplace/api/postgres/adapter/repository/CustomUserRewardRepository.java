@@ -46,6 +46,26 @@ public class CustomUserRewardRepository {
                      order by %order_by% offset :offset limit :limit
                      """;
 
+    protected static final String FIND_USER_PENDING_INVOICE_REWARDS_BY_RECIPIENT_ID = """
+            select pr.requested_at,
+                   pd.name,
+                   pd.logo_url,
+                   pr.id,
+                   pr.amount,
+                   pr.currency,
+                   (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
+                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
+                   'PENDING_INVOICE'                                                       status
+            from auth_users au
+                     join payment_requests pr on pr.recipient_id = au.github_user_id and au.id = :userId
+                     join project_details pd on pd.project_id = pr.project_id
+                     left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                     left join payments r on r.request_id = pr.id
+                     where pr.recipient_id = :recipientId
+                       and pr.invoice_received_at is null
+                     """;
+
+
     public Integer getCount(UUID userId) {
         final var query = entityManager
                 .createNativeQuery(COUNT_USER_REWARDS)
@@ -92,6 +112,13 @@ public class CustomUserRewardRepository {
         return entityManager.createNativeQuery(FIND_USER_REWARD_TOTAL_AMOUNTS_BY_USER_ID,
                         UserRewardTotalAmountEntity.class)
                 .setParameter("userId", userId)
+                .getResultList();
+    }
+
+    public List<UserRewardViewEntity> getPendingInvoicesViewEntities(final Long recipientId) {
+        return entityManager.createNativeQuery(FIND_USER_PENDING_INVOICE_REWARDS_BY_RECIPIENT_ID,
+                        UserRewardViewEntity.class)
+                .setParameter("recipientId", recipientId)
                 .getResultList();
     }
 }

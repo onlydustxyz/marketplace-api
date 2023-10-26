@@ -169,7 +169,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.projectRewardToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardToResponse(rewardView));
     }
 
     @Override
