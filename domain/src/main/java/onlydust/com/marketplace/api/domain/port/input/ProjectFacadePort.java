@@ -42,4 +42,9 @@ public interface ProjectFacadePort {
                                        ProjectRewardView.SortBy sortBy, SortDirection sortDirection);
 
     ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId);
+
+    RewardView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID userId);
+
+    Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLead,
+                                                              int pageIndex, int pageSize);
 }

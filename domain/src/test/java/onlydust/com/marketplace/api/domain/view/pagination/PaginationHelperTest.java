@@ -41,11 +41,12 @@ public class PaginationHelperTest {
     @Test
     void should_sanitize_page_size() {
         // Then
-        assertEquals(50,PaginationHelper.sanitizePageSize(null));
+        assertEquals(50, PaginationHelper.sanitizePageSize(null));
     }
 
     @Test
     void should_compute_page_total_number_from_count() {
+        assertEquals(2, PaginationHelper.calculateTotalNumberOfPage(20, 26));
         assertEquals(2, PaginationHelper.calculateTotalNumberOfPage(5, 10));
         assertEquals(2, PaginationHelper.calculateTotalNumberOfPage(5, 9));
         assertEquals(1, PaginationHelper.calculateTotalNumberOfPage(5, 1));
@@ -59,5 +60,6 @@ public class PaginationHelperTest {
         assertEquals(1, PaginationHelper.nextPageIndex(1, 2));
         assertEquals(true, PaginationHelper.hasMore(0, 2));
         assertEquals(1, PaginationHelper.nextPageIndex(0, 2));
+        assertEquals(true, PaginationHelper.hasMore(0, 2));
     }
 }
