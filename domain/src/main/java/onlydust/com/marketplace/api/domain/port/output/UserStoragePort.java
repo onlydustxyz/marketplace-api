@@ -18,6 +18,8 @@ public interface UserStoragePort {
 
     UserProfileView getProfileById(Long githubUserId);
 
+    UserProfileView getProfileByLogin(String githubLogin);
+
     void saveProfile(UUID userId, UserProfile userProfile);
 
     Optional<User> getUserByGithubId(Long githubId);

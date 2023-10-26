@@ -64,6 +64,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_REWARDS = "/api/v1/me/rewards";
     protected static final String ME_GET_REWARD_TOTAL_AMOUNTS = "/api/v1/me/rewards/amounts";
     protected static final String USERS_GET = "/api/v1/users";
+    protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
 
     @Container
@@ -77,11 +78,11 @@ public class AbstractMarketplaceApiIT {
                     .withCopyFileToContainer(
                             MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
                     .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+    protected final ObjectMapper objectMapper = new ObjectMapper();
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("rust-api")
     protected WireMockServer rustApiWireMockServer;
-
     @LocalServerPort
     int port;
     @Autowired
@@ -126,7 +127,5 @@ public class AbstractMarketplaceApiIT {
                 .build()
                 .toUri();
     }
-
-    protected final ObjectMapper objectMapper = new ObjectMapper();
 
 }

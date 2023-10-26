@@ -118,6 +118,13 @@ public class CustomUserRepository {
             where gu.id = :githubUserId
             """;
 
+    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
+            from public.github_users gu
+                     left join public.auth_users u on gu.id = u.github_user_id
+                     left join public.user_profile_info upi on upi.id = u.id
+            where gu.login = :githubLogin
+            """;
+
     private final static String GET_PROJECT_STATS_BY_USER = """
             select  p.project_id,
                     p.key as slug,
@@ -276,11 +283,16 @@ public class CustomUserRepository {
     }
 
     public Optional<UserProfileView> findProfileById(final UUID userId) {
-        final UserProfileEntity row = (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
-                        UserProfileEntity.class)
-                .setParameter("userId", userId)
-                .getSingleResult();
-        return Optional.ofNullable(rowToUserProfile(row));
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
+                                    UserProfileEntity.class)
+                            .setParameter("userId", userId)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
     public Optional<UserProfileView> findProfileById(final Long githubUserId) {
@@ -296,10 +308,22 @@ public class CustomUserRepository {
         }
     }
 
+    public Optional<UserProfileView> findProfileByLogin(String githubLogin) {
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN,
+                                    UserProfileEntity.class)
+                            .setParameter("githubLogin", githubLogin)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
     public List<ProjectStatsForUserEntity> getProjectsStatsForUser(final Long githubUserId) {
         return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectStatsForUserEntity.class)
                 .setParameter("githubUserId", githubUserId)
                 .getResultList();
     }
-
 }

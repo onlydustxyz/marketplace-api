@@ -26,4 +26,11 @@ public class UsersRestApi implements UsersApi {
         final PublicUserProfileResponse userProfileResponse = userProfileToPublicResponse(userProfileView);
         return ResponseEntity.ok(userProfileResponse);
     }
+
+    @Override
+    public ResponseEntity<PublicUserProfileResponse> getUserProfileByLogin(String githubLogin) {
+        final UserProfileView userProfileView = userFacadePort.getProfileByLogin(githubLogin);
+        final PublicUserProfileResponse userProfileResponse = userProfileToPublicResponse(userProfileView);
+        return ResponseEntity.ok(userProfileResponse);
+    }
 }

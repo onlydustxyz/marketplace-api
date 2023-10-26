@@ -816,6 +816,30 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_public_user_profile_by_login() {
+        // Given
+        final String anthonyLogin = "AnthonyBuisset";
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_BY_LOGIN + "/" + anthonyLogin))
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.allocatedTimeToContribute").doesNotExist()
+                .jsonPath("$.isLookingForAJob").doesNotExist()
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')]").doesNotExist()
+                .jsonPath("$.contacts[?(@.contact=='antho')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='antho')].channel").isEqualTo("DISCORD")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].channel").isEqualTo("TWITTER")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
+                .json(GET_ANTHONY_PROFILE_WITHOUT_CONTACTS_JSON_RESPONSE);
+    }
+
+    @Test
     void should_get_private_user_profile() throws JsonProcessingException {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();

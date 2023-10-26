@@ -89,6 +89,13 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(format("User profile %d not found", githubUserId)));
     }
 
+    @Override
+    public UserProfileView getProfileByLogin(String githubLogin) {
+        return customUserRepository.findProfileByLogin(githubLogin)
+                .map(this::addProjectsStats)
+                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", githubLogin)));
+    }
+
     private UserProfileView addProjectsStats(UserProfileView userProfileView) {
         final var projectsStats = customUserRepository.getProjectsStatsForUser(userProfileView.getGithubId());
         for (ProjectStatsForUserEntity stats : projectsStats) {
