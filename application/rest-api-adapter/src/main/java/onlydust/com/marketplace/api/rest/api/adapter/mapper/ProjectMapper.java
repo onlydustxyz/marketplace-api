@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -173,6 +174,13 @@ public interface ProjectMapper {
         return null;
     }
 
-
-
+    static ShortProjectResponse mapShortProjectResponse(Project project) {
+        return new ShortProjectResponse()
+                .id(project.getId())
+                .name(project.getName())
+                .logoUrl(project.getLogoUrl())
+                .slug(project.getSlug())
+                .shortDescription(project.getShortDescription())
+                .visibility(mapProjectVisibility(project.getVisibility()));
+    }
 }

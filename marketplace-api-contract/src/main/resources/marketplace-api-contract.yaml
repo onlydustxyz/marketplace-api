@@ -305,12 +305,7 @@ paths:
           name: sort
           description: Sorting field
           schema:
-            type: string
-            default: CREATED_AT
-            enum:
-              - CREATED_AT
-              - PROJECT_REPO_NAME
-              - TITLE
+            $ref: '#/components/schemas/ContributionSort'
         - in: query
           name: direction
           description: Sort direction
@@ -324,12 +319,12 @@ paths:
           name: page
           description: Page number
           schema:
-            type: number
+            type: integer
         - in: query
           name: pageSize
           description: Number of items returned by page
           schema:
-            type: number
+            type: integer
       
       responses:
         "200":
@@ -1841,16 +1836,6 @@ components:
         visibility:
           $ref: '#/components/schemas/ProjectVisibility'
 
-    ShortProjectResponseWithRepos:
-      allOf:
-        - $ref: '#/components/schemas/ShortProjectResponse'
-        - type: object
-          properties:
-            repos:
-              type: array
-              items:
-                $ref: '#/components/schemas/GithubRepoResponse'
-
     ProjectVisibility:
       type: string
       enum:
@@ -1858,16 +1843,13 @@ components:
         - PRIVATE
       description: Is the project visible to anyone?
 
-    GithubRepoResponse:
+    ShortGithubRepoResponse:
       type: object
       required:
         - id
         - owner
         - name
-        - stars
-        - forkCount
         - htmlUrl
-        - hasIssues
       properties:
         id:
           $ref: '#/components/schemas/GithubRepoId'
@@ -1879,26 +1861,36 @@ components:
           type: string
           description: Repo name on Github
           example: marketplace-backend
-        description:
-          type: string
-          description: Repo description on Github
-          example: Awesome repo
-        stars:
-          type: integer
-          description: Number of stars on Github
-          example: 625
-        forkCount:
-          type: integer
-          description: Fork count on Github
-          example: 3
         htmlUrl:
           type: string
           format: url
           description: The public Github URL of the repo
           example: https://github.com/onlydustxyz/marketplace-backend
-        hasIssues:
-          type: boolean
-          description: Are issues enabled on Github for this repo
+
+    GithubRepoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ShortGithubRepoResponse'
+        - type: object
+          required:
+            - stars
+            - forkCount
+            - hasIssues
+          properties:
+            description:
+              type: string
+              description: Repo description on Github
+              example: Awesome repo
+            stars:
+              type: integer
+              description: Number of stars on Github
+              example: 625
+            forkCount:
+              type: integer
+              description: Fork count on Github
+              example: 3
+            hasIssues:
+              type: boolean
+              description: Are issues enabled on Github for this repo
 
     Technologies:
       type: object
@@ -2149,7 +2141,7 @@ components:
         author:
           $ref: '#/components/schemas/UserLinkResponse'
         repository:
-          $ref: '#/components/schemas/GithubRepoResponse'
+          $ref: '#/components/schemas/ShortGithubRepoResponse'
         commentCount:
           type: integer
         closingIssues:
@@ -2203,7 +2195,7 @@ components:
         author:
           $ref: '#/components/schemas/UserLinkResponse'
         repository:
-          $ref: '#/components/schemas/GithubRepoResponse'
+          $ref: '#/components/schemas/ShortGithubRepoResponse'
         commentCount:
           type: integer
         closingPullRequests:
@@ -2244,6 +2236,14 @@ components:
         - ISSUE
         - PULL_REQUEST
         - CODE_REVIEW
+
+    ContributionSort:
+      type: string
+      default: CREATED_AT
+      enum:
+        - CREATED_AT
+        - PROJECT_REPO_NAME
+        - GITHUB_NUMBER_TITLE
 
     GithubIssueStatus:
       type: string
@@ -2290,6 +2290,7 @@ components:
       required:
         - contributions
         - projects
+        - repos
         - hasMore
         - totalPageNumber
         - totalItemNumber
@@ -2302,7 +2303,11 @@ components:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ShortProjectResponseWithRepos'
+            $ref: '#/components/schemas/ShortProjectResponse'
+        repos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortGithubRepoResponse'
         hasMore:
           type: boolean
           example: true
@@ -2315,15 +2320,57 @@ components:
           type: integer
 
     ContributionPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionResponse'
+        - type: object
+          required:
+            - project_name
+            - repo_name
+            - links
+            - rewardIds
+          properties:
+            project_name:
+              type: string
+              description: Project name
+              example: Verkle Tries
+            repo_name:
+              type: string
+              description: Github repository name
+              example: marketplace-backend
+            links:
+              type: array
+              description: Related contributions
+              items:
+                $ref: '#/components/schemas/ContributionLinkResponse'
+            rewardIds:
+              type: array
+              description: Rewards granted for this contribution
+              items:
+                $ref: '#/components/schemas/RewardId'
+
+
+    ContributionLinkResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionResponse'
+        - type: object
+          required:
+            - is_mine
+          properties:
+            is_mine:
+              type: boolean
+              description: True if the contribution is made by the same user
+
+    ContributionResponse:
       type: object
       required:
         - id
         - createdAt
         - type
         - status
-        - project
-        - contributor
-        - rewardIds
+        - number
+        - title
+        - htmlUrl
+        - body
       properties:
         id:
           type: string
@@ -2340,21 +2387,22 @@ components:
           $ref: '#/components/schemas/ContributionType'
         status:
           $ref: '#/components/schemas/ContributionStatus'
-        githubIssue:
-          $ref: '#/components/schemas/GithubIssue'
-        githubPullRequest:
-          $ref: '#/components/schemas/GithubPullRequest'
-        githubCodeReview:
-          $ref: '#/components/schemas/GithubCodeReview'
-        project:
-          $ref: '#/components/schemas/ShortProjectResponse'
-        contributor:
-          $ref: '#/components/schemas/UserLinkResponse'
-        rewardIds:
-          type: array
-          description: Rewards granted for this contribution
-          items:
-            $ref: '#/components/schemas/RewardId'
+        githubNumber:
+          type: integer
+          format: int64
+          description: Github item number
+          example: 6
+        githubTitle:
+          type: string
+          description: Github item title
+        githubHtmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the contribution.
+        githubBody:
+          type: string
+          description: The body of the contribution.
+
 
     GetMeResponse:
       type: object

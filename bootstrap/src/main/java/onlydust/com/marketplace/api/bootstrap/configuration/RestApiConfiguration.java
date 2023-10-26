@@ -31,8 +31,9 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort) {
-        return new MeRestApi(authenticationService, userFacadePort);
+    public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort
+            , final ContributorFacadePort contributorFacadePort) {
+        return new MeRestApi(authenticationService, userFacadePort, contributorFacadePort);
     }
 
     @Bean

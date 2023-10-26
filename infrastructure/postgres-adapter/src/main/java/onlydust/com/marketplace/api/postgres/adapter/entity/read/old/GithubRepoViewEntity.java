@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Entity
+@Entity(name = "OldGithubRepoViewEntity")
 @Table(name = "github_repos", schema = "public")
 public class GithubRepoViewEntity {
     @Id

@@ -36,6 +36,7 @@ public class GithubInstallationServiceTest {
                 "avatarUrl",
                 List.of(new GithubRepo(
                         123446L,
+                        "onlydustxyz",
                         "marketplace",
                         "htmlUrl",
                         new Date(),
@@ -66,6 +67,7 @@ public class GithubInstallationServiceTest {
                 "avatarUrl",
                 List.of(new GithubRepo(
                         123446L,
+                        "onlydustxyz",
                         "marketplace",
                         "htmlUrl",
                         new Date(),

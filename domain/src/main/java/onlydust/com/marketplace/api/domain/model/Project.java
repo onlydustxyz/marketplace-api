@@ -16,4 +16,5 @@ public class Project {
     String logoUrl;
     String moreInfoUrl;
     Boolean hiring;
+    ProjectVisibility visibility;
 }

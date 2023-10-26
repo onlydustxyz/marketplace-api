@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.api.domain.view.UserLinkView;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,4 +25,13 @@ public class GithubAccountEntity {
     String name;
     @OneToMany(mappedBy = "owner")
     List<GithubRepoEntity> repos;
+
+    public UserLinkView toView() {
+        return ContributorLinkView.builder()
+                .githubUserId(id)
+                .login(login)
+                .url(htmlUrl)
+                .avatarUrl(avatarUrl)
+                .build();
+    }
 }
