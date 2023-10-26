@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserFacadePort {
@@ -43,4 +44,6 @@ public interface UserFacadePort {
     RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex, int pageSize);
+
+    List<RewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
 }
