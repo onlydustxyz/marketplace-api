@@ -17,11 +17,13 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
-public class ProjectIdsForUserEntity {
+public class ProjectStatsForUserEntity {
 
     @Id
     @Column(name = "project_id")
     UUID id;
+    @Column(name = "slug")
+    String slug;
     @Column(name = "is_lead")
     Boolean isLead;
     @Column(name = "name")
@@ -36,5 +38,6 @@ public class ProjectIdsForUserEntity {
     Integer userContributionsCount;
     @Column(name = "last_contribution_date")
     Date lastContributionDate;
-
+    @Column(name = "first_contribution_date")
+    Date firstContributionDate;
 }

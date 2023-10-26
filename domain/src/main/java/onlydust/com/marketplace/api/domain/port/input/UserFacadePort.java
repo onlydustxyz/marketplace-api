@@ -18,6 +18,10 @@ public interface UserFacadePort {
 
     UserProfileView getProfileById(UUID userId);
 
+    UserProfileView getProfileById(Long githubUserId);
+
+    UserProfileView getProfileByLogin(String githubLogin);
+
     UserProfileView updateProfile(UUID userId, UserProfile userProfile);
 
     UserPayoutInformation getPayoutInformationForUserId(UUID id);

@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
@@ -78,24 +78,41 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public UserProfileView getProfileById(UUID userId) {
         return customUserRepository.findProfileById(userId)
-                .map(userProfileView -> {
-                    for (ProjectIdsForUserEntity projectIdsForUserEntity :
-                            customUserRepository.getProjectIdsForUserId(userId)) {
-                        userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
-                                .contributorCount(projectIdsForUserEntity.getContributorsCount())
-                                .isProjectLead(projectIdsForUserEntity.getIsLead())
-                                .totalGranted(projectIdsForUserEntity.getTotalGranted())
-                                .userContributionCount(projectIdsForUserEntity.getUserContributionsCount())
-                                .userLastContributedAt(projectIdsForUserEntity.getLastContributionDate())
-                                .id(projectIdsForUserEntity.getId())
-                                .logoUrl(projectIdsForUserEntity.getLogoUrl())
-                                .name(projectIdsForUserEntity.getName())
-                                .build());
-                    }
-                    return userProfileView;
-                })
+                .map(this::addProjectsStats)
                 .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", userId)));
+    }
 
+    @Override
+    public UserProfileView getProfileById(Long githubUserId) {
+        return customUserRepository.findProfileById(githubUserId)
+                .map(this::addProjectsStats)
+                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %d not found", githubUserId)));
+    }
+
+    @Override
+    public UserProfileView getProfileByLogin(String githubLogin) {
+        return customUserRepository.findProfileByLogin(githubLogin)
+                .map(this::addProjectsStats)
+                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", githubLogin)));
+    }
+
+    private UserProfileView addProjectsStats(UserProfileView userProfileView) {
+        final var projectsStats = customUserRepository.getProjectsStatsForUser(userProfileView.getGithubId());
+        for (ProjectStatsForUserEntity stats : projectsStats) {
+            userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
+                    .id(stats.getId())
+                    .slug(stats.getSlug())
+                    .name(stats.getName())
+                    .contributorCount(stats.getContributorsCount())
+                    .isProjectLead(stats.getIsLead())
+                    .totalGranted(stats.getTotalGranted())
+                    .userContributionCount(stats.getUserContributionsCount())
+                    .userLastContributedAt(stats.getLastContributionDate())
+                    .userFirstContributedAt(stats.getFirstContributionDate())
+                    .logoUrl(stats.getLogoUrl())
+                    .build());
+        }
+        return userProfileView;
     }
 
     @Override

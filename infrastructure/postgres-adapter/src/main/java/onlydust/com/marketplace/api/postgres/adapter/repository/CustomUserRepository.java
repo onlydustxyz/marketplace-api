@@ -6,21 +6,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectIdsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 @Slf4j
@@ -30,69 +32,110 @@ public class CustomUserRepository {
             select u.* from registered_users u join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
             """;
 
-    private static final String SELECT_USER_PROFILE_WHERE_ID = """
-            select row_number() over (order by u.id)                           row_number,
+    private static final String SELECT_USER_PROFILE = """
+            select
+                   gu.id as github_user_id,
                    u.id,
-                   u.github_user_id,
                    u.email,
                    u.last_seen,
                    u.created_at,
                    gu.login,
                    gu.html_url,
-                   coalesce(upi.bio, gu.bio)                                   bio,
-                   coalesce(upi.location, gu.location)                         location,
-                   coalesce(upi.website, gu.website)                           website,
-                   coalesce(upi.avatar_url, gu.avatar_url)                     avatar_url,
-                   ci.public,
-                   ci.channel,
-                   ci.contact,
+                   coalesce(upi.bio, gu.bio)                        bio,
+                   coalesce(upi.location, gu.location)              location,
+                   coalesce(upi.website, gu.website)                website,
+                   coalesce(upi.avatar_url, gu.avatar_url)          avatar_url,
                    upi.languages,
                    upi.cover,
                    upi.looking_for_a_job,
                    upi.weekly_allocated_time,
-                   count.code_review_count,
-                   count.issue_count,
-                   count.pull_request_count,
-                   count.week,
-                   count.year,
+                        
+                   (SELECT jsonb_agg(jsonb_build_object(
+                           'is_public', ci.public,
+                           'channel', ci.channel,
+                           'contact', ci.contact
+                                     ))
+                    FROM public.contact_informations ci
+                    WHERE u.id is not null and ci.user_id = u.id)   contacts,
+                        
+                   (SELECT jsonb_agg(jsonb_build_object(
+                           'year', cc.year,
+                           'week', cc.week,
+                           'issue_count', cc.issue_count,
+                           'code_review_count', cc.code_review_count,
+                           'pull_request_count', cc.pull_request_count
+                                     ))
+                    FROM (SELECT date_part('isoyear', c.created_at)                                  AS year,
+                                 date_part('week', c.created_at)                                     AS week,
+                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'issue')        AS issue_count,
+                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'code_review')  AS code_review_count,
+                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'pull_request') AS pull_request_count
+                          FROM contributions c
+                          where c.status = 'complete'
+                            and c.user_id = gu.id
+                          GROUP BY year, week) as cc)               counts,
+                        
+                        
                    (select count(pl.project_id)
                     from project_leads pl
-                    where pl.user_id = :userId) leading_project_number,
-                   (select count(distinct project_id)
-                    from auth_users u
-                             left join projects_contributors pc on pc.github_user_id = u.github_user_id
-                    where u.id = :userId)                                 contributor_on_project,
-                   (select sum(pr.amount)
-                    from auth_users u
-                             join payment_requests pr on pr.recipient_id = u.github_user_id
-                    where u.id = :userId)       total_earned,
+                    where u.id is not null and pl.user_id = u.id)   leading_project_number,
+                        
+                   (select count(distinct pc.project_id)
+                    from projects_contributors pc
+                    where pc.github_user_id = gu.id)                contributor_on_project,
+                        
+                   (select jsonb_build_object(
+                                   'total_dollars_equivalent',
+                                   sum(case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end),
+                                   'details', jsonb_agg(jsonb_build_object(
+                                   'total_amount', pr.amount,
+                                   'total_dollars_equivalent',
+                                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end,
+                                   'currency', pr.currency
+                                                        )))
+                    from payment_requests pr
+                    left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                    where pr.recipient_id = gu.id)                  totals_earned,
+                        
                    (select count(distinct c.id)
-                    from auth_users u
-                             join contributions c on c.user_id = u.github_user_id
-                    where u.id = :userId
-                      and c.status = 'complete')                               contributions_count
+                    from contributions c
+                    where c.user_id = gu.id
+                      and c.status = 'complete')                    contributions_count
+                
+            """;
+
+    private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
             from public.auth_users u
-                     left join public.github_users gu on gu.id = u.github_user_id
-                     left join public.contact_informations ci on ci.user_id = u.id
+                     join public.github_users gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
-                     left join (SELECT c.user_id                                                           as github_user_id,
-                                       date_part('year', c.created_at)                                     AS year,
-                                       date_part('week', c.created_at)                                     AS week,
-                                       count(DISTINCT c.details_id) FILTER (WHERE c.type = 'issue')        AS issue_count,
-                                       count(DISTINCT c.details_id) FILTER (WHERE c.type = 'code_review')  AS code_review_count,
-                                       count(DISTINCT c.details_id) FILTER (WHERE c.type = 'pull_request') AS pull_request_count
-                                FROM contributions c
-                                where c.status = 'complete'
-                                GROUP BY c.user_id, (date_part('year', c.created_at)), (date_part('week', c.created_at))) as count
-                               on count.github_user_id = u.github_user_id
             where u.id = :userId
             """;
 
+    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
+            from public.github_users gu
+                     left join public.auth_users u on gu.id = u.github_user_id
+                     left join public.user_profile_info upi on upi.id = u.id
+            where gu.id = :githubUserId
+            """;
+
+    private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
+            from public.github_users gu
+                     left join public.auth_users u on gu.id = u.github_user_id
+                     left join public.user_profile_info upi on upi.id = u.id
+            where gu.login = :githubLogin
+            """;
+
     private final static String GET_PROJECT_STATS_BY_USER = """
-            select p.project_id as                       project_id,
+            select  p.project_id,
+                    p.key as slug,
+                    p.is_lead,
+                    p.name,
+                    p.logo_url,
+                        
                    (select count(distinct github_user_id)
                     from projects_contributors
                     where project_id = p.project_id)     contributors_count,
+                    
                    (select distinct b.initial_amount - b.remaining_amount total_usd_granted
                     from project_details pd
                              left join project_leads pl on pl.project_id = pd.project_id
@@ -100,36 +143,38 @@ public class CustomUserRepository {
                              left join budgets b on b.id = pb.budget_id
                     where pd.project_id = p.project_id
                       and b.currency = 'usd')            total_granted,
+                      
                    (select count(distinct c.id)
                     from project_github_repos pgr
-                             left join contributions c
-                                       on c.repo_id = pgr.github_repo_id and c.status = 'complete'
-                             left join auth_users au on au.github_user_id = c.user_id and au.id = :userId
+                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :githubUserId
                     where pgr.project_id = p.project_id) user_contributions_count,
+                    
                    (select c.closed_at
                     from project_github_repos pgr
-                             left join contributions c
-                                       on c.repo_id = pgr.github_repo_id and c.status = 'complete'
-                            left join auth_users au on au.github_user_id = c.user_id and au.id = :userId
+                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
                     where pgr.project_id = p.project_id
-                      and closed_at is not null
                     order by c.closed_at desc
                     limit 1)                             last_contribution_date,
-                   p.is_lead,
-                   p.name,
-                   p.logo_url
-            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url
-                   from auth_users u
-                            join contributions c on c.user_id = u.github_user_id
+                    
+                    
+                   (select c.closed_at
+                    from project_github_repos pgr
+                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
+                    where pgr.project_id = p.project_id
+                    order by c.closed_at asc
+                    limit 1)                             first_contribution_date                    
+                   
+            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url, pd.key
+                   from contributions c
                             join project_github_repos gpr on gpr.github_repo_id = c.repo_id
                             join project_details pd on pd.project_id = gpr.project_id
-                   where u.id = :userId and c.status = 'complete')
+                   where c.user_id = :githubUserId and c.status = 'complete')
                   UNION
-                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url
+                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url, pd.key
                    from auth_users u
-                            left join project_leads pl on pl.user_id = u.id
-                            left join project_details pd on pd.project_id = pl.project_id
-                   where u.id = :userId)) as p
+                            join project_leads pl on pl.user_id = u.id
+                            join project_details pd on pd.project_id = pl.project_id
+                   where u.github_user_id = :githubUserId)) as p
             order by p.is_lead desc""";
     private final static TypeReference<HashMap<String, Integer>> typeRef
             = new TypeReference<>() {
@@ -137,50 +182,73 @@ public class CustomUserRepository {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EntityManager entityManager;
 
-    private UserProfileView rowsToUserProfile(List<UserProfileEntity> rows) {
-        UserProfileView userProfileView = null;
-        for (UserProfileEntity row : rows) {
-            if (isNull(userProfileView)) {
-                final UserProfileView.ProfileStats profileStats = UserProfileView.ProfileStats.builder()
-                        .totalEarned(row.getTotalEarned())
+    private UserProfileView rowToUserProfile(UserProfileEntity row) {
+        return UserProfileView.builder()
+                .id(row.getId())
+                .login(row.getLogin())
+                .bio(row.getBio())
+                .githubId(row.getGithubId())
+                .avatarUrl(row.getAvatarUrl())
+                .createAt(row.getCreatedAt())
+                .lastSeenAt(row.getLastSeen())
+                .htmlUrl(row.getHtmlUrl())
+                .location(row.getLocation())
+                .cover(isNull(row.getCover()) ? null :
+                        switch (row.getCover()) {
+                            case cyan -> UserProfileCover.CYAN;
+                            case magenta -> UserProfileCover.MAGENTA;
+                            case yellow -> UserProfileCover.YELLOW;
+                            case blue -> UserProfileCover.BLUE;
+                        })
+                .website(row.getWebsite())
+                .technologies(getTechnologies(row))
+                .profileStats(UserProfileView.ProfileStats.builder()
+                        .totalsEarned(isNull(row.getTotalsEarned()) ? null :
+                                UserProfileView.TotalsEarned.builder()
+                                        .totalDollarsEquivalent(row.getTotalsEarned().getTotalDollarsEquivalent())
+                                        .details(row.getTotalsEarned().getDetails().stream().map(detail ->
+                                                UserProfileView.TotalEarnedPerCurrency.builder()
+                                                        .currency(isNull(detail.getCurrency()) ? null :
+                                                                switch (detail.getCurrency()) {
+                                                                    case usd -> Currency.Usd;
+                                                                    case eth -> Currency.Eth;
+                                                                    case op -> Currency.Op;
+                                                                    case apt -> Currency.Apt;
+                                                                    case stark -> Currency.Stark;
+                                                                })
+                                                        .totalAmount(detail.getTotalAmount())
+                                                        .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
+                                                        .build()
+                                        ).collect(Collectors.toList()))
+                                        .build())
                         .leadedProjectCount(row.getNumberOfLeadingProject())
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())
-                        .build();
-                userProfileView = UserProfileView.builder()
-                        .id(row.getId())
-                        .login(row.getLogin())
-                        .bio(row.getBio())
-                        .githubId(row.getGithubId())
-                        .avatarUrl(row.getAvatarUrl())
-                        .createAt(row.getCreatedAt())
-                        .lastSeenAt(row.getLastSeen())
-                        .htmlUrl(row.getHtmlUrl())
-                        .location(row.getLocation())
-                        .cover(isNull(row.getCover()) ? null :
-                                switch (row.getCover()) {
-                                    case cyan -> UserProfileCover.CYAN;
-                                    case magenta -> UserProfileCover.MAGENTA;
-                                    case yellow -> UserProfileCover.YELLOW;
-                                    case blue -> UserProfileCover.BLUE;
-                                })
-                        .website(row.getWebsite())
-                        .technologies(getTechnologies(row))
-                        .profileStats(profileStats)
-                        .isLookingForAJob(row.getIsLookingForAJob())
-                        .allocatedTimeToContribute(isNull(row.getAllocatedTimeToContribute()) ? null : switch (row.getAllocatedTimeToContribute()) {
+                        .contributionStats(row.getCounts().stream().map(weekCount ->
+                                                UserProfileView.ProfileStats.ContributionStats.builder()
+                                                        .codeReviewCount(weekCount.getCodeReviewCount())
+                                                        .issueCount(weekCount.getIssueCount())
+                                                        .pullRequestCount(weekCount.getPullRequestCount())
+                                                        .week(weekCount.getWeek())
+                                                        .year(weekCount.getYear())
+                                                        .build()
+                                        )
+                                        .sorted(new UserProfileView.ProfileStats.ContributionStatsComparator())
+                                        .collect(Collectors.toList())
+                        )
+                        .build())
+                .isLookingForAJob(row.getIsLookingForAJob())
+                .allocatedTimeToContribute(isNull(row.getAllocatedTimeToContribute()) ? null :
+                        switch (row.getAllocatedTimeToContribute()) {
                             case none -> UserAllocatedTimeToContribute.NONE;
                             case less_than_one_day -> UserAllocatedTimeToContribute.LESS_THAN_ONE_DAY;
                             case one_to_three_days -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
                             case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
                         })
-                        .build();
-            }
-            if ((nonNull(row.getContact()) && !row.getContact().isEmpty()) && nonNull(row.getContactChannel()) && nonNull(row.getContactPublic())) {
-                final Contact contactInformation =
+                .contacts(row.getContacts().stream().map(contact ->
                         Contact.builder()
-                                .contact(row.getContact())
-                                .channel(isNull(row.getContactChannel()) ? null : switch (row.getContactChannel()) {
+                                .contact(contact.getContact())
+                                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
                                     case email -> Contact.Channel.EMAIL;
                                     case telegram -> Contact.Channel.TELEGRAM;
                                     case twitter -> Contact.Channel.TWITTER;
@@ -188,23 +256,12 @@ public class CustomUserRepository {
                                     case linkedin -> Contact.Channel.LINKEDIN;
                                     case whatsapp -> Contact.Channel.WHATSAPP;
                                 })
-                                .visibility(row.getContactPublic() ?
+                                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ?
                                         Contact.Visibility.PUBLIC :
                                         Contact.Visibility.PRIVATE)
-                                .build();
-                userProfileView.addContactInformation(contactInformation);
-            }
-            if (nonNull(row.getYear()) && nonNull(row.getWeek())) {
-                userProfileView.getProfileStats().addContributionStat(UserProfileView.ProfileStats.ContributionStats.builder()
-                        .codeReviewCount(row.getCodeReviewCount())
-                        .issueCount(row.getIssueCount())
-                        .pullRequestCount(row.getPullRequestCount())
-                        .week(row.getWeek())
-                        .year(row.getYear())
-                        .build());
-            }
-        }
-        return userProfileView;
+                                .build()
+                ).collect(Collectors.toSet()))
+                .build();
     }
 
     private HashMap<String, Integer> getTechnologies(UserProfileEntity row) {
@@ -225,18 +282,48 @@ public class CustomUserRepository {
                 .getResultList();
     }
 
-    public Optional<UserProfileView> findProfileById(UUID userId) {
-        final List<UserProfileEntity> rows = entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
-                        UserProfileEntity.class)
-                .setParameter("userId", userId)
-                .getResultList();
-        return Optional.ofNullable(rowsToUserProfile(rows));
+    public Optional<UserProfileView> findProfileById(final UUID userId) {
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_ID,
+                                    UserProfileEntity.class)
+                            .setParameter("userId", userId)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
-    public List<ProjectIdsForUserEntity> getProjectIdsForUserId(final UUID userId) {
-        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectIdsForUserEntity.class)
-                .setParameter("userId", userId)
-                .getResultList();
+    public Optional<UserProfileView> findProfileById(final Long githubUserId) {
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_ID,
+                                    UserProfileEntity.class)
+                            .setParameter("githubUserId", githubUserId)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
+    public Optional<UserProfileView> findProfileByLogin(String githubLogin) {
+        try {
+            final UserProfileEntity row =
+                    (UserProfileEntity) entityManager.createNativeQuery(SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN,
+                                    UserProfileEntity.class)
+                            .setParameter("githubLogin", githubLogin)
+                            .getSingleResult();
+            return Optional.ofNullable(rowToUserProfile(row));
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
+    }
+
+    public List<ProjectStatsForUserEntity> getProjectsStatsForUser(final Long githubUserId) {
+        return entityManager.createNativeQuery(GET_PROJECT_STATS_BY_USER, ProjectStatsForUserEntity.class)
+                .setParameter("githubUserId", githubUserId)
+                .getResultList();
+    }
 }

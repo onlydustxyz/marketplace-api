@@ -1,12 +1,17 @@
 package onlydust.com.marketplace.api.domain.view;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.*;
 
 @Data
@@ -21,6 +26,7 @@ public class UserProfileView {
     String htmlUrl;
     Date createAt;
     Date lastSeenAt;
+    Date firstContributedAt;
     String location;
     String twitter;
     String linkedin;
@@ -33,15 +39,15 @@ public class UserProfileView {
     UserAllocatedTimeToContribute allocatedTimeToContribute;
     Boolean isLookingForAJob;
     @Builder.Default
+    @Setter(AccessLevel.NONE)
     Set<ProjectStats> projectsStats = new HashSet<>();
     @Builder.Default
     Set<Contact> contacts = new HashSet<>();
 
-    public void addContactInformation(final Contact contact) {
-        this.contacts.add(contact);
-    }
-
     public void addProjectStats(final ProjectStats projectStats) {
+        if (projectStats.getUserFirstContributedAt() != null && (firstContributedAt == null || projectStats.getUserFirstContributedAt().before(firstContributedAt))) {
+            firstContributedAt = projectStats.getUserFirstContributedAt();
+        }
         this.projectsStats.add(projectStats);
     }
 
@@ -49,12 +55,14 @@ public class UserProfileView {
     @Builder
     public static class ProjectStats {
         UUID id;
+        String slug;
         String name;
         String logoUrl;
         Integer contributorCount;
         BigDecimal totalGranted;
         Integer userContributionCount;
         Date userLastContributedAt;
+        Date userFirstContributedAt;
         Boolean isProjectLead;
     }
 
@@ -63,23 +71,58 @@ public class UserProfileView {
     public static class ProfileStats {
         Integer contributedProjectCount;
         Integer leadedProjectCount;
-        BigDecimal totalEarned;
+        TotalsEarned totalsEarned;
         Integer contributionCount;
         @Builder.Default
-        Set<ContributionStats> contributionStats = new HashSet<>();
+        List<ContributionStats> contributionStats = new ArrayList<>();
 
-        public void addContributionStat(final ContributionStats contributionStats) {
-            this.contributionStats.add(contributionStats);
+        public int getContributionCountVariationSinceLastWeek() {
+            LocalDate currentWeek = LocalDate.now();
+            LocalDate previousWeek = LocalDate.now().minusWeeks(1);
+            final var currentWeekWithStats = contributionStats.stream()
+                    .filter(stats -> stats.getYear() == currentWeek.getYear() && stats.getWeek() == currentWeek.get(WeekFields.of(Locale.getDefault()).weekOfYear())).findFirst();
+            final var previousWeekWithStats = contributionStats.stream()
+                    .filter(stats -> stats.getYear() == previousWeek.getYear() && stats.getWeek() == previousWeek.get(WeekFields.of(Locale.getDefault()).weekOfYear())).findFirst();
+            final int currentWeekCount = currentWeekWithStats.map(ContributionStats::getTotalCount).orElse(0);
+            final int previousWeekCount = previousWeekWithStats.map(ContributionStats::getTotalCount).orElse(0);
+            return currentWeekCount - previousWeekCount;
         }
 
         @Data
         @Builder
         public static class ContributionStats {
-            Integer year;
-            Integer week;
-            Integer codeReviewCount;
-            Integer issueCount;
-            Integer pullRequestCount;
+            int year;
+            int week;
+            int codeReviewCount;
+            int issueCount;
+            int pullRequestCount;
+
+            public int getTotalCount() {
+                return codeReviewCount + issueCount + pullRequestCount;
+            }
         }
+
+        public static class ContributionStatsComparator implements Comparator<ContributionStats> {
+            @Override
+            public int compare(ContributionStats o1, ContributionStats o2) {
+                final int yearComparison = Integer.compare(o1.getYear(), o2.getYear());
+                return yearComparison == 0 ? Integer.compare(o1.getWeek(), o2.getWeek()) : yearComparison;
+            }
+        }
+    }
+
+    @Data
+    @Builder
+    public static class TotalsEarned {
+        BigDecimal totalDollarsEquivalent;
+        List<TotalEarnedPerCurrency> details;
+    }
+
+    @Data
+    @Builder
+    public static class TotalEarnedPerCurrency {
+        BigDecimal totalDollarsEquivalent;
+        BigDecimal totalAmount;
+        Currency currency;
     }
 }
