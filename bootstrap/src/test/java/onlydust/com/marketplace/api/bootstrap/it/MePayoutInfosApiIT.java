@@ -97,6 +97,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.isCompany").isEqualTo(false)
+                .jsonPath("*.hasValidContactInfo").isEqualTo(true)
                 .jsonPath("$.person.lastname").isEqualTo("BUISSET")
                 .jsonPath("$.person.firstname").isEqualTo("Anthony")
                 .jsonPath("$.location.address").isEqualTo("771 chemin de la sine")

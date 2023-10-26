@@ -16,6 +16,8 @@ public class User {
     Long githubUserId;
     String avatarUrl;
     String login;
+    @Builder.Default
+    Boolean hasValidPayoutInfos = true;
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

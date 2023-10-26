@@ -191,6 +191,7 @@ public interface UserMapper {
         getMeResponse.setLogin(authenticatedUser.getLogin());
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
+        getMeResponse.setHasValidPayoutInfos(authenticatedUser.getHasValidPayoutInfos());
         return getMeResponse;
     }
 }

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -57,10 +59,14 @@ public class CustomUserPayoutInfoRepository {
                      join auth_users au on upi.user_id = au.id
             where upi.user_id = :userId""";
 
-    public UserPayoutInfoValidationEntity getUserPayoutInfoValidationEntity(final UUID userId) {
-        return (UserPayoutInfoValidationEntity) entityManager.createNativeQuery(FIND_USER_PAYOUT_INFO_VALIDATIONS,
-                        UserPayoutInfoValidationEntity.class)
-                .setParameter("userId", userId)
-                .getSingleResult();
+    public Optional<UserPayoutInfoValidationEntity> getUserPayoutInfoValidationEntity(final UUID userId) {
+        try {
+            return Optional.of((UserPayoutInfoValidationEntity) entityManager.createNativeQuery(FIND_USER_PAYOUT_INFO_VALIDATIONS,
+                            UserPayoutInfoValidationEntity.class)
+                    .setParameter("userId", userId)
+                    .getSingleResult());
+        } catch (NoResultException noResultException) {
+            return Optional.empty();
+        }
     }
 }

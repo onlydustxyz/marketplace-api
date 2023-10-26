@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
+@Builder
 @Entity
 public class UserPayoutInfoValidationEntity {
 
@@ -37,4 +35,16 @@ public class UserPayoutInfoValidationEntity {
     @Column(name = "valid_banking_account")
     Boolean hasValidBakingAccount;
 
+    public static UserPayoutInfoValidationEntity defaultValue() {
+        return UserPayoutInfoValidationEntity.builder()
+                .hasValidCompany(true)
+                .hasValidLocation(true)
+                .hasValidPerson(true)
+                .hasValidBakingAccount(true)
+                .hasValidAptosWallet(true)
+                .hasValidEthWallet(true)
+                .hasValidOptimismWallet(true)
+                .hasValidStarknetWallet(true)
+                .build();
+    }
 }

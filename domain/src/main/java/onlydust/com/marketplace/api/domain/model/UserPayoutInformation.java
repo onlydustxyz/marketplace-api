@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Data
@@ -15,12 +16,20 @@ public class UserPayoutInformation {
     Boolean isACompany = false;
     Location location;
     PayoutSettings payoutSettings;
-    Boolean hasValidPerson;
-    Boolean hasValidCompany;
-    Boolean hasValidLocation;
+    @Builder.Default
+    Boolean hasValidPerson = true;
+    @Builder.Default
+    Boolean hasValidCompany = true;
+    @Builder.Default
+    Boolean hasValidLocation = true;
 
     public Boolean getHasValidContactInfo() {
         return (hasValidCompany || hasValidPerson) && hasValidLocation;
+    }
+
+    public boolean isValid() {
+        return isNull(this.payoutSettings) ? this.getHasValidContactInfo() :
+                this.getHasValidContactInfo() && this.payoutSettings.isValid();
     }
 
     public void validate() {
@@ -52,15 +61,20 @@ public class UserPayoutInformation {
         UsdPreferredMethodEnum usdPreferredMethodEnum;
         String ethAddress;
         String ethName;
-        Boolean hasMissingEthWallet;
+        @Builder.Default
+        Boolean hasMissingEthWallet = false;
         String optimismAddress;
-        Boolean hasMissingOptimismWallet;
+        @Builder.Default
+        Boolean hasMissingOptimismWallet = false;
         String aptosAddress;
-        Boolean hasMissingAptosWallet;
+        @Builder.Default
+        Boolean hasMissingAptosWallet = false;
         String starknetAddress;
-        Boolean hasMissingStarknetWallet;
+        @Builder.Default
+        Boolean hasMissingStarknetWallet = false;
         SepaAccount sepaAccount;
-        Boolean hasMissingBankingAccount;
+        @Builder.Default
+        Boolean hasMissingBankingAccount = false;
 
         public Boolean isValid() {
             return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount);
