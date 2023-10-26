@@ -6,9 +6,7 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -20,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Applicatio
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
@@ -52,6 +51,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomUserRewardRepository customUserRewardRepository;
     private final WalletRepository walletRepository;
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
+    private final CustomRewardRepository customRewardRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -232,5 +232,27 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId) {
         return UserRewardMapper.mapTotalAmountEntitiesToDomain(customUserRewardRepository.getTotalAmountEntities(userId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RewardView findRewardById(UUID rewardId) {
+        return RewardMapper.projectRewardToDomain(customRewardRepository.findProjectRewardViewEntityByd(rewardId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize) {
+        final Integer count = customRewardRepository.countRewardItemsForRewardId(rewardId);
+        final List<RewardItemView> rewardItemViews =
+                customRewardRepository.findRewardItemsByRewardId(rewardId, pageIndex, pageSize)
+                        .stream()
+                        .map(RewardMapper::itemToDomain)
+                        .toList();
+        return Page.<RewardItemView>builder()
+                .content(rewardItemViews)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
     }
 }

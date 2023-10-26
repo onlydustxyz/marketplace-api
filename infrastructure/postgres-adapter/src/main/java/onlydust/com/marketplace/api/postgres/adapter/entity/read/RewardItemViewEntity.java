@@ -53,6 +53,8 @@ public class RewardItemViewEntity {
     Integer userCommitsCount;
     @Column(name = "comments_count")
     Integer commentsCount;
+    @Column(name = "recipient_id")
+    Long recipientId;
 
     public enum ContributionStatus {
         in_progress, complete, canceled

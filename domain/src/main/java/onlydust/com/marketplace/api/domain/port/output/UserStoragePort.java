@@ -3,9 +3,7 @@ package onlydust.com.marketplace.api.domain.port.output;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -42,4 +40,8 @@ public interface UserStoragePort {
                                               SortDirection sortDirection);
 
     UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId);
+
+    RewardView findRewardById(UUID rewardId);
+
+    Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 }

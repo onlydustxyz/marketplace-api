@@ -41,8 +41,8 @@ public interface RewardMapper {
                 .build();
     }
 
-    static ProjectRewardResponse projectRewardToResponse(RewardView rewardView) {
-        return new ProjectRewardResponse()
+    static RewardResponse projectRewardToResponse(RewardView rewardView) {
+        return new RewardResponse()
                 .from(new GithubUserResponse()
                         .id(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())

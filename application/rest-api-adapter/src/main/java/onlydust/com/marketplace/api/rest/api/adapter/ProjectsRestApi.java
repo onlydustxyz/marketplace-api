@@ -165,7 +165,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectRewardResponse> getProjectReward(UUID projectId, UUID rewardId) {
+    public ResponseEntity<RewardResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
@@ -173,8 +173,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<RewardItemsPageResponse> getProjectRewardsPage(UUID projectId, UUID rewardId,
-                                                                         Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPage(UUID projectId, UUID rewardId, Integer pageIndex, Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
