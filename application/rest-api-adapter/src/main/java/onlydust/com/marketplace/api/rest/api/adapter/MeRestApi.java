@@ -178,7 +178,7 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = userFacadePort.getRewardByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(RewardMapper.projectRewardToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardToResponse(rewardView));
     }
 
     @Override
@@ -193,5 +193,13 @@ public class MeRestApi implements MeApi {
         return rewardItemsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<MyRewardsListResponse> getMyRewardsPendingInvoice() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final List<UserRewardView> rewardViews =
+                userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
+        return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
     }
 }

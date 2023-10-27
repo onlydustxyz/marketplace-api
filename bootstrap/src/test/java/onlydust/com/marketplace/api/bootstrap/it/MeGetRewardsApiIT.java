@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
@@ -19,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -241,7 +242,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(1)
-    void should_get_my_rewards() throws JsonProcessingException {
+    void should_get_my_rewards() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
 
@@ -260,7 +261,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Order(2)
     @Test
-    void should_get_my_rewards_given_multi_currencies() throws JsonProcessingException {
+    void should_get_my_rewards_given_multi_currencies() {
         final String jwt = userHelper.authenticatePierre().jwt();
 
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
@@ -327,7 +328,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(3)
-    void should_get_my_total_reward_amounts_given_multi_currencies() throws JsonProcessingException {
+    void should_get_my_total_reward_amounts_given_multi_currencies() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
 
@@ -343,4 +344,176 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json(GET_MY_REWARD_AMOUNTS_JSON_RESPONSE);
     }
 
+    @Test
+    @Order(4)
+    void should_get_my_rewards_with_pending_invoice() throws ParseException {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "rewards": [
+                             {
+                               "requestedAt": "2023-09-19T05:39:54.45638Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 30,
+                                 "currency": "APT",
+                                 "dollarsEquivalent": 6000
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                             },
+                             {
+                               "requestedAt": "2023-09-19T05:38:22.018458Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 500,
+                                 "currency": "APT",
+                                 "dollarsEquivalent": 100000
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                             },
+                             {
+                               "requestedAt": "2023-09-19T05:39:23.730967Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 9511147,
+                                 "currency": "STARK",
+                                 "dollarsEquivalent": 0
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                             },
+                             {
+                               "requestedAt": "2023-09-19T05:38:52.590518Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 1000,
+                                 "currency": "USD",
+                                 "dollarsEquivalent": 1000
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                             },
+                             {
+                               "requestedAt": "2023-09-20T06:46:52.77875Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 50,
+                                 "currency": "ETH",
+                                 "dollarsEquivalent": 75000
+                               },
+                               "numberOfRewardedContributions": 1,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                             },
+                             {
+                               "requestedAt": "2023-09-19T05:40:26.971981Z",
+                               "status": "PENDING_INVOICE",
+                               "amount": {
+                                 "total": 10,
+                                 "currency": "ETH",
+                                 "dollarsEquivalent": 15000
+                               },
+                               "numberOfRewardedContributions": 25,
+                               "rewardedOnProjectName": "QA new contributions",
+                               "rewardedOnProjectLogoUrl": null,
+                               "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                             }
+                           ]
+                         }
+                         """);
+
+        final PaymentRequestEntity reward1 = paymentRequestRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd" +
+                                                                                               "-ba12-0499dd232d53")).orElseThrow();
+        reward1.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-13"));
+        paymentRequestRepository.save(reward1);
+
+        final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("2ac80cc6-7e83-4eef" +
+                                                                                               "-bc0c-932b58f683c0")).orElseThrow();
+        reward2.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-14"));
+        paymentRequestRepository.save(reward2);
+
+        final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1" +
+                                                                                               "-8819-520b885d9223")).orElseThrow();
+        reward3.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-15"));
+        paymentRequestRepository.save(reward3);
+        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "OP",
+                JacksonUtil.toJsonNode("{}"), reward3.getId(), new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-12")));
+
+
+        client.get()
+                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                            "rewards": [
+                              {
+                                "requestedAt": "2023-09-19T05:39:54.45638Z",
+                                "status": "PENDING_INVOICE",
+                                "amount": {
+                                  "total": 30,
+                                  "currency": "APT",
+                                  "dollarsEquivalent": 6000
+                                },
+                                "numberOfRewardedContributions": 25,
+                                "rewardedOnProjectName": "QA new contributions",
+                                "rewardedOnProjectLogoUrl": null,
+                                "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                              },
+                              {
+                                "requestedAt": "2023-09-19T05:38:52.590518Z",
+                                "status": "PENDING_INVOICE",
+                                "amount": {
+                                  "total": 1000,
+                                  "currency": "USD",
+                                  "dollarsEquivalent": 1000
+                                },
+                                "numberOfRewardedContributions": 25,
+                                "rewardedOnProjectName": "QA new contributions",
+                                "rewardedOnProjectLogoUrl": null,
+                                "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                              },
+                              {
+                                "requestedAt": "2023-09-20T06:46:52.77875Z",
+                                "status": "PENDING_INVOICE",
+                                "amount": {
+                                  "total": 50,
+                                  "currency": "ETH",
+                                  "dollarsEquivalent": 75000
+                                },
+                                "numberOfRewardedContributions": 1,
+                                "rewardedOnProjectName": "QA new contributions",
+                                "rewardedOnProjectLogoUrl": null,
+                                "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                              }
+                            ]
+                          }
+                         """);
+    }
 }

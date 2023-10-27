@@ -2124,7 +2124,7 @@ components:
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/RewardPageItemResponse'
+            $ref: '#/components/schemas/MyRewardPageItemResponse'
     RewardPageItemResponse:
       type: object
       required:

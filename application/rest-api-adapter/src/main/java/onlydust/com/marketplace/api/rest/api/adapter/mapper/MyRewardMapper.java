@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import java.util.List;
 import java.util.Objects;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
@@ -84,5 +85,10 @@ public interface MyRewardMapper {
                     }));
         }
         return myRewardTotalAmountsResponse;
+    }
+
+    static MyRewardsListResponse listToResponse(final List<UserRewardView> views) {
+        return new MyRewardsListResponse()
+                .rewards(views.stream().map(MyRewardMapper::mapMyRewardViewToResponse).toList());
     }
 }

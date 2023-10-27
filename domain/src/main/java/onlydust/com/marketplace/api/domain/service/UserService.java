@@ -123,4 +123,9 @@ public class UserService implements UserFacadePort {
         }
         return page;
     }
+
+    @Override
+    public List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId) {
+        return userStoragePort.findPendingInvoiceRewardsForRecipientId(githubUserId);
+    }
 }
