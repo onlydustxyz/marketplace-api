@@ -10,3 +10,9 @@ where id = 'f0c1b882-76f2-47d0-9331-151ce1f99281'
 
 insert into crypto_usd_quotes (currency, price, updated_at)
 VALUES ('eth', 1781.98, now());
+
+INSERT INTO "public"."budgets" ("id", "initial_amount", "remaining_amount", "currency")
+VALUES ('6b8dd00f-9d0a-41c3-bf1d-08a23d0fd597', 200, 200, 'eth');
+
+INSERT INTO "public"."projects_budgets" ("project_id", "budget_id")
+VALUES ('f39b827f-df73-498c-8853-99bc3f562723', '6b8dd00f-9d0a-41c3-bf1d-08a23d0fd597');

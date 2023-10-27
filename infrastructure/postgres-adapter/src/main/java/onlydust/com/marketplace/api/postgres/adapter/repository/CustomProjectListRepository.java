@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
@@ -22,15 +22,10 @@ import static java.util.Objects.nonNull;
 @AllArgsConstructor
 @Slf4j
 public class CustomProjectListRepository {
-    private final static ObjectMapper objectMapper = new ObjectMapper();
-    private final static TypeReference<HashMap<String, Integer>> typeRef
-            = new TypeReference<>() {
-    };
-    private final EntityManager entityManager;
-
     protected static final String FIND_PROJECTS_BASE_QUERY = """
             select row_number() over (%order_by%), search_project.*
-            from (select p.project_id,
+                from (
+                    select p.project_id,
                          p.hiring,
                          p.logo_url,
                          p.key,
@@ -57,22 +52,27 @@ public class CustomProjectListRepository {
                           from project_leads pl_count
                           where pl_count.project_id = p.project_id) as project_lead_count,
                           false is_pending_project_lead
-                  from project_details p
-                           join projects_budgets pb on pb.project_id = p.project_id
-                           left join projects_sponsors ps on ps.project_id = p.project_id
-                           left join sponsors s on s.id = ps.sponsor_id
-                           left join project_github_repos pgr on pgr.project_id = p.project_id
-                           left join github_repos gr on gr.id = pgr.github_repo_id
-                           left join project_leads pl on pl.project_id = p.project_id
-                           left join auth_users u on u.id = pl.user_id) as search_project
-            where repo_count > 0
-              and search_project.visibility = 'PUBLIC'
-              and project_lead_count > 0 
+                    from project_details p
+                        left join projects_sponsors ps on ps.project_id = p.project_id
+                        left join sponsors s on s.id = ps.sponsor_id
+                        left join project_github_repos pgr on pgr.project_id = p.project_id
+                        left join github_repos gr on gr.id = pgr.github_repo_id
+                        left join project_leads pl on pl.project_id = p.project_id
+                        left join auth_users u on u.id = pl.user_id
+                    where
+                        exists(select 1
+                            from projects_budgets pb
+                            where pb.project_id = p.project_id)
+                            
+                  ) as search_project
+                  
+                where repo_count > 0
+                    and search_project.visibility = 'PUBLIC'
+                    and project_lead_count > 0
             """;
-
     protected static final String FIND_PROJECTS_FOR_USER_BASE_QUERY = """
             select row_number() over (%order_by%), search_project.*
-            from (select p.project_id,
+                from (select p.project_id,
                          p.hiring,
                          p.logo_url,
                          p.key,
@@ -122,45 +122,31 @@ public class CustomProjectListRepository {
                                    left join auth_users me on me.github_user_id = pru.github_user_id
                           where pru.project_id = p.project_id
                             and me.id = :userId )         was_rewarded
-                  from project_details p
-                           join projects_budgets pb on pb.project_id = p.project_id
-                           left join projects_sponsors ps on ps.project_id = p.project_id
-                           left join sponsors s on s.id = ps.sponsor_id
-                           left join project_github_repos pgr on pgr.project_id = p.project_id
-                           left join github_repos gr on gr.id = pgr.github_repo_id
-                           left join project_leads pl on pl.project_id = p.project_id
-                           left join auth_users u on u.id = pl.user_id) as search_project
-            where repo_count > 0
-              and ((search_project.visibility = 'PUBLIC' and (project_lead_count > 0 or is_pending_project_lead))
-                or (search_project.visibility = 'PRIVATE' and
-                    (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor))) 
+                    from project_details p
+                        left join projects_sponsors ps on ps.project_id = p.project_id
+                        left join sponsors s on s.id = ps.sponsor_id
+                        left join project_github_repos pgr on pgr.project_id = p.project_id
+                        left join github_repos gr on gr.id = pgr.github_repo_id
+                        left join project_leads pl on pl.project_id = p.project_id
+                        left join auth_users u on u.id = pl.user_id
+                    where
+                        exists(select 1
+                            from projects_budgets pb
+                            where pb.project_id = p.project_id)
+                            
+                  ) as search_project
+                  
+                where repo_count > 0
+                    and ((search_project.visibility = 'PUBLIC' and (project_lead_count > 0 or is_pending_project_lead))
+                    or (search_project.visibility = 'PRIVATE' and
+                        (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor)))
+                        
             """;
-
-
-    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
-                                                                              List<String> sponsors,
-                                                                              String search,
-                                                                              ProjectCardView.SortBy sort,
-                                                                              UUID userId, Boolean mine) {
-        final String query = buildQueryForUser(technologies, sponsors, search, sort, mine);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class)
-                .setParameter("userId", userId);
-        if (nonNull(search) && !search.isEmpty()) {
-            nativeQuery = nativeQuery.setParameter("search", search);
-        }
-        return executeQueryAndMapResults(nativeQuery);
-    }
-
-
-    public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors
-            , String search, ProjectCardView.SortBy sort) {
-        final String query = buildQuery(technologies, sponsors, search, sort);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class);
-        if (nonNull(search) && !search.isEmpty()) {
-            nativeQuery = nativeQuery.setParameter("search", search);
-        }
-        return executeQueryAndMapResults(nativeQuery);
-    }
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private final static TypeReference<HashMap<String, Integer>> typeRef
+            = new TypeReference<>() {
+    };
+    private final EntityManager entityManager;
 
     private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectCardView> projectViewMap) {
         if (!projectViewMap.containsKey(entity.getId())) {
@@ -192,7 +178,6 @@ public class CustomProjectListRepository {
             LOGGER.warn("No technologies found", e);
         }
     }
-
 
     private static void addSponsorToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         if (nonNull(entity.getSponsorId())) {
@@ -287,6 +272,30 @@ public class CustomProjectListRepository {
         return FIND_PROJECTS_BASE_QUERY.replace("%order_by%", orderByCondition.orElse("order by search_project" +
                                                                                       ".name")) + (whereConditions.isEmpty() ? "" : " and " + String.join(" and ",
                 whereConditions.stream().map(s -> "(" + s + ")").toList()));
+    }
+
+    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
+                                                                              List<String> sponsors,
+                                                                              String search,
+                                                                              ProjectCardView.SortBy sort,
+                                                                              UUID userId, Boolean mine) {
+        final String query = buildQueryForUser(technologies, sponsors, search, sort, mine);
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class)
+                .setParameter("userId", userId);
+        if (nonNull(search) && !search.isEmpty()) {
+            nativeQuery = nativeQuery.setParameter("search", search);
+        }
+        return executeQueryAndMapResults(nativeQuery);
+    }
+
+    public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors
+            , String search, ProjectCardView.SortBy sort) {
+        final String query = buildQuery(technologies, sponsors, search, sort);
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class);
+        if (nonNull(search) && !search.isEmpty()) {
+            nativeQuery = nativeQuery.setParameter("search", search);
+        }
+        return executeQueryAndMapResults(nativeQuery);
     }
 
     private Page<ProjectCardView> executeQueryAndMapResults(Query nativeQuery) {

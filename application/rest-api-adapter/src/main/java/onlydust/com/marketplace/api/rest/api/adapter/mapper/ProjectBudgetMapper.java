@@ -12,7 +12,6 @@ public interface ProjectBudgetMapper {
         final ProjectBudgetsResponse projectBudgetsResponse = new ProjectBudgetsResponse();
         projectBudgetsResponse.setRemainingDollarsEquivalent(projectBudgetsView.getRemainingDollarsEquivalent());
         projectBudgetsResponse.setInitialDollarsEquivalent(projectBudgetsView.getInitialDollarsEquivalent());
-        projectBudgetsResponse.setRemainingDollarsEquivalent(projectBudgetsView.getRemainingDollarsEquivalent());
         for (BudgetView budget : projectBudgetsView.getBudgets()) {
             projectBudgetsResponse.addBudgetsItem(new BudgetResponse()
                     .remaining(budget.getRemaining())

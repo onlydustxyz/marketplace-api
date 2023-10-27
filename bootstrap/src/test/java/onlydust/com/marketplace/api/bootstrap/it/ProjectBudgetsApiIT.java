@@ -76,12 +76,6 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .remainingAmount(BigDecimal.valueOf(0))
                 .currency(CurrencyEnumEntity.apt)
                 .build());
-        final BudgetEntity budget3 = budgetRepository.save(BudgetEntity.builder()
-                .id(UUID.randomUUID())
-                .initialAmount(BigDecimal.valueOf(200))
-                .remainingAmount(BigDecimal.valueOf(50))
-                .currency(CurrencyEnumEntity.eth)
-                .build());
         projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
                 .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
                         .budgetId(budget1.getId())
@@ -91,12 +85,6 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
                 .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
                         .budgetId(budget2.getId())
-                        .projectId(projectId)
-                        .build())
-                .build());
-        projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
-                .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
-                        .budgetId(budget3.getId())
                         .projectId(projectId)
                         .build())
                 .build());
@@ -113,7 +101,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                             "initialDollarsEquivalent": 370000,
-                            "remainingDollarsEquivalent": 79000,
+                            "remainingDollarsEquivalent": 304000,
                             "budgets": [
                                 {
                                     "currency": "USD",
@@ -139,8 +127,8 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                     "currency": "ETH",
                                     "initialAmount": 200,
-                                    "remaining": 50,
-                                    "remainingDollarsEquivalent": 75000,
+                                    "remaining": 200,
+                                    "remainingDollarsEquivalent": 300000,
                                     "initialDollarsEquivalent": 300000
                                 }
                             ]
