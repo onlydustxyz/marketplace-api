@@ -30,7 +30,7 @@ public class UserRewardView {
     }
 
     public enum RewardStatusView {
-        pendingInvoice, processing, complete
+        pendingInvoice, processing, complete, missingPayoutInfo
     }
 
     public enum SortBy {

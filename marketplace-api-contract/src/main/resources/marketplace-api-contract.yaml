@@ -2243,6 +2243,7 @@ components:
       enum:
         - PENDING_INVOICE
         - PENDING_SIGNUP
+        - MISSING_PAYOUT_INFO
         - PROCESSING
         - COMPLETE
     RewardAmountResponse:
