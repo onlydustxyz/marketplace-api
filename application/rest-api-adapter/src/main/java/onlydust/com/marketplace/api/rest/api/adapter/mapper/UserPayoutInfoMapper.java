@@ -33,7 +33,7 @@ public interface UserPayoutInfoMapper {
             contract.setPayoutSettings(payoutSettings);
         }
         final UserPayoutInformationResponseLocation location = new UserPayoutInformationResponseLocation();
-        if (nonNull(location)) {
+        if (nonNull(view.getLocation())) {
             location.setAddress(view.getLocation().getAddress());
             location.setCity(view.getLocation().getCity());
             location.setCountry(view.getLocation().getCountry());
