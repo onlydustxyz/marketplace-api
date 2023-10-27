@@ -198,7 +198,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<MyRewardsListResponse> getMyRewardsPendingInvoice() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final List<RewardView> rewardViews =
+        final List<UserRewardView> rewardViews =
                 userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
     }

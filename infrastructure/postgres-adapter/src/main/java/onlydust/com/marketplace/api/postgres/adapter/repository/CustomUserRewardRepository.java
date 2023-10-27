@@ -56,8 +56,7 @@ public class CustomUserRewardRepository {
                    (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
                    case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
                    'PENDING_INVOICE'                                                       status
-            from auth_users au
-                     join payment_requests pr on pr.recipient_id = au.github_user_id and au.id = :userId
+            from payment_requests pr
                      join project_details pd on pd.project_id = pr.project_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id

@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.view.RewardView;
 import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
@@ -88,8 +87,8 @@ public interface MyRewardMapper {
         return myRewardTotalAmountsResponse;
     }
 
-    static MyRewardsListResponse listToResponse(final List<RewardView> views) {
+    static MyRewardsListResponse listToResponse(final List<UserRewardView> views) {
         return new MyRewardsListResponse()
-                .rewards(views.stream().map(RewardMapper::rewardToResponse).toList());
+                .rewards(views.stream().map(MyRewardMapper::mapMyRewardViewToResponse).toList());
     }
 }

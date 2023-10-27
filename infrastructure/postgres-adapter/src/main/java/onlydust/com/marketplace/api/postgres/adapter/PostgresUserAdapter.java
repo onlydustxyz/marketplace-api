@@ -257,7 +257,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<RewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
+    public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
         return customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId)
                 .stream().map(UserRewardMapper::mapEntityToDomain).toList();
     }
