@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 
-import java.util.Objects;
-
 import static java.util.Objects.nonNull;
 
 public interface UserPayoutInfoMapper {
@@ -29,9 +27,11 @@ public interface UserPayoutInfoMapper {
             person.setLastname(view.getPerson().getLastName());
             contract.setPerson(person);
         }
-        final UserPayoutInformationResponsePayoutSettings payoutSettings =
-                getUserPayoutInformationContractPayoutSettings(view);
-        contract.setPayoutSettings(payoutSettings);
+        if (nonNull(view.getPayoutSettings())) {
+            final UserPayoutInformationResponsePayoutSettings payoutSettings =
+                    getUserPayoutInformationContractPayoutSettings(view);
+            contract.setPayoutSettings(payoutSettings);
+        }
         final UserPayoutInformationResponseLocation location = new UserPayoutInformationResponseLocation();
         location.setAddress(view.getLocation().getAddress());
         location.setCity(view.getLocation().getCity());
@@ -55,14 +55,14 @@ public interface UserPayoutInfoMapper {
         payoutSettings.setMissingStarknetWallet(view.getPayoutSettings().getHasMissingStarknetWallet());
         payoutSettings.setHasValidPayoutSettings(view.getPayoutSettings().isValid());
         payoutSettings.setMissingSepaAccount(view.getPayoutSettings().getHasMissingBankingAccount());
-        if (Objects.nonNull(view.getPayoutSettings().getSepaAccount())) {
+        if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final UserPayoutInformationResponsePayoutSettingsSepaAccount sepaAccount =
                     new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
             sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
             payoutSettings.setSepaAccount(sepaAccount);
         }
-        if (Objects.nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
+        if (nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
             switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
                 case FIAT ->
                         payoutSettings.setUsdPreferredMethod(UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT);
