@@ -29,6 +29,8 @@ public class UserRewardViewEntity {
     String name;
     @Column(name = "logo_url")
     String logoUrl;
+    @Column(name = "project_id")
+    UUID projectId;
     @Column(name = "amount")
     BigDecimal amount;
     @Enumerated(EnumType.STRING)
