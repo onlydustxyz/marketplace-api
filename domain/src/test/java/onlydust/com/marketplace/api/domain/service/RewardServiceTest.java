@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RewardServiceTest {
 
@@ -24,19 +26,23 @@ public class RewardServiceTest {
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
-                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+                RequestRewardCommand.builder()
+                        .projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
                         .currency(Currency.Stark)
                         .build();
+        final var newRewardId = UUID.randomUUID();
 
         // When
+        when(rewardStoragePort.requestPayment(authentication, requestRewardCommand))
+                .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        rewardService.requestPayment(authentication, projectLeadId,
+        final UUID rewardId = rewardService.requestPayment(authentication, projectLeadId,
                 requestRewardCommand);
 
         // Then
-        verify(rewardStoragePort, timeout(1)).requestPayment(authentication, requestRewardCommand);
+        assertThat(rewardId).isEqualTo(newRewardId);
     }
 
     @Test

@@ -15,10 +15,10 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
     private final PermissionService permissionService;
 
     @Override
-    public void requestPayment(Authentication authentication, UUID projectLeadId,
+    public UUID requestPayment(Authentication authentication, UUID projectLeadId,
                                RequestRewardCommand requestRewardCommand) {
         if (permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId)) {
-            rewardStoragePort.requestPayment(authentication, requestRewardCommand);
+            return rewardStoragePort.requestPayment(authentication, requestRewardCommand);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }

@@ -156,12 +156,14 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> createReward(UUID projectId, RewardRequest rewardRequest) {
+    public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
-        rewardFacadePort.requestPayment(hasuraAuthentication, authenticatedUser.getId(),
+        final var rewardId = rewardFacadePort.requestPayment(hasuraAuthentication, authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
-        return ResponseEntity.ok().build();
+        final var response = new CreateRewardResponse();
+        response.setId(rewardId);
+        return ResponseEntity.ok(response);
     }
 
     @Override
@@ -173,7 +175,8 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPage(UUID projectId, UUID rewardId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPage(UUID projectId, UUID rewardId,
+                                                                             Integer pageIndex, Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();

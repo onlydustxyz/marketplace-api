@@ -103,6 +103,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .repoId(4L)
                 ));
 
+        final var newRewardId = UUID.randomUUID();
+
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
@@ -139,7 +141,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 ).willReturn(
                         ResponseDefinitionBuilder.okForJson(RequestRewardResponseDTO.builder()
                                 .commandId(UUID.randomUUID())
-                                .paymentId(UUID.randomUUID())
+                                .paymentId(newRewardId)
                                 .build())
                 ));
 
@@ -151,7 +153,9 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(200);
+                .isEqualTo(200)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(newRewardId.toString());
     }
 
     @Test
@@ -181,6 +185,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .number(4L)
                                 .repoId(5L)
                 ));
+
+        final var newRewardId = UUID.randomUUID();
 
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
@@ -219,7 +225,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 ).willReturn(
                         ResponseDefinitionBuilder.okForJson(RequestRewardResponseDTO.builder()
                                 .commandId(UUID.randomUUID())
-                                .paymentId(UUID.randomUUID())
+                                .paymentId(newRewardId)
                                 .build())
                 ));
 
@@ -232,7 +238,9 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(200);
+                .isEqualTo(200)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(newRewardId.toString());
     }
 
 
