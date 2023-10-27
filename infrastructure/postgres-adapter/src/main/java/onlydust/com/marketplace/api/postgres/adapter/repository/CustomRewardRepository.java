@@ -33,7 +33,8 @@ public class CustomRewardRepository {
                        when au.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
                        else 'PROCESSING'
-                       end                                                                                  status
+                       end                                                                                  status,
+                       r.receipt
             from payment_requests pr
                      join github_users gu_recipient on gu_recipient.id = pr.recipient_id
                      left join public.auth_users au on gu_recipient.id = au.github_user_id

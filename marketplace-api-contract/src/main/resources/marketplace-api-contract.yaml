@@ -2814,6 +2814,8 @@ components:
         processedAt:
           type: string
           format: date-time
+        receipt:
+          $ref: '#/components/schemas/ReceiptResponse'
 
     RewardItemsPageResponse:
       type: object
@@ -2886,5 +2888,26 @@ components:
         authorGithubUrl:
           type: string
 
+    ReceiptType:
+      type: string
+      enum:
+        - CRYPTO
+        - FIAT
 
+    ReceiptResponse:
+      type: object
+      required:
+        - type
+        - transactionReference
+      properties:
+        type:
+          $ref: '#/components/schemas/ReceiptType'
+        iban:
+          type: string
+        walletAddress:
+          type: string
+        ens:
+          type: string
+        transactionReference:
+          type: string
 

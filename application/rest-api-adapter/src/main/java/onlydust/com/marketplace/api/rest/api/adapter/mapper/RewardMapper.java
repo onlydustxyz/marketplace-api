@@ -3,12 +3,15 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.view.ReceiptView;
 import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.RewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 public interface RewardMapper {
 
@@ -70,7 +73,21 @@ public interface RewardMapper {
                     case pendingSignup -> RewardStatus.PENDING_SIGNUP;
                 })
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
-                .id(rewardView.getId());
+                .id(rewardView.getId())
+                .receipt(receiptToResponse(rewardView.getReceipt()))
+                ;
+    }
+
+    static ReceiptResponse receiptToResponse(final ReceiptView receiptView) {
+        return isNull(receiptView) ? null : new ReceiptResponse()
+                .ens(receiptView.getEns())
+                .type(switch (receiptView.getType()) {
+                    case FIAT -> ReceiptType.FIAT;
+                    case CRYPTO -> ReceiptType.CRYPTO;
+                })
+                .iban(receiptView.getIban())
+                .walletAddress(receiptView.getWalletAddress())
+                .transactionReference(receiptView.getTransactionReference());
     }
 
     static RewardItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {

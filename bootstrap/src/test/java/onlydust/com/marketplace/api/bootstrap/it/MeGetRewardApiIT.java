@@ -90,13 +90,15 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.stark);
         paymentRequestRepository.save(paymentRequestEntity);
+        final UUID paymentId = UUID.randomUUID();
         paymentRepository.save(PaymentEntity.builder()
-                .id(UUID.randomUUID())
+                .id(paymentId)
                 .amount(paymentRequestEntity.getAmount())
                 .requestId(paymentRequestEntity.getId())
                 .processedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"))
                 .currencyCode(paymentRequestEntity.getCurrency().name())
-                .receipt(JacksonUtil.toJsonNode("{}"))
+                .receipt(JacksonUtil.toJsonNode("""
+                        {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
                 .build());
 
         client.get()
@@ -127,9 +129,193 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z"
+                           "processedAt": "2023-09-19T22:00:00Z",
+                           "receipt": {
+                               "type": "FIAT",
+                               "iban": "FR7640618802650004034616521",
+                               "walletAddress": null,
+                               "ens": null,
+                               "transactionReference": "IBAN OK"
+                             }
                          }
                          """);
+
+        final PaymentEntity paymentEntity = paymentRepository.findById(paymentId).orElseThrow();
+        paymentEntity.setReceipt(JacksonUtil.toJsonNode("""
+                {"Ethereum": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000000", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea"}}"""));
+        paymentRepository.save(paymentEntity);
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
+                           "currency": "STARK",
+                           "amount": 100,
+                           "dollarsEquivalent": null,
+                           "status": "COMPLETE",
+                           "from": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "to": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "processedAt": "2023-09-19T22:00:00Z",
+                           "receipt": {
+                               "type": "CRYPTO",
+                               "iban": null,
+                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea",
+                               "ens": "ilysse.eth",
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                             }
+                         }
+                         """);
+
+        final PaymentEntity paymentEntity2 = paymentRepository.findById(paymentId).orElseThrow();
+        paymentEntity2.setReceipt(JacksonUtil.toJsonNode("""
+                {"Aptos": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000001", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283eb"}}"""));
+        paymentRepository.save(paymentEntity2);
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
+                           "currency": "STARK",
+                           "amount": 100,
+                           "dollarsEquivalent": null,
+                           "status": "COMPLETE",
+                           "from": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "to": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "processedAt": "2023-09-19T22:00:00Z",
+                           "receipt": {
+                               "type": "CRYPTO",
+                               "iban": null,
+                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283eb",
+                               "ens": "ilysse.eth",
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001"
+                             }
+                         }
+                         """);
+        final PaymentEntity paymentEntity3 = paymentRepository.findById(paymentId).orElseThrow();
+        paymentEntity3.setReceipt(JacksonUtil.toJsonNode("""
+                {"Optimism": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000002", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec"}}"""));
+        paymentRepository.save(paymentEntity3);
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
+                           "currency": "STARK",
+                           "amount": 100,
+                           "dollarsEquivalent": null,
+                           "status": "COMPLETE",
+                           "from": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "to": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "processedAt": "2023-09-19T22:00:00Z",
+                           "receipt": {
+                               "type": "CRYPTO",
+                               "iban": null,
+                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec",
+                               "ens": "ilysse.eth",
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002"
+                             }
+                         }
+                         """);
+
+        final PaymentEntity paymentEntity4 = paymentRepository.findById(paymentId).orElseThrow();
+        paymentEntity4.setReceipt(JacksonUtil.toJsonNode("""
+                {"Starknet": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000003", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ed"}}"""));
+        paymentRepository.save(paymentEntity4);
+
+        client.get()
+                .uri(getApiURI(String.format(ME_REWARD, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
+                           "currency": "STARK",
+                           "amount": 100,
+                           "dollarsEquivalent": null,
+                           "status": "COMPLETE",
+                           "from": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "to": {
+                             "id": 16590657,
+                             "login": "PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                             "isRegistered": null
+                           },
+                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "processedAt": "2023-09-19T22:00:00Z",
+                           "receipt": {
+                               "type": "CRYPTO",
+                               "iban": null,
+                               "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ed",
+                               "ens": "ilysse.eth",
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003"
+                             }
+                         }
+                         """);
+
+
     }
 
     @Test

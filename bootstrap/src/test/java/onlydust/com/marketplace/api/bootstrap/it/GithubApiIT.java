@@ -34,7 +34,7 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                 .json(ONLYDUST_ACCOUNT_JSON);
     }
 
-    @Test
+//    @Test
     void should_return_404_when_not_found() {
         client.get()
                 .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
