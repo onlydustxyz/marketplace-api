@@ -47,6 +47,7 @@ public class OdRustApiHttpClient {
             final HttpResponse<byte[]> httpResponse = httpClient.send(
                     builderFromAuthorizations(authentication)
                             .uri(URI.create(properties.getBaseUri() + path))
+                            .header("Content-Type", "application/json")
                             .method(method.name(),
                                     isNull(requestBody) ? noBody() :
                                             ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
