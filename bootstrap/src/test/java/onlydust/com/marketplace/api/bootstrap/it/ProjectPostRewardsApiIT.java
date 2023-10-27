@@ -110,6 +110,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         WireMock.urlEqualTo("/api/payments"))
                 .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -194,6 +195,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         WireMock.urlEqualTo("/api/payments"))
                 .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withHeader(IMPERSONATION_HEADER, equalTo(impersonatePierreHeader))
                 .withRequestBody(WireMock.equalToJson("""
                         {

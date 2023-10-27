@@ -1,6 +1,10 @@
 infrastructure:
   github:
     personal-access-token: "GITHUB_PAT"
+  od:
+    api:
+      client:
+        api-key: "some-rust-api-key"
 spring:
   main:
     allow-bean-definition-overriding: true

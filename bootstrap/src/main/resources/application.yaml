@@ -58,7 +58,7 @@ spring:
 
 server:
   port: ${PORT}
-  
+
 infrastructure:
   aws:
     image-bucket: onlydust-app-images
@@ -72,3 +72,4 @@ infrastructure:
     api:
       client:
         base-uri: ${RUST_API_BASE_URL}
+        api-key: ${RUST_API_KEY}

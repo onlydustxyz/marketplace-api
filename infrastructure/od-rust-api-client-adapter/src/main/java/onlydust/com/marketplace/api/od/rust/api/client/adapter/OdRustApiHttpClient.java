@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.lang.String.format;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 import static java.util.Objects.isNull;
@@ -28,12 +29,14 @@ public class OdRustApiHttpClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Properties properties;
 
-    private static HttpRequest.Builder builderFromAuthorizations(final HasuraAuthentication authentication) {
-        HttpRequest.Builder builder = HttpRequest.newBuilder().headers("Authorization",
-                BEARER_PREFIX + authentication.getJwt());
+    private HttpRequest.Builder builderFromAuthorizations(final HasuraAuthentication authentication) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .header("Content-Type", "application/json")
+                .header("Api-Key", properties.getApiKey())
+                .header("Authorization", BEARER_PREFIX + authentication.getJwt());
 
         if (authentication.getImpersonationHeader() != null) {
-            builder = builder.headers(IMPERSONATION_HEADER, authentication.getImpersonationHeader());
+            builder = builder.header(IMPERSONATION_HEADER, authentication.getImpersonationHeader());
         }
         return builder;
     }
@@ -47,7 +50,6 @@ public class OdRustApiHttpClient {
             final HttpResponse<byte[]> httpResponse = httpClient.send(
                     builderFromAuthorizations(authentication)
                             .uri(URI.create(properties.getBaseUri() + path))
-                            .header("Content-Type", "application/json")
                             .method(method.name(),
                                     isNull(requestBody) ? noBody() :
                                             ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
@@ -56,28 +58,30 @@ public class OdRustApiHttpClient {
             );
             final int statusCode = httpResponse.statusCode();
             if (statusCode == HttpStatus.UNAUTHORIZED.value()) {
-                throw OnlyDustException.unauthorized("Unauthorized to request a reward");
+                throw OnlyDustException.unauthorized(format("Unauthorized error when calling %s on Rust API", path));
             } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
-                throw OnlyDustException.forbidden("Forbidden to request a reward");
+                throw OnlyDustException.forbidden(format("Forbidden error when calling %s on Rust API", path));
             } else if (statusCode != HttpStatus.OK.value() &&
                        statusCode != HttpStatus.CREATED.value() &&
                        statusCode != HttpStatus.ACCEPTED.value() &&
                        statusCode != HttpStatus.NO_CONTENT.value()) {
-                throw OnlyDustException.internalServerError(String.format("Unknown http status %s", statusCode));
+                throw OnlyDustException.internalServerError(format("Unknown error (status %d) when calling %s on Rust" +
+                                                                   " API", statusCode, path));
             } else if (Void.class.isAssignableFrom(responseClass)) {
                 return null;
             }
             return objectMapper.readValue(httpResponse.body(), responseClass);
 
         } catch (JsonProcessingException e) {
-            throw internalServerError("Fail to serialize reward request", e);
+            throw internalServerError("Fail to serialize request", e);
         } catch (IOException | InterruptedException e) {
-            throw internalServerError("Fail send reward request", e);
+            throw internalServerError("Fail send request", e);
         }
     }
 
     @Data
     public static class Properties {
         String baseUri;
+        String apiKey;
     }
 }
