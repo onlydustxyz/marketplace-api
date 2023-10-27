@@ -18,10 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredU
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -35,18 +32,17 @@ public class CustomUserRepository {
             """;
 
     private static final String SELECT_USER_PROFILE = """
-            select
-                   gu.id as github_user_id,
+            select gu.id as                                github_user_id,
                    u.id,
                    u.email,
                    u.last_seen,
                    u.created_at,
                    gu.login,
                    gu.html_url,
-                   coalesce(upi.bio, gu.bio)                        bio,
-                   coalesce(upi.location, gu.location)              location,
-                   coalesce(upi.website, gu.website)                website,
-                   coalesce(upi.avatar_url, gu.avatar_url)          avatar_url,
+                   coalesce(upi.bio, gu.bio)               bio,
+                   coalesce(upi.location, gu.location)     location,
+                   coalesce(upi.website, gu.website)       website,
+                   coalesce(upi.avatar_url, gu.avatar_url) avatar_url,
                    upi.languages,
                    upi.cover,
                    upi.looking_for_a_job,
@@ -58,7 +54,8 @@ public class CustomUserRepository {
                            'contact', ci.contact
                                      ))
                     FROM public.contact_informations ci
-                    WHERE u.id is not null and ci.user_id = u.id)   contacts,
+                    WHERE u.id is not null
+                      and ci.user_id = u.id)               contacts,
                         
                    (SELECT jsonb_agg(jsonb_build_object(
                            'year', cc.year,
@@ -75,34 +72,39 @@ public class CustomUserRepository {
                           FROM contributions c
                           where c.status = 'complete'
                             and c.user_id = gu.id
-                          GROUP BY year, week) as cc)               counts,
+                          GROUP BY year, week) as cc)      counts,
                         
                         
                    (select count(pl.project_id)
                     from project_leads pl
-                    where u.id is not null and pl.user_id = u.id)   leading_project_number,
+                    where u.id is not null
+                      and pl.user_id = u.id)               leading_project_number,
                         
                    (select count(distinct pc.project_id)
                     from projects_contributors pc
-                    where pc.github_user_id = gu.id)                contributor_on_project,
+                    where pc.github_user_id = gu.id)       contributor_on_project,
                         
                    (select jsonb_build_object(
-                                   'total_dollars_equivalent',
-                                   sum(case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end),
-                                   'details', jsonb_agg(jsonb_build_object(
-                                   'total_amount', pr.amount,
-                                   'total_dollars_equivalent',
-                                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end,
-                                   'currency', pr.currency
-                                                        )))
-                    from payment_requests pr
-                    left join crypto_usd_quotes cuq on cuq.currency = pr.currency
-                    where pr.recipient_id = gu.id)                  totals_earned,
+                                   'total_dollars_equivalent', sum(prs.total_dollars_equivalent),
+                                   'details',
+                                   jsonb_agg(jsonb_build_object(
+                                           'total_amount', prs.total_amount,
+                                           'total_dollars_equivalent', prs.total_dollars_equivalent,
+                                           'currency', prs.currency
+                                             )))
+                    from (select sum(pr.amount)                                                         as total_amount,
+                                 (case when pr.currency = 'usd' then sum(pr.amount)
+                                       else sum(coalesce(cuq.price, 0) * pr.amount) end)                as total_dollars_equivalent,
+                                 pr.currency                                                            as currency
+                          from payment_requests pr
+                                   left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                          where pr.recipient_id = gu.id
+                          group by pr.currency) as prs)    totals_earned,
                         
                    (select count(distinct c.id)
                     from contributions c
                     where c.user_id = gu.id
-                      and c.status = 'complete')                    contributions_count
+                      and c.status = 'complete')           contributions_count
                 
             """;
 
@@ -208,7 +210,8 @@ public class CustomUserRepository {
                         .totalsEarned(isNull(row.getTotalsEarned()) ? null :
                                 TotalsEarned.builder()
                                         .totalDollarsEquivalent(row.getTotalsEarned().getTotalDollarsEquivalent())
-                                        .details(row.getTotalsEarned().getDetails().stream().map(detail ->
+                                        .details(isNull(row.getTotalsEarned().getDetails()) ? List.of() :
+                                                row.getTotalsEarned().getDetails().stream().map(detail ->
                                                 TotalEarnedPerCurrency.builder()
                                                         .currency(isNull(detail.getCurrency()) ? null :
                                                                 switch (detail.getCurrency()) {
@@ -226,7 +229,8 @@ public class CustomUserRepository {
                         .leadedProjectCount(row.getNumberOfLeadingProject())
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())
-                        .contributionStats(row.getCounts().stream().map(weekCount ->
+                        .contributionStats(isNull(row.getCounts()) ? List.of() :
+                                row.getCounts().stream().map(weekCount ->
                                                 UserProfileView.ProfileStats.ContributionStats.builder()
                                                         .codeReviewCount(weekCount.getCodeReviewCount())
                                                         .issueCount(weekCount.getIssueCount())
@@ -247,7 +251,7 @@ public class CustomUserRepository {
                             case one_to_three_days -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
                             case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
                         })
-                .contacts(row.getContacts().stream().map(contact ->
+                .contacts(isNull(row.getContacts()) ? Set.of() : row.getContacts().stream().map(contact ->
                         Contact.builder()
                                 .contact(contact.getContact())
                                 .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
