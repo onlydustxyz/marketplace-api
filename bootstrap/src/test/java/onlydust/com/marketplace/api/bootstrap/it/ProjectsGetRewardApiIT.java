@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -96,11 +98,12 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.stark);
         paymentRequestRepository.save(paymentRequestEntity);
+        final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
         paymentRepository.save(PaymentEntity.builder()
                 .id(UUID.randomUUID())
                 .amount(paymentRequestEntity.getAmount())
                 .requestId(paymentRequestEntity.getId())
-                .processedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"))
+                .processedAt(processedAt)
                 .currencyCode(paymentRequestEntity.getCurrency().name())
                 .receipt(JacksonUtil.toJsonNode("{}"))
                 .build());
@@ -113,7 +116,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                             "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
                             "currency": "STARK",
@@ -133,8 +136,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": null
                             },
                             "createdAt": "2023-09-19T05:38:52.590518Z",
-                            "processedAt": "2023-09-19T22:00:00Z"
-                        }""");
+                            "processedAt": "%s"
+                        }""", DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
 
         paymentRequestEntity.setAmount(BigDecimal.valueOf(200));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.eth);
@@ -150,7 +153,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                             "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
                             "currency": "ETH",
@@ -170,8 +173,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": null
                             },
                             "createdAt": "2023-09-19T05:38:52.590518Z",
-                            "processedAt": "2023-09-19T22:00:00Z"
-                        }""");
+                            "processedAt": "%s"
+                        }""", DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
     }
 
 

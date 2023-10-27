@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @ActiveProfiles({"hasura_auth"})
-public class VersionApiIT extends AbstractMarketplaceApiIT {
+public class    VersionApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     Date startingDate;
