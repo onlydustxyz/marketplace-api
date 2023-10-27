@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
@@ -54,7 +53,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_be_forbidden_given_authenticated_user_not_project_lead() throws JsonProcessingException {
+    void should_be_forbidden_given_authenticated_user_not_project_lead() {
         // Given
         hasuraUserHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
@@ -79,14 +78,42 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_request_reward_to_old_api_given_a_project_lead() throws JsonProcessingException {
+    void should_not_be_able_to_request_reward_when_there_is_not_enough_budget() {
         // Given
         final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
-                .amount(BigDecimal.valueOf(212.95))
+                .amount(BigDecimal.valueOf(1))
                 .currency(CurrencyContract.STARK)
+                .recipientId(11111L)
+                .items(List.of(
+                        new RewardItemRequest().id("pr2")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(2L)
+                                .repoId(3L)
+                ));
+
+        // When
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(rewardRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(400);
+    }
+
+    @Test
+    void should_request_reward_to_old_api_given_a_project_lead() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final RewardRequest rewardRequest = new RewardRequest()
+                .amount(BigDecimal.valueOf(12.95))
+                .currency(CurrencyContract.ETH)
                 .recipientId(pierre.user().getGithubUserId())
                 .items(List.of(
                         new RewardItemRequest().id("pr1")
@@ -115,8 +142,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 16590657,
-                          "amount": 212.95,
-                          "currency": "STARK",
+                          "amount": 12.95,
+                          "currency": "ETH",
                           "reason": {
                             "workItems": [
                               {
@@ -161,7 +188,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_request_reward_to_old_api_given_a_project_lead_impersonated() throws JsonProcessingException {
+    void should_request_reward_to_old_api_given_a_project_lead_impersonated() {
         // Given
         final String jwt = hasuraUserHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
                 faker.internet().url(), true).jwt();
@@ -171,7 +198,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(111.47))
-                .currency(CurrencyContract.ETH)
+                .currency(CurrencyContract.USD)
                 .recipientId(11111L)
                 .items(List.of(
                         new RewardItemRequest().id("pr2")
@@ -202,7 +229,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 11111,
                           "amount": 111.47,
-                          "currency": "ETH",
+                          "currency": "USD",
                           "reason": {
                             "workItems": [
                               {
