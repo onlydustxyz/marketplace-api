@@ -7,8 +7,9 @@ import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestReward
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
+import org.springframework.http.HttpMethod;
 
-import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class OdRustApiClientAdapter implements RewardStoragePort<HasuraAuthentication> {
@@ -16,9 +17,17 @@ public class OdRustApiClientAdapter implements RewardStoragePort<HasuraAuthentic
     private final OdRustApiHttpClient httpClient;
 
     @Override
-    public void requestPayment(final HasuraAuthentication authentication, RequestRewardCommand requestRewardCommand) {
+    public UUID requestPayment(final HasuraAuthentication authentication, RequestRewardCommand requestRewardCommand) {
         final RequestRewardDTO requestRewardDTO = RewardMapper.mapCreateRewardCommandToDTO(requestRewardCommand);
-        httpClient.sendRequest(requestRewardDTO, RequestRewardResponseDTO.class, authentication.getJwt(),
-                Optional.ofNullable(authentication.getImpersonationHeader()));
+        final var response = httpClient.sendRequest("/api/payments", HttpMethod.POST, requestRewardDTO,
+                RequestRewardResponseDTO.class,
+                authentication);
+        return response.getPaymentId();
+    }
+
+    @Override
+    public void cancelPayment(HasuraAuthentication authentication, UUID rewardId) {
+        httpClient.sendRequest("/api/payments/" + rewardId.toString(), HttpMethod.DELETE, null, Void.class,
+                authentication);
     }
 }

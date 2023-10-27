@@ -6,6 +6,8 @@ import java.util.UUID;
 
 public interface RewardFacadePort<Authentication> {
 
-    void requestPayment(Authentication authentication, UUID projectLeadId,
+    UUID requestPayment(Authentication authentication, UUID projectLeadId,
                         RequestRewardCommand requestRewardCommand);
+
+    void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId);
 }
