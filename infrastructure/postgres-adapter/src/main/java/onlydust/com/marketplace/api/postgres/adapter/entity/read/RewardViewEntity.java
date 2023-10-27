@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -53,6 +54,9 @@ public class RewardViewEntity {
     String recipientAvatarUrl;
     @Column(name = "recipient_id")
     Long recipientId;
+    @Column(name = "receipt", columnDefinition = "jsonb")
+    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
+    JsonNode receipt;
 
 
 }

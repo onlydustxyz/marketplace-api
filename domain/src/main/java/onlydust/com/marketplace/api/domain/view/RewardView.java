@@ -21,6 +21,7 @@ public class RewardView {
     GithubUserIdentity to;
     Date createdAt;
     Date processedAt;
+    ReceiptView receipt;
 
     public enum Status {
         pendingInvoice, processing, complete, pendingSignup, missingPayoutInfo
