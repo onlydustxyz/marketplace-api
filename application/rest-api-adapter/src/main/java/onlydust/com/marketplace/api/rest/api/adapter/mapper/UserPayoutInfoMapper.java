@@ -23,7 +23,7 @@ public interface UserPayoutInfoMapper {
             owner.setLastname(view.getCompany().getOwner().getLastName());
             company.setOwner(owner);
             contract.setCompany(company);
-        } else {
+        } else if (nonNull(view.getPerson())){
             final PersonIdentity person = new PersonIdentity();
             person.setFirstname(view.getPerson().getFirstName());
             person.setLastname(view.getPerson().getLastName());
