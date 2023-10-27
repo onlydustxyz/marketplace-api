@@ -46,5 +46,5 @@ public interface UserStoragePort {
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 
-    List<RewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
+    List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
 }

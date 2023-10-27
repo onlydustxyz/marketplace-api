@@ -45,5 +45,5 @@ public interface UserFacadePort {
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex, int pageSize);
 
-    List<RewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
+    List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
 }

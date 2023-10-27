@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
@@ -225,7 +224,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(0)
-    void should_return_forbidden_status_when_getting_project_rewards_given_user_not_project_lead() throws JsonProcessingException {
+    void should_return_forbidden_status_when_getting_project_rewards_given_user_not_project_lead() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
@@ -242,7 +241,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(1)
-    void should_get_projects_rewards() throws JsonProcessingException {
+    void should_get_projects_rewards() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
@@ -284,7 +283,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
-    void should_get_project_rewards_with_multiple_currencies() throws JsonProcessingException {
+    void should_get_project_rewards_with_multiple_currencies() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
