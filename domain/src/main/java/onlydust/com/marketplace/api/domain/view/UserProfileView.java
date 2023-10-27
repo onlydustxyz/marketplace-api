@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.Contact;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
@@ -109,20 +108,5 @@ public class UserProfileView {
                 return yearComparison == 0 ? Integer.compare(o1.getWeek(), o2.getWeek()) : yearComparison;
             }
         }
-    }
-
-    @Data
-    @Builder
-    public static class TotalsEarned {
-        BigDecimal totalDollarsEquivalent;
-        List<TotalEarnedPerCurrency> details;
-    }
-
-    @Data
-    @Builder
-    public static class TotalEarnedPerCurrency {
-        BigDecimal totalDollarsEquivalent;
-        BigDecimal totalAmount;
-        Currency currency;
     }
 }

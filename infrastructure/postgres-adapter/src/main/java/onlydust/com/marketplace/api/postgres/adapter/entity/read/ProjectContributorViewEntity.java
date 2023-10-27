@@ -39,4 +39,24 @@ public class ProjectContributorViewEntity {
     Integer codeReviewsToReward;
     @Column(name = "issues_to_reward")
     Integer issuesToReward;
+    @Column(name = "usd")
+    BigDecimal usdAmount;
+    @Column(name = "eth")
+    BigDecimal ethAmount;
+    @Column(name = "eth_usd")
+    BigDecimal ethDollarsEquivalentAmount;
+    @Column(name = "op")
+    BigDecimal opAmount;
+    @Column(name = "op_usd")
+    BigDecimal opDollarsEquivalentAmount;
+    @Column(name = "apt")
+    BigDecimal aptAmount;
+    @Column(name = "apt_usd")
+    BigDecimal aptDollarsEquivalentAmount;
+    @Column(name = "stark")
+    BigDecimal starkAmount;
+    @Column(name = "stark_usd")
+    BigDecimal starkDollarsEquivalentAmount;
+
+
 }

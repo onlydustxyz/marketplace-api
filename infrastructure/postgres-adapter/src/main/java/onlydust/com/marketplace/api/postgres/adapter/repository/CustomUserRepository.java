@@ -9,6 +9,8 @@ import onlydust.com.marketplace.api.domain.model.Contact;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
+import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.api.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
@@ -204,10 +206,10 @@ public class CustomUserRepository {
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
                         .totalsEarned(isNull(row.getTotalsEarned()) ? null :
-                                UserProfileView.TotalsEarned.builder()
+                                TotalsEarned.builder()
                                         .totalDollarsEquivalent(row.getTotalsEarned().getTotalDollarsEquivalent())
                                         .details(row.getTotalsEarned().getDetails().stream().map(detail ->
-                                                UserProfileView.TotalEarnedPerCurrency.builder()
+                                                TotalEarnedPerCurrency.builder()
                                                         .currency(isNull(detail.getCurrency()) ? null :
                                                                 switch (detail.getCurrency()) {
                                                                     case usd -> Currency.Usd;
