@@ -314,8 +314,6 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              }
                          }
                          """);
-
-
     }
 
     @Test
