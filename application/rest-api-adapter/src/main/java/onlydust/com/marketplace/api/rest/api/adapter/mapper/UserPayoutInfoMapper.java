@@ -33,11 +33,13 @@ public interface UserPayoutInfoMapper {
             contract.setPayoutSettings(payoutSettings);
         }
         final UserPayoutInformationResponseLocation location = new UserPayoutInformationResponseLocation();
-        location.setAddress(view.getLocation().getAddress());
-        location.setCity(view.getLocation().getCity());
-        location.setCountry(view.getLocation().getCountry());
-        location.setPostalCode(view.getLocation().getPostalCode());
-        contract.setLocation(location);
+        if (nonNull(location)) {
+            location.setAddress(view.getLocation().getAddress());
+            location.setCity(view.getLocation().getCity());
+            location.setCountry(view.getLocation().getCountry());
+            location.setPostalCode(view.getLocation().getPostalCode());
+            contract.setLocation(location);
+        }
         return contract;
     }
 
