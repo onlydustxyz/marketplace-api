@@ -37,7 +37,7 @@ public interface UserRewardMapper {
                 .build();
     }
 
-    static UserRewardTotalAmountsView mapTotalAmountEntitiesToDomain(final List<UserRewardTotalAmountEntity> entities) {
+        static UserRewardTotalAmountsView mapTotalAmountEntitiesToDomain(final List<UserRewardTotalAmountEntity> entities) {
         final UserRewardTotalAmountsView userRewardTotalAmountsView = UserRewardTotalAmountsView.builder().build();
         for (UserRewardTotalAmountEntity entity : entities) {
             userRewardTotalAmountsView.addUserTotalReward(UserTotalRewardView.builder()

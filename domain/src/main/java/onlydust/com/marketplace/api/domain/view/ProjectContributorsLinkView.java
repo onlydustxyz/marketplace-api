@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.domain.view;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 @Builder
 public class ProjectContributorsLinkView implements UserLinkView {
@@ -13,7 +11,7 @@ public class ProjectContributorsLinkView implements UserLinkView {
     String login;
     String avatarUrl;
     String url;
-    BigDecimal earned;
+    TotalsEarned earned;
     Integer contributionCount;
     Integer rewards;
     Integer totalToReward;
@@ -25,5 +23,7 @@ public class ProjectContributorsLinkView implements UserLinkView {
     public enum SortBy {
         contributionCount, earned, login, rewardCount, toRewardCount
     }
+
+
 
 }

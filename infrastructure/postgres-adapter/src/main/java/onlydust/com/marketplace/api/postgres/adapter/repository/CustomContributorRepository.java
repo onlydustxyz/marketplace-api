@@ -54,10 +54,6 @@ public class CustomContributorRepository {
                       and user_id = gu.id
                       and c.status = 'complete')                 contribution_count,
                    au.id is not null is_registered,
-                   (select coalesce(sum(pr.amount),0)
-                    from payment_requests pr
-                    where pr.project_id = :projectId
-                      and pr.recipient_id = gu.id and pr.currency = 'usd')   earned,
                    (select count(distinct pr.id)
                     from payment_requests pr
                     where pr.project_id = :projectId
@@ -65,7 +61,19 @@ public class CustomContributorRepository {
                    coalesce(to_rewards_stats.total_count,0) to_reward_count,
                    to_rewards_stats.pull_request_count prs_to_reward,
                    to_rewards_stats.issue_count issues_to_reward,
-                   to_rewards_stats.code_review_count code_reviews_to_reward
+                   to_rewards_stats.code_review_count code_reviews_to_reward,
+                   amounts.usd,
+                          amounts.eth,
+                          coalesce(amounts.eth * cuq_eth.price, 0)   eth_usd,
+                          amounts.stark,
+                          coalesce(amounts.stark * cuq_stark.price, 0) stark_usd,
+                          amounts.apt,
+                          coalesce(amounts.apt * cuq_apt.price, 0)   apt_usd,
+                          amounts.op,
+                          coalesce(amounts.op * cuq_op.price, 0)    op_usd,
+                          coalesce(amounts.eth * cuq_eth.price, 0) + coalesce(amounts.stark * cuq_stark.price, 0) +
+                          coalesce(amounts.apt * cuq_apt.price, 0) + coalesce(amounts.op * cuq_op.price, 0) +
+                          coalesce(amounts.usd, 0)                   earned
             from projects_contributors pc
                      join github_users gu on gu.id = pc.github_user_id
                      left join auth_users au on au.github_user_id = gu.id
@@ -81,6 +89,19 @@ public class CustomContributorRepository {
                                   and c.status = 'complete'
                                   and wi.id is null
                                 group by c.user_id) to_rewards_stats on to_rewards_stats.user_id = gu.id
+                     left join (select sum(pr.amount) filter (where pr.currency = 'usd')   usd,
+                                                sum(pr.amount) filter (where pr.currency = 'apt')   apt,
+                                                sum(pr.amount) filter (where pr.currency = 'stark') stark,
+                                                sum(pr.amount) filter (where pr.currency = 'op')    op,
+                                                sum(pr.amount) filter (where pr.currency = 'eth')   eth,
+                                                pr.recipient_id
+                                         from payment_requests pr
+                                         where pr.project_id = :projectId
+                                         group by pr.recipient_id) amounts on amounts.recipient_id = gu.id
+                              left join crypto_usd_quotes cuq_eth on cuq_eth.currency = 'eth'
+                              left join crypto_usd_quotes cuq_apt on cuq_apt.currency = 'apt'
+                              left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'stark'
+                              left join crypto_usd_quotes cuq_op on cuq_op.currency = 'op'
             where pc.project_id = :projectId
             order by %order_by%
             offset :offset limit :limit

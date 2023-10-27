@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.api.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import org.springframework.beans.BeanUtils;
 
@@ -160,10 +162,10 @@ public interface UserMapper {
         return userProfileStats;
     }
 
-    static RewardTotalAmountsResponse totalsEarnedToResponse(UserProfileView.TotalsEarned totalsEarned) {
+    static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
         final RewardTotalAmountsResponse response = new RewardTotalAmountsResponse();
         response.setTotalAmount(totalsEarned.getTotalDollarsEquivalent());
-        for (UserProfileView.TotalEarnedPerCurrency totalEarnedPerCurrency : totalsEarned.getDetails()) {
+        for (TotalEarnedPerCurrency totalEarnedPerCurrency : totalsEarned.getDetails()) {
             final MyRewardAmountResponse myRewardAmountResponse = new MyRewardAmountResponse();
             myRewardAmountResponse.setTotalAmount(totalEarnedPerCurrency.getTotalAmount());
             myRewardAmountResponse.totalDollarsEquivalent(totalEarnedPerCurrency.getTotalDollarsEquivalent());
