@@ -22,6 +22,14 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
         } else {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }
+    }
 
+    @Override
+    public void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            rewardStoragePort.cancelPayment(authentication, rewardId);
+        } else {
+            throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
+        }
     }
 }

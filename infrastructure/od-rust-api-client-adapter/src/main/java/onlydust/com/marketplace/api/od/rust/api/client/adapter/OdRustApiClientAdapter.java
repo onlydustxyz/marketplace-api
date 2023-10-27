@@ -24,4 +24,10 @@ public class OdRustApiClientAdapter implements RewardStoragePort<HasuraAuthentic
                 authentication);
         return response.getPaymentId();
     }
+
+    @Override
+    public void cancelPayment(HasuraAuthentication authentication, UUID rewardId) {
+        httpClient.sendRequest("/api/payments/" + rewardId.toString(), HttpMethod.DELETE, null, Void.class,
+                authentication);
+    }
 }

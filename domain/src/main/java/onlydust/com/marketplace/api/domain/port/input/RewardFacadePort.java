@@ -8,4 +8,6 @@ public interface RewardFacadePort<Authentication> {
 
     UUID requestPayment(Authentication authentication, UUID projectLeadId,
                         RequestRewardCommand requestRewardCommand);
+
+    void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId);
 }

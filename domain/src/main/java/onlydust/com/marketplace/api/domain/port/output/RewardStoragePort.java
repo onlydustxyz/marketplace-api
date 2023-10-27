@@ -8,4 +8,6 @@ public interface RewardStoragePort<Authentication> {
 
     UUID requestPayment(Authentication authentication,
                         RequestRewardCommand requestRewardCommand);
+
+    void cancelPayment(Authentication authentication, UUID rewardId);
 }

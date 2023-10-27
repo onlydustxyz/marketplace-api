@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static java.net.http.HttpRequest.BodyPublishers.noBody;
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
@@ -47,7 +48,7 @@ public class OdRustApiHttpClient {
                     builderFromAuthorizations(authentication)
                             .uri(URI.create(properties.getBaseUri() + path))
                             .method(method.name(),
-                                    isNull(requestBody) ? null :
+                                    isNull(requestBody) ? noBody() :
                                             ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
                             .build(),
                     HttpResponse.BodyHandlers.ofByteArray()
