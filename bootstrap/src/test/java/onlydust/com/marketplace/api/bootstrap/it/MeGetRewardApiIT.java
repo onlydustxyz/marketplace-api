@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -91,11 +94,12 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.stark);
         paymentRequestRepository.save(paymentRequestEntity);
         final UUID paymentId = UUID.randomUUID();
+        final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
         paymentRepository.save(PaymentEntity.builder()
                 .id(paymentId)
                 .amount(paymentRequestEntity.getAmount())
                 .requestId(paymentRequestEntity.getId())
-                .processedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20"))
+                .processedAt(processedAt)
                 .currencyCode(paymentRequestEntity.getCurrency().name())
                 .receipt(JacksonUtil.toJsonNode("""
                         {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
@@ -109,7 +113,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STARK",
@@ -129,7 +133,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z",
+                           "processedAt": "%s",
                            "receipt": {
                                "type": "FIAT",
                                "iban": "FR7640618802650004034616521",
@@ -138,7 +142,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "IBAN OK"
                              }
                          }
-                         """);
+                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
 
         final PaymentEntity paymentEntity = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity.setReceipt(JacksonUtil.toJsonNode("""
@@ -153,7 +157,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STARK",
@@ -173,7 +177,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z",
+                           "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
                                "iban": null,
@@ -182,7 +186,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000000"
                              }
                          }
-                         """);
+                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
 
         final PaymentEntity paymentEntity2 = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity2.setReceipt(JacksonUtil.toJsonNode("""
@@ -197,7 +201,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STARK",
@@ -217,7 +221,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z",
+                           "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
                                "iban": null,
@@ -226,7 +230,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001"
                              }
                          }
-                         """);
+                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
         final PaymentEntity paymentEntity3 = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity3.setReceipt(JacksonUtil.toJsonNode("""
                 {"Optimism": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000002", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec"}}"""));
@@ -240,7 +244,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STARK",
@@ -260,7 +264,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z",
+                           "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
                                "iban": null,
@@ -269,7 +273,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002"
                              }
                          }
-                         """);
+                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
 
         final PaymentEntity paymentEntity4 = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity4.setReceipt(JacksonUtil.toJsonNode("""
@@ -284,7 +288,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
+                .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
                            "currency": "STARK",
@@ -304,7 +308,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "isRegistered": null
                            },
                            "createdAt": "2023-09-19T05:38:22.018458Z",
-                           "processedAt": "2023-09-19T22:00:00Z",
+                           "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
                                "iban": null,
@@ -313,7 +317,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003"
                              }
                          }
-                         """);
+                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
     }
 
     @Test
