@@ -133,7 +133,8 @@ public class CustomRewardRepository {
                              from github_pull_request_commits c
                              where c.pull_request_id = pull_request.id
                                and c.author_id = pr.recipient_id)                                             user_commits_count,
-                            issue.comments_count
+                            issue.comments_count,
+                            pr.recipient_id
             from payment_requests pr
                       join public.work_items wi on wi.payment_id = pr.id
                       left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)

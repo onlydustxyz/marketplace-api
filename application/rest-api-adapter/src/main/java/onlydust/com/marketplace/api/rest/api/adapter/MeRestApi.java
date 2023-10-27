@@ -9,13 +9,13 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.api.domain.view.ContributionView;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -171,5 +171,27 @@ public class MeRestApi implements MeApi {
         return contributionPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
                 : ResponseEntity.ok(contributionPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<RewardResponse> getMyReward(UUID rewardId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final RewardView rewardView = userFacadePort.getRewardByIdForRecipientId(rewardId,
+                authenticatedUser.getGithubUserId());
+        return ResponseEntity.ok(RewardMapper.projectRewardToResponse(rewardView));
+    }
+
+    @Override
+    public ResponseEntity<RewardItemsPageResponse> getMyRewardItemsPage(UUID rewardId, Integer pageIndex,
+                                                                        Integer pageSize) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientId(rewardId,
+                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize);
+        final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
+        return rewardItemsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
+                ResponseEntity.ok(rewardItemsPageResponse);
     }
 }

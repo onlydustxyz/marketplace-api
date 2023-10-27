@@ -384,6 +384,81 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/rewards/{rewardId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my reward by reward Id
+      operationId: getMyReward
+      description: |
+        Get my reward details. Only authenticated user can access this information.
+      parameters:
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Reward details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/RewardForbiddenError'
+        "404":
+          $ref: '#/components/responses/RewardNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/rewards/{rewardId}/reward-items:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my reward items page by reward Id
+      operationId: getMyRewardItemsPage
+      description: |
+        Get my reward items details. Only authenticated user can access this information.
+      parameters:
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: pageIndex
+          description: Page number
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Reward details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardItemsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/RewardForbiddenError'
+        "404":
+          $ref: '#/components/responses/RewardNotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -848,7 +923,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectRewardResponse'
+                $ref: '#/components/schemas/RewardResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -864,7 +939,7 @@ paths:
       tags:
         - Projects
       summary: Get project reward items page by reward Id
-      operationId: getProjectRewardsPage
+      operationId: getProjectRewardItemsPage
       description: |
         Get reward items details from this project. Only project leaders can access this information.
       parameters:
@@ -2707,7 +2782,7 @@ components:
           $ref: '#/components/schemas/CurrencyContract'
 
 
-    ProjectRewardResponse:
+    RewardResponse:
       type: object
       required:
         - status

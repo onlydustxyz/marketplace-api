@@ -27,4 +27,5 @@ public class RewardItemView {
     String authorLogin;
     String authorAvatarUrl;
     String authorGithubUrl;
+    Long recipientId;
 }

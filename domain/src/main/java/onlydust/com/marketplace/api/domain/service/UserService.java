@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
@@ -104,5 +103,24 @@ public class UserService implements UserFacadePort {
     @Override
     public UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId) {
         return userStoragePort.findRewardTotalAmountsForUserId(userId);
+    }
+
+    @Override
+    public RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId) {
+        final RewardView reward = userStoragePort.findRewardById(rewardId);
+        if (!reward.getTo().getGithubUserId().equals(recipientId)) {
+            throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
+        }
+        return reward;
+    }
+
+    @Override
+    public Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex,
+                                                                     int pageSize) {
+        final Page<RewardItemView> page = userStoragePort.findRewardItemsPageById(rewardId, pageIndex, pageSize);
+        if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId))) {
+            throw OnlyDustException.forbidden("Only recipient user can read it's own reward");
+        }
+        return page;
     }
 }

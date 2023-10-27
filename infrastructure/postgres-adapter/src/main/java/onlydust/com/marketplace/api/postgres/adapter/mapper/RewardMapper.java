@@ -45,6 +45,7 @@ public interface RewardMapper {
     static RewardItemView itemToDomain(RewardItemViewEntity rewardItemViewEntity) {
         return RewardItemView.builder()
                 .id(rewardItemViewEntity.getId())
+                .recipientId(rewardItemViewEntity.getRecipientId())
                 .authorAvatarUrl(rewardItemViewEntity.getAuthorAvatarUrl())
                 .createdAt(rewardItemViewEntity.getCreatedAt())
                 .title(rewardItemViewEntity.getTitle())
