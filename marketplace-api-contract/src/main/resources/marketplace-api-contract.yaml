@@ -2140,7 +2140,6 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
-
         status:
           $ref: '#/components/schemas/RewardStatus'
         amount:
@@ -2166,11 +2165,15 @@ components:
         - rewardedOnProjectName
         - rewardedOnProjectLogoUrl
         - id
+        - projectId
       properties:
         requestedAt:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
+        projectId:
+          type: string
+          format: uuid
         status:
           $ref: '#/components/schemas/RewardStatus'
         amount:

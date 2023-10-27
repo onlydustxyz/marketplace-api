@@ -12,6 +12,7 @@ import java.util.UUID;
 @Builder
 public class UserRewardView {
     UUID id;
+    UUID projectId;
     Integer numberOfRewardedContributions;
     Date requestedAt;
     String rewardedOnProjectName;

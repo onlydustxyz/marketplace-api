@@ -88,13 +88,14 @@ public interface UserPayoutInfoMapper {
                                     .build())
                             .build())
                     .build();
-        } else {
+        } else if (nonNull(contract.getPerson())) {
             userPayoutInformation = userPayoutInformation.toBuilder().person(
                             UserPayoutInformation.Person.builder()
                                     .lastName(contract.getPerson().getLastname())
                                     .firstName(contract.getPerson().getFirstname())
                                     .build())
                     .build();
+
         }
         userPayoutInformation = userPayoutInformation.toBuilder()
                 .payoutSettings(UserPayoutInformation.PayoutSettings.builder()

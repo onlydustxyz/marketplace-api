@@ -29,6 +29,7 @@ public interface UserRewardMapper {
                 .numberOfRewardedContributions(entity.getContributionCount())
                 .id(entity.getId())
                 .requestedAt(entity.getRequestedAt())
+                .projectId(entity.getProjectId())
                 .status(switch (entity.getStatus()) {
                     case "PENDING_INVOICE" -> UserRewardView.RewardStatusView.pendingInvoice;
                     case "COMPLETE" -> UserRewardView.RewardStatusView.complete;

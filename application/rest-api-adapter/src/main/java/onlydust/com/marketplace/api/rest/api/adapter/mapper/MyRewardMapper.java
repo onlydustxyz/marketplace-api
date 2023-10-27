@@ -30,6 +30,7 @@ public interface MyRewardMapper {
     static MyRewardPageItemResponse mapMyRewardViewToResponse(final UserRewardView view) {
         final MyRewardPageItemResponse myRewardPageItemResponse = new MyRewardPageItemResponse();
         myRewardPageItemResponse.setId(view.getId());
+        myRewardPageItemResponse.setProjectId(view.getProjectId());
         myRewardPageItemResponse.setNumberOfRewardedContributions(view.getNumberOfRewardedContributions());
         myRewardPageItemResponse.setRewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl());
         myRewardPageItemResponse.setRewardedOnProjectName(view.getRewardedOnProjectName());
