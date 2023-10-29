@@ -16,7 +16,8 @@ public class CustomProjectBudgetRepository {
                    b.remaining_amount,
                    b.initial_amount,
                    b.initial_amount * cuq.price as initial_amount_dollars_equivalent,
-                   b.remaining_amount * cuq.price as remaining_amount_dollars_equivalent
+                   b.remaining_amount * cuq.price as remaining_amount_dollars_equivalent,
+                   cuq.price dollars_conversion_rate
             from projects_budgets pb
                     join budgets b on pb.budget_id = b.id and pb.project_id = :projectId
                     left join crypto_usd_quotes cuq on cuq.currency = b.currency""";

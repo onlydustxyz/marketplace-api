@@ -33,5 +33,8 @@ public class BudgetViewEntity {
     BigDecimal initialAmountDollarsEquivalent;
     @Column(name = "remaining_amount_dollars_equivalent")
     BigDecimal remainingAmountDollarsEquivalent;
+    @Column(name = "dollars_conversion_rate")
+    BigDecimal dollarsConversionRate;
+
 
 }

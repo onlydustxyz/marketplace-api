@@ -2805,6 +2805,8 @@ components:
           type: number
         initialDollarsEquivalent:
           type: number
+        dollarsConversionRate:
+          type: number
 
     RewardTotalAmountsResponse:
       type: object
