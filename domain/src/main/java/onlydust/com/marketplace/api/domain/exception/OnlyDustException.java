@@ -53,14 +53,6 @@ public class OnlyDustException extends RuntimeException {
         return new OnlyDustException(500, message, cause);
     }
 
-    public static OnlyDustException invalidInput(final String message) {
-        return new OnlyDustException(400, message);
-    }
-
-    public static OnlyDustException invalidInput(final String message, final Throwable cause) {
-        return new OnlyDustException(400, message, cause);
-    }
-
     public static OnlyDustException notFound(final String message) {
         return new OnlyDustException(404, message);
     }

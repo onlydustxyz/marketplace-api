@@ -33,7 +33,7 @@ public class AwsS3Adapter implements ImageStoragePort {
         ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes));
         Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
         if (!imageReaders.hasNext()) {
-            throw OnlyDustException.invalidInput("Input stream is not an image", null);
+            throw OnlyDustException.badRequest("Input stream is not an image", null);
         }
         return imageReaders.next().getFormatName().toLowerCase();
     }
@@ -45,7 +45,7 @@ public class AwsS3Adapter implements ImageStoragePort {
             final String fileName = format("%s.%s", DigestUtils.md5Hex(imageBytes), getImageFileExtension(imageBytes));
             return uploadByteArrayToS3Bucket(imageBytes, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
-            throw OnlyDustException.invalidInput("Failed to read image input stream", e);
+            throw OnlyDustException.badRequest("Failed to read image input stream", e);
         }
     }
 
@@ -56,7 +56,8 @@ public class AwsS3Adapter implements ImageStoragePort {
             final String md5FromUploadedFile = putObjectToS3andGetContentFileUploadedMd5(bucketName, bucketKey,
                     byteArrayInputStream);
             if (!base64Md5.equals(md5FromUploadedFile)) {
-                throw OnlyDustException.internalServerError(format("Bucket %s %s md5 differs from file md5", bucketName, bucketKey));
+                throw OnlyDustException.internalServerError(format("Bucket %s %s md5 differs from file md5",
+                        bucketName, bucketKey));
             }
             return amazonS3.getUrl(bucketName, bucketKey);
         } catch (SdkClientException sdkClientException) {
@@ -74,7 +75,8 @@ public class AwsS3Adapter implements ImageStoragePort {
                     byteArrayInputStream, metadata);
             return putObjectResult.getContentMd5();
         } else {
-            throw OnlyDustException.internalServerError(format("Failed to upload %s to S3 bucket %s", bucketKeyId, bucketStorage));
+            throw OnlyDustException.internalServerError(format("Failed to upload %s to S3 bucket %s", bucketKeyId,
+                    bucketStorage));
         }
     }
 }

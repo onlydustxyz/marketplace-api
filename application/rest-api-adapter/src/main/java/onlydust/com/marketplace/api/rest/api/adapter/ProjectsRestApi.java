@@ -93,7 +93,7 @@ public class ProjectsRestApi implements ProjectsApi {
         try {
             imageInputStream = image.getInputStream();
         } catch (IOException e) {
-            throw OnlyDustException.invalidInput("Error while reading image data", e);
+            throw OnlyDustException.badRequest("Error while reading image data", e);
         }
 
         final URL imageUrl = projectFacadePort.saveLogoImage(imageInputStream);

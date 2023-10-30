@@ -187,8 +187,8 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
-                            throw OnlyDustException.invalidInput(format("Application already exists for project %s " +
-                                                                        "and user %s", projectId, userId));
+                            throw OnlyDustException.badRequest(format("Application already exists for project %s " +
+                                                                      "and user %s", projectId, userId));
                         },
                         () -> applicationRepository.save(ApplicationEntity.builder()
                                 .applicantId(userId)
