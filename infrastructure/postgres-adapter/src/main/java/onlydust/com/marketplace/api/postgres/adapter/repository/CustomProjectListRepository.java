@@ -11,8 +11,6 @@ import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectListItemViewEntity;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -158,7 +156,8 @@ public class CustomProjectListRepository {
     };
     private final EntityManager entityManager;
 
-    private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectCardView> projectViewMap) {
+    private static void entityToProjectView(ProjectListItemViewEntity entity,
+                                            Map<UUID, ProjectCardView> projectViewMap) {
         if (!projectViewMap.containsKey(entity.getId())) {
             final ProjectCardView projectCardView = ProjectCardView.builder()
                     .id(entity.getId())
@@ -294,7 +293,7 @@ public class CustomProjectListRepository {
                                                                               ProjectCardView.SortBy sort,
                                                                               UUID userId, Boolean mine) {
         final String query = buildQueryForUser(technologies, sponsors, search, sort, mine);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class)
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectListItemViewEntity.class)
                 .setParameter("userId", userId);
         if (nonNull(search) && !search.isEmpty()) {
             nativeQuery = nativeQuery.setParameter("search", search);
@@ -305,7 +304,7 @@ public class CustomProjectListRepository {
     public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors
             , String search, ProjectCardView.SortBy sort) {
         final String query = buildQuery(technologies, sponsors, search, sort);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class);
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectListItemViewEntity.class);
         if (nonNull(search) && !search.isEmpty()) {
             nativeQuery = nativeQuery.setParameter("search", search);
         }

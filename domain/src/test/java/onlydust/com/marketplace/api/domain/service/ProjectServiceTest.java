@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -84,7 +85,8 @@ public class ProjectServiceTest {
                 command.getMoreInfos(), command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeads(),
                 ProjectVisibility.PUBLIC,
-                imageUrl
+                imageUrl,
+                ProjectRewardSettings.defaultSettings()
         );
     }
 
