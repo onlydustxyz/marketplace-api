@@ -28,4 +28,6 @@ public class RewardItemView {
     String authorAvatarUrl;
     String authorGithubUrl;
     Long recipientId;
+    CodeReviewOutcome outcome;
+
 }

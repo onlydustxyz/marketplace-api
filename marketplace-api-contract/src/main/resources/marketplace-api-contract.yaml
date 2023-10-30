@@ -2926,6 +2926,11 @@ components:
           type: integer
         commentsCount:
           type: integer
+        codeReviewOutcome:
+          type: string
+          enum:
+            - APPROVED
+            - CHANGE_REQUESTED
         status:
           $ref: '#/components/schemas/ContributionStatus'
         githubAuthorId:

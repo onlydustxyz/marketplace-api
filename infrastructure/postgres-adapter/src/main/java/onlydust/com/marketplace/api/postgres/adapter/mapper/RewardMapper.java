@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.view.CodeReviewOutcome;
 import onlydust.com.marketplace.api.domain.view.ReceiptView;
 import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.RewardView;
@@ -155,6 +156,10 @@ public interface RewardMapper {
                     case canceled -> ContributionStatus.CANCELLED;
                     case complete -> ContributionStatus.COMPLETED;
                     case in_progress -> ContributionStatus.IN_PROGRESS;
+                })
+                .outcome(switch (rewardItemViewEntity.getOutcome()){
+                    case approved -> CodeReviewOutcome.approved;
+                    case change_requested -> CodeReviewOutcome.changeRequested;
                 })
                 .build();
     }

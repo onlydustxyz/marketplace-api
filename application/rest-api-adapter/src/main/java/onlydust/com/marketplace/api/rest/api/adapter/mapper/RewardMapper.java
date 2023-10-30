@@ -127,6 +127,10 @@ public interface RewardMapper {
                 .githubAuthorId(view.getGithubAuthorId())
                 .authorAvatarUrl(view.getAuthorAvatarUrl())
                 .authorGithubUrl(view.getAuthorGithubUrl())
+                .codeReviewOutcome(switch (view.getOutcome()){
+                    case approved -> RewardItemResponse.CodeReviewOutcomeEnum.APPROVED;
+                    case changeRequested -> RewardItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;
+                })
                 .authorLogin(view.getAuthorLogin());
     }
 }
