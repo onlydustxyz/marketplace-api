@@ -265,7 +265,7 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(400, onlyDustException.getStatus());
-        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+        assertThat(onlyDustException.getMessage()).startsWith("Invalid Aptos address format");
     }
 
     @Test
@@ -288,7 +288,7 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(400, onlyDustException.getStatus());
-        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+        assertThat(onlyDustException.getMessage()).startsWith("Invalid Ethereum address format");
     }
 
     @Test
@@ -311,7 +311,7 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(400, onlyDustException.getStatus());
-        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+        assertThat(onlyDustException.getMessage()).startsWith("Invalid Starknet address format");
     }
 
     @Test
@@ -334,7 +334,7 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(400, onlyDustException.getStatus());
-        assertEquals("Invalid wallet address format", onlyDustException.getMessage());
+        assertThat(onlyDustException.getMessage()).startsWith("Invalid Optimism address format");
     }
 
     @Test
@@ -344,7 +344,12 @@ public class UserServiceTest {
         final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().optimismAddress("0x" + faker.crypto().md5()).starknetAddress("0X" + faker.random().hex()).ethName("0x" + faker.random().hex()).aptosAddress("0X" + faker.random().hex()).build()).build();
+                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .optimismAddress("0x2C6277931328e2028C3DB10625D767de19151e92")
+                        .starknetAddress("0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597")
+                        .ethName("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
+                        .aptosAddress("0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b")
+                        .build()).build();
 
         // When
         userService.updatePayoutInformation(userId, userPayoutInformation);

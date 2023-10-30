@@ -27,6 +27,39 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 
+    private static UserPayoutInformationResponse requestToExpectedResponse(final UserPayoutInformationRequest userPayoutInformationRequest,
+                                                                           final Boolean hasValidContactInfo,
+                                                                           final Boolean missingAptosWallet,
+                                                                           final Boolean missingEthWallet,
+                                                                           final Boolean missingStarknetWallet,
+                                                                           final Boolean missingOptimismWallet
+    ) {
+        return new UserPayoutInformationResponse()
+                .company(userPayoutInformationRequest.getCompany())
+                .location(userPayoutInformationRequest.getLocation())
+                .isCompany(userPayoutInformationRequest.getIsCompany())
+                .hasValidContactInfo(hasValidContactInfo)
+                .payoutSettings(new UserPayoutInformationResponsePayoutSettings()
+                        .aptosAddress(userPayoutInformationRequest.getPayoutSettings().getAptosAddress())
+                        .missingAptosWallet(missingAptosWallet)
+                        .ethAddress(userPayoutInformationRequest.getPayoutSettings().getEthAddress())
+                        .ethName(userPayoutInformationRequest.getPayoutSettings().getEthName())
+                        .missingEthWallet(missingEthWallet)
+                        .starknetAddress(userPayoutInformationRequest.getPayoutSettings().getStarknetAddress())
+                        .missingStarknetWallet(missingStarknetWallet)
+                        .optimismAddress(userPayoutInformationRequest.getPayoutSettings().getOptimismAddress())
+                        .missingOptimismWallet(missingOptimismWallet)
+                        .usdPreferredMethod(switch (userPayoutInformationRequest.getPayoutSettings().getUsdPreferredMethod()) {
+                            case FIAT -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT;
+                            case CRYPTO -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO;
+                        })
+                        .sepaAccount(isNull(userPayoutInformationRequest.getPayoutSettings().getSepaAccount()) ?
+                                null :
+                                new UserPayoutInformationResponsePayoutSettingsSepaAccount()
+                                        .bic(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getBic())
+                                        .iban(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getIban())));
+    }
+
     @Test
     void should_get_user_payout_info() {
         // Given
@@ -114,7 +147,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 
-
     @Test
     void should_update_user_payout_infos() {
         // Given
@@ -138,7 +170,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .postalCode(faker.address().zipCode())
                 )
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
-                        .aptosAddress("0x" + faker.crypto().md5())
+                        .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
@@ -158,8 +190,8 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .postalCode(faker.address().zipCode())
                 )
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
-                        .ethAddress("0x" + faker.crypto().md5())
-                        .optimismAddress("0x" + faker.crypto().md5())
+                        .ethAddress("0x" + faker.random().hex(40))
+                        .optimismAddress("0x" + faker.random().hex(40))
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
@@ -215,7 +247,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .postalCode(faker.address().zipCode())
                 )
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
-                        .aptosAddress("0x" + faker.crypto().md5())
+                        .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
@@ -246,40 +278,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .equals(requestToExpectedResponse(requestBody, true, true, true, true, true));
     }
-
-    private static UserPayoutInformationResponse requestToExpectedResponse(final UserPayoutInformationRequest userPayoutInformationRequest,
-                                                                           final Boolean hasValidContactInfo,
-                                                                           final Boolean missingAptosWallet,
-                                                                           final Boolean missingEthWallet,
-                                                                           final Boolean missingStarknetWallet,
-                                                                           final Boolean missingOptimismWallet
-    ) {
-        return new UserPayoutInformationResponse()
-                .company(userPayoutInformationRequest.getCompany())
-                .location(userPayoutInformationRequest.getLocation())
-                .isCompany(userPayoutInformationRequest.getIsCompany())
-                .hasValidContactInfo(hasValidContactInfo)
-                .payoutSettings(new UserPayoutInformationResponsePayoutSettings()
-                        .aptosAddress(userPayoutInformationRequest.getPayoutSettings().getAptosAddress())
-                        .missingAptosWallet(missingAptosWallet)
-                        .ethAddress(userPayoutInformationRequest.getPayoutSettings().getEthAddress())
-                        .ethName(userPayoutInformationRequest.getPayoutSettings().getEthName())
-                        .missingEthWallet(missingEthWallet)
-                        .starknetAddress(userPayoutInformationRequest.getPayoutSettings().getStarknetAddress())
-                        .missingStarknetWallet(missingStarknetWallet)
-                        .optimismAddress(userPayoutInformationRequest.getPayoutSettings().getOptimismAddress())
-                        .missingOptimismWallet(missingOptimismWallet)
-                        .usdPreferredMethod(switch (userPayoutInformationRequest.getPayoutSettings().getUsdPreferredMethod()) {
-                            case FIAT -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT;
-                            case CRYPTO -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO;
-                        })
-                        .sepaAccount(isNull(userPayoutInformationRequest.getPayoutSettings().getSepaAccount()) ?
-                                null :
-                                new UserPayoutInformationResponsePayoutSettingsSepaAccount()
-                                        .bic(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getBic())
-                                        .iban(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getIban())));
-    }
-
 
     @Test
     void should_return_valid_payout_info_given_user_first_connexion_with_no_pending_rewards() {
