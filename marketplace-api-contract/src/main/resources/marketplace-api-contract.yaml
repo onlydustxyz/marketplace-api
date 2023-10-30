@@ -1164,7 +1164,7 @@ components:
     InternalServerError:
       description: Internal Server Error
       content:
-        application/problem+json:
+        application/json:
           example:
             message: Github API is not responding
             status: 500
@@ -1174,7 +1174,7 @@ components:
     UnauthorizedError:
       description: Unauthorized
       content:
-        application/problem+json:
+        application/json:
           example:
             message: You must be authenticated to make this call
             status: 401
@@ -1184,7 +1184,7 @@ components:
     NotFoundError:
       description: Requested resource not found
       content:
-        application/problem+json:
+        application/json:
           example:
             message: NOT_FOUND
             status: 404
@@ -1194,7 +1194,7 @@ components:
     ProjectForbiddenError:
       description: Forbidden. The project is not visible to the caller.
       content:
-        application/problem+json:
+        application/json:
           example:
             message: Access to this project is forbidden
             status: 403
@@ -1204,7 +1204,7 @@ components:
     RewardNotFoundError:
       description: Reward not found
       content:
-        application/problem+json:
+        application/json:
           example:
             message: Reward not found
             status: 404
@@ -1214,7 +1214,7 @@ components:
     RewardForbiddenError:
       description: Forbidden. The reward is not visible to the caller.
       content:
-        application/problem+json:
+        application/json:
           example:
             message: Access to this reward is forbidden
             status: 403
@@ -1224,7 +1224,7 @@ components:
     UserNotFoundError:
       description: User not found
       content:
-        application/problem+json:
+        application/json:
           example:
             message: User not found
             status: 404
