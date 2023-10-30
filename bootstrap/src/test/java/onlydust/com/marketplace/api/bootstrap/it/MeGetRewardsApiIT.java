@@ -248,7 +248,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("page_index", "0", "page_size", "100000", "sort", "CONTRIBUTION"
+                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100000", "sort", "CONTRIBUTION"
                         , "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -315,7 +315,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of("page_index", "0", "page_size",
+                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of("pageIndex", "0", "pageSize",
                         "20", "sort", "AMOUNT", "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -352,32 +352,38 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userHelper.authenticatePierre().jwt();
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("40fda3c6-2a3f-4cdd" +
+                                                                                                "-ba12-0499dd232d53"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("8fe07ae1-cf3b-4401" +
+                                                                                                "-8958-a9e0b0aec7b0"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("2ac80cc6-7e83-4eef" +
+                                                                                                "-bc0c-932b58f683c0"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("5b96ca1e-4ad2-41c1" +
+                                                                                                "-8819-520b885d9223"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("e1498a17-5090-4071" +
+                                                                                                "-a88a-6f0b0c337c3a"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         paymentRepository.save(
                 PaymentEntity.builder().id(UUID.randomUUID()).amount(BigDecimal.ONE)
-                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28"))
+                        .processedAt(new Date()).currencyCode("FAKE").requestId(UUID.fromString("85f8358c-5339-42ac" +
+                                                                                                "-a577-16d7760d1e28"))
                         .receipt(JacksonUtil.toJsonNode("{}")).build());
 
         // When
@@ -565,5 +571,27 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                             ]
                           }
                          """);
+    }
+
+    @Test
+    void should_return_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
+        // Given
+        final long githubUserId = faker.number().randomNumber();
+        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId,
+                faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
+        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
+                new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
+                CurrencyEnumEntity.usd));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[0].status").isEqualTo("MISSING_PAYOUT_INFO");
     }
 }

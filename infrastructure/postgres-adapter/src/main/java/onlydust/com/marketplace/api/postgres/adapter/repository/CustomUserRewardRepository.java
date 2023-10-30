@@ -51,7 +51,7 @@ public class CustomUserRewardRepository {
                      join project_details pd on pd.project_id = pr.project_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-                     left join (select upi.user_id,
+                     left join (select au.id user_id,
                                        (select count(pr.id) > 0
                                         from payment_requests pr
                                                  left join payments p on p.request_id = pr.id
@@ -143,8 +143,8 @@ public class CustomUserRewardRepository {
                                                    and pr_eth.recipient_id = au.github_user_id
                                                    and p_eth is null
                                                  limit 1), true)                                        valid_eth_wallet
-                                from user_payout_info upi
-                                         join auth_users au on upi.user_id = au.id) payout_checks
+                                from auth_users au
+                                         left join user_payout_info upi on upi.user_id = au.id) payout_checks
                                on payout_checks.user_id = au.id
             order by %order_by% offset :offset limit :limit
                      """;
@@ -170,7 +170,7 @@ public class CustomUserRewardRepository {
                      join project_details pd on pd.project_id = pr.project_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-                     left join (select upi.user_id,
+                     left join (select au.id user_id,
                                        (select count(pr.id) > 0
                                         from payment_requests pr
                                                  left join payments p on p.request_id = pr.id
@@ -263,8 +263,8 @@ public class CustomUserRewardRepository {
                                                    and p_eth is null
                                                  limit 1), true)                                        valid_eth_wallet,
                                        au.github_user_id
-                                from user_payout_info upi
-                                         join auth_users au on upi.user_id = au.id) payout_checks
+                                from auth_users au
+                                         left join user_payout_info upi on upi.user_id = au.id) payout_checks
                                on payout_checks.github_user_id = pr.recipient_id
             where pr.recipient_id = :recipientId
               and not (payout_checks.has_pending_payments and

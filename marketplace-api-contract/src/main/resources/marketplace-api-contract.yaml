@@ -226,12 +226,12 @@ paths:
               - ASC
               - DESC
         - in: query
-          name: page_index
+          name: pageIndex
           required: true
           schema:
             type: integer
         - in: query
-          name: page_size
+          name: pageSize
           required: true
           schema:
             type: integer
@@ -713,12 +713,12 @@ paths:
               - ASC
               - DESC
         - in: query
-          name: page_index
+          name: pageIndex
           required: true
           schema:
             type: integer
         - in: query
-          name: page_size
+          name: pageSize
           required: true
           schema:
             type: integer
@@ -838,12 +838,12 @@ paths:
               - ASC
               - DESC
         - in: query
-          name: page_index
+          name: pageIndex
           required: true
           schema:
             type: integer
         - in: query
-          name: page_size
+          name: pageSize
           required: true
           schema:
             type: integer

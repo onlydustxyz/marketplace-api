@@ -130,7 +130,8 @@ public class PostgresUserAdapter implements UserStoragePort {
         return userPayoutInfoEntity.map(entity -> UserPayoutInfoMapper.mapEntityToDomain(entity,
                 userPayoutInfoValidationEntity.orElseGet(
                         UserPayoutInfoValidationEntity::defaultValue
-                ))).orElseGet(() -> UserPayoutInformation.builder().build());
+                ))).orElseGet(() -> UserPayoutInformation.builder().payoutSettings(
+                UserPayoutInformation.PayoutSettings.builder().build()).build());
     }
 
     @Override

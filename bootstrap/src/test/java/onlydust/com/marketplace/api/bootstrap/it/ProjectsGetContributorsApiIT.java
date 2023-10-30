@@ -803,7 +803,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -821,7 +821,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
+                        Map.of("pageIndex", "0", "pageSize", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -832,7 +832,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "1", "page_size", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
+                        Map.of("pageIndex", "1", "pageSize", "3", "sort", "CONTRIBUTION_COUNT", "direction", "DESC")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -851,7 +851,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "10000", "sort", "CONTRIBUTION_COUNT")))
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -908,7 +908,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("page_index", "0", "page_size", "2", "sort", "EARNED", "direction", "DESC")))
+                        Map.of("pageIndex", "0", "pageSize", "2", "sort", "EARNED", "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

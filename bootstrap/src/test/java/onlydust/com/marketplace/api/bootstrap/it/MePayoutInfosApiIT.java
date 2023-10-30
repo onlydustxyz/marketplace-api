@@ -279,4 +279,31 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                         .bic(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getBic())
                                         .iban(userPayoutInformationRequest.getPayoutSettings().getSepaAccount().getIban())));
     }
+
+
+    @Test
+    void should_return_valid_payout_info_given_user_first_connexion_with_no_pending_rewards() {
+        // Given
+        final long githubUserId = faker.number().randomNumber();
+        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId,
+                faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.isCompany").isEqualTo(false)
+                .jsonPath("$.hasValidContactInfo").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(true);
+    }
 }
