@@ -104,6 +104,7 @@ public class CustomRewardRepository {
                                             gprr.id,
                                             gpr.html_url,
                                             gpr.title,
+                                            gprr.outcome,
                                             gr.name           repo_name,
                                             gpr.created_at    start_date,
                                             gprr.submitted_at end_date,
@@ -135,6 +136,7 @@ public class CustomRewardRepository {
                              where c.pull_request_id = pull_request.id
                                and c.author_id = pr.recipient_id)                                             user_commits_count,
                             issue.comments_count,
+                            code_review outcome,
                             pr.recipient_id
             from payment_requests pr
                       join public.work_items wi on wi.payment_id = pr.id

@@ -157,7 +157,7 @@ public interface RewardMapper {
                     case complete -> ContributionStatus.COMPLETED;
                     case in_progress -> ContributionStatus.IN_PROGRESS;
                 })
-                .outcome(switch (rewardItemViewEntity.getOutcome()){
+                .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()){
                     case approved -> CodeReviewOutcome.approved;
                     case change_requested -> CodeReviewOutcome.changeRequested;
                 })

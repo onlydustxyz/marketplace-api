@@ -127,7 +127,7 @@ public interface RewardMapper {
                 .githubAuthorId(view.getGithubAuthorId())
                 .authorAvatarUrl(view.getAuthorAvatarUrl())
                 .authorGithubUrl(view.getAuthorGithubUrl())
-                .codeReviewOutcome(switch (view.getOutcome()){
+                .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()){
                     case approved -> RewardItemResponse.CodeReviewOutcomeEnum.APPROVED;
                     case changeRequested -> RewardItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;
                 })
