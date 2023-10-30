@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BudgetEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
@@ -33,7 +32,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
 
     @Test
-    void should_return_forbidden_status_when_getting_project_budgets_given_user_not_project_lead() throws JsonProcessingException {
+    void should_return_forbidden_status_when_getting_project_budgets_given_user_not_project_lead() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
@@ -50,7 +49,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
-    void should_return_project_budgets_given_a_project_lead() throws JsonProcessingException {
+    void should_return_project_budgets_given_a_project_lead() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
@@ -108,28 +107,32 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                                     "initialAmount": 10000,
                                     "remaining": 4000,
                                     "remainingDollarsEquivalent": 4000,
-                                    "initialDollarsEquivalent": 10000
+                                    "initialDollarsEquivalent": 10000,
+                                    "dollarsConversionRate": null
                                 },
                                 {
                                     "currency": "STARK",
                                     "initialAmount": 3000,
                                     "remaining": 100,
                                     "remainingDollarsEquivalent": null,
-                                    "initialDollarsEquivalent": null
+                                    "initialDollarsEquivalent": null,
+                                    "dollarsConversionRate": null
                                 },
                                 {
                                     "currency": "APT",
                                     "initialAmount": 500,
                                     "remaining": 0,
                                     "remainingDollarsEquivalent": 0,
-                                    "initialDollarsEquivalent": 60000
+                                    "initialDollarsEquivalent": 60000,
+                                    "dollarsConversionRate": 120
                                 },
                                 {
                                     "currency": "ETH",
                                     "initialAmount": 200,
-                                    "remaining": 200,
-                                    "remainingDollarsEquivalent": 300000,
-                                    "initialDollarsEquivalent": 300000
+                                    "remaining": 50,
+                                    "remainingDollarsEquivalent": 75000,
+                                    "initialDollarsEquivalent": 300000,
+                                    "dollarsConversionRate": 1500
                                 }
                             ]
                         }""");

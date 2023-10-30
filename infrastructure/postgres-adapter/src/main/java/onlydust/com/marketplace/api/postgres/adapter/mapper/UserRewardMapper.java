@@ -33,6 +33,7 @@ public interface UserRewardMapper {
                 .status(switch (entity.getStatus()) {
                     case "PENDING_INVOICE" -> UserRewardView.RewardStatusView.pendingInvoice;
                     case "COMPLETE" -> UserRewardView.RewardStatusView.complete;
+                    case "MISSING_PAYOUT_INFO" -> UserRewardView.RewardStatusView.missingPayoutInfo;
                     default -> UserRewardView.RewardStatusView.processing;
                 })
                 .build();

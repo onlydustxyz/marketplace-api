@@ -20,6 +20,7 @@ public interface BudgetMapper {
                 .initialAmount(entity.getInitialAmount())
                 .remainingDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())
                 .initialDollarsEquivalent(entity.getInitialAmountDollarsEquivalent())
+                .dollarsConversionRate(entity.getDollarsConversionRate())
                 .build();
     }
 }

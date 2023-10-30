@@ -14,6 +14,7 @@ public class BudgetView {
     BigDecimal initialDollarsEquivalent;
     BigDecimal remainingDollarsEquivalent;
     Currency currency;
+    BigDecimal dollarsConversionRate;
 
     public BigDecimal getInitialDollarsEquivalent() {
         return currency.equals(Currency.Usd) ? initialAmount : initialDollarsEquivalent;

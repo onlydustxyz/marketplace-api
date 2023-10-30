@@ -25,6 +25,7 @@ public interface UserPayoutInfoMapper {
                     .hasValidPerson(userPayoutInfoValidationEntity.getHasValidPerson())
                     .hasValidCompany(userPayoutInfoValidationEntity.getHasValidCompany())
                     .hasValidLocation(userPayoutInfoValidationEntity.getHasValidLocation())
+                    .hasPendingPayments(userPayoutInfoValidationEntity.getHasPendingPayments())
                     .build();
             userPayoutInformation = mapLocationToDomain(userPayoutInfoEntity, userPayoutInformation);
             userPayoutInformation = mapIdentityToDomain(userPayoutInfoEntity, userPayoutInformation);

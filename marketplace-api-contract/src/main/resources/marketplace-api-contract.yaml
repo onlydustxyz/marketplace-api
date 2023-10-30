@@ -2243,6 +2243,7 @@ components:
       enum:
         - PENDING_INVOICE
         - PENDING_SIGNUP
+        - MISSING_PAYOUT_INFO
         - PROCESSING
         - COMPLETE
     RewardAmountResponse:
@@ -2803,6 +2804,8 @@ components:
         remainingDollarsEquivalent:
           type: number
         initialDollarsEquivalent:
+          type: number
+        dollarsConversionRate:
           type: number
 
     RewardTotalAmountsResponse:

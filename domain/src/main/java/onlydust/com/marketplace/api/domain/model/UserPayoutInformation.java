@@ -22,12 +22,17 @@ public class UserPayoutInformation {
     Boolean hasValidCompany = true;
     @Builder.Default
     Boolean hasValidLocation = true;
+    @Builder.Default
+    Boolean hasPendingPayments = false;
 
     public Boolean getHasValidContactInfo() {
         return (hasValidCompany || hasValidPerson) && hasValidLocation;
     }
 
     public boolean isValid() {
+        if (!this.hasPendingPayments) {
+            return true;
+        }
         return isNull(this.payoutSettings) ? this.getHasValidContactInfo() :
                 this.getHasValidContactInfo() && this.payoutSettings.isValid();
     }

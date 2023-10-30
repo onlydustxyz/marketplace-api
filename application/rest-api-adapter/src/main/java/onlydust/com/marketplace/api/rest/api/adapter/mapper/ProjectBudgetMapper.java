@@ -18,6 +18,7 @@ public interface ProjectBudgetMapper {
                     .initialAmount(budget.getInitialAmount())
                     .initialDollarsEquivalent(budget.getInitialDollarsEquivalent())
                     .remainingDollarsEquivalent(budget.getRemainingDollarsEquivalent())
+                    .dollarsConversionRate(budget.getDollarsConversionRate())
                     .currency(switch (budget.getCurrency()) {
                         case Eth -> CurrencyContract.ETH;
                         case Apt -> CurrencyContract.APT;

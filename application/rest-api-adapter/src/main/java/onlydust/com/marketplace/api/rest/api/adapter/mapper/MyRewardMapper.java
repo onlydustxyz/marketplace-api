@@ -40,6 +40,7 @@ public interface MyRewardMapper {
             case complete -> RewardStatus.COMPLETE;
             case pendingInvoice -> RewardStatus.PENDING_INVOICE;
             case processing -> RewardStatus.PROCESSING;
+            case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
         });
         myRewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
         return myRewardPageItemResponse;
