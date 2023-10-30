@@ -129,8 +129,8 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                     "currency": "ETH",
                                     "initialAmount": 200,
-                                    "remaining": 50,
-                                    "remainingDollarsEquivalent": 75000,
+                                    "remaining": 200,
+                                    "remainingDollarsEquivalent": 300000,
                                     "initialDollarsEquivalent": 300000,
                                     "dollarsConversionRate": 1500
                                 }
