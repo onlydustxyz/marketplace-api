@@ -32,7 +32,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     HasuraUserHelper userHelper;
 
 
-
     @Test
     void should_update_onboarding_state() {
         // Given
@@ -179,8 +178,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_apply_to_project() {
         // Given
-        final var githubUserId = faker.number().randomNumber();
-        final var login = faker.name().username();
+        final var githubUserId = faker.number().numberBetween(10000, 200000);
+        final var login = faker.name().username() + faker.cat().name();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
         final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
@@ -206,8 +205,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_be_able_to_apply_twice() throws JsonProcessingException {
         // Given
-        final var githubUserId = faker.number().randomNumber();
-        final var login = faker.name().username();
+        final var githubUserId = faker.number().numberBetween(100000, 2000000);
+        final var login = faker.name().username() + faker.code().asin();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
         final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
