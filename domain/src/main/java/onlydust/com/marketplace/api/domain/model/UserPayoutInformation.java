@@ -4,12 +4,19 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
+import java.util.regex.Pattern;
+
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Data
 @Builder(toBuilder = true)
 public class UserPayoutInformation {
+    private static final Pattern ETHEREUM_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{40}$");
+    private static final Pattern APTOS_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{64}$");
+    private static final Pattern OPTIMISM_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{40}$");
+    private static final Pattern STARKNET_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{64}$");
+
     Person person;
     Company company;
     @Builder.Default
@@ -39,25 +46,23 @@ public class UserPayoutInformation {
 
     public void validate() {
         if (nonNull(this.payoutSettings)) {
-            if (nonNull(this.payoutSettings.aptosAddress)) {
-                validateWalletAddress(this.payoutSettings.aptosAddress);
+            if (nonNull(this.payoutSettings.aptosAddress) && !APTOS_WALLET_PATTERN.matcher(this.payoutSettings.aptosAddress).matches()) {
+                throw OnlyDustException.badRequest("Invalid Aptos address format (%s)".formatted(this.payoutSettings.aptosAddress));
             }
-            if (nonNull(this.payoutSettings.starknetAddress)) {
-                validateWalletAddress(this.payoutSettings.starknetAddress);
+            if (nonNull(this.payoutSettings.starknetAddress) && !STARKNET_WALLET_PATTERN.matcher(this.payoutSettings.starknetAddress).matches()) {
+                throw OnlyDustException.badRequest("Invalid Starknet address format (%s)".formatted(this.payoutSettings.starknetAddress));
             }
-            if (nonNull(this.payoutSettings.ethAddress)) {
-                validateWalletAddress(this.payoutSettings.ethAddress);
+            if (nonNull(this.payoutSettings.ethAddress) && !ETHEREUM_WALLET_PATTERN.matcher(this.payoutSettings.ethAddress).matches()) {
+                throw OnlyDustException.badRequest("Invalid Ethereum address format (%s)".formatted(this.payoutSettings.ethAddress));
             }
-            if (nonNull(this.payoutSettings.optimismAddress)) {
-                validateWalletAddress(this.payoutSettings.optimismAddress);
+            if (nonNull(this.payoutSettings.optimismAddress) && !OPTIMISM_WALLET_PATTERN.matcher(this.payoutSettings.optimismAddress).matches()) {
+                throw OnlyDustException.badRequest("Invalid Optimism address format (%s)".formatted(this.payoutSettings.optimismAddress));
             }
         }
     }
 
-    private void validateWalletAddress(final String walletAddress) {
-        if (!walletAddress.startsWith("0x") && !walletAddress.startsWith("0X")) {
-            throw OnlyDustException.badRequest("Invalid wallet address format");
-        }
+    public enum UsdPreferredMethodEnum {
+        FIAT, CRYPTO
     }
 
     @Data
@@ -108,10 +113,6 @@ public class UserPayoutInformation {
     public static class Person {
         String firstName;
         String lastName;
-    }
-
-    public enum UsdPreferredMethodEnum {
-        FIAT, CRYPTO
     }
 
     @Data
