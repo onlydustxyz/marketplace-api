@@ -136,7 +136,7 @@ public class CustomRewardRepository {
                              where c.pull_request_id = pull_request.id
                                and c.author_id = pr.recipient_id)                                             user_commits_count,
                             issue.comments_count,
-                            code_review outcome,
+                            code_review.outcome cr_outcome,
                             pr.recipient_id
             from payment_requests pr
                       join public.work_items wi on wi.payment_id = pr.id

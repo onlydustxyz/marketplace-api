@@ -58,6 +58,7 @@ public class RewardItemViewEntity {
     Long recipientId;
     @Enumerated(EnumType.STRING)
     @Type(type = "github_code_review_outcome")
+    @Column(name = "cr_outcome")
     CodeReviewOutcome outcome;
 
     public enum ContributionStatus {
