@@ -3,11 +3,15 @@ package onlydust.com.marketplace.api.domain.service;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.api.domain.view.BudgetView;
+import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,8 +24,10 @@ public class RewardServiceTest {
         // Given
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -37,6 +43,13 @@ public class RewardServiceTest {
                 .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
+        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+                .thenReturn(ProjectBudgetsView.builder()
+                        .budgets(List.of(BudgetView.builder()
+                                .currency(Currency.Stark)
+                                .remaining(BigDecimal.valueOf(100L))
+                                .build()))
+                        .build());
         final UUID rewardId = rewardService.requestPayment(authentication, projectLeadId,
                 requestRewardCommand);
 
@@ -49,8 +62,9 @@ public class RewardServiceTest {
         // Given
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -62,6 +76,13 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(false);
+        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+                .thenReturn(ProjectBudgetsView.builder()
+                        .budgets(List.of(BudgetView.builder()
+                                .currency(Currency.Stark)
+                                .remaining(BigDecimal.valueOf(100L))
+                                .build()))
+                        .build());
         OnlyDustException onlyDustException = null;
         try {
             rewardService.requestPayment(authentication, projectLeadId, requestRewardCommand);
@@ -75,14 +96,93 @@ public class RewardServiceTest {
         Assertions.assertEquals("User must be project lead to request a reward", onlyDustException.getMessage());
     }
 
+    @Test
+    void should_throw_a_invalid_input_exception_when_there_is_no_budget_of_such_currency() {
+        // Given
+        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final RewardService<DummyAuthentication> rewardService =
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+        final DummyAuthentication authentication = new DummyAuthentication();
+        final UUID projectLeadId = UUID.randomUUID();
+        final RequestRewardCommand requestRewardCommand =
+                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+                        .amount(BigDecimal.valueOf(10L))
+                        .currency(Currency.Stark)
+                        .build();
+
+        // When
+        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+                .thenReturn(true);
+        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+                .thenReturn(ProjectBudgetsView.builder()
+                        .budgets(List.of())
+                        .build());
+        OnlyDustException onlyDustException = null;
+        try {
+            rewardService.requestPayment(authentication, projectLeadId, requestRewardCommand);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        Assertions.assertNotNull(onlyDustException);
+        Assertions.assertEquals(400, onlyDustException.getStatus());
+        Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
+                                 "amount of 10").formatted(requestRewardCommand.getProjectId()),
+                onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_a_invalid_input_exception_when_there_is_not_enough_budget_of_such_currency() {
+        // Given
+        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final RewardService<DummyAuthentication> rewardService =
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+        final DummyAuthentication authentication = new DummyAuthentication();
+        final UUID projectLeadId = UUID.randomUUID();
+        final RequestRewardCommand requestRewardCommand =
+                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+                        .amount(BigDecimal.valueOf(10L))
+                        .currency(Currency.Stark)
+                        .build();
+
+        // When
+        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+                .thenReturn(true);
+        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+                .thenReturn(ProjectBudgetsView.builder()
+                        .budgets(List.of(BudgetView.builder()
+                                .currency(Currency.Stark)
+                                .remaining(BigDecimal.valueOf(9L))
+                                .build()))
+                        .build());
+        OnlyDustException onlyDustException = null;
+        try {
+            rewardService.requestPayment(authentication, projectLeadId, requestRewardCommand);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        Assertions.assertNotNull(onlyDustException);
+        Assertions.assertEquals(400, onlyDustException.getStatus());
+        Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
+                                 "amount of 10").formatted(requestRewardCommand.getProjectId()),
+                onlyDustException.getMessage());
+    }
 
     @Test
     void should_cancel_reward_given_a_project_lead() {
         // Given
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
@@ -102,8 +202,9 @@ public class RewardServiceTest {
         // Given
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();

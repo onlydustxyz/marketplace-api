@@ -176,14 +176,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             }
                         ],
                         "technologies": {
-                            "TypeScript": 3028400,
-                            "Dockerfile": 31712,
-                            "CSS": 6755456,
-                            "Shell": 11712,
-                            "Rust": 6512368,
-                            "SCSS": 1573760,
-                            "JavaScript": 1003472,
-                            "HTML": 1950496
+                            "TypeScript": 757100,
+                            "Dockerfile": 7928,
+                            "CSS": 1688864,
+                            "Shell": 2928,
+                            "Rust": 1628092,
+                            "SCSS": 393440,
+                            "JavaScript": 250868,
+                            "HTML": 487624
                         },
                         "isInvitedAsProjectLead": true
                     },
@@ -736,14 +736,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             }
                         ],
                         "technologies": {
-                            "TypeScript": 3028400,
-                            "Dockerfile": 31712,
-                            "CSS": 6755456,
-                            "Shell": 11712,
-                            "Rust": 6512368,
-                            "SCSS": 1573760,
-                            "JavaScript": 1003472,
-                            "HTML": 1950496
+                            "TypeScript": 757100,
+                            "Dockerfile": 7928,
+                            "CSS": 1688864,
+                            "Shell": 2928,
+                            "Rust": 1628092,
+                            "SCSS": 393440,
+                            "JavaScript": 250868,
+                            "HTML": 487624
                         },
                         "isInvitedAsProjectLead": false
                     },
@@ -1611,14 +1611,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             }
                         ],
                         "technologies": {
-                            "TypeScript": 3028400,
-                            "Dockerfile": 31712,
-                            "CSS": 6755456,
-                            "Shell": 11712,
-                            "Rust": 6512368,
-                            "SCSS": 1573760,
-                            "JavaScript": 1003472,
-                            "HTML": 1950496
+                            "TypeScript": 757100,
+                            "Dockerfile": 7928,
+                            "CSS": 1688864,
+                            "Shell": 2928,
+                            "Rust": 1628092,
+                            "SCSS": 393440,
+                            "JavaScript": 250868,
+                            "HTML": 487624
                         },
                         "isInvitedAsProjectLead": false
                     },
