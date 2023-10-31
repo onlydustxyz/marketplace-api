@@ -35,13 +35,16 @@ public class CustomProjectListRepository {
                          p.visibility,
                          p.rank,
                          cast(gr.languages as text),
-                         gr.id                                         repository_id,
-                         u.id                                          p_lead_id,
-                         u.login_at_signup                             p_lead_login,
-                         u.avatar_url_at_signup                        p_lead_avatar_url,
-                         s.name                                        sponsor_name,
-                         s.logo_url                                    sponsor_logo_url,
-                         s.id                                          sponsor_id,
+                         gr.id                                              repository_id,
+                         u.id                                               p_lead_id,
+                         u.github_user_id                                   p_lead_github_user_id,
+                         COALESCE(gu.login, u.login_at_signup)              p_lead_login,
+                         COALESCE(gu.avatar_url, u.avatar_url_at_signup)    p_lead_avatar_url,
+                         gu.html_url                                        p_lead_url,
+                         s.name                                             sponsor_name,
+                         s.logo_url                                         sponsor_logo_url,
+                         s.url                                              sponsor_url,
+                         s.id                                               sponsor_id,
                          (select count(github_repo_id)
                           from project_github_repos pgr_count
                           where pgr_count.project_id = p.project_id)   repo_count,
@@ -59,6 +62,7 @@ public class CustomProjectListRepository {
                         left join github_repos gr on gr.id = pgr.github_repo_id
                         left join project_leads pl on pl.project_id = p.project_id
                         left join auth_users u on u.id = pl.user_id
+                        left join github_users gu on gu.id = u.github_user_id
                     where
                         exists(select 1
                             from projects_budgets pb
@@ -82,13 +86,16 @@ public class CustomProjectListRepository {
                          p.visibility,
                          p.rank,
                          cast(gr.languages as text),
-                         gr.id                                                          repository_id,
-                         u.id                                                           p_lead_id,
-                         u.login_at_signup                                              p_lead_login,
-                         u.avatar_url_at_signup                                         p_lead_avatar_url,
-                         s.name                                                         sponsor_name,
-                         s.logo_url                                                     sponsor_logo_url,
-                         s.id                                                           sponsor_id,
+                         gr.id                                              repository_id,
+                         u.id                                               p_lead_id,
+                         u.github_user_id                                   p_lead_github_user_id,
+                         COALESCE(gu.login, u.login_at_signup)              p_lead_login,
+                         COALESCE(gu.avatar_url, u.avatar_url_at_signup)    p_lead_avatar_url,
+                         gu.html_url                                        p_lead_url,
+                         s.name                                             sponsor_name,
+                         s.logo_url                                         sponsor_logo_url,
+                         s.url                                              sponsor_url,
+                         s.id                                               sponsor_id,
                          (select count(github_repo_id)
                           from project_github_repos pgr_count
                           where pgr_count.project_id = p.project_id)                    repo_count,
@@ -129,6 +136,7 @@ public class CustomProjectListRepository {
                         left join github_repos gr on gr.id = pgr.github_repo_id
                         left join project_leads pl on pl.project_id = p.project_id
                         left join auth_users u on u.id = pl.user_id
+                        left join github_users gu on gu.id = u.github_user_id
                     where
                         exists(select 1
                             from projects_budgets pb
@@ -183,6 +191,7 @@ public class CustomProjectListRepository {
         if (nonNull(entity.getSponsorId())) {
             final SponsorView sponsorView = SponsorView.builder()
                     .logoUrl(entity.getSponsorLogoUrl())
+                    .url(entity.getSponsorUrl())
                     .name(entity.getSponsorName())
                     .id(entity.getSponsorId())
                     .build();
@@ -192,9 +201,11 @@ public class CustomProjectListRepository {
 
     private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
         final ProjectLeaderLinkView projectLeaderLinkView = ProjectLeaderLinkView.builder()
-                .avatarUrl(entity.getProjectLeadAvatarUrl())
                 .id(entity.getProjectLeadId())
+                .githubUserId(entity.getProjectLeadGithubUserId())
                 .login(entity.getProjectLeadLogin())
+                .avatarUrl(entity.getProjectLeadAvatarUrl())
+                .url(entity.getProjectLeadUrl())
                 .build();
         projectCardView.addProjectLeader(projectLeaderLinkView);
     }
