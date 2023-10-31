@@ -1593,6 +1593,7 @@ components:
                 $ref: '#/components/schemas/UserProfileProjects'
             stats:
               $ref: '#/components/schemas/UserProfileStats'
+
     UserProfileStats:
       type: object
       required:
@@ -1623,6 +1624,7 @@ components:
             $ref: '#/components/schemas/UserContributionStats'
         contributionCountVariationSinceLastWeek:
           type: integer
+
     UserContributionStats:
       type: object
       required:
@@ -1644,6 +1646,7 @@ components:
           type: integer
         pullRequestCount:
           type: integer
+
     UserProfileProjects:
       type: object
       required:
@@ -1665,6 +1668,10 @@ components:
         isLead:
           type: boolean
           example: false
+        leadSince:
+          type: string
+          format: date-time
+          description: Since when the user is leading the project
         logoUrl:
           type: string
           format: url
@@ -1689,6 +1696,8 @@ components:
         slug:
           type: string
           description: Slug derived from project name
+        visibility:
+          $ref: '#/components/schemas/ProjectVisibility'
 
     ContactInformation:
       type: object

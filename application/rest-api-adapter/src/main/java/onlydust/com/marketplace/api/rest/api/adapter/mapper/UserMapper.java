@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
@@ -71,6 +72,7 @@ public interface UserMapper {
         privateUserProfileResponse.setContacts(
                 privateUserProfileResponse.getContacts().stream().filter(contact -> contact.getVisibility() == ContactInformation.VisibilityEnum.PUBLIC).collect(Collectors.toList())
         );
+        privateUserProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats(), false));
 
         final PublicUserProfileResponse publicUserProfileResponse = new PublicUserProfileResponse();
         BeanUtils.copyProperties(privateUserProfileResponse, publicUserProfileResponse);
@@ -94,7 +96,7 @@ public interface UserMapper {
         userProfileResponse.setLocation(userProfileView.getLocation());
         userProfileResponse.setContacts(contactToResponse(userProfileView.getContacts()));
         userProfileResponse.setStats(userStatsToResponse(userProfileView.getProfileStats()));
-        userProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats()));
+        userProfileResponse.setProjects(userProjectsToResponse(userProfileView.getProjectsStats(), true));
         userProfileResponse.setTechnologies(userProfileView.getTechnologies());
         userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
         userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
@@ -120,19 +122,26 @@ public interface UserMapper {
         };
     }
 
-    static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats) {
+    static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats,
+                                                            boolean includePrivateProjects) {
         return projectStats.stream()
+                .filter(ps -> includePrivateProjects || ps.getVisibility() == onlydust.com.marketplace.api.domain.model.ProjectVisibility.PUBLIC)
                 .map(ps -> {
                     final UserProfileProjects userProfileProjects = new UserProfileProjects();
                     userProfileProjects.setUserContributionCount(ps.getUserContributionCount());
+                    userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
                     userProfileProjects.setId(ps.getId());
                     userProfileProjects.setName(ps.getName());
                     userProfileProjects.setTotalGranted(ps.getTotalGranted());
                     userProfileProjects.setLogoUrl(ps.getLogoUrl());
                     userProfileProjects.setContributorCount(ps.getContributorCount());
-                    userProfileProjects.setUserLastContributedAt(toZoneDateTime(ps.getUserLastContributedAt()));
                     userProfileProjects.setIsLead(ps.getIsProjectLead());
+                    userProfileProjects.setLeadSince(toZoneDateTime(ps.getProjectLeadSince()));
                     userProfileProjects.setSlug(ps.getSlug());
+                    userProfileProjects.setVisibility(switch (ps.getVisibility()) {
+                        case PUBLIC -> ProjectVisibility.PUBLIC;
+                        case PRIVATE -> ProjectVisibility.PRIVATE;
+                    });
                     return userProfileProjects;
                 })
                 .toList();

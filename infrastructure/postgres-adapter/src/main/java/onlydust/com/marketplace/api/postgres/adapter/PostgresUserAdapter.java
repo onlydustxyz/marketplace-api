@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
@@ -83,6 +84,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserProfileView getProfileById(Long githubUserId) {
         return customUserRepository.findProfileById(githubUserId)
                 .map(this::addProjectsStats)
@@ -90,6 +92,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserProfileView getProfileByLogin(String githubLogin) {
         return customUserRepository.findProfileByLogin(githubLogin)
                 .map(this::addProjectsStats)
@@ -105,11 +108,16 @@ public class PostgresUserAdapter implements UserStoragePort {
                     .name(stats.getName())
                     .contributorCount(stats.getContributorsCount())
                     .isProjectLead(stats.getIsLead())
+                    .projectLeadSince(stats.getLeadSince())
                     .totalGranted(stats.getTotalGranted())
                     .userContributionCount(stats.getUserContributionsCount())
                     .userLastContributedAt(stats.getLastContributionDate())
                     .userFirstContributedAt(stats.getFirstContributionDate())
                     .logoUrl(stats.getLogoUrl())
+                    .visibility(switch (stats.getVisibility()) {
+                        case PUBLIC -> ProjectVisibility.PUBLIC;
+                        case PRIVATE -> ProjectVisibility.PRIVATE;
+                    })
                     .build());
         }
         return userProfileView;

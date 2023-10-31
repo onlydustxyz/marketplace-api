@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.Contact;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 
@@ -63,6 +64,8 @@ public class UserProfileView {
         Date userLastContributedAt;
         Date userFirstContributedAt;
         Boolean isProjectLead;
+        Date projectLeadSince;
+        ProjectVisibility visibility;
     }
 
     @Data
