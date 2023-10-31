@@ -41,14 +41,20 @@ public class ProjectViewEntity {
     ProjectVisibilityEnumEntity visibility;
     @Column(name = "p_lead_id", insertable = false)
     UUID projectLeadId;
+    @Column(name = "p_lead_github_user_id", insertable = false)
+    Long projectLeadGithubUserId;
     @Column(name = "p_lead_login", insertable = false)
     String projectLeadLogin;
     @Column(name = "p_lead_avatar_url", insertable = false)
     String projectLeadAvatarUrl;
+    @Column(name = "p_lead_url", insertable = false)
+    String projectLeadUrl;
     @Column(name = "sponsor_name", insertable = false)
     String sponsorName;
     @Column(name = "sponsor_logo_url", insertable = false)
     String sponsorLogoUrl;
+    @Column(name = "sponsor_url", insertable = false)
+    String sponsorUrl;
     @Column(name = "sponsor_id", insertable = false)
     UUID sponsorId;
     @Column(name = "repo_count", insertable = false)
