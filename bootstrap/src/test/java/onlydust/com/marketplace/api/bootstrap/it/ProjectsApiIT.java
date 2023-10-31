@@ -371,7 +371,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
                   "hiring": true,
-                  "visibility": "PUBLIC",
+                  "visibility": "PRIVATE",
                   "repoCount": 2,
                   "contributorCount": 3,
                   "leaders": [
@@ -1242,35 +1242,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false
                 },
                 {
-                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                  "slug": "b-conseil",
-                  "name": "B Conseil",
-                  "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
-                  "hiring": true,
-                  "visibility": "PUBLIC",
-                  "repoCount": 2,
-                  "contributorCount": 3,
-                  "leaders": [
-                    {
-                      "githubUserId": 134486697,
-                      "login": "axelbconseil",
-                      "htmlUrl": "https://github.com/axelbconseil",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/134486697?v=4",
-                      "id": "83612081-949a-47c4-a467-6f28f6adad6d"
-                    }
-                  ],
-                  "sponsors": [],
-                  "technologies": {
-                    "CSS": 323507,
-                    "Rust": 527,
-                    "SCSS": 102453,
-                    "JavaScript": 58624,
-                    "HTML": 169898
-                  },
-                  "isInvitedAsProjectLead": false
-                },
-                {
                   "id": "7d04163c-4187-4313-8066-61504d34fc56",
                   "slug": "bretzel",
                   "name": "Bretzel",
@@ -2024,7 +1995,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(6)
     void should_get_projects_given_authenticated_user() throws JsonProcessingException {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userHelper.authenticateAnthony().jwt();
 
         // When
         client.get()

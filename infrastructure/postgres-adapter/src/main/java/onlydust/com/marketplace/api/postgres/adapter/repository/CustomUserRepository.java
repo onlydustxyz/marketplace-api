@@ -133,8 +133,10 @@ public class CustomUserRepository {
             select  p.project_id,
                     p.key as slug,
                     p.is_lead,
+                    p.assigned_at as lead_since,
                     p.name,
                     p.logo_url,
+                    p.visibility,
                         
                    (select count(distinct github_user_id)
                     from projects_contributors
@@ -166,15 +168,15 @@ public class CustomUserRepository {
                              join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
                     where pgr.project_id = p.project_id
                     order by c.closed_at asc
-                    limit 1)                             first_contribution_date                    
+                    limit 1)                             first_contribution_date
                    
-            from ((select distinct pd.project_id, false is_lead, pd.name, pd.logo_url, pd.key
+            from ((select distinct pd.project_id, false is_lead, cast(null as timestamp) as assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from contributions c
                             join project_github_repos gpr on gpr.github_repo_id = c.repo_id
                             join project_details pd on pd.project_id = gpr.project_id
                    where c.user_id = :githubUserId and c.status = 'complete')
                   UNION
-                  (select distinct pd.project_id, true is_lead, pd.name, pd.logo_url, pd.key
+                  (select distinct pd.project_id, true is_lead, pl.assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from auth_users u
                             join project_leads pl on pl.user_id = u.id
                             join project_details pd on pd.project_id = pl.project_id
@@ -212,19 +214,19 @@ public class CustomUserRepository {
                                         .totalDollarsEquivalent(row.getTotalsEarned().getTotalDollarsEquivalent())
                                         .details(isNull(row.getTotalsEarned().getDetails()) ? List.of() :
                                                 row.getTotalsEarned().getDetails().stream().map(detail ->
-                                                TotalEarnedPerCurrency.builder()
-                                                        .currency(isNull(detail.getCurrency()) ? null :
-                                                                switch (detail.getCurrency()) {
-                                                                    case usd -> Currency.Usd;
-                                                                    case eth -> Currency.Eth;
-                                                                    case op -> Currency.Op;
-                                                                    case apt -> Currency.Apt;
-                                                                    case stark -> Currency.Stark;
-                                                                })
-                                                        .totalAmount(detail.getTotalAmount())
-                                                        .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
-                                                        .build()
-                                        ).collect(Collectors.toList()))
+                                                        TotalEarnedPerCurrency.builder()
+                                                                .currency(isNull(detail.getCurrency()) ? null :
+                                                                        switch (detail.getCurrency()) {
+                                                                            case usd -> Currency.Usd;
+                                                                            case eth -> Currency.Eth;
+                                                                            case op -> Currency.Op;
+                                                                            case apt -> Currency.Apt;
+                                                                            case stark -> Currency.Stark;
+                                                                        })
+                                                                .totalAmount(detail.getTotalAmount())
+                                                                .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
+                                                                .build()
+                                                ).collect(Collectors.toList()))
                                         .build())
                         .leadedProjectCount(row.getNumberOfLeadingProject())
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())

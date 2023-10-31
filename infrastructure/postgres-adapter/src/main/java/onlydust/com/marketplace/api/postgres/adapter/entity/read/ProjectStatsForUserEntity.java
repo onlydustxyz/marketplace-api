@@ -1,13 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
+@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ProjectStatsForUserEntity {
 
     @Id
@@ -26,6 +29,8 @@ public class ProjectStatsForUserEntity {
     String slug;
     @Column(name = "is_lead")
     Boolean isLead;
+    @Column(name = "lead_since")
+    Date leadSince;
     @Column(name = "name")
     String name;
     @Column(name = "logo_url")
@@ -40,4 +45,8 @@ public class ProjectStatsForUserEntity {
     Date lastContributionDate;
     @Column(name = "first_contribution_date")
     Date firstContributionDate;
+    @Enumerated(EnumType.STRING)
+    @Type(type = "project_visibility")
+    @Column(columnDefinition = "visibility")
+    ProjectVisibilityEnumEntity visibility;
 }
