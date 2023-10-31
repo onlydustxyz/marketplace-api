@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -58,11 +59,22 @@ public class ProjectService implements ProjectFacadePort {
         this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
-                command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeads(),
+                command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings());
         return projectId;
+    }
+
+    @Override
+    public void updateProject(UpdateProjectCommand updateProjectCommand) {
+        this.projectStoragePort.updateProject(updateProjectCommand.getId(), updateProjectCommand.getName(),
+                updateProjectCommand.getShortDescription(), updateProjectCommand.getLongDescription(),
+                updateProjectCommand.getIsLookingForContributors(), updateProjectCommand.getMoreInfos(),
+                updateProjectCommand.getGithubRepoIds(),
+                updateProjectCommand.getGithubUserIdsAsProjectLeadersToInvite(),
+                updateProjectCommand.getProjectLeadersToKeep(), updateProjectCommand.getImageUrl(),
+                updateProjectCommand.getRewardSettings());
     }
 
     @Override

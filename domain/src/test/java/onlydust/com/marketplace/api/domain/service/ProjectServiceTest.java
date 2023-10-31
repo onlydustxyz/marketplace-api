@@ -67,7 +67,7 @@ public class ProjectServiceTest {
                 .longDescription(faker.lorem().paragraph())
                 .isLookingForContributors(false)
                 .moreInfos(List.of(CreateProjectCommand.MoreInfo.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
-                .githubUserIdsAsProjectLeads(List.of(faker.number().randomNumber()))
+                .githubUserIdsAsProjectLeadersToInvite(List.of(faker.number().randomNumber()))
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
                 .build();
@@ -83,7 +83,7 @@ public class ProjectServiceTest {
                 command.getShortDescription(),
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),
-                command.getGithubUserIdsAsProjectLeads(),
+                command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 imageUrl,
                 ProjectRewardSettings.defaultSettings()

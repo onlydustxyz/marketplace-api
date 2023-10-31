@@ -94,7 +94,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional
     public void createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                              Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
+                              Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
         final ProjectEntity projectEntity =
@@ -122,6 +122,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         this.projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
                 .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId)).toList());
+    }
+
+    @Override
+    public void updateProject(UUID id, String name, String shortDescription, String longDescription,
+                              Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                              List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
+                              List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings) {
+
     }
 
     @Override

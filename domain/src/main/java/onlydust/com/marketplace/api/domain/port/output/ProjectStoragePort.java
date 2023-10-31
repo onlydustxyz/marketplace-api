@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.Contributor;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -24,9 +24,14 @@ public interface ProjectStoragePort {
                                                                  String search, ProjectCardView.SortBy sort);
 
     void createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                       Boolean isLookingForContributors, List<CreateProjectCommand.MoreInfo> moreInfos,
+                       Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings);
+
+    void updateProject(UUID id, String name, String shortDescription, String longDescription,
+                       Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
+                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
 
     List<Contributor> searchContributorsByLogin(UUID projectId, String login);
 
@@ -49,4 +54,5 @@ public interface ProjectStoragePort {
     RewardView getProjectReward(UUID rewardId);
 
     Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
+
 }

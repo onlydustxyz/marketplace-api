@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -18,13 +20,32 @@ public interface ProjectMapper {
                 .name(createProjectRequest.getName())
                 .shortDescription(createProjectRequest.getShortDescription())
                 .longDescription(createProjectRequest.getLongDescription())
-                .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                .githubUserIdsAsProjectLeadersToInvite(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .githubRepoIds(createProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
                 .moreInfos(createProjectRequest.getMoreInfo().stream()
-                        .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
+                        .map(moreInfo -> ProjectMoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(createProjectRequest.getLogoUrl())
+                .build();
+    }
+
+    static UpdateProjectCommand mapUpdateProjectCommandToDomain(UUID projectId,
+                                                                UpdateProjectRequest updateProjectRequest) {
+        return UpdateProjectCommand.builder()
+                .id(projectId)
+                .name(updateProjectRequest.getName())
+                .shortDescription(updateProjectRequest.getShortDescription())
+                .longDescription(updateProjectRequest.getLongDescription())
+                .projectLeadersToKeep(updateProjectRequest.getProjectLeads())
+                .githubUserIdsAsProjectLeadersToInvite(updateProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
+                .githubRepoIds(updateProjectRequest.getGithubRepoIds())
+                .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
+                .moreInfos(updateProjectRequest.getMoreInfo().stream()
+                        .map(moreInfo -> ProjectMoreInfoLink.builder()
+                                .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
+                .imageUrl(updateProjectRequest.getLogoUrl())
                 .build();
     }
 
@@ -90,6 +111,15 @@ public interface ProjectMapper {
         projectRewardSettings.setIgnoreCodeReviews(rewardSettings.getIgnoreCodeReviews());
         projectRewardSettings.setIgnoreContributionsBefore(toZoneDateTime(rewardSettings.getIgnoreContributionsBefore()));
         return projectRewardSettings;
+    }
+
+    static onlydust.com.marketplace.api.domain.model.ProjectRewardSettings mapRewardSettingsToDomain(ProjectRewardSettings rewardSettings) {
+        return onlydust.com.marketplace.api.domain.model.ProjectRewardSettings.builder()
+                .ignoreIssues(rewardSettings.getIgnoreIssues())
+                .ignorePullRequests(rewardSettings.getIgnorePullRequests())
+                .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
+                .ignoreContributionsBefore(Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant()))
+                .build();
     }
 
     static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {

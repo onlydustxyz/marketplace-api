@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -24,6 +25,8 @@ public interface ProjectFacadePort {
 
 
     UUID createProject(CreateProjectCommand createProjectCommand);
+
+    void updateProject(UpdateProjectCommand updateProjectCommand);
 
     URL saveLogoImage(InputStream imageInputStream);
 

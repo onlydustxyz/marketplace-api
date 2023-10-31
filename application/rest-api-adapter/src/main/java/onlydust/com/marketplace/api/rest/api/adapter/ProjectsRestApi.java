@@ -88,6 +88,12 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
+    public ResponseEntity<Void> updateProject(UUID projectId, UpdateProjectRequest updateProjectRequest) {
+        projectFacadePort.updateProject(mapUpdateProjectCommandToDomain(projectId, updateProjectRequest));
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<UploadImageResponse> uploadProjectLogo(Resource image) {
         InputStream imageInputStream;
         try {

@@ -4,16 +4,20 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
-public class CreateProjectCommand {
+public class UpdateProjectCommand {
+    UUID id;
     String name;
     String shortDescription;
     String longDescription;
     List<Long> githubUserIdsAsProjectLeadersToInvite;
+    List<UUID> projectLeadersToKeep;
     List<Long> githubRepoIds;
     List<ProjectMoreInfoLink> moreInfos;
     Boolean isLookingForContributors;
     String imageUrl;
+    ProjectRewardSettings rewardSettings;
 }
