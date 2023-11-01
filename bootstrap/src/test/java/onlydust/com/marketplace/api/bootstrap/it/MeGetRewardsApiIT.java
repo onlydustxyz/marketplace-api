@@ -58,91 +58,97 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             """;
     private static final String GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON = """
             {
-              "rewards": [
-                {
-                  "requestedAt": "2023-09-19T05:38:22.018458Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 500,
-                    "currency": "APT",
-                    "dollarsEquivalent": 100000
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                },
-                {
-                  "requestedAt": "2023-09-20T06:46:52.77875Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 50,
-                    "currency": "ETH",
-                    "dollarsEquivalent": 75000
-                  },
-                  "numberOfRewardedContributions": 1,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-                },
-                {
-                  "requestedAt": "2023-09-19T05:40:26.971981Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 10,
-                    "currency": "ETH",
-                    "dollarsEquivalent": 15000
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
-                },
-                {
-                  "requestedAt": "2023-09-19T05:39:54.45638Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 30,
-                    "currency": "APT",
-                    "dollarsEquivalent": 6000
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
-                },
-                {
-                  "requestedAt": "2023-09-19T05:38:52.590518Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 1000,
-                    "currency": "USD",
-                    "dollarsEquivalent": 1000
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-                },
-                {
-                  "requestedAt": "2023-09-19T05:39:23.730967Z",
-                  "status": "MISSING_PAYOUT_INFO",
-                  "amount": {
-                    "total": 9511147,
-                    "currency": "STARK",
-                    "dollarsEquivalent": 0
-                  },
-                  "numberOfRewardedContributions": 25,
-                  "rewardedOnProjectName": "QA new contributions",
-                  "rewardedOnProjectLogoUrl": null,
-                  "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
-                }
-              ],
-              "hasMore": false,
-              "totalPageNumber": 1,
-              "totalItemNumber": 6,
-              "nextPageIndex": 0
-            }
+               "rewards": [
+                 {
+                   "requestedAt": "2023-09-19T05:38:22.018458Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "MISSING_PAYOUT_INFO",
+                   "amount": {
+                     "total": 500,
+                     "currency": "APT",
+                     "dollarsEquivalent": 100000
+                   },
+                   "numberOfRewardedContributions": 25,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                 },
+                 {
+                   "requestedAt": "2023-09-20T06:46:52.77875Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "PENDING_INVOICE",
+                   "amount": {
+                     "total": 50,
+                     "currency": "ETH",
+                     "dollarsEquivalent": 75000
+                   },
+                   "numberOfRewardedContributions": 1,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                 },
+                 {
+                   "requestedAt": "2023-09-19T05:40:26.971981Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "PENDING_INVOICE",
+                   "amount": {
+                     "total": 10,
+                     "currency": "ETH",
+                     "dollarsEquivalent": 15000
+                   },
+                   "numberOfRewardedContributions": 25,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                 },
+                 {
+                   "requestedAt": "2023-09-19T05:39:54.45638Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "MISSING_PAYOUT_INFO",
+                   "amount": {
+                     "total": 30,
+                     "currency": "APT",
+                     "dollarsEquivalent": 6000
+                   },
+                   "numberOfRewardedContributions": 25,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                 },
+                 {
+                   "requestedAt": "2023-09-19T05:38:52.590518Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "PENDING_INVOICE",
+                   "amount": {
+                     "total": 1000,
+                     "currency": "USD",
+                     "dollarsEquivalent": 1000
+                   },
+                   "numberOfRewardedContributions": 25,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                 },
+                 {
+                   "requestedAt": "2023-09-19T05:39:23.730967Z",
+                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                   "status": "MISSING_PAYOUT_INFO",
+                   "amount": {
+                     "total": 9511147,
+                     "currency": "STARK",
+                     "dollarsEquivalent": 0
+                   },
+                   "numberOfRewardedContributions": 25,
+                   "rewardedOnProjectName": "QA new contributions",
+                   "rewardedOnProjectLogoUrl": null,
+                   "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                 }
+               ],
+               "hasMore": false,
+               "totalPageNumber": 1,
+               "totalItemNumber": 6,
+               "nextPageIndex": 0
+             }
             """;
     private static final String ME_GET_REWARDS_RESPONSE_JSON = """
             {

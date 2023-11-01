@@ -6,9 +6,6 @@ on:
   push:
     branches:
       - "main"
-      - "e-*"
-      - "b-*"
-      - "refactor/*"
   workflow_dispatch:
     inputs:
       debug_enabled:
