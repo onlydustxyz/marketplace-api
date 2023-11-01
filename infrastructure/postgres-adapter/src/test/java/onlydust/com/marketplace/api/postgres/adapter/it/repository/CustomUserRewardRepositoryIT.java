@@ -1,0 +1,349 @@
+package onlydust.com.marketplace.api.postgres.adapter.it.repository;
+
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserPayoutInfoRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
+
+    @Autowired
+    AuthUserRepository authUserRepository;
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    CustomUserRewardRepository customUserRewardRepository;
+    @Autowired
+    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    @Autowired
+    PostgresUserAdapter postgresUserAdapter;
+    @Autowired
+    CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
+
+    private static UUID userId = UUID.randomUUID();
+    private static Long githubUserId = faker.random().nextLong();
+    private static UUID projectId = UUID.randomUUID();
+
+    @Test
+    @Order(1)
+    void should_return_user_rewards_given_a_user_without_payout_info_and_with_rewards() {
+        // Given
+        authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(), new Date(),
+                faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
+        projectRepository.save(new ProjectEntity(projectId, faker.pokemon().name(), faker.pokemon().location(),
+                faker.harryPotter().location(),
+                faker.internet().url(), faker.internet().avatar(), false, 0, null, ProjectVisibilityEnumEntity.PUBLIC
+                , List.of()));
+        cryptoUsdQuotesRepository.saveAll(
+                List.of(
+                        new CryptoUsdQuotesEntity(CurrencyEnumEntity.eth, BigDecimal.valueOf(1000), new Date()),
+                        new CryptoUsdQuotesEntity(CurrencyEnumEntity.apt, BigDecimal.valueOf(100), new Date()),
+                        new CryptoUsdQuotesEntity(CurrencyEnumEntity.op, BigDecimal.valueOf(10), new Date())
+                )
+        );
+        paymentRequestRepository.saveAll(
+                List.of(
+                        new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
+                                BigDecimal.valueOf(10000), null, 1, projectId, CurrencyEnumEntity.usd
+                        ),
+                        new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
+                                BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.eth
+                        ),
+                        new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
+                                BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.apt
+                        ),
+                        new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
+                                BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op
+                        ),
+                        new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
+                                BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark
+                        )
+
+                ));
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+    @Test
+    @Order(2)
+    void should_return_user_rewards_given_a_user_with_only_stark_wallet_and_valid_contact_info() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .starknetAddress(faker.random().hex())
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity = customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId).orElseThrow();
+
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidStarknetWallet());
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(4).getStatus());
+    }
+
+    @Test
+    @Order(3)
+    void should_return_user_rewards_given_a_user_with_only_op_wallet_and_valid_contact_info() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .optimismAddress(faker.random().hex())
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+    @Test
+    @Order(4)
+    void should_return_user_rewards_given_a_user_with_only_apt_wallet_and_valid_contact_info() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .aptosAddress(faker.random().hex())
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+    @Test
+    @Order(5)
+    void should_return_user_rewards_given_a_user_with_only_eth_wallet_and_valid_contact_info() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .ethAddress(faker.random().hex())
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+    @Test
+    @Order(6)
+    void should_return_user_rewards_given_a_user_with_only_usdc_wallet_for_valid_company() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .isACompany(true)
+                .company(UserPayoutInformation.Company.builder().name(faker.name().name())
+                        .owner(UserPayoutInformation.Person.builder()
+                                .lastName(faker.name().lastName())
+                                .firstName(faker.name().firstName())
+                                .build())
+                        .identificationNumber(faker.number().digit())
+                        .build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .ethName(faker.random().hex())
+                        .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO)
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+     @Test
+    @Order(7)
+    void should_return_user_rewards_given_a_user_with_only_banking_account_for_valid_company() {
+        // Given
+         postgresUserAdapter.savePayoutInformationForUserId(userId, UserPayoutInformation.builder()
+                .isACompany(true)
+                .company(UserPayoutInformation.Company.builder().name(faker.name().name())
+                        .owner(UserPayoutInformation.Person.builder()
+                                .lastName(faker.name().lastName())
+                                .firstName(faker.name().firstName())
+                                .build())
+                        .identificationNumber(faker.number().digit())
+                        .build())
+                .location(UserPayoutInformation.Location.builder()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .postalCode(faker.address().zipCode())
+                        .country(faker.address().country())
+                        .build())
+                .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                        .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                                .bic(faker.random().hex())
+                                .iban(faker.random().hex())
+                                .build())
+                        .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.FIAT)
+                        .build())
+                .build());
+
+        // When
+        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        // Then
+        assertEquals(5, viewEntities.size());
+        assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+        assertEquals("PENDING_INVOICE", viewEntities.get(0).getStatus());
+        assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+        assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
+        assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+        assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+    }
+
+
+
+
+}
