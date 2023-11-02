@@ -279,7 +279,7 @@ public class CustomUserRewardRepository {
                                    from payment_requests pr
                                             left join auth_users au on au.github_user_id = pr.recipient_id
                                             left join public.user_payout_info upi on au.id = upi.user_id)
-            select pr.requested_at,
+            select distinct pr.requested_at,
                    pd.name,
                    pd.logo_url,
                    pd.project_id,
