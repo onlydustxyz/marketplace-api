@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
+import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -324,7 +325,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(6)
     public void should_return_a_400_when_input_is_invalid() {
         // When
-        client.put()
+        final OnlyDustError response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -350,7 +351,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isBadRequest();
+                .isBadRequest()
+                .expectBody(OnlyDustError.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getMessage()).contains("name: must not be null");
+        assertThat(response.getMessage()).contains("shortDescription: must not be null");
+        assertThat(response.getMessage()).contains("longDescription: must not be null");
     }
 
     @Test

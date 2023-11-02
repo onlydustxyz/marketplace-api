@@ -6,12 +6,15 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -24,9 +27,13 @@ public class OnlydustExceptionRestHandler {
                 .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
         final UUID errorId = UUID.randomUUID();
         final OnlyDustError onlyDustError = new OnlyDustError();
-        onlyDustError.setStatus(httpStatus.value());
-        onlyDustError.setMessage(httpStatus.name());
         onlyDustError.setId(errorId);
+        onlyDustError.setStatus(httpStatus.value());
+        if (httpStatus.is5xxServerError()) {
+            onlyDustError.setMessage(httpStatus.name());
+        } else {
+            onlyDustError.setMessage(exception.getMessage());
+        }
         if (httpStatus.is5xxServerError()) {
             LOGGER.error(format("%d error %s returned by the REST API", httpStatus.value(), errorId), exception);
         } else {
@@ -39,6 +46,28 @@ public class OnlydustExceptionRestHandler {
     protected ResponseEntity<OnlyDustError> handleOnlyDustException(final OnlyDustException exception) {
         final OnlyDustError onlyDustError = onlyDustErrorFromException(exception);
         return ResponseEntity.status(onlyDustError.getStatus()).body(onlyDustError);
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    protected ResponseEntity<OnlyDustError> handleMethodArgumentNotValidException(final MethodArgumentNotValidException exception) {
+        final String message =
+                exception.getBindingResult().getFieldErrors().stream()
+                        .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage()).collect(Collectors.joining(", "));
+
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                message,
+                exception
+        ));
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    protected ResponseEntity<OnlyDustError> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                exception
+        ));
     }
 
     @ExceptionHandler(AuthenticationException.class)

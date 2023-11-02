@@ -62,6 +62,12 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
                 .currency(CurrencyContract.USD)
+                .items(List.of(
+                        new RewardItemRequest().id("pr1")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(1L)
+                                .repoId(2L)
+                ))
                 .recipientId(1L);
 
         // When
@@ -74,7 +80,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(403)
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("FORBIDDEN");
+                .jsonPath("$.message").isEqualTo("User must be project lead to request a reward");
     }
 
     @Test

@@ -66,7 +66,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(403)
                 .expectBody()
-                .jsonPath("$.message").isEqualTo("FORBIDDEN");
+                .jsonPath("$.message").isEqualTo("User must be project lead to cancel a reward");
     }
 
     @Test
