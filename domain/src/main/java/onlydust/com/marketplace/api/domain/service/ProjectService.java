@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -26,6 +27,7 @@ public class ProjectService implements ProjectFacadePort {
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
     private final PermissionService permissionService;
+    private final IndexerPort indexerPort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -55,6 +57,10 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public UUID createProject(CreateProjectCommand command) {
+        if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
+            indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
+        }
+
         final UUID projectId = uuidGeneratorPort.generate();
         this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
@@ -67,14 +73,18 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void updateProject(UpdateProjectCommand updateProjectCommand) {
-        this.projectStoragePort.updateProject(updateProjectCommand.getId(), updateProjectCommand.getName(),
-                updateProjectCommand.getShortDescription(), updateProjectCommand.getLongDescription(),
-                updateProjectCommand.getIsLookingForContributors(), updateProjectCommand.getMoreInfos(),
-                updateProjectCommand.getGithubRepoIds(),
-                updateProjectCommand.getGithubUserIdsAsProjectLeadersToInvite(),
-                updateProjectCommand.getProjectLeadersToKeep(), updateProjectCommand.getImageUrl(),
-                updateProjectCommand.getRewardSettings());
+    public void updateProject(UpdateProjectCommand command) {
+        if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
+            indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
+        }
+
+        this.projectStoragePort.updateProject(command.getId(), command.getName(),
+                command.getShortDescription(), command.getLongDescription(),
+                command.getIsLookingForContributors(), command.getMoreInfos(),
+                command.getGithubRepoIds(),
+                command.getGithubUserIdsAsProjectLeadersToInvite(),
+                command.getProjectLeadersToKeep(), command.getImageUrl(),
+                command.getRewardSettings());
     }
 
     @Override

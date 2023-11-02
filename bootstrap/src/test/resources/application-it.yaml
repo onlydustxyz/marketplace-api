@@ -5,6 +5,10 @@ infrastructure:
     api:
       client:
         api-key: "some-rust-api-key"
+  indexer:
+    api:
+      client:
+        api-key: "some-indexer-api-key"
 spring:
   main:
     allow-bean-definition-overriding: true

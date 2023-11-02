@@ -41,7 +41,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Import(SwaggerConfiguration.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -90,6 +91,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("rust-api")
     protected WireMockServer rustApiWireMockServer;
+    @InjectWireMock("indexer-api")
+    protected WireMockServer indexerApiWireMockServer;
     @LocalServerPort
     int port;
     @Autowired

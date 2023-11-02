@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
@@ -11,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,12 +32,31 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     public void setup() {
         jwt = userHelper.authenticatePierre().jwt();
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
     }
 
     @Test
     @Order(1)
     public void should_create_a_new_project() {
         // When
+
         final var response = client.post()
                 .uri(getApiURI(PROJECTS_POST))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -70,7 +92,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(response).isNotNull();
         assertThat(response.getProjectId()).isNotNull();
 
-        // When
+        // Then
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
                 .exchange()
