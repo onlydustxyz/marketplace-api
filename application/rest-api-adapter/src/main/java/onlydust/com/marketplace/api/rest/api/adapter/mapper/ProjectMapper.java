@@ -37,7 +37,7 @@ public interface ProjectMapper {
                 .name(updateProjectRequest.getName())
                 .shortDescription(updateProjectRequest.getShortDescription())
                 .longDescription(updateProjectRequest.getLongDescription())
-                .projectLeadersToKeep(updateProjectRequest.getProjectLeads())
+                .projectLeadersToKeep(updateProjectRequest.getProjectLeadsToKeep())
                 .githubUserIdsAsProjectLeadersToInvite(updateProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
                 .githubRepoIds(updateProjectRequest.getGithubRepoIds())

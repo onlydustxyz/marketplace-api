@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles({"hasura_auth"})
@@ -19,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     private static UUID projectId;
+
     @Autowired
     HasuraUserHelper userHelper;
+
     private String jwt;
 
     @BeforeEach
@@ -107,6 +110,27 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
+    public void accept_leader_invitation_for_next_tests() {
+        client.put()
+                .uri(getApiURI(format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
+                .header("Authorization", BEARER_PREFIX + userHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists();
+    }
+
+    @Test
+    @Order(10)
     public void should_update_the_project() {
 
         // And When
@@ -129,9 +153,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "inviteGithubUserIdsAsProjectLeads": [
                             16590657
                           ],
-                          "projectLeads": [
-                            "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                            "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                          "projectLeadsToKeep": [
+                            "e461c019-ba23-4671-9b6c-3a5a18748af9"
                           ],
                           "githubRepoIds": [
                             498695724, 452047076
@@ -155,7 +178,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(3)
+    @Order(11)
     public void should_update_lists_only_when_present() {
 
         // And When
@@ -194,7 +217,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(4)
+    @Order(12)
     public void should_update_reward_settings_only_when_present() {
 
         // And When
@@ -227,11 +250,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(5)
-    public void should_update_revoke_leader_when_not_present_in_the_list() {
+    @Order(20)
+    public void should_return_400_when_trying_to_add_a_leader_directly() {
 
         // And When
-        client.put()
+        final var response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -247,7 +270,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "isLookingForContributors": false,
-                          "projectLeads": [
+                          "projectLeadsToKeep": [
                             "f20e6812-8de8-432b-9c31-2920434fe7d0"
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
@@ -262,67 +285,17 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful();
+                .isBadRequest()
+                .expectBody(OnlyDustError.class)
+                .returnResult().getResponseBody();
 
-        // And Then
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(projectId.toString())
-                .jsonPath("$.leaders.length()").isEqualTo(1)
-                .jsonPath("$.leaders[0].login").isEqualTo("pacovilletard");
-
-        // And When
-        client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "name": "Updated Project",
-                          "shortDescription": "This is a super updated project",
-                          "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
-                            {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
-                            }
-                          ],
-                          "isLookingForContributors": false,
-                          "projectLeads": [],
-                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
-                          "rewardSettings": {
-                            "ignorePullRequests": true,
-                            "ignoreIssues": true,
-                            "ignoreCodeReviews": true,
-                            "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
-                          }
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
-
-        // And Then
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(projectId.toString())
-                .jsonPath("$.leaders.length()").isEqualTo(0);
+        assertThat(response.getMessage()).contains("Project leaders to keep must be a subset of current project " +
+                                                   "leaders");
     }
 
 
     @Test
-    @Order(6)
+    @Order(21)
     public void should_return_a_400_when_input_is_invalid() {
         // When
         final OnlyDustError response = client.put()
@@ -338,7 +311,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "isLookingForContributors": false,
-                          "projectLeads": [],
+                          "projectLeadsToKeep": [],
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
                             "ignorePullRequests": true,
@@ -361,7 +334,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(7)
+    @Order(22)
     public void should_return_a_404_when_project_is_not_found() {
         // When
         client.put()
@@ -407,9 +380,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hiring").isEqualTo(false)
                 .jsonPath("$.moreInfoUrl").isEqualTo("https://t.me/foobar-updated")
 
-                .jsonPath("$.leaders.length()").isEqualTo(2)
+                .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("ofux")
-                .jsonPath("$.leaders[1].login").isEqualTo("pacovilletard")
 
                 .jsonPath("$.invitedLeaders.length()").isEqualTo(1)
                 .jsonPath("$.invitedLeaders[0].login").isEqualTo("PierreOucif")

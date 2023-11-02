@@ -2829,10 +2829,20 @@ components:
           type: boolean
         inviteGithubUserIdsAsProjectLeads:
           type: array
+          description: List of Github user ids to invite as project leads.
+            All other project lead invitations will be removed.
+            If empty, all project lead invitations will be removed.
+            If null, no change will be made.
+            It is allowed to add a new project lead invitation directly through this list.
           items:
             $ref: '#/components/schemas/GithubUserId'
-        projectLeads:
+        projectLeadsToKeep:
           type: array
+          description: List of project leads to keep.
+            All other project leads will be removed.
+            If empty, all project leads will be removed.
+            If null, no change will be made.
+            It is not allowed to add a new project lead directly through this list, as they must be invited first.
           items:
             $ref: '#/components/schemas/UserId'
         logoUrl:
@@ -2843,6 +2853,11 @@ components:
           $ref: '#/components/schemas/ProjectRewardSettings'
         githubRepoIds:
           type: array
+          description: List of Github repos to include in the project.
+            All other repos will be unlinked from the project.
+            If empty, all repos will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new repo directly through this list.
           items:
             $ref: '#/components/schemas/GithubRepoId'
 

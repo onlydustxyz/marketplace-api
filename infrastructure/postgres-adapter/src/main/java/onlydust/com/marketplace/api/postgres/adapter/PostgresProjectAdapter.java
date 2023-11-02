@@ -10,7 +10,10 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -155,7 +158,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             project.setIgnoreCodeReviews(rewardSettings.getIgnoreCodeReviews());
             project.setIgnoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore());
         }
-        
+
         project.setTelegramLink(isNull(moreInfos) ? null :
                 moreInfos.stream().findFirst().map(ProjectMoreInfoLink::getUrl).orElse(null));
 
@@ -180,12 +183,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .filter(projectLeader -> !projectLeadersToKeep.contains(projectLeader.getPrimaryKey().getUserId()))
                     .forEach(projectLeadRepository::delete);
 
-            projectLeadersToKeep.stream()
-                    .filter(userId -> projectLeaders.stream()
-                            .noneMatch(projectLeader -> projectLeader.getPrimaryKey().getUserId().equals(userId)))
-                    .forEach(userId -> projectLeadRepository.save(new ProjectLeadEntity(
-                            projectId,
-                            userId)));
+            if (projectLeadersToKeep.stream()
+                    .anyMatch(userId -> projectLeaders.stream()
+                            .noneMatch(projectLeader -> projectLeader.getPrimaryKey().getUserId().equals(userId)))) {
+                throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
+                                                   "leaders");
+            }
         }
 
         final var repos = project.getRepos();
