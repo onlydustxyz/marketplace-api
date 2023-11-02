@@ -308,7 +308,7 @@ public class CustomRewardRepository {
                       left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                       left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                       left join get_code_review code_review on code_review.id = wi.id
-                      left join public.contributions c on c.details_id =
+                      join public.contributions c on c.details_id =
                                                                   coalesce(cast(pull_request.id as text), cast(issue.id as text),
                                                                            cast(code_review.id as text))
             where pr.id = :rewardId
