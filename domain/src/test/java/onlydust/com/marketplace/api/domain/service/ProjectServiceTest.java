@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
@@ -66,7 +64,7 @@ public class ProjectServiceTest {
                 .shortDescription(faker.lorem().sentence())
                 .longDescription(faker.lorem().paragraph())
                 .isLookingForContributors(false)
-                .moreInfos(List.of(CreateProjectCommand.MoreInfo.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
+                .moreInfos(List.of(ProjectMoreInfoLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
                 .githubUserIdsAsProjectLeadersToInvite(List.of(faker.number().randomNumber()))
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
@@ -87,6 +85,51 @@ public class ProjectServiceTest {
                 ProjectVisibility.PUBLIC,
                 imageUrl,
                 ProjectRewardSettings.defaultSettings()
+        );
+    }
+
+
+    @Test
+    void should_update_project() {
+        // Given
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
+        final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+                uuidGeneratorPort, mock(PermissionService.class));
+        final String imageUrl = faker.internet().image();
+        final UUID projectId = UUID.randomUUID();
+        final UpdateProjectCommand command = UpdateProjectCommand.builder()
+                .id(projectId)
+                .name(faker.pokemon().name())
+                .shortDescription(faker.lorem().sentence())
+                .longDescription(faker.lorem().paragraph())
+                .isLookingForContributors(false)
+                .moreInfos(List.of(ProjectMoreInfoLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
+                .githubUserIdsAsProjectLeadersToInvite(List.of(faker.number().randomNumber()))
+                .projectLeadersToKeep(List.of(UUID.randomUUID()))
+                .githubRepoIds(List.of(faker.number().randomNumber()))
+                .imageUrl(imageUrl)
+                .rewardSettings(ProjectRewardSettings.builder()
+                        .ignoreIssues(true)
+                        .ignoreCodeReviews(false)
+                        .ignorePullRequests(true)
+                        .ignoreContributionsBefore(faker.date().birthday())
+                        .build())
+                .build();
+
+        // When
+        projectService.updateProject(command);
+
+        // Then
+        verify(projectStoragePort, times(1)).updateProject(command.getId(), command.getName(),
+                command.getShortDescription(),
+                command.getLongDescription(), command.getIsLookingForContributors(),
+                command.getMoreInfos(), command.getGithubRepoIds(),
+                command.getGithubUserIdsAsProjectLeadersToInvite(),
+                command.getProjectLeadersToKeep(),
+                imageUrl,
+                command.getRewardSettings()
         );
     }
 

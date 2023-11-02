@@ -114,6 +114,9 @@ public interface ProjectMapper {
     }
 
     static onlydust.com.marketplace.api.domain.model.ProjectRewardSettings mapRewardSettingsToDomain(ProjectRewardSettings rewardSettings) {
+        if (rewardSettings == null) {
+            return null;
+        }
         return onlydust.com.marketplace.api.domain.model.ProjectRewardSettings.builder()
                 .ignoreIssues(rewardSettings.getIgnoreIssues())
                 .ignorePullRequests(rewardSettings.getIgnorePullRequests())

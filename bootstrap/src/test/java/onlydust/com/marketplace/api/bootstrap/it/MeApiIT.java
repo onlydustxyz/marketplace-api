@@ -114,11 +114,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
-        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
-                .id(UUID.randomUUID())
-                .projectId(UUID.fromString(projectId))
-                .githubUserId(githubUserId)
-                .build());
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
+                UUID.fromString(projectId), githubUserId));
 
         // When
         client.put()
@@ -150,11 +147,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
-        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
-                .id(UUID.randomUUID())
-                .projectId(UUID.fromString(projectId))
-                .githubUserId(faker.number().randomNumber()) // <- another user
-                .build());
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
+                UUID.fromString(projectId), faker.number().randomNumber()));
 
         // When
         client.put()

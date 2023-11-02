@@ -17,7 +17,8 @@ import java.util.UUID;
 @Table(name = "project_leads", schema = "public")
 public class ProjectLeadEntity {
     @EmbeddedId
-    private ProjectLeadEntity.PrimaryKey primaryKey;
+    @EqualsAndHashCode.Include
+    private PrimaryKey primaryKey;
 
     @CreationTimestamp
     @Column(name = "assigned_at", nullable = false, updatable = false)
@@ -30,10 +31,12 @@ public class ProjectLeadEntity {
     @Embeddable
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
+    @Data
     public static class PrimaryKey implements Serializable {
-        @Column(name = "project_id", nullable = false)
+        @Column(name = "project_id", nullable = false, updatable = false)
         UUID projectId;
-        @Column(name = "user_id", nullable = false)
+        @Column(name = "user_id", nullable = false, updatable = false)
         UUID userId;
     }
 }

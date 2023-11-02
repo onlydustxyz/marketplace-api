@@ -2807,6 +2807,13 @@ components:
 
     UpdateProjectRequest:
       type: object
+      required:
+        - name
+        - shortDescription
+        - longDescription
+        - moreInfo
+        - isLookingForContributors
+        - logoUrl
       properties:
         name:
           type: string

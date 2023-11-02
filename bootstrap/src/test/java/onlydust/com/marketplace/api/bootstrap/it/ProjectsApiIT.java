@@ -2091,11 +2091,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final var auth = userHelper.authenticatePierre();
 
         final ProjectViewEntity bretzel = projectViewRepository.findByKey("bretzel").orElseThrow();
-        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
-                .projectId(bretzel.getId())
-                .githubUserId(auth.user().getGithubUserId())
-                .id(UUID.randomUUID())
-                .build());
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(),
+                auth.user().getGithubUserId()));
 
         // When
         client.get()

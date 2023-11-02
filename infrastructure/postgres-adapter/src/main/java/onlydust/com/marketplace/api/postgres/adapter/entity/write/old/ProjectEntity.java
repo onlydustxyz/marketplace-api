@@ -2,14 +2,15 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SelectBeforeUpdate;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -21,9 +22,12 @@ import java.util.UUID;
 @Builder
 @Table(name = "project_details", schema = "public")
 @TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
+@DynamicUpdate
+@SelectBeforeUpdate
 public class ProjectEntity {
     @Id
     @Column(name = "project_id", nullable = false)
+    @EqualsAndHashCode.Include
     UUID id;
     @Column(name = "name")
     String name;
@@ -37,13 +41,13 @@ public class ProjectEntity {
     String logoUrl;
     @Column(name = "hiring")
     Boolean hiring;
-    @Column(name = "rank")
+    @Column(name = "rank", updatable = false)
     Integer rank;
-    @Column(name = "key", insertable = false)
+    @Column(name = "key", insertable = false, updatable = false)
     String key;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
-    @Column(columnDefinition = "visibility")
+    @Column(columnDefinition = "visibility", updatable = false)
     ProjectVisibilityEnumEntity visibility;
     @Column(name = "reward_ignore_pull_requests_by_default")
     Boolean ignorePullRequests;
@@ -54,25 +58,15 @@ public class ProjectEntity {
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = "projects_sponsors",
-            schema = "public",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "sponsor_id")
-    )
-    List<SponsorEntity> sponsors;
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    Set<ProjectLeaderInvitationEntity> projectLeaderInvitations;
 
-    public Project toModel() {
-        return Project.builder()
-                .id(id)
-                .name(name)
-                .shortDescription(shortDescription)
-                .longDescription(longDescription)
-                .moreInfoUrl(telegramLink)
-                .logoUrl(logoUrl)
-                .hiring(hiring)
-                .slug(key)
-                .build();
-    }
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    Set<ProjectLeadEntity> projectLeaders;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    Set<ProjectRepoEntity> repos;
 }
