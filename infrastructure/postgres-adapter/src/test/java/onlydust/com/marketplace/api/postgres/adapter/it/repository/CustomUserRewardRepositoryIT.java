@@ -30,6 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
+    private static UUID userId = UUID.randomUUID();
+    private static Long githubUserId = faker.random().nextLong();
+    private static UUID projectId = UUID.randomUUID();
     @Autowired
     AuthUserRepository authUserRepository;
     @Autowired
@@ -47,19 +50,27 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
     @Autowired
     CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
 
-    private static UUID userId = UUID.randomUUID();
-    private static Long githubUserId = faker.random().nextLong();
-    private static UUID projectId = UUID.randomUUID();
-
     @Test
     @Order(1)
     void should_return_user_rewards_given_a_user_without_payout_info_and_with_rewards() {
         // Given
         authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(), new Date(),
                 faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
-        projectRepository.save(new ProjectEntity(projectId, faker.pokemon().name(), faker.pokemon().location(),
-                faker.harryPotter().location(), faker.internet().url(), faker.internet().avatar(), false, 0, null,
-                ProjectVisibilityEnumEntity.PUBLIC, List.of()));
+        projectRepository.save(
+                ProjectEntity.builder()
+                        .id(projectId)
+                        .name(faker.pokemon().name())
+                        .shortDescription(faker.pokemon().location())
+                        .longDescription(faker.harryPotter().location())
+                        .telegramLink(faker.internet().url())
+                        .logoUrl(faker.internet().avatar())
+                        .hiring(false)
+                        .rank(0)
+                        .visibility(ProjectVisibilityEnumEntity.PUBLIC)
+                        .ignorePullRequests(false)
+                        .ignoreIssues(false)
+                        .ignoreCodeReviews(false)
+                        .build());
         cryptoUsdQuotesRepository.saveAll(List.of(new CryptoUsdQuotesEntity(CurrencyEnumEntity.eth,
                 BigDecimal.valueOf(1000), new Date()), new CryptoUsdQuotesEntity(CurrencyEnumEntity.apt,
                 BigDecimal.valueOf(100), new Date()), new CryptoUsdQuotesEntity(CurrencyEnumEntity.op,
@@ -143,6 +154,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             final List<UserRewardViewEntity> viewEntities =
                     customUserRewardRepository.getViewEntities(individualIserId, UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId).orElseThrow();
+
 
             // Then
             assertEquals(5, viewEntities.size());
@@ -299,8 +313,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
         }
 
-        @Test
-        @Order(2)
+    @Test
+    @Order(2)
         void should_return_user_rewards_given_a_user_with_only_usdc_wallet_for_valid_company_and_paid_rewards() {
             // Given
             List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
@@ -334,9 +348,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
         @Test
         @Order(3)
-        void should_return_user_rewards_given_a_user_with_only_banking_account_for_valid_company() {
-            // Given
-            postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
+    void should_return_user_rewards_given_a_user_with_only_banking_account_for_valid_company() {
+        // Given
+        postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
                     UserPayoutInformation.builder().isACompany(true).company(UserPayoutInformation.Company.builder().name(faker.name().name()).owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().sepaAccount(UserPayoutInformation.SepaAccount.builder().bic(faker.random().hex()).iban(faker.random().hex()).build()).usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.FIAT).build()).build());
 
             // When
