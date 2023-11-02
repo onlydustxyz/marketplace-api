@@ -34,18 +34,18 @@ public class CustomUserRewardRepository {
                                            where p.id is null
                                              and pr.id = pr2.id)                                           has_pending_payments,
                                           (upi.identity is not null and upi.identity -> 'Person' is not null and
-                                           upi.identity -> 'Person' -> 'lastname' is not null and
-                                           upi.identity -> 'Person' -> 'firstname' is not null)            valid_person,
-                                          (upi.location is not null and upi.location -> 'city' is not null and
-                                           upi.location -> 'post_code' is not null and
-                                           upi.location -> 'address' is not null and
-                                           upi.location -> 'country' is not null)                          valid_location,
-                                          (upi.identity is not null and upi.identity -> 'Company' is not null and
-                                           upi.identity -> 'Company' -> 'name' is not null and
-                                           upi.identity -> 'Company' -> 'identification_number' is not null and
-                                           upi.identity -> 'Company' -> 'owner' is not null and
-                                           upi.identity -> 'Company' -> 'owner' -> 'firstname' is not null and
-                                           upi.identity -> 'Company' -> 'owner' -> 'lastname' is not null) valid_company,
+                                         upi.identity -> 'Person' -> 'lastname' != cast('null' as jsonb) and
+                                         upi.identity -> 'Person' -> 'firstname' != cast('null' as jsonb))            valid_person,
+                                        (upi.location is not null and upi.location -> 'city' != cast('null' as jsonb) and
+                                         upi.location -> 'post_code' != cast('null' as jsonb) and
+                                         upi.location -> 'address' != cast('null' as jsonb) and
+                                         upi.location -> 'country' != cast('null' as jsonb))                          valid_location,
+                                        (upi.identity is not null and upi.identity -> 'Company' is not null and
+                                         upi.identity -> 'Company' -> 'name' != cast('null' as jsonb) and
+                                         upi.identity -> 'Company' -> 'identification_number' != cast('null' as jsonb) and
+                                         upi.identity -> 'Company' -> 'owner' is not null and
+                                         upi.identity -> 'Company' -> 'owner' -> 'firstname' != cast('null' as jsonb) and
+                                         upi.identity -> 'Company' -> 'owner' -> 'lastname' != cast('null' as jsonb)) valid_company,
                                           coalesce((select w_eth.address is not null
                                                     from payment_requests pr_eth
                                                              left join payments p_eth on p_eth.request_id = pr_eth.id
@@ -201,18 +201,18 @@ public class CustomUserRewardRepository {
                                         where p.id is null
                                           and pr.recipient_id = au.github_user_id)                      has_pending_payments,
                                        (upi.identity is not null and upi.identity -> 'Person' is not null and
-                                        upi.identity -> 'Person' -> 'lastname' is not null and
-                                        upi.identity -> 'Person' -> 'firstname' is not null)            valid_person,
-                                       (upi.location is not null and upi.location -> 'city' is not null and
-                                        upi.location -> 'post_code' is not null and
-                                        upi.location -> 'address' is not null and
-                                        upi.location -> 'country' is not null)                          valid_location,
-                                       (upi.identity is not null and upi.identity -> 'Company' is not null and
-                                        upi.identity -> 'Company' -> 'name' is not null and
-                                        upi.identity -> 'Company' -> 'identification_number' is not null and
-                                        upi.identity -> 'Company' -> 'owner' is not null and
-                                        upi.identity -> 'Company' -> 'owner' -> 'firstname' is not null and
-                                        upi.identity -> 'Company' -> 'owner' -> 'lastname' is not null) valid_company,
+                                       upi.identity -> 'Person' -> 'lastname' != cast('null' as jsonb) and
+                                       upi.identity -> 'Person' -> 'firstname' != cast('null' as jsonb))            valid_person,
+                                      (upi.location is not null and upi.location -> 'city' != cast('null' as jsonb) and
+                                       upi.location -> 'post_code' != cast('null' as jsonb) and
+                                       upi.location -> 'address' != cast('null' as jsonb) and
+                                       upi.location -> 'country' != cast('null' as jsonb))                          valid_location,
+                                      (upi.identity is not null and upi.identity -> 'Company' is not null and
+                                       upi.identity -> 'Company' -> 'name' != cast('null' as jsonb) and
+                                       upi.identity -> 'Company' -> 'identification_number' != cast('null' as jsonb) and
+                                       upi.identity -> 'Company' -> 'owner' is not null and
+                                       upi.identity -> 'Company' -> 'owner' -> 'firstname' != cast('null' as jsonb) and
+                                       upi.identity -> 'Company' -> 'owner' -> 'lastname' != cast('null' as jsonb)) valid_company,
                                        coalesce((select w_op.address is not null
                                                  from payment_requests pr_op
                                                           left join payments p_op on p_op.request_id = pr_op.id
