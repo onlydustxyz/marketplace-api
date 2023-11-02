@@ -41,17 +41,11 @@ public class UserPayoutInfoEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @Builder.Default
     Set<WalletEntity> wallets = new HashSet<>();
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     BankAccountEntity bankAccount;
 
     public void addWallets(final WalletEntity walletEntity) {
         this.wallets.add(walletEntity);
-    }
-
-    public void removeWallets(final WalletEntity walletEntity) {
-        if (this.wallets.contains(walletEntity)) {
-            this.wallets.remove(walletEntity);
-        }
     }
 }

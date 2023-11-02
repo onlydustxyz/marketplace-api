@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
@@ -40,7 +41,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         bankAccountRepository.deleteAll();
         authUserRepository.deleteAll();
         paymentRequestRepository.deleteAll();
@@ -788,7 +789,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         assertEquals(false, userPayoutInfoValidationEntityUpdated.getHasPendingPayments());
     }
 
-     @Test
+    @Test
     void should_has_invalid_eth_wallet_for_individual() {
         // Given
         final AuthUserEntity user = authUserRepository.save(AuthUserEntity.builder()
@@ -849,7 +850,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         assertEquals(false, userPayoutInfoValidationEntityUpdated.getHasPendingPayments());
     }
 
-     @Test
+    @Test
     void should_has_invalid_usdc_wallet_for_individual() {
         // Given
         final AuthUserEntity user = authUserRepository.save(AuthUserEntity.builder()
@@ -892,14 +893,14 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         assertEquals(true, userPayoutInfoValidationEntity.getHasPendingPayments());
 
         // Given
-         walletRepository.save(WalletEntity.builder()
-                 .id(WalletIdEntity.builder()
-                         .userId(user.getId())
-                         .network(NetworkEnumEntity.ethereum)
-                         .build())
-                 .address("test")
-                 .type(WalletTypeEnumEntity.name)
-                 .build());
+        walletRepository.save(WalletEntity.builder()
+                .id(WalletIdEntity.builder()
+                        .userId(user.getId())
+                        .network(NetworkEnumEntity.ethereum)
+                        .build())
+                .address("test")
+                .type(WalletTypeEnumEntity.name)
+                .build());
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntityUpdated =
@@ -916,6 +917,35 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
     }
 
 
+    @Test
+    void should_delete_banking_account() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+        final AuthUserEntity user = authUserRepository.save(AuthUserEntity.builder()
+                .id(userId)
+                .githubUserId(faker.number().numberBetween(5000L, 50000L))
+                .isAdmin(false)
+                .loginAtSignup(faker.rickAndMorty().character())
+                .createdAt(new Date())
+                .build());
+        userPayoutInfoRepository.save(UserPayoutInfoEntity.builder()
+                .userId(user.getId())
+                .identity(JacksonUtil.toJsonNode("""
+                        {"Person": {"lastname": "Villetard", "firstname": "Paco"}}"""))
+                .usdPreferredMethodEnum(UsdPreferredMethodEnumEntity.crypto)
+                .bankAccount(new BankAccountEntity(userId, faker.random().hex(), faker.random().hex()))
+                .build());
 
+        // When
+        final UserPayoutInfoEntity userPayoutInfoEntity = userPayoutInfoRepository.save(UserPayoutInfoEntity.builder()
+                .userId(user.getId())
+                .identity(JacksonUtil.toJsonNode("""
+                        {"Person": {"lastname": "Villetard", "firstname": "Paco"}}"""))
+                .usdPreferredMethodEnum(UsdPreferredMethodEnumEntity.crypto)
+                .build());
 
+        // Then
+        assertNull(userPayoutInfoEntity.getBankAccount());
+        assertEquals(0, bankAccountRepository.findAll().size());
+    }
 }
