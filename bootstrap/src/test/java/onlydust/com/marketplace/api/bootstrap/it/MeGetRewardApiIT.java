@@ -411,7 +411,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                         {
                             "rewardItems": [
                                 {
-                                    "number": 16,
+                                    "number": 1129,
                                     "id": "1442413635",
                                     "title": "First API integration test",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
