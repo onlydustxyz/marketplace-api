@@ -230,7 +230,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001"
                              }
                          }
-                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
+                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
         final PaymentEntity paymentEntity3 = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity3.setReceipt(JacksonUtil.toJsonNode("""
                 {"Optimism": {"recipient_ens": "ilysse.eth", "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000002", "recipient_address": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec"}}"""));
@@ -273,7 +273,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002"
                              }
                          }
-                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
+                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
 
         final PaymentEntity paymentEntity4 = paymentRepository.findById(paymentId).orElseThrow();
         paymentEntity4.setReceipt(JacksonUtil.toJsonNode("""
@@ -317,7 +317,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003"
                              }
                          }
-                         """,DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
+                         """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
     }
 
     @Test
@@ -357,7 +357,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                         {
                             "rewardItems": [
                                 {
-                                    "number": 1,
+                                    "number": 1232,
                                     "id": "1511546916",
                                     "title": "Addin sitemap.xml in robots.txt",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1232",
@@ -375,7 +375,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                     "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                                 },
                                 {
-                                    "number": 3,
+                                    "number": 1225,
                                     "id": "1507455279",
                                     "title": "E 730 migrate oscar frontend documentation",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1225",

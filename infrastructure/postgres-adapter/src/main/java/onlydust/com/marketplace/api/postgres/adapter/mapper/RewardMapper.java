@@ -143,7 +143,7 @@ public interface RewardMapper {
                 .commentsCount(rewardItemViewEntity.getCommentsCount())
                 .commitsCount(rewardItemViewEntity.getCommitsCount())
                 .userCommitsCount(rewardItemViewEntity.getUserCommitsCount())
-                .number(rewardItemViewEntity.getUserCommitsCount())
+                .number(rewardItemViewEntity.getNumber())
                 .lastUpdateAt(rewardItemViewEntity.getCompletedAt())
                 .type(switch (rewardItemViewEntity.getType()) {
                     case issue -> ContributionType.ISSUE;
@@ -157,7 +157,7 @@ public interface RewardMapper {
                     case complete -> ContributionStatus.COMPLETED;
                     case in_progress -> ContributionStatus.IN_PROGRESS;
                 })
-                .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()){
+                .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()) {
                     case approved -> CodeReviewOutcome.approved;
                     case change_requested -> CodeReviewOutcome.changeRequested;
                 })

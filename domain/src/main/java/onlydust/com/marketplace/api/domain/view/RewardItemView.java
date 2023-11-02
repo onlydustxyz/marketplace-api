@@ -11,7 +11,7 @@ import java.util.Date;
 @Builder
 @Data
 public class RewardItemView {
-    Integer number;
+    Long number;
     String id;
     String title;
     String githubUrl;
