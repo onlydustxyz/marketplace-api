@@ -246,7 +246,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public RewardView findRewardById(UUID rewardId) {
-        return RewardMapper.rewardWithReceiptToDomain(customRewardRepository.findProjectRewardViewEntityByd(rewardId));
+        return RewardMapper.rewardWithReceiptToDomain(customRewardRepository.findUserRewardViewEntityByd(rewardId));
     }
 
     @Override

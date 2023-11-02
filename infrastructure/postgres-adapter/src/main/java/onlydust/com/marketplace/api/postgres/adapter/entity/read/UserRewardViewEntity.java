@@ -43,4 +43,6 @@ public class UserRewardViewEntity {
     BigDecimal dollarsEquivalent;
     @Column(name = "status")
     String status;
+    @Column(name = "invoice_received_at")
+    Date invoiceReceivedAt;
 }
