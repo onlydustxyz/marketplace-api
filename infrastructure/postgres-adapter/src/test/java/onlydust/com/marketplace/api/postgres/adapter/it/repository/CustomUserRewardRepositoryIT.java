@@ -357,6 +357,44 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
         }
 
+        @Test
+        @Order(4)
+        void should_return_user_rewards_payout_info_missing_given_missing_location() {
+            // Given
+            postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
+                    UserPayoutInformation.builder().isACompany(true)
+                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
+                                    .owner(UserPayoutInformation.Person.builder()
+                                            .lastName(faker.name().lastName())
+                                            .firstName(faker.name().firstName()).build())
+                                    .identificationNumber(faker.number().digit()).build())
+                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                                    .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                                            .bic(faker.random().hex()).iban(faker.random().hex()).build())
+                                    .aptosAddress(faker.random().hex())
+                                    .starknetAddress(faker.random().hex())
+                                    .aptosAddress(faker.random().hex())
+                                    .ethAddress(faker.random().hex())
+                                    .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.FIAT)
+                                    .build()).build());
+
+            // When
+            final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+            // Then
+            assertEquals(5, viewEntities.size());
+            assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+            assertEquals("COMPLETE", viewEntities.get(0).getStatus());
+            assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+            assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+            assertEquals("COMPLETE", viewEntities.get(3).getStatus());
+            assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+        }
     }
 
 
@@ -368,6 +406,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         private static final UUID projectId = UUID.randomUUID();
 
         @Test
+        @Order(1)
         void should_return_one_reward() {
             // Given
             authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
@@ -380,7 +419,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     UserPayoutInformation.builder().isACompany(true)
                             .company(UserPayoutInformation.Company.builder().name(faker.name().name())
                                     .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
-                                    .identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
+                                    .identificationNumber(faker.number().digit()).build())
+                            .location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .ethName(faker.random().hex())
                                     .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO).build()).build());
@@ -409,6 +449,27 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("PENDING_INVOICE", pendingInvoicesViewEntities.get(0).getStatus());
             assertEquals(pendingInvoiceRewardId, pendingInvoicesViewEntities.get(0).getId());
 
+        }
+
+        @Test
+        @Order(2)
+        void should_return_no_reward() {
+            // Given
+            postgresUserAdapter.savePayoutInformationForUserId(userId,
+                    UserPayoutInformation.builder().isACompany(true)
+                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
+                                    .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
+                                    .identificationNumber(faker.number().digit()).build())
+                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+                                    .ethName(faker.random().hex())
+                                    .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO).build()).build());
+
+            // When
+            final List<UserRewardViewEntity> pendingInvoicesViewEntities =
+                    customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId);
+
+            // Then
+            assertEquals(0, pendingInvoicesViewEntities.size());
         }
     }
 

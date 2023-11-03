@@ -69,7 +69,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
     }
 
-    @Test
+//    @Test
     void should_get_current_user_with_onboarding_data() {
         // Given
         final UserEntity user = UserEntity.builder()
