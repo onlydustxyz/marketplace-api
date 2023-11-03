@@ -85,7 +85,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": null
                             },
-                            "createdAt": "2023-09-19T05:38:22.018458Z",
+                            "createdAt": "2023-09-19T07:38:22.018458Z",
                             "processedAt": null
                         }""");
 
@@ -132,7 +132,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
-                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "%s",
                            "receipt": {
                                "type": "FIAT",
@@ -176,7 +176,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
-                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
@@ -220,7 +220,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
-                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
@@ -263,7 +263,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
-                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
@@ -307,7 +307,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
-                           "createdAt": "2023-09-19T05:38:22.018458Z",
+                           "createdAt": "2023-09-19T07:38:22.018458Z",
                            "processedAt": "%s",
                            "receipt": {
                                "type": "CRYPTO",
@@ -361,8 +361,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                     "id": "1511546916",
                                     "title": "Addin sitemap.xml in robots.txt",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1232",
-                                    "createdAt": "2023-09-12T05:38:04Z",
-                                    "lastUpdateAt": "2023-09-12T05:45:12Z",
+                                    "createdAt": "2023-09-12T07:38:04Z",
+                                    "lastUpdateAt": "2023-09-12T07:45:12Z",
                                     "repoName": "marketplace-frontend",
                                     "type": "PULL_REQUEST",
                                     "commitsCount": 1,
@@ -379,8 +379,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                     "id": "1507455279",
                                     "title": "E 730 migrate oscar frontend documentation",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1225",
-                                    "createdAt": "2023-09-08T06:14:32Z",
-                                    "lastUpdateAt": "2023-09-08T06:19:55Z",
+                                    "createdAt": "2023-09-08T08:14:32Z",
+                                    "lastUpdateAt": "2023-09-08T08:19:55Z",
                                     "repoName": "marketplace-frontend",
                                     "type": "PULL_REQUEST",
                                     "commitsCount": 3,
@@ -415,8 +415,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                     "id": "1442413635",
                                     "title": "First API integration test",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
-                                    "createdAt": "2023-07-20T06:45:18Z",
-                                    "lastUpdateAt": "2023-07-21T11:00:05Z",
+                                    "createdAt": "2023-07-20T08:45:18Z",
+                                    "lastUpdateAt": "2023-07-21T13:00:05Z",
                                     "repoName": "marketplace-frontend",
                                     "type": "PULL_REQUEST",
                                     "commitsCount": 39,
