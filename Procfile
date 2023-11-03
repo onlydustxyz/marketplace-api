@@ -1,1 +1,1 @@
-web: java -Dspring.profiles.active=hasura_auth -jar bootstrap/target/marketplace-api.jar
+web: ./heroku/start-dyno-with-datadog-apm.sh
