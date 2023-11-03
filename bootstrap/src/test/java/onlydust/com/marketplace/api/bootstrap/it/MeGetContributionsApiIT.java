@@ -170,7 +170,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
-                        "repositories", "493591124,493591124")
+                        "repositories", "493591124")
                 ))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then

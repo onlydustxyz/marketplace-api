@@ -30,9 +30,9 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                     WHERE 
                         p.project_id = pgr.project_id AND
                         contributor_id = :contributorId AND 
-                        (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN :repoIds)
+                        (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN (:repoIds))
                 )
-                AND (COALESCE(:projectIds) IS NULL OR p.project_id IN :projectIds)
+                AND (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
             """, nativeQuery = true)
     List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
                                                            List<UUID> projectIds,
