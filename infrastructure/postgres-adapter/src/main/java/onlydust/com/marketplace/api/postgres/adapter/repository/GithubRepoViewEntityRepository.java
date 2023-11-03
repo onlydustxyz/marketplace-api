@@ -28,9 +28,9 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                     INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
                     WHERE 
                         c.repo_id = r.id AND contributor_id = :contributorId AND 
-                        (COALESCE(:projectIds) IS NULL OR pgr.project_id IN :projectIds) AND
-                        (COALESCE(:repoIds) IS NULL OR r.id IN :repoIds)
+                        (COALESCE(:projectIds) IS NULL OR pgr.project_id IN :projectIds)
                 ) 
+                AND (COALESCE(:repoIds) IS NULL OR r.id IN :repoIds)
             """, nativeQuery = true)
     List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
                                                       List<UUID> projectIds,
