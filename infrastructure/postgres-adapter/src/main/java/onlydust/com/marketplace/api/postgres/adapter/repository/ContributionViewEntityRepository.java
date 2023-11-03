@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
-public interface ContributionRepository extends JpaRepository<ContributionViewEntity, String> {
+public interface ContributionViewEntityRepository extends JpaRepository<ContributionViewEntity, String> {
 
     @Query(value = """
             SELECT 
@@ -120,62 +118,4 @@ public interface ContributionRepository extends JpaRepository<ContributionViewEn
                                                                  List<ContributionViewEntity.Type> types,
                                                                  List<ContributionViewEntity.Status> statuses,
                                                                  Pageable pageable);
-
-    @Query(value = """
-            SELECT
-                r.id,
-                owner.login as owner,
-                r.name,
-                r.html_url,
-                r.updated_at,
-                r.description,
-                r.stars_count,
-                r.forks_count
-            FROM 
-                 indexer_exp.github_repos r
-            INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
-            INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
-            WHERE
-                EXISTS(
-                    SELECT 1 
-                    FROM indexer_exp.contributions c 
-                    WHERE 
-                        c.repo_id = r.id AND contributor_id = :contributorId AND 
-                        (:projectIds IS NULL OR pgr.project_id IN :projectIds) AND
-                        (:repoIds IS NULL OR r.id IN :repoIds)
-                ) 
-            """, nativeQuery = true)
-    List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
-                                                      List<UUID> projectIds,
-                                                      List<Long> repoIds);
-
-    @Query(value = """
-            SELECT
-                p.project_id as id,
-                p.key,
-                p.name,
-                p.short_description,
-                p.long_description,
-                p.logo_url,
-                p.telegram_link,
-                p.hiring,
-                p.visibility
-            FROM 
-                 project_details p
-            WHERE
-                EXISTS(
-                SELECT 1 
-                FROM 
-                    project_github_repos pgr
-                INNER JOIN indexer_exp.contributions c on c.repo_id = pgr.github_repo_id 
-                WHERE 
-                    p.project_id = pgr.project_id AND
-                    contributor_id = :contributorId AND 
-                    (:projectIds IS NULL OR p.project_id IN :projectIds) AND
-                    (:repoIds IS NULL OR pgr.github_repo_id IN :repoIds)
-                ) 
-            """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
-                                                           List<UUID> projectIds,
-                                                           List<Long> repoIds);
 }

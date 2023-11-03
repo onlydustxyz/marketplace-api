@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
@@ -144,9 +145,9 @@ public class MeRestApi implements MeApi {
         final int sanitizedPageIndex = sanitizePageIndex(page);
 
         final var filters = ContributionView.Filters.builder()
-                .projects(projects)
-                .repos(repositories)
-                .types(types.stream().map(ContributionMapper::mapContributionType).toList())
+                .projects(Optional.ofNullable(projects).orElse(List.of()))
+                .repos(Optional.ofNullable(repositories).orElse(List.of()))
+                .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
                 .build();
 
         final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()

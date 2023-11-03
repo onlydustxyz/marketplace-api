@@ -1,17 +1,22 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 
 import java.util.Date;
 
+@EqualsAndHashCode
 public class ContributionLinkViewEntity {
+    @JsonProperty("id")
     String id;
     @JsonProperty("created_at")
     Date createdAt;
     @JsonProperty("completed_at")
     Date completedAt;
+    @JsonProperty("type")
     ContributionViewEntity.Type type;
+    @JsonProperty("status")
     ContributionViewEntity.Status status;
     @JsonProperty("github_number")
     Long githubNumber;

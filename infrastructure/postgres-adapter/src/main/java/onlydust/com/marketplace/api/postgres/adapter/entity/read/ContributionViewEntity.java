@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "contributions", schema = "indexer_exp")
@@ -50,7 +51,7 @@ public class ContributionViewEntity {
                 .githubBody(githubBody)
                 .projectName(projectName)
                 .repoName(repoName)
-                .links(links.stream().map(ContributionLinkViewEntity::toView).toList())
+                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
                 .build();
     }
 
