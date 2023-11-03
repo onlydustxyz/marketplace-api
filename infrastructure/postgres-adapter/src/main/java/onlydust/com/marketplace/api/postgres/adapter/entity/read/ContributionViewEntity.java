@@ -70,14 +70,6 @@ public class ContributionViewEntity {
     public enum Status {
         IN_PROGRESS, COMPLETED, CANCELLED;
 
-        public static Status of(ContributionStatus status) {
-            return switch (status) {
-                case IN_PROGRESS -> IN_PROGRESS;
-                case COMPLETED -> COMPLETED;
-                case CANCELLED -> CANCELLED;
-            };
-        }
-
         public ContributionStatus toView() {
             return switch (this) {
                 case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;

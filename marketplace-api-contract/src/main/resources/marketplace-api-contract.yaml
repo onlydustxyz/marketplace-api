@@ -310,6 +310,13 @@ paths:
             items:
               $ref: '#/components/schemas/ContributionType'
         - in: query
+          name: statuses
+          description: Contribution status filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionStatus'
+        - in: query
           name: projects
           description: Project filter
           schema:

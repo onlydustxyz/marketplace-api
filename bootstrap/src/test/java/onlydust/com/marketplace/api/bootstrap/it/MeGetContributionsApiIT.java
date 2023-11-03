@@ -189,7 +189,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.nextPageIndex").isEqualTo(0)
         ;
     }
-    
+
     @Test
     void should_get_my_rewards_with_type_filter() {
         // Given
@@ -212,6 +212,31 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.totalPageNumber").isEqualTo(1)
                 .jsonPath("$.totalItemNumber").isEqualTo(40)
                 .jsonPath("$.nextPageIndex").isEqualTo(0)
+        ;
+    }
+
+    @Test
+    void should_get_my_rewards_with_status_filter() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                        "statuses", "IN_PROGRESS")
+                ))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(11)
+                .jsonPath("$.totalItemNumber").isEqualTo(545)
+                .jsonPath("$.nextPageIndex").isEqualTo(1)
         ;
     }
 }

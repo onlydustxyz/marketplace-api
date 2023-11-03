@@ -1,6 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.ContributionLinkResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionSort;
+import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
@@ -21,6 +25,15 @@ public interface ContributionMapper {
             case PULL_REQUEST -> ContributionType.PULL_REQUEST;
         };
     }
+
+    static ContributionStatus mapContributionStatus(onlydust.com.marketplace.api.contract.model.ContributionStatus status) {
+        return switch (status) {
+            case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
+            case COMPLETED -> ContributionStatus.COMPLETED;
+            case CANCELLED -> ContributionStatus.CANCELLED;
+        };
+    }
+
 
     static ContributionPageResponse mapContributionPageResponse(Integer pageIndex,
                                                                 List<Project> contributedProjects,
@@ -68,11 +81,11 @@ public interface ContributionMapper {
                 .isMine(link.getIsMine());
     }
 
-    static ContributionStatus mapContributionStatusToResponse(onlydust.com.marketplace.api.domain.model.ContributionStatus status) {
+    static onlydust.com.marketplace.api.contract.model.ContributionStatus mapContributionStatusToResponse(onlydust.com.marketplace.api.domain.model.ContributionStatus status) {
         return switch (status) {
-            case COMPLETED -> ContributionStatus.COMPLETED;
-            case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
-            case CANCELLED -> ContributionStatus.CANCELLED;
+            case COMPLETED -> onlydust.com.marketplace.api.contract.model.ContributionStatus.COMPLETED;
+            case IN_PROGRESS -> onlydust.com.marketplace.api.contract.model.ContributionStatus.IN_PROGRESS;
+            case CANCELLED -> onlydust.com.marketplace.api.contract.model.ContributionStatus.CANCELLED;
         };
     }
 

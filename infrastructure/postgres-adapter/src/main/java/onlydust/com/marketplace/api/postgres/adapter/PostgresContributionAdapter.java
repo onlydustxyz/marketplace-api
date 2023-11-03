@@ -19,8 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
-
 @AllArgsConstructor
 public class PostgresContributionAdapter implements ContributionStoragePort {
 
@@ -41,8 +39,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getProjects(),
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
-                isNull(filters.getStatuses()) ? null :
-                        filters.getStatuses().stream().map(ContributionViewEntity.Status::of).toList(),
+                filters.getStatuses().stream().map(Enum::name).toList(),
                 PageRequest.of(page, pageSize, Sort.by(
                         direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC,
                         sortBy(sort))));

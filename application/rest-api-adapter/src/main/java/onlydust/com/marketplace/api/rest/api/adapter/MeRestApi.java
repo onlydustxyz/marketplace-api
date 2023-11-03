@@ -134,6 +134,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ContributionPageResponse> getMyContributions(List<ContributionType> types,
+                                                                       List<ContributionStatus> statuses,
                                                                        List<UUID> projects,
                                                                        List<Long> repositories,
                                                                        ContributionSort sort,
@@ -148,6 +149,7 @@ public class MeRestApi implements MeApi {
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
+                .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
                 .build();
 
         final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()
