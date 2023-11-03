@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
@@ -947,5 +946,46 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         // Then
         assertNull(userPayoutInfoEntity.getBankAccount());
         assertEquals(0, bankAccountRepository.findAll().size());
+    }
+
+    @Test
+    void should_return_valid_contact_info_when_no_pending_rewards() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+        final AuthUserEntity user = authUserRepository.save(AuthUserEntity.builder()
+                .id(userId)
+                .githubUserId(faker.number().numberBetween(5000L, 50000L))
+                .isAdmin(false)
+                .loginAtSignup(faker.rickAndMorty().character())
+                .createdAt(new Date())
+                .build());
+        userPayoutInfoRepository.save(UserPayoutInfoEntity.builder()
+                .userId(user.getId())
+                .identity(JacksonUtil.toJsonNode("""
+                        {"Person": {"lastname": "Villetard", "firstname": null}}"""))
+                .usdPreferredMethodEnum(UsdPreferredMethodEnumEntity.crypto)
+                .bankAccount(new BankAccountEntity(userId, faker.random().hex(), faker.random().hex()))
+                .build());
+        final PaymentRequestEntity saved = paymentRequestRepository.save(
+                PaymentRequestEntity.builder()
+                        .id(UUID.randomUUID())
+                        .projectId(UUID.randomUUID())
+                        .recipientId(user.getGithubUserId())
+                        .requestorId(UUID.randomUUID())
+                        .hoursWorked(1)
+                        .currency(CurrencyEnumEntity.eth)
+                        .requestedAt(new Date())
+                        .amount(BigDecimal.ONE)
+                        .build()
+        );
+        paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "USD", JacksonUtil.toJsonNode(
+                "{}"), saved.getId(), new Date()));
+
+        // When
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+
+        // Then
+        assertFalse(userPayoutInfoValidationEntity.getHasValidPerson());
     }
 }

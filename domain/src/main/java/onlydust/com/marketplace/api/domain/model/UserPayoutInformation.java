@@ -33,6 +33,9 @@ public class UserPayoutInformation {
     Boolean hasPendingPayments = false;
 
     public Boolean getHasValidContactInfo() {
+        if (!this.hasPendingPayments) {
+            return true;
+        }
         return (hasValidCompany || hasValidPerson) && hasValidLocation;
     }
 

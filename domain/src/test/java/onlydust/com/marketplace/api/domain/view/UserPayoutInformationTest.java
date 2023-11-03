@@ -13,6 +13,7 @@ public class UserPayoutInformationTest {
                 .hasValidCompany(false)
                 .hasValidLocation(true)
                 .hasValidPerson(true)
+                .hasPendingPayments(true)
                 .build()
                 .getHasValidContactInfo()
         );
@@ -20,6 +21,7 @@ public class UserPayoutInformationTest {
                 .hasValidCompany(true)
                 .hasValidLocation(false)
                 .hasValidPerson(true)
+                .hasPendingPayments(true)
                 .build()
                 .getHasValidContactInfo()
         );
@@ -27,6 +29,7 @@ public class UserPayoutInformationTest {
                 .hasValidCompany(true)
                 .hasValidLocation(true)
                 .hasValidPerson(false)
+                .hasPendingPayments(true)
                 .build()
                 .getHasValidContactInfo()
         );
@@ -34,6 +37,7 @@ public class UserPayoutInformationTest {
                 .hasValidCompany(true)
                 .hasValidLocation(true)
                 .hasValidPerson(true)
+                .hasPendingPayments(true)
                 .build()
                 .getHasValidContactInfo()
         );
@@ -41,6 +45,15 @@ public class UserPayoutInformationTest {
                 .hasValidCompany(false)
                 .hasValidLocation(false)
                 .hasValidPerson(false)
+                .hasPendingPayments(true)
+                .build()
+                .getHasValidContactInfo()
+        );
+        assertEquals(true, UserPayoutInformation.builder()
+                .hasValidCompany(false)
+                .hasValidLocation(false)
+                .hasValidPerson(false)
+                .hasPendingPayments(false)
                 .build()
                 .getHasValidContactInfo()
         );
