@@ -132,4 +132,33 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_get_my_rewards_with_project_filter() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                        "projects", "f39b827f-df73-498c-8853-99bc3f562723,594ca5ca-48f7-49a8-9c26-84b949d4fdd9")
+                ))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.projects.length()").isEqualTo(2)
+                .jsonPath("$.projects[0].id").isEqualTo("594ca5ca-48f7-49a8-9c26-84b949d4fdd9")
+                .jsonPath("$.projects[1].id").isEqualTo("f39b827f-df73-498c-8853-99bc3f562723")
+                .jsonPath("$.repos.length()").isEqualTo(1)
+                .jsonPath("$.repos[0].id").isEqualTo(498695724)
+                .jsonPath("$.hasMore").isEqualTo(true)
+                .jsonPath("$.totalPageNumber").isEqualTo(42)
+                .jsonPath("$.totalItemNumber").isEqualTo(2082)
+                .jsonPath("$.nextPageIndex").isEqualTo(1)
+        ;
+    }
 }

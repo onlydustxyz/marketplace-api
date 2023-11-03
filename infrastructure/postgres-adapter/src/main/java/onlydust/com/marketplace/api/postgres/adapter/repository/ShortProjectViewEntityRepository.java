@@ -23,16 +23,16 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                  project_details p
             WHERE
                 EXISTS(
-                SELECT 1 
-                FROM 
-                    project_github_repos pgr
-                INNER JOIN indexer_exp.contributions c on c.repo_id = pgr.github_repo_id 
-                WHERE 
-                    p.project_id = pgr.project_id AND
-                    contributor_id = :contributorId AND 
-                    (:projectIds IS NULL OR p.project_id IN :projectIds) AND
-                    (:repoIds IS NULL OR pgr.github_repo_id IN :repoIds)
-                ) 
+                    SELECT 1 
+                    FROM 
+                        project_github_repos pgr
+                    INNER JOIN indexer_exp.contributions c on c.repo_id = pgr.github_repo_id 
+                    WHERE 
+                        p.project_id = pgr.project_id AND
+                        contributor_id = :contributorId AND 
+                        (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN :repoIds)
+                )
+                AND (COALESCE(:projectIds) IS NULL OR p.project_id IN :projectIds)
             """, nativeQuery = true)
     List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
                                                            List<UUID> projectIds,
