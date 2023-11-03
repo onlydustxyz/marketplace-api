@@ -109,13 +109,13 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 contributor_id = :contributorId AND
                 (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds)) AND
                 (COALESCE(:repoIds) IS NULL OR r.id IN (:repoIds)) AND
-                (COALESCE(:types) IS NULL OR c.type IN (:types)) AND
+                (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
                 (COALESCE(:statuses) IS NULL OR c.status IN (:statuses))
             """, nativeQuery = true)
     Page<ContributionViewEntity> findContributionsForContributor(Long contributorId,
                                                                  List<UUID> projectIds,
                                                                  List<Long> repoIds,
-                                                                 List<ContributionViewEntity.Type> types,
+                                                                 List<String> types,
                                                                  List<ContributionViewEntity.Status> statuses,
                                                                  Pageable pageable);
 }

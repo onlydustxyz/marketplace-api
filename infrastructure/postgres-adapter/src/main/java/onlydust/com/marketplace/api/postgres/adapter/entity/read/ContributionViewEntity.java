@@ -58,14 +58,6 @@ public class ContributionViewEntity {
     public enum Type {
         PULL_REQUEST, ISSUE, CODE_REVIEW;
 
-        public static Type of(ContributionType type) {
-            return switch (type) {
-                case PULL_REQUEST -> PULL_REQUEST;
-                case ISSUE -> ISSUE;
-                case CODE_REVIEW -> CODE_REVIEW;
-            };
-        }
-
         public ContributionType toView() {
             return switch (this) {
                 case PULL_REQUEST -> ContributionType.PULL_REQUEST;

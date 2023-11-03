@@ -40,8 +40,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 contributorId,
                 filters.getProjects(),
                 filters.getRepos(),
-                isNull(filters.getTypes()) ? null :
-                        filters.getTypes().stream().map(ContributionViewEntity.Type::of).toList(),
+                filters.getTypes().stream().map(Enum::name).toList(),
                 isNull(filters.getStatuses()) ? null :
                         filters.getStatuses().stream().map(ContributionViewEntity.Status::of).toList(),
                 PageRequest.of(page, pageSize, Sort.by(

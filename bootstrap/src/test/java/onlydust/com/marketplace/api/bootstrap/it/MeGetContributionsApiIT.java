@@ -189,4 +189,29 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.nextPageIndex").isEqualTo(0)
         ;
     }
+    
+    @Test
+    void should_get_my_rewards_with_type_filter() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                        "types", "ISSUE")
+                ))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(40)
+                .jsonPath("$.contributions[0].type").isEqualTo("ISSUE")
+                .jsonPath("$.hasMore").isEqualTo(false)
+                .jsonPath("$.totalPageNumber").isEqualTo(1)
+                .jsonPath("$.totalItemNumber").isEqualTo(40)
+                .jsonPath("$.nextPageIndex").isEqualTo(0)
+        ;
+    }
 }
