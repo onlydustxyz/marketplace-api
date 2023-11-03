@@ -62,7 +62,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             {
                "rewards": [
                  {
-                   "requestedAt": "2023-09-19T05:38:22.018458Z",
+                   "requestedAt": "2023-09-19T07:38:22.018458Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "MISSING_PAYOUT_INFO",
                    "amount": {
@@ -76,7 +76,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                    "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                  },
                  {
-                   "requestedAt": "2023-09-20T06:46:52.77875Z",
+                   "requestedAt": "2023-09-20T08:46:52.77875Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "PENDING_INVOICE",
                    "amount": {
@@ -90,7 +90,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                    "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
                  },
                  {
-                   "requestedAt": "2023-09-19T05:40:26.971981Z",
+                   "requestedAt": "2023-09-19T07:40:26.971981Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "COMPLETE",
                    "amount": {
@@ -104,7 +104,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                    "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
                  },
                  {
-                   "requestedAt": "2023-09-19T05:39:54.45638Z",
+                   "requestedAt": "2023-09-19T07:39:54.45638Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "MISSING_PAYOUT_INFO",
                    "amount": {
@@ -118,7 +118,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                    "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                  },
                  {
-                   "requestedAt": "2023-09-19T05:38:52.590518Z",
+                   "requestedAt": "2023-09-19T07:38:52.590518Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "PENDING_INVOICE",
                    "amount": {
@@ -132,7 +132,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                    "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
                  },
                  {
-                   "requestedAt": "2023-09-19T05:39:23.730967Z",
+                   "requestedAt": "2023-09-19T07:39:23.730967Z",
                    "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                    "status": "MISSING_PAYOUT_INFO",
                    "amount": {
@@ -156,7 +156,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             {
                 "rewards": [
                     {
-                        "requestedAt": "2023-09-19T05:40:26.971981Z",
+                        "requestedAt": "2023-09-19T07:40:26.971981Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -169,7 +169,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
                     },
                     {
-                        "requestedAt": "2023-09-19T05:39:54.45638Z",
+                        "requestedAt": "2023-09-19T07:39:54.45638Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -182,7 +182,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
                     },
                     {
-                        "requestedAt": "2023-09-19T05:39:23.730967Z",
+                        "requestedAt": "2023-09-19T07:39:23.730967Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -195,7 +195,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
                     },
                     {
-                        "requestedAt": "2023-09-19T05:38:52.590518Z",
+                        "requestedAt": "2023-09-19T07:38:52.590518Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -208,7 +208,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
                     },
                     {
-                        "requestedAt": "2023-09-19T05:38:22.018458Z",
+                        "requestedAt": "2023-09-19T07:38:22.018458Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -221,7 +221,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                     },
                     {
-                        "requestedAt": "2023-09-20T06:46:52.77875Z",
+                        "requestedAt": "2023-09-20T08:46:52.77875Z",
                         "status": "PENDING_INVOICE",
                         "amount": {
                             "total": 1000,
@@ -395,7 +395,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewards": [
                             {
-                              "requestedAt": "2023-09-20T06:46:52.77875Z",
+                              "requestedAt": "2023-09-20T08:46:52.77875Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "status": "PENDING_INVOICE",
                               "amount": {
@@ -409,7 +409,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
                             },             
                             {
-                              "requestedAt": "2023-09-19T05:38:22.018458Z",
+                              "requestedAt": "2023-09-19T07:38:22.018458Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "status": "PENDING_INVOICE",
                               "amount": {
@@ -423,7 +423,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
                             },
                             {
-                              "requestedAt": "2023-09-19T05:39:54.45638Z",
+                              "requestedAt": "2023-09-19T07:39:54.45638Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "status": "PENDING_INVOICE",
                               "amount": {
@@ -440,11 +440,13 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         }
                          """);
 
-        final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")).orElseThrow();
+        final PaymentRequestEntity reward2 = paymentRequestRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401" +
+                                                                                               "-8958-a9e0b0aec7b0")).orElseThrow();
         reward2.setInvoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-14"));
         paymentRequestRepository.save(reward2);
 
-        final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a")).orElseThrow();
+        final PaymentRequestEntity reward3 = paymentRequestRepository.findById(UUID.fromString("e1498a17-5090-4071" +
+                                                                                               "-a88a-6f0b0c337c3a")).orElseThrow();
         paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "OP",
                 JacksonUtil.toJsonNode("{}"), reward3.getId(), new SimpleDateFormat("yyyy-MM-dd").parse("2023-08-12")));
 
@@ -460,7 +462,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "rewards": [{
-                              "requestedAt": "2023-09-19T05:38:22.018458Z",
+                              "requestedAt": "2023-09-19T07:38:22.018458Z",
                               "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                               "status": "PENDING_INVOICE",
                               "amount": {
