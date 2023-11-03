@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
@@ -28,6 +29,7 @@ public class ProjectService implements ProjectFacadePort {
     private final UUIDGeneratorPort uuidGeneratorPort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
+    private final DateProvider dateProvider;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -68,7 +70,7 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
-                ProjectRewardSettings.defaultSettings());
+                ProjectRewardSettings.defaultSettings(dateProvider.now()));
         return projectId;
     }
 

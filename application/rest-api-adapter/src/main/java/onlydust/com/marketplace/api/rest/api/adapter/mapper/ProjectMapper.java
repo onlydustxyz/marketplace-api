@@ -117,12 +117,13 @@ public interface ProjectMapper {
         if (rewardSettings == null) {
             return null;
         }
-        return onlydust.com.marketplace.api.domain.model.ProjectRewardSettings.builder()
-                .ignoreIssues(rewardSettings.getIgnoreIssues())
-                .ignorePullRequests(rewardSettings.getIgnorePullRequests())
-                .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
-                .ignoreContributionsBefore(Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant()))
-                .build();
+
+        return new onlydust.com.marketplace.api.domain.model.ProjectRewardSettings(
+                rewardSettings.getIgnorePullRequests(),
+                rewardSettings.getIgnoreIssues(),
+                rewardSettings.getIgnoreCodeReviews(),
+                Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant())
+        );
     }
 
     static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {

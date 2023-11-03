@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectOrganizationView;
@@ -54,12 +54,13 @@ public interface ProjectMapper {
                 .name(projectEntity.getName())
                 .moreInfoUrl(projectEntity.getTelegramLink())
                 .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
-                .rewardSettings(ProjectRewardSettings.builder()
-                        .ignorePullRequests(projectEntity.getIgnorePullRequests())
-                        .ignoreIssues(projectEntity.getIgnoreIssues())
-                        .ignoreCodeReviews(projectEntity.getIgnoreCodeReviews())
-                        .ignoreContributionsBefore(projectEntity.getIgnoreContributionsBefore())
-                        .build())
+                .rewardSettings(
+                        new ProjectRewardSettings(
+                                projectEntity.getIgnorePullRequests(),
+                                projectEntity.getIgnoreIssues(),
+                                projectEntity.getIgnoreCodeReviews(),
+                                projectEntity.getIgnoreContributionsBefore()
+                        ))
                 .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).collect(Collectors.toSet()))
                 .contributorCount(contributorCount)
                 .leaders(leaders.stream()
