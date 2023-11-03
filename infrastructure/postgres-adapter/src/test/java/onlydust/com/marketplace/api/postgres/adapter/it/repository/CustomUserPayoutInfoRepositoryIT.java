@@ -64,7 +64,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(false, userPayoutInfoValidationEntity.getHasValidLocation());
@@ -94,7 +94,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidLocation());
@@ -122,7 +122,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(false, userPayoutInfoValidationEntity.getHasValidLocation());
@@ -155,7 +155,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(false, userPayoutInfoValidationEntity.getHasValidLocation());
@@ -180,7 +180,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -223,7 +223,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -277,7 +277,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -320,7 +320,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -374,7 +374,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -417,7 +417,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(false, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -471,7 +471,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -517,7 +517,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -563,7 +563,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -610,7 +610,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -663,7 +663,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -715,7 +715,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -758,7 +758,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -776,7 +776,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntityUpdated =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntityUpdated.getHasValidAptosWallet());
@@ -819,7 +819,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -837,7 +837,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntityUpdated =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntityUpdated.getHasValidAptosWallet());
@@ -880,7 +880,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
@@ -903,7 +903,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntityUpdated =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertEquals(true, userPayoutInfoValidationEntityUpdated.getHasValidAptosWallet());
@@ -983,7 +983,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
 
         // When
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
-                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId()).orElseThrow();
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
 
         // Then
         assertFalse(userPayoutInfoValidationEntity.getHasValidPerson());

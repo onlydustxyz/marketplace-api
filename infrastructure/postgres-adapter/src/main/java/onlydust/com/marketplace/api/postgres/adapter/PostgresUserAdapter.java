@@ -133,13 +133,10 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional(readOnly = true)
     public UserPayoutInformation getPayoutInformationById(UUID userId) {
         final Optional<UserPayoutInfoEntity> userPayoutInfoEntity = userPayoutInfoRepository.findByUserId(userId);
-        final Optional<UserPayoutInfoValidationEntity> userPayoutInfoValidationEntity =
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
                 customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
-        return userPayoutInfoEntity.map(entity -> UserPayoutInfoMapper.mapEntityToDomain(entity,
-                userPayoutInfoValidationEntity.orElseGet(
-                        UserPayoutInfoValidationEntity::defaultValue
-                ))).orElseGet(() -> UserPayoutInformation.builder().payoutSettings(
-                UserPayoutInformation.PayoutSettings.builder().build()).build());
+        return UserPayoutInfoMapper.mapEntityToDomain(userPayoutInfoEntity.orElseGet(UserPayoutInfoEntity::new),
+                userPayoutInfoValidationEntity);
     }
 
     @Override
@@ -215,10 +212,9 @@ public class PostgresUserAdapter implements UserStoragePort {
                 userPayoutInformation);
         userPayoutInfoRepository.findById(userId).ifPresent(entity -> walletRepository.deleteByUserId(userId));
         final UserPayoutInfoEntity saved = userPayoutInfoRepository.save(userPayoutInfoEntity);
-        final Optional<UserPayoutInfoValidationEntity> userPayoutInfoValidationEntity =
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
                 customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);
-        return UserPayoutInfoMapper.mapEntityToDomain(saved,
-                userPayoutInfoValidationEntity.orElseGet(UserPayoutInfoValidationEntity::defaultValue));
+        return UserPayoutInfoMapper.mapEntityToDomain(saved, userPayoutInfoValidationEntity);
     }
 
     @Override

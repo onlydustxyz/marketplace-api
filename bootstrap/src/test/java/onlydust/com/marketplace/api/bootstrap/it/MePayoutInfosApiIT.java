@@ -280,7 +280,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_valid_payout_info_given_user_first_connexion_with_no_pending_rewards() {
+    void should_return_valid_payout_info_given_user_first_connexion() {
         // Given
         final long githubUserId = faker.number().randomNumber();
         final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId,
@@ -303,5 +303,27 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(true);
+
+        // Given
+        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
+                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.op));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.isCompany").isEqualTo(false)
+                .jsonPath("$.hasValidContactInfo").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 }
