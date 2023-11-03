@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 
 import java.util.Date;
@@ -19,7 +18,7 @@ public class RewardItemView {
     Date lastUpdateAt;
     String repoName;
     ContributionType type;
-    ContributionStatus status;
+    Status status;
     Integer commitsCount;
     Integer userCommitsCount;
     Integer commentsCount;
@@ -30,4 +29,7 @@ public class RewardItemView {
     Long recipientId;
     CodeReviewOutcome outcome;
 
+    public enum Status {
+        PENDING, COMPLETED, CHANGES_REQUESTED, OPEN, CLOSED, MERGED, DRAFT, CANCELLED
+    }
 }

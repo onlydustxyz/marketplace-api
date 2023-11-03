@@ -111,9 +111,14 @@ public interface RewardMapper {
                     case PULL_REQUEST -> ContributionType.PULL_REQUEST;
                 })
                 .status(switch (view.getStatus()) {
-                    case CANCELLED -> ContributionStatus.CANCELLED;
-                    case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
-                    case COMPLETED -> ContributionStatus.COMPLETED;
+                    case CANCELLED -> RewardItemStatus.CANCELLED;
+                    case PENDING -> RewardItemStatus.PENDING;
+                    case DRAFT -> RewardItemStatus.DRAFT;
+                    case OPEN -> RewardItemStatus.OPEN;
+                    case MERGED -> RewardItemStatus.MERGED;
+                    case CLOSED -> RewardItemStatus.CLOSED;
+                    case CHANGES_REQUESTED -> RewardItemStatus.CHANGES_REQUESTED;
+                    case COMPLETED -> RewardItemStatus.COMPLETED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
                 .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
@@ -127,7 +132,7 @@ public interface RewardMapper {
                 .githubAuthorId(view.getGithubAuthorId())
                 .authorAvatarUrl(view.getAuthorAvatarUrl())
                 .authorGithubUrl(view.getAuthorGithubUrl())
-                .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()){
+                .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()) {
                     case approved -> RewardItemResponse.CodeReviewOutcomeEnum.APPROVED;
                     case changeRequested -> RewardItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;
                 })

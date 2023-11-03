@@ -2484,12 +2484,23 @@ components:
         - APPROVED
         - CHANGES_REQUESTED
         - DISMISSED
-
     ContributionStatus:
       type: string
       enum:
         - IN_PROGRESS
         - COMPLETED
+        - CANCELLED
+
+    RewardItemStatus:
+      type: string
+      enum:
+        - PENDING
+        - COMPLETED
+        - CHANGES_REQUESTED
+        - OPEN
+        - CLOSED
+        - MERGED
+        - DRAFT
         - CANCELLED
 
     CurrencyContract:
@@ -2942,7 +2953,7 @@ components:
             - APPROVED
             - CHANGE_REQUESTED
         status:
-          $ref: '#/components/schemas/ContributionStatus'
+          $ref: '#/components/schemas/RewardItemStatus'
         githubAuthorId:
           type: integer
           format: int64

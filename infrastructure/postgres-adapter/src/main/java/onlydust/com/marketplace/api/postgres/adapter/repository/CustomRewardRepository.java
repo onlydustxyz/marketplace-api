@@ -237,6 +237,8 @@ public class CustomRewardRepository {
                                    gpr.id,
                                    gpr.html_url,
                                    gpr.title,
+                                   gpr.status,
+                                   gpr.draft,
                                    gr.name                                repo_name,
                                    gpr.created_at                         start_date,
                                    coalesce(gpr.closed_at, gpr.merged_at) end_date,
@@ -252,6 +254,7 @@ public class CustomRewardRepository {
                                      left join github_repos gr on gr.id = gpr.repo_id),
                  get_issue as (select gi.number,
                                       gi.id,
+                                      gi.status,
                                       gi.html_url,
                                       gi.title,
                                       gr.name       repo_name,
@@ -267,6 +270,7 @@ public class CustomRewardRepository {
                                         left join github_repos gr on gr.id = gi.repo_id),
                  get_code_review as (select gpr.number,
                                             gprr.id,
+                                            gprr.status,
                                             gpr.html_url,
                                             gpr.title,
                                             gprr.outcome,
@@ -283,7 +287,8 @@ public class CustomRewardRepository {
                                               left join github_repos gr on gr.id = gpr.repo_id)
             select distinct wi.type,
                             coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             contribution_id,
-                            c.status,
+                            coalesce(cast(pull_request.status as text), cast(issue.status as text), cast(code_review.status as text))                   status,
+                            pull_request.draft,
                             coalesce(pull_request.number, issue.number, code_review.number)                   number,
                             coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
                             coalesce(pull_request.title, issue.title, code_review.title)                      title,
@@ -302,15 +307,13 @@ public class CustomRewardRepository {
                                and c.author_id = pr.recipient_id)                                             user_commits_count,
                             issue.comments_count,
                             code_review.outcome cr_outcome,
-                            pr.recipient_id
+                            pr.recipient_id,
+                            issue.id
             from payment_requests pr
-                      join public.work_items wi on wi.payment_id = pr.id
-                      left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
-                      left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
-                      left join get_code_review code_review on code_review.id = wi.id
-                      join public.contributions c on c.details_id =
-                                                                  coalesce(cast(pull_request.id as text), cast(issue.id as text),
-                                                                           cast(code_review.id as text))
+                     join public.work_items wi on wi.payment_id = pr.id
+                     left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
+                     left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
+                     left join get_code_review code_review on code_review.id = wi.id
             where pr.id = :rewardId
             order by start_date desc, end_date desc offset :offset limit :limit""";
 

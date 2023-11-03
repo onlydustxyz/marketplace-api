@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
@@ -18,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Crypt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatReceiptJsonEntity;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper.OBJECT_MAPPER;
 
 public interface RewardMapper {
@@ -152,15 +152,26 @@ public interface RewardMapper {
                 })
                 .repoName(rewardItemViewEntity.getRepoName())
                 .authorLogin(rewardItemViewEntity.getAuthorLogin())
-                .status(switch (rewardItemViewEntity.getStatus()) {
-                    case canceled -> ContributionStatus.CANCELLED;
-                    case complete -> ContributionStatus.COMPLETED;
-                    case in_progress -> ContributionStatus.IN_PROGRESS;
-                })
+                .status(statusToDomain(rewardItemViewEntity.getDraft(), rewardItemViewEntity.getStatus()))
                 .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()) {
                     case approved -> CodeReviewOutcome.approved;
                     case change_requested -> CodeReviewOutcome.changeRequested;
                 })
                 .build();
+    }
+
+    private static RewardItemView.Status statusToDomain(final Boolean draft, final String status) {
+        if (nonNull(draft) && draft) {
+            return RewardItemView.Status.DRAFT;
+        }
+        return switch (status) {
+            case "open" -> RewardItemView.Status.OPEN;
+            case "closed" -> RewardItemView.Status.CLOSED;
+            case "merged" -> RewardItemView.Status.MERGED;
+            case "pending" -> RewardItemView.Status.PENDING;
+            case "completed" -> RewardItemView.Status.COMPLETED;
+            case "cancelled" -> RewardItemView.Status.CANCELLED;
+            default -> RewardItemView.Status.OPEN;
+        };
     }
 }
