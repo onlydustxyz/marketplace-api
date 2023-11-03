@@ -48,7 +48,7 @@ spring:
         order_updates: true
         generate_statistics: false
         jdbc:
-          time_zone: Europe/Paris
+          time_zone: UTC
           batch_size: 10000
         temp:
           use_jdbc_metadata_defaults: false
