@@ -7,7 +7,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -18,6 +20,11 @@ public class MarketplaceApiApplication {
         SpringApplication.run(MarketplaceApiApplication.class, args);
     }
 
+    @PostConstruct
+    public void init() {
+        // Setting default JVM timezone as UTC
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    }
 
     @Bean()
     public Date startingDate() {
