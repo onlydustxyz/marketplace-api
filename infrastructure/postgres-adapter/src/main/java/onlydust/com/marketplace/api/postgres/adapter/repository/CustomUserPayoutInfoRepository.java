@@ -89,7 +89,14 @@ public class CustomUserPayoutInfoRepository {
                                        and p_usdc is null
                                      limit 1), true)
                            )
-                       else true
+                       when (upi.identity -> 'Company' is not null and upi.usd_preferred_method = 'fiat') then true    
+                       else (not exists(select 1
+                                        from payment_requests pr_usdc
+                                                 left join payments p_usdc on p_usdc.request_id = pr_usdc.id
+                                        where pr_usdc.currency = 'usd'
+                                          and pr_usdc.recipient_id = au.github_user_id
+                                          and p_usdc is null)
+                           )
                        end                                                                           valid_usdc_wallet,
                    coalesce((select w_eth.address is not null
                              from payment_requests pr_eth

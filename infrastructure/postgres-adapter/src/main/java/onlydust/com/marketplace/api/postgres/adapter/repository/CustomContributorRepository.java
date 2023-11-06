@@ -84,7 +84,7 @@ public class CustomContributorRepository {
                                        c.user_id
                                 from project_github_repos pgr
                                          left join contributions c on c.repo_id = pgr.github_repo_id
-                                         left join work_items wi on wi.id = c.details_id
+                                         left join work_items wi on wi.id = c.details_id and wi.recipient_id = c.user_id
                                          left join ignored_contributions ic on ic.contribution_id = c.id
                                 where pgr.project_id = :projectId
                                   and c.status = 'complete'
