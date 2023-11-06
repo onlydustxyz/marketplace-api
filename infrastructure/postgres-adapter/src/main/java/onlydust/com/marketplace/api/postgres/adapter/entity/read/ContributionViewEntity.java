@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @Table(name = "contributions", schema = "indexer_exp")
@@ -38,6 +39,9 @@ public class ContributionViewEntity {
     @org.hibernate.annotations.Type(type = "jsonb")
     List<ContributionLinkViewEntity> links;
 
+    @org.hibernate.annotations.Type(type = "jsonb")
+    List<UUID> rewardIds;
+
     public ContributionView toView() {
         return ContributionView.builder()
                 .id(id)
@@ -52,6 +56,7 @@ public class ContributionViewEntity {
                 .projectName(projectName)
                 .repoName(repoName)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
+                .rewardIds(Optional.ofNullable(rewardIds).orElse(List.of()))
                 .build();
     }
 
