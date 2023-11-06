@@ -42,7 +42,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getStatuses().stream().map(Enum::name).toList(),
                 PageRequest.of(page, pageSize, Sort.by(
                         direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC,
-                        sortBy(sort))));
+                        sortBy(sort).toArray(String[]::new)
+                )));
 
         return Page.<ContributionView>builder()
                 .content(contributionPage.getContent().stream().map(ContributionViewEntity::toView).toList())
@@ -51,11 +52,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 .build();
     }
 
-    private String sortBy(ContributionView.Sort sort) {
+    private List<String> sortBy(ContributionView.Sort sort) {
         return switch (sort) {
-            case CREATED_AT -> "created_at";
-            case PROJECT_REPO_NAME -> "project_name, repo_name";
-            case GITHUB_NUMBER_TITLE -> "github_number, github_title";
+            case CREATED_AT -> List.of("created_at");
+            case PROJECT_REPO_NAME -> List.of("project_name", "repo_name");
+            case GITHUB_NUMBER_TITLE -> List.of("github_number", "github_title");
         };
     }
 

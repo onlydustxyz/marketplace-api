@@ -282,4 +282,84 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                         """)
         ;
     }
+
+    @Test
+    void should_order_by_project_repo_name() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "sort", "PROJECT_REPO_NAME"
+                        )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].projectName").isEqualTo("Mooooooonlight")
+                .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "sort", "PROJECT_REPO_NAME",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].projectName").isEqualTo("kaaper")
+                .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
+        ;
+    }
+
+    @Test
+    void should_order_by_github_number_title() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "sort", "GITHUB_NUMBER_TITLE"
+                        )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("8")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("feat: add main logic and output structure")
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "sort", "GITHUB_NUMBER_TITLE",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1318")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("This is a test PR for development purposes")
+        ;
+    }
 }
