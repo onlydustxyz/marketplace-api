@@ -14,7 +14,9 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,10 +27,23 @@ public class ContributorService implements ContributorFacadePort {
     private final ContributionStoragePort contributionStoragePort;
 
     @Override
-    public Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, String login) {
-        final List<Contributor> internalContributors = projectStorage.searchContributorsByLogin(projectId, login);
-        final List<Contributor> externalContributors = internalContributors.size() < 5 ?
-                getExternalContributors(login) : List.of();
+    public Pair<List<Contributor>, List<Contributor>> searchContributors(final UUID projectId, final Set<Long> repoIds,
+                                                                         final String login,
+                                                                         int maxInternalContributorCountToTriggerExternalSearch,
+                                                                         int maxInternalContributorCountToReturn) {
+
+        final Set<Long> searchInRepoIds = repoIds != null ? new HashSet<>(repoIds) : new HashSet<>();
+        if (projectId != null) {
+            searchInRepoIds.addAll(projectStorage.getProjectRepoIds(projectId));
+        }
+
+        final List<Contributor> internalContributors = searchInRepoIds.isEmpty() ? List.of() :
+                userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
+
+        final List<Contributor> externalContributors =
+                internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch &&
+                login != null && !login.isEmpty() ?
+                        getExternalContributors(login) : List.of();
 
         return Pair.of(internalContributors, externalContributors);
     }

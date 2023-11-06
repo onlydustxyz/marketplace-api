@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
@@ -7,10 +8,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public interface UserStoragePort {
     UserProfileView getProfileById(UUID userId);
@@ -47,4 +45,6 @@ public interface UserStoragePort {
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 
     List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
+
+    List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 }

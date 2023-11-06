@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -108,6 +110,31 @@ public class CustomContributorRepository {
             order by %order_by%
             offset :offset limit :limit
             """;
+
+
+    protected static final String FIND_REPOS_CONTRIBUTORS = """
+            WITH users AS (
+                SELECT github_user_id
+                FROM auth_users
+                UNION
+                SELECT github_user_id
+                FROM iam.users
+            )
+            SELECT
+                gu.id as github_user_id,
+                gu.login,
+                gu.avatar_url,
+                u.github_user_id IS NOT NULL as is_registered
+            FROM github_users gu
+                LEFT JOIN users u on u.github_user_id = gu.id
+            WHERE
+                EXISTS(select 1 from contributions c where c.repo_id in :reposIds and c.user_id = gu.id)
+                AND gu.login ilike '%' || :login ||'%'
+            ORDER BY gu.login
+            LIMIT :limit
+            """;
+
+
     private final EntityManager entityManager;
 
     static protected String buildQuery(ProjectContributorsLinkView.SortBy sortBy, SortDirection sortDirection) {
@@ -147,6 +174,15 @@ public class CustomContributorRepository {
                 .setParameter("projectId", projectId)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
+                .getResultList();
+    }
+
+    public List<ContributorViewEntity> findReposContributorsByLogin(Set<Long> reposIds, String login, int limit) {
+        return entityManager
+                .createNativeQuery(FIND_REPOS_CONTRIBUTORS, ContributorViewEntity.class)
+                .setParameter("reposIds", reposIds)
+                .setParameter("login", login != null ? login : "")
+                .setParameter("limit", limit)
                 .getResultList();
     }
 }

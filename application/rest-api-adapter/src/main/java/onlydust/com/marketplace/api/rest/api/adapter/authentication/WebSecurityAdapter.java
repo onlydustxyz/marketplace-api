@@ -29,6 +29,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/me/**").hasAuthority(UserRole.USER.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/projects").hasAuthority(UserRole.ADMIN.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/projects/*/**").hasAuthority(UserRole.USER.name())
+                .antMatchers(HttpMethod.GET, "/api/v1/users/search").hasAuthority(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/projects/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/github/**").permitAll()

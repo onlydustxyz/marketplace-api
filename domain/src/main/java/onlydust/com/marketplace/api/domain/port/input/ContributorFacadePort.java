@@ -9,10 +9,13 @@ import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ContributorFacadePort {
-    Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, String login);
+    Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, Set<Long> repoIds, String login,
+                                                                  int maxInternalContributorCountToTriggerExternalSearch,
+                                                                  int maxInternalContributorCountToReturn);
 
     Page<ContributionView> contributions(Long contributorId,
                                          ContributionView.Filters filters,
