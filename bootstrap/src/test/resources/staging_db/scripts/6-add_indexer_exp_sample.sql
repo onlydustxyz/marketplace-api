@@ -2,7 +2,7 @@ insert into indexer_exp.github_app_installations (id, account_id)
 values (123456, 98735558);
 
 INSERT INTO indexer_exp.github_accounts
-VALUES (121887739, 'od-mocks', 'Organization', 'https://github.com/od-mocks',
+VALUES (121887739, 'od-mocks', 'ORGANIZATION', 'https://github.com/od-mocks',
         'https://avatars.githubusercontent.com/u/121887739?v=4', 'OD Mocks');
 
 INSERT INTO indexer_exp.github_repos
@@ -12,7 +12,7 @@ VALUES (602953043, 121887739, 'cool-repo-A', 'https://github.com/od-mocks/cool-r
     }'::jsonb, true, null);
 
 INSERT INTO indexer_exp.github_accounts
-VALUES (8642470, 'gregcha', 'User', 'https://github.com/gregcha',
+VALUES (8642470, 'gregcha', 'USER', 'https://github.com/gregcha',
         'https://avatars.githubusercontent.com/u/8642470?v=4', 'Grégoire');
 
 INSERT INTO indexer_exp.github_repos
@@ -37,7 +37,7 @@ VALUES (380954304, 8642470, 'bretzel-app', 'https://github.com/gregcha/bretzel-a
 
 
 INSERT INTO indexer_exp.github_accounts
-VALUES (14176906, 'paritytech', 'Organization', 'https://github.com/paritytech',
+VALUES (14176906, 'paritytech', 'ORGANIZATION', 'https://github.com/paritytech',
         'https://avatars.githubusercontent.com/u/14176906?v=4', 'Paritytech');
 
 INSERT INTO indexer_exp.github_repos
@@ -53,7 +53,7 @@ VALUES (137778655, 14176906, 'substrate-telemetry', 'https://github.com/parityte
     }'::jsonb, false, null);
 
 INSERT INTO indexer_exp.github_accounts
-VALUES (119948009, 'KasarLabs', 'Organization', 'https://github.com/KasarLabs',
+VALUES (119948009, 'KasarLabs', 'ORGANIZATION', 'https://github.com/KasarLabs',
         'https://avatars.githubusercontent.com/u/119948009?v=4', 'Kasar Labs');
 
 INSERT INTO indexer_exp.github_repos

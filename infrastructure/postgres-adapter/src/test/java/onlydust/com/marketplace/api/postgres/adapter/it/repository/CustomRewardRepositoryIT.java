@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class CustomRewardRepositoryIT extends AbstractPostgresIT {
@@ -62,9 +61,21 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
             authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
                     new Date(),
                     faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
-            projectRepository.save(new ProjectEntity(projectId, faker.pokemon().name(), faker.pokemon().location(),
-                    faker.harryPotter().location(), faker.internet().url(), faker.internet().avatar(), false, 0, null,
-                    ProjectVisibilityEnumEntity.PUBLIC, List.of()));
+            projectRepository.save(
+                    ProjectEntity.builder()
+                            .id(projectId)
+                            .name(faker.pokemon().name())
+                            .shortDescription(faker.pokemon().location())
+                            .longDescription(faker.harryPotter().location())
+                            .telegramLink(faker.internet().url())
+                            .logoUrl(faker.internet().avatar())
+                            .hiring(false)
+                            .rank(0)
+                            .visibility(ProjectVisibilityEnumEntity.PUBLIC)
+                            .ignorePullRequests(false)
+                            .ignoreIssues(false)
+                            .ignoreCodeReviews(false)
+                            .build());
             postgresUserAdapter.savePayoutInformationForUserId(userId,
                     UserPayoutInformation.builder()
                             .person(UserPayoutInformation.Person.builder()
@@ -150,9 +161,21 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
             authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
                     new Date(),
                     faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
-            projectRepository.save(new ProjectEntity(projectId, faker.pokemon().name(), faker.pokemon().location(),
-                    faker.harryPotter().location(), faker.internet().url(), faker.internet().avatar(), false, 0, null,
-                    ProjectVisibilityEnumEntity.PUBLIC, List.of()));
+            projectRepository.save(
+                    ProjectEntity.builder()
+                            .id(projectId)
+                            .name(faker.pokemon().name())
+                            .shortDescription(faker.pokemon().location())
+                            .longDescription(faker.harryPotter().location())
+                            .telegramLink(faker.internet().url())
+                            .logoUrl(faker.internet().avatar())
+                            .hiring(false)
+                            .rank(0)
+                            .visibility(ProjectVisibilityEnumEntity.PUBLIC)
+                            .ignorePullRequests(false)
+                            .ignoreIssues(false)
+                            .ignoreCodeReviews(false)
+                            .build());
             postgresUserAdapter.savePayoutInformationForUserId(userId,
                     UserPayoutInformation.builder()
                             .isACompany(true)

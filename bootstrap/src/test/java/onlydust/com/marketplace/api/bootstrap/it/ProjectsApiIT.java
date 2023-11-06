@@ -200,9 +200,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               },
               "remainingUsdBudget": 99250,
               "rewardSettings": {
-                "ignorePullRequests": true,
-                "ignoreIssues": true,
-                "ignoreCodeReviews": true,
+                "ignorePullRequests": false,
+                "ignoreIssues": false,
+                "ignoreCodeReviews": false,
                 "ignoreContributionsBefore": null
               }
             }

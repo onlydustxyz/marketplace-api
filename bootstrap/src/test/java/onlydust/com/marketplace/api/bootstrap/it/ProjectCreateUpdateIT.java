@@ -125,7 +125,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
-                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo(null);
+                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty();
 
         projectId = response.getProjectId();
     }
@@ -183,7 +183,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
-                            "ignorePullRequests": true,
+                            "ignorePullRequests": false,
                             "ignoreIssues": true,
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
@@ -222,7 +222,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "isLookingForContributors": false,
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
-                            "ignorePullRequests": true,
+                            "ignorePullRequests": false,
                             "ignoreIssues": true,
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
@@ -297,7 +297,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
-                            "ignorePullRequests": true,
+                            "ignorePullRequests": false,
                             "ignoreIssues": true,
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
@@ -336,7 +336,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "projectLeadsToKeep": [],
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
-                            "ignorePullRequests": true,
+                            "ignorePullRequests": false,
                             "ignoreIssues": true,
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
@@ -419,7 +419,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[1].repos[0].name").isEqualTo("bretzel-site")
 
-                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(true)
+                .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(true)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(true)
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("2021-01-01T00:00:00Z");
