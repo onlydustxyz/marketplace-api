@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.view.MyContributionRewardView;
 import onlydust.com.marketplace.api.domain.view.ReceiptView;
 import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.RewardView;
@@ -75,6 +76,40 @@ public interface RewardMapper {
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 .receipt(receiptToResponse(rewardView.getReceipt()))
+                ;
+    }
+
+    static RewardResponse rewardToResponse(MyContributionRewardView rewardView) {
+        return new RewardResponse()
+                .from(new GithubUserResponse()
+                        .id(rewardView.getFrom().getGithubUserId())
+                        .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
+                        .login(rewardView.getFrom().getGithubLogin())
+                )
+                .to(
+                        new GithubUserResponse()
+                                .id(rewardView.getTo().getGithubUserId())
+                                .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
+                                .login(rewardView.getTo().getGithubLogin())
+                )
+                .createdAt(DateMapper.toZoneDateTime(rewardView.getCreatedAt()))
+                .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
+                .amount(rewardView.getAmount())
+                .currency(switch (rewardView.getCurrency()) {
+                    case Stark -> CurrencyContract.STARK;
+                    case Apt -> CurrencyContract.APT;
+                    case Op -> CurrencyContract.OP;
+                    case Eth -> CurrencyContract.ETH;
+                    case Usd -> CurrencyContract.USD;
+                })
+                .status(switch (rewardView.getStatus()) {
+                    case complete -> RewardStatus.COMPLETE;
+                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
+                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
+                    case processing -> RewardStatus.PROCESSING;
+                })
+                .dollarsEquivalent(rewardView.getDollarsEquivalent())
+                .id(rewardView.getId())
                 ;
     }
 
