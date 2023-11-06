@@ -282,4 +282,39 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                         """)
         ;
     }
+
+    @Test
+    void should_order_by_project_repo_name() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "1", "sort", "PROJECT_REPO_NAME")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].projectName").isEqualTo("Mooooooonlight")
+                .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "PROJECT_REPO_NAME",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].projectName").isEqualTo("kaaper")
+                .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
+        ;
+    }
 }
