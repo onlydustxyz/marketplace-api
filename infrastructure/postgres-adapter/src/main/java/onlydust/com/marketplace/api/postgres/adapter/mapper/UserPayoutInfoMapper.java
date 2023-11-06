@@ -40,7 +40,9 @@ public interface UserPayoutInfoMapper {
                                          || !userPayoutInfoValidationEntity.getHasValidUsdcWallet())
                     .hasMissingOptimismWallet(!userPayoutInfoValidationEntity.getHasValidOptimismWallet())
                     .hasMissingStarknetWallet(!userPayoutInfoValidationEntity.getHasValidStarknetWallet())
-                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount())
+                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount()
+                                              || !userPayoutInfoValidationEntity.getHasValidUsdcWallet())
+                    .hasMissingUsdcWallet(!userPayoutInfoValidationEntity.getHasValidUsdcWallet())
                     .build();
             userPayoutInformation = userPayoutInformation.toBuilder().payoutSettings(payoutSettings).build();
             return userPayoutInformation;

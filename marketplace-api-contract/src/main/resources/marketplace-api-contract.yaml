@@ -1479,6 +1479,8 @@ components:
               example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
             missingStarknetWallet:
               type: boolean
+            missingUsdcWallet:
+              type: boolean
     UserPayoutInformationRequest:
       type: object
       properties:

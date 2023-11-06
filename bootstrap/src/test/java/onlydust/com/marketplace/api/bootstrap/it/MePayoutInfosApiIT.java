@@ -345,7 +345,8 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingUsdcWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 }

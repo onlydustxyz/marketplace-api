@@ -39,20 +39,4 @@ public class UserPayoutInfoValidationEntity {
     @Column(name = "has_pending_payments")
     Boolean hasPendingPayments;
 
-
-
-    public static UserPayoutInfoValidationEntity defaultValue() {
-        return UserPayoutInfoValidationEntity.builder()
-                .hasValidCompany(true)
-                .hasValidLocation(true)
-                .hasValidPerson(true)
-                .hasValidBakingAccount(false)
-                .hasPendingPayments(false)
-                .hasValidAptosWallet(true)
-                .hasValidEthWallet(true)
-                .hasValidOptimismWallet(true)
-                .hasValidStarknetWallet(true)
-                .hasValidUsdcWallet(true)
-                .build();
-    }
 }

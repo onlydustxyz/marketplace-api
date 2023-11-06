@@ -57,6 +57,7 @@ public interface UserPayoutInfoMapper {
         payoutSettings.setMissingStarknetWallet(view.getPayoutSettings().getHasMissingStarknetWallet());
         payoutSettings.setHasValidPayoutSettings(view.getPayoutSettings().isValid());
         payoutSettings.setMissingSepaAccount(view.getPayoutSettings().getHasMissingBankingAccount());
+        payoutSettings.setMissingUsdcWallet(view.getPayoutSettings().getHasMissingUsdcWallet());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final UserPayoutInformationResponsePayoutSettingsSepaAccount sepaAccount =
                     new UserPayoutInformationResponsePayoutSettingsSepaAccount();

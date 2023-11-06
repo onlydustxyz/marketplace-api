@@ -88,9 +88,11 @@ public class UserPayoutInformation {
         SepaAccount sepaAccount;
         @Builder.Default
         Boolean hasMissingBankingAccount = false;
+        @Builder.Default
+        Boolean hasMissingUsdcWallet = false;
 
         public Boolean isValid() {
-            return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount);
+            return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount || hasMissingUsdcWallet);
         }
     }
 
