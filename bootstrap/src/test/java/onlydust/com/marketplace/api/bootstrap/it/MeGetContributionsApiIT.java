@@ -290,7 +290,11 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "1", "sort", "PROJECT_REPO_NAME")))
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "sort", "PROJECT_REPO_NAME"
+                        )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -305,6 +309,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                 "sort", "PROJECT_REPO_NAME",
                                 "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -325,7 +330,11 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "1", "sort", "GITHUB_NUMBER_TITLE")))
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "sort", "GITHUB_NUMBER_TITLE"
+                        )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -340,6 +349,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "sort", "GITHUB_NUMBER_TITLE",
                                 "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
