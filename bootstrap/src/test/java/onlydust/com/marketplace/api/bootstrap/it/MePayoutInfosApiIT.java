@@ -341,11 +341,11 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.isCompany").isEqualTo(false)
                 .jsonPath("$.hasValidContactInfo").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingUsdcWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }

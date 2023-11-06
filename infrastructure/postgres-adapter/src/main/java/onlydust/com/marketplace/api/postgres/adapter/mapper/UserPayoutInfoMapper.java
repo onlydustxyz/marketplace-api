@@ -36,12 +36,10 @@ public interface UserPayoutInfoMapper {
             payoutSettings = mapBankingAccountToDomain(userPayoutInfoEntity, payoutSettings);
             payoutSettings = payoutSettings.toBuilder()
                     .hasMissingAptosWallet(!userPayoutInfoValidationEntity.getHasValidAptosWallet())
-                    .hasMissingEthWallet(!userPayoutInfoValidationEntity.getHasValidEthWallet()
-                                         || !userPayoutInfoValidationEntity.getHasValidUsdcWallet())
+                    .hasMissingEthWallet(!userPayoutInfoValidationEntity.getHasValidEthWallet())
                     .hasMissingOptimismWallet(!userPayoutInfoValidationEntity.getHasValidOptimismWallet())
                     .hasMissingStarknetWallet(!userPayoutInfoValidationEntity.getHasValidStarknetWallet())
-                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount()
-                                              || !userPayoutInfoValidationEntity.getHasValidUsdcWallet())
+                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount())
                     .hasMissingUsdcWallet(!userPayoutInfoValidationEntity.getHasValidUsdcWallet())
                     .build();
             userPayoutInformation = userPayoutInformation.toBuilder().payoutSettings(payoutSettings).build();
