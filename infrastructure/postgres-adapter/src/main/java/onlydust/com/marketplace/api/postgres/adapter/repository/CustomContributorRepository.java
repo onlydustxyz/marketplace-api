@@ -85,9 +85,11 @@ public class CustomContributorRepository {
                                 from project_github_repos pgr
                                          left join contributions c on c.repo_id = pgr.github_repo_id
                                          left join work_items wi on wi.id = c.details_id
+                                         left join ignored_contributions ic on ic.contribution_id = c.id
                                 where pgr.project_id = :projectId
                                   and c.status = 'complete'
                                   and wi.id is null
+                                  and ic.project_id is null
                                 group by c.user_id) to_rewards_stats on to_rewards_stats.user_id = gu.id
                      left join (select sum(pr.amount) filter (where pr.currency = 'usd')   usd,
                                                 sum(pr.amount) filter (where pr.currency = 'apt')   apt,

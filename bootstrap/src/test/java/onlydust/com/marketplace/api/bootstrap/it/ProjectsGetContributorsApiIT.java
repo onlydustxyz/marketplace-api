@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import org.junit.jupiter.api.MethodOrderer;
@@ -791,8 +793,81 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
             }
             """;
 
+    private static final String GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES_AND_IGNORED_CONTRIBUTIONS = """
+            {
+              "totalPageNumber": 9,
+              "totalItemNumber": 17,
+              "hasMore": true,
+              "nextPageIndex": 1,
+              "contributors": [
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "contributionCount": 92,
+                  "rewardCount": 6,
+                  "earned": {
+                    "totalAmount": 35190.00,
+                    "details": [
+                      {
+                        "totalAmount": 450,
+                        "totalDollarsEquivalent": 643.50,
+                        "currency": "OP"
+                      },
+                      {
+                        "totalAmount": 500000,
+                        "totalDollarsEquivalent": 0,
+                        "currency": "STARK"
+                      },
+                      {
+                        "totalAmount": 20.5,
+                        "totalDollarsEquivalent": 31426.5,
+                        "currency": "ETH"
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 1120.00,
+                        "currency": "APT"
+                      },
+                      {
+                        "totalAmount": 2000,
+                        "totalDollarsEquivalent": 2000,
+                        "currency": "USD"
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": 70,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 70,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                  "contributionCount": 853,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 762,
+                  "pullRequestToReward": 396,
+                  "issueToReward": 11,
+                  "codeReviewToReward": 355,
+                  "isRegistered": true
+                }
+              ]
+            }
+            """;
+
+
+
     @Autowired
     HasuraUserHelper userHelper;
+    @Autowired
+    IgnoredContributionsRepository ignoredContributionsRepository;
 
     @Test
     @Order(1)
@@ -916,5 +991,38 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES);
+    }
+
+
+    @Test
+    @Order(5)
+    void should_find_project_contributors_with_ignored_contributions() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
+                        .id(IgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId("1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13")
+                                .build())
+                .build());
+        ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
+                        .id(IgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId("2884dc233c8512d062d7dd0b60d78d58e416349bf0a3e1feddff1183a01895e8")
+                                .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("pageIndex", "0", "pageSize", "2", "sort", "EARNED", "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES_AND_IGNORED_CONTRIBUTIONS);
     }
 }
