@@ -141,8 +141,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresContributionAdapter postgresContributionAdapter(final ContributionRepository contributionRepository) {
-        return new PostgresContributionAdapter(contributionRepository);
+    public PostgresContributionAdapter postgresContributionAdapter(final ContributionViewEntityRepository contributionViewEntityRepository,
+                                                                   final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
+                                                                   final GithubRepoViewEntityRepository githubRepoViewEntityRepository) {
+        return new PostgresContributionAdapter(contributionViewEntityRepository, shortProjectViewEntityRepository,
+                githubRepoViewEntityRepository);
     }
 
     @Bean

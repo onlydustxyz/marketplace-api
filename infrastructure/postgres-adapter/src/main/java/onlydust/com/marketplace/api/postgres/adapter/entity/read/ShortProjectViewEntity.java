@@ -9,7 +9,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Proje
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -30,6 +33,5 @@ public class ShortProjectViewEntity {
     Boolean hiring;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
-    @Column(columnDefinition = "visibility")
     ProjectVisibilityEnumEntity visibility;
 }

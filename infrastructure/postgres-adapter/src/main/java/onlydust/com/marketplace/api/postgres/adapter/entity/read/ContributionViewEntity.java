@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "contributions", schema = "indexer_exp")
@@ -50,20 +51,12 @@ public class ContributionViewEntity {
                 .githubBody(githubBody)
                 .projectName(projectName)
                 .repoName(repoName)
-                .links(links.stream().map(ContributionLinkViewEntity::toView).toList())
+                .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
                 .build();
     }
 
     public enum Type {
         PULL_REQUEST, ISSUE, CODE_REVIEW;
-
-        public static Type of(ContributionType type) {
-            return switch (type) {
-                case PULL_REQUEST -> PULL_REQUEST;
-                case ISSUE -> ISSUE;
-                case CODE_REVIEW -> CODE_REVIEW;
-            };
-        }
 
         public ContributionType toView() {
             return switch (this) {
@@ -76,14 +69,6 @@ public class ContributionViewEntity {
 
     public enum Status {
         IN_PROGRESS, COMPLETED, CANCELLED;
-
-        public static Status of(ContributionStatus status) {
-            return switch (status) {
-                case IN_PROGRESS -> IN_PROGRESS;
-                case COMPLETED -> COMPLETED;
-                case CANCELLED -> CANCELLED;
-            };
-        }
 
         public ContributionStatus toView() {
             return switch (this) {

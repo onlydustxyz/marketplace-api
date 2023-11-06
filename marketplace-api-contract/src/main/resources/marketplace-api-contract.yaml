@@ -310,6 +310,13 @@ paths:
             items:
               $ref: '#/components/schemas/ContributionType'
         - in: query
+          name: statuses
+          description: Contribution status filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionStatus'
+        - in: query
           name: projects
           description: Project filter
           schema:
@@ -2552,16 +2559,16 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - project_name
-            - repo_name
+            - projectName
+            - repoName
             - links
             - rewardIds
           properties:
-            project_name:
+            projectName:
               type: string
               description: Project name
               example: Verkle Tries
-            repo_name:
+            repoName:
               type: string
               description: Github repository name
               example: marketplace-backend
