@@ -15,7 +15,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     HasuraUserHelper userHelper;
 
     @Test
-    void should_get_my_rewards() {
+    void should_get_my_contributions() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
 
@@ -33,8 +33,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                           "contributions": [
                             {
                               "id": "94c28c8ac7b92df46aa30bab982815275abe0369fdaea61b342c15729e67a8ac",
-                              "createdAt": "2022-06-15T09:08:47Z",
-                              "completedAt": "2022-06-15T09:34:25Z",
+                              "createdAt": "2022-06-15T11:08:47Z",
+                              "completedAt": "2022-06-15T11:34:25Z",
                               "type": "PULL_REQUEST",
                               "status": "COMPLETED",
                               "githubNumber": 11,
@@ -48,8 +48,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "94c28c8ac7b92df46aa30bab982815275abe0369fdaea61b342c15729e67a8ac",
-                              "createdAt": "2022-06-15T09:08:47Z",
-                              "completedAt": "2022-06-15T09:34:25Z",
+                              "createdAt": "2022-06-15T11:08:47Z",
+                              "completedAt": "2022-06-15T11:34:25Z",
                               "type": "PULL_REQUEST",
                               "status": "COMPLETED",
                               "githubNumber": 11,
@@ -63,8 +63,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "94c28c8ac7b92df46aa30bab982815275abe0369fdaea61b342c15729e67a8ac",
-                              "createdAt": "2022-06-15T09:08:47Z",
-                              "completedAt": "2022-06-15T09:34:25Z",
+                              "createdAt": "2022-06-15T11:08:47Z",
+                              "completedAt": "2022-06-15T11:34:25Z",
                               "type": "PULL_REQUEST",
                               "status": "COMPLETED",
                               "githubNumber": 11,
