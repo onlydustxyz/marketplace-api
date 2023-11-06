@@ -325,5 +325,27 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
+
+        // Given
+        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
+                new Date(), BigDecimal.ONE, null, 1, UUID.randomUUID(), CurrencyEnumEntity.usd));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.isCompany").isEqualTo(false)
+                .jsonPath("$.hasValidContactInfo").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 }
