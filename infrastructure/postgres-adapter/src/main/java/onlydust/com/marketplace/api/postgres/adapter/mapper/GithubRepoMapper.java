@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubRepoEntity;
 
 public class GithubRepoMapper {
     public static GithubRepo map(GithubRepoEntity repo) {

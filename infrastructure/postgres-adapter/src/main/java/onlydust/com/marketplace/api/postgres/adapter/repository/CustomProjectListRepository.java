@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectListItemViewEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -156,7 +156,8 @@ public class CustomProjectListRepository {
     };
     private final EntityManager entityManager;
 
-    private static void entityToProjectView(ProjectViewEntity entity, Map<UUID, ProjectCardView> projectViewMap) {
+    private static void entityToProjectView(ProjectListItemViewEntity entity,
+                                            Map<UUID, ProjectCardView> projectViewMap) {
         if (!projectViewMap.containsKey(entity.getId())) {
             final ProjectCardView projectCardView = ProjectCardView.builder()
                     .id(entity.getId())
@@ -174,7 +175,8 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addRepoTechnologiesToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addRepoTechnologiesToProject(ProjectListItemViewEntity entity,
+                                                     ProjectCardView projectCardView) {
         try {
             if (isNull(entity.getRepositoryLanguages())) {
                 return;
@@ -187,7 +189,7 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addSponsorToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addSponsorToProject(ProjectListItemViewEntity entity, ProjectCardView projectCardView) {
         if (nonNull(entity.getSponsorId())) {
             final SponsorView sponsorView = SponsorView.builder()
                     .logoUrl(entity.getSponsorLogoUrl())
@@ -199,7 +201,7 @@ public class CustomProjectListRepository {
         }
     }
 
-    private static void addProjectLeadToProject(ProjectViewEntity entity, ProjectCardView projectCardView) {
+    private static void addProjectLeadToProject(ProjectListItemViewEntity entity, ProjectCardView projectCardView) {
         final ProjectLeaderLinkView projectLeaderLinkView = ProjectLeaderLinkView.builder()
                 .id(entity.getProjectLeadId())
                 .githubUserId(entity.getProjectLeadGithubUserId())
@@ -291,7 +293,7 @@ public class CustomProjectListRepository {
                                                                               ProjectCardView.SortBy sort,
                                                                               UUID userId, Boolean mine) {
         final String query = buildQueryForUser(technologies, sponsors, search, sort, mine);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class)
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectListItemViewEntity.class)
                 .setParameter("userId", userId);
         if (nonNull(search) && !search.isEmpty()) {
             nativeQuery = nativeQuery.setParameter("search", search);
@@ -302,7 +304,7 @@ public class CustomProjectListRepository {
     public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors
             , String search, ProjectCardView.SortBy sort) {
         final String query = buildQuery(technologies, sponsors, search, sort);
-        Query nativeQuery = entityManager.createNativeQuery(query, ProjectViewEntity.class);
+        Query nativeQuery = entityManager.createNativeQuery(query, ProjectListItemViewEntity.class);
         if (nonNull(search) && !search.isEmpty()) {
             nativeQuery = nativeQuery.setParameter("search", search);
         }
@@ -310,9 +312,9 @@ public class CustomProjectListRepository {
     }
 
     private Page<ProjectCardView> executeQueryAndMapResults(Query nativeQuery) {
-        final List<ProjectViewEntity> rows = nativeQuery.getResultList();
+        final List<ProjectListItemViewEntity> rows = nativeQuery.getResultList();
         final Map<UUID, ProjectCardView> projectViewMap = new LinkedHashMap<>();
-        for (ProjectViewEntity entity : rows) {
+        for (ProjectListItemViewEntity entity : rows) {
             entityToProjectView(entity, projectViewMap);
             final ProjectCardView projectCardView = projectViewMap.get(entity.getId());
             addProjectLeadToProject(entity, projectCardView);

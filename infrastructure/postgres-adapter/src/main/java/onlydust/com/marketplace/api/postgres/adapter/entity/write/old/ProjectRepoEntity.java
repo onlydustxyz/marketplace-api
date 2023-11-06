@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name = "project_github_repos", schema = "public")
 public class ProjectRepoEntity {
     @EmbeddedId
+    @EqualsAndHashCode.Include
     private PrimaryKey primaryKey;
 
     public ProjectRepoEntity(UUID projectId, Long repoId) {
@@ -24,10 +25,12 @@ public class ProjectRepoEntity {
     @Embeddable
     @AllArgsConstructor
     @NoArgsConstructor
+    @EqualsAndHashCode
+    @Data
     public static class PrimaryKey implements Serializable {
-        @Column(name = "project_id", nullable = false)
+        @Column(name = "project_id", nullable = false, updatable = false)
         UUID projectId;
-        @Column(name = "github_repo_id", nullable = false)
+        @Column(name = "github_repo_id", nullable = false, updatable = false)
         Long repoId;
     }
 }

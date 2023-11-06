@@ -37,8 +37,11 @@ public class DomainConfiguration {
     public ProjectFacadePort projectFacadePort(final PostgresProjectAdapter postgresProjectAdapter,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
-                                               final PermissionService permissionService) {
-        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService);
+                                               final PermissionService permissionService,
+                                               final IndexerPort indexerPort,
+                                               final DateProvider dateProvider) {
+        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService,
+                indexerPort, dateProvider);
     }
 
     @Bean

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.view.RepoCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectOrganizationRepoView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
 
 import java.util.HashMap;
@@ -13,16 +14,18 @@ import static java.util.Objects.isNull;
 
 public interface RepoMapper {
 
-    static RepoCardView mapToRepoCardView(GithubRepoViewEntity repo) {
-        return RepoCardView.builder()
-                .githubRepoId(repo.getGithubId())
-                .owner(repo.getOwner())
+    static ProjectOrganizationRepoView mapToDomain(GithubRepoEntity repo, boolean isIncludedInProject) {
+        return ProjectOrganizationRepoView.builder()
+                .githubRepoId(repo.getId())
+                .owner(repo.getOwner().getLogin())
                 .name(repo.getName())
                 .description(repo.getDescription())
-                .forkCount(repo.getForkCount())
-                .starCount(repo.getStarCount())
+                .forkCount(repo.getForksCount())
+                .starCount(repo.getStarsCount())
                 .url(repo.getHtmlUrl())
                 .hasIssues(repo.getHasIssues())
+                .isIncludedInProject(isIncludedInProject)
+                .technologies(repo.getLanguages())
                 .build();
     }
 

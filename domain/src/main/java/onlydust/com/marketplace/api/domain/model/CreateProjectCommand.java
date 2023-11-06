@@ -11,17 +11,9 @@ public class CreateProjectCommand {
     String name;
     String shortDescription;
     String longDescription;
-    List<Long> githubUserIdsAsProjectLeads;
+    List<Long> githubUserIdsAsProjectLeadersToInvite;
     List<Long> githubRepoIds;
-    List<MoreInfo> moreInfos;
+    List<ProjectMoreInfoLink> moreInfos;
     Boolean isLookingForContributors;
     String imageUrl;
-
-
-    @Data
-    @Builder
-    public static class MoreInfo {
-        String url;
-        String value;
-    }
 }

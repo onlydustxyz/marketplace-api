@@ -80,6 +80,11 @@ public class HasuraUserHelper {
     }
 
     @NonNull
+    public AuthenticatedUser authenticateOlivier() {
+        return authenticateUser(595505L);
+    }
+
+    @NonNull
     public AuthenticatedUser authenticateUser(Long githubUserId) {
         final AuthUserEntity user = authUserRepository.findByGithubUserId(githubUserId).orElseThrow();
         return authenticateUser(user);

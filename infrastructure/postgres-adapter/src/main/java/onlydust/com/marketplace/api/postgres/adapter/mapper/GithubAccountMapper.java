@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubAccountEntity;
 
 import java.util.stream.Collectors;
 

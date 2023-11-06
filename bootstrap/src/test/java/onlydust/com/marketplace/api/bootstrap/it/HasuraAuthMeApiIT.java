@@ -8,7 +8,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepo
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,25 +25,12 @@ import java.util.UUID;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
 
-    Long githubUserId;
-    String login;
-    String avatarUrl;
-    UUID userId;
-
     @Autowired
     JwtSecret jwtSecret;
     @Autowired
     AuthUserRepository authUserRepository;
     @Autowired
     OnboardingRepository onboardingRepository;
-
-    @BeforeEach
-    void setup() {
-        githubUserId = faker.number().randomNumber();
-        login = faker.name().username();
-        avatarUrl = faker.internet().avatar();
-        userId = UUID.randomUUID();
-    }
 
     @Test
     @Order(1)
@@ -58,6 +48,11 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_current_user_given_a_valid_jwt() throws JsonProcessingException {
         // Given
+        Long githubUserId = faker.number().randomNumber();
+        String login = faker.name().username();
+        String avatarUrl = faker.internet().avatar();
+        UUID userId = UUID.randomUUID();
+
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(userId)
                 .githubUserId(githubUserId)
@@ -99,6 +94,11 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_get_current_user_with_onboarding_data() throws JsonProcessingException {
         // Given
+        Long githubUserId = faker.number().randomNumber();
+        String login = faker.name().username();
+        String avatarUrl = faker.internet().avatar();
+        UUID userId = UUID.randomUUID();
+
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(userId)
                 .githubUserId(githubUserId)

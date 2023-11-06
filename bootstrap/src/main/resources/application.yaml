@@ -73,3 +73,8 @@ infrastructure:
       client:
         base-uri: ${RUST_API_BASE_URL}
         api-key: ${RUST_API_KEY}
+  indexer:
+    api:
+      client:
+        base-uri: ${INDEXER_API_BASE_URL}
+        api-key: ${INDEXER_API_KEY}

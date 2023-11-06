@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -10,29 +12,79 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+
 public interface ProjectMapper {
     static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest) {
         return CreateProjectCommand.builder()
                 .name(createProjectRequest.getName())
                 .shortDescription(createProjectRequest.getShortDescription())
                 .longDescription(createProjectRequest.getLongDescription())
-                .githubUserIdsAsProjectLeads(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                .githubUserIdsAsProjectLeadersToInvite(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .githubRepoIds(createProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
                 .moreInfos(createProjectRequest.getMoreInfo().stream()
-                        .map(moreInfo -> CreateProjectCommand.MoreInfo.builder()
+                        .map(moreInfo -> ProjectMoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
-                .imageUrl(createProjectRequest.getLogoUrl()).build();
+                .imageUrl(createProjectRequest.getLogoUrl())
+                .build();
     }
 
-    static ProjectResponse mapProjectDetails(final ProjectDetailsView project) {
+    static UpdateProjectCommand mapUpdateProjectCommandToDomain(UUID projectId,
+                                                                UpdateProjectRequest updateProjectRequest) {
+        return UpdateProjectCommand.builder()
+                .id(projectId)
+                .name(updateProjectRequest.getName())
+                .shortDescription(updateProjectRequest.getShortDescription())
+                .longDescription(updateProjectRequest.getLongDescription())
+                .projectLeadersToKeep(updateProjectRequest.getProjectLeadsToKeep())
+                .githubUserIdsAsProjectLeadersToInvite(updateProjectRequest.getInviteGithubUserIdsAsProjectLeads())
+                .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
+                .githubRepoIds(updateProjectRequest.getGithubRepoIds())
+                .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
+                .moreInfos(updateProjectRequest.getMoreInfo().stream()
+                        .map(moreInfo -> ProjectMoreInfoLink.builder()
+                                .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
+                .imageUrl(updateProjectRequest.getLogoUrl())
+                .build();
+    }
+
+    static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
         final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
         projectListItemResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
         projectListItemResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectListItemResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
         projectListItemResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
-        projectListItemResponse.setRepos(project.getRepos().stream().map(ProjectMapper::mapRepo).collect(Collectors.toList()));
+        projectListItemResponse.setOrganizations(project.getOrganizations().stream()
+                .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos)).collect(Collectors.toList()));
         projectListItemResponse.setTechnologies(project.getTechnologies());
+
+        //TODO: this list is kept for backwards compatibility with the old API
+        final var repos = new ArrayList<GithubRepoResponse>();
+        for (ProjectOrganizationView organization : project.getOrganizations()) {
+            repos.addAll(organization.getRepos().stream()
+                    .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
+                    .map(ProjectMapper::mapRepo)
+                    .toList());
+        }
+        projectListItemResponse.setRepos(repos);
+
         return projectListItemResponse;
+    }
+
+    static ProjectGithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
+                                                             final boolean includeAllAvailableRepos) {
+        final var organization = new ProjectGithubOrganizationResponse();
+        organization.setId(projectOrganizationView.getId());
+        organization.setLogin(projectOrganizationView.getLogin());
+        organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
+        organization.setHtmlUrl(projectOrganizationView.getHtmlUrl());
+        organization.setName(projectOrganizationView.getName());
+        organization.setRepos(projectOrganizationView.getRepos().stream()
+                .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
+                .map(ProjectMapper::mapOrganizationRepo)
+                .toList());
+        return organization;
     }
 
     private static ProjectResponse mapProjectDetailsMetadata(final ProjectDetailsView projectDetailsView) {
@@ -48,7 +100,30 @@ public interface ProjectMapper {
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());
         project.setRemainingUsdBudget(projectDetailsView.getRemainingUsdBudget());
+        project.setRewardSettings(mapRewardSettings(projectDetailsView.getRewardSettings()));
         return project;
+    }
+
+    static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.api.domain.model.ProjectRewardSettings rewardSettings) {
+        final var projectRewardSettings = new ProjectRewardSettings();
+        projectRewardSettings.setIgnorePullRequests(rewardSettings.getIgnorePullRequests());
+        projectRewardSettings.setIgnoreIssues(rewardSettings.getIgnoreIssues());
+        projectRewardSettings.setIgnoreCodeReviews(rewardSettings.getIgnoreCodeReviews());
+        projectRewardSettings.setIgnoreContributionsBefore(toZoneDateTime(rewardSettings.getIgnoreContributionsBefore()));
+        return projectRewardSettings;
+    }
+
+    static onlydust.com.marketplace.api.domain.model.ProjectRewardSettings mapRewardSettingsToDomain(ProjectRewardSettings rewardSettings) {
+        if (rewardSettings == null) {
+            return null;
+        }
+
+        return new onlydust.com.marketplace.api.domain.model.ProjectRewardSettings(
+                rewardSettings.getIgnorePullRequests(),
+                rewardSettings.getIgnoreIssues(),
+                rewardSettings.getIgnoreCodeReviews(),
+                Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant())
+        );
     }
 
     static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {
@@ -108,16 +183,23 @@ public interface ProjectMapper {
         return sponsorResponse;
     }
 
-    private static GithubRepoResponse mapRepo(final RepoCardView repo) {
-        final GithubRepoResponse repoResponse = new GithubRepoResponse();
+    private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
+        final var organizationRepo = mapOrganizationRepo(repo);
+        organizationRepo.setIsIncludedInProject(null);
+        return organizationRepo;
+    }
+
+    private static ProjectGithubOrganizationRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
+        final ProjectGithubOrganizationRepoResponse repoResponse = new ProjectGithubOrganizationRepoResponse();
         repoResponse.setId(repo.getGithubRepoId());
         repoResponse.setOwner(repo.getOwner());
         repoResponse.setName(repo.getName());
         repoResponse.setHtmlUrl(repo.getUrl());
         repoResponse.setDescription(repo.getDescription());
-        repoResponse.setForkCount(repo.getForkCount());
-        repoResponse.setStars(repo.getStarCount());
+        repoResponse.setForkCount(Math.toIntExact(repo.getForkCount()));
+        repoResponse.setStars(Math.toIntExact(repo.getStarCount()));
         repoResponse.setHasIssues(repo.getHasIssues());
+        repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
         return repoResponse;
     }
 

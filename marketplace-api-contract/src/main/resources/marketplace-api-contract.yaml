@@ -540,7 +540,6 @@ paths:
   /api/v1/projects:
     post:
       security:
-        - { }
         - bearerAuth: [ ]
       tags:
         - Projects
@@ -637,6 +636,10 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: includeAllAvailableRepos
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'The project'
@@ -648,6 +651,33 @@ paths:
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
           $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Update project
+      operationId: updateProject
+      description: |
+        Update project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectRequest'
+      responses:
+        "204":
+          description: 'The project was updated successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -668,6 +698,10 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: includeAllAvailableRepos
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'The project'
@@ -1969,6 +2003,7 @@ components:
         - contributorCount
         - topContributors
         - leaders
+        - invitedLeaders
         - sponsors
         - technologies
         - remainingUsdBudget
@@ -2011,11 +2046,22 @@ components:
           maxItems: 3
           items:
             $ref: '#/components/schemas/UserLinkResponse'
+        # For now, we let the flatten repos list here to avoid breaking changes. However, it is marked as deprecated.
+        # The 'organizations' field should be used instead.
         repos:
+          deprecated: true
           type: array
           items:
             $ref: '#/components/schemas/GithubRepoResponse'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectGithubOrganizationResponse'
         leaders:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisteredUserLinkResponse'
+        invitedLeaders:
           type: array
           items:
             $ref: '#/components/schemas/RegisteredUserLinkResponse'
@@ -2028,6 +2074,9 @@ components:
         remainingUsdBudget:
           type: number
           example: 20.0
+        rewardSettings:
+          $ref: '#/components/schemas/ProjectRewardSettings'
+
     ShortProjectResponse:
       type: object
       required:
@@ -2063,7 +2112,48 @@ components:
         - PRIVATE
       description: Is the project visible to anyone?
 
+    ProjectGithubOrganizationResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: Organization's Github login
+          example: onlydustxyz
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to organization's avatar image
+          example: 'https://avatars.githubusercontent.com/u/98735558?v=4'
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the organization
+          example: 'https://github.com/onlydustxyz'
+        name:
+          type: string
+          example: OnlyDust
+        repos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectGithubOrganizationRepoResponse'
+
+    ProjectGithubOrganizationRepoResponse:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/GithubRepoResponse'
+        - type: object
+          properties:
+            isIncludedInProject:
+              type: boolean
+              description: Is the repo included in the project?
+
     ShortGithubRepoResponse:
+      discriminator:
+        propertyName: type
+        mapping:
+          projectGithubOrganizationRepoResponse: '#/components/schemas/ProjectGithubOrganizationRepoResponse'
       type: object
       required:
         - id
@@ -2293,7 +2383,7 @@ components:
           $ref: '#/components/schemas/CurrencyContract'
         items:
           type: array
-          maxItems: 1
+          minItems: 1
           items:
             $ref: '#/components/schemas/RewardItemRequest'
 
@@ -2705,17 +2795,88 @@ components:
         inviteGithubUserIdsAsProjectLeads:
           type: array
           items:
-            type: integer
-            format: int64
+            $ref: '#/components/schemas/GithubUserId'
         githubRepoIds:
           type: array
           items:
-            type: integer
-            format: int64
+            $ref: '#/components/schemas/GithubRepoId'
         logoUrl:
           type: string
           format: url
           description: Direct URL to project's logo image
+
+    UpdateProjectRequest:
+      type: object
+      required:
+        - name
+        - shortDescription
+        - longDescription
+        - moreInfo
+        - isLookingForContributors
+        - logoUrl
+      properties:
+        name:
+          type: string
+        shortDescription:
+          type: string
+        longDescription:
+          type: string
+        moreInfo:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoreInfo'
+        isLookingForContributors:
+          type: boolean
+        inviteGithubUserIdsAsProjectLeads:
+          type: array
+          description: List of Github user ids to invite as project leads.
+            All other project lead invitations will be removed.
+            If empty, all project lead invitations will be removed.
+            If null, no change will be made.
+            It is allowed to add a new project lead invitation directly through this list.
+          items:
+            $ref: '#/components/schemas/GithubUserId'
+        projectLeadsToKeep:
+          type: array
+          description: List of project leads to keep.
+            All other project leads will be removed.
+            If empty, all project leads will be removed.
+            If null, no change will be made.
+            It is not allowed to add a new project lead directly through this list, as they must be invited first.
+          items:
+            $ref: '#/components/schemas/UserId'
+        logoUrl:
+          type: string
+          format: url
+          description: Direct URL to project's logo image
+        rewardSettings:
+          $ref: '#/components/schemas/ProjectRewardSettings'
+        githubRepoIds:
+          type: array
+          description: List of Github repos to include in the project.
+            All other repos will be unlinked from the project.
+            If empty, all repos will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new repo directly through this list.
+          items:
+            $ref: '#/components/schemas/GithubRepoId'
+
+    ProjectRewardSettings:
+      type: object
+      properties:
+        ignorePullRequests:
+          type: boolean
+          description: Ignore pull requests by default
+        ignoreIssues:
+          type: boolean
+          description: Ignore issues by default
+        ignoreCodeReviews:
+          type: boolean
+          description: Ignore code reviews by default
+        ignoreContributionsBefore:
+          type: string
+          format: date-time
+          description: Ignore contributions before this date by default
 
     CreateProjectResponse:
       type: object
@@ -2750,6 +2911,9 @@ components:
 
     InstallationResponse:
       type: object
+      required:
+        - organization
+        - repos
       properties:
         organization:
           $ref: '#/components/schemas/InstalledGithubOrganizationResponse'

@@ -44,35 +44,33 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomRepoRepository customRepoRepository(final EntityManager entityManager) {
-        return new CustomRepoRepository(entityManager);
-    }
-
-    @Bean
     public PostgresProjectAdapter postgresProjectAdapter(final ProjectRepository projectRepository,
+                                                         final ProjectViewRepository projectViewRepository,
                                                          final ProjectIdRepository projectIdRepository,
                                                          final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
+                                                         final ProjectLeadRepository projectLeadRepository,
                                                          final ProjectRepoRepository projectRepoRepository,
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
-                                                         final CustomRepoRepository customRepoRepository,
                                                          final CustomProjectListRepository customProjectListRepository,
-                                                         final CustomUserRepository customUserRepository,
                                                          final CustomProjectRewardRepository customProjectRewardRepository,
                                                          final CustomProjectBudgetRepository customProjectBudgetRepository,
+                                                         final ProjectLeadViewRepository projectLeadViewRepository,
                                                          final CustomRewardRepository customRewardRepository) {
         return new PostgresProjectAdapter(projectRepository,
+                projectViewRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
+                projectLeadRepository,
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customRepoRepository,
-                customUserRepository,
                 customProjectListRepository,
                 customProjectRewardRepository,
                 customProjectBudgetRepository,
-                customRewardRepository);
+                projectLeadViewRepository,
+                customRewardRepository
+        );
     }
 
     @Bean

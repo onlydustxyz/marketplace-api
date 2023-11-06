@@ -41,7 +41,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Import(SwaggerConfiguration.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -56,6 +57,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
+    protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String ME_PATCH = "/api/v1/me";
     protected static final String ME_GET_PROFILE = "/api/v1/me/profile";
@@ -89,6 +91,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("rust-api")
     protected WireMockServer rustApiWireMockServer;
+    @InjectWireMock("indexer-api")
+    protected WireMockServer indexerApiWireMockServer;
     @LocalServerPort
     int port;
     @Autowired

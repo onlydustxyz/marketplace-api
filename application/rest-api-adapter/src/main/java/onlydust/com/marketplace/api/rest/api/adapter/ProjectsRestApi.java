@@ -52,16 +52,16 @@ public class ProjectsRestApi implements ProjectsApi {
     private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
 
     @Override
-    public ResponseEntity<ProjectResponse> getProject(final UUID projectId) {
+    public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
         final var project = projectFacadePort.getById(projectId);
-        final var projectResponse = mapProjectDetails(project);
+        final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
         return ResponseEntity.ok(projectResponse);
     }
 
     @Override
-    public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug) {
+    public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
         final var project = projectFacadePort.getBySlug(slug);
-        final var projectResponse = mapProjectDetails(project);
+        final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
         return ResponseEntity.ok(projectResponse);
     }
 
@@ -73,7 +73,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                        sponsors, search, sortBy, user.getId(), isNull(mine) ? false : mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
+                        sponsors, search, sortBy, user.getId(), !isNull(mine) && mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
     }
 
@@ -85,6 +85,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectId);
         return ResponseEntity.ok(createProjectResponse);
+    }
+
+    @Override
+    public ResponseEntity<Void> updateProject(UUID projectId, UpdateProjectRequest updateProjectRequest) {
+        projectFacadePort.updateProject(mapUpdateProjectCommandToDomain(projectId, updateProjectRequest));
+        return ResponseEntity.noContent().build();
     }
 
     @Override

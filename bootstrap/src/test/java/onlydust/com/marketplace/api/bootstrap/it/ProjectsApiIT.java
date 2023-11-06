@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -49,44 +49,112 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               ],
               "repos": [
                 {
-                  "id": 380954304,
-                  "owner": "gregcha",
-                  "name": "bretzel-app",
-                  "description": "",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                  "hasIssues": true
-                },
-                {
-                  "id": 466482535,
-                  "owner": "gregcha",
-                  "name": "bretzel-ressources",
-                  "description": "",
-                  "stars": 0,
-                  "forkCount": 0,
-                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                  "hasIssues": true
-                },
-                {
                   "id": 659718526,
                   "owner": "KasarLabs",
                   "name": "deoxys-telemetry",
                   "description": "Deoxys Telemetry service",
-                  "stars": 0,
-                  "forkCount": 1,
+                  "stars": 1,
+                  "forkCount": 0,
                   "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                  "hasIssues": false
+                  "hasIssues": true,
+                  "isIncludedInProject": null
+                },
+                {
+                  "id": 380954304,
+                  "owner": "gregcha",
+                  "name": "bretzel-app",
+                  "description": null,
+                  "stars": 0,
+                  "forkCount": 0,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                  "hasIssues": true,
+                  "isIncludedInProject": null
                 },
                 {
                   "id": 452047076,
                   "owner": "gregcha",
                   "name": "bretzel-site",
-                  "description": "",
-                  "stars": 0,
+                  "description": null,
+                  "stars": 10,
                   "forkCount": 0,
                   "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                  "hasIssues": true
+                  "hasIssues": false,
+                  "isIncludedInProject": null
+                },
+                {
+                  "id": 466482535,
+                  "owner": "gregcha",
+                  "name": "bretzel-ressources",
+                  "description": null,
+                  "stars": 0,
+                  "forkCount": 0,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                  "hasIssues": true,
+                  "isIncludedInProject": null
+                }
+              ],
+              "organizations": [
+                {
+                  "id": 119948009,
+                  "login": "KasarLabs",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
+                  "htmlUrl": "https://github.com/KasarLabs",
+                  "name": "Kasar Labs",
+                  "repos": [
+                    {
+                      "id": 659718526,
+                      "owner": "KasarLabs",
+                      "name": "deoxys-telemetry",
+                      "description": "Deoxys Telemetry service",
+                      "stars": 1,
+                      "forkCount": 0,
+                      "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                      "hasIssues": true,
+                      "isIncludedInProject": true
+                    }
+                  ]
+                },
+                {
+                  "id": 8642470,
+                  "login": "gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "name": "Grégoire",
+                  "repos": [
+                    {
+                      "id": 380954304,
+                      "owner": "gregcha",
+                      "name": "bretzel-app",
+                      "description": null,
+                      "stars": 0,
+                      "forkCount": 0,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                      "hasIssues": true,
+                      "isIncludedInProject": true
+                    },
+                    {
+                      "id": 452047076,
+                      "owner": "gregcha",
+                      "name": "bretzel-site",
+                      "description": null,
+                      "stars": 10,
+                      "forkCount": 0,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                      "hasIssues": false,
+                      "isIncludedInProject": true
+                    },
+                    {
+                      "id": 466482535,
+                      "owner": "gregcha",
+                      "name": "bretzel-ressources",
+                      "description": null,
+                      "stars": 0,
+                      "forkCount": 0,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                      "hasIssues": true,
+                      "isIncludedInProject": true
+                    }
+                  ]
                 }
               ],
               "leaders": [
@@ -105,6 +173,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
                 }
               ],
+              "invitedLeaders": [],
               "sponsors": [
                 {
                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
@@ -129,7 +198,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "JavaScript": 62717,
                 "HTML": 121906
               },
-              "remainingUsdBudget": 99250.00
+              "remainingUsdBudget": 99250,
+              "rewardSettings": {
+                "ignorePullRequests": false,
+                "ignoreIssues": false,
+                "ignoreCodeReviews": false,
+                "ignoreContributionsBefore": null
+              }
             }
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
@@ -1924,7 +1999,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
             }
             """;
     @Autowired
-    ProjectRepository projectRepository;
+    ProjectViewRepository projectViewRepository;
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired
@@ -2015,12 +2090,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var auth = userHelper.authenticatePierre();
 
-        final ProjectEntity bretzel = projectRepository.findByKey("bretzel").orElseThrow();
-        projectLeaderInvitationRepository.save(ProjectLeaderInvitationEntity.builder()
-                .projectId(bretzel.getId())
-                .githubUserId(auth.user().getGithubUserId())
-                .id(UUID.randomUUID())
-                .build());
+        final ProjectViewEntity bretzel = projectViewRepository.findByKey("bretzel").orElseThrow();
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(),
+                auth.user().getGithubUserId()));
 
         // When
         client.get()

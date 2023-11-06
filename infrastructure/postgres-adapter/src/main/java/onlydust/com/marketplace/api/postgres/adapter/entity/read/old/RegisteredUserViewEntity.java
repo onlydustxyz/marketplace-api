@@ -31,7 +31,7 @@ public class RegisteredUserViewEntity {
     @Column(name = "html_url", nullable = false)
     String htmlUrl;
     @Column(name = "email")
-    String bio;
+    String email;
     @Column(name = "last_seen")
     LocalDateTime lastSeen;
     @Column(name = "admin")

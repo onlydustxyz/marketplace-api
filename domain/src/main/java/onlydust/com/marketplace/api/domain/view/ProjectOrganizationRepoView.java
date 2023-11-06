@@ -3,15 +3,19 @@ package onlydust.com.marketplace.api.domain.view;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 @Builder
-public class RepoCardView {
+public class ProjectOrganizationRepoView {
     Long githubRepoId;
     String owner;
     String name;
     String description;
-    Integer starCount;
-    Integer forkCount;
+    Long starCount;
+    Long forkCount;
     String url;
     Boolean hasIssues;
+    Boolean isIncludedInProject;
+    Map<String, Long> technologies;
 }
