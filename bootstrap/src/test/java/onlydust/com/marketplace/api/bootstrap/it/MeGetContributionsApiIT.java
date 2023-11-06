@@ -261,6 +261,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "contributions": [

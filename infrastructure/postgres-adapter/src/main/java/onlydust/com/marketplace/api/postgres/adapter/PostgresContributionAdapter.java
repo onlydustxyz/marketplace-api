@@ -5,19 +5,20 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
+import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionViewEntityRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.GithubRepoViewEntityRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectViewEntityRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class PostgresContributionAdapter implements ContributionStoragePort {
@@ -25,6 +26,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
+    private final ContributionDetailsViewEntityRepository contributionDetailsViewEntityRepository;
+    private final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -50,6 +53,16 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 .totalItemNumber((int) contributionPage.getTotalElements())
                 .totalPageNumber(contributionPage.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public Optional<MyContributionDetailsView> findContributionById(String id) {
+        return contributionDetailsViewEntityRepository.findContributionById(id)
+                .map(contribution -> {
+                    final var rewards = contributionRewardViewEntityRepository.listByContributionId(id);
+                    return contribution.toView()
+                            .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
+                });
     }
 
     private List<String> sortBy(ContributionView.Sort sort) {

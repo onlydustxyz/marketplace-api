@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
-import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
@@ -31,6 +28,11 @@ public class DomainConfiguration {
     @Bean
     public UUIDGeneratorPort uuidGeneratorPort() {
         return UUID::randomUUID;
+    }
+
+    @Bean
+    public ContributionFacadePort contributionFacadePort(final ContributionStoragePort contributionStoragePort) {
+        return new ContributionService(contributionStoragePort);
     }
 
     @Bean

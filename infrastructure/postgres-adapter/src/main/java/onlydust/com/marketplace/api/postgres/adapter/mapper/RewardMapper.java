@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.view.CodeReviewOutcome;
-import onlydust.com.marketplace.api.domain.view.ReceiptView;
-import onlydust.com.marketplace.api.domain.view.RewardItemView;
-import onlydust.com.marketplace.api.domain.view.RewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity;
@@ -152,7 +149,7 @@ public interface RewardMapper {
                 })
                 .repoName(rewardItemViewEntity.getRepoName())
                 .authorLogin(rewardItemViewEntity.getAuthorLogin())
-                .status(statusToDomain(rewardItemViewEntity.getDraft(), rewardItemViewEntity.getStatus()))
+                .status(githubStatusToDomain(rewardItemViewEntity.getDraft(), rewardItemViewEntity.getStatus()))
                 .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()) {
                     case approved -> CodeReviewOutcome.approved;
                     case change_requested -> CodeReviewOutcome.changeRequested;
@@ -160,7 +157,7 @@ public interface RewardMapper {
                 .build();
     }
 
-    private static RewardItemView.Status statusToDomain(final Boolean draft, final String status) {
+    private static RewardItemView.Status githubStatusToDomain(final Boolean draft, final String status) {
         if (nonNull(draft) && draft) {
             return RewardItemView.Status.DRAFT;
         }
@@ -172,6 +169,23 @@ public interface RewardMapper {
             case "completed" -> RewardItemView.Status.COMPLETED;
             case "cancelled" -> RewardItemView.Status.CANCELLED;
             default -> RewardItemView.Status.OPEN;
+        };
+    }
+
+    static UserRewardView.RewardStatusView mapStatusForUser(String status) {
+        return switch (status) {
+            case "PENDING_INVOICE" -> UserRewardView.RewardStatusView.pendingInvoice;
+            case "COMPLETE" -> UserRewardView.RewardStatusView.complete;
+            case "MISSING_PAYOUT_INFO" -> UserRewardView.RewardStatusView.missingPayoutInfo;
+            default -> UserRewardView.RewardStatusView.processing;
+        };
+    }
+
+    static ProjectRewardView.RewardStatusView mapStatusForProject(String status) {
+        return switch (status) {
+            case "PENDING_SIGNUP" -> ProjectRewardView.RewardStatusView.pendingSignup;
+            case "COMPLETE" -> ProjectRewardView.RewardStatusView.complete;
+            default -> ProjectRewardView.RewardStatusView.processing;
         };
     }
 }

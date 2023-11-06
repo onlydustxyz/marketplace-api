@@ -3,10 +3,12 @@ package onlydust.com.marketplace.api.domain.port.output;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
+import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ContributionStoragePort {
     Page<ContributionView> findContributionsForUser(Long contributorId,
@@ -15,6 +17,8 @@ public interface ContributionStoragePort {
                                                     SortDirection direction,
                                                     Integer page,
                                                     Integer pageSize);
+
+    Optional<MyContributionDetailsView> findContributionById(String id);
 
     List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters);
 

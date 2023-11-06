@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class MyContributionDetailsView {
     String id;
     Date createdAt;
@@ -24,4 +24,10 @@ public class MyContributionDetailsView {
     String repoName;
     List<ContributionLinkView> links;
     List<MyContributionRewardView> rewards;
+
+    public MyContributionDetailsView withRewards(List<MyContributionRewardView> rewards) {
+        return this.toBuilder()
+                .rewards(rewards)
+                .build();
+    }
 }
