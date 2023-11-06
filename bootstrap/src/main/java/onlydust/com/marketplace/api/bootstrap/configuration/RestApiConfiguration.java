@@ -26,8 +26,9 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public UsersRestApi usersRestApi(final UserFacadePort userFacadePort) {
-        return new UsersRestApi(userFacadePort);
+    public UsersRestApi usersRestApi(final UserFacadePort userFacadePort,
+                                     final ContributorFacadePort contributorFacadePort) {
+        return new UsersRestApi(userFacadePort, contributorFacadePort);
     }
 
     @Bean

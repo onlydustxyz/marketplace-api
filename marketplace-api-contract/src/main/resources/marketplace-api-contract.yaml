@@ -484,6 +484,66 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/users/search:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Users
+      summary: Search contributors by login
+      operationId: searchContributors
+      description: |
+        Get the list of all contributors of the project's repos or provided repos who match the login input query.
+        If not enough results are found, the search is extended to the 5 best matching github users (by login).
+      parameters:
+        - in: query
+          name: projectId
+          description: |
+            Allows to trigger internal contributors search within the project's repos.
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: repoIds
+          description: |
+            Allows to trigger internal contributors search within the provided repos.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: login
+          description: login query
+          schema:
+            type: string
+        - in: query
+          name: maxInternalContributorCountToTriggerExternalSearch
+          description: |
+            If the number of internal contributors is greater than this value, the external search is not triggered.
+            Default value is 5.
+          schema:
+            type: integer
+        - in: query
+          name: maxInternalContributorCountToReturn
+          description: |
+            Max number of internal contributors that can be returned.
+            Default value is 50.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorSearchResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/users/{githubId}:
     get:
       tags:
@@ -770,43 +830,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContributorsPageResponse'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/projects/{projectId}/search/contributors:
-    get:
-      security:
-        - { }
-        - bearerAuth: [ ]
-      tags:
-        - Projects
-      summary: Search project contributors by login
-      operationId: searchProjectContributors
-      description: |
-        Get the list of all contributors of the project matching the input query.
-        If not enough results are found, the search is extended to the 5 best matching github users.
-      parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: login
-          description: login query
-          schema:
-            type: string
-      responses:
-        "200":
-          description: 'List of project contributors'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ContributorSearchResponse'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":

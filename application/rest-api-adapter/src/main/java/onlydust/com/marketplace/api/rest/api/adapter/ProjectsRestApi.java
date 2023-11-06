@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
@@ -106,12 +105,6 @@ public class ProjectsRestApi implements ProjectsApi {
         final UploadImageResponse response = new UploadImageResponse();
         response.url(imageUrl.toString());
         return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<ContributorSearchResponse> searchProjectContributors(UUID projectId, String login) {
-        final var contributors = contributorFacadePort.searchContributors(projectId, login);
-        return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
     }
 
     @Override

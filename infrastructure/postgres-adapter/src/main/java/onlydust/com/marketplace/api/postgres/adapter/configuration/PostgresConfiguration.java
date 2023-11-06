@@ -85,6 +85,7 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
+                                                   final CustomContributorRepository customContributorRepository,
                                                    final UserRepository userRepository,
                                                    final UserViewRepository userViewRepository,
                                                    final GlobalSettingsRepository globalSettingsRepository,
@@ -101,6 +102,7 @@ public class PostgresConfiguration {
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository) {
         return new PostgresUserAdapter(customUserRepository,
+                customContributorRepository,
                 userRepository,
                 userViewRepository,
                 globalSettingsRepository,

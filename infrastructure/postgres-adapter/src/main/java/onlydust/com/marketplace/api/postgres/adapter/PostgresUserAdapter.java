@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -27,10 +24,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -38,6 +32,7 @@ import static java.lang.String.format;
 public class PostgresUserAdapter implements UserStoragePort {
 
     private final CustomUserRepository customUserRepository;
+    private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
     private final GlobalSettingsRepository globalSettingsRepository;
@@ -262,8 +257,25 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId) {
         return customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId)
                 .stream().map(UserRewardMapper::mapEntityToDomain).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login,
+                                                       int maxContributorCountToReturn) {
+        return customContributorRepository.findReposContributorsByLogin(reposIds, login, maxContributorCountToReturn)
+                .stream()
+                .map(entity -> Contributor.builder()
+                        .id(GithubUserIdentity.builder()
+                                .githubUserId(entity.getGithubUserId())
+                                .githubLogin(entity.getLogin())
+                                .githubAvatarUrl(entity.getAvatarUrl())
+                                .build())
+                        .isRegistered(entity.getIsRegistered())
+                        .build()).toList();
     }
 }

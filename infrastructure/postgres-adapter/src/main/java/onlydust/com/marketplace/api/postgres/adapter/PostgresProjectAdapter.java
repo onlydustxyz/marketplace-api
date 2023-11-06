@@ -2,7 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -208,12 +211,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         this.projectRepository.save(project);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<Contributor> searchContributorsByLogin(UUID projectId, String login) {
-        return customProjectRepository.findProjectContributorsByLogin(projectId, login)
-                .stream().map(entity -> Contributor.builder().id(GithubUserIdentity.builder().githubUserId(entity.getGithubUserId()).githubLogin(entity.getLogin()).githubAvatarUrl(entity.getAvatarUrl()).build()).isRegistered(entity.getIsRegistered()).build()).toList();
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -308,5 +305,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .totalItemNumber(count)
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> getProjectRepoIds(UUID projectId) {
+        final var project = projectRepository.getById(projectId);
+        return project.getRepos() == null ? Set.of() : project.getRepos().stream()
+                .map(repo -> repo.getPrimaryKey().getRepoId())
+                .collect(Collectors.toSet());
     }
 }
