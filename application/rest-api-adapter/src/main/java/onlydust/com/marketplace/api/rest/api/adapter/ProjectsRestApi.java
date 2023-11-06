@@ -180,11 +180,11 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<RewardResponse> getProjectReward(UUID projectId, UUID rewardId) {
+    public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.rewardToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
     }
 
     @Override

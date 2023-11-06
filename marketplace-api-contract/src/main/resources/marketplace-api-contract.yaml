@@ -414,7 +414,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardResponse'
+                $ref: '#/components/schemas/RewardDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -678,6 +678,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/contributions/{contributionId}:
+    get:
+      tags:
+        - Contributions
+      summary: Get contribution details
+      operationId: getContribution
+      description: |
+        Get the details of a given contribution.
+      parameters:
+        - in: path
+          name: contributionId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      responses:
+        "200":
+          description: 'Contribution details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionDetailsResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}:
     get:
@@ -990,7 +1015,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardResponse'
+                $ref: '#/components/schemas/RewardDetailsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1323,6 +1348,11 @@ components:
 
 
     # VALUE OBJECTS ==================================================================
+    ContributionId:
+      type: string
+      description: Contribution ID
+      example: 2189e8dc91876fa1686e81b09de33ca7bdca08e80854d4cada02c8288cf03739
+
     UserId:
       type: string
       format: uuid
@@ -2748,6 +2778,34 @@ components:
           type: string
           description: The body of the contribution.
 
+    ContributionDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionResponse'
+        - type: object
+          required:
+            - project_name
+            - repo_name
+            - links
+            - rewards
+          properties:
+            project_name:
+              type: string
+              description: Project name
+              example: Verkle Tries
+            repo_name:
+              type: string
+              description: Github repository name
+              example: marketplace-backend
+            links:
+              type: array
+              description: Related contributions
+              items:
+                $ref: '#/components/schemas/ContributionLinkResponse'
+            rewards:
+              type: array
+              description: Rewards granted for this contribution
+              items:
+                $ref: '#/components/schemas/RewardResponse'
 
     GetMeResponse:
       type: object
@@ -3044,7 +3102,6 @@ components:
         currency:
           $ref: '#/components/schemas/CurrencyContract'
 
-
     RewardResponse:
       type: object
       required:
@@ -3077,8 +3134,14 @@ components:
         processedAt:
           type: string
           format: date-time
-        receipt:
-          $ref: '#/components/schemas/ReceiptResponse'
+
+    RewardDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/RewardResponse'
+        - type: object
+          properties:
+            receipt:
+              $ref: '#/components/schemas/ReceiptResponse'
 
     RewardItemsPageResponse:
       type: object

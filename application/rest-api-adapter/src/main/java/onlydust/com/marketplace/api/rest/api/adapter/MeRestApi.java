@@ -177,11 +177,11 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<RewardResponse> getMyReward(UUID rewardId) {
+    public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = userFacadePort.getRewardByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId());
-        return ResponseEntity.ok(RewardMapper.rewardToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
     }
 
     @Override
