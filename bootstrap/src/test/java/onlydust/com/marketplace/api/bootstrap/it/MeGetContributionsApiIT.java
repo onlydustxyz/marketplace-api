@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .json("""
                         {
@@ -147,7 +148,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.projects.length()").isEqualTo(2)
@@ -176,7 +177,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isOk()
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(18)
                 .jsonPath("$.projects.length()").isEqualTo(1)
@@ -204,7 +205,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isOk()
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(40)
                 .jsonPath("$.contributions[0].type").isEqualTo("ISSUE")
@@ -229,7 +230,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
