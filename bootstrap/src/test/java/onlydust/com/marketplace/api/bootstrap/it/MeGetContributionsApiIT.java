@@ -317,4 +317,39 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
         ;
     }
+
+    @Test
+    void should_order_by_github_number_title() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "1", "sort", "GITHUB_NUMBER_TITLE")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("8")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("feat: add main logic and output structure")
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "GITHUB_NUMBER_TITLE",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1318")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("This is a test PR for development purposes")
+        ;
+    }
 }
