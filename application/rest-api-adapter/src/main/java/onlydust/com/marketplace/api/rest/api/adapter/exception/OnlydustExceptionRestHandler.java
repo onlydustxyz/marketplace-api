@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.rest.api.adapter.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +65,24 @@ public class OnlydustExceptionRestHandler {
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     protected ResponseEntity<OnlyDustError> handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                exception
+        ));
+    }
+
+    @ExceptionHandler({BindException.class})
+    protected ResponseEntity<OnlyDustError> handleBindException(final BindException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                exception.getMessage(),
+                exception
+        ));
+    }
+
+    @ExceptionHandler({JsonMappingException.class})
+    protected ResponseEntity<OnlyDustError> handleJsonMappingException(final JsonMappingException exception) {
         return handleOnlyDustException(new OnlyDustException(
                 HttpStatus.BAD_REQUEST.value(),
                 exception.getMessage(),
