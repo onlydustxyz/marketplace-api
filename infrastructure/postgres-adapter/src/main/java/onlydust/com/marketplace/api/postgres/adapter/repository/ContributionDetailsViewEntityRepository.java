@@ -5,25 +5,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ContributionDetailsViewEntityRepository extends JpaRepository<ContributionDetailsViewEntity, String> {
 
     @Query(value = """
                 SELECT 
                    c.id,
-                    c.created_at,
-                    c.completed_at,
-                    c.type,
-                    c.status,
-                    COALESCE(pr.number, i.number, cr_pr.number) as github_number,
-                    COALESCE(pr.title, i.title, cr_pr.title) as github_title,
-                    COALESCE(pr.html_url, i.html_url, cr_pr.html_url) as github_html_url,
-                    COALESCE(pr.body, i.body, cr_pr.body) as github_body,
-                    p.name as project_name,
-                    r.name as repo_name,
-                    COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links
+                   c.created_at,
+                   c.completed_at,
+                   c.type,
+                   c.status,
+                   COALESCE(pr.number, i.number, cr_pr.number) as github_number,
+                   COALESCE(pr.title, i.title, cr_pr.title) as github_title,
+                   COALESCE(pr.html_url, i.html_url, cr_pr.html_url) as github_html_url,
+                   COALESCE(pr.body, i.body, cr_pr.body) as github_body,
+                   p.name as project_name,
+                   r.name as repo_name,
+                   COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links
                 FROM
-                    indexer_exp.contributions c
+                   indexer_exp.contributions c
                 LEFT JOIN indexer_exp.github_pull_requests pr ON pr.id = pull_request_id
                 LEFT JOIN indexer_exp.github_issues i ON i.id = issue_id
                 LEFT JOIN indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
@@ -114,7 +115,8 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                         pr.project_id = p.project_id
                 ) AS rewards ON TRUE
                 WHERE 
-                    c.id = :contributionId
+                    c.id = :contributionId AND
+                    p.project_id = :projectId
             """, nativeQuery = true)
-    Optional<ContributionDetailsViewEntity> findContributionById(String contributionId);
+    Optional<ContributionDetailsViewEntity> findContributionById(UUID projectId, String contributionId);
 }

@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresContributionAdapter implements ContributionStoragePort {
@@ -56,10 +57,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
-    public Optional<MyContributionDetailsView> findContributionById(String id) {
-        return contributionDetailsViewEntityRepository.findContributionById(id)
+    public Optional<MyContributionDetailsView> findContributionById(UUID projectId, String contributionId) {
+        return contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
                 .map(contribution -> {
-                    final var rewards = contributionRewardViewEntityRepository.listByContributionId(id);
+                    final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
+                            contributionId);
                     return contribution.toView()
                             .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
                 });

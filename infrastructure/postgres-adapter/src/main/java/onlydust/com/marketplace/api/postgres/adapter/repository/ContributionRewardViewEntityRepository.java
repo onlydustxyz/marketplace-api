@@ -166,7 +166,8 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
             LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency
             LEFT JOIN payout_checks ON payout_checks.recipient_id = pr.recipient_id AND payout_checks.id = pr.id
             WHERE
-                c.id = :contributionId
+                c.id = :contributionId AND
+                pr.project_id = :projectId
             """, nativeQuery = true)
-    List<ContributionRewardViewEntity> listByContributionId(String contributionId);
+    List<ContributionRewardViewEntity> listByContributionId(UUID projectId, String contributionId);
 }

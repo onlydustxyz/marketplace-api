@@ -19,14 +19,16 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(CONTRIBUTIONS_GET_BY_ID, "000000")))
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "298a547f-ecb6-4ab2-8975-68f4e9bf7b39", "000000"
+                )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .isNotFound();
     }
-    
+
     @Test
     void should_return_contribution_details_when_found() {
         // Given
@@ -34,7 +36,8 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(CONTRIBUTIONS_GET_BY_ID,
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -53,7 +56,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubTitle": "Anthony buisset feature/starknet",
                           "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/62",
                           "githubBody": null,
-                          "project_name": "Mooooooonlight",
+                          "project_name": "kaaper",
                           "repo_name": "marketplace-frontend",
                           "links": [],
                           "rewards": [

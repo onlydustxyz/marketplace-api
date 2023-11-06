@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ContributionStoragePort {
     Page<ContributionView> findContributionsForUser(Long contributorId,
@@ -18,7 +19,7 @@ public interface ContributionStoragePort {
                                                     Integer page,
                                                     Integer pageSize);
 
-    Optional<MyContributionDetailsView> findContributionById(String id);
+    Optional<MyContributionDetailsView> findContributionById(UUID projectId, String contributionId);
 
     List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters);
 

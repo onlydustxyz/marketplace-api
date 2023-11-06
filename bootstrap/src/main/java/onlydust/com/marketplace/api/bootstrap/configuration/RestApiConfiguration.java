@@ -15,16 +15,13 @@ import java.util.Date;
 public class RestApiConfiguration {
 
     @Bean
-    public ContributionsRestApi contributionsRestApi(final ContributionFacadePort contributionFacadePort) {
-        return new ContributionsRestApi(contributionFacadePort);
-    }
-
-    @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
                                           final ContributorFacadePort contributorFacadePort,
                                           final AuthenticationService authenticationService,
-                                          final RewardService<HasuraAuthentication> rewardService) {
-        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService);
+                                          final RewardService<HasuraAuthentication> rewardService,
+                                          final ContributionFacadePort contributionFacadePort) {
+        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService,
+                contributionFacadePort);
     }
 
     @Bean
