@@ -41,8 +41,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": ":memo: Update README with installation instructions",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/11",
                               "githubBody": null,
-                              "project_name": "No sponsors",
-                              "repo_name": "marketplace-frontend",
+                              "projectName": "No sponsors",
+                              "repoName": "marketplace-frontend",
                               "links": [],
                               "rewardIds": null
                             },
@@ -56,8 +56,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": ":memo: Update README with installation instructions",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/11",
                               "githubBody": null,
-                              "project_name": "No sponsors",
-                              "repo_name": "marketplace-frontend",
+                              "projectName": "No sponsors",
+                              "repoName": "marketplace-frontend",
                               "links": [],
                               "rewardIds": null
                             },
@@ -71,8 +71,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": ":memo: Update README with installation instructions",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/11",
                               "githubBody": null,
-                              "project_name": "No sponsors",
-                              "repo_name": "marketplace-frontend",
+                              "projectName": "No sponsors",
+                              "repoName": "marketplace-frontend",
                               "links": [],
                               "rewardIds": null
                             }

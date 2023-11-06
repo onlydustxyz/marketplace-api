@@ -2559,16 +2559,16 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - project_name
-            - repo_name
+            - projectName
+            - repoName
             - links
             - rewardIds
           properties:
-            project_name:
+            projectName:
               type: string
               description: Project name
               example: Verkle Tries
-            repo_name:
+            repoName:
               type: string
               description: Github repository name
               example: marketplace-backend
