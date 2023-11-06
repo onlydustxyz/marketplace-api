@@ -24,7 +24,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 COALESCE(pr.body, i.body, cr_pr.body) as github_body,
                 p.name as project_name,
                 r.name as repo_name,
-                COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links
+                COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links,
+                rewards.ids as reward_ids
             FROM 
                 indexer_exp.contributions c
             LEFT JOIN indexer_exp.github_pull_requests pr ON pr.id = pull_request_id
@@ -105,6 +106,17 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 GROUP BY 
                     c.id
             ) AS reviewed_pull_requests ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT 
+                    jsonb_agg(pr.id) as ids
+                FROM
+                    payment_requests pr
+                JOIN work_items wi ON wi.payment_id = pr.id 
+                WHERE
+                    wi.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id) AND
+                    c.contributor_id = pr.recipient_id AND
+                    pr.project_id = p.project_id
+            ) AS rewards ON TRUE
             WHERE 
                 contributor_id = :contributorId AND
                 (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds)) AND

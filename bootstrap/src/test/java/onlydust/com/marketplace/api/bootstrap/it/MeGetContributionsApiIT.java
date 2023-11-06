@@ -45,7 +45,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "No sponsors",
                               "repoName": "marketplace-frontend",
                               "links": [],
-                              "rewardIds": null
+                              "rewardIds": []
                             },
                             {
                               "id": "94c28c8ac7b92df46aa30bab982815275abe0369fdaea61b342c15729e67a8ac",
@@ -60,7 +60,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "No sponsors",
                               "repoName": "marketplace-frontend",
                               "links": [],
-                              "rewardIds": null
+                              "rewardIds": []
                             },
                             {
                               "id": "94c28c8ac7b92df46aa30bab982815275abe0369fdaea61b342c15729e67a8ac",
@@ -75,7 +75,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "No sponsors",
                               "repoName": "marketplace-frontend",
                               "links": [],
-                              "rewardIds": null
+                              "rewardIds": []
                             }
                           ],
                           "projects": [
@@ -238,6 +238,48 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.totalPageNumber").isEqualTo(11)
                 .jsonPath("$.totalItemNumber").isEqualTo(545)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
+        ;
+    }
+
+    @Test
+    void should_get_list_rewards_associated_to_a_contribution() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "page", "17",
+                                "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "repositories", "498695724",
+                                "statuses", "COMPLETED",
+                                "types", "PULL_REQUEST")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .json("""
+                        {
+                          "contributions": [
+                            {
+                              "rewardIds": [
+                                "6587511b-3791-47c6-8430-8f793606c63a",
+                                "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf",
+                                "335e45a5-7f59-4519-8a12-1addc530214c",
+                                "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
+                                "e33ea956-d2f5-496b-acf9-e2350faddb16",
+                                "dd7d445f-6915-4955-9bae-078173627b05",
+                                "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                                "95e079c9-609c-4531-8c5c-13217306b299"
+                              ]
+                            }
+                          ]
+                        }
+
+                        """)
         ;
     }
 }
