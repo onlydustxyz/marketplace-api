@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +17,7 @@ public class MyContributionDetailsView {
     Date completedAt;
     ContributionType type;
     ContributionStatus status;
+    GithubUserIdentity contributor;
     Long githubNumber;
     String githubTitle;
     String githubHtmlUrl;

@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
 import org.hibernate.annotations.TypeDef;
 
@@ -24,6 +25,7 @@ public class ContributionDetailsViewEntity {
     String id;
     Date createdAt;
     Date completedAt;
+
     @Enumerated(EnumType.STRING)
     @org.hibernate.annotations.Type(type = "contribution_type")
     Type type;
@@ -36,17 +38,27 @@ public class ContributionDetailsViewEntity {
     String githubBody;
     String projectName;
     String repoName;
+    String contributorLogin;
+    String contributorAvatarUrl;
+    Long contributorId;
 
     @org.hibernate.annotations.Type(type = "jsonb")
     List<ContributionLinkViewEntity> links;
 
     public MyContributionDetailsView toView() {
+        final var contributor = GithubUserIdentity.builder()
+                .githubLogin(contributorLogin)
+                .githubAvatarUrl(contributorAvatarUrl)
+                .githubUserId(contributorId)
+                .build();
+
         return MyContributionDetailsView.builder()
                 .id(id)
                 .createdAt(createdAt)
                 .completedAt(completedAt)
                 .type(type.toView())
                 .status(status.toView())
+                .contributor(contributor)
                 .githubNumber(githubNumber)
                 .githubTitle(githubTitle)
                 .githubHtmlUrl(githubHtmlUrl)

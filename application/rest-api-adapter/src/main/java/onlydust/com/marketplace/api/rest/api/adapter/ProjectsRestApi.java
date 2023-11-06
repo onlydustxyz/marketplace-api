@@ -207,8 +207,13 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
         return contributionsFacadePort.getContribution(projectId, contributionId)
-                .map(contribution -> ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution)))
+                .map(contribution -> contribution.getContributor().getGithubUserId().equals(authenticatedUser.getGithubUserId()) ?
+                        ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution)) :
+                        new ResponseEntity<ContributionDetailsResponse>(HttpStatus.FORBIDDEN)
+                )
                 .orElse(ResponseEntity.notFound().build());
     }
 }

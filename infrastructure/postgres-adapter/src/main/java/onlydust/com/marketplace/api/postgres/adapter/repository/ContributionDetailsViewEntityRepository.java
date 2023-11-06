@@ -22,9 +22,13 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                    COALESCE(pr.body, i.body, cr_pr.body) as github_body,
                    p.name as project_name,
                    r.name as repo_name,
-                   COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links
+                   COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links,
+                   ga.login as contributor_login,
+                   ga.avatar_url as contributor_avatar_url,
+                   c.contributor_id
                 FROM
                    indexer_exp.contributions c
+                JOIN indexer_exp.github_accounts ga ON ga.id = c.contributor_id
                 LEFT JOIN indexer_exp.github_pull_requests pr ON pr.id = pull_request_id
                 LEFT JOIN indexer_exp.github_issues i ON i.id = issue_id
                 LEFT JOIN indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
