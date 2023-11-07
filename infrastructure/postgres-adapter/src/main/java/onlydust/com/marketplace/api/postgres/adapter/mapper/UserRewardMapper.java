@@ -15,13 +15,7 @@ public interface UserRewardMapper {
         return UserRewardView.builder()
                 .amount(UserRewardView.RewardAmountView.builder()
                         .dollarsEquivalent(entity.getDollarsEquivalent())
-                        .currency(switch (entity.getCurrency()) {
-                            case op -> Currency.Op;
-                            case apt -> Currency.Apt;
-                            case usd -> Currency.Usd;
-                            case eth -> Currency.Eth;
-                            case stark -> Currency.Stark;
-                        })
+                        .currency(entity.getCurrency().toDomain())
                         .total(entity.getAmount())
                         .build())
                 .rewardedOnProjectLogoUrl(entity.getLogoUrl())
@@ -30,16 +24,11 @@ public interface UserRewardMapper {
                 .id(entity.getId())
                 .requestedAt(entity.getRequestedAt())
                 .projectId(entity.getProjectId())
-                .status(switch (entity.getStatus()) {
-                    case "PENDING_INVOICE" -> UserRewardView.RewardStatusView.pendingInvoice;
-                    case "COMPLETE" -> UserRewardView.RewardStatusView.complete;
-                    case "MISSING_PAYOUT_INFO" -> UserRewardView.RewardStatusView.missingPayoutInfo;
-                    default -> UserRewardView.RewardStatusView.processing;
-                })
+                .status(RewardMapper.mapStatusForUser(entity.getStatus()))
                 .build();
     }
 
-        static UserRewardTotalAmountsView mapTotalAmountEntitiesToDomain(final List<UserRewardTotalAmountEntity> entities) {
+    static UserRewardTotalAmountsView mapTotalAmountEntitiesToDomain(final List<UserRewardTotalAmountEntity> entities) {
         final UserRewardTotalAmountsView userRewardTotalAmountsView = UserRewardTotalAmountsView.builder().build();
         for (UserRewardTotalAmountEntity entity : entities) {
             userRewardTotalAmountsView.addUserTotalReward(UserTotalRewardView.builder()

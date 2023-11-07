@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
@@ -16,6 +17,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
@@ -49,6 +51,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ContributorFacadePort contributorFacadePort;
     private final AuthenticationService authenticationService;
     private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
+    private final ContributionFacadePort contributionsFacadePort;
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
@@ -180,11 +183,11 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<RewardResponse> getProjectReward(UUID projectId, UUID rewardId) {
+    public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.rewardToResponse(rewardView));
+        return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
     }
 
     @Override
@@ -199,5 +202,15 @@ public class ProjectsRestApi implements ProjectsApi {
         return rewardItemsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        final var contribution = contributionsFacadePort.getContribution(projectId, contributionId,
+                authenticatedUser.getGithubUserId());
+
+        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution));
     }
 }

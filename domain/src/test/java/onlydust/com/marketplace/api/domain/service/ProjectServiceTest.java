@@ -4,10 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
@@ -216,7 +213,8 @@ public class ProjectServiceTest {
     void should_check_project_lead_permissions_when_getting_project_contributors_given_an_invalid_project_lead() {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -242,7 +240,8 @@ public class ProjectServiceTest {
     void should_check_project_lead_permissions_when_getting_project_contributors_given_a_valid_project_lead() {
         // Given
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -268,7 +267,8 @@ public class ProjectServiceTest {
     @Test
     void should_check_project_lead_permissions_when_getting_project_rewards_given_a_valid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -290,7 +290,8 @@ public class ProjectServiceTest {
     @Test
     void should_throw_forbidden_exception_when_getting_project_rewards_given_an_invalid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -320,7 +321,8 @@ public class ProjectServiceTest {
     @Test
     void should_check_project_lead_permissions_when_getting_project_budgets_given_a_valid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -338,7 +340,8 @@ public class ProjectServiceTest {
     @Test
     void should_throw_forbidden_exception_when_getting_project_budgets_given_an_invalid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -364,7 +367,8 @@ public class ProjectServiceTest {
     @Test
     void should_check_project_lead_permissions_when_getting_project_reward_by_id_given_a_valid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -383,7 +387,8 @@ public class ProjectServiceTest {
     @Test
     void should_throw_forbidden_exception_when_getting_project_reward_by_id_given_an_invalid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -409,7 +414,8 @@ public class ProjectServiceTest {
     @Test
     void should_check_project_lead_permissions_when_getting_project_reward_items_by_id_given_a_valid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();
@@ -428,7 +434,8 @@ public class ProjectServiceTest {
     @Test
     void should_throw_forbidden_exception_when_getting_project_reward_items_by_id_given_an_invalid_project_lead() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-        final PermissionService permissionService = new PermissionService(projectStoragePort);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
         final UUID projectId = UUID.randomUUID();

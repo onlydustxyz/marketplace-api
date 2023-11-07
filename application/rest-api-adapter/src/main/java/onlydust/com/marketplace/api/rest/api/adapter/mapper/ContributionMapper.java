@@ -1,13 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributionLinkResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionPageResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionSort;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -105,4 +103,20 @@ public interface ContributionMapper {
         };
     }
 
+    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution) {
+        return new ContributionDetailsResponse()
+                .id(contribution.getId())
+                .createdAt(DateMapper.toZoneDateTime(contribution.getCreatedAt()))
+                .completedAt(DateMapper.toZoneDateTime(contribution.getCompletedAt()))
+                .type(mapContributionTypeToResponse(contribution.getType()))
+                .status(ContributionMapper.mapContributionStatusToResponse(contribution.getStatus()))
+                .githubNumber(contribution.getGithubNumber())
+                .githubTitle(contribution.getGithubTitle())
+                .githubHtmlUrl(contribution.getGithubHtmlUrl())
+                .githubBody(contribution.getGithubBody())
+                .projectName(contribution.getProjectName())
+                .repoName(contribution.getRepoName())
+                .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
+                .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
+    }
 }

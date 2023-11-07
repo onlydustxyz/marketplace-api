@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserV
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
 import javax.persistence.EntityManager;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -134,6 +135,11 @@ public class CustomContributorRepository {
             LIMIT :limit
             """;
 
+    protected static final String GET_CONTRIBUTION_CONTRIBUTOR_ID = """
+            SELECT contributor_id
+            FROM indexer_exp.contributions
+            WHERE id = :contributionId
+            """;
 
     private final EntityManager entityManager;
 
@@ -184,5 +190,14 @@ public class CustomContributorRepository {
                 .setParameter("login", login != null ? login : "")
                 .setParameter("limit", limit)
                 .getResultList();
+    }
+
+    public Optional<Long> getContributionContributorId(String contributionId) {
+        final var result = entityManager
+                .createNativeQuery(GET_CONTRIBUTION_CONTRIBUTOR_ID)
+                .setParameter("contributionId", contributionId)
+                .getResultList();
+
+        return result.isEmpty() ? Optional.empty() : Optional.of(((BigInteger) result.get(0)).longValue());
     }
 }

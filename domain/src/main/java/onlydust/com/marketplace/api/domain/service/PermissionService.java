@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 
 import java.util.UUID;
@@ -8,8 +9,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PermissionService {
     private final ProjectStoragePort projectStoragePort;
+    private final ContributionStoragePort contributionStoragePort;
 
     public boolean isUserProjectLead(UUID projectId, UUID projectLeadId) {
         return projectStoragePort.getProjectLeadIds(projectId).contains(projectLeadId);
+    }
+
+    public boolean isUserContributor(String contributionId, Long githubUserId) {
+        return contributionStoragePort.getContributorId(contributionId).equals(githubUserId);
     }
 }

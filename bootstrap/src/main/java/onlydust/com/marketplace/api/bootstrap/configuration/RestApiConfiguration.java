@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.service.RewardService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
@@ -21,8 +18,10 @@ public class RestApiConfiguration {
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
                                           final ContributorFacadePort contributorFacadePort,
                                           final AuthenticationService authenticationService,
-                                          final RewardService<HasuraAuthentication> rewardService) {
-        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService);
+                                          final RewardService<HasuraAuthentication> rewardService,
+                                          final ContributionFacadePort contributionFacadePort) {
+        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService,
+                contributionFacadePort);
     }
 
     @Bean
