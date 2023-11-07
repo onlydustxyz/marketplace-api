@@ -524,7 +524,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidEthWallet());
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidOptimismWallet());
         assertEquals(true, userPayoutInfoValidationEntity.getHasValidStarknetWallet());
-        assertEquals(true, userPayoutInfoValidationEntity.getHasValidUsdcWallet());
+        assertEquals(false, userPayoutInfoValidationEntity.getHasValidUsdcWallet());
         assertEquals(false, userPayoutInfoValidationEntity.getHasValidBakingAccount());
         assertEquals(true, userPayoutInfoValidationEntity.getHasPendingPayments());
     }

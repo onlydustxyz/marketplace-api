@@ -89,7 +89,17 @@ public class CustomUserPayoutInfoRepository {
                                        and p_usdc is null
                                      limit 1), true)
                            )
-                       when (upi.identity -> 'Company' is not null and upi.usd_preferred_method = 'fiat') then true    
+                       when (
+                      (upi.identity -> 'Company' is not null and upi.usd_preferred_method = 'fiat' and
+                       (select count(pr_usd.id) > 0
+                        from payment_requests pr_usd
+                                 left join payments p_usd on p_usd.request_id = pr_usd.id
+                        where pr_usd.recipient_id = au.github_user_id
+                          and pr_usd.currency = 'usd'
+                          and p_usd.id is null))
+                      ) then (select count(*) > 0
+                              from bank_accounts ba
+                              where ba.user_id = upi.user_id)    
                        else (not exists(select 1
                                         from payment_requests pr_usdc
                                                  left join payments p_usdc on p_usdc.request_id = pr_usdc.id
