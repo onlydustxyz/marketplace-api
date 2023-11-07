@@ -26,7 +26,7 @@ public interface ProjectFacadePort {
 
     UUID createProject(CreateProjectCommand createProjectCommand);
 
-    void updateProject(UpdateProjectCommand updateProjectCommand);
+    void updateProject(UUID projectLeadId, UpdateProjectCommand updateProjectCommand);
 
     URL saveLogoImage(InputStream imageInputStream);
 

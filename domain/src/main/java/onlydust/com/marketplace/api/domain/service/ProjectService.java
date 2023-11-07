@@ -77,7 +77,11 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void updateProject(UpdateProjectCommand command) {
+    public void updateProject(UUID projectLeadId, UpdateProjectCommand command) {
+        if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can update their projects");
+        }
+
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }

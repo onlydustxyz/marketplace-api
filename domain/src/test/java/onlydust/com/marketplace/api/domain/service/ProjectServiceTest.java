@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -102,12 +103,14 @@ public class ProjectServiceTest {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                uuidGeneratorPort, mock(PermissionService.class), indexerPort, dateProvider);
+                uuidGeneratorPort, permissionService, indexerPort, dateProvider);
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
         final UpdateProjectCommand command = UpdateProjectCommand.builder()
                 .id(projectId)
                 .name(faker.pokemon().name())
@@ -129,7 +132,8 @@ public class ProjectServiceTest {
                 .build();
 
         // When
-        projectService.updateProject(command);
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        projectService.updateProject(projectLeadId, command);
 
         // Then
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
@@ -142,6 +146,49 @@ public class ProjectServiceTest {
                 imageUrl,
                 command.getRewardSettings()
         );
+    }
+
+    @Test
+    void should_not_update_project_when_user_is_not_lead() {
+        // Given
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
+        final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+                uuidGeneratorPort, permissionService, indexerPort, dateProvider);
+        final String imageUrl = faker.internet().image();
+        final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final UpdateProjectCommand command = UpdateProjectCommand.builder()
+                .id(projectId)
+                .name(faker.pokemon().name())
+                .shortDescription(faker.lorem().sentence())
+                .longDescription(faker.lorem().paragraph())
+                .isLookingForContributors(false)
+                .moreInfos(List.of(ProjectMoreInfoLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
+                .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
+                .projectLeadersToKeep(List.of(UUID.randomUUID()))
+                .githubRepoIds(List.of(faker.number().randomNumber()))
+                .imageUrl(imageUrl)
+                .rewardSettings(
+                        new ProjectRewardSettings(
+                                true,
+                                true,
+                                false,
+                                faker.date().birthday()
+                        ))
+                .build();
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> projectService.updateProject(projectLeadId, command))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only project leads can update their projects");
     }
 
     @Test

@@ -91,7 +91,9 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> updateProject(UUID projectId, UpdateProjectRequest updateProjectRequest) {
-        projectFacadePort.updateProject(mapUpdateProjectCommandToDomain(projectId, updateProjectRequest));
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        projectFacadePort.updateProject(authenticatedUser.getId(), mapUpdateProjectCommandToDomain(projectId,
+                updateProjectRequest));
         return ResponseEntity.noContent().build();
     }
 
