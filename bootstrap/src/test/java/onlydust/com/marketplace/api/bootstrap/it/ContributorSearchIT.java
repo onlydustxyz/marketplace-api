@@ -16,15 +16,13 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     final static UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"); // kaaper
     final static String PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE = """
             {
-              "internalContributors": [
+              "contributors": [
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                   "isRegistered": true
-                }
-              ],
-              "externalContributors": [
+                },
                 {
                   "githubUserId": 31220,
                   "login": "antho",
@@ -97,8 +95,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(17)
-                .jsonPath("$.externalContributors.length()").isEqualTo(0);
+                .jsonPath("$.contributors.length()").isEqualTo(17);
     }
 
     @Test
@@ -109,8 +106,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(21)
-                .jsonPath("$.externalContributors.length()").isEqualTo(0);
+                .jsonPath("$.contributors.length()").isEqualTo(21);
     }
 
     @Test
@@ -121,8 +117,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(0)
-                .jsonPath("$.externalContributors.length()").isEqualTo(5);
+                .jsonPath("$.contributors.length()").isEqualTo(5);
     }
 
     @Test

@@ -1804,14 +1804,9 @@ components:
     ContributorSearchResponse:
       type: object
       required:
-        - internalContributors
-        - externalContributors
+        - contributors
       properties:
-        internalContributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributorSearchItemResponse'
-        externalContributors:
+        contributors:
           type: array
           items:
             $ref: '#/components/schemas/ContributorSearchItemResponse'
