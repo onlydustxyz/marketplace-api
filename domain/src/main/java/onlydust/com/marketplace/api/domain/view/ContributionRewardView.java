@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class MyContributionRewardView {
+public class ContributionRewardView {
     UUID id;
     Currency currency;
     BigDecimal amount;

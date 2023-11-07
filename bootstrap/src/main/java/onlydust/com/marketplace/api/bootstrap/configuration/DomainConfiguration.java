@@ -31,8 +31,9 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ContributionFacadePort contributionFacadePort(final ContributionStoragePort contributionStoragePort) {
-        return new ContributionService(contributionStoragePort);
+    public ContributionFacadePort contributionFacadePort(final ContributionStoragePort contributionStoragePort,
+                                                         final PermissionService permissionService) {
+        return new ContributionService(contributionStoragePort, permissionService);
     }
 
     @Bean
@@ -110,8 +111,9 @@ public class DomainConfiguration {
     }
 
     @Bean
-    PermissionService permissionService(final ProjectStoragePort projectStoragePort) {
-        return new PermissionService(projectStoragePort);
+    PermissionService permissionService(final ProjectStoragePort projectStoragePort,
+                                        final ContributionStoragePort contributionStoragePort) {
+        return new PermissionService(projectStoragePort, contributionStoragePort);
     }
 
     @Bean

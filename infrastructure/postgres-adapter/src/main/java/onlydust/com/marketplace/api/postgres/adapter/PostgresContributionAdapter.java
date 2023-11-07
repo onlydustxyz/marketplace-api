@@ -5,8 +5,8 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
-import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
@@ -29,6 +29,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
     private final ContributionDetailsViewEntityRepository contributionDetailsViewEntityRepository;
     private final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository;
+    private final CustomContributorRepository customContributorRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -57,7 +58,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
-    public MyContributionDetailsView findContributionById(UUID projectId, String contributionId) {
+    public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
         final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
 
@@ -89,5 +90,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                         filters.getRepos()).stream()
                 .map(GithubRepoMapper::map)
                 .toList();
+    }
+
+    @Override
+    public Long getContributorId(String contributionId) {
+        return customContributorRepository.getContributionContributorId(contributionId)
+                .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
     }
 }

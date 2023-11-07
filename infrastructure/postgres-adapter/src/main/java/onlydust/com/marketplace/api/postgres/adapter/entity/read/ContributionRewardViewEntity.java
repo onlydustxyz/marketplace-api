@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.view.MyContributionRewardView;
+import onlydust.com.marketplace.api.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import org.hibernate.annotations.Type;
@@ -41,7 +41,7 @@ public class ContributionRewardViewEntity {
     String recipientAvatarUrl;
     Long recipientId;
 
-    public MyContributionRewardView toView() {
+    public ContributionRewardView toView() {
         final var requestor = GithubUserIdentity.builder()
                 .githubLogin(requestorLogin)
                 .githubAvatarUrl(requestorAvatarUrl)
@@ -53,7 +53,7 @@ public class ContributionRewardViewEntity {
                 .githubUserId(recipientId)
                 .build();
 
-        return MyContributionRewardView.builder()
+        return ContributionRewardView.builder()
                 .id(id)
                 .currency(currency.toDomain())
                 .amount(amount)

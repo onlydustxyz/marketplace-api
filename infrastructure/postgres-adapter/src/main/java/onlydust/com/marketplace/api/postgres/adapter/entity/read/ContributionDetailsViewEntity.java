@@ -5,7 +5,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
@@ -45,14 +45,14 @@ public class ContributionDetailsViewEntity {
     @org.hibernate.annotations.Type(type = "jsonb")
     List<ContributionLinkViewEntity> links;
 
-    public MyContributionDetailsView toView() {
+    public ContributionDetailsView toView() {
         final var contributor = GithubUserIdentity.builder()
                 .githubLogin(contributorLogin)
                 .githubAvatarUrl(contributorAvatarUrl)
                 .githubUserId(contributorId)
                 .build();
 
-        return MyContributionDetailsView.builder()
+        return ContributionDetailsView.builder()
                 .id(id)
                 .createdAt(createdAt)
                 .completedAt(completedAt)

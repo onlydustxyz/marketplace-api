@@ -145,10 +145,11 @@ public class PostgresConfiguration {
                                                                    final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                                    final GithubRepoViewEntityRepository githubRepoViewEntityRepository,
                                                                    final ContributionDetailsViewEntityRepository contributionDetailsViewEntityRepository,
-                                                                   final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository) {
+                                                                   final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository,
+                                                                   final CustomContributorRepository customContributorRepository) {
         return new PostgresContributionAdapter(contributionViewEntityRepository, shortProjectViewEntityRepository,
                 githubRepoViewEntityRepository, contributionDetailsViewEntityRepository,
-                contributionRewardViewEntityRepository);
+                contributionRewardViewEntityRepository, customContributorRepository);
     }
 
     @Bean

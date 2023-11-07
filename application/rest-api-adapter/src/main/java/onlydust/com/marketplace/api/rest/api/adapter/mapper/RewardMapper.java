@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.api.domain.view.MyContributionRewardView;
+import onlydust.com.marketplace.api.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.api.domain.view.ReceiptView;
 import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.RewardView;
@@ -79,7 +79,7 @@ public interface RewardMapper {
                 ;
     }
 
-    static RewardResponse rewardToResponse(MyContributionRewardView rewardView) {
+    static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
         return new RewardResponse()
                 .from(new GithubUserResponse()
                         .id(rewardView.getFrom().getGithubUserId())

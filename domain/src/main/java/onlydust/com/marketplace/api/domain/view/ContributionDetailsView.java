@@ -11,7 +11,7 @@ import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
-public class MyContributionDetailsView {
+public class ContributionDetailsView {
     String id;
     Date createdAt;
     Date completedAt;
@@ -25,9 +25,9 @@ public class MyContributionDetailsView {
     String projectName;
     String repoName;
     List<ContributionLinkView> links;
-    List<MyContributionRewardView> rewards;
+    List<ContributionRewardView> rewards;
 
-    public MyContributionDetailsView withRewards(List<MyContributionRewardView> rewards) {
+    public ContributionDetailsView withRewards(List<ContributionRewardView> rewards) {
         return this.toBuilder()
                 .rewards(rewards)
                 .build();

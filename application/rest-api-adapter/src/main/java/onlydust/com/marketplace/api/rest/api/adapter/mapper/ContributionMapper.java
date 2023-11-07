@@ -5,9 +5,9 @@ import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
-import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -103,7 +103,7 @@ public interface ContributionMapper {
         };
     }
 
-    static ContributionDetailsResponse mapContributionDetails(MyContributionDetailsView contribution) {
+    static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution) {
         return new ContributionDetailsResponse()
                 .id(contribution.getId())
                 .createdAt(DateMapper.toZoneDateTime(contribution.getCreatedAt()))

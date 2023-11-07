@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
-import onlydust.com.marketplace.api.domain.view.MyContributionDetailsView;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 
 import java.util.UUID;
 
 public interface ContributionFacadePort {
-    MyContributionDetailsView getContribution(UUID projectId, String contributionId);
+    ContributionDetailsView getContribution(UUID projectId, String contributionId, Long githubUserId);
 }
