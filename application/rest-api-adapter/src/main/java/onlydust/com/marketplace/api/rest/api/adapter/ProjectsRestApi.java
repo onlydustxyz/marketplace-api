@@ -78,8 +78,11 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
         final UUID projectId =
-                projectFacadePort.createProject(mapCreateProjectCommandToDomain(createProjectRequest));
+                projectFacadePort.createProject(mapCreateProjectCommandToDomain(createProjectRequest,
+                        authenticatedUser.getId()));
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectId);

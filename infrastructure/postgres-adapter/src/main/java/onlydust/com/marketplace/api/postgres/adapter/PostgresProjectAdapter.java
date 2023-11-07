@@ -12,10 +12,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -102,7 +99,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void createProject(UUID projectId, String name, String shortDescription, String longDescription,
                               Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                              List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads,
+                              List<Long> githubRepoIds, UUID firstProjectLeaderId,
+                              List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
@@ -124,6 +122,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
+        this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
 
         if (!isNull(githubUserIdsAsProjectLeads)) {
             projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()

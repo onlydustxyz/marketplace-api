@@ -67,7 +67,9 @@ public class ProjectService implements ProjectFacadePort {
         this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
-                command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeadersToInvite(),
+                command.getGithubRepoIds(),
+                command.getFirstProjectLeaderId(),
+                command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
