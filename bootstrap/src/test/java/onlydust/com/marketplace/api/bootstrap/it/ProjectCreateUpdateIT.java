@@ -87,6 +87,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         assertThat(response).isNotNull();
         assertThat(response.getProjectId()).isNotNull();
+        projectId = response.getProjectId();
+
+        assertThat(response.getProjectSlug()).isEqualTo("super-project");
 
         // Then
         client.get()
@@ -123,8 +126,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty();
-
-        projectId = response.getProjectId();
     }
 
     @Test

@@ -54,7 +54,7 @@ public class ContributorServiceTest {
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
         verify(userStoragePort, never()).getUserByGithubId(anyLong());
-        assertThat(contributors.getLeft()).isEqualTo(internalContributors);
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
 
@@ -88,8 +88,8 @@ public class ContributorServiceTest {
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100);
 
         // Then
-        assertThat(contributors.getLeft()).isEqualTo(internalContributors);
-        assertThat(contributors.getRight()).isEqualTo(externalContributors);
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
+        assertThat(contributors.getRight()).containsExactlyElementsOf(externalContributors);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class ContributorServiceTest {
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
         verify(userStoragePort, never()).getUserByGithubId(anyLong());
-        assertThat(contributors.getLeft()).isEqualTo(internalContributors);
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
 
@@ -135,7 +135,7 @@ public class ContributorServiceTest {
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
         verify(userStoragePort, never()).getUserByGithubId(anyLong());
-        assertThat(contributors.getLeft()).isEqualTo(internalContributors);
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
 }

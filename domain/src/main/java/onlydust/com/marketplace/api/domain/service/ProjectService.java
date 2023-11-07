@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -58,13 +59,13 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public UUID createProject(CreateProjectCommand command) {
+    public Pair<UUID, String> createProject(CreateProjectCommand command) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
         final UUID projectId = uuidGeneratorPort.generate();
-        this.projectStoragePort.createProject(projectId, command.getName(),
+        final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
                 command.getGithubRepoIds(),
@@ -73,7 +74,7 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
-        return projectId;
+        return Pair.of(projectId, projectSlug);
     }
 
     @Override

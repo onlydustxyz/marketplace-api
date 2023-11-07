@@ -2909,6 +2909,8 @@ components:
         projectId:
           type: string
           format: uuid
+        projectSlug:
+          type: string
     MoreInfo:
       type: object
       properties:
