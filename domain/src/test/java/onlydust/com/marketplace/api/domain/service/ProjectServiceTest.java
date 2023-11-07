@@ -79,12 +79,7 @@ public class ProjectServiceTest {
 
         // When
         when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
-        final UUID projectId = projectService.createProject(command);
-
-        // Then
-        assertNotNull(projectId);
-        verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(projectStoragePort, times(1)).createProject(expectedProjectId, command.getName(),
+        when(projectStoragePort.createProject(expectedProjectId, command.getName(),
                 command.getShortDescription(),
                 command.getLongDescription(), command.getIsLookingForContributors(),
                 command.getMoreInfos(), command.getGithubRepoIds(),
@@ -93,7 +88,14 @@ public class ProjectServiceTest {
                 ProjectVisibility.PUBLIC,
                 imageUrl,
                 ProjectRewardSettings.defaultSettings(dateProvider.now())
-        );
+        )).thenReturn("slug");
+        final var projectIdentity = projectService.createProject(command);
+
+        // Then
+        assertNotNull(projectIdentity);
+        assertNotNull(projectIdentity.getLeft());
+        assertThat(projectIdentity.getRight()).isEqualTo("slug");
+        verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
     }
 
 

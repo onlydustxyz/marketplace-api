@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -24,7 +25,7 @@ public interface ProjectFacadePort {
                                                                 String search, ProjectCardView.SortBy sort);
 
 
-    UUID createProject(CreateProjectCommand createProjectCommand);
+    Pair<UUID, String> createProject(CreateProjectCommand createProjectCommand);
 
     void updateProject(UUID projectLeadId, UpdateProjectCommand updateProjectCommand);
 

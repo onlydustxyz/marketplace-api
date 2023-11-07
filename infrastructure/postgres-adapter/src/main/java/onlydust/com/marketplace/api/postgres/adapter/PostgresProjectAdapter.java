@@ -97,11 +97,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                              Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                              List<Long> githubRepoIds, UUID firstProjectLeaderId,
-                              List<Long> githubUserIdsAsProjectLeads,
-                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
+    public String createProject(UUID projectId, String name, String shortDescription, String longDescription,
+                                Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                                List<Long> githubRepoIds, UUID firstProjectLeaderId,
+                                List<Long> githubUserIdsAsProjectLeads,
+                                ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -138,6 +138,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .map(repoId -> new ProjectRepoEntity(projectId, repoId))
                     .collect(Collectors.toSet()));
         }
+
+        return projectRepository.getKeyById(projectId);
     }
 
     @Override

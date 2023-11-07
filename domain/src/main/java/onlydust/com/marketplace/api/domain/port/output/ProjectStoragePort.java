@@ -23,10 +23,10 @@ public interface ProjectStoragePort {
     Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
                                                                  String search, ProjectCardView.SortBy sort);
 
-    void createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                       Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                       List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
-                       ProjectVisibility visibility
+    String createProject(UUID projectId, String name, String shortDescription, String longDescription,
+                         Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                         List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
+                         ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings);
 
     void updateProject(UUID id, String name, String shortDescription, String longDescription,
