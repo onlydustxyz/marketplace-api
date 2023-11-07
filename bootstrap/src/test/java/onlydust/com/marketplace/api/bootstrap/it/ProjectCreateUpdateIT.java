@@ -27,12 +27,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Autowired
     HasuraUserHelper userHelper;
 
-    private String jwt;
-
     @BeforeEach
     public void setup() {
-        jwt = userHelper.authenticatePierre().jwt();
-
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/595505"))
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -59,7 +55,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         final var response = client.post()
                 .uri(getApiURI(PROJECTS_POST))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -108,7 +104,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/16590657?v=4")
                 .jsonPath("$.hiring").isEqualTo(true)
                 .jsonPath("$.moreInfoUrl").isEqualTo("https://t.me/foobar")
-                .jsonPath("$.leaders.length()").isEqualTo(0)
+                .jsonPath("$.leaders.length()").isEqualTo(1)
+                .jsonPath("$.leaders[0].login").isEqualTo("PierreOucif")
                 .jsonPath("$.invitedLeaders.length()").isEqualTo(2)
                 .jsonPath("$.invitedLeaders[0].login").isEqualTo("ofux")
                 .jsonPath("$.invitedLeaders[1].login").isEqualTo("AnthonyBuisset")
@@ -158,7 +155,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -206,7 +203,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -245,7 +242,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -278,7 +275,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         final var response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -322,7 +319,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // When
         final OnlyDustError response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -355,13 +352,15 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(response.getMessage()).contains("longDescription: must not be null");
     }
 
+
     @Test
-    @Order(22)
-    public void should_return_a_404_when_project_is_not_found() {
-        // When
+    @Order(23)
+    public void should_return_403_when_caller_is_not_lead() {
+
+        // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, UUID.randomUUID())))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateAnthony().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -381,7 +380,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isNotFound();
+                .isForbidden();
     }
 
     private void assertProjectWasUpdated() {

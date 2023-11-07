@@ -67,7 +67,9 @@ public class ProjectService implements ProjectFacadePort {
         this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
-                command.getGithubRepoIds(), command.getGithubUserIdsAsProjectLeadersToInvite(),
+                command.getGithubRepoIds(),
+                command.getFirstProjectLeaderId(),
+                command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
@@ -75,7 +77,11 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void updateProject(UpdateProjectCommand command) {
+    public void updateProject(UUID projectLeadId, UpdateProjectCommand command) {
+        if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can update their projects");
+        }
+
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }

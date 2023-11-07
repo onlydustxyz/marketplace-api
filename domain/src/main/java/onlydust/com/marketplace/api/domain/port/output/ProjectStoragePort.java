@@ -25,7 +25,8 @@ public interface ProjectStoragePort {
 
     void createProject(UUID projectId, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeads, ProjectVisibility visibility
+                       List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
+                       ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings);
 
     void updateProject(UUID id, String name, String shortDescription, String longDescription,

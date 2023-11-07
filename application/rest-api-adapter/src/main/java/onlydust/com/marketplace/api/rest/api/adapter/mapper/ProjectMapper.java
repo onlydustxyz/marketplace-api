@@ -15,11 +15,13 @@ import java.util.stream.Collectors;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface ProjectMapper {
-    static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest) {
+    static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest,
+                                                                UUID authenticatedUserId) {
         return CreateProjectCommand.builder()
                 .name(createProjectRequest.getName())
                 .shortDescription(createProjectRequest.getShortDescription())
                 .longDescription(createProjectRequest.getLongDescription())
+                .firstProjectLeaderId(authenticatedUserId)
                 .githubUserIdsAsProjectLeadersToInvite(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .githubRepoIds(createProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
