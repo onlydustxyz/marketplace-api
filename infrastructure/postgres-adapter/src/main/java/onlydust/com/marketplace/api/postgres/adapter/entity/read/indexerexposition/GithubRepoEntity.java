@@ -2,21 +2,22 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposit
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Map;
 
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity
 @Table(schema = "indexer_exp", name = "github_repos")
 @Immutable
 public class GithubRepoEntity {
     @Id
+    @EqualsAndHashCode.Include
     Long id;
     @ManyToOne(fetch = FetchType.LAZY)
     GithubAccountEntity owner;

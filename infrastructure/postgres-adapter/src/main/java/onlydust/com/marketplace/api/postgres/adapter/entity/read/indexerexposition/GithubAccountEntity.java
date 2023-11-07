@@ -5,15 +5,16 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(schema = "indexer_exp", name = "github_accounts")
 @Immutable
 public class GithubAccountEntity {
     @Id
+    @EqualsAndHashCode.Include
     Long id;
     String login;
     String type;
@@ -21,5 +22,5 @@ public class GithubAccountEntity {
     String avatarUrl;
     String name;
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
-    List<GithubRepoEntity> repos;
+    Set<GithubRepoEntity> repos;
 }
