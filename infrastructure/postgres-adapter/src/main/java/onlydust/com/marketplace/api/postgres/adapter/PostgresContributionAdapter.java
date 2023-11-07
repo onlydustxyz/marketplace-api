@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -57,14 +57,14 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
-    public Optional<MyContributionDetailsView> findContributionById(UUID projectId, String contributionId) {
-        return contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
-                .map(contribution -> {
-                    final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
-                            contributionId);
-                    return contribution.toView()
-                            .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
-                });
+    public MyContributionDetailsView findContributionById(UUID projectId, String contributionId) {
+        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
+                .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
+
+        final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
+                contributionId);
+        return contribution.toView()
+                .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
     }
 
     private List<String> sortBy(ContributionView.Sort sort) {

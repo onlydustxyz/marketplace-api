@@ -18,7 +18,6 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.springframework.core.io.Resource;
@@ -209,11 +208,10 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
-        return contributionsFacadePort.getContribution(projectId, contributionId)
-                .map(contribution -> contribution.getContributor().getGithubUserId().equals(authenticatedUser.getGithubUserId()) ?
-                        ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution)) :
-                        new ResponseEntity<ContributionDetailsResponse>(HttpStatus.FORBIDDEN)
-                )
-                .orElse(ResponseEntity.notFound().build());
+        final var contribution = contributionsFacadePort.getContribution(projectId, contributionId);
+
+        return contribution.getContributor().getGithubUserId().equals(authenticatedUser.getGithubUserId()) ?
+                ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution)) :
+                ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }
