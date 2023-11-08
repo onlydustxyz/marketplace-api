@@ -130,15 +130,9 @@ public class CustomProjectListRepository {
                         left join project_leads pl on pl.project_id = p.project_id
                         left join auth_users u on u.id = pl.user_id
                         left join github_users gu on gu.id = u.github_user_id
-                    where
-                        exists(select 1
-                            from projects_budgets pb
-                            where pb.project_id = p.project_id)
-                            
                   ) as search_project
-                  
                 where repo_count > 0
-                    and ((search_project.visibility = 'PUBLIC' and (project_lead_count > 0 or is_pending_project_lead))
+                    and (search_project.visibility = 'PUBLIC'
                     or (search_project.visibility = 'PRIVATE' and
                         (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor)))
                         

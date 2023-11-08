@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepositor
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,6 +29,14 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
     ProjectRepoRepository projectRepoRepository;
     @Autowired
     CustomProjectListRepository customProjectListRepository;
+
+
+    @BeforeEach
+    void setUp() {
+        projectIdRepository.deleteAll();
+        projectRepository.deleteAll();
+        projectRepoRepository.deleteAll();
+    }
 
     @Test
     void should_return_published_public_projects_with_no_budget_and_no_project_leads() {
@@ -52,6 +61,53 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         Assertions.assertEquals(1, projects.getContent().size());
         Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
     }
+
+    @Test
+    void should_return_published_public_projects_with_no_budget_and_no_project_leads_given_a_user_id() {
+        final ProjectEntity publicProjectEntity = buildProjectStub(ProjectVisibility.PUBLIC);
+        final ProjectEntity privateProjectEntity = buildProjectStub(ProjectVisibility.PRIVATE);
+
+        this.projectIdRepository.save(new ProjectIdEntity(publicProjectEntity.getId()));
+        this.projectRepository.save(publicProjectEntity);
+        projectRepoRepository.save(new ProjectRepoEntity(publicProjectEntity.getId(), faker.random().nextLong()));
+
+        this.projectIdRepository.save(new ProjectIdEntity(privateProjectEntity.getId()));
+        this.projectRepository.save(privateProjectEntity);
+        projectRepoRepository.save(new ProjectRepoEntity(privateProjectEntity.getId(), faker.random().nextLong()));
+
+        // When
+        final Page<ProjectCardView> projects =
+                customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
+                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
+
+        // Then
+        Assertions.assertEquals(1, projects.getContent().size());
+        Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
+    }
+
+    @Test
+    void should_return_published_public_and_private_projects_with_no_budget_and_no_project_leads_given_a_user_id() {
+        final ProjectEntity publicProjectEntity = buildProjectStub(ProjectVisibility.PUBLIC);
+        final ProjectEntity privateProjectEntity = buildProjectStub(ProjectVisibility.PRIVATE);
+
+        this.projectIdRepository.save(new ProjectIdEntity(publicProjectEntity.getId()));
+        this.projectRepository.save(publicProjectEntity);
+        projectRepoRepository.save(new ProjectRepoEntity(publicProjectEntity.getId(), faker.random().nextLong()));
+
+        this.projectIdRepository.save(new ProjectIdEntity(privateProjectEntity.getId()));
+        this.projectRepository.save(privateProjectEntity);
+        projectRepoRepository.save(new ProjectRepoEntity(privateProjectEntity.getId(), faker.random().nextLong()));
+
+        // When
+        final Page<ProjectCardView> projects =
+                customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
+                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
+
+        // Then
+        Assertions.assertEquals(1, projects.getContent().size());
+        Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
+    }
+
 
 
     private static ProjectEntity buildProjectStub(final ProjectVisibility visibility) {
