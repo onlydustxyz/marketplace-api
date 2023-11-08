@@ -25,4 +25,6 @@ public interface ContributionStoragePort {
     List<GithubRepo> listReposByContributor(Long contributorId, ContributionView.Filters filters);
 
     Long getContributorId(String contributionId);
+
+    void setIgnoredContributions(UUID projectId, List<String> ignoredContributionIds);
 }

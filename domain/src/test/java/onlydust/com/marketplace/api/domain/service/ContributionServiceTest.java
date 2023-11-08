@@ -1,0 +1,90 @@
+package onlydust.com.marketplace.api.domain.service;
+
+import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.ContributionStatus;
+import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+class ContributionServiceTest {
+
+    final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+    final PermissionService permissionService = mock(PermissionService.class);
+
+    final ContributionService contributionService = new ContributionService(contributionStoragePort, permissionService);
+
+    private final Faker faker = new Faker();
+
+    @Test
+    void getContribution_should_return_contribution() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var contributionId = faker.pokemon().name();
+        final var githubUserId = faker.number().randomNumber();
+        final var expectedContribution =
+                ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
+
+        // When
+        when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(true);
+        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        final var contribution = contributionService.getContribution(projectId, contributionId, githubUserId);
+
+        // Then
+        assertThat(contribution).isEqualTo(expectedContribution);
+    }
+
+    @Test
+    void getContribution_should_return_401_when_caller_is_not_the_contributor() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var contributionId = faker.pokemon().name();
+        final var githubUserId = faker.number().randomNumber();
+
+        // When
+        when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(false);
+
+        assertThatThrownBy(() -> contributionService.getContribution(projectId, contributionId, githubUserId))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User is not a contributor of this contribution");
+    }
+
+    @Test
+    void setIgnoredContributions_should_set_ignored_contributions() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var ignoredContributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        contributionService.setIgnoredContributions(projectId, projectLeadId, ignoredContributionIds);
+
+        // Then
+        verify(contributionStoragePort, times(1)).setIgnoredContributions(projectId, ignoredContributionIds);
+    }
+
+    @Test
+    void setIgnoredContributions_should_return_401_when_caller_is_not_lead() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var ignoredContributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+        assertThatThrownBy(() -> contributionService.setIgnoredContributions(projectId, projectLeadId,
+                ignoredContributionIds))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only project leaders can edit the list of ignored contributions");
+        // Then
+        verify(contributionStoragePort, never()).setIgnoredContributions(projectId, ignoredContributionIds);
+    }
+}

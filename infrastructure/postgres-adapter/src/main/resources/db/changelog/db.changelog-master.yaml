@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000001_add_terms_and_conditions_version.sql
   - include:
       file: db/changelog/changelogs/00000002_add_rewardable_contributions_settings.sql
+  - include:
+      file: db/changelog/changelogs/00000003_ignored_contributions.sql

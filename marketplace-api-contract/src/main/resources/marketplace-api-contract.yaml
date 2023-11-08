@@ -709,6 +709,36 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/ignored-contributions:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Update project's ignored contributions
+      operationId: updateIgnoredContributions
+      description: |
+        Update project's ignored contributions. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProjectIgnoredContributionsRequest'
+      responses:
+        "204":
+          description: 'The list of ignored contributions was updated successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/projects/{projectId}:
     get:
       security:
@@ -2887,6 +2917,16 @@ components:
           type: string
           format: url
           description: Direct URL to project's logo image
+
+    UpdateProjectIgnoredContributionsRequest:
+      type: object
+      required:
+        - ignoredContributions
+      properties:
+        ignoredContributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionId'
 
     UpdateProjectRequest:
       type: object
