@@ -47,6 +47,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
+    private final PostgresContributionAdapter postgresContributionAdapter;
 
     @Override
     @Transactional(readOnly = true)
@@ -210,6 +211,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         }
 
         this.projectRepository.save(project);
+
+        if (!isNull(rewardSettings)) {
+            postgresContributionAdapter.refreshIgnoredContributions(projectId);
+        }
     }
 
 

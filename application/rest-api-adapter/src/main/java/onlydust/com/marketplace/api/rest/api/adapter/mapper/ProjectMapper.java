@@ -12,6 +12,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface ProjectMapper {
@@ -124,7 +125,8 @@ public interface ProjectMapper {
                 rewardSettings.getIgnorePullRequests(),
                 rewardSettings.getIgnoreIssues(),
                 rewardSettings.getIgnoreCodeReviews(),
-                Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant())
+                isNull(rewardSettings.getIgnoreContributionsBefore()) ? null :
+                        Date.from(rewardSettings.getIgnoreContributionsBefore().toInstant())
         );
     }
 

@@ -56,7 +56,8 @@ public class PostgresConfiguration {
                                                          final CustomProjectRewardRepository customProjectRewardRepository,
                                                          final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                          final ProjectLeadViewRepository projectLeadViewRepository,
-                                                         final CustomRewardRepository customRewardRepository) {
+                                                         final CustomRewardRepository customRewardRepository,
+                                                         final PostgresContributionAdapter postgresContributionAdapter) {
         return new PostgresProjectAdapter(projectRepository,
                 projectViewRepository,
                 projectIdRepository,
@@ -69,7 +70,8 @@ public class PostgresConfiguration {
                 customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
-                customRewardRepository
+                customRewardRepository,
+                postgresContributionAdapter
         );
     }
 
@@ -148,11 +150,12 @@ public class PostgresConfiguration {
                                                                    final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository,
                                                                    final CustomContributorRepository customContributorRepository,
                                                                    final CustomIgnoredContributionsRepository customIgnoredContributionsRepository,
-                                                                   final IgnoredContributionsRepository ignoredContributionsRepository) {
+                                                                   final IgnoredContributionsRepository ignoredContributionsRepository,
+                                                                   final ProjectRepository projectRepository) {
         return new PostgresContributionAdapter(contributionViewEntityRepository, shortProjectViewEntityRepository,
                 githubRepoViewEntityRepository, contributionDetailsViewEntityRepository,
                 contributionRewardViewEntityRepository, customContributorRepository,
-                customIgnoredContributionsRepository, ignoredContributionsRepository);
+                customIgnoredContributionsRepository, ignoredContributionsRepository, projectRepository);
     }
 
     @Bean

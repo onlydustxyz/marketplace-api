@@ -226,6 +226,48 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(4)
+    public void should_unignore_all_contribution() {
+        // Given
+        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+
+        // When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "ignoredContributions": []
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        final var ignoredContributions = ignoredContributionsRepository.findAllByProjectId(projectId);
+        assertThat(ignoredContributions).isEmpty();
+
+        final var customIgnoredContributions = customIgnoredContributionsRepository.findAllByProjectId(projectId);
+        assertThat(customIgnoredContributions).containsExactlyInAnyOrder(
+                new CustomIgnoredContributionEntity(
+                        new CustomIgnoredContributionEntity.Id(projectId,
+                                "070e5317dfaa3eff83f7467824718cd048a1ed1c6338856b6fc4bc255c1a1a91"
+                        ),
+                        false
+                ),
+                new CustomIgnoredContributionEntity(
+                        new CustomIgnoredContributionEntity.Id(projectId,
+                                "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
+                        ),
+                        false
+                )
+        );
+    }
+
+    @Test
     @Order(10)
     public void should_return_403_when_caller_is_not_leader() {
         // Given
