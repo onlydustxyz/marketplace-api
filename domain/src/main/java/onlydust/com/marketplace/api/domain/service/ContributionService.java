@@ -22,9 +22,16 @@ public class ContributionService implements ContributionFacadePort {
     }
 
     @Override
-    public void setIgnoredContributions(UUID projectId, UUID projectLeadId, List<String> ignoredContributionIds) {
+    public void ignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw OnlyDustException.forbidden("Only project leaders can edit the list of ignored contributions");
-        contributionStoragePort.setIgnoredContributions(projectId, ignoredContributionIds);
+        contributionStoragePort.ignoreContributions(projectId, contributionIds);
+    }
+
+    @Override
+    public void unignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId))
+            throw OnlyDustException.forbidden("Only project leaders can edit the list of ignored contributions");
+        contributionStoragePort.unignoreContributions(projectId, contributionIds);
     }
 }

@@ -8,5 +8,7 @@ import java.util.UUID;
 public interface ContributionFacadePort {
     ContributionDetailsView getContribution(UUID projectId, String contributionId, Long githubUserId);
 
-    void setIgnoredContributions(UUID projectId, UUID projectLeadId, List<String> ignoredContributionIds);
+    void ignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds);
+
+    void unignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds);
 }

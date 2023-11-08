@@ -37,13 +37,13 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
-        client.put()
+        client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "ignoredContributions": [
+                          "contributionsToIgnore": [
                             "070e5317dfaa3eff83f7467824718cd048a1ed1c6338856b6fc4bc255c1a1a91",
                             "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
                           ]
@@ -87,14 +87,14 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
-        client.put()
+        client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "ignoredContributions": [
-                            "070e5317dfaa3eff83f7467824718cd048a1ed1c6338856b6fc4bc255c1a1a91"
+                          "contributionsToUnignore": [
+                            "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
                           ]
                         }
                         """)
@@ -134,14 +134,65 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
-        client.put()
+        client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "ignoredContributions": [
+                          "contributionsToIgnore": [
                             "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
+                          ],
+                          "contributionsToUnignore": [
+                            "070e5317dfaa3eff83f7467824718cd048a1ed1c6338856b6fc4bc255c1a1a91"
+                          ]
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        final var ignoredContributions = ignoredContributionsRepository.findAllByProjectId(projectId);
+        assertThat(ignoredContributions).containsExactlyInAnyOrder(
+                new IgnoredContributionEntity(new IgnoredContributionEntity.Id(projectId,
+                        "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"))
+        );
+
+        final var customIgnoredContributions = customIgnoredContributionsRepository.findAllByProjectId(projectId);
+        assertThat(customIgnoredContributions).containsExactlyInAnyOrder(
+                new CustomIgnoredContributionEntity(
+                        new CustomIgnoredContributionEntity.Id(projectId,
+                                "070e5317dfaa3eff83f7467824718cd048a1ed1c6338856b6fc4bc255c1a1a91"
+                        ),
+                        false
+                ),
+                new CustomIgnoredContributionEntity(
+                        new CustomIgnoredContributionEntity.Id(projectId,
+                                "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
+                        ),
+                        true
+                )
+        );
+    }
+
+    @Test
+    @Order(4)
+    public void should_do_nothing_when_lists_are_empty() {
+        // Given
+        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+
+        // When
+        client.patch()
+                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "contributionsToIgnore": [
+                          ],
+                          "contributionsToUnignore": [
                           ]
                         }
                         """)
@@ -181,13 +232,13 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
-        client.put()
+        client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "ignoredContributions": [
+                          "contributionsToIgnore": [
                             "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
                           ]
                         }
@@ -205,12 +256,12 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
-        client.put()
+        client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "ignoredContributions": [
+                          "contributionsToIgnore": [
                             "1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13"
                           ]
                         }

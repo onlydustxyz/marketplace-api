@@ -57,34 +57,66 @@ class ContributionServiceTest {
     }
 
     @Test
-    void setIgnoredContributions_should_set_ignored_contributions() {
+    void should_ignore_contributions() {
         // Given
         final var projectId = UUID.randomUUID();
         final var projectLeadId = UUID.randomUUID();
-        final var ignoredContributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+        final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-        contributionService.setIgnoredContributions(projectId, projectLeadId, ignoredContributionIds);
+        contributionService.ignoreContributions(projectId, projectLeadId, contributionIds);
 
         // Then
-        verify(contributionStoragePort, times(1)).setIgnoredContributions(projectId, ignoredContributionIds);
+        verify(contributionStoragePort, times(1)).ignoreContributions(projectId, contributionIds);
     }
 
     @Test
-    void setIgnoredContributions_should_return_401_when_caller_is_not_lead() {
+    void should_return_401_from_ignore_contributions_when_caller_is_not_lead() {
         // Given
         final var projectId = UUID.randomUUID();
         final var projectLeadId = UUID.randomUUID();
-        final var ignoredContributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+        final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-        assertThatThrownBy(() -> contributionService.setIgnoredContributions(projectId, projectLeadId,
-                ignoredContributionIds))
+        assertThatThrownBy(() -> contributionService.ignoreContributions(projectId, projectLeadId,
+                contributionIds))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Only project leaders can edit the list of ignored contributions");
         // Then
-        verify(contributionStoragePort, never()).setIgnoredContributions(projectId, ignoredContributionIds);
+        verify(contributionStoragePort, never()).ignoreContributions(projectId, contributionIds);
+    }
+
+    @Test
+    void should_unignore_contributions() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        contributionService.unignoreContributions(projectId, projectLeadId, contributionIds);
+
+        // Then
+        verify(contributionStoragePort, times(1)).unignoreContributions(projectId, contributionIds);
+    }
+
+    @Test
+    void should_return_401_from_unignore_contributions_when_caller_is_not_lead() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+        assertThatThrownBy(() -> contributionService.unignoreContributions(projectId, projectLeadId,
+                contributionIds))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only project leaders can edit the list of ignored contributions");
+        // Then
+        verify(contributionStoragePort, never()).unignoreContributions(projectId, contributionIds);
     }
 }

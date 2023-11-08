@@ -26,5 +26,7 @@ public interface ContributionStoragePort {
 
     Long getContributorId(String contributionId);
 
-    void setIgnoredContributions(UUID projectId, List<String> ignoredContributionIds);
+    void ignoreContributions(UUID projectId, List<String> contributionIds);
+
+    void unignoreContributions(UUID projectId, List<String> contributionIds);
 }

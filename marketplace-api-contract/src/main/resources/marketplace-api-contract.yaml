@@ -710,7 +710,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/ignored-contributions:
-    put:
+    patch:
       security:
         - bearerAuth: [ ]
       tags:
@@ -2920,10 +2920,12 @@ components:
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
-      required:
-        - ignoredContributions
       properties:
-        ignoredContributions:
+        contributionsToIgnore:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionId'
+        contributionsToUnignore:
           type: array
           items:
             $ref: '#/components/schemas/ContributionId'

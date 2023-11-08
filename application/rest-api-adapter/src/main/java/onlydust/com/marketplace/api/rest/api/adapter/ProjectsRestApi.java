@@ -218,8 +218,17 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<Void> updateIgnoredContributions(UUID projectId,
                                                            UpdateProjectIgnoredContributionsRequest updateProjectIgnoredContributionsRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        contributionsFacadePort.setIgnoredContributions(projectId, authenticatedUser.getId(),
-                updateProjectIgnoredContributionsRequest.getIgnoredContributions());
+
+        if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
+            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+            contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
+                    updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
+        }
+        if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
+            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+            contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
+                    updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
+        }
         return ResponseEntity.noContent().build();
     }
 }

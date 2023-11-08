@@ -108,8 +108,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional
-    public void setIgnoredContributions(UUID projectId, List<String> ignoredContributionIds) {
-        customIgnoredContributionsRepository.saveAll(ignoredContributionIds.stream().map(contributionId ->
+    public void ignoreContributions(UUID projectId, List<String> contributionIds) {
+        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
                 CustomIgnoredContributionEntity.builder()
                         .id(CustomIgnoredContributionEntity.Id.builder()
                                 .projectId(projectId)
@@ -118,9 +118,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                         .ignored(true)
                         .build()
         ).toList());
-        customIgnoredContributionsRepository.unignoreOtherContributions(projectId, ignoredContributionIds);
 
-        ignoredContributionsRepository.saveAll(ignoredContributionIds.stream().map(contributionId ->
+        ignoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
                 IgnoredContributionEntity.builder()
                         .id(IgnoredContributionEntity.Id.builder()
                                 .projectId(projectId)
@@ -128,6 +127,29 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                                 .build())
                         .build()
         ).toList());
-        ignoredContributionsRepository.deleteOtherContributions(projectId, ignoredContributionIds);
+    }
+
+    @Override
+    @Transactional
+    public void unignoreContributions(UUID projectId, List<String> contributionIds) {
+        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+                CustomIgnoredContributionEntity.builder()
+                        .id(CustomIgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .ignored(false)
+                        .build()
+        ).toList());
+
+        ignoredContributionsRepository.deleteAll(contributionIds.stream().map(contributionId ->
+                IgnoredContributionEntity.builder()
+                        .id(IgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .build()
+        ).toList());
+
     }
 }
