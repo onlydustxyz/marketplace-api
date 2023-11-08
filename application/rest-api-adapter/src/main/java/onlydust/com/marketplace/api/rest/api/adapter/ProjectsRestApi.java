@@ -213,4 +213,22 @@ public class ProjectsRestApi implements ProjectsApi {
 
         return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution));
     }
+
+    @Override
+    public ResponseEntity<Void> updateIgnoredContributions(UUID projectId,
+                                                           UpdateProjectIgnoredContributionsRequest updateProjectIgnoredContributionsRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
+            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+            contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
+                    updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
+        }
+        if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
+            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+            contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
+                    updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
+        }
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -11,6 +11,8 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -30,6 +32,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final ContributionDetailsViewEntityRepository contributionDetailsViewEntityRepository;
     private final ContributionRewardViewEntityRepository contributionRewardViewEntityRepository;
     private final CustomContributorRepository customContributorRepository;
+    private final CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
+    private final IgnoredContributionsRepository ignoredContributionsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -58,6 +62,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
         final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
@@ -77,6 +82,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters) {
         return shortProjectViewEntityRepository.listProjectsByContributor(contributorId, filters.getProjects(),
                         filters.getRepos()).stream()
@@ -85,6 +91,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<GithubRepo> listReposByContributor(Long contributorId, ContributionView.Filters filters) {
         return githubRepoViewEntityRepository.listReposByContributor(contributorId, filters.getProjects(),
                         filters.getRepos()).stream()
@@ -93,8 +100,56 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Long getContributorId(String contributionId) {
         return customContributorRepository.getContributionContributorId(contributionId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
+    }
+
+    @Override
+    @Transactional
+    public void ignoreContributions(UUID projectId, List<String> contributionIds) {
+        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+                CustomIgnoredContributionEntity.builder()
+                        .id(CustomIgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .ignored(true)
+                        .build()
+        ).toList());
+
+        ignoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+                IgnoredContributionEntity.builder()
+                        .id(IgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .build()
+        ).toList());
+    }
+
+    @Override
+    @Transactional
+    public void unignoreContributions(UUID projectId, List<String> contributionIds) {
+        customIgnoredContributionsRepository.saveAll(contributionIds.stream().map(contributionId ->
+                CustomIgnoredContributionEntity.builder()
+                        .id(CustomIgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .ignored(false)
+                        .build()
+        ).toList());
+
+        ignoredContributionsRepository.deleteAll(contributionIds.stream().map(contributionId ->
+                IgnoredContributionEntity.builder()
+                        .id(IgnoredContributionEntity.Id.builder()
+                                .projectId(projectId)
+                                .contributionId(contributionId)
+                                .build())
+                        .build()
+        ).toList());
+
     }
 }
