@@ -26,6 +26,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "id": "7d04163c-4187-4313-8066-61504d34fc56",
               "slug": "bretzel",
               "name": "Bretzel",
+              "createdAt": "2023-02-21T09:15:09.603Z",
               "shortDescription": "A project for people who love fruits",
               "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",

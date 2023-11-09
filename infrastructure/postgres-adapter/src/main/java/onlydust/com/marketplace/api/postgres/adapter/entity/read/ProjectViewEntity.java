@@ -10,6 +10,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,8 @@ public class ProjectViewEntity {
     UUID id;
     @Column(name = "name")
     String name;
+    @Column(name = "created_at")
+    Instant createdAt;
     @Column(name = "short_description")
     String shortDescription;
     @Column(name = "long_description")

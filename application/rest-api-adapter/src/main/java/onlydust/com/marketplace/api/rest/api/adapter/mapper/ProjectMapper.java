@@ -53,14 +53,14 @@ public interface ProjectMapper {
     }
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
-        final ProjectResponse projectListItemResponse = mapProjectDetailsMetadata(project);
-        projectListItemResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
-        projectListItemResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
-        projectListItemResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
-        projectListItemResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
-        projectListItemResponse.setOrganizations(project.getOrganizations().stream()
+        final ProjectResponse projectResponse = mapProjectDetailsMetadata(project);
+        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
+        projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
+        projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos)).collect(Collectors.toList()));
-        projectListItemResponse.setTechnologies(project.getTechnologies());
+        projectResponse.setTechnologies(project.getTechnologies());
 
         //TODO: this list is kept for backwards compatibility with the old API
         final var repos = new ArrayList<GithubRepoResponse>();
@@ -70,9 +70,9 @@ public interface ProjectMapper {
                     .map(ProjectMapper::mapRepo)
                     .toList());
         }
-        projectListItemResponse.setRepos(repos);
+        projectResponse.setRepos(repos);
 
-        return projectListItemResponse;
+        return projectResponse;
     }
 
     static ProjectGithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
@@ -95,6 +95,7 @@ public interface ProjectMapper {
         project.setId(projectDetailsView.getId());
         project.setSlug(projectDetailsView.getSlug());
         project.setName(projectDetailsView.getName());
+        project.setCreatedAt(toZoneDateTime(projectDetailsView.getCreatedAt()));
         project.setShortDescription(projectDetailsView.getShortDescription());
         project.setLongDescription(projectDetailsView.getLongDescription());
         project.setLogoUrl(projectDetailsView.getLogoUrl());

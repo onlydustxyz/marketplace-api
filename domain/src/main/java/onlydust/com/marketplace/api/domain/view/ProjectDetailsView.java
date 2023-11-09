@@ -16,6 +16,7 @@ public class ProjectDetailsView {
     UUID id;
     String slug;
     String name;
+    Date createdAt;
     String shortDescription;
     String longDescription;
     String logoUrl;

@@ -2079,6 +2079,7 @@ components:
         - id
         - slug
         - name
+        - createdAt
         - shortDescription
         - longDescription
         - logoUrl
@@ -2100,6 +2101,10 @@ components:
         name:
           type: string
           example: Verkle Tries
+        createdAt:
+          type: string
+          format: date-time
+          description: When the project was created
         shortDescription:
           type: string
           example: A short project description

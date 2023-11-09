@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000002_add_rewardable_contributions_settings.sql
   - include:
       file: db/changelog/changelogs/00000003_ignored_contributions.sql
+  - include:
+      file: db/changelog/changelogs/00000004_add_projects_createdAt.sql

@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ public interface ProjectMapper {
                 .shortDescription(projectEntity.getShortDescription())
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
+                .createdAt(Date.from(projectEntity.getCreatedAt()))
                 .moreInfoUrl(projectEntity.getTelegramLink())
                 .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
                 .rewardSettings(
