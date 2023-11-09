@@ -315,7 +315,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
-                                "page", "17",
+                                "pageIndex", "17",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "repositories", "498695724",
                                 "statuses", "COMPLETED",

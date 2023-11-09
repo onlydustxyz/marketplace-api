@@ -345,7 +345,7 @@ paths:
               - ASC
               - DESC
         - in: query
-          name: page
+          name: pageIndex
           description: Page number
           schema:
             type: integer
