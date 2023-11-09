@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.net.URI;
 import java.util.*;
@@ -131,23 +132,27 @@ public interface ProjectMapper {
         );
     }
 
-    static ProjectListResponse mapProjectCards(final Page<ProjectCardView> projectViewPage) {
-        final ProjectListResponse projectListResponse = new ProjectListResponse();
-        final List<ProjectListItemResponse> projectListItemResponses = new ArrayList<>();
+    static ProjectPageResponse mapProjectCards(final Page<ProjectCardView> page, final Integer pageIndex) {
+        final ProjectPageResponse projectPageResponse = new ProjectPageResponse();
+        final List<ProjectPageItemResponse> projectPageItemResponses = new ArrayList<>();
         final Set<String> sponsorsNames = new HashSet<>();
         final Set<String> technologies = new HashSet<>();
-        for (ProjectCardView projectCardView : projectViewPage.getContent()) {
-            projectListItemResponses.add(mapProjectCard(projectCardView, sponsorsNames, technologies));
+        for (ProjectCardView projectCardView : page.getContent()) {
+            projectPageItemResponses.add(mapProjectCard(projectCardView, sponsorsNames, technologies));
         }
-        projectListResponse.setProjects(projectListItemResponses);
-        projectListResponse.setTechnologies(technologies.stream().sorted().toList());
-        projectListResponse.setSponsors(sponsorsNames.stream().sorted().toList());
-        return projectListResponse;
+        projectPageResponse.setProjects(projectPageItemResponses);
+        projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
+        projectPageResponse.setSponsors(sponsorsNames.stream().sorted().toList());
+        projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
+        projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
+        projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
+        projectPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        return projectPageResponse;
     }
 
-    private static ProjectListItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames,
+    private static ProjectPageItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames,
                                                           Set<String> technologies) {
-        final ProjectListItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
+        final ProjectPageItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
 
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
             projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
@@ -164,8 +169,8 @@ public interface ProjectMapper {
         return projectListItemResponse;
     }
 
-    private static ProjectListItemResponse mapProjectCardMetadata(final ProjectCardView projectCardView) {
-        final ProjectListItemResponse project = new ProjectListItemResponse();
+    private static ProjectPageItemResponse mapProjectCardMetadata(final ProjectCardView projectCardView) {
+        final ProjectPageItemResponse project = new ProjectPageItemResponse();
         project.setId(projectCardView.getId());
         project.setName(projectCardView.getName());
         project.setLogoUrl(projectCardView.getLogoUrl());

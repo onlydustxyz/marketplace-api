@@ -18,10 +18,12 @@ public interface ProjectStoragePort {
 
     Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
                                                                        UUID userId, String search,
-                                                                       ProjectCardView.SortBy sort, Boolean mine);
+                                                                       ProjectCardView.SortBy sort, Boolean mine,
+                                                                       Integer pageIndex, Integer pageSize);
 
     Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
-                                                                 String search, ProjectCardView.SortBy sort);
+                                                                 String search, ProjectCardView.SortBy sort,
+                                                                 Integer pageIndex, Integer pageSize);
 
     String createProject(UUID projectId, String name, String shortDescription, String longDescription,
                          Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,

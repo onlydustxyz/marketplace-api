@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
@@ -53,13 +52,13 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         projectRepoRepository.save(new ProjectRepoEntity(privateProjectEntity.getId(), faker.random().nextLong()));
 
         // When
-        final Page<ProjectCardView> projects =
+        final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(List.of(), List.of(), null,
                         ProjectCardView.SortBy.NAME);
 
         // Then
-        Assertions.assertEquals(1, projects.getContent().size());
-        Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
+        Assertions.assertEquals(1, projects.size());
+        Assertions.assertEquals(publicProjectEntity.getId(), projects.get(0).getId());
     }
 
     @Test
@@ -76,13 +75,13 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         projectRepoRepository.save(new ProjectRepoEntity(privateProjectEntity.getId(), faker.random().nextLong()));
 
         // When
-        final Page<ProjectCardView> projects =
+        final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
                         ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
 
         // Then
-        Assertions.assertEquals(1, projects.getContent().size());
-        Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
+        Assertions.assertEquals(1, projects.size());
+        Assertions.assertEquals(publicProjectEntity.getId(), projects.get(0).getId());
     }
 
     @Test
@@ -99,13 +98,13 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         projectRepoRepository.save(new ProjectRepoEntity(privateProjectEntity.getId(), faker.random().nextLong()));
 
         // When
-        final Page<ProjectCardView> projects =
+        final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
                         ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
 
         // Then
-        Assertions.assertEquals(1, projects.getContent().size());
-        Assertions.assertEquals(publicProjectEntity.getId(), projects.getContent().get(0).getId());
+        Assertions.assertEquals(1, projects.size());
+        Assertions.assertEquals(publicProjectEntity.getId(), projects.get(0).getId());
     }
 
 

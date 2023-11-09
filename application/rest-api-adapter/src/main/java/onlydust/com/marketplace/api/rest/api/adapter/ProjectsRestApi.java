@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
@@ -66,15 +67,21 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectListResponse> getProjects(final String sort, final List<String> technologies,
+    public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex, final Integer pageSize,
+                                                           final String sort, final List<String> technologies,
                                                            final List<String> sponsors, final Boolean mine,
                                                            final String search) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final Optional<User> optionalUser = authenticationService.tryGetAuthenticatedUser();
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                        sponsors, search, sortBy, user.getId(), !isNull(mine) && mine)).orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sortBy));
-        return ResponseEntity.ok(mapProjectCards(projectCardViewPage));
+                                sponsors, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
+                                sanitizedPageSize))
+                        .orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies,
+                                sponsors, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
+        return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }
 
     @Override
@@ -141,12 +148,14 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
-        Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), pageIndex,
+        Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(),
+                sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
-        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(pageIndex, page);
+        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page);
 
         return rewardsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :

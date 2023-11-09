@@ -26,7 +26,8 @@ public class CustomProjectListRepositoryTest {
             // Given
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), null, null, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null,
+                    null, false);
             ;
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT, query);
@@ -38,7 +39,8 @@ public class CustomProjectListRepositoryTest {
             final String search = faker.pokemon().name();
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), search, null, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), search,
+                    null, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT
@@ -54,11 +56,14 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.CONTRIBUTORS_COUNT;
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), null, sort, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null,
+                    sort, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.contributors_count desc,name")
+                                                                                 "is_pending_project_lead desc," +
+                                                                                 "search_project.contributors_count " +
+                                                                                 "desc,name")
                     , query);
         }
 
@@ -68,11 +73,13 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.REPOS_COUNT;
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), null, sort, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null,
+                    sort, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.repo_count desc,name")
+                                                                                 "is_pending_project_lead desc," +
+                                                                                 "search_project.repo_count desc,name")
                     , query);
         }
 
@@ -82,7 +89,8 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.NAME;
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), null, sort, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null,
+                    sort, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
@@ -96,11 +104,13 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.RANK;
 
             // When
-            final String query = buildQueryForUser(List.of(), List.of(), null, sort, false);
+            final String query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null,
+                    sort, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY.replace("%order_by%", "order by " +
-                                                                                 "is_pending_project_lead desc,search_project.rank desc,name")
+                                                                                 "is_pending_project_lead desc," +
+                                                                                 "search_project.rank desc,name")
                     , query);
         }
 
@@ -110,8 +120,10 @@ public class CustomProjectListRepositoryTest {
             final List<String> sponsors = List.of(faker.pokemon().name(), faker.pokemon().location());
 
             // When
-            final String query1 = buildQueryForUser(List.of(), sponsors.subList(0, 1), null, null, false);
-            final String query2 = buildQueryForUser(List.of(), sponsors, null, null, false);
+            final String query1 = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), sponsors.subList(0,
+                    1), null, null, false);
+            final String query2 = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), sponsors, null,
+                    null, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.sponsor_name in " +
@@ -127,8 +139,10 @@ public class CustomProjectListRepositoryTest {
             final List<String> technologies = List.of(faker.pokemon().name(), faker.pokemon().location());
 
             // When
-            final String query1 = buildQueryForUser(technologies.subList(0, 1), List.of(), null, null, false);
-            final String query2 = buildQueryForUser(technologies, List.of(), null, null, false);
+            final String query1 = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, technologies.subList(0, 1),
+                    List.of(), null, null, false);
+            final String query2 = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, technologies, List.of(), null,
+                    null, false);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike " +
@@ -146,7 +160,8 @@ public class CustomProjectListRepositoryTest {
             // Given
 
             // When
-            final String mine_query = buildQueryForUser(List.of(), List.of(), null, null, true);
+            final String mine_query = buildQueryForUser(FIND_PROJECTS_FOR_USER_BASE_QUERY, List.of(), List.of(), null
+                    , null, true);
 
             // Then
             assertEquals(FIND_PROJECTS_FOR_USER_BASE_QUERY_WITH_DEFAULT_SORT + " and ((search_project.is_lead = true " +
@@ -167,7 +182,7 @@ public class CustomProjectListRepositoryTest {
             // Given
 
             // When
-            final String query = buildQuery(List.of(), List.of(), null, null);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), null, null);
             ;
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT, query);
@@ -179,7 +194,7 @@ public class CustomProjectListRepositoryTest {
             final String search = faker.pokemon().name();
 
             // When
-            final String query = buildQuery(List.of(), List.of(), search, null);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), search, null);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT
@@ -195,7 +210,7 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.CONTRIBUTORS_COUNT;
 
             // When
-            final String query = buildQuery(List.of(), List.of(), null, sort);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), null, sort);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.contributors_count " +
@@ -209,7 +224,7 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.REPOS_COUNT;
 
             // When
-            final String query = buildQuery(List.of(), List.of(), null, sort);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), null, sort);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.repo_count desc,name")
@@ -222,7 +237,7 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.NAME;
 
             // When
-            final String query = buildQuery(List.of(), List.of(), null, sort);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), null, sort);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.name")
@@ -235,7 +250,7 @@ public class CustomProjectListRepositoryTest {
             final ProjectCardView.SortBy sort = ProjectCardView.SortBy.RANK;
 
             // When
-            final String query = buildQuery(List.of(), List.of(), null, sort);
+            final String query = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), List.of(), null, sort);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY.replace("%order_by%", "order by search_project.rank desc,name")
@@ -248,8 +263,8 @@ public class CustomProjectListRepositoryTest {
             final List<String> sponsors = List.of(faker.pokemon().name(), faker.pokemon().location());
 
             // When
-            final String query1 = buildQuery(List.of(), sponsors.subList(0, 1), null, null);
-            final String query2 = buildQuery(List.of(), sponsors, null, null);
+            final String query1 = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), sponsors.subList(0, 1), null, null);
+            final String query2 = buildQuery(FIND_PROJECTS_BASE_QUERY, List.of(), sponsors, null, null);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.sponsor_name in ('" + sponsors.get(0) + "'))",
@@ -263,8 +278,9 @@ public class CustomProjectListRepositoryTest {
             final List<String> technologies = List.of(faker.pokemon().name(), faker.pokemon().location());
 
             // When
-            final String query1 = buildQuery(technologies.subList(0, 1), List.of(), null, null);
-            final String query2 = buildQuery(technologies, List.of(), null, null);
+            final String query1 = buildQuery(FIND_PROJECTS_BASE_QUERY, technologies.subList(0, 1), List.of(), null,
+                    null);
+            final String query2 = buildQuery(FIND_PROJECTS_BASE_QUERY, technologies, List.of(), null, null);
 
             // Then
             assertEquals(FIND_PROJECTS_BASE_QUERY_WITH_DEFAULT_SORT + " and (search_project.languages ilike '%\"" + technologies.get(0) +

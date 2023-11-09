@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
@@ -19,6 +20,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -48,6 +50,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
     private final PostgresContributionAdapter postgresContributionAdapter;
+    private final ProjectsPageRepository projectsPageRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -83,17 +86,39 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                               List<String> sponsors, UUID userId,
                                                                               String search,
                                                                               ProjectCardView.SortBy sort,
-                                                                              Boolean mine) {
-        return customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors,
+                                                                              Boolean mine, Integer pageIndex,
+                                                                              Integer pageSize) {
+        final Integer count = customProjectListRepository.getProjectsCountForUserId(technologies, sponsors,
                 search, sort, userId, mine);
+        final List<ProjectCardView> byTechnologiesSponsorsUserIdSearchSortBy =
+                customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors,
+                        search, sort, userId, mine, pageIndex, pageSize);
+        return Page.<ProjectCardView>builder()
+                .content(byTechnologiesSponsorsUserIdSearchSortBy)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies,
                                                                         List<String> sponsors, String search,
-                                                                        ProjectCardView.SortBy sort) {
-        return customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort);
+                                                                        ProjectCardView.SortBy sort,
+                                                                        Integer pageIndex, Integer pageSize) {
+        final org.springframework.data.domain.Page<ProjectPageItemViewEntity> projectsForAnonymousUser =
+                projectsPageRepository.findProjectsForAnonymousUser(Pageable.ofSize(2));
+        System.out.println(projectsForAnonymousUser);
+        final Integer count = customProjectListRepository.getProjectsCount(technologies, sponsors,
+                search, sort);
+        final List<ProjectCardView> byTechnologiesSponsorsSearchSortBy =
+                customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search,
+                        sort, pageIndex, pageSize);
+        return Page.<ProjectCardView>builder()
+                .content(byTechnologiesSponsorsSearchSortBy)
+                .totalItemNumber(count)
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .build();
     }
 
     @Override
