@@ -133,9 +133,8 @@ public class CustomProjectListRepository {
                   ) as search_project
                 where repo_count > 0
                     and (search_project.visibility = 'PUBLIC'
-                    or (search_project.visibility = 'PRIVATE' and
-                        (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor)))
-                        
+                    or (search_project.visibility = 'PRIVATE' and (project_lead_count > 0 or is_pending_project_lead)
+                    and (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor)))
             """;
     private final static ObjectMapper objectMapper = new ObjectMapper();
     private final static TypeReference<HashMap<String, Integer>> typeRef

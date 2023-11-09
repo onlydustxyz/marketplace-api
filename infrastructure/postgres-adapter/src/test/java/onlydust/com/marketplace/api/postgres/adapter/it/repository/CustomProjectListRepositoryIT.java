@@ -110,6 +110,8 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
 
 
 
+
+
     private static ProjectEntity buildProjectStub(final ProjectVisibility visibility) {
         return ProjectEntity.builder()
                 .id(UUID.randomUUID())
