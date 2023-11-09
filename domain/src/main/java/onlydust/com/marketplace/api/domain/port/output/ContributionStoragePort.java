@@ -29,4 +29,8 @@ public interface ContributionStoragePort {
     void ignoreContributions(UUID projectId, List<String> contributionIds);
 
     void unignoreContributions(UUID projectId, List<String> contributionIds);
+
+    void refreshIgnoredContributions(UUID projectId);
+
+    void refreshIgnoredContributions(List<Long> repoIds);
 }

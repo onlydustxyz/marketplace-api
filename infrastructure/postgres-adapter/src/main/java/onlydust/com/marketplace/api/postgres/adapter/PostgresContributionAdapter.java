@@ -34,6 +34,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final CustomContributorRepository customContributorRepository;
     private final CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     private final IgnoredContributionsRepository ignoredContributionsRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -151,5 +152,24 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                         .build()
         ).toList());
 
+    }
+
+    @Override
+    @Transactional
+    public void refreshIgnoredContributions(UUID projectId) {
+        final var repoIds = projectRepository.findById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound("project %s not found".formatted(projectId)))
+                .getRepos().stream()
+                .map(repo -> repo.getPrimaryKey().getRepoId())
+                .toList();
+
+        refreshIgnoredContributions(repoIds);
+    }
+
+    @Override
+    @Transactional
+    public void refreshIgnoredContributions(List<Long> repoIds) {
+        ignoredContributionsRepository.addMissingContributions(repoIds);
+        ignoredContributionsRepository.deleteContributionsThatShouldNotBeIgnored(repoIds);
     }
 }
