@@ -63,8 +63,8 @@ server:
 
 infrastructure:
   aws:
-    image-bucket: onlydust-app-images
-    region: eu-west-1
+    image-bucket: ${IMAGE_BUCKET_NAME}
+    region: ${AWS_REGION}
     access-key: ${AWS_ACCESS_KEY_ID}
     secret-key: ${AWS_SECRET_ACCESS_KEY}
   github:
