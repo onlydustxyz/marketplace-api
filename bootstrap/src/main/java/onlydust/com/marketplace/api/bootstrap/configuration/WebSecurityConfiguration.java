@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
@@ -25,8 +27,11 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter, final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
-        return new WebSecurityAdapter(authenticationFilter, delegatedAuthenticationEntryPoint);
+    public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter,
+                                                       final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                                       final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
+        return new WebSecurityAdapter(authenticationFilter, apiKeyAuthenticationFilter,
+                delegatedAuthenticationEntryPoint);
     }
 
     @Bean
@@ -37,13 +42,15 @@ public class WebSecurityConfiguration {
 
     @Bean
     @Profile("!hasura_auth")
-    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final JWTVerifier jwtVerifier, final UserFacadePort userFacadePort) {
+    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final JWTVerifier jwtVerifier,
+                                      final UserFacadePort userFacadePort) {
         return new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
     }
 
     @Bean
     @Profile("hasura_auth")
-    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret, final UserFacadePort userFacadePort) {
+    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret,
+                                       final UserFacadePort userFacadePort) {
         return new HasuraJwtService(objectMapper, jwtSecret, userFacadePort);
     }
 
@@ -60,6 +67,16 @@ public class WebSecurityConfiguration {
     @Bean
     public AuthenticationService authenticationService(final AuthenticationContext authenticationContext) {
         return new AuthenticationService(authenticationContext);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationFilter apiKeyAuthenticationFilter(final ApiKeyAuthenticationService apiKeyAuthenticationService) {
+        return new ApiKeyAuthenticationFilter(apiKeyAuthenticationService);
+    }
+
+    @Bean
+    public ApiKeyAuthenticationService apiKeyAuthenticationService(final ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig) {
+        return new ApiKeyAuthenticationService(apiKeyAuthenticationConfig);
     }
 
     @Bean
@@ -80,6 +97,12 @@ public class WebSecurityConfiguration {
     @ConfigurationProperties("application.web.auth0")
     public Auth0Properties auth0Properties() {
         return new Auth0Properties();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.machine-to-machine")
+    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
     }
 
     @Data

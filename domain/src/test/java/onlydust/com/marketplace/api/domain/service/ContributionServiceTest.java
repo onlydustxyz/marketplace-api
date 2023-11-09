@@ -119,4 +119,16 @@ class ContributionServiceTest {
         // Then
         verify(contributionStoragePort, never()).unignoreContributions(projectId, contributionIds);
     }
+
+    @Test
+    void should_refresh_contributions() {
+        // Given
+        final var repoIds = List.of(faker.number().randomNumber(), faker.number().randomNumber());
+
+        // When
+        contributionService.refreshIgnoredContributions(repoIds);
+
+        // Then
+        verify(contributionStoragePort, times(1)).refreshIgnoredContributions(repoIds);
+    }
 }

@@ -1275,7 +1275,29 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
+  /api/v1/events/on-contributions-change:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Events
+      summary: On contributions change
+      operationId: onContributionsChange
+      description: |
+        Should be called when (at least) a contribution is added or removed from a repo.
+      requestBody:
+        description: 'Contributions change event'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OnContributionsChangeEvent'
+      responses:
+        "204":
+          description: 'Event processed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -1283,6 +1305,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: Api-Key
 
   responses:
     InternalServerError:
@@ -3295,3 +3321,13 @@ components:
         transactionReference:
           type: string
 
+    OnContributionsChangeEvent:
+      type: object
+      required:
+        - repoIds
+      properties:
+        repoIds:
+          type: array
+          description: List of Github repos on which contributions have changed
+          items:
+            $ref: '#/components/schemas/GithubRepoId'
