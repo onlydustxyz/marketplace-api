@@ -60,4 +60,9 @@ public class RestApiConfiguration {
         return new AppRestApi();
     }
 
+    @Bean
+    public EventsRestApi eventsRestApi(final ContributionFacadePort contributionFacadePort) {
+        return new EventsRestApi(contributionFacadePort);
+    }
+
 }
