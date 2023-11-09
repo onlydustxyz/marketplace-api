@@ -75,10 +75,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "owner": "gregcha",
                   "name": "bretzel-site",
                   "description": null,
-                  "stars": 10,
+                  "stars": 0,
                   "forkCount": 0,
                   "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                  "hasIssues": false,
+                  "hasIssues": true,
                   "isIncludedInProject": null
                 },
                 {
@@ -119,7 +119,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "login": "gregcha",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "htmlUrl": "https://github.com/gregcha",
-                  "name": "Grégoire",
+                  "name": "Grégoire CHARLES",
                   "repos": [
                     {
                       "id": 380954304,
@@ -137,10 +137,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "owner": "gregcha",
                       "name": "bretzel-site",
                       "description": null,
-                      "stars": 10,
+                      "stars": 0,
                       "forkCount": 0,
                       "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                      "hasIssues": false,
+                      "hasIssues": true,
                       "isIncludedInProject": true
                     },
                     {
