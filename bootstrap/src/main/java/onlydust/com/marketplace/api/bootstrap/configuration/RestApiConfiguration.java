@@ -16,11 +16,10 @@ public class RestApiConfiguration {
 
     @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
-                                          final ContributorFacadePort contributorFacadePort,
                                           final AuthenticationService authenticationService,
                                           final RewardService<HasuraAuthentication> rewardService,
                                           final ContributionFacadePort contributionFacadePort) {
-        return new ProjectsRestApi(projectFacadePort, contributorFacadePort, authenticationService, rewardService,
+        return new ProjectsRestApi(projectFacadePort, authenticationService, rewardService,
                 contributionFacadePort);
     }
 

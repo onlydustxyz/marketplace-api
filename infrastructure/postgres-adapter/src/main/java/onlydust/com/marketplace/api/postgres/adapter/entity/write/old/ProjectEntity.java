@@ -3,12 +3,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.*;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder
 @Table(name = "project_details", schema = "public")
@@ -27,7 +27,6 @@ import java.util.UUID;
 public class ProjectEntity {
     @Id
     @Column(name = "project_id", nullable = false)
-    @EqualsAndHashCode.Include
     UUID id;
     @Column(name = "name")
     String name;
@@ -44,6 +43,7 @@ public class ProjectEntity {
     @Column(name = "rank", updatable = false)
     Integer rank;
     @Column(name = "key", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     String key;
     @Enumerated(EnumType.STRING)
     @Type(type = "project_visibility")
@@ -58,15 +58,28 @@ public class ProjectEntity {
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
 
+    @EqualsAndHashCode.Exclude
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    Instant createdAt;
+
+    @EqualsAndHashCode.Exclude
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    Instant updatedAt;
+
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     Set<ProjectLeaderInvitationEntity> projectLeaderInvitations;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     Set<ProjectLeadEntity> projectLeaders;
 
     @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     Set<ProjectRepoEntity> repos;
 }

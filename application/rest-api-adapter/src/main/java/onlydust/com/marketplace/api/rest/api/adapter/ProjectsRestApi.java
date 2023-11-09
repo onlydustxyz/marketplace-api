@@ -9,7 +9,6 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -48,7 +47,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectReward
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
-    private final ContributorFacadePort contributorFacadePort;
     private final AuthenticationService authenticationService;
     private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
