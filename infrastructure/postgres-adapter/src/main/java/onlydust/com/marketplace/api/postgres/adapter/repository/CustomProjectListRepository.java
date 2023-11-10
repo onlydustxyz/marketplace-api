@@ -254,7 +254,7 @@ public class CustomProjectListRepository {
                     and (is_contributor or is_pending_project_lead or is_lead or is_pending_contributor)))
             """;
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private final static TypeReference<HashMap<String, Integer>> typeRef
+    private final static TypeReference<HashMap<String, Long>> typeRef
             = new TypeReference<>() {
     };
     private final EntityManager entityManager;
@@ -284,7 +284,7 @@ public class CustomProjectListRepository {
             if (isNull(entity.getRepositoryLanguages())) {
                 return;
             }
-            final HashMap<String, Integer> technologies =
+            final HashMap<String, Long> technologies =
                     objectMapper.readValue(entity.getRepositoryLanguages(), typeRef);
             projectCardView.addTechnologies(technologies);
         } catch (JsonProcessingException e) {

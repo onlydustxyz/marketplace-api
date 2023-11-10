@@ -54,7 +54,7 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         // When
         final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(List.of(), List.of(), null,
-                        ProjectCardView.SortBy.NAME);
+                        ProjectCardView.SortBy.NAME,0,10);
 
         // Then
         Assertions.assertEquals(1, projects.size());
@@ -77,7 +77,7 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         // When
         final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
-                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
+                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false,0,10);
 
         // Then
         Assertions.assertEquals(1, projects.size());
@@ -100,7 +100,7 @@ public class CustomProjectListRepositoryIT extends AbstractPostgresIT {
         // When
         final List<ProjectCardView> projects =
                 customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(List.of(), List.of(), null,
-                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false);
+                        ProjectCardView.SortBy.NAME, UUID.randomUUID(), false,0,10);
 
         // Then
         Assertions.assertEquals(1, projects.size());

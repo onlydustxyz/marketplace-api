@@ -231,7 +231,11 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         final UserProfile profile =
-                UserProfile.builder().bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).cover(UserProfileCover.CYAN).technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomDigit(), faker.programmingLanguage().name(), faker.number().randomDigit())).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
+                UserProfile.builder().bio(faker.lorem().sentence())
+                        .website(faker.internet().url()).location(faker.address().city())
+                        .cover(UserProfileCover.CYAN)
+                        .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(), faker.programmingLanguage().name(), faker.number().randomNumber()))
+                        .contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
 
         final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
 

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
@@ -20,25 +21,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    p.long_description,
                    p.visibility,
                    p.rank,
-                   (select count(pgr_count.github_repo_id)
-                    from public.project_github_repos pgr_count
-                    where pgr_count.project_id = p.project_id)  as repo_count,
-                   (select count(pc_count.github_user_id) as contributors_count
-                    from public.projects_contributors pc_count
-                    where pc_count.project_id = p.project_id)  as contributors_count,
+                   r_count.repo_count  as repo_count,
+                   pc_count.contributors_count                as contributors_count,
                    (select count(pl_count.user_id)
                     from project_leads pl_count
                     where pl_count.project_id = p.project_id) as project_lead_count,
                    false                                      as   is_pending_project_lead,
-                   (select jsonb_agg(jsonb_build_object(
-                           'url', sponsor.url,
-                           'logoUrl', sponsor.logo_url,
-                           'id', sponsor.id
-                                     ))
-                    from sponsors sponsor
-                             join public.projects_sponsors ps on ps.project_id = p.project_id
-                    where sponsor.id = ps.sponsor_id
-                    group by ps.project_id)                     as sponsors,
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
@@ -51,16 +39,69 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                              left join github_users gu on gu.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                   as   project_leads,
-                   (select json_agg(gr.languages)
-                    from project_github_repos pgr
-                             left join github_repos gr on gr.id = pgr.github_repo_id
-                    where pgr.project_id = p.project_id
-                    group by pgr.project_id)                   as  technologies
+                   t.technologies as  technologies,
+                   s.sponsor_json                                 sponsors
             from project_details p
-            where (select count(github_repo_id)
-                   from project_github_repos pgr_count
-                   where pgr_count.project_id = p.project_id) > 0
+                left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
+                            from project_github_repos pgr
+                                     left join github_repos gr on gr.id = pgr.github_repo_id
+                            group by pgr.project_id) ) as t on t.project_id = p.project_id
+                left join (select ps.project_id,
+                                           jsonb_agg(jsonb_build_object(
+                                                   'url', sponsor.url,
+                                                   'logoUrl', sponsor.logo_url,
+                                                   'id', sponsor.id,
+                                                   'name', sponsor.name
+                                                     )) sponsor_json
+                                    from sponsors sponsor
+                                             join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                    group by ps.project_id) s on s.project_id = p.project_id
+                left join (select pgr_count.project_id, count(github_repo_id) repo_count
+                                from project_github_repos pgr_count
+                                group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
+                left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
+                                    from public.projects_contributors pc_count
+                                    group by pc_count.project_id) pc_count on pc_count.project_id = p.project_id
+            where r_count.repo_count > 0
               and p.visibility = 'PUBLIC'
-              """, nativeQuery = true)
-    Page<ProjectPageItemViewEntity> findProjectsForAnonymousUser(Pageable pageable);
+              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+              and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
+              order by case
+                           when cast(:orderBy as text) = 'NAME' then (upper(p.name), 0)
+                           when cast(:orderBy as text) = 'REPOS_COUNT' then (-r_count.repo_count, upper(p.name))
+                           when cast(:orderBy as text) = 'CONTRIBUTORS_COUNT' then (-pc_count.contributors_count, upper(p.name))
+                           when cast(:orderBy as text) = 'RANK' then (-p.rank, upper(p.name))
+                       end
+              """, countQuery = """
+                        select count(p.project_id)
+                        from project_details p
+                        left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
+                            from project_github_repos pgr
+                                     left join github_repos gr on gr.id = pgr.github_repo_id
+                            group by pgr.project_id) ) as t on t.project_id = p.project_id
+                        left join (select ps.project_id,
+                                                   jsonb_agg(jsonb_build_object(
+                                                           'url', sponsor.url,
+                                                           'logoUrl', sponsor.logo_url,
+                                                           'id', sponsor.id,
+                                                           'name', sponsor.name
+                                                             )) sponsor_json
+                                            from sponsors sponsor
+                                                     join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                            group by ps.project_id) s on s.project_id = p.project_id
+                        where (select count(github_repo_id)
+                                           from project_github_repos pgr_count
+                                           where pgr_count.project_id = p.project_id) > 0
+                                       and p.visibility = 'PUBLIC'
+                                       and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+                                       and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+                                       and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
+                                       and (coalesce(:orderBy) is null or :orderBy is null)
+            """, nativeQuery = true)
+    Page<ProjectPageItemViewEntity> findProjectsForAnonymousUser(Pageable pageable,
+                                                                 @Param("technologiesJsonPath") String technologiesJsonPath,
+                                                                 @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                                 @Param("search") String search,
+                                                                 @Param("orderBy") String orderBy);
 }

@@ -2346,6 +2346,7 @@ components:
       description: List fo technologies ordered by mastering level (the higher the better) or usage (ie. line count of a language)
       additionalProperties:
         type: integer
+        format: int64
       example:
         Rust: 91283
         Go: 12388

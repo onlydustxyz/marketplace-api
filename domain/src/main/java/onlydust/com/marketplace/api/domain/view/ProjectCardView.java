@@ -23,7 +23,7 @@ public class ProjectCardView {
     @Builder.Default
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
     @Builder.Default
-    Map<String, Integer> technologies = new HashMap<>();
+    Map<String, Long> technologies = new HashMap<>();
     @Builder.Default
     Boolean isInvitedAsProjectLead = false;
 
@@ -35,7 +35,7 @@ public class ProjectCardView {
         this.getSponsors().add(sponsor);
     }
 
-    public void addTechnologies(final Map<String, Integer> technologiesToAdd) {
+    public void addTechnologies(final Map<String, Long> technologiesToAdd) {
         technologiesToAdd.forEach((key, value) -> {
             if (this.getTechnologies().containsKey(key)) {
                 this.getTechnologies().replace(key, this.getTechnologies().get(key) + value);

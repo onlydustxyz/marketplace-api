@@ -48,7 +48,7 @@ public class UserProfileInfoEntity {
     ProfileCoverEnumEntity cover;
     @Type(type = "jsonb")
     @Column(name = "languages", columnDefinition = "jsonb")
-    Map<String, Integer> languages;
+    Map<String, Long> languages;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)

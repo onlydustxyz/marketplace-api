@@ -266,7 +266,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .isLookingForAJob(false)
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())
-                .languages(Map.of(faker.rickAndMorty().location(), 5, faker.hacker().adjective(), 10))
+                .languages(Map.of(faker.rickAndMorty().location(), 5L, faker.hacker().adjective(), 10L))
                 .contactInformations(List.of(ContactInformationEntity.builder()
                         .contact(faker.rickAndMorty().location())
                         .id(ContactInformationIdEntity.builder()

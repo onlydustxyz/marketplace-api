@@ -45,7 +45,7 @@ spring:
         event:
           merge:
             entity_copy_observer: allow
-        format_sql: false
+        format_sql: true
         order_inserts: true
         order_updates: true
         generate_statistics: false
@@ -56,8 +56,12 @@ spring:
           use_jdbc_metadata_defaults: false
     generate-ddl: false
     open-in-view: false
-    show-sql: false
-
+    show-sql: true
+  logging:
+    level:
+      org:
+        hibernate:
+          type: trace
 server:
   port: ${PORT}
 

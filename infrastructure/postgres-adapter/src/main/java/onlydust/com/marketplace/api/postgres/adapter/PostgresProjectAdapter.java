@@ -20,7 +20,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -106,18 +106,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                         List<String> sponsors, String search,
                                                                         ProjectCardView.SortBy sort,
                                                                         Integer pageIndex, Integer pageSize) {
+
+        final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+        final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
         final org.springframework.data.domain.Page<ProjectPageItemViewEntity> projectsForAnonymousUser =
-                projectsPageRepository.findProjectsForAnonymousUser(Pageable.ofSize(2));
-        System.out.println(projectsForAnonymousUser);
-        final Integer count = customProjectListRepository.getProjectsCount(technologies, sponsors,
-                search, sort);
-        final List<ProjectCardView> byTechnologiesSponsorsSearchSortBy =
-                customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search,
-                        sort, pageIndex, pageSize);
+                projectsPageRepository.findProjectsForAnonymousUser(PageRequest.of(pageIndex, pageSize),
+                        technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
+                                ProjectCardView.SortBy.NAME.name() : sort.name());
         return Page.<ProjectCardView>builder()
-                .content(byTechnologiesSponsorsSearchSortBy)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                .content(projectsForAnonymousUser.getContent().stream().map(ProjectPageItemViewEntity::toView).toList())
+                .totalItemNumber((int) projectsForAnonymousUser.getTotalElements())
+                .totalPageNumber(projectsForAnonymousUser.getTotalPages())
                 .build();
     }
 
