@@ -2,10 +2,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import onlydust.com.marketplace.api.domain.model.ContributionStatus;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
@@ -32,12 +34,32 @@ public class ContributionDetailsViewEntity {
     @Enumerated(EnumType.STRING)
     @org.hibernate.annotations.Type(type = "contribution_status")
     Status status;
+
     Long githubNumber;
+    String githubStatus;
     String githubTitle;
     String githubHtmlUrl;
     String githubBody;
+    Long githubAuthorId;
+    String githubAuthorLogin;
+    String githubAuthorHtmlUrl;
+    String githubAuthorAvatarUrl;
+    Integer githubCommentsCount;
+
+    UUID projectId;
     String projectName;
+    String projectKey;
+    String projectShortDescription;
+    String projectLogoUrl;
+    @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(type = "project_visibility")
+    ProjectVisibilityEnumEntity projectVisibility;
+
+    Long repoId;
+    String repoOwner;
     String repoName;
+    String repoHtmlUrl;
+
     String contributorLogin;
     String contributorAvatarUrl;
     Long contributorId;
@@ -52,6 +74,29 @@ public class ContributionDetailsViewEntity {
                 .githubUserId(contributorId)
                 .build();
 
+        final var project = Project.builder()
+                .id(projectId)
+                .slug(projectKey)
+                .name(projectName)
+                .shortDescription(projectShortDescription)
+                .logoUrl(projectLogoUrl)
+                .visibility(ProjectMapper.projectVisibilityToDomain(projectVisibility))
+                .build();
+
+        final var repo = GithubRepo.builder()
+                .id(repoId)
+                .owner(repoOwner)
+                .name(repoName)
+                .htmlUrl(repoHtmlUrl)
+                .build();
+
+        final var author = ContributorLinkView.builder()
+                .githubUserId(githubAuthorId)
+                .login(githubAuthorLogin)
+                .url(githubAuthorHtmlUrl)
+                .avatarUrl(githubAuthorAvatarUrl)
+                .build();
+
         return ContributionDetailsView.builder()
                 .id(id)
                 .createdAt(createdAt)
@@ -60,11 +105,14 @@ public class ContributionDetailsViewEntity {
                 .status(status.toView())
                 .contributor(contributor)
                 .githubNumber(githubNumber)
+                .githubStatus(githubStatus)
                 .githubTitle(githubTitle)
                 .githubHtmlUrl(githubHtmlUrl)
                 .githubBody(githubBody)
-                .projectName(projectName)
-                .repoName(repoName)
+                .githubCommentsCount(githubCommentsCount)
+                .githubAuthor(author)
+                .project(project)
+                .githubRepo(repo)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
                 .build();
     }

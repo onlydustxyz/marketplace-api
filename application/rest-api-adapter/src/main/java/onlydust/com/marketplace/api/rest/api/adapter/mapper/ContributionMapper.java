@@ -56,11 +56,13 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(contributionView.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
                 .githubNumber(contributionView.getGithubNumber())
+                .githubStatus(contributionView.getGithubStatus())
                 .githubTitle(contributionView.getGithubTitle())
                 .githubHtmlUrl(contributionView.getGithubHtmlUrl())
                 .githubBody(contributionView.getGithubBody())
-                .projectName(contributionView.getProjectName())
-                .repoName(contributionView.getRepoName())
+                .githubAuthor(ProjectMapper.mapUserLink(contributionView.getGithubAuthor()))
+                .project(ProjectMapper.mapShortProjectResponse(contributionView.getProject()))
+                .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
                 .links(contributionView.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewardIds(contributionView.getRewardIds());
     }
@@ -73,9 +75,12 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(link.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(link.getStatus()))
                 .githubNumber(link.getGithubNumber())
+                .githubStatus(link.getGithubStatus())
                 .githubTitle(link.getGithubTitle())
                 .githubHtmlUrl(link.getGithubHtmlUrl())
                 .githubBody(link.getGithubBody())
+                .githubAuthor(ProjectMapper.mapUserLink(link.getGithubAuthor()))
+                .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()))
                 .isMine(link.getIsMine());
     }
 
@@ -111,11 +116,14 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(contribution.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(contribution.getStatus()))
                 .githubNumber(contribution.getGithubNumber())
+                .githubStatus(contribution.getGithubStatus())
                 .githubTitle(contribution.getGithubTitle())
                 .githubHtmlUrl(contribution.getGithubHtmlUrl())
                 .githubBody(contribution.getGithubBody())
-                .projectName(contribution.getProjectName())
-                .repoName(contribution.getRepoName())
+                .githubAuthor(ProjectMapper.mapUserLink(contribution.getGithubAuthor()))
+                .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
+                .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))
+                .commentsCount(contribution.getGithubCommentsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
     }

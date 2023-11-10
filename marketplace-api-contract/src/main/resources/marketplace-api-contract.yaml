@@ -2789,19 +2789,12 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - projectName
-            - repoName
+            - project
             - links
             - rewardIds
           properties:
-            projectName:
-              type: string
-              description: Project name
-              example: Verkle Tries
-            repoName:
-              type: string
-              description: Github repository name
-              example: marketplace-backend
+            project:
+              $ref: '#/components/schemas/ShortProjectResponse'
             links:
               type: array
               description: Related contributions
@@ -2832,10 +2825,12 @@ components:
         - createdAt
         - type
         - status
-        - number
-        - title
-        - htmlUrl
-        - body
+        - repo
+        - githubNumber
+        - githubStatus
+        - githubAuthor
+        - githubTitle
+        - githubHtmlUrl
       properties:
         id:
           type: string
@@ -2852,11 +2847,18 @@ components:
           $ref: '#/components/schemas/ContributionType'
         status:
           $ref: '#/components/schemas/ContributionStatus'
+        repo:
+          $ref: '#/components/schemas/ShortGithubRepoResponse'
+        githubAuthor:
+          $ref: '#/components/schemas/UserLinkResponse'
         githubNumber:
           type: integer
           format: int64
           description: Github item number
           example: 6
+        githubStatus:
+          type: string
+          description: Github item status
         githubTitle:
           type: string
           description: Github item title
@@ -2873,19 +2875,19 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - project_name
-            - repo_name
+            - project
+            - repo
+            - commentsCount
             - links
             - rewards
           properties:
-            project_name:
-              type: string
-              description: Project name
-              example: Verkle Tries
-            repo_name:
-              type: string
-              description: Github repository name
-              example: marketplace-backend
+            project:
+              $ref: '#/components/schemas/ShortProjectResponse'
+            repo:
+              $ref: '#/components/schemas/ShortGithubRepoResponse'
+            commentsCount:
+              type: integer
+              description: Number of comments on the contribution
             links:
               type: array
               description: Related contributions
