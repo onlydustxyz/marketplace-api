@@ -34,16 +34,17 @@ public class GithubInstallationServiceTest {
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",
-                List.of(new GithubRepo(
-                        123446L,
-                        "onlydustxyz",
-                        "marketplace",
-                        "htmlUrl",
-                        new Date(),
-                        "description",
-                        1L,
-                        12L
-                ))
+                List.of(GithubRepo.builder()
+                        .id(123446L)
+                        .owner("onlydustxyz")
+                        .name("marketplace")
+                        .htmlUrl("htmlUrl")
+                        .updatedAt(new Date())
+                        .description("description")
+                        .starsCount(1L)
+                        .forksCount(12L)
+                        .build()
+                )
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))
@@ -65,16 +66,17 @@ public class GithubInstallationServiceTest {
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",
-                List.of(new GithubRepo(
-                        123446L,
-                        "onlydustxyz",
-                        "marketplace",
-                        "htmlUrl",
-                        new Date(),
-                        "description",
-                        1L,
-                        12L
-                ))
+                List.of(GithubRepo.builder()
+                        .id(123446L)
+                        .owner("onlydustxyz")
+                        .name("marketplace")
+                        .htmlUrl("htmlUrl")
+                        .updatedAt(new Date())
+                        .description("description")
+                        .starsCount(1L)
+                        .forksCount(12L)
+                        .build()
+                )
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))

@@ -6,28 +6,28 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexpositi
 
 public class GithubRepoMapper {
     public static GithubRepo map(GithubRepoEntity repo) {
-        return new GithubRepo(
-                repo.getId(),
-                repo.getOwner().getLogin(),
-                repo.getName(),
-                repo.getHtmlUrl(),
-                repo.getUpdatedAt(),
-                repo.getDescription(),
-                repo.getStarsCount(),
-                repo.getForksCount()
-        );
+        return GithubRepo.builder()
+                .id(repo.getId())
+                .owner(repo.getOwner().getLogin())
+                .name(repo.getName())
+                .htmlUrl(repo.getHtmlUrl())
+                .updatedAt(repo.getUpdatedAt())
+                .description(repo.getDescription())
+                .starsCount(repo.getStarsCount())
+                .forksCount(repo.getForksCount())
+                .build();
     }
 
     public static GithubRepo map(GithubRepoViewEntity repo) {
-        return new GithubRepo(
-                repo.getId(),
-                repo.getOwner(),
-                repo.getName(),
-                repo.getHtmlUrl(),
-                repo.getUpdatedAt(),
-                repo.getDescription(),
-                repo.getStarsCount(),
-                repo.getForksCount()
-        );
+        return GithubRepo.builder()
+                .id(repo.getId())
+                .owner(repo.getOwner())
+                .name(repo.getName())
+                .htmlUrl(repo.getHtmlUrl())
+                .updatedAt(repo.getUpdatedAt())
+                .description(repo.getDescription())
+                .starsCount(repo.getStarsCount())
+                .forksCount(repo.getForksCount())
+                .build();
     }
 }

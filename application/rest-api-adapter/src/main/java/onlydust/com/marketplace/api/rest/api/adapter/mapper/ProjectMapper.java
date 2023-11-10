@@ -225,7 +225,7 @@ public interface ProjectMapper {
         return userLink;
     }
 
-    private static UserLinkResponse mapUserLink(final UserLinkView userLinkView) {
+    static UserLinkResponse mapUserLink(final UserLinkView userLinkView) {
         final var userLink = new UserLinkResponse();
         userLink.setGithubUserId(userLinkView.getGithubUserId());
         userLink.setAvatarUrl(userLinkView.getAvatarUrl());

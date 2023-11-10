@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
 import lombok.Value;
-import onlydust.com.marketplace.api.domain.model.ContributionStatus;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.model.*;
 
 import java.util.Date;
 import java.util.List;
@@ -19,11 +17,14 @@ public class ContributionDetailsView {
     ContributionStatus status;
     GithubUserIdentity contributor;
     Long githubNumber;
+    String githubStatus;
     String githubTitle;
     String githubHtmlUrl;
     String githubBody;
-    String projectName;
-    String repoName;
+    Integer githubCommentsCount;
+    UserLinkView githubAuthor;
+    GithubRepo githubRepo;
+    Project project;
     List<ContributionLinkView> links;
     List<ContributionRewardView> rewards;
 

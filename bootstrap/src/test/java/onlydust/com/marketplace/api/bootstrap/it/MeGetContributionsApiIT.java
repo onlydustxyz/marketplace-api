@@ -31,170 +31,227 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "contributions": [
-                            {
-                              "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
-                              "createdAt": "2022-04-12T13:59:17Z",
-                              "completedAt": "2022-04-13T11:00:49Z",
-                              "type": "PULL_REQUEST",
-                              "status": "COMPLETED",
-                              "githubNumber": 1,
-                              "githubTitle": "feat: add common model",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
-                              "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
-                              "projectName": "Zama",
-                              "repoName": "starklings",
-                              "links": [],
-                              "rewardIds": []
-                            },
-                            {
-                              "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
-                              "createdAt": "2022-04-12T18:56:44Z",
-                              "completedAt": "2022-04-13T11:00:48Z",
-                              "type": "PULL_REQUEST",
-                              "status": "COMPLETED",
-                              "githubNumber": 2,
-                              "githubTitle": "DUST token creation",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
-                              "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
-                              "projectName": "Zama",
-                              "repoName": "starklings",
-                              "links": [],
-                              "rewardIds": []
-                            },
-                            {
-                              "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
-                              "createdAt": "2022-04-13T17:42:14Z",
-                              "completedAt": "2022-04-13T18:01:10Z",
-                              "type": "PULL_REQUEST",
-                              "status": "COMPLETED",
-                              "githubNumber": 3,
-                              "githubTitle": "Feature/space",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
-                              "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
-                              "projectName": "Zama",
-                              "repoName": "starklings",
-                              "links": [],
-                              "rewardIds": []
-                            }
-                          ],
-                          "projects": [
-                            {
-                              "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                              "slug": "kaaper",
-                              "name": "kaaper",
-                              "shortDescription": "Documentation generator for Cairo projects.",
-                              "logoUrl": null,
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
-                              "slug": "pizzeria-yoshi-",
-                              "name": "Pizzeria Yoshi !",
-                              "shortDescription": "Miaaaam une pizza !",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                              "slug": "no-sponsors",
-                              "name": "No sponsors",
-                              "shortDescription": "afsasdas",
-                              "logoUrl": null,
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                              "slug": "zama",
-                              "name": "Zama",
-                              "shortDescription": "A super description for Zama",
-                              "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                              "slug": "mooooooonlight",
-                              "name": "Mooooooonlight",
-                              "shortDescription": "hello la team",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
-                              "slug": "zero-title-4",
-                              "name": "Zero title 4",
-                              "shortDescription": "Missing short description",
-                              "logoUrl": null,
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                              "slug": "bretzel",
-                              "name": "Bretzel",
-                              "shortDescription": "A project for people who love fruits",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                              "slug": "qa-new-contributions",
-                              "name": "QA new contributions",
-                              "shortDescription": "QA new contributions",
-                              "logoUrl": null,
-                              "visibility": "PUBLIC"
-                            },
-                            {
-                              "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                              "slug": "b-conseil",
-                              "name": "B Conseil",
-                              "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
-                              "visibility": "PRIVATE"
-                            }
-                          ],
-                          "repos": [
-                            {
-                              "id": 466482535,
-                              "owner": "gregcha",
-                              "name": "bretzel-ressources",
-                              "htmlUrl": null
-                            },
-                            {
-                              "id": 480776993,
-                              "owner": "onlydustxyz",
-                              "name": "starklings",
-                              "htmlUrl": null
-                            },
-                            {
-                              "id": 493591124,
-                              "owner": "onlydustxyz",
-                              "name": "kaaper",
-                              "htmlUrl": null
-                            },
-                            {
-                              "id": 498695724,
-                              "owner": "onlydustxyz",
-                              "name": "marketplace-frontend",
-                              "htmlUrl": null
-                            },
-                            {
-                              "id": 593701982,
-                              "owner": "onlydustxyz",
-                              "name": "gateway",
-                              "htmlUrl": null
-                            },
-                            {
-                              "id": 602953043,
-                              "owner": "od-mocks",
-                              "name": "cool-repo-A",
-                              "htmlUrl": null
-                            }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 1410,
-                          "totalItemNumber": 4230,
-                          "nextPageIndex": 1
-                        }
+                           "contributions": [
+                             {
+                               "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
+                               "createdAt": "2022-04-12T13:59:17Z",
+                               "completedAt": "2022-04-13T11:00:49Z",
+                               "type": "PULL_REQUEST",
+                               "status": "COMPLETED",
+                               "repo": {
+                                 "id": 480776993,
+                                 "owner": "onlydustxyz",
+                                 "name": "starklings",
+                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                               },
+                               "githubAuthor": {
+                                 "githubUserId": 595505,
+                                 "login": "ofux",
+                                 "htmlUrl": "https://github.com/ofux",
+                                 "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                               },
+                               "githubNumber": 1,
+                               "githubStatus": "MERGED",
+                               "githubTitle": "feat: add common model",
+                               "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
+                               "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                               "project": {
+                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                 "slug": "zama",
+                                 "name": "Zama",
+                                 "shortDescription": "A super description for Zama",
+                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                 "visibility": "PUBLIC"
+                               },
+                               "links": [],
+                               "rewardIds": []
+                             },
+                             {
+                               "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
+                               "createdAt": "2022-04-12T18:56:44Z",
+                               "completedAt": "2022-04-13T11:00:48Z",
+                               "type": "PULL_REQUEST",
+                               "status": "COMPLETED",
+                               "repo": {
+                                 "id": 480776993,
+                                 "owner": "onlydustxyz",
+                                 "name": "starklings",
+                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                               },
+                               "githubAuthor": {
+                                 "githubUserId": 43467246,
+                                 "login": "AnthonyBuisset",
+                                 "htmlUrl": "https://github.com/AnthonyBuisset",
+                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                               },
+                               "githubNumber": 2,
+                               "githubStatus": "MERGED",
+                               "githubTitle": "DUST token creation",
+                               "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
+                               "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
+                               "project": {
+                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                 "slug": "zama",
+                                 "name": "Zama",
+                                 "shortDescription": "A super description for Zama",
+                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                 "visibility": "PUBLIC"
+                               },
+                               "links": [],
+                               "rewardIds": []
+                             },
+                             {
+                               "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
+                               "createdAt": "2022-04-13T17:42:14Z",
+                               "completedAt": "2022-04-13T18:01:10Z",
+                               "type": "PULL_REQUEST",
+                               "status": "COMPLETED",
+                               "repo": {
+                                 "id": 480776993,
+                                 "owner": "onlydustxyz",
+                                 "name": "starklings",
+                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                               },
+                               "githubAuthor": {
+                                 "githubUserId": 595505,
+                                 "login": "ofux",
+                                 "htmlUrl": "https://github.com/ofux",
+                                 "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                               },
+                               "githubNumber": 3,
+                               "githubStatus": "MERGED",
+                               "githubTitle": "Feature/space",
+                               "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
+                               "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
+                               "project": {
+                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                 "slug": "zama",
+                                 "name": "Zama",
+                                 "shortDescription": "A super description for Zama",
+                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                 "visibility": "PUBLIC"
+                               },
+                               "links": [],
+                               "rewardIds": []
+                             }
+                           ],
+                           "projects": [
+                             {
+                               "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                               "slug": "kaaper",
+                               "name": "kaaper",
+                               "shortDescription": "Documentation generator for Cairo projects.",
+                               "logoUrl": null,
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                               "slug": "qa-new-contributions",
+                               "name": "QA new contributions",
+                               "shortDescription": "QA new contributions",
+                               "logoUrl": null,
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                               "slug": "pizzeria-yoshi-",
+                               "name": "Pizzeria Yoshi !",
+                               "shortDescription": "Miaaaam une pizza !",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                               "slug": "no-sponsors",
+                               "name": "No sponsors",
+                               "shortDescription": "afsasdas",
+                               "logoUrl": null,
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                               "slug": "zama",
+                               "name": "Zama",
+                               "shortDescription": "A super description for Zama",
+                               "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                               "slug": "mooooooonlight",
+                               "name": "Mooooooonlight",
+                               "shortDescription": "hello la team",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                               "slug": "zero-title-4",
+                               "name": "Zero title 4",
+                               "shortDescription": "Missing short description",
+                               "logoUrl": null,
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                               "slug": "bretzel",
+                               "name": "Bretzel",
+                               "shortDescription": "A project for people who love fruits",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                               "visibility": "PUBLIC"
+                             },
+                             {
+                               "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                               "slug": "b-conseil",
+                               "name": "B Conseil",
+                               "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
+                               "visibility": "PRIVATE"
+                             }
+                           ],
+                           "repos": [
+                             {
+                               "id": 466482535,
+                               "owner": "gregcha",
+                               "name": "bretzel-ressources",
+                               "htmlUrl": "https://github.com/gregcha/bretzel-ressources"
+                             },
+                             {
+                               "id": 480776993,
+                               "owner": "onlydustxyz",
+                               "name": "starklings",
+                               "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                             },
+                             {
+                               "id": 493591124,
+                               "owner": "onlydustxyz",
+                               "name": "kaaper",
+                               "htmlUrl": "https://github.com/onlydustxyz/kaaper"
+                             },
+                             {
+                               "id": 498695724,
+                               "owner": "onlydustxyz",
+                               "name": "marketplace-frontend",
+                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                             },
+                             {
+                               "id": 593701982,
+                               "owner": "onlydustxyz",
+                               "name": "gateway",
+                               "htmlUrl": "https://github.com/onlydustxyz/gateway"
+                             },
+                             {
+                               "id": 602953043,
+                               "owner": "od-mocks",
+                               "name": "cool-repo-A",
+                               "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
+                             }
+                           ],
+                           "hasMore": true,
+                           "totalPageNumber": 1410,
+                           "totalItemNumber": 4230,
+                           "nextPageIndex": 1
+                         }
                         """);
     }
 
@@ -367,8 +424,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].projectName").isEqualTo("Mooooooonlight")
-                .jsonPath("$.contributions[0].repoName").isEqualTo("gateway")
+                .jsonPath("$.contributions[0].project.name").isEqualTo("Mooooooonlight")
+                .jsonPath("$.contributions[0].repo.name").isEqualTo("gateway")
         ;
 
         // When
@@ -384,8 +441,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].projectName").isEqualTo("kaaper")
-                .jsonPath("$.contributions[0].repoName").isEqualTo("marketplace-frontend")
+                .jsonPath("$.contributions[0].project.name").isEqualTo("kaaper")
+                .jsonPath("$.contributions[0].repo.name").isEqualTo("marketplace-frontend")
         ;
     }
 

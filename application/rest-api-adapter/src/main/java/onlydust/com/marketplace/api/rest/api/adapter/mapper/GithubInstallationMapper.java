@@ -15,9 +15,9 @@ public class GithubInstallationMapper {
         installation.setOrganization(organization);
         githubAccount.repos().forEach(repo -> {
             var installedGithubRepoResponse = new InstalledGithubRepoResponse();
-            installedGithubRepoResponse.setName(repo.name());
-            installedGithubRepoResponse.setShortDescription(repo.description());
-            installedGithubRepoResponse.setGithubId(repo.id());
+            installedGithubRepoResponse.setName(repo.getName());
+            installedGithubRepoResponse.setShortDescription(repo.getDescription());
+            installedGithubRepoResponse.setGithubId(repo.getId());
             installation.addReposItem(installedGithubRepoResponse);
         });
 

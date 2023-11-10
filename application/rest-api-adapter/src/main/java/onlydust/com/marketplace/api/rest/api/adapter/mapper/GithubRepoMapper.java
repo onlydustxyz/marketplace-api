@@ -6,8 +6,9 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 public interface GithubRepoMapper {
     static ShortGithubRepoResponse mapRepoToShortResponse(GithubRepo githubRepo) {
         return new ShortGithubRepoResponse()
-                .id(githubRepo.id())
-                .name(githubRepo.name())
-                .owner(githubRepo.owner());
+                .id(githubRepo.getId())
+                .name(githubRepo.getName())
+                .owner(githubRepo.getOwner())
+                .htmlUrl(githubRepo.getHtmlUrl());
     }
 }
