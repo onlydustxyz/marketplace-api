@@ -34,11 +34,6 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomProjectListRepository customProjectListRepository(final EntityManager entityManager) {
-        return new CustomProjectListRepository(entityManager);
-    }
-
-    @Bean
     public CustomContributorRepository customContributorRepository(final EntityManager entityManager) {
         return new CustomContributorRepository(entityManager);
     }
@@ -52,12 +47,12 @@ public class PostgresConfiguration {
                                                          final ProjectRepoRepository projectRepoRepository,
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
-                                                         final CustomProjectListRepository customProjectListRepository,
                                                          final CustomProjectRewardRepository customProjectRewardRepository,
                                                          final CustomProjectBudgetRepository customProjectBudgetRepository,
                                                          final ProjectLeadViewRepository projectLeadViewRepository,
                                                          final CustomRewardRepository customRewardRepository,
-                                                         final PostgresContributionAdapter postgresContributionAdapter) {
+                                                         final PostgresContributionAdapter postgresContributionAdapter,
+                                                         final ProjectsPageRepository projectsPageRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectViewRepository,
                 projectIdRepository,
@@ -66,12 +61,12 @@ public class PostgresConfiguration {
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
-                customProjectListRepository,
                 customProjectRewardRepository,
                 customProjectBudgetRepository,
                 projectLeadViewRepository,
                 customRewardRepository,
-                postgresContributionAdapter
+                postgresContributionAdapter,
+                projectsPageRepository
         );
     }
 

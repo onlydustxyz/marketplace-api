@@ -37,7 +37,7 @@ public class ProjectDetailsView {
     Set<ProjectLeaderLinkView> invitedLeaders = new HashSet<>();
     @Builder.Default
     @Setter(AccessLevel.NONE)
-    Map<String, Integer> technologies = new HashMap<>();
+    Map<String, Long> technologies = new HashMap<>();
     BigDecimal remainingUsdBudget;
     ProjectRewardSettings rewardSettings;
 
@@ -51,9 +51,9 @@ public class ProjectDetailsView {
     private void addTechnologies(final Map<String, Long> technologiesToAdd) {
         technologiesToAdd.forEach((key, value) -> {
             if (this.getTechnologies().containsKey(key)) {
-                this.getTechnologies().replace(key, Math.toIntExact(this.getTechnologies().get(key) + value));
+                this.getTechnologies().replace(key, this.getTechnologies().get(key) + value);
             } else {
-                this.getTechnologies().put(key, Math.toIntExact(value));
+                this.getTechnologies().put(key, value);
             }
         });
     }

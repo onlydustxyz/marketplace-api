@@ -17,7 +17,7 @@ public class UserProfile {
     private String bio;
     private String website;
     @Builder.Default
-    private Map<String, Integer> technologies = new HashMap<>();
+    private Map<String, Long> technologies = new HashMap<>();
     private UserProfileCover cover;
     @Builder.Default
     private List<Contact> contacts = new ArrayList<>();

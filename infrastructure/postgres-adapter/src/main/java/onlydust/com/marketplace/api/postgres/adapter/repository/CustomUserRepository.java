@@ -182,7 +182,7 @@ public class CustomUserRepository {
                             join project_details pd on pd.project_id = pl.project_id
                    where u.github_user_id = :githubUserId)) as p
             order by p.is_lead desc""";
-    private final static TypeReference<HashMap<String, Integer>> typeRef
+    private final static TypeReference<HashMap<String, Long>> typeRef
             = new TypeReference<>() {
     };
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -272,7 +272,7 @@ public class CustomUserRepository {
                 .build();
     }
 
-    private HashMap<String, Integer> getTechnologies(UserProfileEntity row) {
+    private HashMap<String, Long> getTechnologies(UserProfileEntity row) {
         if (isNull(row.getLanguages())) {
             return new HashMap<>();
         }

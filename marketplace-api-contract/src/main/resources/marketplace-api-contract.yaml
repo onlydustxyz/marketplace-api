@@ -668,13 +668,23 @@ paths:
           description: Full text search
           schema:
             type: string
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'List of projects'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectListResponse'
+                $ref: '#/components/schemas/ProjectPageResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -2022,15 +2032,19 @@ components:
           description: Direct URL to sponsor's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
 
-    ProjectListResponse:
+    ProjectPageResponse:
       type: object
       required:
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
         - projects
       properties:
         projects:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectListItemResponse'
+            $ref: '#/components/schemas/ProjectPageItemResponse'
         technologies:
           type: array
           items:
@@ -2039,8 +2053,17 @@ components:
           type: array
           items:
             type: string
-
-    ProjectListItemResponse:
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+    ProjectPageItemResponse:
       type: object
       required:
         - id
@@ -2323,6 +2346,7 @@ components:
       description: List fo technologies ordered by mastering level (the higher the better) or usage (ie. line count of a language)
       additionalProperties:
         type: integer
+        format: int64
       example:
         Rust: 91283
         Go: 12388

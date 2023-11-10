@@ -57,7 +57,6 @@ spring:
     generate-ddl: false
     open-in-view: false
     show-sql: false
-
 server:
   port: ${PORT}
 

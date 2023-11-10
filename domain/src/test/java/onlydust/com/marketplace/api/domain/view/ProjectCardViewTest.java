@@ -11,18 +11,18 @@ class ProjectCardViewTest {
     @Test
     void should_add_technologies() {
         // Given
-        final Map<String, Integer> technologies1 = Map.of(
-                "Java", 5, "Rust", 3
+        final Map<String, Long> technologies1 = Map.of(
+                "Java", 5L, "Rust", 3L
         );
-        final Map<String, Integer> technologies2 = Map.of(
-                "Java", 1, "Python", 10
+        final Map<String, Long> technologies2 = Map.of(
+                "Java", 1L, "Python", 10L
         );
         final ProjectCardView projectCard = ProjectCardView.builder().build();
 
         // When
         projectCard.addTechnologies(technologies1);
         projectCard.addTechnologies(technologies2);
-        final Map<String, Integer> technologies = projectCard.getTechnologies();
+        final Map<String, Long> technologies = projectCard.getTechnologies();
 
         // Then
         assertEquals(technologies.get("Java"), 6);

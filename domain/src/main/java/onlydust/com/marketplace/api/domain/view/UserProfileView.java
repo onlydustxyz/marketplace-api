@@ -33,7 +33,7 @@ public class UserProfileView {
     String github;
     String telegram;
     String discord;
-    Map<String, Integer> technologies;
+    Map<String, Long> technologies;
     UserProfileCover cover;
     ProfileStats profileStats;
     UserAllocatedTimeToContribute allocatedTimeToContribute;

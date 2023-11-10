@@ -19,10 +19,12 @@ public interface ProjectFacadePort {
 
     Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
                                                                       String search, ProjectCardView.SortBy sort,
-                                                                      UUID userId, Boolean mine);
+                                                                      UUID userId, Boolean mine,
+                                                                      Integer pageIndex, Integer pageSize);
 
     Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
-                                                                String search, ProjectCardView.SortBy sort);
+                                                                String search, ProjectCardView.SortBy sort,
+                                                                Integer pageIndex, Integer pageSize);
 
 
     Pair<UUID, String> createProject(CreateProjectCommand createProjectCommand);

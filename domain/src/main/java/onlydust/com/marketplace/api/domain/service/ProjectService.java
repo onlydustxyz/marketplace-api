@@ -47,15 +47,16 @@ public class ProjectService implements ProjectFacadePort {
     public Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
                                                                              List<String> sponsors, String search,
                                                                              ProjectCardView.SortBy sort, UUID userId
-            , Boolean mine) {
+            , Boolean mine, Integer pageIndex, Integer pageSize) {
         return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors, userId, search,
-                sort, mine);
+                sort, mine, pageIndex, pageSize);
     }
 
     @Override
     public Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
-                                                                       String search, ProjectCardView.SortBy sort) {
-        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort);
+                                                                       String search, ProjectCardView.SortBy sort,
+                                                                       Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort, pageIndex, pageSize);
     }
 
     @Override

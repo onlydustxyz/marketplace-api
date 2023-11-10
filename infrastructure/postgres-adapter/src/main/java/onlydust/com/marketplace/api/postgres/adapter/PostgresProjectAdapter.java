@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
@@ -19,6 +20,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -42,12 +44,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
-    private final CustomProjectListRepository customProjectListRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
     private final CustomProjectBudgetRepository customProjectBudgetRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final CustomRewardRepository customRewardRepository;
     private final PostgresContributionAdapter postgresContributionAdapter;
+    private final ProjectsPageRepository projectsPageRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -83,17 +85,39 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                               List<String> sponsors, UUID userId,
                                                                               String search,
                                                                               ProjectCardView.SortBy sort,
-                                                                              Boolean mine) {
-        return customProjectListRepository.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsors,
-                search, sort, userId, mine);
+                                                                              Boolean mine, Integer pageIndex,
+                                                                              Integer pageSize) {
+        final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+        final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+        final org.springframework.data.domain.Page<ProjectPageItemViewEntity> projectsForUserId =
+                projectsPageRepository.findProjectsForUserId(PageRequest.of(pageIndex, pageSize), userId, mine,
+                        technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
+                                ProjectCardView.SortBy.NAME.name() : sort.name());
+        return Page.<ProjectCardView>builder()
+                .content(projectsForUserId.getContent().stream().map(ProjectPageItemViewEntity::toView).toList())
+                .totalItemNumber((int) projectsForUserId.getTotalElements())
+                .totalPageNumber(projectsForUserId.getTotalPages())
+                .build();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies,
                                                                         List<String> sponsors, String search,
-                                                                        ProjectCardView.SortBy sort) {
-        return customProjectListRepository.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort);
+                                                                        ProjectCardView.SortBy sort,
+                                                                        Integer pageIndex, Integer pageSize) {
+
+        final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+        final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+        final org.springframework.data.domain.Page<ProjectPageItemViewEntity> projectsForAnonymousUser =
+                projectsPageRepository.findProjectsForAnonymousUser(PageRequest.of(pageIndex, pageSize),
+                        technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
+                                ProjectCardView.SortBy.NAME.name() : sort.name());
+        return Page.<ProjectCardView>builder()
+                .content(projectsForAnonymousUser.getContent().stream().map(ProjectPageItemViewEntity::toView).toList())
+                .totalItemNumber((int) projectsForAnonymousUser.getTotalElements())
+                .totalPageNumber(projectsForAnonymousUser.getTotalPages())
+                .build();
     }
 
     @Override
