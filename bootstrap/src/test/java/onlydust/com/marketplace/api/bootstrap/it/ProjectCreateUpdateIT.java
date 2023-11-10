@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +27,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     HasuraUserHelper userHelper;
+
+    @Autowired
+    EventRepository eventRepository;
 
     @BeforeEach
     public void setup() {
@@ -126,6 +130,14 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty();
+
+        final var events = eventRepository.findAll();
+        final var event = events.get(events.size() - 1);
+        assertThat(event.getIndex()).isNotNull();
+        assertThat(event.getTimestamp()).isNotNull();
+        assertThat(event.getAggregateId()).isEqualTo(projectId);
+        assertThat(event.getAggregateName()).isEqualTo("PROJECT");
+        assertThat(event.getPayload()).isEqualTo("{\"Created\": {\"id\": \"%s\"}}".formatted(response.getProjectId()));
     }
 
     @Test

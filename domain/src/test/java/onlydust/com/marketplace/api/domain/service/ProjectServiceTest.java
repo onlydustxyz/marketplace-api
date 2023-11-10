@@ -35,7 +35,8 @@ public class ProjectServiceTest {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                mock(UUIDGeneratorPort.class), mock(PermissionService.class), mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), mock(PermissionService.class), mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
@@ -57,8 +58,10 @@ public class ProjectServiceTest {
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
+        final EventStoragePort eventStoragePort = mock(EventStoragePort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                uuidGeneratorPort, mock(PermissionService.class), indexerPort, dateProvider);
+                uuidGeneratorPort, mock(PermissionService.class), indexerPort, dateProvider,
+                eventStoragePort);
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final CreateProjectCommand command = CreateProjectCommand.builder()
@@ -93,6 +96,7 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
+        verify(eventStoragePort).saveEvent(new ProjectCreatedEvent(projectIdentity.getLeft()));
     }
 
 
@@ -105,7 +109,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = mock(PermissionService.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                uuidGeneratorPort, permissionService, indexerPort, dateProvider);
+                uuidGeneratorPort, permissionService, indexerPort, dateProvider, mock(EventStoragePort.class));
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
@@ -156,7 +160,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = mock(PermissionService.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                uuidGeneratorPort, permissionService, indexerPort, dateProvider);
+                uuidGeneratorPort, permissionService, indexerPort, dateProvider, mock(EventStoragePort.class));
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
@@ -197,7 +201,8 @@ public class ProjectServiceTest {
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
-                uuidGeneratorPort, mock(PermissionService.class), mock(IndexerPort.class), dateProvider);
+                uuidGeneratorPort, mock(PermissionService.class), mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final InputStream imageInputStream = mock(InputStream.class);
         final String imageUrl = faker.internet().image();
 
@@ -216,7 +221,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
         final UUID projectLeadId = UUID.randomUUID();
@@ -243,7 +249,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
         final UUID projectLeadId = UUID.randomUUID();
@@ -270,7 +277,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final UUID projectLeadId = UUID.randomUUID();
@@ -293,7 +301,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final int pageIndex = 1;
@@ -324,7 +333,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
 
@@ -343,7 +353,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -370,7 +381,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
@@ -390,7 +402,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
 
@@ -417,7 +430,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
@@ -437,7 +451,8 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
-                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider);
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
 

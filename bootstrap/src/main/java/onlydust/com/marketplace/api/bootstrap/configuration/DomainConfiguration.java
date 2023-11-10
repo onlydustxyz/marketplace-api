@@ -42,9 +42,10 @@ public class DomainConfiguration {
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
                                                final IndexerPort indexerPort,
-                                               final DateProvider dateProvider) {
+                                               final DateProvider dateProvider,
+                                               final EventStoragePort eventStoragePort) {
         return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService,
-                indexerPort, dateProvider);
+                indexerPort, dateProvider, eventStoragePort);
     }
 
     @Bean
