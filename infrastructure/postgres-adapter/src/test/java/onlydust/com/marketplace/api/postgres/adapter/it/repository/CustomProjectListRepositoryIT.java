@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdE
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectListRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
