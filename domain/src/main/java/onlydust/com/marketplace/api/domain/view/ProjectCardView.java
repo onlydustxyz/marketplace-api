@@ -6,6 +6,8 @@ import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
 import java.util.*;
 
+import static java.util.Objects.nonNull;
+
 @Data
 @Builder
 public class ProjectCardView {
@@ -36,13 +38,15 @@ public class ProjectCardView {
     }
 
     public void addTechnologies(final Map<String, Long> technologiesToAdd) {
-        technologiesToAdd.forEach((key, value) -> {
-            if (this.getTechnologies().containsKey(key)) {
-                this.getTechnologies().replace(key, this.getTechnologies().get(key) + value);
-            } else {
-                this.getTechnologies().put(key, value);
-            }
-        });
+        if (nonNull(technologiesToAdd)) {
+            technologiesToAdd.forEach((key, value) -> {
+                if (this.getTechnologies().containsKey(key)) {
+                    this.getTechnologies().replace(key, this.getTechnologies().get(key) + value);
+                } else {
+                    this.getTechnologies().put(key, value);
+                }
+            });
+        }
     }
 
     public enum SortBy {
