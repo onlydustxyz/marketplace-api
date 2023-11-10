@@ -3,15 +3,9 @@ package onlydust.com.marketplace.api.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UUIDGeneratorPort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -31,6 +25,7 @@ public class ProjectService implements ProjectFacadePort {
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
     private final DateProvider dateProvider;
+    private final EventStoragePort eventStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -75,6 +70,8 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
+
+        eventStoragePort.saveEvent(new ProjectCreatedEvent(projectId));
         return Pair.of(projectId, projectSlug);
     }
 

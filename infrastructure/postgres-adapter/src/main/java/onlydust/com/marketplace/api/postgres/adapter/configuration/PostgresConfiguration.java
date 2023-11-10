@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
-import onlydust.com.marketplace.api.postgres.adapter.PostgresContributionAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -156,5 +153,10 @@ public class PostgresConfiguration {
     @Bean
     public CustomRewardRepository customRewardRepository(final EntityManager entityManager) {
         return new CustomRewardRepository(entityManager);
+    }
+
+    @Bean
+    public PostgresEventStorageAdapter postgresEventStorageAdapter(final EventRepository eventRepository) {
+        return new PostgresEventStorageAdapter(eventRepository);
     }
 }
