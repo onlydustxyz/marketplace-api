@@ -22,7 +22,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    p.visibility,
                    p.rank,
                    r_count.repo_count  as repo_count,
-                   pc_count.contributors_count                as contributors_count,
+                   coalesce(pc_count.contributors_count,0)                as contributors_count,
                    (select count(pl_count.user_id)
                     from project_leads pl_count
                     where pl_count.project_id = p.project_id) as project_lead_count,

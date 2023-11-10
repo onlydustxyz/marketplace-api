@@ -6,6 +6,7 @@ import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
@@ -97,14 +98,24 @@ public class ProjectPageItemViewEntity {
                     case PRIVATE -> ProjectVisibility.PRIVATE;
                 })
                 .build();
-        if (nonNull(this.technologies)) {
+        if (nonNull(this.technologies) && !this.technologies.isEmpty()) {
             this.technologies.forEach(view::addTechnologies);
         }
-        if (nonNull(this.sponsors)) {
+        if (nonNull(this.sponsors) && !this.sponsors.isEmpty()) {
             this.sponsors.forEach(sponsor -> view.addSponsor(SponsorView.builder()
                     .id(sponsor.id)
                     .logoUrl(sponsor.logoUrl)
                     .name(sponsor.name)
+                    .url(sponsor.url)
+                    .build()));
+        }
+        if (nonNull(this.projectLeads) && !this.projectLeads.isEmpty()) {
+            this.projectLeads.forEach(projectLead -> view.addProjectLeader(ProjectLeaderLinkView.builder()
+                    .avatarUrl(projectLead.avatarUrl)
+                    .url(projectLead.url)
+                    .githubUserId(projectLead.githubId)
+                    .login(projectLead.login)
+                    .id(projectLead.id)
                     .build()));
         }
         return view;
