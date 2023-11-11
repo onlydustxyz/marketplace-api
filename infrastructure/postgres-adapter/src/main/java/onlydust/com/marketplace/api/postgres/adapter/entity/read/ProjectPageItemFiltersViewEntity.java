@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -17,6 +17,10 @@ import static java.util.Objects.nonNull;
 
 @Entity
 @Table(name = "project_details", schema = "public")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ProjectPageItemFiltersViewEntity {
     @Id
@@ -47,10 +51,15 @@ public class ProjectPageItemFiltersViewEntity {
         final Set<String> sponsorNames = new HashSet<>();
         for (ProjectPageItemFiltersViewEntity filtersViewEntity : filtersViewEntities) {
             if (nonNull(filtersViewEntity.technologies)) {
-                filtersViewEntity.technologies.stream().map(Map::keySet).forEach(technologyNames::addAll);
+                filtersViewEntity.technologies.stream()
+                        .filter(Objects::nonNull)
+                        .map(Map::keySet)
+                        .forEach(technologyNames::addAll);
             }
             if (nonNull(filtersViewEntity.sponsors)) {
-                filtersViewEntity.sponsors.stream().map(s -> s.name).forEach(sponsorNames::add);
+                filtersViewEntity.sponsors.stream()
+                        .filter(sponsor -> nonNull(sponsor.name))
+                        .map(s -> s.name).forEach(sponsorNames::add);
             }
         }
         filters.put(ProjectCardView.FilterBy.TECHNOLOGIES.name(), technologyNames);

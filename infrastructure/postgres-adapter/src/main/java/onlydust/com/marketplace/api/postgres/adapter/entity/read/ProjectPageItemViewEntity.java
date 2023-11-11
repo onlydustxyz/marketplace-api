@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-import org.springframework.data.domain.Sort;
 
 import javax.persistence.*;
 import java.util.List;
@@ -133,15 +132,5 @@ public class ProjectPageItemViewEntity {
             return null;
         }
         return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
-    }
-
-    public static Sort getSort(ProjectCardView.SortBy sortBy) {
-        sortBy = isNull(sortBy) ? ProjectCardView.SortBy.RANK : sortBy;
-        return switch (sortBy) {
-            case CONTRIBUTORS_COUNT -> Sort.by("contributors_count").descending().and(Sort.by("name").ascending());
-            case REPOS_COUNT -> Sort.by("repo_count").descending().and(Sort.by("name").ascending());
-            case RANK -> Sort.by("rank").ascending().and(Sort.by("name").ascending());
-            case NAME -> Sort.by("name").ascending();
-        };
     }
 }
