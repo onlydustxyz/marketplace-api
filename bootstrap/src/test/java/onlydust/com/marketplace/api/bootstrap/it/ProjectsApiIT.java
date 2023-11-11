@@ -260,7 +260,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      "JavaScript": 62717,
                      "HTML": 121906
                    },
-                   "isInvitedAsProjectLead": false
+                   "isInvitedAsProjectLead": true
                  },
                  {
                    "id": "f39b827f-df73-498c-8853-99bc3f562723",

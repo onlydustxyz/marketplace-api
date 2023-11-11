@@ -35,15 +35,11 @@ public class ProjectPageItemViewEntity {
     String name;
     @Column(name = "short_description")
     String shortDescription;
-    @Column(name = "long_description")
-    String longDescription;
     @Type(type = "project_visibility")
     @Enumerated(EnumType.STRING)
     ProjectVisibilityEnumEntity visibility;
-    Integer rank;
     Integer repoCount;
     Integer contributorsCount;
-    Integer projectLeadCount;
     Boolean isPendingProjectLead;
     @Type(type = "jsonb")
     List<Sponsor> sponsors;
@@ -92,6 +88,7 @@ public class ProjectPageItemViewEntity {
                 .logoUrl(this.logoUrl)
                 .hiring(this.hiring)
                 .contributorCount(this.contributorsCount)
+                .isInvitedAsProjectLead(this.isPendingProjectLead)
                 .visibility(switch (this.visibility) {
                     case PUBLIC -> ProjectVisibility.PUBLIC;
                     case PRIVATE -> ProjectVisibility.PRIVATE;
