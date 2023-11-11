@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,7 +51,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomRewardRepository customRewardRepository;
     private final PostgresContributionAdapter postgresContributionAdapter;
     private final ProjectsPageRepository projectsPageRepository;
-    private final ProjectsPageCountRepository projectsPageCountRepository;
+    private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -89,17 +91,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                               Integer pageSize) {
         final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
         final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
-        final Long count = projectsPageCountRepository.countProjectsForUserId(userId, mine, technologiesJsonPath,
+        final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, technologiesJsonPath,
                 sponsorsJsonPath, search);
         final List<ProjectPageItemViewEntity> projectsForUserId =
                 projectsPageRepository.findProjectsForUserId(userId, mine,
                         technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
+        final Map<String, Set<String>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
+                projectsPageFiltersRepository.findFiltersForUser(userId, mine, technologiesJsonPath, sponsorsJsonPath,
+                        search));
         return Page.<ProjectCardView>builder()
                 .content(projectsForUserId.stream().map(ProjectPageItemViewEntity::toView).toList())
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
+                .filters(filters)
                 .build();
     }
 
@@ -117,12 +123,16 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
-        final Long count = projectsPageCountRepository.countProjectsForAnonymousUser(technologiesJsonPath,
+        final Long count = projectsPageRepository.countProjectsForAnonymousUser(technologiesJsonPath,
                 sponsorsJsonPath, search);
+        final Map<String, Set<String>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
+                projectsPageFiltersRepository.findFiltersForAnonymousUser(technologiesJsonPath, sponsorsJsonPath,
+                        search));
         return Page.<ProjectCardView>builder()
                 .content(projectsForAnonymousUser.stream().map(ProjectPageItemViewEntity::toView).toList())
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
+                .filters(filters)
                 .build();
     }
 

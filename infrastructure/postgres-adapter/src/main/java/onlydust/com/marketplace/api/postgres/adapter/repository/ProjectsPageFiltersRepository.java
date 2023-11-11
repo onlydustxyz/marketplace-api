@@ -1,46 +1,50 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersViewEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
-public interface ProjectsPageCountRepository extends JpaRepository<ProjectPageItemViewEntity, UUID> {
+public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersViewEntity, UUID> {
 
     @Query(value = """
-                        select count(p.project_id)
-                        from project_details p
-                        left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                            from project_github_repos pgr
-                                     left join github_repos gr on gr.id = pgr.github_repo_id
-                            group by pgr.project_id) ) as t on t.project_id = p.project_id
-                        left join (select ps.project_id,
-                                                   jsonb_agg(jsonb_build_object(
-                                                           'url', sponsor.url,
-                                                           'logoUrl', sponsor.logo_url,
-                                                           'id', sponsor.id,
-                                                           'name', sponsor.name
-                                                             )) sponsor_json
-                                            from sponsors sponsor
-                                                     join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
-                                            group by ps.project_id) s on s.project_id = p.project_id
-                        where (select count(github_repo_id)
-                                           from project_github_repos pgr_count
-                                           where pgr_count.project_id = p.project_id) > 0
-                                       and p.visibility = 'PUBLIC'
-                                       and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
-                                       and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
-                                       and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
-            """
-            , nativeQuery = true)
-    Long countProjectsForAnonymousUser(@Param("technologiesJsonPath") String technologiesJsonPath,
-                                       @Param("sponsorsJsonPath") String sponsorsJsonPath,
-                                       @Param("search") String search);
+            select t.technologies,
+                   s.sponsor_json as sponsors,
+                   p.project_id
+            from project_details p
+                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
+                                 from project_github_repos pgr
+                                          left join github_repos gr on gr.id = pgr.github_repo_id
+                                 group by pgr.project_id) ) as t on t.project_id = p.project_id
+                     left join (select ps.project_id,
+                                       jsonb_agg(jsonb_build_object(
+                                               'url', sponsor.url,
+                                               'logoUrl', sponsor.logo_url,
+                                               'id', sponsor.id,
+                                               'name', sponsor.name
+                                                 )) sponsor_json
+                                from sponsors sponsor
+                                         join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                group by ps.project_id) s on s.project_id = p.project_id
+            where (select count(github_repo_id)
+                   from project_github_repos pgr_count
+                   where pgr_count.project_id = p.project_id) > 0
+              and p.visibility = 'PUBLIC'
+              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+              and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')""",
+            nativeQuery = true)
+    List<ProjectPageItemFiltersViewEntity> findFiltersForAnonymousUser(@Param("technologiesJsonPath") String technologiesJsonPath,
+                                                                       @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                                       @Param("search") String search);
 
     @Query(value = """
-            select count(p.project_id)
+            select p.project_id,
+                   t.technologies                             as technologies,
+                   s.sponsor_json                             as   sponsors
             from project_details p
                      left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
                                  from project_github_repos pgr
@@ -96,11 +100,10 @@ public interface ProjectsPageCountRepository extends JpaRepository<ProjectPageIt
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
-            """, nativeQuery = true)
-    Long countProjectsForUserId(@Param("userId") UUID userId,
-                                @Param("mine") Boolean mine,
-                                @Param("technologiesJsonPath") String technologiesJsonPath,
-                                @Param("sponsorsJsonPath") String sponsorsJsonPath,
-                                @Param("search") String search);
-
+                     """, nativeQuery = true)
+    List<ProjectPageItemFiltersViewEntity> findFiltersForUser(@Param("userId") UUID userId,
+                                                              @Param("mine") Boolean mine,
+                                                              @Param("technologiesJsonPath") String technologiesJsonPath,
+                                                              @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                              @Param("search") String search);
 }

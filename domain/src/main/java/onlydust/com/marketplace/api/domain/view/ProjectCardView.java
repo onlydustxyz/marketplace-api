@@ -52,4 +52,8 @@ public class ProjectCardView {
     public enum SortBy {
         CONTRIBUTORS_COUNT, REPOS_COUNT, RANK, NAME;
     }
+
+    public enum FilterBy {
+        TECHNOLOGIES, SPONSORS
+    }
 }

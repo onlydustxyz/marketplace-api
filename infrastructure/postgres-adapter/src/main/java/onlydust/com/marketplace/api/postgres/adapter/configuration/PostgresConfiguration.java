@@ -50,7 +50,7 @@ public class PostgresConfiguration {
                                                          final CustomRewardRepository customRewardRepository,
                                                          final PostgresContributionAdapter postgresContributionAdapter,
                                                          final ProjectsPageRepository projectsPageRepository,
-                                                         final ProjectsPageCountRepository projectsPageCountRepository) {
+                                                         final ProjectsPageFiltersRepository projectsPageFiltersRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectViewRepository,
                 projectIdRepository,
@@ -65,7 +65,7 @@ public class PostgresConfiguration {
                 customRewardRepository,
                 postgresContributionAdapter,
                 projectsPageRepository,
-                projectsPageCountRepository
+                projectsPageFiltersRepository
         );
     }
 

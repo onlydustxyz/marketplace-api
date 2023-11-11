@@ -135,14 +135,14 @@ public interface ProjectMapper {
     static ProjectPageResponse mapProjectCards(final Page<ProjectCardView> page, final Integer pageIndex) {
         final ProjectPageResponse projectPageResponse = new ProjectPageResponse();
         final List<ProjectPageItemResponse> projectPageItemResponses = new ArrayList<>();
-        final Set<String> sponsorsNames = new HashSet<>();
-        final Set<String> technologies = new HashSet<>();
+        final Set<String> technologies = page.getFilters().get(ProjectCardView.FilterBy.TECHNOLOGIES.name());
+        final Set<String> sponsorNames = page.getFilters().get(ProjectCardView.FilterBy.SPONSORS.name());
         for (ProjectCardView projectCardView : page.getContent()) {
-            projectPageItemResponses.add(mapProjectCard(projectCardView, sponsorsNames, technologies));
+            projectPageItemResponses.add(mapProjectCard(projectCardView));
         }
         projectPageResponse.setProjects(projectPageItemResponses);
         projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
-        projectPageResponse.setSponsors(sponsorsNames.stream().sorted().toList());
+        projectPageResponse.setSponsors(sponsorNames.stream().sorted().toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
@@ -150,22 +150,15 @@ public interface ProjectMapper {
         return projectPageResponse;
     }
 
-    private static ProjectPageItemResponse mapProjectCard(ProjectCardView projectCardView, Set<String> sponsorsNames,
-                                                          Set<String> technologies) {
+    private static ProjectPageItemResponse mapProjectCard(ProjectCardView projectCardView) {
         final ProjectPageItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
-
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
             projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
         }
-
         for (SponsorView sponsor : projectCardView.getSponsors()) {
             projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
         }
-        sponsorsNames.addAll(projectCardView.getSponsors().stream().map(SponsorView::getName).collect(Collectors.toSet()));
-
         projectListItemResponse.setTechnologies(projectCardView.getTechnologies());
-        technologies.addAll(projectCardView.getTechnologies().keySet());
-
         return projectListItemResponse;
     }
 
