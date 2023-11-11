@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 @SpringBootApplication
@@ -24,6 +25,7 @@ public class MarketplaceApiApplication {
     public void init() {
         // Setting default JVM timezone as UTC
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        Locale.setDefault(Locale.ENGLISH);
     }
 
     @Bean()
