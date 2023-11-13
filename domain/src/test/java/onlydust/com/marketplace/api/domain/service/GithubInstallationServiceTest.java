@@ -31,6 +31,7 @@ public class GithubInstallationServiceTest {
         final var expectedAccount = new GithubAccount(
                 4534322L,
                 "onlydustxyz",
+                "OnlyDust",
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",
@@ -63,6 +64,7 @@ public class GithubInstallationServiceTest {
         final var expectedAccount = new GithubAccount(
                 4534322L,
                 "onlydustxyz",
+                "OnlyDust",
                 "Organization",
                 "htmlUrl",
                 "avatarUrl",

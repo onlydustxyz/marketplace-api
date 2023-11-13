@@ -14,6 +14,7 @@ public class ProjectOrganizationView {
     String avatarUrl;
     String htmlUrl;
     String name;
+    Long installationId;
     @Builder.Default
     Set<ProjectOrganizationRepoView> repos = new HashSet<>();
 }

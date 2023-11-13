@@ -23,4 +23,6 @@ public class GithubAccountEntity {
     String name;
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     Set<GithubRepoEntity> repos;
+    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
+    GithubAppInstallationEntity installation;
 }

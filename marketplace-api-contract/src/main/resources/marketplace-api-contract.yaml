@@ -1253,7 +1253,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/github/installations/{id}:
+  /api/v1/github/installations/{installationId}:
     get:
       security:
         - bearerAuth: [ ]
@@ -1265,12 +1265,10 @@ paths:
         Get Github Organization and  Repositories for installation Id
       parameters:
         - in: path
-          name: id
+          name: installationId
           required: true
           schema:
-            type: integer
-            format: int64
-            example: 123456
+            $ref: '#/components/schemas/GithubInstallationId'
       responses:
         "200":
           description: 'Github installation info'
@@ -1475,6 +1473,12 @@ components:
       type: string
       format: uuid
       description: OnlyDust reward ID
+
+    GithubInstallationId:
+      type: integer
+      format: int64
+      description: Github installation ID
+      example: 123456
 
     # RESPONSES ==================================================================
     UserLinkResponse:
@@ -2273,6 +2277,8 @@ components:
         name:
           type: string
           example: OnlyDust
+        installationId:
+          $ref: '#/components/schemas/GithubInstallationId'
         repos:
           type: array
           items:
@@ -2287,6 +2293,40 @@ components:
             isIncludedInProject:
               type: boolean
               description: Is the repo included in the project?
+
+    GithubOrganizationResponse:
+      type: object
+      required:
+        - id
+        - login
+        - avatarUrl
+        - htmlUrl
+        - name
+        - repos
+      properties:
+        id:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: Organization's Github login
+          example: onlydustxyz
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to organization's avatar image
+          example: 'https://avatars.githubusercontent.com/u/98735558?v=4'
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the organization
+          example: 'https://github.com/onlydustxyz'
+        name:
+          type: string
+          example: OnlyDust
+        repos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortGithubRepoResponse'
 
     ShortGithubRepoResponse:
       discriminator:
@@ -3102,48 +3142,13 @@ components:
     InstallationResponse:
       type: object
       required:
+        - id
         - organization
-        - repos
       properties:
+        id:
+          $ref: '#/components/schemas/GithubInstallationId'
         organization:
-          $ref: '#/components/schemas/InstalledGithubOrganizationResponse'
-        repos:
-          $ref: '#/components/schemas/InstalledGithubRepoListResponse'
-
-    InstalledGithubRepoListResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/InstalledGithubRepoResponse'
-      example:
-        - name: marketplace-backend
-          shortDescription: The backend of the OnlyDust marketplace
-          githubId: 650626566
-        - name: marketplace-frontend
-          shortDescription: The frontend of the OnlyDust marketplace
-          githubId: 650626568
-
-    InstalledGithubRepoResponse:
-      type: object
-      properties:
-        name:
-          type: string
-        shortDescription:
-          type: string
-        githubId:
-          type: integer
-          format: int64
-
-    InstalledGithubOrganizationResponse:
-      type: object
-      properties:
-        name:
-          type: string
-        logoUrl:
-          type: string
-          format: url
-      example:
-        name: Kakarot
-        logoUrl: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+          $ref: '#/components/schemas/GithubOrganizationResponse'
 
     UploadImageResponse:
       type: object

@@ -60,7 +60,9 @@ public interface ProjectMapper {
         projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
-                .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos)).collect(Collectors.toList()));
+                .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
+                .sorted(Comparator.comparing(ProjectGithubOrganizationResponse::getId))
+                .collect(Collectors.toList()));
         projectResponse.setTechnologies(project.getTechnologies());
 
         //TODO: this list is kept for backwards compatibility with the old API
@@ -84,9 +86,11 @@ public interface ProjectMapper {
         organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
         organization.setHtmlUrl(projectOrganizationView.getHtmlUrl());
         organization.setName(projectOrganizationView.getName());
+        organization.setInstallationId(projectOrganizationView.getInstallationId());
         organization.setRepos(projectOrganizationView.getRepos().stream()
                 .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
                 .map(ProjectMapper::mapOrganizationRepo)
+                .sorted(Comparator.comparing(ProjectGithubOrganizationRepoResponse::getId))
                 .toList());
         return organization;
     }
