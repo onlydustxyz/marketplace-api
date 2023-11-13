@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Set;
@@ -32,7 +31,7 @@ public interface ProjectStoragePort {
                          ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings);
 
-    Pair<UUID, String> updateProject(UUID id, String name, String shortDescription, String longDescription,
+    void updateProject(UUID id, String name, String shortDescription, String longDescription,
                                      Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
                                      List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                                      List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
@@ -58,4 +57,6 @@ public interface ProjectStoragePort {
     Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
 
     Set<Long> getProjectRepoIds(UUID projectId);
+
+    String getProjectSlugById(UUID projectId);
 }

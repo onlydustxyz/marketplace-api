@@ -89,7 +89,7 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
-        final Pair<UUID, String> projectIdAndSlugUpdated = this.projectStoragePort.updateProject(command.getId(),
+        this.projectStoragePort.updateProject(command.getId(),
                 command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
@@ -102,7 +102,8 @@ public class ProjectService implements ProjectFacadePort {
         if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
             contributionStoragePort.refreshIgnoredContributions(command.getId());
         }
-        return projectIdAndSlugUpdated;
+        final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
+        return Pair.of(command.getId(), slug);
     }
 
     @Override

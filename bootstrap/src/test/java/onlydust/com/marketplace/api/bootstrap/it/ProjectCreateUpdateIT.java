@@ -210,8 +210,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectId").isEqualTo(projectId)
-                .jsonPath("$.slug").isEqualTo("updated-project");
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();
@@ -252,8 +252,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectId").isEqualTo(projectId)
-                .jsonPath("$.slug").isEqualTo("updated-project");
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();
@@ -288,8 +288,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectId").isEqualTo(projectId)
-                .jsonPath("$.slug").isEqualTo("updated-project");
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();
@@ -421,6 +421,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isEqualTo(projectId.toString())
                 .jsonPath("$.visibility").isEqualTo("PUBLIC")
                 .jsonPath("$.name").isEqualTo("Updated Project")
+                .jsonPath("$.slug").isEqualTo("updated-project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice " +
                                                          "description")
