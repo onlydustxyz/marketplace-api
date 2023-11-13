@@ -32,9 +32,9 @@ public interface ProjectStoragePort {
             , String imageUrl, ProjectRewardSettings rewardSettings);
 
     void updateProject(UUID id, String name, String shortDescription, String longDescription,
-                       Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
+                                     Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                                     List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
+                                     List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
 
     Page<ProjectContributorsLinkView> findContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
                                                        SortDirection sortDirection,
@@ -57,4 +57,6 @@ public interface ProjectStoragePort {
     Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
 
     Set<Long> getProjectRepoIds(UUID projectId);
+
+    String getProjectSlugById(UUID projectId);
 }

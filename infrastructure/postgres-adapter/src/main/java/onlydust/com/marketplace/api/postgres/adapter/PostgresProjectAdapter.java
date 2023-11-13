@@ -68,6 +68,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         return getProjectDetails(projectEntity);
     }
 
+    @Override
+    public String getProjectSlugById(UUID projectId) {
+        return projectViewRepository.findById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)))
+                .getKey();
+    }
+
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);
@@ -184,10 +191,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void updateProject(UUID projectId, String name, String shortDescription, String longDescription,
+    public void updateProject(UUID projectId, String name, String shortDescription,
+                              String longDescription,
                               Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                              List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings) {
+                              List<UUID> projectLeadersToKeep, String imageUrl,
+                              ProjectRewardSettings rewardSettings) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
         project.setName(name);
