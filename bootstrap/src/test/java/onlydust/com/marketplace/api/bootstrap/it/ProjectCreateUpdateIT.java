@@ -124,10 +124,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].installationId").isEqualTo(123456)
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
+                .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
+                                                                               "services")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[1].repos[0].name").isEqualTo("cool-repo-A")
+                .jsonPath("$.organizations[1].repos[0].description").isEqualTo("This is repo A for our e2e tests")
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)

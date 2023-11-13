@@ -23,6 +23,7 @@ public class GithubInstallationMapper {
                             installedRepo.setName(repo.getName());
                             installedRepo.setOwner(repo.getOwner());
                             installedRepo.setHtmlUrl(repo.getHtmlUrl());
+                            installedRepo.setDescription(repo.getDescription());
                             return installedRepo;
                         })
                         .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))

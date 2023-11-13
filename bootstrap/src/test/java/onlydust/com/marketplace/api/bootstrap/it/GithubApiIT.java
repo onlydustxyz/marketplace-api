@@ -19,30 +19,35 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                     "id": 480776993,
                     "owner": "onlydustxyz",
                     "name": "starklings",
+                    "description": "An interactive tutorial to get you up and running with Starknet",
                     "htmlUrl": "https://github.com/onlydustxyz/starklings"
                   },
                   {
                     "id": 481932781,
                     "owner": "onlydustxyz",
                     "name": "starkonquest",
+                    "description": "An educational game to learn Cairo where you implement ship AIs that fight to catch as much dust as possible!",
                     "htmlUrl": "https://github.com/onlydustxyz/starkonquest"
                   },
                   {
                     "id": 493591124,
                     "owner": "onlydustxyz",
                     "name": "kaaper",
+                    "description": "Documentation generator for Cairo projects.",
                     "htmlUrl": "https://github.com/onlydustxyz/kaaper"
                   },
                   {
                     "id": 498695724,
                     "owner": "onlydustxyz",
                     "name": "marketplace-frontend",
+                    "description": "Contributions marketplace backend services",
                     "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                   },
                   {
                     "id": 593701982,
                     "owner": "onlydustxyz",
                     "name": "gateway",
+                    "description": null,
                     "htmlUrl": "https://github.com/onlydustxyz/gateway"
                   }
                 ]
