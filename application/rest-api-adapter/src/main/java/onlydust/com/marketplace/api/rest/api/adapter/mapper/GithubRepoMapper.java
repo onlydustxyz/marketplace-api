@@ -8,6 +8,7 @@ public interface GithubRepoMapper {
         return new ShortGithubRepoResponse()
                 .id(githubRepo.getId())
                 .name(githubRepo.getName())
+                .description(githubRepo.getDescription())
                 .owner(githubRepo.getOwner())
                 .htmlUrl(githubRepo.getHtmlUrl());
     }

@@ -2350,6 +2350,10 @@ components:
           type: string
           description: Repo name on Github
           example: marketplace-backend
+        description:
+          type: string
+          description: Repo description on Github
+          example: Awesome repo
         htmlUrl:
           type: string
           format: url
@@ -2365,10 +2369,6 @@ components:
             - forkCount
             - hasIssues
           properties:
-            description:
-              type: string
-              description: Repo description on Github
-              example: Awesome repo
             stars:
               type: integer
               description: Number of stars on Github
