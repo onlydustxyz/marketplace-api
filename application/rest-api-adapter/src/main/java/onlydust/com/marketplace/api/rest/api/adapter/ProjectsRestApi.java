@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.Hasur
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,11 +100,13 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateProject(UUID projectId, UpdateProjectRequest updateProjectRequest) {
+    public ResponseEntity<UpdateProjectResponse> updateProject(UUID projectId,
+                                                               UpdateProjectRequest updateProjectRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        projectFacadePort.updateProject(authenticatedUser.getId(), mapUpdateProjectCommandToDomain(projectId,
+        final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.getId(),
+                mapUpdateProjectCommandToDomain(projectId,
                 updateProjectRequest));
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft()).projectSlug(projectIdAndSlug.getRight()));
     }
 
     @Override

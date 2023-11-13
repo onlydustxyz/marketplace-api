@@ -80,7 +80,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void updateProject(UUID projectLeadId, UpdateProjectCommand command) {
+    public Pair<UUID, String> updateProject(UUID projectLeadId, UpdateProjectCommand command) {
         if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
@@ -89,7 +89,8 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
-        this.projectStoragePort.updateProject(command.getId(), command.getName(),
+        final Pair<UUID, String> projectIdAndSlugUpdated = this.projectStoragePort.updateProject(command.getId(),
+                command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
                 command.getIsLookingForContributors(), command.getMoreInfos(),
                 command.getGithubRepoIds(),
@@ -101,6 +102,7 @@ public class ProjectService implements ProjectFacadePort {
         if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
             contributionStoragePort.refreshIgnoredContributions(command.getId());
         }
+        return projectIdAndSlugUpdated;
     }
 
     @Override

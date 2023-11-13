@@ -205,7 +205,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful();
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId)
+                .jsonPath("$.slug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();
@@ -244,7 +247,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful();
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId)
+                .jsonPath("$.slug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();
@@ -277,7 +283,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful();
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId)
+                .jsonPath("$.slug").isEqualTo("updated-project");
 
         // And Then
         assertProjectWasUpdated();

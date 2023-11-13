@@ -21,6 +21,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -184,10 +185,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void updateProject(UUID projectId, String name, String shortDescription, String longDescription,
-                              Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
-                              List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                              List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings) {
+    public Pair<UUID, String> updateProject(UUID projectId, String name, String shortDescription,
+                                            String longDescription,
+                                            Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                                            List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
+                                            List<UUID> projectLeadersToKeep, String imageUrl,
+                                            ProjectRewardSettings rewardSettings) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
         project.setName(name);
@@ -249,7 +252,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                             repoId)));
         }
 
-        this.projectRepository.save(project);
+        final ProjectEntity projectUpdated = this.projectRepository.save(project);
+        return Pair.of(projectUpdated.getId(), projectUpdated.getKey());
     }
 
 

@@ -29,7 +29,7 @@ public interface ProjectFacadePort {
 
     Pair<UUID, String> createProject(CreateProjectCommand createProjectCommand);
 
-    void updateProject(UUID projectLeadId, UpdateProjectCommand updateProjectCommand);
+    Pair<UUID, String> updateProject(UUID projectLeadId, UpdateProjectCommand updateProjectCommand);
 
     URL saveLogoImage(InputStream imageInputStream);
 

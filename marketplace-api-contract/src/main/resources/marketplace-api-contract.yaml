@@ -804,6 +804,12 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateProjectRequest'
       responses:
+        "200":
+          description: 'Update Project response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateProjectResponse'
         "204":
           description: 'The project was updated successfully.'
         "401":
@@ -3108,6 +3114,20 @@ components:
 
     CreateProjectResponse:
       type: object
+      required:
+        - projectId
+        - projectSlug
+      properties:
+        projectId:
+          type: string
+          format: uuid
+        projectSlug:
+          type: string
+    UpdateProjectResponse:
+      type: object
+      required:
+        - projectId
+        - projectSlug
       properties:
         projectId:
           type: string
