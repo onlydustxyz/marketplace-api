@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.model;
 
 import lombok.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,8 @@ public class User {
     String login;
     @Builder.Default
     Boolean hasValidPayoutInfos = true;
+    @Builder.Default
+    List<Pair<UUID,String>> projectLedIdAndSlugList = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

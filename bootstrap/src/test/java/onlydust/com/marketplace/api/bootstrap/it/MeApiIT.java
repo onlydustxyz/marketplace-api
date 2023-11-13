@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -197,7 +196,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_not_be_able_to_apply_twice() throws JsonProcessingException {
+    void should_not_be_able_to_apply_twice() {
         // Given
         final var githubUserId = faker.number().numberBetween(100000, 2000000);
         final var login = faker.name().username() + faker.code().asin();
@@ -231,7 +230,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_not_be_able_to_apply_to_non_existing_project() throws JsonProcessingException {
+    void should_not_be_able_to_apply_to_non_existing_project() {
         // Given
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
@@ -255,5 +254,23 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isNotFound();
+    }
+
+    @Test
+    void should_return_project_led_ids_and_slugs() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectLedIds[0].id").isEqualTo("f39b827f-df73-498c-8853-99bc3f562723")
+                .jsonPath("$.projectLedIds[0].slug").isEqualTo("qa-new-contributions");
     }
 }

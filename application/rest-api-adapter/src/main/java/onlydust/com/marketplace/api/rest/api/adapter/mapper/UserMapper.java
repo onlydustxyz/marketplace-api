@@ -232,6 +232,9 @@ public interface UserMapper {
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
         getMeResponse.setHasValidPayoutInfos(authenticatedUser.getHasValidPayoutInfos());
+        getMeResponse.setProjectLedIds(authenticatedUser.getProjectLedIdAndSlugList()
+                .stream().map(idAndSlug -> new ProjectLedIdAndSlugResponse().id(idAndSlug.getLeft()).slug(idAndSlug.getRight()))
+                .toList());
         return getMeResponse;
     }
 }
