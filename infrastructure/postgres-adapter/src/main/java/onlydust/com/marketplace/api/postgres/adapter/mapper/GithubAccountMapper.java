@@ -10,6 +10,7 @@ public class GithubAccountMapper {
         return new GithubAccount(
                 account.getId(),
                 account.getLogin(),
+                account.getName(),
                 account.getType(),
                 account.getHtmlUrl(),
                 account.getAvatarUrl(),

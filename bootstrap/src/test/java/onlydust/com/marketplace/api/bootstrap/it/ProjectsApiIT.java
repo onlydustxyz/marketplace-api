@@ -100,6 +100,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
                   "htmlUrl": "https://github.com/KasarLabs",
                   "name": "Kasar Labs",
+                  "installationId": null,
                   "repos": [
                     {
                       "id": 659718526,
@@ -120,6 +121,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "htmlUrl": "https://github.com/gregcha",
                   "name": "Grégoire CHARLES",
+                  "installationId": 424242,
                   "repos": [
                     {
                       "id": 380954304,

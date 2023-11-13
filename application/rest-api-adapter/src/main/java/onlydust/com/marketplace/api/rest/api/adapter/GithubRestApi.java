@@ -23,7 +23,7 @@ public class GithubRestApi implements GithubApi {
     @Override
     public ResponseEntity<InstallationResponse> getGithubInstallation(Long installationId) {
         return githubInstallationFacadePort.getAccountByInstallationId(installationId)
-                .map(GithubInstallationMapper::mapToInstallationResponse)
+                .map(account -> GithubInstallationMapper.mapToInstallationResponse(installationId, account))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Installation %d not found", installationId)));
     }

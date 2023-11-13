@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 public interface ProjectMapper {
 
     static ProjectDetailsView mapToProjectDetailsView(ProjectViewEntity projectEntity,
@@ -40,6 +42,7 @@ public interface ProjectMapper {
                 .avatarUrl(entity.getAvatarUrl())
                 .htmlUrl(entity.getHtmlUrl())
                 .name(entity.getName())
+                .installationId(isNull(entity.getInstallation()) ? null : entity.getInstallation().getId())
                 .repos(entity.getRepos().stream()
                         .map(repo -> RepoMapper.mapToDomain(repo, repoIdsIncludedInProject.contains(repo.getId())))
                         .collect(Collectors.toSet()))

@@ -1,6 +1,9 @@
 insert into indexer_exp.github_app_installations (id, account_id)
 values (123456, 98735558);
 
+insert into indexer_exp.github_app_installations (id, account_id)
+values (424242, 8642470);
+
 INSERT INTO indexer_exp.github_repos
 VALUES (380954304, 8642470, 'bretzel-app', 'https://github.com/gregcha/bretzel-app',
         '2021-11-23T19:51:19Z', null, 0, 0, '{

@@ -5,6 +5,7 @@ import java.util.List;
 public record GithubAccount(
         Long id,
         String login,
+        String name,
         String type,
         String htmlUrl,
         String avatarUrl,
