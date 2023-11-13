@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @AllArgsConstructor
 public class ProjectService implements ProjectFacadePort {
 
@@ -26,6 +28,7 @@ public class ProjectService implements ProjectFacadePort {
     private final IndexerPort indexerPort;
     private final DateProvider dateProvider;
     private final EventStoragePort eventStoragePort;
+    private final ContributionStoragePort contributionStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -51,7 +54,8 @@ public class ProjectService implements ProjectFacadePort {
     public Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
                                                                        String search, ProjectCardView.SortBy sort,
                                                                        Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort, pageIndex, pageSize);
+        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsors, search, sort,
+                pageIndex, pageSize);
     }
 
     @Override
@@ -92,6 +96,11 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
+
+
+        if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
+            contributionStoragePort.refreshIgnoredContributions(command.getId());
+        }
     }
 
     @Override

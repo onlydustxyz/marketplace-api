@@ -163,6 +163,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 .map(repo -> repo.getPrimaryKey().getRepoId())
                 .toList();
 
+        ignoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId);
+        customIgnoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId);
         refreshIgnoredContributions(repoIds);
     }
 
