@@ -97,6 +97,47 @@ public class RewardServiceTest {
     }
 
     @Test
+    void should_throw_a_forbidden_exception_given_not_amount_equals_to_0() {
+        // Given
+        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final RewardService<DummyAuthentication> rewardService =
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+        final DummyAuthentication authentication = new DummyAuthentication();
+        final UUID projectLeadId = UUID.randomUUID();
+        final RequestRewardCommand requestRewardCommand =
+                RequestRewardCommand.builder().projectId(UUID.randomUUID())
+                        .amount(BigDecimal.valueOf(0L))
+                        .currency(Currency.Stark)
+                        .build();
+
+        // When
+        when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
+                .thenReturn(true);
+        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+                .thenReturn(ProjectBudgetsView.builder()
+                        .budgets(List.of(BudgetView.builder()
+                                .currency(Currency.Stark)
+                                .remaining(BigDecimal.valueOf(100L))
+                                .build()))
+                        .build());
+        OnlyDustException onlyDustException = null;
+        try {
+            rewardService.requestPayment(authentication, projectLeadId, requestRewardCommand);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        Assertions.assertNotNull(onlyDustException);
+        Assertions.assertEquals(403, onlyDustException.getStatus());
+        Assertions.assertEquals("Amount must be superior to 0", onlyDustException.getMessage());
+    }
+
+
+
+    @Test
     void should_throw_a_invalid_input_exception_when_there_is_no_budget_of_such_currency() {
         // Given
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
