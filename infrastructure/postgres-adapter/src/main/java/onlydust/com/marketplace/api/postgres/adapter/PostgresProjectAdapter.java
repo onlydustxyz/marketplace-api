@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
@@ -355,6 +356,16 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .totalItemNumber(count)
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                 .build();
+    }
+
+    @Override
+    public Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                              ContributionType contributionType,
+                                                                                              Long githubUserid,
+                                                                                              int pageIndex,
+                                                                                              int pageSize,
+                                                                                              String search) {
+        return null;
     }
 
     @Override

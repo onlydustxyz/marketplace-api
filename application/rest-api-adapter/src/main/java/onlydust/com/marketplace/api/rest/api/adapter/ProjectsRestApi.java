@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
@@ -209,6 +210,30 @@ public class ProjectsRestApi implements ProjectsApi {
         final Page<RewardItemView> page = projectFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
+        return rewardItemsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
+                ResponseEntity.ok(rewardItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<RewardItemsPageResponse> getProjectRewardableContributions(UUID projectId, Long githubUserId,
+                                                                                     Integer pageIndex,
+                                                                                     Integer pageSize,
+                                                                                     String search, RewardType type) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ContributionType contributionType = isNull(type) ? null : switch (type) {
+            case ISSUE -> ContributionType.ISSUE;
+            case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+            case CODE_REVIEW -> ContributionType.CODE_REVIEW;
+        };
+        final Page<RewardItemView> rewardableItemsPage =
+                projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
+                        contributionType,
+                        authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search);
+        final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex,
+                rewardableItemsPage);
         return rewardItemsPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);

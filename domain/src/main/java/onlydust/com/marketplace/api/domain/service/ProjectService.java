@@ -170,4 +170,20 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.forbidden("Only project leads can read reward items on their projects");
         }
     }
+
+    @Override
+    public Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                           ContributionType contributionType,
+                                                                                           UUID projectLeadId,
+                                                                                           Long githubUserid,
+                                                                                           int pageIndex,
+                                                                                           int pageSize,
+                                                                                           String search) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
+                    contributionType, githubUserid, pageIndex, pageSize, search);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
+import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -53,4 +54,11 @@ public interface ProjectFacadePort {
 
     Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLead,
                                                               int pageIndex, int pageSize);
+
+    Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                    ContributionType contributionType,
+                                                                                    UUID projectLeadId,
+                                                                                    Long githubUserid,
+                                                                                    int pageIndex, int pageSize,
+                                                                                    String search);
 }
