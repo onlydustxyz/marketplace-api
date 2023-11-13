@@ -55,6 +55,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                "githubTitle": "feat: add common model",
                                "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
                                "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                               "githubCodeReviewOutcome": null,
                                "project": {
                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                  "slug": "zama",
@@ -89,6 +90,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                "githubTitle": "DUST token creation",
                                "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
                                "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
+                               "githubCodeReviewOutcome": null,
                                "project": {
                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                  "slug": "zama",
@@ -123,6 +125,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                "githubTitle": "Feature/space",
                                "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
                                "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
+                               "githubCodeReviewOutcome": null,
                                "project": {
                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                  "slug": "zama",

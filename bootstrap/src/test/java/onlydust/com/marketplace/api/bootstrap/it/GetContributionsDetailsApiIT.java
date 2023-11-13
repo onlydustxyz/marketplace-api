@@ -69,6 +69,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                            "githubTitle": "Anthony buisset feature/starknet",
                            "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/62",
                            "githubBody": null,
+                           "githubCodeReviewOutcome": null,
                            "project": {
                              "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                              "slug": "kaaper",
@@ -252,6 +253,91 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                          }
                         """);
     }
+
+    @Test
+    void should_return_code_review_details() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                        "9e374e732c9017c3fee800d686e02962dd21b69d9a11c4c21517d76fec56b1a1")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "9e374e732c9017c3fee800d686e02962dd21b69d9a11c4c21517d76fec56b1a1",
+                          "createdAt": "2022-07-12T11:26:34Z",
+                          "completedAt": "2022-07-12T17:32:58Z",
+                          "type": "CODE_REVIEW",
+                          "status": "COMPLETED",
+                          "repo": {
+                            "id": 493591124,
+                            "owner": "onlydustxyz",
+                            "name": "kaaper",
+                            "htmlUrl": "https://github.com/onlydustxyz/kaaper"
+                          },
+                          "githubAuthor": {
+                            "githubUserId": 43467246,
+                            "login": "AnthonyBuisset",
+                            "htmlUrl": "https://github.com/AnthonyBuisset",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                          },
+                          "githubNumber": 17,
+                          "githubStatus": "APPROVED",
+                          "githubTitle": "Feat/view",
+                          "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
+                          "githubBody": null,
+                          "githubCodeReviewOutcome": "APPROVED",
+                          "project": {
+                            "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                            "slug": "kaaper",
+                            "name": "kaaper",
+                            "shortDescription": "Documentation generator for Cairo projects.",
+                            "logoUrl": null,
+                            "visibility": "PUBLIC"
+                          },
+                          "commentsCount": 0,
+                          "links": [
+                            {
+                              "id": "280b78a0af8f14475bd4474060482071a7b4331247ed99de59e4541e69d2c942",
+                              "createdAt": "2022-07-12T11:26:34Z",
+                              "completedAt": "2022-07-12T17:34:04Z",
+                              "type": "PULL_REQUEST",
+                              "status": "COMPLETED",
+                              "repo": {
+                                "id": 493591124,
+                                "owner": "onlydustxyz",
+                                "name": "kaaper",
+                                "htmlUrl": "https://github.com/onlydustxyz/kaaper"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 26416205,
+                                "login": "internnos",
+                                "htmlUrl": "https://github.com/internnos",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/26416205?v=4"
+                              },
+                              "githubNumber": 17,
+                              "githubStatus": "MERGED",
+                              "githubTitle": "Feat/view",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
+                              "githubBody": null,
+                              "githubCodeReviewOutcome": null,
+                              "is_mine": false
+                            }
+                          ],
+                          "rewards": []
+                        }
+                        """)
+        ;
+    }
+
 
     @Test
     void should_return_403_when_not_mine() {

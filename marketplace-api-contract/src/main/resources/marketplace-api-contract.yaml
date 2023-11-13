@@ -2721,6 +2721,7 @@ components:
         - APPROVED
         - CHANGES_REQUESTED
         - DISMISSED
+
     ContributionStatus:
       type: string
       enum:
@@ -2728,17 +2729,20 @@ components:
         - COMPLETED
         - CANCELLED
 
-    RewardItemStatus:
+    GithubStatus:
       type: string
       enum:
-        - PENDING
-        - COMPLETED
-        - CHANGES_REQUESTED
         - OPEN
+        - COMPLETED
+        - CANCELLED
         - CLOSED
         - MERGED
         - DRAFT
-        - CANCELLED
+        - PENDING
+        - COMMENTED
+        - APPROVED
+        - CHANGES_REQUESTED
+        - DISMISSED
 
     CurrencyContract:
       type: string
@@ -2857,8 +2861,7 @@ components:
           description: Github item number
           example: 6
         githubStatus:
-          type: string
-          description: Github item status
+          $ref: '#/components/schemas/GithubStatus'
         githubTitle:
           type: string
           description: Github item title
@@ -2869,6 +2872,9 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
+        githubCodeReviewOutcome:
+          $ref: '#/components/schemas/GithubCodeReviewState'
+
 
     ContributionDetailsResponse:
       allOf:
@@ -3313,7 +3319,7 @@ components:
             - APPROVED
             - CHANGE_REQUESTED
         status:
-          $ref: '#/components/schemas/RewardItemStatus'
+          $ref: '#/components/schemas/GithubStatus'
         githubAuthorId:
           type: integer
           format: int64

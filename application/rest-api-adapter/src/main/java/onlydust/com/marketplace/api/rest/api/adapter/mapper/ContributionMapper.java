@@ -56,15 +56,27 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(contributionView.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
                 .githubNumber(contributionView.getGithubNumber())
-                .githubStatus(contributionView.getGithubStatus())
+                .githubStatus(GithubStatus.valueOf(contributionView.getGithubStatus()))
                 .githubTitle(contributionView.getGithubTitle())
                 .githubHtmlUrl(contributionView.getGithubHtmlUrl())
                 .githubBody(contributionView.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(contributionView.getGithubAuthor()))
+                .githubCodeReviewOutcome(mapGithubCodeReviewState(contributionView.getGithubStatus()))
                 .project(ProjectMapper.mapShortProjectResponse(contributionView.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
                 .links(contributionView.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewardIds(contributionView.getRewardIds());
+    }
+
+    static GithubCodeReviewState mapGithubCodeReviewState(String githubStatus) {
+        return switch (githubStatus) {
+            case "APPROVED" -> GithubCodeReviewState.APPROVED;
+            case "CHANGES_REQUESTED" -> GithubCodeReviewState.CHANGES_REQUESTED;
+            case "COMMENTED" -> GithubCodeReviewState.COMMENTED;
+            case "DISMISSED" -> GithubCodeReviewState.DISMISSED;
+            case "PENDING" -> GithubCodeReviewState.PENDING;
+            default -> null;
+        };
     }
 
     static ContributionLinkResponse mapContributionLink(ContributionLinkView link) {
@@ -75,11 +87,12 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(link.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(link.getStatus()))
                 .githubNumber(link.getGithubNumber())
-                .githubStatus(link.getGithubStatus())
+                .githubStatus(GithubStatus.valueOf(link.getGithubStatus()))
                 .githubTitle(link.getGithubTitle())
                 .githubHtmlUrl(link.getGithubHtmlUrl())
                 .githubBody(link.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(link.getGithubAuthor()))
+                .githubCodeReviewOutcome(mapGithubCodeReviewState(link.getGithubStatus()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()))
                 .isMine(link.getIsMine());
     }
@@ -116,11 +129,12 @@ public interface ContributionMapper {
                 .type(mapContributionTypeToResponse(contribution.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(contribution.getStatus()))
                 .githubNumber(contribution.getGithubNumber())
-                .githubStatus(contribution.getGithubStatus())
+                .githubStatus(GithubStatus.valueOf(contribution.getGithubStatus()))
                 .githubTitle(contribution.getGithubTitle())
                 .githubHtmlUrl(contribution.getGithubHtmlUrl())
                 .githubBody(contribution.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(contribution.getGithubAuthor()))
+                .githubCodeReviewOutcome(mapGithubCodeReviewState(contribution.getGithubStatus()))
                 .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))
                 .commentsCount(contribution.getGithubCommentsCount())

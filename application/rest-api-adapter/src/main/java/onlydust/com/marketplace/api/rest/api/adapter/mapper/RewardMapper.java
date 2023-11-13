@@ -146,14 +146,14 @@ public interface RewardMapper {
                     case PULL_REQUEST -> ContributionType.PULL_REQUEST;
                 })
                 .status(switch (view.getStatus()) {
-                    case CANCELLED -> RewardItemStatus.CANCELLED;
-                    case PENDING -> RewardItemStatus.PENDING;
-                    case DRAFT -> RewardItemStatus.DRAFT;
-                    case OPEN -> RewardItemStatus.OPEN;
-                    case MERGED -> RewardItemStatus.MERGED;
-                    case CLOSED -> RewardItemStatus.CLOSED;
-                    case CHANGES_REQUESTED -> RewardItemStatus.CHANGES_REQUESTED;
-                    case COMPLETED -> RewardItemStatus.COMPLETED;
+                    case CANCELLED -> GithubStatus.CANCELLED;
+                    case PENDING -> GithubStatus.PENDING;
+                    case DRAFT -> GithubStatus.DRAFT;
+                    case OPEN -> GithubStatus.OPEN;
+                    case MERGED -> GithubStatus.MERGED;
+                    case CLOSED -> GithubStatus.CLOSED;
+                    case CHANGES_REQUESTED -> GithubStatus.CHANGES_REQUESTED;
+                    case COMPLETED -> GithubStatus.COMPLETED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
                 .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
