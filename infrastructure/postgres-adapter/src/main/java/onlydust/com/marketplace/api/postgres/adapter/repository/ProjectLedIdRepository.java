@@ -14,7 +14,7 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                    pl.project_id,
                    pd.key as project_slug
             from project_leads pl
-            left join project_details pd on pd.project_id = pl.project_id
+            join project_details pd on pd.project_id = pl.project_id
             where pl.user_id = :userId""", nativeQuery = true)
     List<ProjectLedIdViewEntity> findProjectLedIdsByUserId(final UUID userId);
 }
