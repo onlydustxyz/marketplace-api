@@ -2196,6 +2196,8 @@ components:
         isInvitedAsProjectLead:
           type: boolean
           default: false
+        isMissingGithubAppInstallation:
+          type: boolean
 
     ProjectResponse:
       type: object

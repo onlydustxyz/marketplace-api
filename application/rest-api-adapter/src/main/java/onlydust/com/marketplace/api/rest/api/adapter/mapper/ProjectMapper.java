@@ -71,6 +71,7 @@ public interface ProjectMapper {
             repos.addAll(organization.getRepos().stream()
                     .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
                     .map(ProjectMapper::mapRepo)
+                    .sorted(Comparator.comparing(GithubRepoResponse::getId))
                     .toList());
         }
         projectResponse.setRepos(repos);
@@ -178,6 +179,7 @@ public interface ProjectMapper {
         project.setRepoCount(projectCardView.getRepoCount());
         project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
         project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
+        project.setIsMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
         return project;
     }
 
