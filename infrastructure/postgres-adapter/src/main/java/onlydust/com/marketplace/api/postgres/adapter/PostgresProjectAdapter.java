@@ -108,7 +108,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectsPageFiltersRepository.findFiltersForUser(userId, mine, technologiesJsonPath, sponsorsJsonPath,
                         search));
         return Page.<ProjectCardView>builder()
-                .content(projectsForUserId.stream().map(ProjectPageItemViewEntity::toView).toList())
+                .content(projectsForUserId.stream().map(p -> p.toView(userId)).toList())
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
                 .filters(filters)
@@ -135,7 +135,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectsPageFiltersRepository.findFiltersForAnonymousUser(technologiesJsonPath, sponsorsJsonPath,
                         search));
         return Page.<ProjectCardView>builder()
-                .content(projectsForAnonymousUser.stream().map(ProjectPageItemViewEntity::toView).toList())
+                .content(projectsForAnonymousUser.stream().map(p -> p.toView(null)).toList())
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
                 .filters(filters)

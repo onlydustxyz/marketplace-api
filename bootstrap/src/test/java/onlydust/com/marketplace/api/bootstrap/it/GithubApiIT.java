@@ -44,6 +44,13 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                     "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                   },
                   {
+                    "id": 593218280,
+                    "owner": "onlydustxyz",
+                    "name": "octocrab",
+                    "description": "A modern, extensible GitHub API Client for Rust.",
+                    "htmlUrl": "https://github.com/onlydustxyz/octocrab"
+                  },
+                  {
                     "id": 593701982,
                     "owner": "onlydustxyz",
                     "name": "gateway",
