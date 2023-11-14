@@ -6,20 +6,10 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 
-import java.util.Date;
-
 @EqualsAndHashCode
 public class ContributionLinkViewEntity {
-    @JsonProperty("id")
-    String id;
-    @JsonProperty("created_at")
-    Date createdAt;
-    @JsonProperty("completed_at")
-    Date completedAt;
     @JsonProperty("type")
     ContributionViewEntity.Type type;
-    @JsonProperty("status")
-    ContributionViewEntity.Status status;
     @JsonProperty("github_number")
     Long githubNumber;
     @JsonProperty("github_status")
@@ -65,11 +55,7 @@ public class ContributionLinkViewEntity {
                 .build();
 
         return ContributionLinkView.builder()
-                .id(id)
-                .createdAt(createdAt)
-                .completedAt(completedAt)
                 .type(type.toView())
-                .status(status.toView())
                 .githubNumber(githubNumber)
                 .githubStatus(githubStatus)
                 .githubTitle(githubTitle)
