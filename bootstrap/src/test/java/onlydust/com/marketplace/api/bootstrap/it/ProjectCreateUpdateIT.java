@@ -50,6 +50,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/777"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.responseDefinition().withStatus(500)));
     }
 
     @Test
@@ -164,6 +170,33 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists();
+    }
+
+    @Test
+    @Order(3)
+    public void should_fail_to_update_the_project_when_indexer_responds_with_500() {
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            777
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is5xxServerError();
     }
 
     @Test
