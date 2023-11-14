@@ -9,7 +9,7 @@ import java.util.Date;
 @Builder
 public class CreatedAndClosedIssueView {
     Long id;
-    Long repoId;
+    String repoName;
     Long number;
     String title;
     String htmlUrl;

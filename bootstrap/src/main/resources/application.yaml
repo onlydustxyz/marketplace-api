@@ -69,6 +69,9 @@ infrastructure:
   github:
     personal-access-token: ${GITHUB_PAT}
     base-uri: ${GITHUB_BASE_URL}
+  dusty-bot:
+    personal-access-token: ${DUSTY_BOT_GITHUB_PAT}
+    base-uri: ${DUSTY_BOT_GITHUB_BASE_URL}
   od:
     api:
       client:

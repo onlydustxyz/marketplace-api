@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.github_api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
+
+import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
@@ -32,7 +35,8 @@ public class GithubHttpClient {
     public HttpResponse<byte[]> fetch(final URI uri) {
         LOGGER.debug("Fetching {}", uri);
         try {
-            final var requestBuilder = HttpRequest.newBuilder().uri(uri).headers("Authorization", "Bearer " + config.personalAccessToken).GET();
+            final var requestBuilder = HttpRequest.newBuilder().uri(uri).headers("Authorization",
+                    "Bearer " + config.personalAccessToken).GET();
             return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
         } catch (IOException | InterruptedException e) {
             throw OnlyDustException.internalServerError("Unable to fetch github API:" + uri, e);
@@ -46,6 +50,24 @@ public class GithubHttpClient {
             case 403, 404 -> Optional.empty();
             default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
         };
+    }
+
+    public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody,
+                                                                   Class<ResponseBody> responseClass) {
+        try {
+            final HttpResponse<byte[]> httpResponse =
+                    httpClient.send(HttpRequest.newBuilder().uri(buildURI(path)).headers("Authorization",
+                            "Bearer " + config.personalAccessToken).POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody))).build(), HttpResponse.BodyHandlers.ofByteArray());
+            return switch (httpResponse.statusCode()) {
+                case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
+                case 403, 404 -> Optional.empty();
+                default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
+            };
+        } catch (JsonProcessingException e) {
+            throw internalServerError("Fail to serialize request", e);
+        } catch (IOException | InterruptedException e) {
+            throw internalServerError("Fail send request", e);
+        }
     }
 
     public final URI buildURI(String path) {

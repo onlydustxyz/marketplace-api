@@ -3584,6 +3584,7 @@ components:
         - githubRepoId
         - title
         - description
+        - ownerName
       properties:
         projectId:
           type: string
@@ -3594,6 +3595,8 @@ components:
         title:
           type: string
         description:
+          type: string
+        ownerName:
           type: string
 
     CreateIssueResponse:
@@ -3624,6 +3627,8 @@ components:
         closeAt:
           type: string
           format: date-time
+        repoName:
+          type: string
         status:
           type: string
           enum:
