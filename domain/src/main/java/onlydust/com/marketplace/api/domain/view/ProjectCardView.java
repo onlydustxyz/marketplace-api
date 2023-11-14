@@ -28,6 +28,8 @@ public class ProjectCardView {
     Map<String, Long> technologies = new HashMap<>();
     @Builder.Default
     Boolean isInvitedAsProjectLead = false;
+    @Builder.Default
+    Boolean isMissingGithubAppInstallation = null;
 
     public void addProjectLeader(final ProjectLeaderLinkView leader) {
         this.getLeaders().add(leader);

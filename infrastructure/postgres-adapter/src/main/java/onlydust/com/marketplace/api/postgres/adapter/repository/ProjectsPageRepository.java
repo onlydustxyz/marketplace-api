@@ -24,13 +24,14 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                     from project_leads pl_count
                     where pl_count.project_id = p.project_id) as project_lead_count,
                    false                                      as   is_pending_project_lead,
+                   false                                      as   is_missing_github_app_installation,
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
                            'login', COALESCE(gu.login, u.login_at_signup),
                            'avatarUrl', COALESCE(gu.avatar_url, u.avatar_url_at_signup),
                            'url', gu.html_url
-                                    ))
+                           ))
                     from project_leads pl
                              left join auth_users u on u.id = pl.user_id
                              left join github_users gu on gu.id = u.github_user_id
@@ -39,17 +40,17 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    t.technologies as  technologies,
                    s.sponsor_json                                 sponsors
             from project_details p
-                left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
+                left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                             from project_github_repos pgr
-                                     left join github_repos gr on gr.id = pgr.github_repo_id
-                            group by pgr.project_id) ) as t on t.project_id = p.project_id
+                            join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                            group by pgr.project_id) as t on t.project_id = p.project_id
                 left join (select ps.project_id,
                                            jsonb_agg(jsonb_build_object(
                                                    'url', sponsor.url,
                                                    'logoUrl', sponsor.logo_url,
                                                    'id', sponsor.id,
                                                    'name', sponsor.name
-                                                     )) sponsor_json
+                                           )) sponsor_json
                                     from sponsors sponsor
                                              join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
                                     group by ps.project_id) s on s.project_id = p.project_id
@@ -96,33 +97,39 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                            'login', COALESCE(gu.login, u.login_at_signup),
                            'avatarUrl', COALESCE(gu.avatar_url, u.avatar_url_at_signup),
                            'url', gu.html_url
-                                    ))
+                           ))
                     from project_leads pl
                              left join auth_users u on u.id = pl.user_id
                              left join github_users gu on gu.id = u.github_user_id
                     where pl.project_id = p.project_id
-                    group by pl.project_id)                   as project_leads,
-                   t.technologies                             as technologies,
-                   s.sponsor_json                             as   sponsors,
-                   coalesce(is_pending_pl.is_p_pl, false) as is_pending_project_lead
+                    group by pl.project_id)                     as project_leads,
+                   t.technologies                               as technologies,
+                   s.sponsor_json                               as sponsors,
+                   coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
+                   coalesce(r_without_github_app.is_missing_github_app_installation, false)        as is_missing_github_app_installation
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                          left join github_repos gr on gr.id = pgr.github_repo_id
-                                 group by pgr.project_id)) as t on t.project_id = p.project_id
+                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
+                                from project_github_repos pgr
+                                join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                group by pgr.project_id) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
                                                'logoUrl', sponsor.logo_url,
                                                'id', sponsor.id,
                                                'name', sponsor.name
-                                                 )) sponsor_json
+                                       )) sponsor_json
                                 from sponsors sponsor
-                                         join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
+                     left join (select pgr.project_id, case count(*) when 0 then false else true end is_missing_github_app_installation
+                                from project_github_repos pgr
+                                join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                join indexer_exp.github_app_installations i on i.account_id = gr.owner_id
+                                group by pgr.project_id) r_without_github_app on r_without_github_app.project_id = p.project_id
                      left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                 from public.projects_contributors pc_count
                                 group by pc_count.project_id) pc_count on pc_count.project_id = p.project_id
@@ -180,17 +187,17 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
                         select count(p.project_id)
                         from project_details p
-                        left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                            from project_github_repos pgr
-                                     left join github_repos gr on gr.id = pgr.github_repo_id
-                            group by pgr.project_id) ) as t on t.project_id = p.project_id
+                        left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
+                                    from project_github_repos pgr
+                                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                    group by pgr.project_id) as t on t.project_id = p.project_id
                         left join (select ps.project_id,
                                                    jsonb_agg(jsonb_build_object(
                                                            'url', sponsor.url,
                                                            'logoUrl', sponsor.logo_url,
                                                            'id', sponsor.id,
                                                            'name', sponsor.name
-                                                             )) sponsor_json
+                                                   )) sponsor_json
                                             from sponsors sponsor
                                                      join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
                                             group by ps.project_id) s on s.project_id = p.project_id
@@ -210,19 +217,19 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
             select count(p.project_id)
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
+                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                                  from project_github_repos pgr
-                                          left join github_repos gr on gr.id = pgr.github_repo_id
-                                 group by pgr.project_id)) as t on t.project_id = p.project_id
+                                 join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                 group by pgr.project_id) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
                                                'logoUrl', sponsor.logo_url,
                                                'id', sponsor.id,
                                                'name', sponsor.name
-                                                 )) sponsor_json
+                                       )) sponsor_json
                                 from sponsors sponsor
-                                         join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
