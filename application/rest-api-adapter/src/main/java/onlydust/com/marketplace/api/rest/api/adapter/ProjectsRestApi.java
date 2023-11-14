@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
@@ -18,6 +19,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticati
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
@@ -105,7 +107,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.getId(),
                 mapUpdateProjectCommandToDomain(projectId,
-                updateProjectRequest));
+                        updateProjectRequest));
         return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft()).projectSlug(projectIdAndSlug.getRight()));
     }
 
@@ -142,7 +144,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final ContributorsPageResponse contributorsPageResponse =
                 mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
                         pageIndex);
-        return contributorsPageResponse.getHasMore() ?
+        return contributorsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
                 ResponseEntity.ok(contributorsPageResponse);
     }
@@ -160,7 +162,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
         final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page);
 
-        return rewardsPageResponse.getHasMore() ?
+        return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
                 ResponseEntity.ok(rewardsPageResponse);
     }
@@ -209,9 +211,36 @@ public class ProjectsRestApi implements ProjectsApi {
         final Page<RewardItemView> page = projectFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
-        return rewardItemsPageResponse.getHasMore() ?
+        return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<RewardableItemsPageResponse> getProjectRewardableContributions(UUID projectId,
+                                                                                         Long githubUserId,
+                                                                                         Integer pageIndex,
+                                                                                         Integer pageSize,
+                                                                                         String search,
+                                                                                         RewardType type) {
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ContributionType contributionType = isNull(type) ? null : switch (type) {
+            case ISSUE -> ContributionType.ISSUE;
+            case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+            case CODE_REVIEW -> ContributionType.CODE_REVIEW;
+        };
+        final Page<RewardItemView> rewardableItemsPage =
+                projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
+                        contributionType,
+                        authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search);
+        final RewardableItemsPageResponse rewardableItemsPageResponse =
+                RewardableItemMapper.pageToResponse(sanitizedPageIndex,
+                        rewardableItemsPage);
+        return rewardableItemsPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardableItemsPageResponse) :
+                ResponseEntity.ok(rewardableItemsPageResponse);
     }
 
     @Override
