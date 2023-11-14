@@ -73,11 +73,7 @@ public interface ContributionMapper {
 
     static ContributionLinkResponse mapContributionLink(ContributionLinkView link) {
         return new ContributionLinkResponse()
-                .id(link.getId())
-                .createdAt(DateMapper.toZoneDateTime(link.getCreatedAt()))
-                .completedAt(DateMapper.toZoneDateTime(link.getCompletedAt()))
                 .type(mapContributionTypeToResponse(link.getType()))
-                .status(ContributionMapper.mapContributionStatusToResponse(link.getStatus()))
                 .githubNumber(link.getGithubNumber())
                 .githubStatus(GithubStatus.valueOf(link.getGithubStatus()))
                 .githubTitle(link.getGithubTitle())

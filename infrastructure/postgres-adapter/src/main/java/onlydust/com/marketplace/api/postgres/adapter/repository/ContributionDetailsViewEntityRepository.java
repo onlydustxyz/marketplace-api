@@ -55,11 +55,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                 LEFT JOIN LATERAL (
                     SELECT 
                         jsonb_agg(jsonb_build_object(
-                            'id', c2.id, 
-                            'created_at', c2.created_at, 
-                            'completed_at', c2.completed_at, 
-                            'type', c2.type, 
-                            'status', c2.status,
+                            'type', 'ISSUE',
                             'github_number', i2.number,
                             'github_status', i2.status,
                             'github_title', i2.title,
@@ -69,17 +65,16 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                             'github_author_login', author2.login,
                             'github_author_html_url', author2.html_url,
                             'github_author_avatar_url', author2.avatar_url,
-                            'is_mine', c.contributor_id = c2.contributor_id,
+                            'is_mine', c.contributor_id = i2.author_id,
                             'repo_id', gr2.id,
                             'repo_owner', repo_owner2.login,
                             'repo_name', gr2.name,
                             'repo_html_url', gr2.html_url
                         )
                     ) as links
-                    FROM 
-                        indexer_exp.github_pull_requests_closing_issues pr_ci 
-                    INNER JOIN indexer_exp.contributions c2 ON c2.issue_id = pr_ci.issue_id
-                    INNER JOIN indexer_exp.github_issues i2 ON i2.id = c2.issue_id
+                    FROM
+                        indexer_exp.github_pull_requests_closing_issues pr_ci
+                    INNER JOIN indexer_exp.github_issues i2 ON i2.id = pr_ci.issue_id
                     INNER JOIN indexer_exp.github_repos gr2 ON gr2.id = i2.repo_id
                     INNER JOIN indexer_exp.github_accounts repo_owner2 ON repo_owner2.id = gr2.owner_id
                     INNER JOIN indexer_exp.github_accounts author2 ON author2.id = i2.author_id
@@ -91,32 +86,26 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                 LEFT JOIN LATERAL (
                     SELECT 
                         jsonb_agg(jsonb_build_object(
-                            'id', c2.id, 
-                            'created_at', c2.created_at, 
-                            'completed_at', c2.completed_at, 
-                            'type', c2.type, 
-                            'status', c2.status,
+                            'type', 'PULL_REQUEST',
                             'github_number', pr2.number,
                             'github_status', pr2.status,
                             'github_title', pr2.title,
                             'github_html_url', pr2.html_url,
                             'github_body', pr2.body,
-                            'is_mine', c.contributor_id = c2.contributor_id,
                             'github_author_id', author2.id,
                             'github_author_login', author2.login,
                             'github_author_html_url', author2.html_url,
                             'github_author_avatar_url', author2.avatar_url,
-                            'is_mine', c.contributor_id = c2.contributor_id,
+                            'is_mine', c.contributor_id = pr2.author_id,
                             'repo_id', gr2.id,
                             'repo_owner', repo_owner2.login,
                             'repo_name', gr2.name,
                             'repo_html_url', gr2.html_url
                         )
                     ) as links
-                    FROM 
-                        indexer_exp.github_pull_requests_closing_issues pr_ci 
-                    INNER JOIN indexer_exp.contributions c2 ON c2.pull_request_id = pr_ci.pull_request_id
-                    INNER JOIN indexer_exp.github_pull_requests pr2 ON pr2.id = c2.pull_request_id
+                    FROM
+                        indexer_exp.github_pull_requests_closing_issues pr_ci
+                    INNER JOIN indexer_exp.github_pull_requests pr2 ON pr2.id = c.pull_request_id
                     INNER JOIN indexer_exp.github_repos gr2 ON gr2.id = pr2.repo_id
                     INNER JOIN indexer_exp.github_accounts repo_owner2 ON repo_owner2.id = gr2.owner_id
                     INNER JOIN indexer_exp.github_accounts author2 ON author2.id = pr2.author_id
@@ -128,36 +117,29 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                 LEFT JOIN LATERAL (
                     SELECT 
                         jsonb_agg(jsonb_build_object(
-                            'id', c2.id, 
-                            'created_at', c2.created_at, 
-                            'completed_at', c2.completed_at, 
-                            'type', c2.type, 
-                            'status', c2.status,
+                            'type', 'PULL_REQUEST',
                             'github_number', pr2.number,
                             'github_status', pr2.status,
                             'github_title', pr2.title,
                             'github_html_url', pr2.html_url,
                             'github_body', pr2.body,
-                            'is_mine', c.contributor_id = c2.contributor_id,
                             'github_author_id', author2.id,
                             'github_author_login', author2.login,
                             'github_author_html_url', author2.html_url,
                             'github_author_avatar_url', author2.avatar_url,
-                            'is_mine', c.contributor_id = c2.contributor_id,
+                            'is_mine', c.contributor_id = pr2.author_id,
                             'repo_id', gr2.id,
                             'repo_owner', repo_owner2.login,
                             'repo_name', gr2.name,
                             'repo_html_url', gr2.html_url
                         )
                     ) as links
-                    FROM 
-                        indexer_exp.contributions c2
-                    INNER JOIN indexer_exp.github_pull_requests pr2 ON pr2.id = c2.pull_request_id
+                    FROM indexer_exp.github_pull_requests pr2
                     INNER JOIN indexer_exp.github_repos gr2 ON gr2.id = pr2.repo_id
                     INNER JOIN indexer_exp.github_accounts repo_owner2 ON repo_owner2.id = gr2.owner_id
                     INNER JOIN indexer_exp.github_accounts author2 ON author2.id = pr2.author_id
-                    WHERE 
-                        cr.pull_request_id = c2.pull_request_id
+                    WHERE
+                        pr2.id = cr.pull_request_id
                     GROUP BY 
                         c.id
                 ) AS reviewed_pull_requests ON TRUE

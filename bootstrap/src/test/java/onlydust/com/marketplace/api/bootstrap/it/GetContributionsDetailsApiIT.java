@@ -306,11 +306,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "commentsCount": 0,
                           "links": [
                             {
-                              "id": "280b78a0af8f14475bd4474060482071a7b4331247ed99de59e4541e69d2c942",
-                              "createdAt": "2022-07-12T11:26:34Z",
-                              "completedAt": "2022-07-12T17:34:04Z",
                               "type": "PULL_REQUEST",
-                              "status": "COMPLETED",
                               "repo": {
                                 "id": 493591124,
                                 "owner": "onlydustxyz",

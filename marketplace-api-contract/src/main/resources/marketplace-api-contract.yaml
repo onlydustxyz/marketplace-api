@@ -2910,10 +2910,26 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
+            - id
+            - createdAt
+            - status
             - project
             - links
             - rewardIds
           properties:
+            id:
+              type: string
+              description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
+            createdAt:
+              type: string
+              format: date-time
+              description: When the contribution was created
+            completedAt:
+              type: string
+              format: date-time
+              description: When the contribution was completed
+            status:
+              $ref: '#/components/schemas/ContributionStatus'
             project:
               $ref: '#/components/schemas/ShortProjectResponse'
             links:
@@ -2942,10 +2958,7 @@ components:
     ContributionResponse:
       type: object
       required:
-        - id
-        - createdAt
         - type
-        - status
         - repo
         - githubNumber
         - githubStatus
@@ -2953,21 +2966,8 @@ components:
         - githubTitle
         - githubHtmlUrl
       properties:
-        id:
-          type: string
-          description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
-        createdAt:
-          type: string
-          format: date-time
-          description: When the contribution was created
-        completedAt:
-          type: string
-          format: date-time
-          description: When the contribution was completed
         type:
           $ref: '#/components/schemas/ContributionType'
-        status:
-          $ref: '#/components/schemas/ContributionStatus'
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         githubAuthor:
@@ -2998,12 +2998,28 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
+            - id
+            - createdAt
+            - status
             - project
             - repo
             - commentsCount
             - links
             - rewards
           properties:
+            id:
+              type: string
+              description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
+            createdAt:
+              type: string
+              format: date-time
+              description: When the contribution was created
+            completedAt:
+              type: string
+              format: date-time
+              description: When the contribution was completed
+            status:
+              $ref: '#/components/schemas/ContributionStatus'
             project:
               $ref: '#/components/schemas/ShortProjectResponse'
             repo:
