@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Immutable;
 
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -17,8 +16,17 @@ import java.util.UUID;
 @Entity
 @Immutable
 public class ProjectLedIdViewEntity {
-    @Id
-    UUID userId;
-    UUID projectId;
+    @EmbeddedId
+    Id id;
     String projectSlug;
+
+    @Embeddable
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Data
+    public static class Id implements Serializable {
+        UUID userId;
+        UUID projectId;
+    }
 }

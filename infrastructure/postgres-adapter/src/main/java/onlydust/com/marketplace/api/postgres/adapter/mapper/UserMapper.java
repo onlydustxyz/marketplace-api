@@ -77,7 +77,7 @@ public interface UserMapper {
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
                                          && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
                 .projectLedIdAndSlugList(projectLedIdViewEntities.stream()
-                        .map(projectLedIdViewEntity -> Pair.of(projectLedIdViewEntity.getProjectId(),
+                        .map(projectLedIdViewEntity -> Pair.of(projectLedIdViewEntity.getId().getProjectId(),
                                 projectLedIdViewEntity.getProjectSlug())).toList())
                 .build();
     }
