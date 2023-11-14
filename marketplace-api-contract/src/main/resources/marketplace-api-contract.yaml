@@ -2960,7 +2960,6 @@ components:
         - avatarUrl
         - hasSeenOnboardingWizard
         - hasAcceptedLatestTermsAndConditions
-        - projectLedIds
       properties:
         id:
           type: string
@@ -2982,6 +2981,10 @@ components:
           type: boolean
           description: False if the user has invalid payout information
         projectsLed:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLedShortResponse'
+        pendingProjectsLed:
           type: array
           items:
             $ref: '#/components/schemas/ProjectLedShortResponse'

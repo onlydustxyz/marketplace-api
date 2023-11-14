@@ -240,6 +240,14 @@ public interface UserMapper {
                         .logoUrl(projectLedView.getLogoUrl())
                 )
                 .toList());
+        getMeResponse.setPendingProjectsLed(authenticatedUser.getPendingProjectsLed()
+                .stream().map(projectLedView -> new ProjectLedShortResponse()
+                        .id(projectLedView.getId())
+                        .slug(projectLedView.getSlug())
+                        .name(projectLedView.getName())
+                        .logoUrl(projectLedView.getLogoUrl())
+                )
+                .toList());
         return getMeResponse;
     }
 }

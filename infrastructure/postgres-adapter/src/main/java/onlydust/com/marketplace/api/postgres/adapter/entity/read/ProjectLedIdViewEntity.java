@@ -21,6 +21,7 @@ public class ProjectLedIdViewEntity {
     String projectSlug;
     String logoUrl;
     String name;
+    Boolean pending;
 
     @Embeddable
     @Builder
