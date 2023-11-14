@@ -864,13 +864,18 @@ paths:
       summary: Get all project contributors
       operationId: getProjectContributors
       description: |
-        Get the (soon to be paginated) list of all contributors of the project.
+        Get the paginated list of all contributors of the project.
       parameters:
         - in: path
           name: projectId
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: login
+          description: Filter by login (case-insensitive search by login)
+          schema:
+            type: string
         - in: query
           name: sort
           description: Sort order

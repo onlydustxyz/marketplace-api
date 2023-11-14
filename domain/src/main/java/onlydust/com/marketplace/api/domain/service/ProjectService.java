@@ -112,24 +112,25 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ProjectContributorsLinkView> getContributors(UUID projectId,
+    public Page<ProjectContributorsLinkView> getContributors(UUID projectId, String login,
                                                              ProjectContributorsLinkView.SortBy sortBy,
                                                              SortDirection sortDirection,
                                                              Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
+        return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+    public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
+                                                                             UUID projectLeadId,
                                                                              ProjectContributorsLinkView.SortBy sortBy,
                                                                              SortDirection sortDirection,
-                                                                             UUID projectLeadId, Integer pageIndex,
+                                                                             Integer pageIndex,
                                                                              Integer pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, sortDirection, pageIndex,
+            return projectStoragePort.findContributorsForProjectLead(projectId, login, sortBy, sortDirection, pageIndex,
                     pageSize);
         } else {
-            return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
+            return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
         }
     }
 

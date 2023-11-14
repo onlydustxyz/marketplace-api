@@ -436,6 +436,65 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 ]
               }
             """;
+
+    private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD_LOGIN_LE = """
+            {
+                "totalPageNumber": 1,
+                "totalItemNumber": 3,
+                "hasMore": false,
+                "nextPageIndex": 0,
+                "contributors": [
+                  {
+                    "githubUserId": 5160414,
+                    "login": "haydencleary",
+                    "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                    "contributionCount": 27,
+                    "rewardCount": 0,
+                    "earned": {
+                      "totalAmount": 0,
+                      "details": null
+                    },
+                    "contributionToRewardCount": 27,
+                    "pullRequestToReward": 7,
+                    "issueToReward": 0,
+                    "codeReviewToReward": 20,
+                    "isRegistered": true
+                  },
+                  {
+                    "githubUserId": 10167015,
+                    "login": "lechinoix",
+                    "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                    "contributionCount": 36,
+                    "rewardCount": 0,
+                    "earned": {
+                      "totalAmount": 0,
+                      "details": null
+                    },
+                    "contributionToRewardCount": 36,
+                    "pullRequestToReward": 25,
+                    "issueToReward": 0,
+                    "codeReviewToReward": 11,
+                    "isRegistered": false
+                  },
+                  {
+                    "githubUserId": 10922658,
+                    "login": "alexbensimon",
+                    "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                    "contributionCount": 44,
+                    "rewardCount": 0,
+                    "earned": {
+                      "totalAmount": 0,
+                      "details": null
+                    },
+                    "contributionToRewardCount": 44,
+                    "pullRequestToReward": 32,
+                    "issueToReward": 0,
+                    "codeReviewToReward": 12,
+                    "isRegistered": true
+                  }
+                ]
+              }
+            """;
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS = """
             {
               "totalPageNumber": 1,
@@ -724,6 +783,65 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
               ]
             }
             """;
+
+    private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS_LOGIN_LE = """
+            {
+              "totalPageNumber": 1,
+              "totalItemNumber": 3,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "contributors": [
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "contributionCount": 27,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "contributionCount": 44,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                }
+              ]
+            }
+            """;
     private static final String GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES = """
             {
               "totalPageNumber": 9,
@@ -863,11 +981,14 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
             """;
 
 
-
     @Autowired
     HasuraUserHelper userHelper;
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
 
     @Test
     @Order(1)
@@ -885,6 +1006,25 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS);
+    }
+
+    @Test
+    @Order(1)
+    void should_find_project_contributors_as_anonymous_user_with_login_filter() {
+        // Given
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("login", "le",
+                                "pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_ANONYMOUS_LOGIN_LE);
     }
 
     @Test
@@ -936,10 +1076,26 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD);
     }
 
-    @Autowired
-    PaymentRequestRepository paymentRequestRepository;
-    @Autowired
-    CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    @Test
+    @Order(3)
+    void should_find_project_contributors_as_project_lead_with_login_filter() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("login", "le",
+                                "pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD_LOGIN_LE);
+    }
 
     @Test
     @Order(4)
@@ -1001,16 +1157,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
-                        .id(IgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
-                                .contributionId("1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13")
-                                .build())
+                .id(IgnoredContributionEntity.Id.builder()
+                        .projectId(projectId)
+                        .contributionId("1c1c1d320997eeba0fabfc25b583fb763f6649867b997a49dad16d5c52eebd13")
+                        .build())
                 .build());
         ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
-                        .id(IgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
-                                .contributionId("2884dc233c8512d062d7dd0b60d78d58e416349bf0a3e1feddff1183a01895e8")
-                                .build())
+                .id(IgnoredContributionEntity.Id.builder()
+                        .projectId(projectId)
+                        .contributionId("2884dc233c8512d062d7dd0b60d78d58e416349bf0a3e1feddff1183a01895e8")
+                        .build())
                 .build());
 
         // When

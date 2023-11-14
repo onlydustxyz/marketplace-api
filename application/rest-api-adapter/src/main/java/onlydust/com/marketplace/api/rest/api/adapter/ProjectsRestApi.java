@@ -127,20 +127,23 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId, Integer pageIndex,
-                                                                           Integer pageSize, String sort,
+    public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId,
+                                                                           Integer pageIndex,
+                                                                           Integer pageSize,
+                                                                           String login,
+                                                                           String sort,
                                                                            String direction) {
 
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
         final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
                 authenticationService.tryGetAuthenticatedUser()
-                        .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, sortBy,
-                                SortDirectionMapper.requestToDomain(direction),
-                                user.getId(), pageIndex, sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getContributors(projectId, sortBy,
-                                SortDirectionMapper.requestToDomain(direction), pageIndex,
-                                sanitizedPageSize));
+                        .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, login, user.getId(),
+                                sortBy, SortDirectionMapper.requestToDomain(direction),
+                                pageIndex, sanitizedPageSize))
+                        .orElseGet(() -> projectFacadePort.getContributors(projectId, login,
+                                sortBy, SortDirectionMapper.requestToDomain(direction),
+                                pageIndex, sanitizedPageSize));
         final ContributorsPageResponse contributorsPageResponse =
                 mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
                         pageIndex);

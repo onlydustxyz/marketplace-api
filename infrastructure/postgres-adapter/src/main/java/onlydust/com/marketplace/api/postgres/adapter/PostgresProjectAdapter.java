@@ -77,7 +77,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);
-        final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId());
+        final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
@@ -263,13 +263,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectContributorsLinkView> findContributors(UUID projectId,
+    public Page<ProjectContributorsLinkView> findContributors(UUID projectId, String login,
                                                               ProjectContributorsLinkView.SortBy sortBy,
                                                               SortDirection sortDirection,
                                                               int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, sortDirection,
+                customContributorRepository.getProjectContributorViewEntity(projectId, login, sortBy, sortDirection,
                                 pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
                         .toList();
@@ -282,13 +282,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId,
+    public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, String login,
                                                                             ProjectContributorsLinkView.SortBy sortBy,
                                                                             SortDirection sortDirection,
                                                                             int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.getProjectContributorCount(projectId);
+        final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, sortBy, sortDirection,
+                customContributorRepository.getProjectContributorViewEntity(projectId, login, sortBy, sortDirection,
                                 pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)
                         .toList();

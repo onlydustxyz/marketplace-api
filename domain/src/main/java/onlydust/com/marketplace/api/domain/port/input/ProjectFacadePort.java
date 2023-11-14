@@ -34,15 +34,17 @@ public interface ProjectFacadePort {
 
     URL saveLogoImage(InputStream imageInputStream);
 
-    Page<ProjectContributorsLinkView> getContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
+    Page<ProjectContributorsLinkView> getContributors(UUID projectId, String login,
+                                                      ProjectContributorsLinkView.SortBy sortBy,
                                                       SortDirection sortDirection,
                                                       Integer pageIndex,
                                                       Integer pageSize);
 
-    Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+    Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
+                                                                      UUID projectLeadId,
                                                                       ProjectContributorsLinkView.SortBy sortBy,
                                                                       SortDirection sortDirection,
-                                                                      UUID projectLeadId, Integer pageIndex,
+                                                                      Integer pageIndex,
                                                                       Integer pageSize);
 
     Page<ProjectRewardView> getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize,
