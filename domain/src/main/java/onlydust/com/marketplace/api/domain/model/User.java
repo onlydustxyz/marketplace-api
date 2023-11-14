@@ -21,6 +21,7 @@ public class User {
     Boolean hasValidPayoutInfos = true;
     @Builder.Default
     List<ProjectLedView> projectsLed = new ArrayList<>();
+    @Builder.Default
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
