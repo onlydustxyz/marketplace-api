@@ -120,7 +120,7 @@ public class MeRestApi implements MeApi {
 
         final MyRewardsPageResponse myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);
 
-        return myRewardsPageResponse.getHasMore() ?
+        return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ResponseEntity.ok(myRewardsPageResponse);
     }
@@ -171,7 +171,7 @@ public class MeRestApi implements MeApi {
                 contributedRepos,
                 contributions);
 
-        return contributionPageResponse.getHasMore() ?
+        return contributionPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
                 : ResponseEntity.ok(contributionPageResponse);
     }
@@ -193,7 +193,7 @@ public class MeRestApi implements MeApi {
         final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientId(rewardId,
                 authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
-        return rewardItemsPageResponse.getHasMore() ?
+        return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
     }

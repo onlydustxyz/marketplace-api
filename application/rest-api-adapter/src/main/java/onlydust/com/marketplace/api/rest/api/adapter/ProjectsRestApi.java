@@ -107,7 +107,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.getId(),
                 mapUpdateProjectCommandToDomain(projectId,
-                updateProjectRequest));
+                        updateProjectRequest));
         return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft()).projectSlug(projectIdAndSlug.getRight()));
     }
 
@@ -144,7 +144,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final ContributorsPageResponse contributorsPageResponse =
                 mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
                         pageIndex);
-        return contributorsPageResponse.getHasMore() ?
+        return contributorsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
                 ResponseEntity.ok(contributorsPageResponse);
     }
@@ -162,7 +162,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
         final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page);
 
-        return rewardsPageResponse.getHasMore() ?
+        return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
                 ResponseEntity.ok(rewardsPageResponse);
     }
@@ -211,7 +211,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final Page<RewardItemView> page = projectFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
-        return rewardItemsPageResponse.getHasMore() ?
+        return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
     }
@@ -237,8 +237,8 @@ public class ProjectsRestApi implements ProjectsApi {
                         authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search);
         final RewardableItemsPageResponse rewardableItemsPageResponse =
                 RewardableItemMapper.pageToResponse(sanitizedPageIndex,
-                rewardableItemsPage);
-        return rewardableItemsPageResponse.getHasMore() ?
+                        rewardableItemsPage);
+        return rewardableItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardableItemsPageResponse) :
                 ResponseEntity.ok(rewardableItemsPageResponse);
     }

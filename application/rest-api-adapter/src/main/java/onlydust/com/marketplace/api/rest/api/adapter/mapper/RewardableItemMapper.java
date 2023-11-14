@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.domain.view.RewardItemView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import java.util.List;
+
 import static java.util.Objects.isNull;
 
 public interface RewardableItemMapper {
@@ -19,9 +21,13 @@ public interface RewardableItemMapper {
         rewardableItemsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         rewardableItemsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex,
                 page.getTotalPageNumber()));
-        page.getContent().stream()
-                .map(RewardableItemMapper::itemToResponse)
-                .forEach(rewardableItemsPageResponse::addRewardItemsItem);
+        if (!page.getContent().isEmpty()) {
+            page.getContent().stream()
+                    .map(RewardableItemMapper::itemToResponse)
+                    .forEach(rewardableItemsPageResponse::addRewardableItemsItem);
+        } else {
+            rewardableItemsPageResponse.setRewardableItems(List.of());
+        }
         return rewardableItemsPageResponse;
     }
 

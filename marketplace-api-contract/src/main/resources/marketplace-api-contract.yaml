@@ -3421,7 +3421,7 @@ components:
         - totalItemNumber
         - nextPageIndex
       properties:
-        rewardItems:
+        rewardableItems:
           type: array
           items:
             $ref: '#/components/schemas/RewardableItemResponse'
