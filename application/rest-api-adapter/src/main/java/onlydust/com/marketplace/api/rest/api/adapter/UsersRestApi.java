@@ -50,7 +50,8 @@ public class UsersRestApi implements UsersApi {
     public ResponseEntity<ContributorSearchResponse> searchContributors(UUID projectId, List<Long> repoIds,
                                                                         String login,
                                                                         Integer maxInternalContributorCountToTriggerExternalSearch,
-                                                                        Integer maxInternalContributorCountToReturn) {
+                                                                        Integer maxInternalContributorCountToReturn,
+                                                                        Boolean externalSearchOnly) {
 
         if (projectId == null && repoIds == null && login == null) {
             throw OnlyDustException.badRequest("At least one of projectId, repoIds and login query param must be " +
@@ -64,7 +65,8 @@ public class UsersRestApi implements UsersApi {
                         maxInternalContributorCountToTriggerExternalSearch :
                         DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_TRIGGER_EXTERNAL_SEARCH,
                 maxInternalContributorCountToReturn != null ? maxInternalContributorCountToReturn :
-                        DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN);
+                        DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN,
+                Boolean.TRUE.equals(externalSearchOnly));
         return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
     }
 }

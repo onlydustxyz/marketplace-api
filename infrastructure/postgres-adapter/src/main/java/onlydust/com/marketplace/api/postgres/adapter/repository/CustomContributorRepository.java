@@ -2,13 +2,13 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
 import java.math.BigInteger;
@@ -45,8 +45,11 @@ public class CustomContributorRepository {
     protected static final String GET_CONTRIBUTOR_COUNT = """
                 select count(*)
                 from projects_contributors pc
+                join github_users gu on gu.id = pc.github_user_id
                 where pc.project_id = :projectId
+                  and gu.login ilike '%' || :login || '%'
             """;
+    @Language("PostgreSQL")
     protected static final String GET_CONTRIBUTORS_FOR_PROJECT = """
             select gu.id,
                    gu.login,
@@ -109,6 +112,7 @@ public class CustomContributorRepository {
                               left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'stark'
                               left join crypto_usd_quotes cuq_op on cuq_op.currency = 'op'
             where pc.project_id = :projectId
+              and gu.login ilike '%' || :login || '%'
             order by %order_by%
             offset :offset limit :limit
             """;
@@ -165,20 +169,22 @@ public class CustomContributorRepository {
                 .getResultList();
     }
 
-    public Integer getProjectContributorCount(UUID projectId) {
+    public Integer getProjectContributorCount(UUID projectId, String login) {
         final var query = entityManager
                 .createNativeQuery(GET_CONTRIBUTOR_COUNT)
-                .setParameter("projectId", projectId);
+                .setParameter("projectId", projectId)
+                .setParameter("login", login != null ? login : "");
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId,
+    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId, String login,
                                                                               ProjectContributorsLinkView.SortBy sortBy,
                                                                               SortDirection sortDirection,
                                                                               int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection),
                         ProjectContributorViewEntity.class)
                 .setParameter("projectId", projectId)
+                .setParameter("login", login != null ? login : "")
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList();

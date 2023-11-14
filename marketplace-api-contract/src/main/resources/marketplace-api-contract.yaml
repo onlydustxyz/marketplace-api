@@ -591,6 +591,13 @@ paths:
             Default value is 50.
           schema:
             type: integer
+        - in: query
+          name: externalSearchOnly
+          description: |
+            If true, only external search is performed.
+            Default value is false.
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'List of contributors'
@@ -925,13 +932,18 @@ paths:
       summary: Get all project contributors
       operationId: getProjectContributors
       description: |
-        Get the (soon to be paginated) list of all contributors of the project.
+        Get the paginated list of all contributors of the project.
       parameters:
         - in: path
           name: projectId
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: login
+          description: Filter by login (case-insensitive search by login)
+          schema:
+            type: string
         - in: query
           name: sort
           description: Sort order

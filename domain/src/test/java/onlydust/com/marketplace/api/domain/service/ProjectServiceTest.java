@@ -237,12 +237,13 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID()));
-        projectService.getContributorsForProjectLeadId(projectId, sortBy, sortDirection, projectLeadId, pageIndex,
+        projectService.getContributorsForProjectLeadId(projectId, null, projectLeadId, sortBy, sortDirection, pageIndex,
                 pageSize);
 
         // Then
-        verify(projectStoragePort, times(1)).findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
-        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, sortBy, sortDirection,
+        verify(projectStoragePort, times(1)).findContributors(projectId, null, sortBy, sortDirection, pageIndex,
+                pageSize);
+        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, null, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 
@@ -257,6 +258,7 @@ public class ProjectServiceTest {
                 mock(EventStoragePort.class), mock(ContributionStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
+        final String login = faker.name().username();
         final UUID projectLeadId = UUID.randomUUID();
         final int pageIndex = 1;
         final int pageSize = 1;
@@ -265,12 +267,14 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getContributorsForProjectLeadId(projectId, sortBy, sortDirection, projectLeadId, pageIndex,
+        projectService.getContributorsForProjectLeadId(projectId, login, projectLeadId, sortBy, sortDirection,
+                pageIndex,
                 pageSize);
 
         // Then
-        verify(projectStoragePort, times(0)).findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
-        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, sortBy, sortDirection,
+        verify(projectStoragePort, times(0)).findContributors(projectId, login, sortBy, sortDirection, pageIndex,
+                pageSize);
+        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, login, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 

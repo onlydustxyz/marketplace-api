@@ -30,18 +30,14 @@ public class ContributorService implements ContributorFacadePort {
     public Pair<List<Contributor>, List<Contributor>> searchContributors(final UUID projectId, final Set<Long> repoIds,
                                                                          final String login,
                                                                          int maxInternalContributorCountToTriggerExternalSearch,
-                                                                         int maxInternalContributorCountToReturn) {
+                                                                         int maxInternalContributorCountToReturn,
+                                                                         boolean externalSearchOnly) {
 
-        final Set<Long> searchInRepoIds = repoIds != null ? new HashSet<>(repoIds) : new HashSet<>();
-        if (projectId != null) {
-            searchInRepoIds.addAll(projectStorage.getProjectRepoIds(projectId));
-        }
-
-        final List<Contributor> internalContributors = searchInRepoIds.isEmpty() ? List.of() :
-                userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
+        final List<Contributor> internalContributors = externalSearchOnly ? List.of() :
+                searchInternalContributors(projectId, repoIds, login, maxInternalContributorCountToReturn);
 
         final List<Contributor> externalContributors =
-                internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch &&
+                (externalSearchOnly || internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch) &&
                 login != null && !login.isEmpty() ?
                         getExternalContributors(login) : List.of();
 
@@ -67,6 +63,17 @@ public class ContributorService implements ContributorFacadePort {
     @Override
     public List<GithubRepo> contributedRepos(Long contributorId, ContributionView.Filters filters) {
         return contributionStoragePort.listReposByContributor(contributorId, filters);
+    }
+
+    private List<Contributor> searchInternalContributors(UUID projectId, Set<Long> repoIds, String login,
+                                                         int maxInternalContributorCountToReturn) {
+        final Set<Long> searchInRepoIds = repoIds != null ? new HashSet<>(repoIds) : new HashSet<>();
+        if (projectId != null) {
+            searchInRepoIds.addAll(projectStorage.getProjectRepoIds(projectId));
+        }
+
+        return searchInRepoIds.isEmpty() ? List.of() :
+                userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
     }
 
     private List<Contributor> getExternalContributors(String login) {

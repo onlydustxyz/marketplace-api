@@ -15,7 +15,8 @@ import java.util.UUID;
 public interface ContributorFacadePort {
     Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, Set<Long> repoIds, String login,
                                                                   int maxInternalContributorCountToTriggerExternalSearch,
-                                                                  int maxInternalContributorCountToReturn);
+                                                                  int maxInternalContributorCountToReturn,
+                                                                  boolean externalSearchOnly);
 
     Page<ContributionView> contributions(Long contributorId,
                                          ContributionView.Filters filters,
