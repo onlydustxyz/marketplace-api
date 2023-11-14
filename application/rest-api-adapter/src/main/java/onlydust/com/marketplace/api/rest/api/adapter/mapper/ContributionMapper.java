@@ -3,15 +3,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
-
-import java.util.List;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 
@@ -34,13 +30,9 @@ public interface ContributionMapper {
 
 
     static ContributionPageResponse mapContributionPageResponse(Integer pageIndex,
-                                                                List<Project> contributedProjects,
-                                                                List<GithubRepo> contributedRepos,
                                                                 Page<ContributionView> contributions) {
 
         return new ContributionPageResponse()
-                .projects(contributedProjects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
-                .repos(contributedRepos.stream().map(GithubRepoMapper::mapRepoToShortResponse).toList())
                 .contributions(contributions.getContent().stream().map(ContributionMapper::mapContribution).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
                 .totalPageNumber(contributions.getTotalPageNumber())

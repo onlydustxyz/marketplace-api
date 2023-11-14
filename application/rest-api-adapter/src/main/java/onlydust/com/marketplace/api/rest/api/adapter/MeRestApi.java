@@ -13,10 +13,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -152,11 +149,6 @@ public class MeRestApi implements MeApi {
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
                 .build();
 
-        final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()
-                , filters);
-        final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.getGithubUserId(),
-                filters);
-
         final var contributions = contributorFacadePort.contributions(
                 authenticatedUser.getGithubUserId(),
                 filters,
@@ -167,14 +159,44 @@ public class MeRestApi implements MeApi {
 
         final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
                 sanitizedPageIndex,
-                contributedProjects,
-                contributedRepos,
                 contributions);
 
         return contributionPageResponse.getHasMore() ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
                 : ResponseEntity.ok(contributionPageResponse);
     }
+
+    @Override
+    public ResponseEntity<ContributedProjectsResponse> getMyContributedProjects(List<Long> repositories) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        final var filters = ContributionView.Filters.builder()
+                .repos(Optional.ofNullable(repositories).orElse(List.of()))
+                .build();
+
+        final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()
+                , filters);
+
+        return ResponseEntity.ok(new ContributedProjectsResponse()
+                .projects(contributedProjects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
+        );
+    }
+
+    public ResponseEntity<ContributedReposResponse> getMyContributedRepos(List<UUID> projects) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        final var filters = ContributionView.Filters.builder()
+                .projects(Optional.ofNullable(projects).orElse(List.of()))
+                .build();
+
+        final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.getGithubUserId(),
+                filters);
+
+        return ResponseEntity.ok(new ContributedReposResponse()
+                .repos(contributedRepos.stream().map(GithubRepoMapper::mapRepoToShortResponse).toList())
+        );
+    }
+
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
