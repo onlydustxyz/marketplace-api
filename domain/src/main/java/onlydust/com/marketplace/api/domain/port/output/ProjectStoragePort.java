@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
@@ -58,5 +59,10 @@ public interface ProjectStoragePort {
 
     Set<Long> getProjectRepoIds(UUID projectId);
 
+    Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                       ContributionType contributionType,
+                                                                                       Long githubUserid,
+                                                                                       int pageIndex, int pageSize,
+                                                                                       String search);
     String getProjectSlugById(UUID projectId);
 }

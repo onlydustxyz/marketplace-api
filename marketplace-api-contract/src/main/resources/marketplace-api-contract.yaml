@@ -1193,6 +1193,63 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/rewardable-items:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get rewardable contributions of a user within the project
+      operationId: getProjectRewardableContributions
+      description: |
+        Get rewardable contributions of a user on a given project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: githubUserId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - in: query
+          name: pageIndex
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            $ref: '#/components/schemas/RewardType'
+      responses:
+        "200":
+          description: 'Rewardable contributions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardableItemsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/projects/logos:
     post:
       security:
@@ -3379,6 +3436,74 @@ components:
           type: string
         authorGithubUrl:
           type: string
+
+    RewardableItemsPageResponse:
+      type: object
+      required:
+        - rewardItems
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        rewardableItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardableItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+    RewardableItemResponse:
+      type: object
+      required:
+        - title
+        - githubUrl
+        - createdAt
+        - repoName
+        - type
+        - status
+        - number
+        - id
+      properties:
+        number:
+          type: integer
+          format: int64
+        id:
+          type: string
+        title:
+          type: string
+        githubUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastUpdateAt:
+          type: string
+          format: date-time
+        repoName:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        commitsCount:
+          type: integer
+        userCommitsCount:
+          type: integer
+        commentsCount:
+          type: integer
+        codeReviewOutcome:
+          type: string
+          enum:
+            - APPROVED
+            - CHANGE_REQUESTED
+        status:
+          $ref: '#/components/schemas/GithubStatus'
 
     ReceiptType:
       type: string

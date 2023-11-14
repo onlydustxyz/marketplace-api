@@ -188,7 +188,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD_ITEMS, projectId, rewardId)))
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -205,7 +205,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "0")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -259,7 +259,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                             "nextPageIndex": 1
                         }""");
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "12")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
