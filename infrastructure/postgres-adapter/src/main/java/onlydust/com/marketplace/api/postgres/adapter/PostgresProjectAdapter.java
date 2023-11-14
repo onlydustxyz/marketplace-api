@@ -11,10 +11,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -52,6 +49,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomRewardRepository customRewardRepository;
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
+    private final RewardableItemRepository rewardableItemRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -365,7 +363,26 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                                               int pageIndex,
                                                                                               int pageSize,
                                                                                               String search) {
-        return null;
+        final String type = isNull(contributionType) ? null :
+                switch (contributionType) {
+                    case ISSUE -> RewardableItemViewEntity.ContributionType.ISSUE.name();
+                    case PULL_REQUEST -> RewardableItemViewEntity.ContributionType.PULL_REQUEST.name();
+                    case CODE_REVIEW -> RewardableItemViewEntity.ContributionType.CODE_REVIEW.name();
+                };
+        final List<RewardItemView> rewardItemViews =
+                rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid, type, search,
+                                PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
+                                pageSize)
+                        .stream()
+                        .map(RewardableItemMapper::itemToDomain)
+                        .toList();
+        final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid, type,
+                search);
+        return Page.<RewardItemView>builder()
+                .content(rewardItemViews)
+                .totalItemNumber(count.intValue())
+                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
+                .build();
     }
 
     @Override

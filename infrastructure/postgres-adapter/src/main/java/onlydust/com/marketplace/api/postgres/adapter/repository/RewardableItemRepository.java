@@ -63,7 +63,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    (select count(c.pull_request_id)
                     from github_pull_request_commits c
                     where c.pull_request_id = pull_request.id
-                      and c.author_id = 84864519)                                                                            user_commits_count,
+                      and c.author_id = :githubUserId)                                                                      user_commits_count,
                    issue.comments_count,
                    code_review.outcome                                                                                       cr_outcome
             from public.project_github_repos pgr
@@ -72,7 +72,57 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      left join get_issue issue on issue.id = c.issue_id
                      left join get_pr pull_request on pull_request.id = c.pull_request_id
                      left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
-            where pgr.project_id = '1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e'
-              and c.contributor_id = 84864519""", nativeQuery = true)
-    List<RewardableItemViewEntity> findByProjectIdGithubUserId(final @Param("projectId")UUID projectId,final @Param());
+            where pgr.project_id = :projectId
+              and c.contributor_id = :githubUserId
+              and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
+               and (coalesce(:search) is null
+                    or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
+                    or cast(coalesce(pull_request.number, issue.number, code_review.number) as text) ilike '%' || cast(:search as text) || '%'
+             order by coalesce(pull_request.start_date, issue.start_date,code_review.start_date) desc
+              offset :offset limit :limit
+              """, nativeQuery = true)
+    List<RewardableItemViewEntity> findByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
+                                                                  final @Param("githubUserId") Long githubUserId,
+                                                                  final @Param("contributionType") String contributionType,
+                                                                  final @Param("search") String search,
+                                                                  final @Param("offset") int offset,
+                                                                  final @Param("limit") int limit);
+
+
+    @Query(value = """
+                        with get_pr as (select gpr.number,
+                                   gpr.id,
+                                   gpr.title,
+                                   gpr.created_at                         start_date
+                            from indexer_exp.github_pull_requests gpr),
+                 get_issue as (select gi.number,
+                                      gi.id,
+                                      gi.title,
+                                      gi.created_at start_date
+                               from indexer_exp.github_issues gi),
+                 get_code_review as (select gpr.number,
+                                            gcr.id,
+                                            gpr.title,
+                                            gpr.created_at   start_date
+                                     from indexer_exp.github_code_reviews gcr
+                                              left join indexer_exp.github_pull_requests gpr
+                                                        on gpr.id = gcr.pull_request_id)
+            select count(c.id)
+            from public.project_github_repos pgr
+                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
+                     left join get_code_review code_review on code_review.id = c.code_review_id
+                     left join get_issue issue on issue.id = c.issue_id
+                     left join get_pr pull_request on pull_request.id = c.pull_request_id
+                     left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
+            where pgr.project_id = :projectId
+              and c.contributor_id = :githubUserId
+              and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
+               and (coalesce(:search) is null
+                    or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
+                    or cast(coalesce(pull_request.number, issue.number, code_review.number) as text) ilike '%' || cast(:search as text) || '%'
+              """, nativeQuery = true)
+    Long countByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
+                                         final @Param("githubUserId") Long githubUserId,
+                                         final @Param("contributionType") String contributionType,
+                                         final @Param("search") String search);
 }

@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticati
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
@@ -216,10 +217,12 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<RewardItemsPageResponse> getProjectRewardableContributions(UUID projectId, Long githubUserId,
-                                                                                     Integer pageIndex,
-                                                                                     Integer pageSize,
-                                                                                     String search, RewardType type) {
+    public ResponseEntity<RewardableItemsPageResponse> getProjectRewardableContributions(UUID projectId,
+                                                                                         Long githubUserId,
+                                                                                         Integer pageIndex,
+                                                                                         Integer pageSize,
+                                                                                         String search,
+                                                                                         RewardType type) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
@@ -232,11 +235,12 @@ public class ProjectsRestApi implements ProjectsApi {
                 projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
                         contributionType,
                         authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search);
-        final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex,
+        final RewardableItemsPageResponse rewardableItemsPageResponse =
+                RewardableItemMapper.pageToResponse(sanitizedPageIndex,
                 rewardableItemsPage);
-        return rewardItemsPageResponse.getHasMore() ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
-                ResponseEntity.ok(rewardItemsPageResponse);
+        return rewardableItemsPageResponse.getHasMore() ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardableItemsPageResponse) :
+                ResponseEntity.ok(rewardableItemsPageResponse);
     }
 
     @Override

@@ -31,7 +31,7 @@ public class RewardableItemViewEntity {
     Date completedAt;
     @Enumerated(EnumType.STRING)
     @Type(type = "contribution_type")
-    RewardItemViewEntity.ContributionType type;
+    RewardableItemViewEntity.ContributionType type;
     @Column(name = "status")
     String status;
     @Column(name = "number")
@@ -56,11 +56,11 @@ public class RewardableItemViewEntity {
     Boolean draft;
 
     public enum ContributionType {
-        issue, pull_request, code_review
+        ISSUE, PULL_REQUEST, CODE_REVIEW
     }
 
     public enum CodeReviewOutcome {
-        change_requested, approved
+        CHANGE_REQUESTED, APPROVED, DISMISSED, PENDING, COMMENTED
     }
 
 }

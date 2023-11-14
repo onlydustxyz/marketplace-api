@@ -1241,7 +1241,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RewardItemsPageResponse'
+                $ref: '#/components/schemas/RewardableItemsPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -3411,6 +3411,74 @@ components:
           type: string
         authorGithubUrl:
           type: string
+
+    RewardableItemsPageResponse:
+      type: object
+      required:
+        - rewardItems
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        rewardItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardableItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+    RewardableItemResponse:
+      type: object
+      required:
+        - title
+        - githubUrl
+        - createdAt
+        - repoName
+        - type
+        - status
+        - number
+        - id
+      properties:
+        number:
+          type: integer
+          format: int64
+        id:
+          type: string
+        title:
+          type: string
+        githubUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastUpdateAt:
+          type: string
+          format: date-time
+        repoName:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        commitsCount:
+          type: integer
+        userCommitsCount:
+          type: integer
+        commentsCount:
+          type: integer
+        codeReviewOutcome:
+          type: string
+          enum:
+            - APPROVED
+            - CHANGE_REQUESTED
+        status:
+          $ref: '#/components/schemas/GithubStatus'
 
     ReceiptType:
       type: string
