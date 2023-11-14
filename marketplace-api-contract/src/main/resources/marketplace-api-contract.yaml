@@ -2960,6 +2960,7 @@ components:
         - avatarUrl
         - hasSeenOnboardingWizard
         - hasAcceptedLatestTermsAndConditions
+        - projectLedIds
       properties:
         id:
           type: string
@@ -2980,7 +2981,21 @@ components:
         hasValidPayoutInfos:
           type: boolean
           description: False if the user has invalid payout information
-
+        projectLedIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLedIdAndSlugResponse'
+    ProjectLedIdAndSlugResponse:
+      type: object
+      required:
+        - id
+        - slug
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
     PatchMeContract:
       type: object
       properties:

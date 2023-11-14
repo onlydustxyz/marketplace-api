@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
@@ -48,6 +49,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final WalletRepository walletRepository;
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
+    private final ProjectLedIdRepository projectLedIdRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,7 +63,11 @@ public class PostgresUserAdapter implements UserStoragePort {
         }
         // Fallback on hasura auth user
         Optional<RegisteredUserViewEntity> hasuraUser = registeredUserRepository.findByGithubId(githubId);
-        return hasuraUser.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
+        return hasuraUser.map(u -> {
+            final List<ProjectLedIdViewEntity> projectLedIdsByUserId =
+                    projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
+            return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(), projectLedIdsByUserId);
+        });
     }
 
     @Override
