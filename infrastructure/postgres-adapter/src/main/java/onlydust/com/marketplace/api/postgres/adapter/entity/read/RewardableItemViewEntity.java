@@ -19,7 +19,6 @@ import java.util.Date;
 @Entity
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "github_code_review_outcome", typeClass = PostgreSQLEnumType.class)
-@Table(name = "project_github_repos", schema = "public")
 public class RewardableItemViewEntity {
 
     @Id
