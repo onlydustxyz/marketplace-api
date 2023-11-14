@@ -232,8 +232,13 @@ public interface UserMapper {
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
         getMeResponse.setHasValidPayoutInfos(authenticatedUser.getHasValidPayoutInfos());
-        getMeResponse.setProjectLedIds(authenticatedUser.getProjectLedIdAndSlugList()
-                .stream().map(idAndSlug -> new ProjectLedIdAndSlugResponse().id(idAndSlug.getLeft()).slug(idAndSlug.getRight()))
+        getMeResponse.setProjectsLed(authenticatedUser.getProjectsLed()
+                .stream().map(projectLedView -> new ProjectLedShortResponse()
+                        .id(projectLedView.getId())
+                        .slug(projectLedView.getSlug())
+                        .name(projectLedView.getName())
+                        .logoUrl(projectLedView.getLogoUrl())
+                )
                 .toList());
         return getMeResponse;
     }

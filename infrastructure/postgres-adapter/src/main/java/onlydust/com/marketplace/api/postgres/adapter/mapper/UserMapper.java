@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.api.domain.view.ProjectLedView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
@@ -15,7 +16,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Alloc
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -76,9 +76,13 @@ public interface UserMapper {
                                                      && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
                                          && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
-                .projectLedIdAndSlugList(projectLedIdViewEntities.stream()
-                        .map(projectLedIdViewEntity -> Pair.of(projectLedIdViewEntity.getId().getProjectId(),
-                                projectLedIdViewEntity.getProjectSlug())).toList())
+                .projectsLed(projectLedIdViewEntities.stream()
+                        .map(projectLedIdViewEntity -> ProjectLedView.builder()
+                                .name(projectLedIdViewEntity.getName())
+                                .logoUrl(projectLedIdViewEntity.getLogoUrl())
+                                .slug(projectLedIdViewEntity.getProjectSlug())
+                                .id(projectLedIdViewEntity.getId().getProjectId())
+                                .build()).toList())
                 .build();
     }
 

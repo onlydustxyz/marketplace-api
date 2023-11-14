@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserPayoutInfoRepository;
 import org.junit.jupiter.api.Test;
@@ -256,11 +258,16 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isNotFound();
     }
 
-    @Test
-    void should_return_project_led_ids_and_slugs() {
-        // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+    @Autowired
+    ProjectLeadRepository projectLeadRepository;
 
+    @Test
+    void should_return_projects_led() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        projectLeadRepository.save(new ProjectLeadEntity(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                pierre.user().getId()));
         // When
         client.get()
                 .uri(ME_GET)
@@ -270,7 +277,14 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectLedIds[0].id").isEqualTo("f39b827f-df73-498c-8853-99bc3f562723")
-                .jsonPath("$.projectLedIds[0].slug").isEqualTo("qa-new-contributions");
+                .jsonPath("$.projectsLed[0].id").isEqualTo("f39b827f-df73-498c-8853-99bc3f562723")
+                .jsonPath("$.projectsLed[0].name").isEqualTo("QA new contributions")
+                .jsonPath("$.projectsLed[0].logoUrl").isEqualTo(null)
+                .jsonPath("$.projectsLed[0].slug").isEqualTo("qa-new-contributions")
+                .jsonPath("$.projectsLed[1].id").isEqualTo("7d04163c-4187-4313-8066-61504d34fc56")
+                .jsonPath("$.projectsLed[1].name").isEqualTo("Bretzel")
+                .jsonPath("$.projectsLed[1].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
+                                                                ".com/5003677688814069549.png")
+                .jsonPath("$.projectsLed[1].slug").isEqualTo("bretzel");
     }
 }

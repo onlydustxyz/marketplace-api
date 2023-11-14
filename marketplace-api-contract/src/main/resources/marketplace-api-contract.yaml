@@ -2981,20 +2981,25 @@ components:
         hasValidPayoutInfos:
           type: boolean
           description: False if the user has invalid payout information
-        projectLedIds:
+        projectsLed:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectLedIdAndSlugResponse'
-    ProjectLedIdAndSlugResponse:
+            $ref: '#/components/schemas/ProjectLedShortResponse'
+    ProjectLedShortResponse:
       type: object
       required:
         - id
         - slug
+        - name
       properties:
         id:
           type: string
           format: uuid
         slug:
+          type: string
+        name:
+          type: string
+        logoUrl:
           type: string
     PatchMeContract:
       type: object

@@ -19,6 +19,8 @@ public class ProjectLedIdViewEntity {
     @EmbeddedId
     Id id;
     String projectSlug;
+    String logoUrl;
+    String name;
 
     @Embeddable
     @Builder
