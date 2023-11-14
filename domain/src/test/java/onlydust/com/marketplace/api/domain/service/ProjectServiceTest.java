@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -525,6 +526,74 @@ public class ProjectServiceTest {
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewardable items on their projects", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_creating_rewardable_issue_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand.builder()
+                    .projectId(projectId)
+                    .projectLeadId(projectLeadId)
+                    .build());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can create rewardable issue on their projects",
+                onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_creating_rewardable_issue_given_a_valid_project_lead_and_invalid_github_repo_id() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final Long githubRepoId = 1L;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+        when(projectStoragePort.getProjectRepoIds(projectId))
+                .thenReturn(Set.of(2L, 3L));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand.builder()
+                    .projectId(projectId)
+                    .projectLeadId(projectLeadId)
+                    .githubRepoId(githubRepoId)
+                    .build());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Rewardable issue can only be created on repos linked to this project",
+                onlyDustException.getMessage());
     }
 
 

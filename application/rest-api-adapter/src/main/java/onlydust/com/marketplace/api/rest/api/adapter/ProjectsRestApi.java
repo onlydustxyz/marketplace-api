@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
@@ -17,10 +18,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardableItemMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -269,5 +267,21 @@ public class ProjectsRestApi implements ProjectsApi {
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<CreateIssueResponse> postProjectRewardableIssue(UUID projectId,
+                                                                          CreateIssueRequest createIssueRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final CreatedAndClosedIssueView issue = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
+                CreateAndCloseIssueCommand.builder()
+                        .projectId(projectId)
+                        .projectLeadId(authenticatedUser.getId())
+                        .githubRepoId(createIssueRequest.getGithubRepoId())
+                        .title(createIssueRequest.getTitle())
+                        .description(createIssueRequest.getDescription())
+                        .build()
+        );
+        return ResponseEntity.ok(IssueMapper.toResponse(issue));
     }
 }

@@ -186,4 +186,18 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
         }
     }
+
+    @Override
+    public CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand) {
+        if (permissionService.isUserProjectLead(createAndCloseIssueCommand.getProjectId(),
+                createAndCloseIssueCommand.getProjectLeadId())) {
+            if (permissionService.isRepoLinkedToProject(createAndCloseIssueCommand.getProjectId(),createAndCloseIssueCommand.getGithubRepoId())){
+                return null;
+            }else {
+                throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this project");
+            }
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
+        }
+    }
 }
