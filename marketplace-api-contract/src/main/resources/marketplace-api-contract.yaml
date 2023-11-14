@@ -1917,7 +1917,11 @@ components:
       required:
         - contributors
       properties:
-        contributors:
+        internalContributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorSearchItemResponse'
+        externalContributors:
           type: array
           items:
             $ref: '#/components/schemas/ContributorSearchItemResponse'

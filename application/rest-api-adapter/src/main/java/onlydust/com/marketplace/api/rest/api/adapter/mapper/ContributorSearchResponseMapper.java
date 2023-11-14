@@ -5,16 +5,20 @@ import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ContributorSearchResponseMapper {
     public static ContributorSearchResponse of(List<Contributor> internalContributors,
                                                List<Contributor> externalContributors) {
         return new ContributorSearchResponse()
-                .contributors(Stream.concat(
-                        internalContributors.stream().map(ContributorSearchResponseMapper::of),
-                        externalContributors.stream().map(ContributorSearchResponseMapper::of)
-                ).distinct().toList());
+                .internalContributors(
+                        internalContributors.stream()
+                                .map(ContributorSearchResponseMapper::of).distinct().toList()
+                )
+                .externalContributors(
+                        externalContributors.stream()
+                                .filter(contributor -> !internalContributors.contains(contributor))
+                                .map(ContributorSearchResponseMapper::of).distinct().toList()
+                );
     }
 
     static ContributorSearchItemResponse of(Contributor contributor) {

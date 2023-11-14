@@ -16,13 +16,15 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     final static UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"); // kaaper
     final static String PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE = """
             {
-              "contributors": [
+              "internalContributors": [
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                   "isRegistered": true
-                },
+                }
+              ],
+              "externalContributors": [
                 {
                   "githubUserId": 31220,
                   "login": "antho",
@@ -56,6 +58,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
               ]
             }
             """;
+
     final Long githubUserId = faker.number().randomNumber();
     final String avatarUrl = faker.internet().avatar();
 
@@ -84,7 +87,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody().json(PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE);
+                .expectBody().consumeWith(System.out::println)
+                .json(PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE);
     }
 
     @Test
@@ -95,7 +99,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contributors.length()").isEqualTo(17);
+                .jsonPath("$.internalContributors.length()").isEqualTo(17)
+                .jsonPath("$.externalContributors.length()").isEqualTo(0);
     }
 
     @Test
@@ -106,7 +111,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contributors.length()").isEqualTo(21);
+                .jsonPath("$.internalContributors.length()").isEqualTo(21)
+                .jsonPath("$.externalContributors.length()").isEqualTo(0);
     }
 
     @Test
@@ -117,7 +123,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contributors.length()").isEqualTo(5);
+                .jsonPath("$.internalContributors.length()").isEqualTo(0)
+                .jsonPath("$.externalContributors.length()").isEqualTo(5);
     }
 
     @Test
