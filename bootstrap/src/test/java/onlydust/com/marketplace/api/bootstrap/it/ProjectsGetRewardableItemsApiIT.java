@@ -954,8 +954,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                              }
                            ],
                            "hasMore": true,
-                           "totalPageNumber": 14,
-                           "totalItemNumber": 138,
+                           "totalPageNumber": 27,
+                           "totalItemNumber": 133,
                            "nextPageIndex": 1
                          }
                          """);
