@@ -67,4 +67,8 @@ public interface ProjectFacadePort {
                                                                                     Boolean includeIgnoredItems);
 
     RewardableItemView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
+
+    RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl);
+
+    RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl);
 }

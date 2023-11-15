@@ -12,6 +12,7 @@ public interface RewardableItemMapper {
     static RewardableItemView itemToDomain(RewardableItemViewEntity rewardableItemViewEntity) {
         return RewardableItemView.builder()
                 .id(rewardableItemViewEntity.getId())
+                .contributionId(rewardableItemViewEntity.getContributionId())
                 .createdAt(rewardableItemViewEntity.getCreatedAt())
                 .title(rewardableItemViewEntity.getTitle())
                 .githubUrl(rewardableItemViewEntity.getGithubUrl())

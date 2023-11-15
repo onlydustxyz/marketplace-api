@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface RewardableItemRepository extends JpaRepository<RewardableItemViewEntity, String> {
@@ -44,8 +45,9 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                               left join indexer_exp.github_pull_requests gpr
                                                         on gpr.id = gcr.pull_request_id)
 
-            select c.id,
+            select c.id as contribution_id,
                    c.type,
+                   coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text)) id,
                    coalesce(cast(pull_request.status as text), cast(issue.status as text), cast(code_review.status as text)) status,
                    false                                                                                                     draft,
                    coalesce(pull_request.number, issue.number, code_review.number)                                           number,
@@ -129,4 +131,82 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                          final @Param("contributionType") String contributionType,
                                          final @Param("search") String search,
                                          final @Param("includeIgnoredItems") boolean includeIgnoredItems);
+
+    @Query(value = """
+            with get_issue as (select gi.number,
+                                      gi.id,
+                                      gi.status,
+                                      gi.html_url,
+                                      gi.title,
+                                      gi.created_at start_date,
+                                      gi.closed_at  end_date,
+                                      gi.comments_count,
+                                      repo.name repo_name,
+                                      ga.login  repo_owner
+                               from indexer_exp.github_issues gi
+                               join indexer_exp.github_repos repo on repo.id = gi.repo_id
+                               join indexer_exp.github_accounts ga on ga.id = repo.owner_id)
+            select issue.id,
+                   NULL as contribution_id,
+                   'ISSUE' as type,
+                   cast(issue.status as text) status,
+                   false                      draft,
+                   issue.number,
+                   issue.html_url,
+                   issue.title,
+                   issue.repo_name,
+                   issue.start_date,
+                   issue.end_date,
+                   issue.html_url,
+                   NULL as                    commits_count,
+                   NULL as                    user_commits_count,
+                   issue.comments_count,
+                   NULL as                    cr_outcome
+            from get_issue issue
+            where issue.repo_owner = :repoOwner
+                and issue.repo_name = :repoName
+                and issue.number = :issueNumber
+              """, nativeQuery = true)
+    Optional<RewardableItemViewEntity> findRewardableIssue(String repoOwner, String repoName, long issueNumber);
+
+    @Query(value = """
+            with get_pr as (select gpr.number,
+                                   gpr.id,
+                                   gpr.html_url,
+                                   gpr.title,
+                                   gpr.status,
+            --                        gpr.draft,
+                                   gpr.created_at                         start_date,
+                                   coalesce(gpr.closed_at, gpr.merged_at) end_date,
+                                   (select count(c.pull_request_id)
+                                    from github_pull_request_commits c
+                                    where c.pull_request_id = gpr.id)     commits_count,
+                                   repo.name repo_name,
+                                   ga.login  repo_owner
+                            from indexer_exp.github_pull_requests gpr
+                               join indexer_exp.github_repos repo on repo.id = gpr.repo_id
+                               join indexer_exp.github_accounts ga on ga.id = repo.owner_id)
+            select pr.id,
+                   NULL as contribution_id,
+                   'PULL_REQUEST' as type,
+                   cast(pr.status as text) status,
+                   false                   draft,
+                   pr.number,
+                   pr.html_url,
+                   pr.title,
+                   pr.repo_name,
+                   pr.start_date,
+                   pr.end_date,
+                   pr.html_url,
+                   pr.commits_count,
+                   NULL as                  user_commits_count,
+                   NULL as                  comments_count,
+                   NULL as                  cr_outcome
+            from get_pr pr
+            where pr.repo_owner = :repoOwner
+                and pr.repo_name = :repoName
+                and pr.number = :pullRequestNumber
+              """, nativeQuery = true)
+    Optional<RewardableItemViewEntity> findRewardablePullRequest(String repoOwner, String repoName,
+                                                                 long pullRequestNumber);
 }

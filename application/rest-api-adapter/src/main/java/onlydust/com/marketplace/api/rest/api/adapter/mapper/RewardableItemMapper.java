@@ -34,6 +34,7 @@ public interface RewardableItemMapper {
     static RewardableItemResponse itemToResponse(final RewardableItemView view) {
         return new RewardableItemResponse()
                 .id(view.getId())
+                .contributionId(view.getContributionId())
                 .type(switch (view.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;

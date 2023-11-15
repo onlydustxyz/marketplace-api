@@ -3357,7 +3357,6 @@ components:
         - longDescription
         - moreInfo
         - isLookingForContributors
-        - logoUrl
       properties:
         name:
           type: string
@@ -3703,8 +3702,13 @@ components:
         number:
           type: integer
           format: int64
+          description: Either the issue number, the pull request number or the code review's pull request number
         id:
           type: string
+          description: Either the issue id, the pull request id or the code review id
+        contributionId:
+          type: string
+          description: Id of the contribution (if any) related to this rewardable item.
         title:
           type: string
         githubUrl:

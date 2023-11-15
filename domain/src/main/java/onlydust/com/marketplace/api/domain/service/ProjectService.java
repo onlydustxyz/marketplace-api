@@ -15,11 +15,17 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class ProjectService implements ProjectFacadePort {
+
+    private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
+            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)");
+    private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
+            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)");
 
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
@@ -208,5 +214,39 @@ public class ProjectService implements ProjectFacadePort {
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
         }
+    }
+
+    @Override
+    public RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can add other issues as rewardable items");
+        }
+        final var matcher = ISSUE_URL_REGEX.matcher(issueUrl);
+        if (!matcher.matches()) {
+            throw OnlyDustException.badRequest("Invalid issue url '%s'".formatted(issueUrl));
+        }
+        final var repoOwner = matcher.group(1);
+        final var repoName = matcher.group(2);
+        final var issueNumber = Long.parseLong(matcher.group(3));
+
+        indexerPort.indexIssue(repoOwner, repoName, issueNumber);
+        return projectStoragePort.getRewardableIssue(repoOwner, repoName, issueNumber);
+    }
+
+    @Override
+    public RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can add other pull requests as rewardable items");
+        }
+        final var matcher = PULL_REQUEST_URL_REGEX.matcher(pullRequestUrl);
+        if (!matcher.matches()) {
+            throw OnlyDustException.badRequest("Invalid pull request url '%s'".formatted(pullRequestUrl));
+        }
+        final var repoOwner = matcher.group(1);
+        final var repoName = matcher.group(2);
+        final var pullRequestNumber = Long.parseLong(matcher.group(3));
+
+        indexerPort.indexPullRequest(repoOwner, repoName, pullRequestNumber);
+        return projectStoragePort.getRewardablePullRequest(repoOwner, repoName, pullRequestNumber);
     }
 }

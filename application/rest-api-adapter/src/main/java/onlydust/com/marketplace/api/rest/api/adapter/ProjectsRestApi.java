@@ -281,15 +281,20 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardableItemResponse> addRewardableOtherIssue(UUID projectId,
                                                                           AddOtherIssueRequest addOtherIssueRequest) {
-
-        return null;//TODO
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final RewardableItemView issue = projectFacadePort.addRewardableIssue(projectId, authenticatedUser.getId(),
+                addOtherIssueRequest.getGithubIssueHtmlUrl());
+        return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
 
     @Override
     public ResponseEntity<RewardableItemResponse> addRewardableOtherPullRequest(UUID projectId,
                                                                                 AddOtherPullRequestRequest addOtherPullRequestRequest) {
-
-        return null;//TODO
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final RewardableItemView pullRequest = projectFacadePort.addRewardablePullRequest(projectId,
+                authenticatedUser.getId(),
+                addOtherPullRequestRequest.getGithubPullRequestHtmlUrl());
+        return ResponseEntity.ok(RewardableItemMapper.itemToResponse(pullRequest));
     }
 
     @Override

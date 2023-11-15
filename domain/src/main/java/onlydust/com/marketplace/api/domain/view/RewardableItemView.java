@@ -11,6 +11,7 @@ import java.util.Date;
 @Data
 public class RewardableItemView {
     String id;
+    String contributionId;
     ContributionType type;
     RewardItemStatus status;
     Date createdAt;

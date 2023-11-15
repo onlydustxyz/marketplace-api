@@ -74,6 +74,23 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .getKey();
     }
 
+    @Override
+    public RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber) {
+        return rewardableItemRepository.findRewardableIssue(repoOwner, repoName, issueNumber)
+                .map(RewardableItemMapper::itemToDomain)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Issue %s/%s#%d not found", repoOwner, repoName,
+                        issueNumber)));
+    }
+
+    @Override
+    public RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber) {
+        return rewardableItemRepository.findRewardablePullRequest(repoOwner, repoName, pullRequestNumber)
+                .map(RewardableItemMapper::itemToDomain)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Pull request %s/%s#%d not found", repoOwner,
+                        repoName,
+                        pullRequestNumber)));
+    }
+
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);

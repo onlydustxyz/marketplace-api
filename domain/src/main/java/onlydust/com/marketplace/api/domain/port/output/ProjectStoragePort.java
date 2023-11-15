@@ -68,4 +68,8 @@ public interface ProjectStoragePort {
                                                                                        Boolean includeIgnoredItems);
 
     String getProjectSlugById(UUID projectId);
+
+    RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
+
+    RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 }

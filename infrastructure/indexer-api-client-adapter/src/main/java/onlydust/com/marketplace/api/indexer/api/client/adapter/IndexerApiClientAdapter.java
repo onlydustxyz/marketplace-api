@@ -23,11 +23,13 @@ public class IndexerApiClientAdapter implements IndexerPort {
 
     @Override
     public void indexPullRequest(String repoOwner, String repoName, Long pullRequestNumber) {
-        //TODO
+        httpClient.sendRequest("/api/v1/repos/%s/%s/pull-requests/%d".formatted(repoOwner, repoName, pullRequestNumber),
+                HttpMethod.PUT, null, Void.class);
     }
 
     @Override
     public void indexIssue(String repoOwner, String repoName, Long issueNumber) {
-        //TODO
+        httpClient.sendRequest("/api/v1/repos/%s/%s/issues/%d".formatted(repoOwner, repoName, issueNumber),
+                HttpMethod.PUT, null, Void.class);
     }
 }

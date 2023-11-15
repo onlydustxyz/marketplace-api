@@ -19,7 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @ActiveProfiles({"hasura_auth"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
+public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApiIT {
 
     private static final String CREATE_ISSUE_RESPONSE_JSON = """
             {

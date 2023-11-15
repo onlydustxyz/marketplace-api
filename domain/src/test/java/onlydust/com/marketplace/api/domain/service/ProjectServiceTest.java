@@ -671,5 +671,120 @@ public class ProjectServiceTest {
         verify(dustyBotStoragePort, times(1)).closeIssue(githubRepoOwner, githubRepoName, issueNumber);
     }
 
+    @Test
+    void should_add_rewardable_issue() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort,
+                mock(ContributionStoragePort.class));
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final String githubRepoOwner = faker.name().username();
+        final String githubRepoName = faker.pokemon().name();
+        final Long issueNumber = 1234L;
 
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+        when(projectStoragePort.getRewardableIssue(githubRepoOwner, githubRepoName, issueNumber))
+                .thenReturn(RewardableItemView.builder().number(issueNumber).build());
+
+        projectService.addRewardableIssue(projectId, projectLeadId, "https://github.com/%s/%s/issues/%d".formatted(
+                githubRepoOwner, githubRepoName, issueNumber));
+
+        // Then
+        verify(indexerPort, times(1)).indexIssue(githubRepoOwner, githubRepoName, issueNumber);
+    }
+
+    @Test
+    void should_reject_invalid_issue_url() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort,
+                mock(ContributionStoragePort.class));
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final String githubRepoOwner = faker.name().username();
+        final String githubRepoName = faker.pokemon().name();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+
+        assertThatThrownBy(() -> projectService.addRewardableIssue(projectId,
+                projectLeadId,
+                "https://github.com/%s/%s/issues".formatted(githubRepoOwner, githubRepoName)))
+                .isInstanceOf(OnlyDustException.class);
+
+        // Then
+        verify(indexerPort, never()).indexIssue(anyString(), anyString(), anyLong());
+        verify(projectStoragePort, never()).getRewardableIssue(anyString(), anyString(), anyLong());
+    }
+
+
+    @Test
+    void should_add_rewardable_pull_request() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort,
+                mock(ContributionStoragePort.class));
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final String githubRepoOwner = faker.name().username();
+        final String githubRepoName = faker.pokemon().name();
+        final Long pullRequestNumber = 1234L;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+        when(projectStoragePort.getRewardablePullRequest(githubRepoOwner, githubRepoName, pullRequestNumber))
+                .thenReturn(RewardableItemView.builder().number(pullRequestNumber).build());
+
+        projectService.addRewardablePullRequest(projectId, projectLeadId, "https://github.com/%s/%s/pull/%d".formatted(
+                githubRepoOwner, githubRepoName, pullRequestNumber));
+
+        // Then
+        verify(indexerPort, times(1)).indexPullRequest(githubRepoOwner, githubRepoName, pullRequestNumber);
+    }
+
+    @Test
+    void should_reject_invalid_pull_request_url() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort,
+                mock(ContributionStoragePort.class));
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final String githubRepoOwner = faker.name().username();
+        final String githubRepoName = faker.pokemon().name();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+
+        assertThatThrownBy(() -> projectService.addRewardablePullRequest(projectId,
+                projectLeadId,
+                "https://github.com/%s/%s/pull".formatted(githubRepoOwner, githubRepoName)))
+                .isInstanceOf(OnlyDustException.class);
+
+        // Then
+        verify(indexerPort, never()).indexPullRequest(anyString(), anyString(), anyLong());
+        verify(projectStoragePort, never()).getRewardablePullRequest(anyString(), anyString(), anyLong());
+    }
 }
