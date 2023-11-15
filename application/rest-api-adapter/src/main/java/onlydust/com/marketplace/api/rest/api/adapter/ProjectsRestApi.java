@@ -278,9 +278,10 @@ public class ProjectsRestApi implements ProjectsApi {
                         .projectId(projectId)
                         .projectLeadId(authenticatedUser.getId())
                         .githubRepoId(createIssueRequest.getGithubRepoId())
+                        .githubRepoName(createIssueRequest.getGithubRepoName())
                         .title(createIssueRequest.getTitle())
                         .description(createIssueRequest.getDescription())
-                        .githubRepoOwnerName(createIssueRequest.getOwnerName())
+                        .githubRepoOwnerName(createIssueRequest.getGithubOwnerName())
                         .build()
         );
         return ResponseEntity.ok(IssueMapper.toResponse(issue));

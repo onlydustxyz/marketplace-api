@@ -57,7 +57,9 @@ public class GithubHttpClient {
         try {
             final HttpResponse<byte[]> httpResponse =
                     httpClient.send(HttpRequest.newBuilder().uri(buildURI(path)).headers("Authorization",
-                            "Bearer " + config.personalAccessToken).POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody))).build(), HttpResponse.BodyHandlers.ofByteArray());
+                            "Bearer " + config.personalAccessToken)
+                            .POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
+                            .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
                 case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
                 case 403, 404 -> Optional.empty();

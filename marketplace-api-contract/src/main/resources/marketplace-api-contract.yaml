@@ -3580,32 +3580,28 @@ components:
     CreateIssueRequest:
       type: object
       required:
-        - projectId
         - githubRepoId
+        - githubRepoName
         - title
         - description
-        - ownerName
+        - githubOwnerName
       properties:
-        projectId:
-          type: string
-          format: uuid
         githubRepoId:
           type: integer
           format: int64
+        githubRepoName:
+          type: string
         title:
           type: string
         description:
           type: string
-        ownerName:
+        githubOwnerName:
           type: string
 
     CreateIssueResponse:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
-        repoId:
           type: integer
           format: int64
         number:

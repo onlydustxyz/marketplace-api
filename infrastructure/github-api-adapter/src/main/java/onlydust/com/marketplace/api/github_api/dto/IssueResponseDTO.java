@@ -1,12 +1,16 @@
 package onlydust.com.marketplace.api.github_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 import onlydust.com.marketplace.api.domain.view.CreatedAndClosedIssueView;
 
 import java.util.Date;
 
-@Data
+@Value
+@NoArgsConstructor(force = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueResponseDTO {
     @JsonProperty("created_at")
     Date createdAt;
@@ -26,7 +30,7 @@ public class IssueResponseDTO {
 
 
     public enum State {
-        open, close
+        open, closed
     }
 
     public enum StateReason {
@@ -41,15 +45,17 @@ public class IssueResponseDTO {
                 .id(this.id)
                 .commentsCount(this.comments)
                 .repoName(repoName)
+                .number(this.number)
                 .htmlUrl(this.htmlUrl)
                 .status(this.toStatus())
+                .title(this.title)
                 .build();
     }
 
     private CreatedAndClosedIssueView.Status toStatus() {
         return switch (this.state) {
             case open -> CreatedAndClosedIssueView.Status.OPEN;
-            case close -> switch (this.stateReason) {
+            case closed -> switch (this.stateReason) {
                 case not_planned -> CreatedAndClosedIssueView.Status.CANCELLED;
                 default -> CreatedAndClosedIssueView.Status.CLOSED;
             };

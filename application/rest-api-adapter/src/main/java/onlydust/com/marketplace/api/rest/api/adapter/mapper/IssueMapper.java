@@ -14,10 +14,10 @@ public interface IssueMapper {
         createIssueResponse.setCloseAt(DateMapper.toZoneDateTime(view.getClosedAt()));
         createIssueResponse.setId(view.getId());
         createIssueResponse.setNumber(view.getNumber());
-        createIssueResponse.setRepoId(view.getRepoId());
         createIssueResponse.setTitle(view.getTitle());
         createIssueResponse.setCommentsCount(view.getCommentsCount());
         createIssueResponse.setHtmlUrl(view.getHtmlUrl());
+        createIssueResponse.setRepoName(view.getRepoName());
         createIssueResponse.setStatus(isNull(view.getStatus()) ? null : switch (view.getStatus()) {
             case OPEN -> CreateIssueResponse.StatusEnum.OPEN;
             case CANCELLED -> CreateIssueResponse.StatusEnum.CANCELED;
