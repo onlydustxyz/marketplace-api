@@ -35,7 +35,8 @@ public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
                           "githubRepoId": 1,
                           "title": "test",
                           "description": "test",
-                          "ownerName": "test"
+                          "githubOwnerName": "test",
+                          "githubRepoName": "test"
                         }
                         """, UUID.randomUUID()))
                 // Then
@@ -57,7 +58,8 @@ public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
                           "githubRepoId": 1,
                           "title": "test",
                           "description": "test",
-                          "ownerName": "test"
+                          "githubOwnerName": "test",
+                          "githubRepoName": "test"
                         }
                         """, projectId)).header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -81,7 +83,8 @@ public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
                           "githubRepoId": 554756922,
                           "title": "test",
                           "description": "test",
-                          "ownerName": "test"
+                          "githubOwnerName": "test",
+                          "githubRepoName": "test"
                         }
                         """, projectId)).header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
