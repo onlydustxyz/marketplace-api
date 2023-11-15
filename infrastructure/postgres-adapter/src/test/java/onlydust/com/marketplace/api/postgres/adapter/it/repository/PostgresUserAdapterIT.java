@@ -38,7 +38,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .loginAtSignup(faker.name().name())
                 .avatarUrlAtSignup(faker.internet().avatar())
                 .isAdmin(true)
@@ -71,7 +71,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .loginAtSignup(faker.name().name())
                 .avatarUrlAtSignup(faker.internet().avatar())
                 .isAdmin(true)
@@ -104,7 +104,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .loginAtSignup(faker.name().name())
                 .avatarUrlAtSignup(faker.internet().avatar())
                 .isAdmin(true)
@@ -130,7 +130,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final AuthUserEntity user = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .loginAtSignup(faker.name().name())
                 .avatarUrlAtSignup(faker.internet().avatar())
                 .isAdmin(false)
@@ -156,7 +156,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
@@ -188,7 +188,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
@@ -220,7 +220,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
