@@ -238,6 +238,7 @@ public interface UserMapper {
                         .slug(projectLedView.getSlug())
                         .name(projectLedView.getName())
                         .logoUrl(projectLedView.getLogoUrl())
+                        .contributorCount(projectLedView.getContributorCount())
                 )
                 .toList());
         getMeResponse.setPendingProjectsLed(authenticatedUser.getPendingProjectsLed()
@@ -246,6 +247,7 @@ public interface UserMapper {
                         .slug(projectLedView.getSlug())
                         .name(projectLedView.getName())
                         .logoUrl(projectLedView.getLogoUrl())
+                        .contributorCount(projectLedView.getContributorCount())
                 )
                 .toList());
         return getMeResponse;

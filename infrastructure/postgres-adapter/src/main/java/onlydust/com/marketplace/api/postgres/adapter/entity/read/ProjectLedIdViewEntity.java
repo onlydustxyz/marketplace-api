@@ -22,6 +22,7 @@ public class ProjectLedIdViewEntity {
     String logoUrl;
     String name;
     Boolean pending;
+    Long contributorCount;
 
     @Embeddable
     @Builder

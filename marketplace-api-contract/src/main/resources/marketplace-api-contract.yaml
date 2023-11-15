@@ -3085,6 +3085,7 @@ components:
         - id
         - slug
         - name
+        - contributorCount
       properties:
         id:
           type: string
@@ -3095,6 +3096,9 @@ components:
           type: string
         logoUrl:
           type: string
+        contributorCount:
+          type: integer
+          format: int64
     PatchMeContract:
       type: object
       properties:

@@ -15,7 +15,11 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                     pd.key as project_slug,
                     pd.name,
                     pd.logo_url,
-                    false     pending
+                    false     pending,
+                     (select count(rc.contributor_id)
+                      from indexer_exp.repos_contributors rc
+                               left join project_github_repos pgr on pgr.github_repo_id = rc.repo_id
+                      where pgr.project_id = pd.project_id) contributor_count
              from project_leads pl
                       join project_details pd on pd.project_id = pl.project_id
              where pl.user_id = :userId)
@@ -25,7 +29,11 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                     pd.key as project_slug,
                     pd.name,
                     pd.logo_url,
-                    true      pending
+                    true      pending,
+                     (select count(rc.contributor_id)
+                      from indexer_exp.repos_contributors rc
+                               left join project_github_repos pgr on pgr.github_repo_id = rc.repo_id
+                      where pgr.project_id = pd.project_id) contributor_count
              from auth_users au
                       join pending_project_leader_invitations ppli on ppli.github_user_id = au.github_user_id
                       join project_details pd on pd.project_id = ppli.project_id

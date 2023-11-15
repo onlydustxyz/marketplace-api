@@ -12,4 +12,5 @@ public class ProjectLedView {
     String slug;
     String name;
     String logoUrl;
+    Long contributorCount;
 }

@@ -83,6 +83,7 @@ public interface UserMapper {
                                 .logoUrl(projectLedIdViewEntity.getLogoUrl())
                                 .slug(projectLedIdViewEntity.getProjectSlug())
                                 .id(projectLedIdViewEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdViewEntity.getContributorCount())
                                 .build()).toList())
                 .pendingProjectsLed(projectLedIdViewEntities.stream()
                         .filter(ProjectLedIdViewEntity::getPending)
@@ -91,6 +92,7 @@ public interface UserMapper {
                                 .logoUrl(projectLedIdViewEntity.getLogoUrl())
                                 .slug(projectLedIdViewEntity.getProjectSlug())
                                 .id(projectLedIdViewEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdViewEntity.getContributorCount())
                                 .build()).toList())
                 .build();
     }

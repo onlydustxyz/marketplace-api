@@ -284,13 +284,16 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[1].name").isEqualTo("QA new contributions")
                 .jsonPath("$.projectsLed[1].logoUrl").isEqualTo(null)
                 .jsonPath("$.projectsLed[1].slug").isEqualTo("qa-new-contributions")
+                .jsonPath("$.projectsLed[1].contributorCount").isEqualTo(0)
                 .jsonPath("$.projectsLed[0].id").isEqualTo("7d04163c-4187-4313-8066-61504d34fc56")
                 .jsonPath("$.projectsLed[0].name").isEqualTo("Bretzel")
+                .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(0)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
                                                                 ".com/5003677688814069549.png")
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
                 .jsonPath("$.pendingProjectsLed[0].id").isEqualTo("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")
                 .jsonPath("$.pendingProjectsLed[0].name").isEqualTo("Red bull")
+                .jsonPath("$.pendingProjectsLed[0].contributorCount").isEqualTo(0)
                 .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A")
                 .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull");
     }
