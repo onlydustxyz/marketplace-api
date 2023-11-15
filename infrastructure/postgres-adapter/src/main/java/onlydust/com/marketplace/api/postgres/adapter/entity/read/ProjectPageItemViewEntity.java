@@ -41,6 +41,7 @@ public class ProjectPageItemViewEntity {
     Integer repoCount;
     Integer contributorsCount;
     Boolean isPendingProjectLead;
+    Boolean isMissingGithubAppInstallation;
     @Type(type = "jsonb")
     List<Sponsor> sponsors;
     @Type(type = "jsonb")
@@ -48,37 +49,21 @@ public class ProjectPageItemViewEntity {
     @Type(type = "jsonb")
     List<Map<String, Long>> technologies;
 
-    @EqualsAndHashCode
-    public static class ProjectLead {
-
-        @JsonProperty("id")
-        UUID id;
-
-        @JsonProperty("url")
-        String url;
-        @JsonProperty("avatarUrl")
-        String avatarUrl;
-        @JsonProperty("login")
-        String login;
-        @JsonProperty("githubId")
-        Long githubId;
+    public static String getSponsorsJsonPath(List<String> sponsors) {
+        if (isNull(sponsors) || sponsors.isEmpty()) {
+            return null;
+        }
+        return "$[*] ? (" + String.join(" || ", sponsors.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
     }
 
-    @EqualsAndHashCode
-    public static class Sponsor {
-
-        @JsonProperty("url")
-        String url;
-
-        @JsonProperty("logoUrl")
-        String logoUrl;
-        @JsonProperty("id")
-        UUID id;
-        @JsonProperty("name")
-        String name;
+    public static String getTechnologiesJsonPath(List<String> technologies) {
+        if (isNull(technologies) || technologies.isEmpty()) {
+            return null;
+        }
+        return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
     }
 
-    public ProjectCardView toView() {
+    public ProjectCardView toView(UUID userId) {
         final ProjectCardView view = ProjectCardView.builder()
                 .repoCount(this.repoCount)
                 .id(this.projectId)
@@ -113,21 +98,40 @@ public class ProjectPageItemViewEntity {
                     .login(projectLead.login)
                     .id(projectLead.id)
                     .build()));
+            if (userId != null && this.projectLeads.stream().anyMatch(lead -> userId.equals(lead.id))) {
+                view.setIsMissingGithubAppInstallation(this.isMissingGithubAppInstallation);
+            }
         }
         return view;
     }
 
-    public static String getSponsorsJsonPath(List<String> sponsors) {
-        if (isNull(sponsors) || sponsors.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", sponsors.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
+    @EqualsAndHashCode
+    public static class ProjectLead {
+
+        @JsonProperty("id")
+        UUID id;
+
+        @JsonProperty("url")
+        String url;
+        @JsonProperty("avatarUrl")
+        String avatarUrl;
+        @JsonProperty("login")
+        String login;
+        @JsonProperty("githubId")
+        Long githubId;
     }
 
-    public static String getTechnologiesJsonPath(List<String> technologies) {
-        if (isNull(technologies) || technologies.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
+    @EqualsAndHashCode
+    public static class Sponsor {
+
+        @JsonProperty("url")
+        String url;
+
+        @JsonProperty("logoUrl")
+        String logoUrl;
+        @JsonProperty("id")
+        UUID id;
+        @JsonProperty("name")
+        String name;
     }
 }

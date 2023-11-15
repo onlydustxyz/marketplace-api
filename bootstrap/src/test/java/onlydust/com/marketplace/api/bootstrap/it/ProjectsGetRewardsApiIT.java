@@ -276,7 +276,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isEqualTo(HttpStatus.OK)
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_1);
     }

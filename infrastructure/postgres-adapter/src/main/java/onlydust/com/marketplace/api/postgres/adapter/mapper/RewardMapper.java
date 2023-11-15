@@ -157,7 +157,7 @@ public interface RewardMapper {
                 .build();
     }
 
-    private static RewardItemView.Status githubStatusToDomain(final Boolean draft, final String status) {
+    static RewardItemView.Status githubStatusToDomain(final Boolean draft, final String status) {
         if (nonNull(draft) && draft) {
             return RewardItemView.Status.DRAFT;
         }

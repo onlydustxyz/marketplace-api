@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
+import onlydust.com.marketplace.api.domain.view.CreatedAndClosedIssueView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +38,8 @@ public class ProjectServiceTest {
         final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
                 mock(UUIDGeneratorPort.class), mock(PermissionService.class), mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class),
+                mock(DustyBotStoragePort.class));
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
@@ -61,7 +64,7 @@ public class ProjectServiceTest {
         final EventStoragePort eventStoragePort = mock(EventStoragePort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
                 uuidGeneratorPort, mock(PermissionService.class), indexerPort, dateProvider,
-                eventStoragePort, mock(ContributionStoragePort.class));
+                eventStoragePort, mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final CreateProjectCommand command = CreateProjectCommand.builder()
@@ -111,7 +114,7 @@ public class ProjectServiceTest {
         final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
                 uuidGeneratorPort, permissionService, indexerPort, dateProvider, mock(EventStoragePort.class),
-                contributionStoragePort);
+                contributionStoragePort, mock(DustyBotStoragePort.class));
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
@@ -164,7 +167,7 @@ public class ProjectServiceTest {
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
                 uuidGeneratorPort, permissionService, indexerPort, dateProvider, mock(EventStoragePort.class),
-                mock(ContributionStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
@@ -206,7 +209,7 @@ public class ProjectServiceTest {
         final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
         final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
                 uuidGeneratorPort, mock(PermissionService.class), mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final InputStream imageInputStream = mock(InputStream.class);
         final String imageUrl = faker.internet().image();
 
@@ -226,7 +229,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
         final UUID projectLeadId = UUID.randomUUID();
@@ -237,12 +240,13 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID()));
-        projectService.getContributorsForProjectLeadId(projectId, sortBy, sortDirection, projectLeadId, pageIndex,
+        projectService.getContributorsForProjectLeadId(projectId, null, projectLeadId, sortBy, sortDirection, pageIndex,
                 pageSize);
 
         // Then
-        verify(projectStoragePort, times(1)).findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
-        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, sortBy, sortDirection,
+        verify(projectStoragePort, times(1)).findContributors(projectId, null, sortBy, sortDirection, pageIndex,
+                pageSize);
+        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, null, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 
@@ -254,9 +258,10 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
+        final String login = faker.name().username();
         final UUID projectLeadId = UUID.randomUUID();
         final int pageIndex = 1;
         final int pageSize = 1;
@@ -265,12 +270,14 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getContributorsForProjectLeadId(projectId, sortBy, sortDirection, projectLeadId, pageIndex,
+        projectService.getContributorsForProjectLeadId(projectId, login, projectLeadId, sortBy, sortDirection,
+                pageIndex,
                 pageSize);
 
         // Then
-        verify(projectStoragePort, times(0)).findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
-        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, sortBy, sortDirection,
+        verify(projectStoragePort, times(0)).findContributors(projectId, login, sortBy, sortDirection, pageIndex,
+                pageSize);
+        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, login, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 
@@ -282,7 +289,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final UUID projectLeadId = UUID.randomUUID();
@@ -306,7 +313,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final ProjectRewardView.SortBy sortBy = ProjectRewardView.SortBy.contribution;
         final int pageIndex = 1;
@@ -338,7 +345,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
 
@@ -358,7 +365,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -386,7 +393,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
@@ -407,7 +414,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
 
@@ -435,7 +442,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
@@ -456,7 +463,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
         final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
-                mock(EventStoragePort.class), mock(ContributionStoragePort.class));
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
         final UUID projectId = UUID.randomUUID();
         final UUID rewardId = UUID.randomUUID();
 
@@ -475,6 +482,164 @@ public class ProjectServiceTest {
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read reward items on their projects", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_check_project_lead_permissions_when_getting_project_rewardable_items_by_id_given_a_valid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+        projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, projectLeadId,
+                12345L, 0, 50, null);
+
+        // Then
+        verify(projectStoragePort, times(1)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
+                null, 12345L, 0, 50, null);
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_getting_project_rewardable_items_by_id_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null,
+                    UUID.randomUUID(), 1234L, 0, 50, null);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can read rewardable items on their projects", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_creating_rewardable_issue_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final DustyBotStoragePort dustyBotStoragePort = mock(DustyBotStoragePort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), dustyBotStoragePort);
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand.builder()
+                    .projectId(projectId)
+                    .projectLeadId(projectLeadId)
+                    .build());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verifyNoInteractions(dustyBotStoragePort);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can create rewardable issue on their projects",
+                onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_creating_rewardable_issue_given_a_valid_project_lead_and_invalid_github_repo_id() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final DustyBotStoragePort dustyBotStoragePort = mock(DustyBotStoragePort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), dustyBotStoragePort);
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final Long githubRepoId = 1L;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+        when(projectStoragePort.getProjectRepoIds(projectId))
+                .thenReturn(Set.of(2L, 3L));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand.builder()
+                    .projectId(projectId)
+                    .projectLeadId(projectLeadId)
+                    .githubRepoId(githubRepoId)
+                    .build());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verifyNoInteractions(dustyBotStoragePort);
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Rewardable issue can only be created on repos linked to this project",
+                onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_create_and_close_rewardable_issue_given_a_valid_project_lead_and_valid_github_repo_id() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final DustyBotStoragePort dustyBotStoragePort = mock(DustyBotStoragePort.class);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), dustyBotStoragePort);
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+        final Long githubRepoId = 1L;
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(projectLeadId));
+        when(projectStoragePort.getProjectRepoIds(projectId))
+                .thenReturn(Set.of(2L, 3L, githubRepoId));
+        final CreateAndCloseIssueCommand createAndCloseIssueCommand = CreateAndCloseIssueCommand.builder()
+                .projectId(projectId)
+                .projectLeadId(projectLeadId)
+                .githubRepoId(githubRepoId)
+                .build();
+        final CreatedAndClosedIssueView createdAndClosedIssueView = CreatedAndClosedIssueView.builder()
+                .id(faker.random().nextLong())
+                .number(faker.random().nextLong())
+                .build();
+        when(dustyBotStoragePort.createIssue(createAndCloseIssueCommand))
+                .thenReturn(createdAndClosedIssueView);
+
+        projectService.createAndCloseIssueForProjectIdAndRepositoryId(createAndCloseIssueCommand);
+
+        // Then
+        verify(dustyBotStoragePort, times(1)).closeIssue(createAndCloseIssueCommand.toBuilder()
+                .githubIssueNumber(createdAndClosedIssueView.getNumber())
+                .build());
     }
 
 

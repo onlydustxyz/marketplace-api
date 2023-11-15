@@ -29,6 +29,7 @@ public class ProjectService implements ProjectFacadePort {
     private final DateProvider dateProvider;
     private final EventStoragePort eventStoragePort;
     private final ContributionStoragePort contributionStoragePort;
+    private final DustyBotStoragePort dustyBotStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -112,24 +113,25 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ProjectContributorsLinkView> getContributors(UUID projectId,
+    public Page<ProjectContributorsLinkView> getContributors(UUID projectId, String login,
                                                              ProjectContributorsLinkView.SortBy sortBy,
                                                              SortDirection sortDirection,
                                                              Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
+        return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+    public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
+                                                                             UUID projectLeadId,
                                                                              ProjectContributorsLinkView.SortBy sortBy,
                                                                              SortDirection sortDirection,
-                                                                             UUID projectLeadId, Integer pageIndex,
+                                                                             Integer pageIndex,
                                                                              Integer pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findContributorsForProjectLead(projectId, sortBy, sortDirection, pageIndex,
+            return projectStoragePort.findContributorsForProjectLead(projectId, login, sortBy, sortDirection, pageIndex,
                     pageSize);
         } else {
-            return projectStoragePort.findContributors(projectId, sortBy, sortDirection, pageIndex, pageSize);
+            return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
         }
     }
 
@@ -168,6 +170,41 @@ public class ProjectService implements ProjectFacadePort {
             return projectStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read reward items on their projects");
+        }
+    }
+
+    @Override
+    public Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                           ContributionType contributionType,
+                                                                                           UUID projectLeadId,
+                                                                                           Long githubUserid,
+                                                                                           int pageIndex,
+                                                                                           int pageSize,
+                                                                                           String search) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            return projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
+                    contributionType, githubUserid, pageIndex, pageSize, search);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
+        }
+    }
+
+    @Override
+    public CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand) {
+        if (permissionService.isUserProjectLead(createAndCloseIssueCommand.getProjectId(),
+                createAndCloseIssueCommand.getProjectLeadId())) {
+            if (permissionService.isRepoLinkedToProject(createAndCloseIssueCommand.getProjectId(),
+                    createAndCloseIssueCommand.getGithubRepoId())) {
+                final CreatedAndClosedIssueView issue = dustyBotStoragePort.createIssue(createAndCloseIssueCommand);
+                return dustyBotStoragePort.closeIssue(createAndCloseIssueCommand.toBuilder()
+                        .githubIssueNumber(issue.getNumber())
+                        .build());
+            } else {
+                throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
+                                                  "project");
+            }
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
         }
     }
 }

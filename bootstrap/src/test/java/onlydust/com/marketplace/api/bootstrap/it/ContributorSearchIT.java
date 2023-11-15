@@ -128,6 +128,53 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_fetch_external_contributors_when_externalSearchOnly_is_true() {
+        client.get()
+                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login,
+                        "externalSearchOnly", "true")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "contributors": [
+                            {
+                              "githubUserId": 31220,
+                              "login": "antho",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/31220?v=4",
+                              "isRegistered": false
+                            },
+                            {
+                              "githubUserId": 3982077,
+                              "login": "anthonychu",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/3982077?v=4",
+                              "isRegistered": false
+                            },
+                            {
+                              "githubUserId": 36125,
+                              "login": "anthonyshort",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/36125?v=4",
+                              "isRegistered": false
+                            },
+                            {
+                              "githubUserId": 16854916,
+                              "login": "AnthoPakPak",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16854916?v=4",
+                              "isRegistered": false
+                            },
+                            {
+                              "githubUserId": 101401469,
+                              "login": "AnthonyByansi",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/101401469?v=4",
+                              "isRegistered": false
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_return_400_when_no_param_is_provided() {
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS))

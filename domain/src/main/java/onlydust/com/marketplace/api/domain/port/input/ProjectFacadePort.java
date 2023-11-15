@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
+import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -33,15 +35,17 @@ public interface ProjectFacadePort {
 
     URL saveLogoImage(InputStream imageInputStream);
 
-    Page<ProjectContributorsLinkView> getContributors(UUID projectId, ProjectContributorsLinkView.SortBy sortBy,
+    Page<ProjectContributorsLinkView> getContributors(UUID projectId, String login,
+                                                      ProjectContributorsLinkView.SortBy sortBy,
                                                       SortDirection sortDirection,
                                                       Integer pageIndex,
                                                       Integer pageSize);
 
-    Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId,
+    Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
+                                                                      UUID projectLeadId,
                                                                       ProjectContributorsLinkView.SortBy sortBy,
                                                                       SortDirection sortDirection,
-                                                                      UUID projectLeadId, Integer pageIndex,
+                                                                      Integer pageIndex,
                                                                       Integer pageSize);
 
     Page<ProjectRewardView> getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize,
@@ -53,4 +57,13 @@ public interface ProjectFacadePort {
 
     Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLead,
                                                               int pageIndex, int pageSize);
+
+    Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+                                                                                    ContributionType contributionType,
+                                                                                    UUID projectLeadId,
+                                                                                    Long githubUserid,
+                                                                                    int pageIndex, int pageSize,
+                                                                                    String search);
+
+    CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
 }

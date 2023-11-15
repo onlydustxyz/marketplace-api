@@ -41,6 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Import(SwaggerConfiguration.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
+        @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
 })
@@ -55,7 +56,9 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_CONTRIBUTORS = "/api/v1/projects/%s/contributors";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String PROJECTS_REWARD = "/api/v1/projects/%s/rewards/%s";
-    protected static final String PROJECTS_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
+    protected static final String PROJECTS_GET_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
+    protected static final String PROJECTS_GET_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items";
+    protected static final String PROJECTS_POST_REWARDABLE_ISSUE = "/api/v1/projects/%s/rewardable-items/issues";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
@@ -98,6 +101,9 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer rustApiWireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
+    @InjectWireMock("dustyBot")
+    protected WireMockServer dustyBotApiWireMockServer;
+
     @LocalServerPort
     int port;
     @Autowired
