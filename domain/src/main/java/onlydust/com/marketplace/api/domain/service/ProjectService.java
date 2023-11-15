@@ -180,10 +180,11 @@ public class ProjectService implements ProjectFacadePort {
                                                                                            Long githubUserid,
                                                                                            int pageIndex,
                                                                                            int pageSize,
-                                                                                           String search) {
+                                                                                           String search,
+                                                                                           Boolean includeIgnoredItems) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
-                    contributionType, githubUserid, pageIndex, pageSize, search);
+                    contributionType, githubUserid, pageIndex, pageSize, search, includeIgnoredItems);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
         }

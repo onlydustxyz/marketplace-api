@@ -63,7 +63,8 @@ public interface ProjectFacadePort {
                                                                                     UUID projectLeadId,
                                                                                     Long githubUserid,
                                                                                     int pageIndex, int pageSize,
-                                                                                    String search);
+                                                                                    String search,
+                                                                                    Boolean includeIgnoredItems);
 
     CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
 }

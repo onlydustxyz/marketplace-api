@@ -74,7 +74,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
             where pgr.project_id = :projectId
               and c.contributor_id = :githubUserId
-              and c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId)
+              and (:includeIgnoredItems is true or c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId))
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
                and (coalesce(:search) is null
                     or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
@@ -87,7 +87,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                                                   final @Param("contributionType") String contributionType,
                                                                   final @Param("search") String search,
                                                                   final @Param("offset") int offset,
-                                                                  final @Param("limit") int limit);
+                                                                  final @Param("limit") int limit,
+                                                                  final @Param("includeIgnoredItems") boolean includeIgnoredItems);
 
 
     @Query(value = """
@@ -117,7 +118,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
             where pgr.project_id = :projectId
               and c.contributor_id = :githubUserId
-              and c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId)
+              and (:includeIgnoredItems is true or c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId))
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
                and (coalesce(:search) is null
                     or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
@@ -126,5 +127,6 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
     Long countByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
                                          final @Param("githubUserId") Long githubUserId,
                                          final @Param("contributionType") String contributionType,
-                                         final @Param("search") String search);
+                                         final @Param("search") String search,
+                                         final @Param("includeIgnoredItems") boolean includeIgnoredItems);
 }

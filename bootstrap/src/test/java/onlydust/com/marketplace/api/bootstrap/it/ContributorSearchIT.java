@@ -138,39 +138,40 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "contributors": [
-                            {
-                              "githubUserId": 31220,
-                              "login": "antho",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/31220?v=4",
-                              "isRegistered": false
-                            },
-                            {
-                              "githubUserId": 3982077,
-                              "login": "anthonychu",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/3982077?v=4",
-                              "isRegistered": false
-                            },
-                            {
-                              "githubUserId": 36125,
-                              "login": "anthonyshort",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/36125?v=4",
-                              "isRegistered": false
-                            },
-                            {
-                              "githubUserId": 16854916,
-                              "login": "AnthoPakPak",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/16854916?v=4",
-                              "isRegistered": false
-                            },
-                            {
-                              "githubUserId": 101401469,
-                              "login": "AnthonyByansi",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/101401469?v=4",
-                              "isRegistered": false
-                            }
-                          ]
-                        }
+                           "internalContributors": [],
+                           "externalContributors": [
+                             {
+                               "githubUserId": 31220,
+                               "login": "antho",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/31220?v=4",
+                               "isRegistered": false
+                             },
+                             {
+                               "githubUserId": 3982077,
+                               "login": "anthonychu",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/3982077?v=4",
+                               "isRegistered": false
+                             },
+                             {
+                               "githubUserId": 36125,
+                               "login": "anthonyshort",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/36125?v=4",
+                               "isRegistered": false
+                             },
+                             {
+                               "githubUserId": 16854916,
+                               "login": "AnthoPakPak",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/16854916?v=4",
+                               "isRegistered": false
+                             },
+                             {
+                               "githubUserId": 101401469,
+                               "login": "AnthonyByansi",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/101401469?v=4",
+                               "isRegistered": false
+                             }
+                           ]
+                         }
                         """);
     }
 

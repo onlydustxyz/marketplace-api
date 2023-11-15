@@ -362,7 +362,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                                               Long githubUserid,
                                                                                               int pageIndex,
                                                                                               int pageSize,
-                                                                                              String search) {
+                                                                                              String search,
+                                                                                              Boolean includeIgnoredItems) {
         final String type = isNull(contributionType) ? null :
                 switch (contributionType) {
                     case ISSUE -> RewardableItemViewEntity.ContributionType.ISSUE.name();
@@ -372,12 +373,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final List<RewardItemView> rewardItemViews =
                 rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid, type, search,
                                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
-                                pageSize)
+                                pageSize, includeIgnoredItems)
                         .stream()
                         .map(RewardableItemMapper::itemToDomain)
                         .toList();
         final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid, type,
-                search);
+                search, includeIgnoredItems);
         return Page.<RewardItemView>builder()
                 .content(rewardItemViews)
                 .totalItemNumber(count.intValue())

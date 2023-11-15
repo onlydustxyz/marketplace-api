@@ -499,11 +499,11 @@ public class ProjectServiceTest {
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
         projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, projectLeadId,
-                12345L, 0, 50, null);
+                12345L, 0, 50, null, null);
 
         // Then
         verify(projectStoragePort, times(1)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
-                null, 12345L, 0, 50, null);
+                null, 12345L, 0, 50, null, null);
     }
 
     @Test
@@ -522,7 +522,7 @@ public class ProjectServiceTest {
         OnlyDustException onlyDustException = null;
         try {
             projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null,
-                    UUID.randomUUID(), 1234L, 0, 50, null);
+                    UUID.randomUUID(), 1234L, 0, 50, null, null);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
