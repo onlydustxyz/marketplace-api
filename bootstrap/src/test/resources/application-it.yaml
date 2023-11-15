@@ -1,6 +1,8 @@
 infrastructure:
   github:
     personal-access-token: "GITHUB_PAT"
+  dusty-bot:
+    personal-access-token: "DUSTY_BOT_PAT"
   od:
     api:
       client:

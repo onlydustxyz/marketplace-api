@@ -29,6 +29,7 @@ public class ProjectService implements ProjectFacadePort {
     private final DateProvider dateProvider;
     private final EventStoragePort eventStoragePort;
     private final ContributionStoragePort contributionStoragePort;
+    private final DustyBotStoragePort dustyBotStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -185,6 +186,25 @@ public class ProjectService implements ProjectFacadePort {
                     contributionType, githubUserid, pageIndex, pageSize, search);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
+        }
+    }
+
+    @Override
+    public CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand) {
+        if (permissionService.isUserProjectLead(createAndCloseIssueCommand.getProjectId(),
+                createAndCloseIssueCommand.getProjectLeadId())) {
+            if (permissionService.isRepoLinkedToProject(createAndCloseIssueCommand.getProjectId(),
+                    createAndCloseIssueCommand.getGithubRepoId())) {
+                final CreatedAndClosedIssueView issue = dustyBotStoragePort.createIssue(createAndCloseIssueCommand);
+                return dustyBotStoragePort.closeIssue(createAndCloseIssueCommand.toBuilder()
+                        .githubIssueNumber(issue.getNumber())
+                        .build());
+            } else {
+                throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
+                                                  "project");
+            }
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
         }
     }
 }

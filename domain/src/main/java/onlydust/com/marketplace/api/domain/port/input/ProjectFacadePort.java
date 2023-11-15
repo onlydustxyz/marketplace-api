@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -63,4 +64,6 @@ public interface ProjectFacadePort {
                                                                                     Long githubUserid,
                                                                                     int pageIndex, int pageSize,
                                                                                     String search);
+
+    CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
 }

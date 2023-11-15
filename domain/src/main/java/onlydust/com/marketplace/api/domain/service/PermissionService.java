@@ -18,4 +18,8 @@ public class PermissionService {
     public boolean isUserContributor(String contributionId, Long githubUserId) {
         return contributionStoragePort.getContributorId(contributionId).equals(githubUserId);
     }
+
+    public boolean isRepoLinkedToProject(UUID projectId, Long githubRepoId) {
+        return projectStoragePort.getProjectRepoIds(projectId).contains(githubRepoId);
+    }
 }
