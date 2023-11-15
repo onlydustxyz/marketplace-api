@@ -2,15 +2,15 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.view.CodeReviewOutcome;
-import onlydust.com.marketplace.api.domain.view.RewardItemView;
+import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemViewEntity;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper.githubStatusToDomain;
 
 public interface RewardableItemMapper {
-    static RewardItemView itemToDomain(RewardableItemViewEntity rewardableItemViewEntity) {
-        return RewardItemView.builder()
+    static RewardableItemView itemToDomain(RewardableItemViewEntity rewardableItemViewEntity) {
+        return RewardableItemView.builder()
                 .id(rewardableItemViewEntity.getId())
                 .createdAt(rewardableItemViewEntity.getCreatedAt())
                 .title(rewardableItemViewEntity.getTitle())
@@ -32,7 +32,7 @@ public interface RewardableItemMapper {
                             case APPROVED -> CodeReviewOutcome.approved;
                             case CHANGE_REQUESTED -> CodeReviewOutcome.changeRequested;
                             default -> null;
-                })
+                        })
                 .build();
     }
 }

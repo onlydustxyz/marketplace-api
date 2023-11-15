@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import onlydust.com.marketplace.api.domain.view.CreatedAndClosedIssueView;
+import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.view.RewardItemStatus;
+import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 
 import java.util.Date;
+
 
 @Value
 @NoArgsConstructor(force = true)
@@ -21,44 +24,43 @@ public class IssueResponseDTO {
     Long id;
     String title;
     State state;
-    Long comments;
+    Integer comments;
     Long number;
     @JsonProperty("state_reason")
     StateReason stateReason;
     @JsonProperty("html_url")
     String htmlUrl;
 
-
-    public enum State {
-        open, closed
-    }
-
-    public enum StateReason {
-        completed, not_planned, reopened
-    }
-
-    public CreatedAndClosedIssueView toView(final String repoName) {
-        return CreatedAndClosedIssueView.builder()
-                .updatedAt(this.updatedAt)
-                .createdAt(this.createdAt)
-                .closedAt(this.closedAt)
-                .id(this.id)
-                .commentsCount(this.comments)
-                .repoName(repoName)
-                .number(this.number)
-                .htmlUrl(this.htmlUrl)
+    public RewardableItemView toView(final String repoName) {
+        assert this.id != null;
+        return RewardableItemView.builder()
+                .id(this.id.toString())
+                .type(ContributionType.ISSUE)
                 .status(this.toStatus())
+                .createdAt(this.createdAt)
+                .lastUpdateAt(this.updatedAt)
+                .commentsCount(this.comments)
+                .number(this.number)
+                .repoName(repoName)
+                .githubUrl(this.htmlUrl)
                 .title(this.title)
                 .build();
     }
 
-    private CreatedAndClosedIssueView.Status toStatus() {
-        return switch (this.state) {
-            case open -> CreatedAndClosedIssueView.Status.OPEN;
-            case closed -> switch (this.stateReason) {
-                case not_planned -> CreatedAndClosedIssueView.Status.CANCELLED;
-                default -> CreatedAndClosedIssueView.Status.CLOSED;
-            };
+    private RewardItemStatus toStatus() {
+        return this.state == null ? RewardItemStatus.OPEN : switch (this.state) {
+            case open -> RewardItemStatus.OPEN;
+            case closed ->
+                    StateReason.not_planned.equals(this.stateReason) ? RewardItemStatus.CANCELLED :
+                            RewardItemStatus.CLOSED;
         };
+    }
+
+    enum State {
+        open, closed
+    }
+
+    enum StateReason {
+        completed, not_planned, reopened
     }
 }

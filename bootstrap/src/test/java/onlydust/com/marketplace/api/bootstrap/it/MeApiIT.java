@@ -31,7 +31,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     ApplicationRepository applicationRepository;
     @Autowired
     HasuraUserHelper userHelper;
-
+    @Autowired
+    ProjectLeadRepository projectLeadRepository;
 
     @Test
     void should_update_onboarding_state() {
@@ -102,7 +103,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
     }
-
 
     @Test
     void should_accept_valid_project_leader_invitation() {
@@ -258,9 +258,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isNotFound();
     }
 
-    @Autowired
-    ProjectLeadRepository projectLeadRepository;
-
     @Test
     void should_return_projects_led() {
         // Given
@@ -294,7 +291,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.pendingProjectsLed[0].id").isEqualTo("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")
                 .jsonPath("$.pendingProjectsLed[0].name").isEqualTo("Red bull")
                 .jsonPath("$.pendingProjectsLed[0].contributorCount").isEqualTo(0)
-                .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A")
+                .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent" +
+                                                                       ".com/cZCHED10RzuEloOXuk7A")
                 .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull");
     }
 }

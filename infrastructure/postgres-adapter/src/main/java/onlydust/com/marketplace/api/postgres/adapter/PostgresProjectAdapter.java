@@ -357,7 +357,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                               ContributionType contributionType,
                                                                                               Long githubUserid,
                                                                                               int pageIndex,
@@ -370,7 +370,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     case PULL_REQUEST -> RewardableItemViewEntity.ContributionType.PULL_REQUEST.name();
                     case CODE_REVIEW -> RewardableItemViewEntity.ContributionType.CODE_REVIEW.name();
                 };
-        final List<RewardItemView> rewardItemViews =
+        final List<RewardableItemView> rewardableItemViews =
                 rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid, type, search,
                                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                                 pageSize, includeIgnoredItems)
@@ -379,8 +379,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .toList();
         final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid, type,
                 search, includeIgnoredItems);
-        return Page.<RewardItemView>builder()
-                .content(rewardItemViews)
+        return Page.<RewardableItemView>builder()
+                .content(rewardableItemViews)
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
                 .build();

@@ -60,7 +60,7 @@ public interface ProjectStoragePort {
 
     Set<Long> getProjectRepoIds(UUID projectId);
 
-    Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                        ContributionType contributionType,
                                                                                        Long githubUserid,
                                                                                        int pageIndex, int pageSize,

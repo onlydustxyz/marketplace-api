@@ -20,4 +20,14 @@ public class IndexerApiClientAdapter implements IndexerPort {
     public void indexUsers(List<Long> githubUserIds) {
         githubUserIds.stream().parallel().forEach(this::indexUser);
     }
+
+    @Override
+    public void indexPullRequest(String repoOwner, String repoName, Long pullRequestNumber) {
+        //TODO
+    }
+
+    @Override
+    public void indexIssue(String repoOwner, String repoName, Long issueNumber) {
+        //TODO
+    }
 }

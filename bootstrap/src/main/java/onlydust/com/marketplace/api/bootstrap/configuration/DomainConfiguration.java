@@ -38,11 +38,12 @@ public class DomainConfiguration {
                                                final DateProvider dateProvider,
                                                final EventStoragePort eventStoragePort,
                                                final ContributionStoragePort contributionStoragePort,
-                                               final DustyBotStoragePort dustyBotStoragePort) {
+                                               final DustyBotStoragePort dustyBotStoragePort,
+                                               final GithubStoragePort githubStoragePort) {
         return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService,
-                indexerPort, dateProvider, eventStoragePort, contributionStoragePort, dustyBotStoragePort);
+                indexerPort, dateProvider, eventStoragePort, contributionStoragePort, dustyBotStoragePort,
+                githubStoragePort);
     }
-
 
 
     @Bean

@@ -30,6 +30,7 @@ public class ProjectService implements ProjectFacadePort {
     private final EventStoragePort eventStoragePort;
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
+    private final GithubStoragePort githubStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -174,7 +175,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                            ContributionType contributionType,
                                                                                            UUID projectLeadId,
                                                                                            Long githubUserid,
@@ -191,15 +192,15 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand) {
-        if (permissionService.isUserProjectLead(createAndCloseIssueCommand.getProjectId(),
-                createAndCloseIssueCommand.getProjectLeadId())) {
-            if (permissionService.isRepoLinkedToProject(createAndCloseIssueCommand.getProjectId(),
-                    createAndCloseIssueCommand.getGithubRepoId())) {
-                final CreatedAndClosedIssueView issue = dustyBotStoragePort.createIssue(createAndCloseIssueCommand);
-                return dustyBotStoragePort.closeIssue(createAndCloseIssueCommand.toBuilder()
-                        .githubIssueNumber(issue.getNumber())
-                        .build());
+    public RewardableItemView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand command) {
+        if (permissionService.isUserProjectLead(command.getProjectId(), command.getProjectLeadId())) {
+            if (permissionService.isRepoLinkedToProject(command.getProjectId(), command.getGithubRepoId())) {
+                final var repo = githubStoragePort.findRepoById(command.getGithubRepoId()).orElseThrow(() ->
+                        OnlyDustException.notFound("Repo not found"));
+                final RewardableItemView issue = dustyBotStoragePort.createIssue(repo.getOwner(),
+                        repo.getName(), command.getTitle(), command.getDescription());
+                return dustyBotStoragePort.closeIssue(repo.getOwner(),
+                        repo.getName(), issue.getNumber());
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
                                                   "project");

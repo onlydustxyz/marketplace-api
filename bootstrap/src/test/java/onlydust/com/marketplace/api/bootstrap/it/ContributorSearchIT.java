@@ -135,11 +135,11 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody()
+                .expectBody().consumeWith(System.out::println)
                 .json("""
                         {
-                           "internalContributors": [],
-                           "externalContributors": [
+                          "internalContributors": [],
+                          "externalContributors": [
                              {
                                "githubUserId": 31220,
                                "login": "antho",

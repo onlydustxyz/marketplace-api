@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepoViewEntity, Long> {
@@ -18,7 +20,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 r.description,
                 r.stars_count,
                 r.forks_count
-            FROM 
+            FROM
                  indexer_exp.github_repos r
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
             WHERE
@@ -35,4 +37,24 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
     List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
                                                       List<UUID> projectIds,
                                                       List<Long> repoIds);
+
+    @Override
+    @Query(value = """
+            SELECT
+                r.id,
+                owner.login as owner,
+                r.name,
+                r.html_url,
+                r.updated_at,
+                r.description,
+                r.stars_count,
+                r.forks_count
+            FROM
+                 indexer_exp.github_repos r
+            INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
+            WHERE
+                r.id = :repoId
+            """, nativeQuery = true)
+    @NonNull
+    Optional<GithubRepoViewEntity> findById(@NonNull Long repoId);
 }

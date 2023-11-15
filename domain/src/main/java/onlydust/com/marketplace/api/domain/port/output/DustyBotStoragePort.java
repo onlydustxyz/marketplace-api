@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
-import onlydust.com.marketplace.api.domain.view.CreatedAndClosedIssueView;
+import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 
 public interface DustyBotStoragePort {
 
-    CreatedAndClosedIssueView createIssue(final CreateAndCloseIssueCommand createAndCloseIssueCommand);
+    RewardableItemView createIssue(final String repoOwner,
+                                   final String repoName,
+                                   final String title,
+                                   final String description);
 
-    CreatedAndClosedIssueView closeIssue(final CreateAndCloseIssueCommand createAndCloseIssueCommand);
+    RewardableItemView closeIssue(final String repoOwner,
+                                  final String repoName,
+                                  final Long issueNumber);
 }

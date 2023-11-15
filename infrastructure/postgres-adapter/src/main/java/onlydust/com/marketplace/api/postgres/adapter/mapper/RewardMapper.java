@@ -157,18 +157,18 @@ public interface RewardMapper {
                 .build();
     }
 
-    static RewardItemView.Status githubStatusToDomain(final Boolean draft, final String status) {
+    static RewardItemStatus githubStatusToDomain(final Boolean draft, final String status) {
         if (nonNull(draft) && draft) {
-            return RewardItemView.Status.DRAFT;
+            return RewardItemStatus.DRAFT;
         }
         return switch (status) {
-            case "open" -> RewardItemView.Status.OPEN;
-            case "closed" -> RewardItemView.Status.CLOSED;
-            case "merged" -> RewardItemView.Status.MERGED;
-            case "pending" -> RewardItemView.Status.PENDING;
-            case "completed" -> RewardItemView.Status.COMPLETED;
-            case "cancelled" -> RewardItemView.Status.CANCELLED;
-            default -> RewardItemView.Status.OPEN;
+            case "open" -> RewardItemStatus.OPEN;
+            case "closed" -> RewardItemStatus.CLOSED;
+            case "merged" -> RewardItemStatus.MERGED;
+            case "pending" -> RewardItemStatus.PENDING;
+            case "completed" -> RewardItemStatus.COMPLETED;
+            case "cancelled" -> RewardItemStatus.CANCELLED;
+            default -> RewardItemStatus.OPEN;
         };
     }
 

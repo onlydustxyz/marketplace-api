@@ -18,7 +18,10 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardableItemMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -234,7 +237,7 @@ public class ProjectsRestApi implements ProjectsApi {
             case PULL_REQUEST -> ContributionType.PULL_REQUEST;
             case CODE_REVIEW -> ContributionType.CODE_REVIEW;
         };
-        final Page<RewardItemView> rewardableItemsPage =
+        final Page<RewardableItemView> rewardableItemsPage =
                 projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
                         contributionType,
                         authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
@@ -276,20 +279,32 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<CreateIssueResponse> postProjectRewardableIssue(UUID projectId,
-                                                                          CreateIssueRequest createIssueRequest) {
+    public ResponseEntity<RewardableItemResponse> addRewardableOtherIssue(UUID projectId,
+                                                                          AddOtherIssueRequest addOtherIssueRequest) {
+
+        return null;//TODO
+    }
+
+    @Override
+    public ResponseEntity<RewardableItemResponse> addRewardableOtherPullRequest(UUID projectId,
+                                                                                AddOtherPullRequestRequest addOtherPullRequestRequest) {
+
+        return null;//TODO
+    }
+
+    @Override
+    public ResponseEntity<RewardableItemResponse> addRewardableOtherWork(UUID projectId,
+                                                                         AddOtherWorkRequest addOtherWorkRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final CreatedAndClosedIssueView issue = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
+        final RewardableItemView issue = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
                 CreateAndCloseIssueCommand.builder()
                         .projectId(projectId)
                         .projectLeadId(authenticatedUser.getId())
-                        .githubRepoId(createIssueRequest.getGithubRepoId())
-                        .githubRepoName(createIssueRequest.getGithubRepoName())
-                        .title(createIssueRequest.getTitle())
-                        .description(createIssueRequest.getDescription())
-                        .githubRepoOwnerName(createIssueRequest.getGithubOwnerName())
+                        .githubRepoId(addOtherWorkRequest.getGithubRepoId())
+                        .title(addOtherWorkRequest.getTitle())
+                        .description(addOtherWorkRequest.getDescription())
                         .build()
         );
-        return ResponseEntity.ok(IssueMapper.toResponse(issue));
+        return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
 }
