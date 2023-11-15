@@ -217,13 +217,15 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.ok(rewardItemsPageResponse);
     }
 
+
     @Override
     public ResponseEntity<RewardableItemsPageResponse> getProjectRewardableContributions(UUID projectId,
                                                                                          Long githubUserId,
                                                                                          Integer pageIndex,
                                                                                          Integer pageSize,
                                                                                          String search,
-                                                                                         RewardType type) {
+                                                                                         RewardType type,
+                                                                                         Boolean includeIgnoredItems) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
@@ -235,7 +237,8 @@ public class ProjectsRestApi implements ProjectsApi {
         final Page<RewardItemView> rewardableItemsPage =
                 projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
                         contributionType,
-                        authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search);
+                        authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
+                        isNull(includeIgnoredItems) ? false : includeIgnoredItems);
         final RewardableItemsPageResponse rewardableItemsPageResponse =
                 RewardableItemMapper.pageToResponse(sanitizedPageIndex,
                         rewardableItemsPage);

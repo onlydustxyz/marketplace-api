@@ -284,10 +284,10 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[1].name").isEqualTo("QA new contributions")
                 .jsonPath("$.projectsLed[1].logoUrl").isEqualTo(null)
                 .jsonPath("$.projectsLed[1].slug").isEqualTo("qa-new-contributions")
-                .jsonPath("$.projectsLed[1].contributorCount").isEqualTo(0)
+                .jsonPath("$.projectsLed[1].contributorCount").isEqualTo(18)
                 .jsonPath("$.projectsLed[0].id").isEqualTo("7d04163c-4187-4313-8066-61504d34fc56")
                 .jsonPath("$.projectsLed[0].name").isEqualTo("Bretzel")
-                .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(0)
+                .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(6)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
                                                                 ".com/5003677688814069549.png")
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")

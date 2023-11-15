@@ -449,7 +449,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(206)
                 .expectBody()
                 .json("""
-                       
+                                               
                         {
                            "rewardableItems": [
                              {
@@ -987,6 +987,178 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                           "hasMore": true,
                           "totalPageNumber": 29,
                           "totalItemNumber": 142,
+                          "nextPageIndex": 1
+                        }
+                         """);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
+                        pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "0", "pageSize", "10", "include_ignored_items", "true")))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(206)
+                .expectBody()
+                .json("""
+                        {
+                          "rewardableItems": [
+                            {
+                              "number": 1393,
+                              "id": "b88b3aac4b3e975c292074e203b60ca9d5bd46f3fd863c07c9e7774d436c497c",
+                              "title": "fix: gen types",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1393",
+                              "createdAt": "2023-11-10T17:04:16Z",
+                              "lastUpdateAt": "2023-11-10T17:05:18Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1388,
+                              "id": "bac9985221e5a0c3811b3bc232221dd9173cb1bfb37c410793f0668fbd5c9a9e",
+                              "title": "revert this fix : I see not completed items within my send reward panel",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1388",
+                              "createdAt": "2023-11-09T12:59:11Z",
+                              "lastUpdateAt": "2023-11-09T14:25:59Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1384,
+                              "id": "2fc89b8762d0536a804d3d0fa819170cc574629d2bd015a93612738c5efad961",
+                              "title": "E-841 Front fixies",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1384",
+                              "createdAt": "2023-11-07T15:05:35Z",
+                              "lastUpdateAt": "2023-11-07T15:07:31Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1383,
+                              "id": "0d0720a102776b9992b5c94fbeb8829a8eb67f4c4a6ce3da8a78974ea6a815e0",
+                              "title": "[E-843]  Dynamic statusses payout alerting",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1383",
+                              "createdAt": "2023-11-07T14:13:25Z",
+                              "lastUpdateAt": "2023-11-08T16:38:31Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1380,
+                              "id": "8fb9cdb66d15767bfba6fb6da4d0d3c6bce5be8c051bfb603ab5cf17e73d8ba0",
+                              "title": "fix test and delete duplicate const",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1380",
+                              "createdAt": "2023-11-07T09:06:10Z",
+                              "lastUpdateAt": "2023-11-07T09:06:37Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1379,
+                              "id": "c90613bf0e7d05ca1fc4451e3b25c2a040da1ecd6094ce412c2b013a900d45e8",
+                              "title": "feat: hasMissingUsdcWallet logic to payout info form",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1379",
+                              "createdAt": "2023-11-06T16:54:38Z",
+                              "lastUpdateAt": null,
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": null,
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1378,
+                              "id": "4286747370468a1395d78642b48a97c1d81db6bf3b51d6540a2a610af250f33d",
+                              "title": "fix lint and types",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1378",
+                              "createdAt": "2023-11-06T16:15:28Z",
+                              "lastUpdateAt": "2023-11-07T08:53:38Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 0,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": null,
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1378,
+                              "id": "6ec7b4345a5a5ef3b71e98d67847621ca0a264334781ac3b66d636897eeea0b8",
+                              "title": "fix lint and types",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1378",
+                              "createdAt": "2023-11-06T16:15:28Z",
+                              "lastUpdateAt": "2023-11-07T08:53:11Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1377,
+                              "id": "7c5211884e70166194c71ed5895a876c36914f15796fba51987ddec76ff84320",
+                              "title": "Fixing contributions filter",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1377",
+                              "createdAt": "2023-11-06T15:56:30Z",
+                              "lastUpdateAt": "2023-11-06T15:57:34Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 0,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": null,
+                              "status": "OPEN"
+                            },
+                            {
+                              "number": 1375,
+                              "id": "279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d",
+                              "title": "fix tooltip text",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1375",
+                              "createdAt": "2023-11-03T16:42:17Z",
+                              "lastUpdateAt": "2023-11-03T16:43:49Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": 0,
+                              "commentsCount": null,
+                              "codeReviewOutcome": "APPROVED",
+                              "status": "OPEN"
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 15,
+                          "totalItemNumber": 147,
                           "nextPageIndex": 1
                         }
                          """);

@@ -64,7 +64,8 @@ public interface ProjectStoragePort {
                                                                                        ContributionType contributionType,
                                                                                        Long githubUserid,
                                                                                        int pageIndex, int pageSize,
-                                                                                       String search);
+                                                                                       String search,
+                                                                                       Boolean includeIgnoredItems);
 
     String getProjectSlugById(UUID projectId);
 }

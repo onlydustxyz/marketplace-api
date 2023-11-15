@@ -1308,6 +1308,12 @@ paths:
           name: type
           schema:
             $ref: '#/components/schemas/RewardType'
+        - in: query
+          name: include_ignored_items
+          schema:
+            type: boolean
+            default: false
+            description: True if the response should contain ignored rewardable items
       responses:
         "200":
           description: 'Rewardable contributions'
