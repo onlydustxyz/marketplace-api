@@ -70,11 +70,15 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     GithubAppInstallationRepository githubAppInstallationRepository;
+    @Autowired
+    HasuraUserHelper hasuraUserHelper;
 
     @Test
     void should_get_github_account_from_installation_id() {
+        final String jwt = hasuraUserHelper.authenticatePierre().jwt();
         client.get()
                 .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/123456"))
+                .header("Authorization", "Bearer " + jwt)
                 .exchange()
                 // Then
                 .expectStatus()
@@ -85,8 +89,10 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_404_when_not_found() {
+        final String jwt = hasuraUserHelper.authenticatePierre().jwt();
         client.get()
                 .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
+                .header("Authorization", "Bearer " + jwt)
                 .exchange()
                 // Then
                 .expectStatus()
@@ -96,9 +102,6 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo(404)
                 .jsonPath("$.message").isEqualTo("Installation 0 not found");
     }
-
-    @Autowired
-    HasuraUserHelper hasuraUserHelper;
 
     @Test
     void should_return_user_organizations() {

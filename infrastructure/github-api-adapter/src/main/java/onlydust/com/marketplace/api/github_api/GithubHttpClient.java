@@ -45,12 +45,7 @@ public class GithubHttpClient {
     }
 
     public <ResponseBody> Optional<ResponseBody> get(String path, Class<ResponseBody> responseClass) {
-        final var httpResponse = fetch(buildURI(path), null);
-        return switch (httpResponse.statusCode()) {
-            case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
-            case 403, 404 -> Optional.empty();
-            default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
-        };
+        return get(path, responseClass, null);
     }
 
     public <ResponseBody> Optional<ResponseBody> get(String path, Class<ResponseBody> responseClass,
