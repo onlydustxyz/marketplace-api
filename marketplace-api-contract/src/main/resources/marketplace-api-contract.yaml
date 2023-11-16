@@ -1509,6 +1509,36 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/github/users/{githubUserId}/organizations:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Github
+      summary: Search Github user's organizations
+      operationId: searchGithubUserOrganizations
+      description: |
+        Search Github user's organizations for github user id
+      parameters:
+        - in: path
+          name: githubUserId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: "Github user's organization list"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GithubOrganizationResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/github/installations/{installationId}:
     get:
@@ -2588,8 +2618,12 @@ components:
           example: OnlyDust
         repos:
           type: array
+          description: Github repos linked to installed organization
           items:
             $ref: '#/components/schemas/ShortGithubRepoResponse'
+        installed:
+          type: boolean
+          description: False if this organization is not installed
 
     ShortGithubRepoResponse:
       discriminator:
