@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +36,11 @@ public class GithubRestApi implements GithubApi {
     }
 
     @Override
-    public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations() {
-        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+    public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations(Long githubUserId) {
+        final String githubAccessToken =
+                authenticationService.getHasuraAuthentication().getClaims().getGithubAccessToken();
         final List<GithubAccount> githubAccounts =
-                githubOrganizationFacadePort.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(
-                        hasuraAuthentication.getClaims().getGithubAccessToken(),
-                        hasuraAuthentication.getUser());
+                githubOrganizationFacadePort.getOrganizationsForGithubPersonalToken(githubAccessToken);
         return githubAccounts.isEmpty() ? ResponseEntity.notFound().build() :
                 ResponseEntity.ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
     }
