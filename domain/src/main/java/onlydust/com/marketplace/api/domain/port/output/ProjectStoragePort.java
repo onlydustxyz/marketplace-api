@@ -60,7 +60,7 @@ public interface ProjectStoragePort {
 
     Set<Long> getProjectRepoIds(UUID projectId);
 
-    Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                        ContributionType contributionType,
                                                                                        Long githubUserid,
                                                                                        int pageIndex, int pageSize,
@@ -68,4 +68,8 @@ public interface ProjectStoragePort {
                                                                                        Boolean includeIgnoredItems);
 
     String getProjectSlugById(UUID projectId);
+
+    RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
+
+    RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 }

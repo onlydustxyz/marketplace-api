@@ -9,24 +9,19 @@ import java.util.Date;
 
 @Builder
 @Data
-public class RewardItemView {
-    Long number;
+public class RewardableItemView {
     String id;
-    String title;
-    String githubUrl;
-    Date createdAt;
-    Date lastUpdateAt;
-    String repoName;
+    String contributionId;
     ContributionType type;
     RewardItemStatus status;
+    Date createdAt;
+    Date lastUpdateAt;
+    Integer commentsCount;
     Integer commitsCount;
     Integer userCommitsCount;
-    Integer commentsCount;
-    Long githubAuthorId;
-    String authorLogin;
-    String authorAvatarUrl;
-    String authorGithubUrl;
-    Long recipientId;
+    Long number;
+    String repoName;
+    String githubUrl;
+    String title;
     CodeReviewOutcome outcome;
-
 }

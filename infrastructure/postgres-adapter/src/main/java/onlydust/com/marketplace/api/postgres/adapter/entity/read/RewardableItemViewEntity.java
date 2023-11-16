@@ -24,6 +24,8 @@ public class RewardableItemViewEntity {
     @Id
     @Column(name = "id")
     String id;
+    @Column(name = "contribution_id")
+    String contributionId;
     @Column(name = "start_date")
     Date createdAt;
     @Column(name = "end_date")

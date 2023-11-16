@@ -15,11 +15,17 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class ProjectService implements ProjectFacadePort {
+
+    private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
+            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)");
+    private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
+            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)");
 
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
@@ -30,6 +36,7 @@ public class ProjectService implements ProjectFacadePort {
     private final EventStoragePort eventStoragePort;
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
+    private final GithubStoragePort githubStoragePort;
 
     @Override
     public ProjectDetailsView getById(UUID projectId) {
@@ -174,7 +181,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                            ContributionType contributionType,
                                                                                            UUID projectLeadId,
                                                                                            Long githubUserid,
@@ -191,15 +198,15 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand) {
-        if (permissionService.isUserProjectLead(createAndCloseIssueCommand.getProjectId(),
-                createAndCloseIssueCommand.getProjectLeadId())) {
-            if (permissionService.isRepoLinkedToProject(createAndCloseIssueCommand.getProjectId(),
-                    createAndCloseIssueCommand.getGithubRepoId())) {
-                final CreatedAndClosedIssueView issue = dustyBotStoragePort.createIssue(createAndCloseIssueCommand);
-                return dustyBotStoragePort.closeIssue(createAndCloseIssueCommand.toBuilder()
-                        .githubIssueNumber(issue.getNumber())
-                        .build());
+    public RewardableItemView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand command) {
+        if (permissionService.isUserProjectLead(command.getProjectId(), command.getProjectLeadId())) {
+            if (permissionService.isRepoLinkedToProject(command.getProjectId(), command.getGithubRepoId())) {
+                final var repo = githubStoragePort.findRepoById(command.getGithubRepoId()).orElseThrow(() ->
+                        OnlyDustException.notFound("Repo not found"));
+                final RewardableItemView issue = dustyBotStoragePort.createIssue(repo.getOwner(),
+                        repo.getName(), command.getTitle(), command.getDescription());
+                return dustyBotStoragePort.closeIssue(repo.getOwner(),
+                        repo.getName(), issue.getNumber());
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
                                                   "project");
@@ -207,5 +214,39 @@ public class ProjectService implements ProjectFacadePort {
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
         }
+    }
+
+    @Override
+    public RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can add other issues as rewardable items");
+        }
+        final var matcher = ISSUE_URL_REGEX.matcher(issueUrl);
+        if (!matcher.matches()) {
+            throw OnlyDustException.badRequest("Invalid issue url '%s'".formatted(issueUrl));
+        }
+        final var repoOwner = matcher.group(1);
+        final var repoName = matcher.group(2);
+        final var issueNumber = Long.parseLong(matcher.group(3));
+
+        indexerPort.indexIssue(repoOwner, repoName, issueNumber);
+        return projectStoragePort.getRewardableIssue(repoOwner, repoName, issueNumber);
+    }
+
+    @Override
+    public RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            throw OnlyDustException.forbidden("Only project leads can add other pull requests as rewardable items");
+        }
+        final var matcher = PULL_REQUEST_URL_REGEX.matcher(pullRequestUrl);
+        if (!matcher.matches()) {
+            throw OnlyDustException.badRequest("Invalid pull request url '%s'".formatted(pullRequestUrl));
+        }
+        final var repoOwner = matcher.group(1);
+        final var repoName = matcher.group(2);
+        final var pullRequestNumber = Long.parseLong(matcher.group(3));
+
+        indexerPort.indexPullRequest(repoOwner, repoName, pullRequestNumber);
+        return projectStoragePort.getRewardablePullRequest(repoOwner, repoName, pullRequestNumber);
     }
 }

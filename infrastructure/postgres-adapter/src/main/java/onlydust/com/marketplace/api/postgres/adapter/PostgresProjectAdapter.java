@@ -74,6 +74,23 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .getKey();
     }
 
+    @Override
+    public RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber) {
+        return rewardableItemRepository.findRewardableIssue(repoOwner, repoName, issueNumber)
+                .map(RewardableItemMapper::itemToDomain)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Issue %s/%s#%d not found", repoOwner, repoName,
+                        issueNumber)));
+    }
+
+    @Override
+    public RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber) {
+        return rewardableItemRepository.findRewardablePullRequest(repoOwner, repoName, pullRequestNumber)
+                .map(RewardableItemMapper::itemToDomain)
+                .orElseThrow(() -> OnlyDustException.notFound(format("Pull request %s/%s#%d not found", repoOwner,
+                        repoName,
+                        pullRequestNumber)));
+    }
+
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);
@@ -357,7 +374,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<RewardItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                               ContributionType contributionType,
                                                                                               Long githubUserid,
                                                                                               int pageIndex,
@@ -370,7 +387,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     case PULL_REQUEST -> RewardableItemViewEntity.ContributionType.PULL_REQUEST.name();
                     case CODE_REVIEW -> RewardableItemViewEntity.ContributionType.CODE_REVIEW.name();
                 };
-        final List<RewardItemView> rewardItemViews =
+        final List<RewardableItemView> rewardableItemViews =
                 rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid, type, search,
                                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                                 pageSize, includeIgnoredItems)
@@ -379,8 +396,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .toList();
         final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid, type,
                 search, includeIgnoredItems);
-        return Page.<RewardItemView>builder()
-                .content(rewardItemViews)
+        return Page.<RewardableItemView>builder()
+                .content(rewardableItemViews)
                 .totalItemNumber(count.intValue())
                 .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
                 .build();

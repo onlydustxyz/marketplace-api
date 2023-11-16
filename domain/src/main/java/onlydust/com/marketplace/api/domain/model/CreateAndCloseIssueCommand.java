@@ -11,9 +11,6 @@ public class CreateAndCloseIssueCommand {
     UUID projectId;
     UUID projectLeadId;
     Long githubRepoId;
-    String githubRepoName;
-    String githubRepoOwnerName;
     String title;
     String description;
-    Long githubIssueNumber;
 }

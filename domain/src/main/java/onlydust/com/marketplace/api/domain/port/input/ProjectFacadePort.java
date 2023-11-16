@@ -58,7 +58,7 @@ public interface ProjectFacadePort {
     Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLead,
                                                               int pageIndex, int pageSize);
 
-    Page<RewardItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+    Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                     ContributionType contributionType,
                                                                                     UUID projectLeadId,
                                                                                     Long githubUserid,
@@ -66,5 +66,9 @@ public interface ProjectFacadePort {
                                                                                     String search,
                                                                                     Boolean includeIgnoredItems);
 
-    CreatedAndClosedIssueView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
+    RewardableItemView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
+
+    RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl);
+
+    RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl);
 }

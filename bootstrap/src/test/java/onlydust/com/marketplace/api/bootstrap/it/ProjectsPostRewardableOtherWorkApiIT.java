@@ -19,147 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @ActiveProfiles({"hasura_auth"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
-
-    @Autowired
-    HasuraUserHelper hasuraUserHelper;
-    @Autowired
-    ProjectRepository projectRepository;
-
-    @Test
-    @Order(1)
-    public void should_be_unauthorized() {
-        // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_ISSUE, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
-                        {
-                          "githubRepoId": 1,
-                          "title": "test",
-                          "description": "test",
-                          "githubOwnerName": "test",
-                          "githubRepoName": "test"
-                        }
-                        """, UUID.randomUUID()))
-                // Then
-                .exchange().expectStatus().isEqualTo(401);
-    }
-
-    @Test
-    @Order(2)
-    void should_be_forbidden_given_authenticated_user_not_project_lead() {
-        // Given
-        hasuraUserHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
-                false);
-        final String jwt = hasuraUserHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
-
-        // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_ISSUE, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
-                        {
-                          "githubRepoId": 1,
-                          "title": "test",
-                          "description": "test",
-                          "githubOwnerName": "test",
-                          "githubRepoName": "test"
-                        }
-                        """, projectId)).header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Only project "
-                                                                                                       + "leads can " + "create " + "rewardable " + "issue on " + "their " + "projects");
-    }
-
-    @Autowired
-    ProjectLeadRepository projectLeadRepository;
-
-    @Test
-    @Order(3)
-    void should_be_forbidden_given_authenticated_user_project_lead_on_not_linked_repo() {
-        // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-
-        // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue(String.format("""
-                        {
-                          "githubRepoId": 554756922,
-                          "title": "test",
-                          "description": "test",
-                          "githubOwnerName": "test",
-                          "githubRepoName": "test"
-                        }
-                        """, projectId)).header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Rewardable " + "issue can " + "only be " + "created on " + "repos linked " + "to this " + "project");
-    }
-
-    @Autowired
-    GithubHttpClient.Config githubDustyBotConfig;
-
-    @Test
-    void should_create_and_close_rewardable_issue_given_a_project_lead_and_linked_repo() {
-        // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        final Long repoId = 498695724L;
-        final String repoName = "marketplace-frontend";
-        final String owner = "onlydustxyz";
-        final String title = faker.rickAndMorty().character();
-        final String description = faker.rickAndMorty().location();
-
-        // When
-        dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/issues", owner, repoName)))
-                .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
-                .withRequestBody(equalToJson(String.format("""
-                        {
-                            "body": "%s",
-                            "title": "%s"
-                        }
-                        """, description, title)))
-                .willReturn(okJson(CREATE_ISSUE_RESPONSE_JSON)));
-
-        dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/issues/%s", owner, repoName, 25)))
-                .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
-                .withRequestBody(equalToJson("""
-                        {
-                            "state": "closed"
-                        }
-                        """))
-                .willReturn(okJson(String.format(CLOSE_ISSUE_RESPONSE_JSON, title))));
-
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_ISSUE, projectId)))
-                .contentType(APPLICATION_JSON)
-                .bodyValue(String.format("""
-                        {
-                          "githubRepoId": %s,
-                          "title": "%s",
-                          "description": "%s",
-                          "githubOwnerName": "%s",
-                          "githubRepoName": "%s"
-                        }
-                        """, repoId, title, description, owner, repoName))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(String.format(
-                        """
-                                {
-                                    "id": %s,
-                                    "number": %s,
-                                    "title": "%s",
-                                    "htmlUrl": "%s",
-                                    "commentsCount": %s,
-                                    "createdAt": "2023-08-08T06:11:35Z",
-                                    "updatedAt": "2023-08-08T06:13:08Z",
-                                    "closeAt": "2023-08-08T06:13:08Z",
-                                    "repoName": "%s"
-                                }
-                                """, 1840630179, 25, title,
-                        "https://github.com/onlydustxyz/marketplace-frontend/issues/25", 0, repoName
-                ));
-    }
-
+public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApiIT {
 
     private static final String CREATE_ISSUE_RESPONSE_JSON = """
             {
@@ -223,7 +83,6 @@ public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
                                   "performed_via_github_app": null,
                                   "state_reason": null
                                 }""";
-
     private static final String CLOSE_ISSUE_RESPONSE_JSON = """
             {
               "url": "https://api.github.com/repos/onlydustxyz/marketplace-frontend/issues/25",
@@ -307,4 +166,133 @@ public class ProjectsPostRewardableIssueApiIT extends AbstractMarketplaceApiIT {
             }
 
                 """;
+    @Autowired
+    HasuraUserHelper hasuraUserHelper;
+    @Autowired
+    ProjectRepository projectRepository;
+    @Autowired
+    ProjectLeadRepository projectLeadRepository;
+    @Autowired
+    GithubHttpClient.Config githubDustyBotConfig;
+
+    @Test
+    @Order(1)
+    public void should_be_unauthorized() {
+        // When
+        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+                        {
+                          "githubRepoId": 1,
+                          "title": "test",
+                          "description": "test"
+                        }
+                        """, UUID.randomUUID()))
+                // Then
+                .exchange().expectStatus().isEqualTo(401);
+    }
+
+    @Test
+    @Order(2)
+    void should_be_forbidden_given_authenticated_user_not_project_lead() {
+        // Given
+        hasuraUserHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
+                false);
+        final String jwt = hasuraUserHelper.authenticateUser(1L).jwt();
+        final UUID projectId = projectRepository.findAll().get(0).getId();
+
+        // When
+        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+                        {
+                          "githubRepoId": 1,
+                          "title": "test",
+                          "description": "test"
+                        }
+                        """, projectId)).header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Only project "
+                                                                                                       + "leads can " + "create " + "rewardable " + "issue on " + "their " + "projects");
+    }
+
+    @Test
+    @Order(3)
+    void should_be_forbidden_given_authenticated_user_project_lead_on_not_linked_repo() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+                        {
+                          "githubRepoId": 554756922,
+                          "title": "test",
+                          "description": "test"
+                        }
+                        """, projectId)).header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Rewardable " + "issue can " + "only be " + "created on " + "repos linked " + "to this " + "project");
+    }
+
+    @Test
+    void should_create_and_close_rewardable_issue_given_a_project_lead_and_linked_repo() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final Long repoId = 498695724L;
+        final String repoName = "marketplace-frontend";
+        final String owner = "onlydustxyz";
+        final String title = faker.backToTheFuture().quote();
+        final String description = faker.lorem().paragraph();
+
+        // When
+        dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/issues", owner, repoName)))
+                .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
+                .withRequestBody(equalToJson(String.format("""
+                        {
+                            "body": "%s",
+                            "title": "%s"
+                        }
+                        """, description, title)))
+                .willReturn(okJson(CREATE_ISSUE_RESPONSE_JSON)));
+
+        dustyBotApiWireMockServer.stubFor(post(urlEqualTo(String.format("/repos/%s/%s/issues/%s", owner, repoName, 25)))
+                .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
+                .withRequestBody(equalToJson("""
+                        {
+                            "state": "closed"
+                        }
+                        """))
+                .willReturn(okJson(String.format(CLOSE_ISSUE_RESPONSE_JSON, title))));
+
+        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId)))
+                .contentType(APPLICATION_JSON)
+                .bodyValue(String.format("""
+                        {
+                          "githubRepoId": %s,
+                          "title": "%s",
+                          "description": "%s"
+                        }
+                        """, repoId, title, description))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().consumeWith(System.out::println)
+                .json("""
+                        {
+                          "number": 25,
+                          "id": "1840630179",
+                          "title": "%s",
+                          "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25",
+                          "createdAt": "2023-08-08T06:11:35Z",
+                          "lastUpdateAt": "2023-08-08T06:13:08Z",
+                          "repoName": "marketplace-frontend",
+                          "type": "ISSUE",
+                          "commitsCount": null,
+                          "userCommitsCount": null,
+                          "commentsCount": 0,
+                          "codeReviewOutcome": null,
+                          "status": "CLOSED"
+                        }
+                        """.formatted(title));
+    }
 }

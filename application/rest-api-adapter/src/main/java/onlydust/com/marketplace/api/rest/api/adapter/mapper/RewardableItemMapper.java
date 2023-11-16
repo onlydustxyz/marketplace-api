@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.contract.model.GithubStatus;
 import onlydust.com.marketplace.api.contract.model.RewardableItemResponse;
 import onlydust.com.marketplace.api.contract.model.RewardableItemsPageResponse;
-import onlydust.com.marketplace.api.domain.view.RewardItemView;
+import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
 
 public interface RewardableItemMapper {
 
-    static RewardableItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {
+    static RewardableItemsPageResponse pageToResponse(final int pageIndex, Page<RewardableItemView> page) {
         final RewardableItemsPageResponse rewardableItemsPageResponse = new RewardableItemsPageResponse();
         rewardableItemsPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
         rewardableItemsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
@@ -31,9 +31,10 @@ public interface RewardableItemMapper {
         return rewardableItemsPageResponse;
     }
 
-    private static RewardableItemResponse itemToResponse(final RewardItemView view) {
+    static RewardableItemResponse itemToResponse(final RewardableItemView view) {
         return new RewardableItemResponse()
                 .id(view.getId())
+                .contributionId(view.getContributionId())
                 .type(switch (view.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;
