@@ -2596,6 +2596,7 @@ components:
         - htmlUrl
         - name
         - repos
+        - installed
       properties:
         id:
           $ref: '#/components/schemas/GithubUserId'
