@@ -3345,6 +3345,14 @@ components:
 
     CreateProjectRequest:
       type: object
+      required: 
+        - name
+        - shortDescription
+        - longDescription
+        - moreInfo
+        - isLookingForContributors
+        - inviteGithubUserIdsAsProjectLeads
+        - githubRepoIds
       properties:
         name:
           type: string
