@@ -15,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
 
 @Slf4j
@@ -32,11 +33,11 @@ public class GithubHttpClient {
         }
     }
 
-    public HttpResponse<byte[]> fetch(final URI uri) {
+    public HttpResponse<byte[]> fetch(final URI uri, final String personalAccessToken) {
         LOGGER.debug("Fetching {}", uri);
         try {
             final var requestBuilder = HttpRequest.newBuilder().uri(uri).headers("Authorization",
-                    "Bearer " + config.personalAccessToken).GET();
+                    "Bearer " + personalAccessToken).GET();
             return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofByteArray());
         } catch (IOException | InterruptedException e) {
             throw OnlyDustException.internalServerError("Unable to fetch github API:" + uri, e);
@@ -44,7 +45,7 @@ public class GithubHttpClient {
     }
 
     public <ResponseBody> Optional<ResponseBody> get(String path, Class<ResponseBody> responseClass) {
-        final var httpResponse = fetch(buildURI(path));
+        final var httpResponse = fetch(buildURI(path), null);
         return switch (httpResponse.statusCode()) {
             case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
             case 403, 404 -> Optional.empty();
@@ -52,12 +53,24 @@ public class GithubHttpClient {
         };
     }
 
+    public <ResponseBody> Optional<ResponseBody> get(String path, Class<ResponseBody> responseClass,
+                                                     final String personalAccessToken) {
+        final var httpResponse = fetch(buildURI(path), isNull(personalAccessToken) ? config.personalAccessToken :
+                personalAccessToken);
+        return switch (httpResponse.statusCode()) {
+            case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
+            case 403, 404 -> Optional.empty();
+            default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
+        };
+    }
+
+
     public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody,
                                                                    Class<ResponseBody> responseClass) {
         try {
             final HttpResponse<byte[]> httpResponse =
                     httpClient.send(HttpRequest.newBuilder().uri(buildURI(path)).headers("Authorization",
-                            "Bearer " + config.personalAccessToken)
+                                    "Bearer " + config.personalAccessToken)
                             .POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {

@@ -86,6 +86,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
+    protected static final String GITHUB_USERS_ORGANIZATIONS_GET = "/api/v1/github/users/organizations";
     protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
 
     @Container

@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.service.RetriedGithubInstallationFaca
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.adapters.GithubDustyBotAdapter;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
+import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,7 @@ public class GithubApiClientConfiguration {
 
     @Bean
     public GithubSearchPort githubSearchPort(final GithubHttpClient githubHttpClient) {
-        return new GithubSearchApiAdapter(githubHttpClient);
+        return new GithubSearchApiAdapter(githubHttpClient, GithubPaginationProperties.builder().build());
     }
 
     @Bean

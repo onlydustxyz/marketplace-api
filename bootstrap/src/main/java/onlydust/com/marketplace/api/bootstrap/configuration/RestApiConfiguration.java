@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.port.input.*;
+import onlydust.com.marketplace.api.domain.service.GithubAccountService;
 import onlydust.com.marketplace.api.domain.service.RewardService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
@@ -46,8 +47,10 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public GithubRestApi githubRestApi(final GithubInstallationFacadePort githubInstallationFacadePort) {
-        return new GithubRestApi(githubInstallationFacadePort);
+    public GithubRestApi githubRestApi(final GithubInstallationFacadePort githubInstallationFacadePort,
+                                       final GithubAccountService githubAccountService,
+                                       final AuthenticationService authenticationService) {
+        return new GithubRestApi(githubInstallationFacadePort, githubAccountService, authenticationService);
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class GithubAccount {
     Long id;
+    Long installationId;
     String login;
     String name;
     String type;

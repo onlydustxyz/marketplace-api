@@ -11,5 +11,5 @@ public interface GithubStoragePort {
 
     Optional<GithubRepo> findRepoById(Long repoId);
 
-    List<GithubAccount> findAccountsByIds(List<GithubAccount> userGithubAccounts);
+    List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
 }

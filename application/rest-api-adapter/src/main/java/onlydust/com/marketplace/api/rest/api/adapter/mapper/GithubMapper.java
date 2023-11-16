@@ -10,13 +10,14 @@ import java.util.Comparator;
 public class GithubMapper {
     public static InstallationResponse mapToInstallationResponse(Long installationId, GithubAccount githubAccount) {
         var organization = new GithubOrganizationResponse();
-        organization.setId(githubAccount.id());
-        organization.setLogin(githubAccount.login());
-        organization.setAvatarUrl(githubAccount.avatarUrl());
-        organization.setHtmlUrl(githubAccount.htmlUrl());
-        organization.setName(githubAccount.name());
+        organization.setId(githubAccount.getId());
+        organization.setLogin(githubAccount.getLogin());
+        organization.setAvatarUrl(githubAccount.getAvatarUrl());
+        organization.setHtmlUrl(githubAccount.getHtmlUrl());
+        organization.setName(githubAccount.getName());
+        organization.setInstalled(githubAccount.getInstalled());
         organization.setRepos(
-                githubAccount.repos().stream()
+                githubAccount.getRepos().stream()
                         .map(repo -> {
                             var installedRepo = new ShortGithubRepoResponse();
                             installedRepo.setId(repo.getId());
@@ -37,13 +38,15 @@ public class GithubMapper {
 
     public static GithubOrganizationResponse mapToGithubOrganizationResponse(final GithubAccount githubAccount) {
         var organization = new GithubOrganizationResponse();
-        organization.setId(githubAccount.id());
-        organization.setLogin(githubAccount.login());
-        organization.setAvatarUrl(githubAccount.avatarUrl());
-        organization.setHtmlUrl(githubAccount.htmlUrl());
-        organization.setName(githubAccount.name());
+        organization.setId(githubAccount.getId());
+        organization.setLogin(githubAccount.getLogin());
+        organization.setAvatarUrl(githubAccount.getAvatarUrl());
+        organization.setHtmlUrl(githubAccount.getHtmlUrl());
+        organization.setName(githubAccount.getName());
+        organization.setInstalled(githubAccount.getInstalled());
+        organization.setInstallationId(githubAccount.getInstallationId());
         organization.setRepos(
-                githubAccount.repos().stream()
+                githubAccount.getRepos().stream()
                         .map(repo -> {
                             var installedRepo = new ShortGithubRepoResponse();
                             installedRepo.setId(repo.getId());
