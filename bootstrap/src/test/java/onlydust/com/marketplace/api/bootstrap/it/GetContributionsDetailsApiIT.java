@@ -30,6 +30,26 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_return_pull_request_review_state() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "90fb751a-1137-4815-b3c4-54927a5db059",
+                        "97735d1fae1597c261d55e07ac10c947ae99ed2d0daf2826938e2f2de9b69ac8")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.githubPullRequestReviewState").isEqualTo("APPROVED");
+    }
+
+
+    @Test
     void should_return_contribution_details_when_found() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
@@ -69,7 +89,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                            "githubTitle": "Anthony buisset feature/starknet",
                            "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/62",
                            "githubBody": null,
-                           "githubCodeReviewOutcome": null,
+                           "githubPullRequestReviewState": "PENDING_REVIEWER",
                            "project": {
                              "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                              "slug": "kaaper",
@@ -254,6 +274,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+
     @Test
     void should_return_code_review_details() {
         // Given
@@ -294,7 +315,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubTitle": "Feat/view",
                           "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
                           "githubBody": null,
-                          "githubCodeReviewOutcome": "APPROVED",
                           "project": {
                             "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                             "slug": "kaaper",
@@ -324,7 +344,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": "Feat/view",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
                               "githubBody": null,
-                              "githubCodeReviewOutcome": null,
                               "is_mine": false
                             }
                           ],
