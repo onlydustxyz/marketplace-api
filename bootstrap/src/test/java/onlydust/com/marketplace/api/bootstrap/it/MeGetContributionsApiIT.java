@@ -51,7 +51,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                  "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
                                },
                                "githubNumber": 1,
-                               "githubStatus": "MERGED",
+                               "githubStatus": "DRAFT",
                                "githubTitle": "feat: add common model",
                                "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
                                "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",

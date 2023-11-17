@@ -66,8 +66,23 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                     "name": "gateway",
                     "description": null,
                     "htmlUrl": "https://github.com/onlydustxyz/gateway"
+                  },
+                  {
+                    "id": 663102799,
+                    "owner": "onlydustxyz",
+                    "name": "od-rust-template",
+                    "description": null,
+                    "htmlUrl": "https://github.com/onlydustxyz/od-rust-template"
+                  },
+                  {
+                    "id": 698096830,
+                    "owner": "onlydustxyz",
+                    "name": "marketplace-api",
+                    "description": null,
+                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-api"
                   }
-                ]
+                ],
+                "installed": null
               }
             }
             """;
