@@ -209,6 +209,7 @@ public interface ProjectMapper {
         repoResponse.setStars(Math.toIntExact(repo.getStarCount()));
         repoResponse.setHasIssues(repo.getHasIssues());
         repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
+        repoResponse.setIsAuthorizedInGithubApp(repo.getIsAuthorizedInGithubApp());
         return repoResponse;
     }
 

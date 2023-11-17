@@ -17,5 +17,6 @@ public class ProjectOrganizationRepoView {
     String url;
     Boolean hasIssues;
     Boolean isIncludedInProject;
+    Boolean isAuthorizedInGithubApp;
     Map<String, Long> technologies;
 }

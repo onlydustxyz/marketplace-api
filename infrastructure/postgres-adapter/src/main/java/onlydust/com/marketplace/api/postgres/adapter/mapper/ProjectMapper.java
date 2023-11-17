@@ -44,7 +44,12 @@ public interface ProjectMapper {
                 .name(entity.getName())
                 .installationId(isNull(entity.getInstallation()) ? null : entity.getInstallation().getId())
                 .repos(entity.getRepos().stream()
-                        .map(repo -> RepoMapper.mapToDomain(repo, repoIdsIncludedInProject.contains(repo.getId())))
+                        .map(repo -> RepoMapper.mapToDomain(repo,
+                                repoIdsIncludedInProject.contains(repo.getId()),
+                                entity.getInstallation() != null &&
+                                entity.getInstallation().getAuthorizedRepos().stream()
+                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                        )
                         .collect(Collectors.toSet()))
                 .build()).toList();
 
