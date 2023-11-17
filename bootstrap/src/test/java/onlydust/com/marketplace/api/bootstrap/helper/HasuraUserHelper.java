@@ -71,7 +71,12 @@ public class HasuraUserHelper {
 
     @NonNull
     public AuthenticatedUser authenticatePierre() {
-        return authenticateUser(16590657L);
+        return authenticateUser(16590657L, null);
+    }
+
+    @NonNull
+    public AuthenticatedUser authenticatePierre(String githubPAT) {
+        return authenticateUser(16590657L, githubPAT);
     }
 
     @NonNull
@@ -91,7 +96,19 @@ public class HasuraUserHelper {
     }
 
     @NonNull
+    public AuthenticatedUser authenticateUser(Long githubUserId, String githubPAT) {
+        final AuthUserEntity user = authUserRepository.findByGithubUserId(githubUserId).orElseThrow();
+        return authenticateUser(user, githubPAT);
+    }
+
+
+
+    @NonNull
     public AuthenticatedUser authenticateUser(AuthUserEntity user) {
+        return authenticateUser(user, null);
+    }
+
+    public AuthenticatedUser authenticateUser(AuthUserEntity user, String githubPAT) {
         try {
             return new AuthenticatedUser(HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
                     .iss(jwtSecret.getIssuer())
@@ -100,6 +117,7 @@ public class HasuraUserHelper {
                             .allowedRoles(List.of("me", "public", "registered_user"))
                             .githubUserId(user.getGithubUserId())
                             .avatarUrl(user.getAvatarUrlAtSignup())
+                            .githubAccessToken(githubPAT)
                             .login(user.getLoginAtSignup())
                             .build())
                     .build()), user);
@@ -107,6 +125,7 @@ public class HasuraUserHelper {
             throw new RuntimeException(e);
         }
     }
+
 
     public record AuthenticatedUser(String jwt, AuthUserEntity user) {
     }

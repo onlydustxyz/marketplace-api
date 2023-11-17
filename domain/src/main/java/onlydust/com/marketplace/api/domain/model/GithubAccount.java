@@ -1,14 +1,25 @@
 package onlydust.com.marketplace.api.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public record GithubAccount(
-        Long id,
-        String login,
-        String name,
-        String type,
-        String htmlUrl,
-        String avatarUrl,
-        List<GithubRepo> repos
-) {
+@Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
+public class GithubAccount {
+    Long id;
+    Long installationId;
+    String login;
+    String name;
+    String type;
+    String htmlUrl;
+    String avatarUrl;
+    @Builder.Default
+    List<GithubRepo> repos = new ArrayList<>();
+    @Builder.Default
+    Boolean installed = false;
 }

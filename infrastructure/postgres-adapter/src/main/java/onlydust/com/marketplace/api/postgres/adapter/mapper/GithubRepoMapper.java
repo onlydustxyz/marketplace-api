@@ -4,8 +4,8 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubRepoEntity;
 
-public class GithubRepoMapper {
-    public static GithubRepo map(GithubRepoEntity repo) {
+public interface GithubRepoMapper {
+    static GithubRepo map(GithubRepoEntity repo) {
         return GithubRepo.builder()
                 .id(repo.getId())
                 .owner(repo.getOwner().getLogin())
@@ -18,7 +18,7 @@ public class GithubRepoMapper {
                 .build();
     }
 
-    public static GithubRepo map(GithubRepoViewEntity repo) {
+    static GithubRepo map(GithubRepoViewEntity repo) {
         return GithubRepo.builder()
                 .id(repo.getId())
                 .owner(repo.getOwner())

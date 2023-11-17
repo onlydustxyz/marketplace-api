@@ -1509,7 +1509,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /api/v1/github/users/{githubUserId}/organizations:
+  /api/v1/github/users/organizations:
     get:
       security:
         - bearerAuth: [ ]
@@ -1519,13 +1519,6 @@ paths:
       operationId: searchGithubUserOrganizations
       description: |
         Search Github user's organizations for github user id
-      parameters:
-        - in: path
-          name: githubUserId
-          required: true
-          schema:
-            type: integer
-            format: int64
       responses:
         "200":
           description: "Github user's organization list"
@@ -2596,6 +2589,7 @@ components:
         - htmlUrl
         - name
         - repos
+        - installed
       properties:
         id:
           $ref: '#/components/schemas/GithubUserId'
@@ -2624,6 +2618,9 @@ components:
         installed:
           type: boolean
           description: False if this organization is not installed
+        installationId:
+          type: integer
+          format: int64
 
     ShortGithubRepoResponse:
       discriminator:

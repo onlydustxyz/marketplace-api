@@ -49,9 +49,11 @@ public class DomainConfiguration {
     @Bean
     public GithubInstallationFacadePort githubInstallationFacadePort(
             final PostgresGithubAdapter postgresGithubAdapter,
+            final GithubSearchPort githubSearchPort,
             final RetriedGithubInstallationFacade.Config config
     ) {
-        return new RetriedGithubInstallationFacade(new GithubInstallationService(postgresGithubAdapter), config);
+        return new RetriedGithubInstallationFacade(new GithubAccountService(postgresGithubAdapter, githubSearchPort),
+                config);
     }
 
     @Bean
@@ -85,5 +87,11 @@ public class DomainConfiguration {
                                                              final ProjectStoragePort projectStoragePort,
                                                              final PermissionService permissionService) {
         return new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+    }
+
+    @Bean
+    public GithubAccountService githubAccountService(final GithubSearchPort githubSearchPort,
+                                                     final GithubStoragePort githubStoragePort) {
+        return new GithubAccountService(githubStoragePort, githubSearchPort);
     }
 }
