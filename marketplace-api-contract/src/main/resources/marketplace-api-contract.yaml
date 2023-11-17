@@ -2485,7 +2485,7 @@ components:
         organizations:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectGithubOrganizationResponse'
+            $ref: '#/components/schemas/GithubOrganizationResponse'
         leaders:
           type: array
           items:
@@ -2541,48 +2541,6 @@ components:
         - PRIVATE
       description: Is the project visible to anyone?
 
-    ProjectGithubOrganizationResponse:
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/GithubUserId'
-        login:
-          type: string
-          description: Organization's Github login
-          example: onlydustxyz
-        avatarUrl:
-          type: string
-          format: url
-          description: Direct URL to organization's avatar image
-          example: 'https://avatars.githubusercontent.com/u/98735558?v=4'
-        htmlUrl:
-          type: string
-          format: url
-          description: The public Github URL of the organization
-          example: 'https://github.com/onlydustxyz'
-        name:
-          type: string
-          example: OnlyDust
-        installationId:
-          $ref: '#/components/schemas/GithubInstallationId'
-        repos:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectGithubOrganizationRepoResponse'
-
-    ProjectGithubOrganizationRepoResponse:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/GithubRepoResponse'
-        - type: object
-          properties:
-            isIncludedInProject:
-              type: boolean
-              description: Is the repo included in the project?
-            isAuthorizedInGithubApp:
-              type: boolean
-              description: Is the repo authorized in the Github app?
-
     GithubOrganizationResponse:
       type: object
       required:
@@ -2617,7 +2575,7 @@ components:
           type: array
           description: Github repos linked to installed organization
           items:
-            $ref: '#/components/schemas/ShortGithubRepoResponse'
+            $ref: '#/components/schemas/GithubRepoResponse'
         installed:
           type: boolean
           description: False if this organization is not installed
@@ -2662,9 +2620,7 @@ components:
         - $ref: '#/components/schemas/ShortGithubRepoResponse'
         - type: object
           required:
-            - stars
-            - forkCount
-            - hasIssues
+            - isIncludedInProject
           properties:
             stars:
               type: integer
@@ -2677,6 +2633,9 @@ components:
             hasIssues:
               type: boolean
               description: Are issues enabled on Github for this repo
+            isIncludedInProject:
+              type: boolean
+              description: Is the repo included in the project?
 
     Technologies:
       type: object
