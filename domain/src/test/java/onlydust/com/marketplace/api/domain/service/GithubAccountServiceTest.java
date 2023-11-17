@@ -50,7 +50,8 @@ public class GithubAccountServiceTest {
                         .starsCount(1L)
                         .forksCount(12L)
                         .build()
-                )
+                ),
+                List.of(123446L)
                 , true
         );
 
@@ -86,6 +87,7 @@ public class GithubAccountServiceTest {
                         .forksCount(12L)
                         .build()
                 ),
+                List.of(123446L),
                 true
         );
 

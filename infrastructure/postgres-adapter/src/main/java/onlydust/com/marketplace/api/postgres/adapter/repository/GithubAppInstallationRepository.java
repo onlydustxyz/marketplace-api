@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubAppInstallationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
