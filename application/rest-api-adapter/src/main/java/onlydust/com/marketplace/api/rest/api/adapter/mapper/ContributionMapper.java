@@ -6,8 +6,11 @@ import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
+import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+
+import java.util.Optional;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 
@@ -53,11 +56,20 @@ public interface ContributionMapper {
                 .githubHtmlUrl(contributionView.getGithubHtmlUrl())
                 .githubBody(contributionView.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(contributionView.getGithubAuthor()))
-                .githubCodeReviewOutcome(mapGithubCodeReviewState(contributionView.getGithubStatus()))
+                .githubPullRequestReviewState(contributionView.getGithubPullRequestReviewState().map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contributionView.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
                 .links(contributionView.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewardIds(contributionView.getRewardIds());
+    }
+
+    static GithubPullRequestReviewState mapGithubPullRequestReviewState(PullRequestReviewState githubPullRequestReviewState) {
+        return switch (githubPullRequestReviewState) {
+            case APPROVED -> GithubPullRequestReviewState.APPROVED;
+            case CHANGES_REQUESTED -> GithubPullRequestReviewState.CHANGES_REQUESTED;
+            case PENDING_REVIEWER -> GithubPullRequestReviewState.PENDING_REVIEWER;
+            case UNDER_REVIEW -> GithubPullRequestReviewState.UNDER_REVIEW;
+        };
     }
 
     static GithubCodeReviewState mapGithubCodeReviewState(String githubStatus) {
@@ -80,7 +92,6 @@ public interface ContributionMapper {
                 .githubHtmlUrl(link.getGithubHtmlUrl())
                 .githubBody(link.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(link.getGithubAuthor()))
-                .githubCodeReviewOutcome(mapGithubCodeReviewState(link.getGithubStatus()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()))
                 .isMine(link.getIsMine());
     }
@@ -122,7 +133,7 @@ public interface ContributionMapper {
                 .githubHtmlUrl(contribution.getGithubHtmlUrl())
                 .githubBody(contribution.getGithubBody())
                 .githubAuthor(ProjectMapper.mapUserLink(contribution.getGithubAuthor()))
-                .githubCodeReviewOutcome(mapGithubCodeReviewState(contribution.getGithubStatus()))
+                .githubPullRequestReviewState(contribution.getGithubPullRequestReviewState().map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))
                 .commentsCount(contribution.getGithubCommentsCount())
