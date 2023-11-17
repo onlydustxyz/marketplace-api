@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
@@ -9,11 +10,13 @@ import onlydust.com.marketplace.api.domain.model.Project;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Value
 @Builder
-public class ContributionView {
+@EqualsAndHashCode(callSuper = true)
+public class ContributionView extends ContributionBaseView {
     String id;
     Date createdAt;
     Date completedAt;
@@ -29,6 +32,7 @@ public class ContributionView {
     Project project;
     List<ContributionLinkView> links;
     List<UUID> rewardIds;
+    List<CodeReviewState> codeReviewStates;
 
     public enum Sort {
         CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE
