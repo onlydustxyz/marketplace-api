@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.view.ProjectOrganizationRepoView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubRepoViewEntity;
 
 import java.util.HashMap;

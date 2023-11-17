@@ -17,7 +17,7 @@ public class GithubMapper {
         organization.setName(githubAccount.getName());
         organization.setInstalled(githubAccount.getInstalled());
         organization.setRepos(
-                githubAccount.getRepos().stream()
+                githubAccount.getAuthorizedRepos().stream()
                         .map(repo -> {
                             var installedRepo = new ShortGithubRepoResponse();
                             installedRepo.setId(repo.getId());
@@ -46,7 +46,7 @@ public class GithubMapper {
         organization.setInstalled(githubAccount.getInstalled());
         organization.setInstallationId(githubAccount.getInstallationId());
         organization.setRepos(
-                githubAccount.getRepos().stream()
+                githubAccount.getAuthorizedRepos().stream()
                         .map(repo -> {
                             var installedRepo = new ShortGithubRepoResponse();
                             installedRepo.setId(repo.getId());

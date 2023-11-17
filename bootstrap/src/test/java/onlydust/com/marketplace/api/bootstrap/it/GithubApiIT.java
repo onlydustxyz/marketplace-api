@@ -2,10 +2,14 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAuthorizedRepoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 
@@ -103,6 +107,9 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.message").isEqualTo("Installation 0 not found");
     }
 
+    @Autowired
+    GithubAuthorizedRepoRepository githubAuthorizedRepoRepository;
+
     @Test
     void should_return_user_organizations() {
         // Given
@@ -157,6 +164,51 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                                     }
                                 ]
                         """)));
+        githubAuthorizedRepoRepository.deleteAll(List.of(
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(649551461L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(656103826L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(656112347L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(636240099L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(641970419L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(593536214L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(595278857L)
+                                .build()),
+                        new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                                .installationId(43872836L)
+                                .repoId(624779785L)
+                                .build())
+                )
+        );
+        githubAuthorizedRepoRepository.saveAll(List.of(
+                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                        .installationId(43914822L)
+                        .repoId(347315291L)
+                        .build()),
+                new GithubAuthorizedRepoEntity(GithubAuthorizedRepoEntity.Id.builder()
+                        .installationId(123456L)
+                        .repoId(498695724L)
+                        .build())
+        ));
 
         // When
         client.get()
@@ -181,6 +233,7 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                                  "owner": "Barbicane-fr",
                                  "name": "maston",
                                  "description": "Open source java project providing simple kafka streams tools using Vavr",
+                          
                                  "htmlUrl": "https://github.com/Barbicane-fr/maston"
                                }
                              ],
@@ -195,46 +248,11 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                              "name": "OnlyDust",
                              "repos": [
                                {
-                                 "id": 480776993,
-                                 "owner": "onlydustxyz",
-                                 "name": "starklings",
-                                 "description": "An interactive tutorial to get you up and running with Starknet",
-                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
-                               },
-                               {
-                                 "id": 481932781,
-                                 "owner": "onlydustxyz",
-                                 "name": "starkonquest",
-                                 "description": "An educational game to learn Cairo where you implement ship AIs that fight to catch as much dust as possible!",
-                                 "htmlUrl": "https://github.com/onlydustxyz/starkonquest"
-                               },
-                               {
-                                 "id": 493591124,
-                                 "owner": "onlydustxyz",
-                                 "name": "kaaper",
-                                 "description": "Documentation generator for Cairo projects.",
-                                 "htmlUrl": "https://github.com/onlydustxyz/kaaper"
-                               },
-                               {
                                  "id": 498695724,
                                  "owner": "onlydustxyz",
                                  "name": "marketplace-frontend",
                                  "description": "Contributions marketplace backend services",
                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                               },
-                               {
-                                 "id": 593218280,
-                                 "owner": "onlydustxyz",
-                                 "name": "octocrab",
-                                 "description": "A modern, extensible GitHub API Client for Rust.",
-                                 "htmlUrl": "https://github.com/onlydustxyz/octocrab"
-                               },
-                               {
-                                 "id": 593701982,
-                                 "owner": "onlydustxyz",
-                                 "name": "gateway",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/onlydustxyz/gateway"
                                }
                              ],
                              "installed": true,
@@ -255,67 +273,11 @@ public class GithubApiIT extends AbstractMarketplaceApiIT {
                                  "htmlUrl": "https://github.com/symeo-io/symeo-monolithic-backend"
                                },
                                {
-                                 "id": 593536214,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-js",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-js"
-                               },
-                               {
                                  "id": 595202901,
                                  "owner": "symeo-io",
                                  "name": "symeo-python",
                                  "description": "The Symeo SDK made for interacting with your Symeo secrets and configuration from python applications",
                                  "htmlUrl": "https://github.com/symeo-io/symeo-python"
-                               },
-                               {
-                                 "id": 595278857,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-webapp",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-webapp"
-                               },
-                               {
-                                 "id": 624779785,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-cli",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-cli"
-                               },
-                               {
-                                 "id": 636240099,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-js-template",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-js-template"
-                               },
-                               {
-                                 "id": 641970419,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-python-template",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-python-template"
-                               },
-                               {
-                                 "id": 649551461,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-reactjs-template",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-reactjs-template"
-                               },
-                               {
-                                 "id": 656103826,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-cloud-function-example",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-cloud-function-example"
-                               },
-                               {
-                                 "id": 656112347,
-                                 "owner": "symeo-io",
-                                 "name": "symeo-lambda-example",
-                                 "description": null,
-                                 "htmlUrl": "https://github.com/symeo-io/symeo-lambda-example"
                                }
                              ],
                              "installed": true,

@@ -21,5 +21,13 @@ public class GithubAccount {
     @Builder.Default
     List<GithubRepo> repos = new ArrayList<>();
     @Builder.Default
+    List<Long> authorizedRepoIds = new ArrayList<>();
+    @Builder.Default
     Boolean installed = false;
+
+    public List<GithubRepo> getAuthorizedRepos() {
+        return this.repos.stream()
+                .filter(githubRepo -> this.authorizedRepoIds.contains(githubRepo.getId()))
+                .toList();
+    }
 }

@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexerexposition.GithubAppInstallationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationEntity;
 
 import java.util.stream.Collectors;
 
@@ -19,6 +19,10 @@ public interface GithubAccountMapper {
                 .installed(true)
                 .installationId(installation.getId())
                 .repos(account.getRepos().stream().map(GithubRepoMapper::map).collect(Collectors.toList()))
+                .authorizedRepoIds(installation.getAuthorizedRepos()
+                        .stream()
+                        .map(githubAuthorizedRepoEntity -> githubAuthorizedRepoEntity.getId().getRepoId())
+                        .toList())
                 .build();
     }
 }
