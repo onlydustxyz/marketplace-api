@@ -38,7 +38,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.repo_name,
                 c.repo_html_url,
                 COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links) as links,
-                rewards.ids as reward_ids
+                rewards.ids as reward_ids,
+                code_reviews.states as code_review_states
             FROM 
                 indexer_exp.contributions c
             INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = c.repo_id
@@ -126,6 +127,16 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 GROUP BY 
                     c.id
             ) AS reviewed_pull_requests ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT 
+                    array_agg(cr.state) as states
+                FROM indexer_exp.github_pull_requests pr
+                INNER JOIN indexer_exp.github_code_reviews cr on cr.pull_request_id = pr.id
+                WHERE 
+                    pr.id = c.pull_request_id
+                GROUP BY 
+                    c.id
+            ) AS code_reviews ON TRUE
             LEFT JOIN LATERAL (
                 SELECT 
                     jsonb_agg(pr.id) as ids
