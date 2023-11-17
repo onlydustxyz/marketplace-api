@@ -65,7 +65,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                              "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
                            },
                            "githubNumber": 62,
-                           "githubStatus": "MERGED",
+                           "githubStatus": "DRAFT",
                            "githubTitle": "Anthony buisset feature/starknet",
                            "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/62",
                            "githubBody": null,
@@ -320,7 +320,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/26416205?v=4"
                               },
                               "githubNumber": 17,
-                              "githubStatus": "MERGED",
+                              "githubStatus": "DRAFT",
                               "githubTitle": "Feat/view",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
                               "githubBody": null,
@@ -331,6 +331,26 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "rewards": []
                         }
                         """)
+        ;
+    }
+
+    @Test
+    void should_return_draft_status() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                        "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.githubStatus").isEqualTo("DRAFT")
         ;
     }
 

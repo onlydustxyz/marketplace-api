@@ -80,6 +80,11 @@ public class HasuraUserHelper {
     }
 
     @NonNull
+    public AuthenticatedUser authenticateHayden() {
+        return authenticateUser(5160414L);
+    }
+
+    @NonNull
     public AuthenticatedUser authenticateAnthony() {
         return authenticateUser(43467246L);
     }
