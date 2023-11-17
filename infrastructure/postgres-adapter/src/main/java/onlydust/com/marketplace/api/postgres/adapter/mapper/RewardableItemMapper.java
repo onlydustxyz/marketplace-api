@@ -20,6 +20,7 @@ public interface RewardableItemMapper {
                 .commitsCount(rewardableItemViewEntity.getCommitsCount())
                 .userCommitsCount(rewardableItemViewEntity.getUserCommitsCount())
                 .number(rewardableItemViewEntity.getNumber())
+                .ignored(rewardableItemViewEntity.getIgnored())
                 .lastUpdateAt(rewardableItemViewEntity.getCompletedAt())
                 .type(switch (rewardableItemViewEntity.getType()) {
                     case ISSUE -> ContributionType.ISSUE;

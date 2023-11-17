@@ -44,15 +44,15 @@ public class IssueResponseDTO {
                 .repoName(repoName)
                 .githubUrl(this.htmlUrl)
                 .title(this.title)
+                .ignored(false)
                 .build();
     }
 
     private RewardItemStatus toStatus() {
         return this.state == null ? RewardItemStatus.OPEN : switch (this.state) {
             case open -> RewardItemStatus.OPEN;
-            case closed ->
-                    StateReason.not_planned.equals(this.stateReason) ? RewardItemStatus.CANCELLED :
-                            RewardItemStatus.CLOSED;
+            case closed -> StateReason.not_planned.equals(this.stateReason) ? RewardItemStatus.CANCELLED :
+                    RewardItemStatus.CLOSED;
         };
     }
 

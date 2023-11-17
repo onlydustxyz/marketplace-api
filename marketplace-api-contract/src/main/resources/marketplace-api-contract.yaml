@@ -3342,7 +3342,7 @@ components:
 
     CreateProjectRequest:
       type: object
-      required: 
+      required:
         - name
         - shortDescription
         - longDescription
@@ -3737,6 +3737,7 @@ components:
         - status
         - number
         - id
+        - ignored
       properties:
         number:
           type: integer
@@ -3775,6 +3776,9 @@ components:
             - CHANGE_REQUESTED
         status:
           $ref: '#/components/schemas/GithubStatus'
+        ignored:
+          type: boolean
+          description: True if the contribution is ignored in the project
 
     ReceiptType:
       type: string
