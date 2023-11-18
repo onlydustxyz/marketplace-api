@@ -127,8 +127,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
                      left join (select pgr.project_id, case count(*) when 0 then false else true end is_missing_github_app_installation
                                 from project_github_repos pgr
-                                join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                join indexer_exp.github_app_installations i on i.account_id = gr.owner_id
+                                join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                                 group by pgr.project_id) r_without_github_app on r_without_github_app.project_id = p.project_id
                      left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                 from public.projects_contributors pc_count

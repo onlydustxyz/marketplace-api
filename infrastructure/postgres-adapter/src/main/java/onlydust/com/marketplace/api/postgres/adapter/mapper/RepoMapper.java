@@ -14,7 +14,8 @@ import static java.util.Objects.isNull;
 
 public interface RepoMapper {
 
-    static ProjectOrganizationRepoView mapToDomain(GithubRepoEntity repo, boolean isIncludedInProject) {
+    static ProjectOrganizationRepoView mapToDomain(GithubRepoEntity repo, boolean isIncludedInProject,
+                                                   boolean isAuthorizedInGithubApp) {
         return ProjectOrganizationRepoView.builder()
                 .githubRepoId(repo.getId())
                 .owner(repo.getOwner().getLogin())
@@ -25,6 +26,7 @@ public interface RepoMapper {
                 .url(repo.getHtmlUrl())
                 .hasIssues(repo.getHasIssues())
                 .isIncludedInProject(isIncludedInProject)
+                .isAuthorizedInGithubApp(isAuthorizedInGithubApp)
                 .technologies(repo.getLanguages())
                 .build();
     }
