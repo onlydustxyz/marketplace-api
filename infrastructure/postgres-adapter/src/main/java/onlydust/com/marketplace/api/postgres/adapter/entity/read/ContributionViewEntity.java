@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.vladmihalcea.hibernate.type.array.EnumArrayType;
+import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
@@ -13,15 +15,22 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "contributions", schema = "indexer_exp")
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
+@TypeDef(
+        typeClass = EnumArrayType.class,
+        defaultForType = CodeReviewState[].class,
+        parameters = {
+                @org.hibernate.annotations.Parameter(
+                        name = AbstractArrayType.SQL_ARRAY_TYPE,
+                        value = "github_code_review_state"
+                )
+        }
+)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributionViewEntity {
     @Id
@@ -65,6 +74,9 @@ public class ContributionViewEntity {
     @org.hibernate.annotations.Type(type = "jsonb")
     List<UUID> rewardIds;
 
+    @Column(columnDefinition = "github_code_review_state[]")
+    CodeReviewState[] codeReviewStates;
+
     public ContributionView toView() {
         final var project = Project.builder()
                 .id(projectId)
@@ -105,6 +117,7 @@ public class ContributionViewEntity {
                 .githubRepo(repo)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
                 .rewardIds(Optional.ofNullable(rewardIds).orElse(List.of()))
+                .codeReviewStates(codeReviewStates == null ? null : Arrays.stream(codeReviewStates).map(CodeReviewState::toDomain).toList())
                 .build();
     }
 

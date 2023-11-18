@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.*;
 
@@ -9,7 +10,8 @@ import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
-public class ContributionDetailsView {
+@EqualsAndHashCode(callSuper = true)
+public class ContributionDetailsView extends ContributionBaseView {
     String id;
     Date createdAt;
     Date completedAt;
@@ -27,6 +29,7 @@ public class ContributionDetailsView {
     Project project;
     List<ContributionLinkView> links;
     List<ContributionRewardView> rewards;
+    List<CodeReviewState> codeReviewStates;
 
     public ContributionDetailsView withRewards(List<ContributionRewardView> rewards) {
         return this.toBuilder()

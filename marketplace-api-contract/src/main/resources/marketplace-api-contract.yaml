@@ -3078,6 +3078,14 @@ components:
         - CHANGES_REQUESTED
         - DISMISSED
 
+    GithubPullRequestReviewState:
+        type: string
+        enum:
+            - PENDING_REVIEWER
+            - UNDER_REVIEW
+            - APPROVED
+            - CHANGES_REQUESTED
+
     CurrencyContract:
       type: string
       description: Currency
@@ -3164,6 +3172,8 @@ components:
               description: Related contributions
               items:
                 $ref: '#/components/schemas/ContributionLinkResponse'
+            githubPullRequestReviewState:
+              $ref: '#/components/schemas/GithubPullRequestReviewState'
             rewardIds:
               type: array
               description: Rewards granted for this contribution
@@ -3216,9 +3226,6 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
-        githubCodeReviewOutcome:
-          $ref: '#/components/schemas/GithubCodeReviewState'
-
 
     ContributionDetailsResponse:
       allOf:
@@ -3259,6 +3266,8 @@ components:
               description: Related contributions
               items:
                 $ref: '#/components/schemas/ContributionLinkResponse'
+            githubPullRequestReviewState:
+              $ref: '#/components/schemas/GithubPullRequestReviewState'
             rewards:
               type: array
               description: Rewards granted for this contribution
