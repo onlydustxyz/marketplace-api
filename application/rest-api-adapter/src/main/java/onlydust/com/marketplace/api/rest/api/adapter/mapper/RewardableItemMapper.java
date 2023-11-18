@@ -59,6 +59,7 @@ public interface RewardableItemMapper {
                 .repoName(view.getRepoName())
                 .githubUrl(view.getGithubUrl())
                 .title(view.getTitle())
+                .ignored(Boolean.TRUE.equals(view.getIgnored()))
                 .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()) {
                     case approved -> RewardableItemResponse.CodeReviewOutcomeEnum.APPROVED;
                     case changeRequested -> RewardableItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;

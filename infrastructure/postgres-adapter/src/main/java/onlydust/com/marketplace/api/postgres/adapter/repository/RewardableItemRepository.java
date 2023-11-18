@@ -67,16 +67,18 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                     where c.pull_request_id = pull_request.id
                       and c.author_id = :githubUserId)                                                                      user_commits_count,
                    issue.comments_count,
-                   code_review.outcome                                                                                       cr_outcome
+                   code_review.outcome                                                                                       cr_outcome,
+                   ic.contribution_id is not null                                                                            ignored
             from public.project_github_repos pgr
                      join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
                      left join get_code_review code_review on code_review.id = c.code_review_id
                      left join get_issue issue on issue.id = c.issue_id
                      left join get_pr pull_request on pull_request.id = c.pull_request_id
                      left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
+                     left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
             where pgr.project_id = :projectId
               and c.contributor_id = :githubUserId
-              and (:includeIgnoredItems is true or c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId))
+              and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
                and (coalesce(:search) is null
                     or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
@@ -118,9 +120,10 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                      left join get_issue issue on issue.id = c.issue_id
                      left join get_pr pull_request on pull_request.id = c.pull_request_id
                      left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
+                     left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
             where pgr.project_id = :projectId
               and c.contributor_id = :githubUserId
-              and (:includeIgnoredItems is true or c.id not in (select ic.contribution_id from public.ignored_contributions ic where ic.project_id = :projectId))
+              and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
                and (coalesce(:search) is null
                     or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
@@ -161,7 +164,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    NULL as                    commits_count,
                    NULL as                    user_commits_count,
                    issue.comments_count,
-                   NULL as                    cr_outcome
+                   NULL as                    cr_outcome,
+                   FALSE as                   ignored
             from get_issue issue
             where issue.repo_owner = :repoOwner
                 and issue.repo_name = :repoName
@@ -201,7 +205,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    pr.commits_count,
                    NULL as                  user_commits_count,
                    NULL as                  comments_count,
-                   NULL as                  cr_outcome
+                   NULL as                  cr_outcome,
+                   FALSE as                 ignored
             from get_pr pr
             where pr.repo_owner = :repoOwner
                 and pr.repo_name = :repoName

@@ -55,6 +55,8 @@ public class RewardableItemViewEntity {
     CodeReviewOutcome outcome;
     @Column(name = "draft")
     Boolean draft;
+    @Column(name = "ignored")
+    Boolean ignored;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW
