@@ -2610,6 +2610,10 @@ components:
             isIncludedInProject:
               type: boolean
               description: Is the repo included in the project?
+            isAuthorizedInGithubApp:
+              type: boolean
+              description: Is the repo authorized in the Github app?
+
 
     Technologies:
       type: object
