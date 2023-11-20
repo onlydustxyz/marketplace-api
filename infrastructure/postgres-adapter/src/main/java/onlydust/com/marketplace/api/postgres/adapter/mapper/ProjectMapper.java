@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public interface ProjectMapper {
 
@@ -43,6 +44,7 @@ public interface ProjectMapper {
                 .htmlUrl(entity.getHtmlUrl())
                 .name(entity.getName())
                 .installationId(isNull(entity.getInstallation()) ? null : entity.getInstallation().getId())
+                .isInstalled(nonNull(entity.getInstallation()))
                 .repos(entity.getRepos().stream()
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),

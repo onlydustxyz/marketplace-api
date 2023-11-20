@@ -88,6 +88,7 @@ public interface ProjectMapper {
         organization.setHtmlUrl(projectOrganizationView.getHtmlUrl());
         organization.setName(projectOrganizationView.getName());
         organization.setInstallationId(projectOrganizationView.getInstallationId());
+        organization.setInstalled(projectOrganizationView.getIsInstalled());
         organization.setRepos(projectOrganizationView.getRepos().stream()
                 .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
                 .map(ProjectMapper::mapOrganizationRepo)
