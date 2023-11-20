@@ -1,14 +1,15 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.GithubOrganizationResponse;
+import onlydust.com.marketplace.api.contract.model.GithubRepoResponse;
 import onlydust.com.marketplace.api.contract.model.InstallationResponse;
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 
 import java.util.Comparator;
 
-public class GithubMapper {
-    public static InstallationResponse mapToInstallationResponse(Long installationId, GithubAccount githubAccount) {
+public interface GithubMapper {
+    static InstallationResponse mapToInstallationResponse(Long installationId, GithubAccount githubAccount) {
         var organization = new GithubOrganizationResponse();
         organization.setId(githubAccount.getId());
         organization.setLogin(githubAccount.getLogin());
@@ -19,7 +20,7 @@ public class GithubMapper {
         organization.setRepos(
                 githubAccount.getAuthorizedRepos().stream()
                         .map(repo -> {
-                            var installedRepo = new ShortGithubRepoResponse();
+                            var installedRepo = new GithubRepoResponse();
                             installedRepo.setId(repo.getId());
                             installedRepo.setName(repo.getName());
                             installedRepo.setOwner(repo.getOwner());
@@ -36,7 +37,7 @@ public class GithubMapper {
         return installation;
     }
 
-    public static GithubOrganizationResponse mapToGithubOrganizationResponse(final GithubAccount githubAccount) {
+    static GithubOrganizationResponse mapToGithubOrganizationResponse(final GithubAccount githubAccount) {
         var organization = new GithubOrganizationResponse();
         organization.setId(githubAccount.getId());
         organization.setLogin(githubAccount.getLogin());
@@ -48,7 +49,7 @@ public class GithubMapper {
         organization.setRepos(
                 githubAccount.getAuthorizedRepos().stream()
                         .map(repo -> {
-                            var installedRepo = new ShortGithubRepoResponse();
+                            var installedRepo = new GithubRepoResponse();
                             installedRepo.setId(repo.getId());
                             installedRepo.setName(repo.getName());
                             installedRepo.setOwner(repo.getOwner());

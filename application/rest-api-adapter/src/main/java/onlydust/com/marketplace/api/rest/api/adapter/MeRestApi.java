@@ -5,14 +5,17 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +41,7 @@ public class MeRestApi implements MeApi {
     private final AuthenticationService authenticationService;
     private final UserFacadePort userFacadePort;
     private final ContributorFacadePort contributorFacadePort;
+    private final GithubOrganizationFacadePort githubOrganizationFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -182,6 +186,7 @@ public class MeRestApi implements MeApi {
         );
     }
 
+    @Override
     public ResponseEntity<ContributedReposResponse> getMyContributedRepos(List<UUID> projects) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
@@ -226,5 +231,16 @@ public class MeRestApi implements MeApi {
         final List<UserRewardView> rewardViews =
                 userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
+    }
+
+    @Override
+    public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations() {
+        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+        final List<GithubAccount> githubAccounts =
+                githubOrganizationFacadePort.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(
+                        hasuraAuthentication.getClaims().getGithubAccessToken(),
+                        hasuraAuthentication.getUser());
+        return githubAccounts.isEmpty() ? ResponseEntity.notFound().build() :
+                ResponseEntity.ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
     }
 }

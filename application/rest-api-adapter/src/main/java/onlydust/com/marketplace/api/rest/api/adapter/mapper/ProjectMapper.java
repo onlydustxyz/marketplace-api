@@ -61,7 +61,7 @@ public interface ProjectMapper {
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
-                .sorted(Comparator.comparing(ProjectGithubOrganizationResponse::getId))
+                .sorted(Comparator.comparing(GithubOrganizationResponse::getId))
                 .collect(Collectors.toList()));
         projectResponse.setTechnologies(project.getTechnologies());
 
@@ -79,9 +79,9 @@ public interface ProjectMapper {
         return projectResponse;
     }
 
-    static ProjectGithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
+    static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
                                                              final boolean includeAllAvailableRepos) {
-        final var organization = new ProjectGithubOrganizationResponse();
+        final var organization = new GithubOrganizationResponse();
         organization.setId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
         organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
@@ -91,7 +91,7 @@ public interface ProjectMapper {
         organization.setRepos(projectOrganizationView.getRepos().stream()
                 .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
                 .map(ProjectMapper::mapOrganizationRepo)
-                .sorted(Comparator.comparing(ProjectGithubOrganizationRepoResponse::getId))
+                .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))
                 .toList());
         return organization;
     }
@@ -198,8 +198,8 @@ public interface ProjectMapper {
         return organizationRepo;
     }
 
-    private static ProjectGithubOrganizationRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
-        final ProjectGithubOrganizationRepoResponse repoResponse = new ProjectGithubOrganizationRepoResponse();
+    private static GithubRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
+        final GithubRepoResponse repoResponse = new GithubRepoResponse();
         repoResponse.setId(repo.getGithubRepoId());
         repoResponse.setOwner(repo.getOwner());
         repoResponse.setName(repo.getName());
