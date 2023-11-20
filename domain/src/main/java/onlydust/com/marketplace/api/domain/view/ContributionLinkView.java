@@ -10,8 +10,8 @@ import java.util.List;
 
 @Value
 @Builder
-@EqualsAndHashCode(callSuper = true)
-public class ContributionLinkView extends ContributionBaseView {
+@EqualsAndHashCode
+public class ContributionLinkView {
     ContributionType type;
     Long githubNumber;
     String githubStatus;
@@ -21,5 +21,4 @@ public class ContributionLinkView extends ContributionBaseView {
     UserLinkView githubAuthor;
     GithubRepo githubRepo;
     Boolean isMine;
-    List<CodeReviewState> codeReviewStates;
 }

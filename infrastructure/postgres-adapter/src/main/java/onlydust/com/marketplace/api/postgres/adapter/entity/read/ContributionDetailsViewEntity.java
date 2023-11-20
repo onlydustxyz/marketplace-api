@@ -18,16 +18,7 @@ import java.util.*;
 @Entity
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(
-        typeClass = EnumArrayType.class,
-        defaultForType = CodeReviewState[].class,
-        parameters = {
-                @org.hibernate.annotations.Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "github_code_review_state"
-                )
-        }
-)
+@TypeDef(name = "github_pull_request_review_state", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributionDetailsViewEntity {
     @Id
@@ -74,8 +65,9 @@ public class ContributionDetailsViewEntity {
     @org.hibernate.annotations.Type(type = "jsonb")
     List<ContributionLinkViewEntity> links;
 
-    @Column(columnDefinition = "github_code_review_state[]")
-    CodeReviewState[] codeReviewStates;
+    @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(type = "github_pull_request_review_state")
+    GithubPullRequestReviewState prReviewState;
 
     public ContributionDetailsView toView() {
         final var contributor = GithubUserIdentity.builder()
@@ -124,7 +116,7 @@ public class ContributionDetailsViewEntity {
                 .project(project)
                 .githubRepo(repo)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
-                .codeReviewStates(codeReviewStates == null ? null : Arrays.stream(codeReviewStates).map(CodeReviewState::toDomain).toList())
+                .prReviewState(Optional.ofNullable(prReviewState).map(GithubPullRequestReviewState::toView).orElse(null))
                 .build();
     }
 

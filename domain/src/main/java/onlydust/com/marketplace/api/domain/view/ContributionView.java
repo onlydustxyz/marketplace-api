@@ -15,8 +15,8 @@ import java.util.UUID;
 
 @Value
 @Builder
-@EqualsAndHashCode(callSuper = true)
-public class ContributionView extends ContributionBaseView {
+@EqualsAndHashCode
+public class ContributionView {
     String id;
     Date createdAt;
     Date completedAt;
@@ -32,7 +32,7 @@ public class ContributionView extends ContributionBaseView {
     Project project;
     List<ContributionLinkView> links;
     List<UUID> rewardIds;
-    List<CodeReviewState> codeReviewStates;
+    PullRequestReviewState prReviewState;
 
     public enum Sort {
         CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE

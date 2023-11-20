@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
@@ -21,16 +22,7 @@ import java.util.*;
 @Table(name = "contributions", schema = "indexer_exp")
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
-@TypeDef(
-        typeClass = EnumArrayType.class,
-        defaultForType = CodeReviewState[].class,
-        parameters = {
-                @org.hibernate.annotations.Parameter(
-                        name = AbstractArrayType.SQL_ARRAY_TYPE,
-                        value = "github_code_review_state"
-                )
-        }
-)
+@TypeDef(name = "github_pull_request_review_state", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class ContributionViewEntity {
     @Id
@@ -74,8 +66,9 @@ public class ContributionViewEntity {
     @org.hibernate.annotations.Type(type = "jsonb")
     List<UUID> rewardIds;
 
-    @Column(columnDefinition = "github_code_review_state[]")
-    CodeReviewState[] codeReviewStates;
+    @Enumerated(EnumType.STRING)
+    @org.hibernate.annotations.Type(type = "github_pull_request_review_state")
+    GithubPullRequestReviewState prReviewState;
 
     public ContributionView toView() {
         final var project = Project.builder()
@@ -117,7 +110,7 @@ public class ContributionViewEntity {
                 .githubRepo(repo)
                 .links(Optional.ofNullable(links).orElse(List.of()).stream().map(ContributionLinkViewEntity::toView).toList())
                 .rewardIds(Optional.ofNullable(rewardIds).orElse(List.of()))
-                .codeReviewStates(codeReviewStates == null ? null : Arrays.stream(codeReviewStates).map(CodeReviewState::toDomain).toList())
+                .prReviewState(Optional.ofNullable(prReviewState).map(GithubPullRequestReviewState::toView).orElse(null))
                 .build();
     }
 

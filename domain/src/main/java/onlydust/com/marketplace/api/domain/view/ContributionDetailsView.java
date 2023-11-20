@@ -10,8 +10,8 @@ import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
-public class ContributionDetailsView extends ContributionBaseView {
+@EqualsAndHashCode
+public class ContributionDetailsView {
     String id;
     Date createdAt;
     Date completedAt;
@@ -29,7 +29,7 @@ public class ContributionDetailsView extends ContributionBaseView {
     Project project;
     List<ContributionLinkView> links;
     List<ContributionRewardView> rewards;
-    List<CodeReviewState> codeReviewStates;
+    PullRequestReviewState prReviewState;
 
     public ContributionDetailsView withRewards(List<ContributionRewardView> rewards) {
         return this.toBuilder()
