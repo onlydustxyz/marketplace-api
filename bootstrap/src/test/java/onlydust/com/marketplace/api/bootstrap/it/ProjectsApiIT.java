@@ -142,7 +142,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                         "isAuthorizedInGithubApp": false
                       }
                     ],
-                    "installed": null,
+                    "installed": false,
                     "installationId": null
                   },
                   {
@@ -165,7 +165,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                         "isAuthorizedInGithubApp": false
                       }
                     ],
-                    "installed": null,
+                    "installed": false,
                     "installationId": null
                   }
                 ],
