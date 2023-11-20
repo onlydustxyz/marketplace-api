@@ -1,8 +1,14 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
@@ -10,9 +16,16 @@ import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
@@ -22,9 +35,23 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
+})
 public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("rust-api")
+    protected WireMockServer rustApiWireMockServer;
 
     @Autowired
     public HasuraUserHelper hasuraUserHelper;
@@ -44,7 +71,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARDS, projectId)))
                 .body(BodyInserters.fromValue(rewardRequest))
                 // Then
                 .exchange()
@@ -72,7 +99,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARDS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .body(BodyInserters.fromValue(rewardRequest))
                 // Then
@@ -102,7 +129,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARDS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .body(BodyInserters.fromValue(rewardRequest))
                 // Then
@@ -182,7 +209,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
 
         client.post()
-                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARDS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .body(BodyInserters.fromValue(rewardRequest))
                 // Then
@@ -268,7 +295,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
 
         client.post()
-                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARDS, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .header(IMPERSONATION_HEADER, impersonatePierreHeader)
                 .body(BodyInserters.fromValue(rewardRequest))

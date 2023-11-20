@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
@@ -9,16 +11,30 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 import java.util.UUID;
 
-@ActiveProfiles({"hasura_auth"})
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
 
     private static final String BRETZEL_OVERVIEW_JSON = """
             {
@@ -2436,7 +2452,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .uri(getApiURI(port, PROJECTS_GET_BY_SLUG + "/" + slug))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2453,7 +2469,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .uri(getApiURI(port, PROJECTS_GET_BY_ID + "/" + id))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2466,7 +2482,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_get_projects_given_anonymous_user() {
         client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
+                .uri(getApiURI(port, PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2479,7 +2495,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
         client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsor",
+                .uri(getApiURI(port, PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust",
+                        "sponsor",
                         "Theodo", "search", "t", "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then
@@ -2497,7 +2514,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
+                .uri(getApiURI(port, PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 // Then
@@ -2520,7 +2537,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true")))
+                .uri(getApiURI(port, PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt())
                 .exchange()
                 // Then
@@ -2529,4 +2546,5 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
     }
+
 }

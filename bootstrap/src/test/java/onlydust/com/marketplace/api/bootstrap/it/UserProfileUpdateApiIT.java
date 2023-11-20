@@ -1,17 +1,34 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
 
@@ -22,7 +39,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
         // Proves that the initial user profile is different from the updated one
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(port,ME_GET_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -47,7 +64,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(ME_PUT_PROFILE))
+                .uri(getApiURI(port,ME_PUT_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -108,7 +125,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(ME_PUT_PROFILE))
+                .uri(getApiURI(port,ME_PUT_PROFILE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

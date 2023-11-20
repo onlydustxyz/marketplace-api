@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
@@ -8,20 +10,35 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgno
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class EventsApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     private static final String API_KEY = "some-api-key";
     private final static ProjectRewardSettings REWARD_SETTINGS = new ProjectRewardSettings(true, false, true, null);
     final Long repo1 = 86943508L;
@@ -71,7 +88,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
+                .uri(getApiURI(port, EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
                 .header("Api-Key", API_KEY)
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -124,7 +141,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
+                .uri(getApiURI(port, EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
                 .header("Api-Key", API_KEY)
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -175,7 +192,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
+                .uri(getApiURI(port, EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
                 .header("Api-Key", API_KEY)
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -195,7 +212,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Test
     public void should_return_401_when_api_key_is_missing() {
         client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
+                .uri(getApiURI(port, EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {

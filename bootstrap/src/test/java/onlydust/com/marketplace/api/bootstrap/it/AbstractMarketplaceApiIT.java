@@ -1,50 +1,14 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
-import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
-import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
-import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.MountableFile;
 
 import java.net.URI;
 import java.util.Map;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-
-@ActiveProfiles({"it"})
-@AutoConfigureWebTestClient(timeout = "36000")
-@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
-@Testcontainers
 @Slf4j
-@DirtiesContext
-@Import(SwaggerConfiguration.class)
-@EnableWireMock({
-        @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
-        @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
-        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
-        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
-})
 public class AbstractMarketplaceApiIT {
 
     protected static final Faker faker = new Faker();
@@ -89,40 +53,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
     protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
 
-    @Container
-    static PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer<>("postgres:14.3-alpine")
-                    .withDatabaseName("marketplace_db")
-                    .withUsername("test")
-                    .withPassword("test")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
-                    .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
-    protected final ObjectMapper objectMapper = new ObjectMapper();
-    @InjectWireMock("github")
-    protected WireMockServer githubWireMockServer;
-    @InjectWireMock("rust-api")
-    protected WireMockServer rustApiWireMockServer;
-    @InjectWireMock("indexer-api")
-    protected WireMockServer indexerApiWireMockServer;
-    @InjectWireMock("dustyBot")
-    protected WireMockServer dustyBotApiWireMockServer;
-
-    @LocalServerPort
-    int port;
-    @Autowired
-    WebTestClient client;
-
-    @DynamicPropertySource
-    static void updateProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgresSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.password", postgresSQLContainer::getPassword);
-        registry.add("spring.datasource.username", postgresSQLContainer::getUsername);
-    }
-
-    protected URI getApiURI(final String path) {
+    protected URI getApiURI(final int port, final String path) {
         return UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
@@ -132,7 +63,7 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
-    protected URI getApiURI(final String path, String paramName, String paramValue) {
+    protected URI getApiURI(final int port, final String path, String paramName, String paramValue) {
         return UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
@@ -143,7 +74,7 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
-    protected URI getApiURI(final String path, final Map<String, String> params) {
+    protected URI getApiURI(final int port, final String path, final Map<String, String> params) {
         final UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")

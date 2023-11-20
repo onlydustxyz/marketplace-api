@@ -1,26 +1,43 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Date;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class MeApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     UserPayoutInfoRepository userPayoutInfoRepository;
     @Autowired
@@ -42,7 +59,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -67,7 +84,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -92,7 +109,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -118,7 +135,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
+                .uri(getApiURI(port,format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -126,7 +143,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .uri(getApiURI(port,PROJECTS_GET_BY_ID + "/" + projectId))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -151,7 +168,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
+                .uri(getApiURI(port,format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -159,7 +176,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isNotFound();
 
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .uri(getApiURI(port,PROJECTS_GET_BY_ID + "/" + projectId))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -181,7 +198,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(port,ME_APPLY_TO_PROJECT))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -215,7 +232,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(port,ME_APPLY_TO_PROJECT))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -242,7 +259,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(port,ME_APPLY_TO_PROJECT))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""

@@ -1,17 +1,34 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
 
@@ -22,7 +39,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of("pageSize", "3")))
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS, Map.of("pageSize", "3")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -153,7 +170,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS, Map.of(
                         "projects", "f39b827f-df73-498c-8853-99bc3f562723,594ca5ca-48f7-49a8-9c26-84b949d4fdd9")
                 ))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -177,7 +194,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS, Map.of(
                         "repositories", "493591124")
                 ))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -201,7 +218,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS, Map.of(
                         "types", "ISSUE")
                 ))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -226,7 +243,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS, Map.of(
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS, Map.of(
                         "statuses", "IN_PROGRESS")
                 ))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -251,7 +268,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
                                 "pageIndex", "17",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -294,7 +311,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                 "sort", "PROJECT_REPO_NAME"
@@ -311,7 +328,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39,594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                 "sort", "PROJECT_REPO_NAME",
@@ -334,7 +351,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "sort", "GITHUB_NUMBER_TITLE"
@@ -351,7 +368,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                .uri(getApiURI(port, ME_GET_CONTRIBUTIONS,
                         Map.of("pageSize", "1",
                                 "projects", "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "sort", "GITHUB_NUMBER_TITLE",

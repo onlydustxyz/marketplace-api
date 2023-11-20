@@ -1,21 +1,49 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAuthorizedRepoRepository;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles("hasura_auth")
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "github", property = "infrastructure.github.baseUri")
+})
 public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("github")
+    protected WireMockServer githubWireMockServer;
+
     private static final String ONLYDUST_ACCOUNT_JSON = """
             {
                "id": 44089550,
@@ -630,7 +658,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     void should_get_github_account_from_installation_id() {
         final String jwt = hasuraUserHelper.authenticatePierre().jwt();
         client.get()
-                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/44089550"))
+                .uri(getApiURI(port,GITHUB_INSTALLATIONS_GET + "/44089550"))
                 .header("Authorization", "Bearer " + jwt)
                 .exchange()
                 // Then
@@ -644,7 +672,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     void should_return_404_when_not_found() {
         final String jwt = hasuraUserHelper.authenticatePierre().jwt();
         client.get()
-                .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
+                .uri(getApiURI(port,GITHUB_INSTALLATIONS_GET + "/0"))
                 .header("Authorization", "Bearer " + jwt)
                 .exchange()
                 // Then
@@ -749,7 +777,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_ORGANIZATIONS))
+                .uri(getApiURI(port,ME_GET_ORGANIZATIONS))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()

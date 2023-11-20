@@ -1,25 +1,48 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
+})
 public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("indexer-api")
+    protected WireMockServer indexerApiWireMockServer;
     @Autowired
     HasuraUserHelper hasuraUserHelper;
     @Autowired
@@ -31,7 +54,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
     @Order(1)
     public void should_be_unauthorized() {
         // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue("""
                         {
                           "githubIssueHtmlUrl": "https://github.com/golang/go/issues/64179"
                         }
@@ -50,7 +73,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
         final UUID projectId = projectRepository.findAll().get(0).getId();
 
         // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue("""
                         {
                           "githubIssueHtmlUrl": "https://github.com/golang/go/issues/64179"
                         }
@@ -72,7 +95,8 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
         indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/onlydustxyz/starklings/issues/100"))
                 .willReturn(ok()));
 
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId)))
+                .contentType(APPLICATION_JSON).bodyValue("""
                         {
                           "githubIssueHtmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
                         }

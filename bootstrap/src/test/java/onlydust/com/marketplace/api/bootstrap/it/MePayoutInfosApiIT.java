@@ -1,13 +1,22 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
@@ -18,10 +27,18 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
     @Autowired
@@ -122,7 +139,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -198,7 +215,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .body(BodyInserters.fromValue(requestBody1))
                 // Then
@@ -208,7 +225,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .expectBody().equals(requestToExpectedResponse(requestBody1, true, true, true, true, true));
 
         client.put()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .body(BodyInserters.fromValue(requestBody2))
                 // Then
@@ -257,7 +274,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.put()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .header(IMPERSONATION_HEADER, impersonatePierreHeader)
                 .body(BodyInserters.fromValue(requestBody))
@@ -270,7 +287,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
         final String pierreJwt = userHelper.authenticatePierre().jwt();
 
         client.get()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + pierreJwt)
                 .exchange()
                 .expectStatus()
@@ -288,7 +305,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -310,7 +327,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -332,7 +349,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_PAYOUT_INFO))
+                .uri(getApiURI(port,ME_PAYOUT_INFO))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

@@ -1,16 +1,27 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
@@ -18,11 +29,23 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
+})
 public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("indexer-api")
+    protected WireMockServer indexerApiWireMockServer;
     private static UUID projectId;
 
     @Autowired
@@ -64,7 +87,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // When
 
         final var response = client.post()
-                .uri(getApiURI(PROJECTS_POST))
+                .uri(getApiURI(port,PROJECTS_POST))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -103,7 +126,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
+                .uri(getApiURI(port,PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -155,7 +178,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(2)
     public void accept_leader_invitation_for_next_tests() {
         client.put()
-                .uri(getApiURI(format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
+                .uri(getApiURI(port,format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
                 .header("Authorization", BEARER_PREFIX + userHelper.authenticateOlivier().jwt())
                 // Then
                 .exchange()
@@ -163,7 +186,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .uri(getApiURI(port,PROJECTS_GET_BY_ID + "/" + projectId))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -178,7 +201,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -205,7 +228,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -256,7 +279,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -298,7 +321,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -334,7 +357,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         final var response = client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -378,7 +401,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     public void should_return_a_400_when_input_is_invalid() {
         // When
         final OnlyDustError response = client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -419,7 +442,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And When
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port,format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateAnthony().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -445,7 +468,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     private void assertProjectWasUpdated() {
         client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .uri(getApiURI(port,PROJECTS_GET_BY_ID + "/" + projectId))
                 .exchange()
                 // Then
                 .expectStatus()

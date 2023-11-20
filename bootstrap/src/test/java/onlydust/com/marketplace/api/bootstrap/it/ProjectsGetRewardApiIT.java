@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -10,9 +12,16 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuo
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -23,10 +32,18 @@ import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
     @Autowired
@@ -46,7 +63,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -63,7 +80,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -109,7 +126,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .build());
 
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -146,7 +163,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 new Date()));
 
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -188,7 +205,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -205,7 +222,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
+                .uri(getApiURI(port,String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "0")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -259,7 +276,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                             "nextPageIndex": 1
                         }""");
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
+                .uri(getApiURI(port, String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "12")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then

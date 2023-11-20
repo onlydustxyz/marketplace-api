@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
@@ -11,10 +13,15 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContribut
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,11 +29,18 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     final Long repo1 = 86943508L;
     final Long repo2 = 602953043L;
 
@@ -580,7 +594,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
 
     private void updateRewardSettings(UUID projectId, String rewardSettings) {
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -606,7 +620,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
 
     private void updateLinkedRepos(UUID projectId, String repoIds) {
         client.put()
-                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""

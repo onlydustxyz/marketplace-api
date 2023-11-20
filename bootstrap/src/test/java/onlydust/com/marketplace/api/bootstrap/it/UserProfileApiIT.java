@@ -1,16 +1,33 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class UserProfileApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     private static final String GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE = """
             {
               "githubUserId": 43467246,
@@ -1452,7 +1469,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(USERS_GET + "/" + notExistingUserId))
+                .uri(getApiURI(port,USERS_GET + "/" + notExistingUserId))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -1466,7 +1483,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(USERS_GET + "/" + anthonyId))
+                .uri(getApiURI(port,USERS_GET + "/" + anthonyId))
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful()
@@ -1491,7 +1508,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(USERS_GET_BY_LOGIN + "/" + anthonyLogin))
+                .uri(getApiURI(port,USERS_GET_BY_LOGIN + "/" + anthonyLogin))
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful()
@@ -1516,7 +1533,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(port,ME_GET_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then

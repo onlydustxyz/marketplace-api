@@ -1,16 +1,29 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -18,9 +31,23 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri")
+})
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("rust-api")
+    protected WireMockServer rustApiWireMockServer;
 
     @Autowired
     public HasuraUserHelper hasuraUserHelper;
@@ -41,7 +68,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.delete()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -59,7 +86,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.delete()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -86,7 +113,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         client.delete()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -115,7 +142,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         client.delete()
-                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .uri(getApiURI(port,String.format(PROJECTS_REWARD, projectId, rewardId)))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .header(IMPERSONATION_HEADER, impersonatePierreHeader)
                 // Then

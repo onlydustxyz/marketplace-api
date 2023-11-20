@@ -1,26 +1,46 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Date;
 import java.util.UUID;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@ActiveProfiles({"it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     final static String JWT_TOKEN = "fake-jwt";
     Long githubUserId;
     String login;
     String avatarUrl;
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     JWTVerifier jwtVerifier;
     @Autowired
@@ -40,7 +60,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     public void should_be_unauthorized() {
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -54,7 +74,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
                 // Then
@@ -90,7 +110,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
                 // Then

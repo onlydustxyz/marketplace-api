@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
@@ -9,20 +11,32 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
     @Autowired
@@ -38,7 +52,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -88,7 +102,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -135,7 +149,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -185,7 +199,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -233,7 +247,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -257,7 +271,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
+                .uri(getApiURI(port, format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

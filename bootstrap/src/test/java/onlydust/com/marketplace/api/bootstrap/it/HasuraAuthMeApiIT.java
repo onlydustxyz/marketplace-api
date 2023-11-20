@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
@@ -12,19 +14,32 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
-
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     JwtSecret jwtSecret;
     @Autowired
@@ -37,7 +52,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     public void should_be_unauthorized() {
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -76,7 +91,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 // Then
@@ -129,7 +144,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(port,ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 // Then

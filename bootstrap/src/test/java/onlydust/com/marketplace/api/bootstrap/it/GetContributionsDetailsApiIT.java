@@ -1,14 +1,32 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     @Autowired
     HasuraUserHelper userHelper;
 
@@ -19,7 +37,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39", "000000"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -36,7 +54,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "90fb751a-1137-4815-b3c4-54927a5db059",
                         "97735d1fae1597c261d55e07ac10c947ae99ed2d0daf2826938e2f2de9b69ac8")))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -56,7 +74,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf")))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -282,7 +300,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "9e374e732c9017c3fee800d686e02962dd21b69d9a11c4c21517d76fec56b1a1")))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -360,7 +378,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf")))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -381,7 +399,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                .uri(getApiURI(port,String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                         "2eba1ee6dd0e0a3acb2f0d411eea52500eb572b1eec6f2ccf45bc53e8cd77bd6")))
                 .header("Authorization", BEARER_PREFIX + jwt)

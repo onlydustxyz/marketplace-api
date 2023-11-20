@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
@@ -15,9 +17,14 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -27,10 +34,18 @@ import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     private static final String GET_MY_REWARD_AMOUNTS_JSON_RESPONSE = """
             {
               "totalAmount": 197000,
@@ -258,7 +273,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100000", "sort", "CONTRIBUTION"
+                .uri(getApiURI(port,ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100000", "sort", "CONTRIBUTION"
                         , "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -324,7 +339,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(ME_GET_REWARDS), Map.of("pageIndex", "0", "pageSize",
+                .uri(getApiURI(port,String.format(ME_GET_REWARDS), Map.of("pageIndex", "0", "pageSize",
                         "20", "sort", "AMOUNT", "direction", "DESC")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -344,7 +359,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_REWARD_TOTAL_AMOUNTS))
+                .uri(getApiURI(port,ME_GET_REWARD_TOTAL_AMOUNTS))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -390,7 +405,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(port,ME_REWARDS_PENDING_INVOICE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -458,7 +473,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
 
         client.get()
-                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .uri(getApiURI(port,ME_REWARDS_PENDING_INVOICE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -497,7 +512,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
+                .uri(getApiURI(port,ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

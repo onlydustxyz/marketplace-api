@@ -1,17 +1,36 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Map;
 import java.util.UUID;
 
-@ActiveProfiles({"hasura_auth"})
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
 public class ContributorSearchIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
     final static String login = "antho";
     final static UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"); // kaaper
     final static String PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE = """
@@ -68,7 +87,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_project_contributors_and_suggest_external_contributors_from_github() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login)))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login",
+                        login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -79,7 +99,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_repos_contributors_and_suggest_external_contributors_from_github() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "493591124,498695724", "login", login)))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "493591124,498695724", "login",
+                        login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -91,7 +112,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_repos_contributors_even_without_login_search() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "498695724")))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "498695724")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -104,7 +125,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_project_contributors_even_without_login_search() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString())))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -117,7 +138,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_external_contributors_even_without_project_nor_repo() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "login", login))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, "login", login))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -130,7 +151,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_fetch_external_contributors_when_externalSearchOnly_is_true() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login,
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login,
                         "externalSearchOnly", "true")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
@@ -179,7 +200,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     void should_return_400_when_no_param_is_provided() {
         final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS))
+                .uri(getApiURI(port, USERS_SEARCH_CONTRIBUTORS))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -188,7 +209,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_401_when_no_authentication_is_provided() {
         client.get()
-                .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "login", login))
+                .uri(getApiURI(port,USERS_SEARCH_CONTRIBUTORS, "login", login))
                 .exchange()
                 .expectStatus().isUnauthorized();
     }

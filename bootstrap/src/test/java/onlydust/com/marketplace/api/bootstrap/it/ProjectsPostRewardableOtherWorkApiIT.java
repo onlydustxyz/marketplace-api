@@ -1,6 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.it.extension.PostgresITExtension;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -8,18 +14,36 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles({"hasura_auth"})
+@ActiveProfiles({"hasura_auth", "it"})
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext
+@ExtendWith(PostgresITExtension.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "dusty-bot", property = "infrastructure.dustyBot.baseUri")
+})
 public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApiIT {
+    @LocalServerPort
+    int port;
+    @Autowired
+    WebTestClient client;
+    @InjectWireMock("dusty-bot")
+    protected WireMockServer dustyBotApiWireMockServer;
 
     private static final String CREATE_ISSUE_RESPONSE_JSON = """
             {
@@ -179,7 +203,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     @Order(1)
     public void should_be_unauthorized() {
         // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
                         {
                           "githubRepoId": 1,
                           "title": "test",
@@ -200,7 +224,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
         final UUID projectId = projectRepository.findAll().get(0).getId();
 
         // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
                         {
                           "githubRepoId": 1,
                           "title": "test",
@@ -220,7 +244,8 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId))).contentType(APPLICATION_JSON).bodyValue(String.format("""
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId)))
+                .contentType(APPLICATION_JSON).bodyValue(String.format("""
                         {
                           "githubRepoId": 554756922,
                           "title": "test",
@@ -262,7 +287,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         """))
                 .willReturn(okJson(String.format(CLOSE_ISSUE_RESPONSE_JSON, title))));
 
-        client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId)))
+        client.post().uri(getApiURI(port, String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId)))
                 .contentType(APPLICATION_JSON)
                 .bodyValue(String.format("""
                         {
