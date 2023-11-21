@@ -106,7 +106,10 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    t.technologies                               as technologies,
                    s.sponsor_json                               as sponsors,
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
-                   coalesce(r_without_github_app.is_missing_github_app_installation, false)        as is_missing_github_app_installation
+                   (select count(pgr.github_repo_id) > count(agr.repo_id)
+                           from project_github_repos pgr
+                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
+                           where pgr.project_id = p.project_id)        as is_missing_github_app_installation
             from project_details p
                      left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                                 from project_github_repos pgr
@@ -125,10 +128,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
-                     left join (select pgr.project_id, case count(*) when 0 then false else true end is_missing_github_app_installation
-                                from project_github_repos pgr
-                                join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
-                                group by pgr.project_id) r_without_github_app on r_without_github_app.project_id = p.project_id
                      left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                 from public.projects_contributors pc_count
                                 group by pc_count.project_id) pc_count on pc_count.project_id = p.project_id
