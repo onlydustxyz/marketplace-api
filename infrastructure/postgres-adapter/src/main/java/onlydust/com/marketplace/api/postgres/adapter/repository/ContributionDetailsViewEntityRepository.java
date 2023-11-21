@@ -40,7 +40,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                    c.contributor_login,
                    c.contributor_avatar_url,
                    c.contributor_id,
-                   code_reviews.states as code_review_states
+                   c.pr_review_state
                 FROM
                    indexer_exp.contributions c
                 INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = c.repo_id
@@ -128,16 +128,6 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                     GROUP BY 
                         c.id
                 ) AS reviewed_pull_requests ON TRUE
-                LEFT JOIN LATERAL (
-                    SELECT 
-                        array_agg(cr.state) as states
-                    FROM indexer_exp.github_pull_requests pr
-                    INNER JOIN indexer_exp.github_code_reviews cr on cr.pull_request_id = pr.id
-                    WHERE 
-                        pr.id = c.pull_request_id
-                    GROUP BY 
-                        c.id
-                ) AS code_reviews ON TRUE
                 LEFT JOIN LATERAL (
                     SELECT 
                         jsonb_agg(pr.id) as ids

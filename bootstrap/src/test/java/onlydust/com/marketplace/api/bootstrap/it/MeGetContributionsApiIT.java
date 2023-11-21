@@ -238,8 +238,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
                 .jsonPath("$.hasMore").isEqualTo(true)
-                .jsonPath("$.totalPageNumber").isEqualTo(11)
-                .jsonPath("$.totalItemNumber").isEqualTo(541)
+                .jsonPath("$.totalPageNumber").isEqualTo(10)
+                .jsonPath("$.totalItemNumber").isEqualTo(488)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
         ;
     }
