@@ -27,11 +27,20 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
     public List<GithubAccount> getOrganizationsForAuthenticatedUserAndGithubPersonalToken(final String githubPersonalToken,
                                                                                           final User authenticatedUser) {
         final List<GithubAccount> userGithubAccounts =
-                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPersonalToken));
+                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPersonalToken))
+                        .stream()
+                        .map(githubAccount -> githubAccount.toBuilder()
+                                .isCurrentUserAdmin(githubSearchPort.isGithubUserAdminOfOrganization(githubPersonalToken
+                                        , authenticatedUser.getLogin(), githubAccount.getLogin()))
+                                .build()
+                        )
+                        .collect(Collectors.toList());
         userGithubAccounts.add(GithubAccount.builder()
                 .id(authenticatedUser.getGithubUserId())
                 .login(authenticatedUser.getLogin())
                 .avatarUrl(authenticatedUser.getAvatarUrl())
+                .isPersonal(true)
+                .isCurrentUserAdmin(true)
                 .installed(false)
                 .build());
 
@@ -47,7 +56,10 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                 updatedUserGithubAccounts.add(installedGithubAccounts.stream()
                         .filter(githubAccount -> githubAccount.getId().equals(userGithubAccount.getId()))
                         .findFirst()
-                        .map(githubAccount -> githubAccount.toBuilder().installed(true).build())
+                        .map(githubAccount -> githubAccount.toBuilder()
+                                .isPersonal(userGithubAccount.getIsPersonal())
+                                .isCurrentUserAdmin(userGithubAccount.getIsCurrentUserAdmin())
+                                .installed(true).build())
                         .orElse(userGithubAccount));
             }
             return updatedUserGithubAccounts;

@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
+import onlydust.com.marketplace.api.github_api.dto.GetOrgaMembershipsResponseDTO;
 import onlydust.com.marketplace.api.github_api.dto.GithubOrgaSearchResponseDTO;
 import onlydust.com.marketplace.api.github_api.dto.GithubUserSearchResponse;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class GithubSearchApiAdapter implements GithubSearchPort {
@@ -70,5 +73,15 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
                         .htmlUrl(githubOrgaSearchResponseDTO.getUrl())
                         .build())
                 .toList();
+    }
+
+    @Override
+    public boolean isGithubUserAdminOfOrganization(String githubPersonalToken, String userLogin,
+                                                   String organizationLogin) {
+        return client.get(String.format("/orgs/%s/memberships/%s", organizationLogin, userLogin),
+                        GetOrgaMembershipsResponseDTO.class, githubPersonalToken)
+                .filter(dto -> nonNull(dto.getRole()) && nonNull(dto.getState()))
+                .map(dto -> dto.getRole().equals("admin") && dto.getState().equals("active"))
+                .orElse(false);
     }
 }

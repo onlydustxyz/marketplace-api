@@ -9,4 +9,6 @@ public interface GithubSearchPort {
     List<GithubUserIdentity> searchUsersByLogin(String login);
 
     List<GithubAccount> searchOrganizationsByGithubPersonalToken(String githubPersonalToken);
+
+    boolean isGithubUserAdminOfOrganization(String githubPersonalToken, String userLogin, String organizationLogin);
 }
