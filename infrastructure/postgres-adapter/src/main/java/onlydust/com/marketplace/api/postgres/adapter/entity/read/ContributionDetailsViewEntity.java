@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
@@ -13,9 +14,11 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @Entity
+@IdClass(ContributionDetailsViewEntity.PrimaryKey.class)
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "github_pull_request_review_state", typeClass = PostgreSQLEnumType.class)
@@ -44,6 +47,7 @@ public class ContributionDetailsViewEntity {
     String githubAuthorAvatarUrl;
     Integer githubCommentsCount;
 
+    @Id
     UUID projectId;
     String projectName;
     String projectKey;
@@ -68,6 +72,12 @@ public class ContributionDetailsViewEntity {
     @Enumerated(EnumType.STRING)
     @org.hibernate.annotations.Type(type = "github_pull_request_review_state")
     GithubPullRequestReviewState prReviewState;
+
+    @EqualsAndHashCode
+    public static class PrimaryKey implements Serializable {
+        String id;
+        UUID projectId;
+    }
 
     public ContributionDetailsView toView() {
         final var contributor = GithubUserIdentity.builder()

@@ -1,24 +1,24 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
+import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @Entity
+@IdClass(ContributionViewEntity.PrimaryKey.class)
 @Table(name = "contributions", schema = "indexer_exp")
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "contribution_status", typeClass = PostgreSQLEnumType.class)
@@ -27,6 +27,7 @@ import java.util.*;
 public class ContributionViewEntity {
     @Id
     String id;
+
     Date createdAt;
     Date completedAt;
     @Enumerated(EnumType.STRING)
@@ -46,6 +47,7 @@ public class ContributionViewEntity {
     String githubAuthorHtmlUrl;
     String githubAuthorAvatarUrl;
 
+    @Id
     UUID projectId;
     String projectName;
     String projectKey;
@@ -112,6 +114,12 @@ public class ContributionViewEntity {
                 .rewardIds(Optional.ofNullable(rewardIds).orElse(List.of()))
                 .prReviewState(Optional.ofNullable(prReviewState).map(GithubPullRequestReviewState::toView).orElse(null))
                 .build();
+    }
+
+    @EqualsAndHashCode
+    public static class PrimaryKey implements Serializable {
+        String id;
+        UUID projectId;
     }
 
     public enum Type {

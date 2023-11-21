@@ -366,4 +366,31 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contributions[0].githubTitle").isEqualTo("This is a test PR for development purposes")
         ;
     }
+
+
+    @Test
+    void should_not_duplicate_contributions() {
+        // Given
+        final String jwt = userHelper.authenticateHayden().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "10",
+                                "projects", "594ca5ca-48f7-49a8-9c26-84b949d4fdd9,90fb751a-1137-4815-b3c4-54927a5db059",
+                                "types", "ISSUE",
+                                "statuses", "IN_PROGRESS",
+                                "sort", "PROJECT_REPO_NAME"
+                        )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(2)
+                .jsonPath("$.contributions[0].project.name").isEqualTo("Mooooooonlight")
+                .jsonPath("$.contributions[1].project.name").isEqualTo("No sponsors")
+        ;
+    }
 }
