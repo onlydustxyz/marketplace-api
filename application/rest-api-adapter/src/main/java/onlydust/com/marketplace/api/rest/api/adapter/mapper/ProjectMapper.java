@@ -206,8 +206,8 @@ public interface ProjectMapper {
         repoResponse.setName(repo.getName());
         repoResponse.setHtmlUrl(repo.getUrl());
         repoResponse.setDescription(repo.getDescription());
-        repoResponse.setForkCount(Math.toIntExact(repo.getForkCount()));
-        repoResponse.setStars(Math.toIntExact(repo.getStarCount()));
+        repoResponse.setForkCount(isNull(repo.getForkCount()) ? null : Math.toIntExact(repo.getForkCount()));
+        repoResponse.setStars(isNull(repo.getStarCount()) ? null : Math.toIntExact(repo.getStarCount()));
         repoResponse.setHasIssues(repo.getHasIssues());
         repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
         repoResponse.setIsAuthorizedInGithubApp(repo.getIsAuthorizedInGithubApp());
