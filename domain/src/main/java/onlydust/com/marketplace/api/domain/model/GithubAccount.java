@@ -24,6 +24,11 @@ public class GithubAccount {
     List<Long> authorizedRepoIds = new ArrayList<>();
     @Builder.Default
     Boolean installed = false;
+    @Builder.Default
+    Boolean isCurrentUserAdmin = false;
+    @Builder.Default
+    Boolean isPersonal = false;
+
 
     public List<GithubRepo> getAuthorizedRepos() {
         return this.repos.stream()

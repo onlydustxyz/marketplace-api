@@ -2525,6 +2525,8 @@ components:
         - name
         - repos
         - installed
+        - canBeInstalled
+        - isCurrentUserAdmin
       properties:
         id:
           $ref: '#/components/schemas/GithubUserId'
@@ -2553,6 +2555,10 @@ components:
         installed:
           type: boolean
           description: False if this organization is not installed
+        isCurrentUserAdmin:
+          type: boolean
+        isPersonal:
+          type: boolean
         installationId:
           type: integer
           format: int64

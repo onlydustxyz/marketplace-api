@@ -55,10 +55,13 @@ public interface GithubMapper {
                             installedRepo.setOwner(repo.getOwner());
                             installedRepo.setHtmlUrl(repo.getHtmlUrl());
                             installedRepo.setDescription(repo.getDescription());
+                            installedRepo.setIsAuthorizedInGithubApp(true);
                             return installedRepo;
                         })
                         .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))
                         .toList());
+        organization.setIsPersonal(githubAccount.getIsPersonal());
+        organization.setIsCurrentUserAdmin(githubAccount.getIsCurrentUserAdmin());
         return organization;
     }
 }

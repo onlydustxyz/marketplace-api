@@ -7,7 +7,7 @@ import lombok.Value;
 import java.util.Date;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode
 public class GithubRepo {
     Long id;

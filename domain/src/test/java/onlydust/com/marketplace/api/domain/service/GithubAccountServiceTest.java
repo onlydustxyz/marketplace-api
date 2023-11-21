@@ -52,7 +52,7 @@ public class GithubAccountServiceTest {
                         .build()
                 ),
                 List.of(123446L)
-                , true
+                , true, false, false
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))
@@ -87,8 +87,8 @@ public class GithubAccountServiceTest {
                         .forksCount(12L)
                         .build()
                 ),
-                List.of(123446L),
-                true
+                List.of(123446L)
+                , true, false, false
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))
@@ -110,25 +110,34 @@ public class GithubAccountServiceTest {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
         final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
+        final User authenticatedUser = User.builder().githubUserId(5L).login(faker.pokemon().name()).build();
 
         // When
         final List<GithubAccount> githubAccounts = List.of(
                 GithubAccount.builder()
                         .id(1L)
+                        .login("org1")
                         .build(),
                 GithubAccount.builder()
                         .id(2L)
+                        .login("org2")
                         .build()
         );
         when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
                 .thenReturn(githubAccounts);
+        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, authenticatedUser.getLogin(), "org1"))
+                .thenReturn(true);
+        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, authenticatedUser.getLogin(), "org2"))
+                .thenReturn(false);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L))).thenReturn(List.of());
         final List<GithubAccount> organizationsForGithubPersonalToken =
                 githubAccountService.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(githubPAT,
-                        User.builder().githubUserId(5L).build());
+                        authenticatedUser);
 
         // Then
-        assertEquals(List.of(githubAccounts.get(0), githubAccounts.get(1), GithubAccount.builder().id(5L).build()),
+        assertEquals(List.of(githubAccounts.get(0).toBuilder().isCurrentUserAdmin(true).build(),
+                        githubAccounts.get(1).toBuilder().isCurrentUserAdmin(false).build(),
+                        GithubAccount.builder().id(5L).login(authenticatedUser.getLogin()).isPersonal(true).isCurrentUserAdmin(true).build()),
                 organizationsForGithubPersonalToken);
     }
 
@@ -137,26 +146,36 @@ public class GithubAccountServiceTest {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
         final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
-        final User user = User.builder().githubUserId(5L).build();
+        final User user = User.builder().login(faker.pokemon().name()).githubUserId(5L).build();
         // When
         final List<GithubAccount> githubAccounts = List.of(
                 GithubAccount.builder()
                         .id(1L)
+                        .login("org1")
                         .build(),
                 GithubAccount.builder()
                         .id(2L)
+                        .login("org2")
                         .build()
         );
         when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
                 .thenReturn(githubAccounts);
+        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, user.getLogin(), "org1"))
+                .thenReturn(true);
+        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, user.getLogin(), "org2"))
+                .thenReturn(false);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L, 5L))).thenReturn(List.of(
                 GithubAccount.builder()
                         .id(2L)
+                        .login(githubAccounts.get(1).getLogin())
                         .installed(true)
+                        .installationId(1L)
                         .build(),
                 GithubAccount.builder()
                         .id(user.getGithubUserId())
+                        .login(user.getLogin())
                         .installed(true)
+                        .installationId(3L)
                         .build()
         ));
         final List<GithubAccount> organizationsForGithubPersonalToken =
@@ -164,14 +183,22 @@ public class GithubAccountServiceTest {
 
         // Then
         assertEquals(List.of(
-                        githubAccounts.get(0),
+                        githubAccounts.get(0).toBuilder().isCurrentUserAdmin(true).build(),
                         githubAccounts.get(1)
                                 .toBuilder()
                                 .installed(true)
+                                .installationId(1L)
+                                .isCurrentUserAdmin(false)
+                                .isPersonal(false)
                                 .build(),
                         GithubAccount.builder()
                                 .installed(true)
-                                .id(user.getGithubUserId()).build())
+                                .id(user.getGithubUserId())
+                                .login(user.getLogin())
+                                .isPersonal(true)
+                                .isCurrentUserAdmin(true)
+                                .installationId(3L)
+                                .build())
                 , organizationsForGithubPersonalToken);
     }
 }
