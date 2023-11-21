@@ -3051,12 +3051,12 @@ components:
         - DISMISSED
 
     GithubPullRequestReviewState:
-        type: string
-        enum:
-            - PENDING_REVIEWER
-            - UNDER_REVIEW
-            - APPROVED
-            - CHANGES_REQUESTED
+      type: string
+      enum:
+        - PENDING_REVIEWER
+        - UNDER_REVIEW
+        - APPROVED
+        - CHANGES_REQUESTED
 
     CurrencyContract:
       type: string
@@ -3671,11 +3671,6 @@ components:
           type: integer
         commentsCount:
           type: integer
-        codeReviewOutcome:
-          type: string
-          enum:
-            - APPROVED
-            - CHANGE_REQUESTED
         status:
           $ref: '#/components/schemas/GithubStatus'
         githubAuthorId:
@@ -3755,11 +3750,6 @@ components:
           type: integer
         commentsCount:
           type: integer
-        codeReviewOutcome:
-          type: string
-          enum:
-            - APPROVED
-            - CHANGE_REQUESTED
         status:
           $ref: '#/components/schemas/GithubStatus'
         ignored:

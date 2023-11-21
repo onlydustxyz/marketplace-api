@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Crypt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatReceiptJsonEntity;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper.OBJECT_MAPPER;
 
 public interface RewardMapper {
@@ -143,31 +142,28 @@ public interface RewardMapper {
                 .number(rewardItemViewEntity.getNumber())
                 .lastUpdateAt(rewardItemViewEntity.getCompletedAt())
                 .type(switch (rewardItemViewEntity.getType()) {
-                    case issue -> ContributionType.ISSUE;
-                    case pull_request -> ContributionType.PULL_REQUEST;
-                    case code_review -> ContributionType.CODE_REVIEW;
+                    case ISSUE -> ContributionType.ISSUE;
+                    case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+                    case CODE_REVIEW -> ContributionType.CODE_REVIEW;
                 })
                 .repoName(rewardItemViewEntity.getRepoName())
                 .authorLogin(rewardItemViewEntity.getAuthorLogin())
-                .status(githubStatusToDomain(rewardItemViewEntity.getDraft(), rewardItemViewEntity.getStatus()))
-                .outcome(isNull(rewardItemViewEntity.getOutcome()) ? null : switch (rewardItemViewEntity.getOutcome()) {
-                    case approved -> CodeReviewOutcome.approved;
-                    case change_requested -> CodeReviewOutcome.changeRequested;
-                })
+                .status(githubStatusToDomain(rewardItemViewEntity.getStatus()))
                 .build();
     }
 
-    static RewardItemStatus githubStatusToDomain(final Boolean draft, final String status) {
-        if (nonNull(draft) && draft) {
-            return RewardItemStatus.DRAFT;
-        }
+    static RewardItemStatus githubStatusToDomain(final String status) {
         return switch (status) {
-            case "open" -> RewardItemStatus.OPEN;
-            case "closed" -> RewardItemStatus.CLOSED;
-            case "merged" -> RewardItemStatus.MERGED;
-            case "pending" -> RewardItemStatus.PENDING;
-            case "completed" -> RewardItemStatus.COMPLETED;
-            case "cancelled" -> RewardItemStatus.CANCELLED;
+            case "COMPLETED" -> RewardItemStatus.COMPLETED;
+            case "CANCELLED" -> RewardItemStatus.CANCELLED;
+            case "CLOSED" -> RewardItemStatus.CLOSED;
+            case "MERGED" -> RewardItemStatus.MERGED;
+            case "DRAFT" -> RewardItemStatus.DRAFT;
+            case "PENDING" -> RewardItemStatus.PENDING;
+            case "COMMENTED" -> RewardItemStatus.COMMENTED;
+            case "APPROVED" -> RewardItemStatus.APPROVED;
+            case "CHANGES_REQUESTED" -> RewardItemStatus.CHANGES_REQUESTED;
+            case "DISMISSED" -> RewardItemStatus.DISMISSED;
             default -> RewardItemStatus.OPEN;
         };
     }

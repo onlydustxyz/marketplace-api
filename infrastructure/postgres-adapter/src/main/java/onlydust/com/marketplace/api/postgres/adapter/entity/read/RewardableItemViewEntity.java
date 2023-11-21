@@ -18,7 +18,6 @@ import java.util.Date;
 @Data
 @Entity
 @TypeDef(name = "contribution_type", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "github_code_review_outcome", typeClass = PostgreSQLEnumType.class)
 public class RewardableItemViewEntity {
 
     @Id
@@ -49,21 +48,10 @@ public class RewardableItemViewEntity {
     Integer userCommitsCount;
     @Column(name = "comments_count")
     Integer commentsCount;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "github_code_review_outcome")
-    @Column(name = "cr_outcome")
-    CodeReviewOutcome outcome;
-    @Column(name = "draft")
-    Boolean draft;
     @Column(name = "ignored")
     Boolean ignored;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW
     }
-
-    public enum CodeReviewOutcome {
-        CHANGE_REQUESTED, APPROVED, DISMISSED, PENDING, COMMENTED
-    }
-
 }

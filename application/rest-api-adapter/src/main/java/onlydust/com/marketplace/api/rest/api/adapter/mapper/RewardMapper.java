@@ -152,8 +152,11 @@ public interface RewardMapper {
                     case OPEN -> GithubStatus.OPEN;
                     case MERGED -> GithubStatus.MERGED;
                     case CLOSED -> GithubStatus.CLOSED;
+                    case COMMENTED -> GithubStatus.COMMENTED;
+                    case APPROVED -> GithubStatus.APPROVED;
                     case CHANGES_REQUESTED -> GithubStatus.CHANGES_REQUESTED;
                     case COMPLETED -> GithubStatus.COMPLETED;
+                    case DISMISSED -> GithubStatus.DISMISSED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
                 .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
@@ -167,10 +170,6 @@ public interface RewardMapper {
                 .githubAuthorId(view.getGithubAuthorId())
                 .authorAvatarUrl(view.getAuthorAvatarUrl())
                 .authorGithubUrl(view.getAuthorGithubUrl())
-                .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()) {
-                    case approved -> RewardItemResponse.CodeReviewOutcomeEnum.APPROVED;
-                    case changeRequested -> RewardItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;
-                })
                 .authorLogin(view.getAuthorLogin());
     }
 }
