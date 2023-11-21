@@ -95,7 +95,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                     ) as links
                     FROM
                         indexer_exp.github_pull_requests_closing_issues pr_ci
-                    INNER JOIN indexer_exp.github_pull_requests pr ON pr.id = c.pull_request_id
+                    INNER JOIN indexer_exp.github_pull_requests pr ON pr.id = pr_ci.pull_request_id
                     WHERE 
                         pr_ci.issue_id = c.issue_id
                     GROUP BY 
