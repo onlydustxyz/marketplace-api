@@ -70,15 +70,14 @@ public class GithubHttpClient {
                             .POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
-                case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
+                case 200, 201, 204, 206 -> Optional.of(decode(httpResponse.body(), responseClass));
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or
                     // rate limiting exceeded,
                     // but never due to a user action
                         throw OnlyDustException.internalServerError(deserializeErrorMessage(httpResponse));
-                default ->
-                        throw OnlyDustException.internalServerError("Unable to fetch github API: " + path + " for " +
-                                                                    "error message " + deserializeErrorMessage(httpResponse), null);
+                default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path + " for " +
+                                                                       "error message " + deserializeErrorMessage(httpResponse), null);
             };
         } catch (JsonProcessingException e) {
             throw internalServerError("Fail to serialize request", e);
@@ -87,7 +86,7 @@ public class GithubHttpClient {
         }
     }
 
-    private final String deserializeErrorMessage(final HttpResponse<byte[]> httpResponse) {
+    private String deserializeErrorMessage(final HttpResponse<byte[]> httpResponse) {
         try {
             return decode(httpResponse.body(), JsonNode.class).toString();
         } catch (Exception e) {
@@ -97,7 +96,11 @@ public class GithubHttpClient {
     }
 
     public final URI buildURI(String path) {
-        return URI.create(config.baseUri + path);
+        String baseUri = config.baseUri;
+        if (config.baseUri.endsWith("/")) {
+            baseUri = config.baseUri.substring(0, config.baseUri.length() - 2);
+        }
+        return URI.create(baseUri + path);
     }
 
     @ToString
