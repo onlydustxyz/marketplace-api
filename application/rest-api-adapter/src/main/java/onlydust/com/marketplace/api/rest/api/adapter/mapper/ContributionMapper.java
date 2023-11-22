@@ -117,6 +117,7 @@ public interface ContributionMapper {
             case CREATED_AT -> ContributionView.Sort.CREATED_AT;
             case PROJECT_REPO_NAME -> ContributionView.Sort.PROJECT_REPO_NAME;
             case GITHUB_NUMBER_TITLE -> ContributionView.Sort.GITHUB_NUMBER_TITLE;
+            case LINKS_COUNT -> ContributionView.Sort.LINKS_COUNT;
         };
     }
 

@@ -367,6 +367,42 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
         ;
     }
 
+    @Test
+    void should_order_by_links_count() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "LINKS_COUNT")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].links.length()").isEqualTo(0)
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "LINKS_COUNT",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].links.length()").isEqualTo(3)
+        ;
+    }
+
+
 
     @Test
     void should_not_duplicate_contributions() {
