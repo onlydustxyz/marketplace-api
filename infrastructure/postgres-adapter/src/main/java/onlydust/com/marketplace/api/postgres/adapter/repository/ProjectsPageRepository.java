@@ -28,13 +28,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
-                           'login', COALESCE(gu.login, u.login_at_signup),
-                           'avatarUrl', COALESCE(gu.avatar_url, u.avatar_url_at_signup),
-                           'url', gu.html_url
+                           'login', COALESCE(ga.login, u.login_at_signup),
+                           'avatarUrl', COALESCE(ga.avatar_url, u.avatar_url_at_signup),
+                           'url', ga.html_url
                            ))
                     from project_leads pl
-                             left join auth_users u on u.id = pl.user_id
-                             left join github_users gu on gu.id = u.github_user_id
+                         left join auth_users u on u.id = pl.user_id
+                         left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                   as   project_leads,
                    t.technologies as  technologies,
@@ -94,13 +94,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
-                           'login', COALESCE(gu.login, u.login_at_signup),
-                           'avatarUrl', COALESCE(gu.avatar_url, u.avatar_url_at_signup),
-                           'url', gu.html_url
+                           'login', COALESCE(ga.login, u.login_at_signup),
+                           'avatarUrl', COALESCE(ga.avatar_url, u.avatar_url_at_signup),
+                           'url', ga.html_url
                            ))
                     from project_leads pl
                              left join auth_users u on u.id = pl.user_id
-                             left join github_users gu on gu.id = u.github_user_id
+                             left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                     as project_leads,
                    t.technologies                               as technologies,

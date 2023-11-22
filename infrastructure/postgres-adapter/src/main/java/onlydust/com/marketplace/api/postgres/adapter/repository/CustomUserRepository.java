@@ -110,20 +110,20 @@ public class CustomUserRepository {
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
             from public.auth_users u
-                     join public.github_users gu on gu.id = u.github_user_id
+                     join indexer_exp.github_accounts gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where u.id = :userId
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
-            from public.github_users gu
+            from indexer_exp.github_accounts gu
                      left join public.auth_users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.id = :githubUserId
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
-            from public.github_users gu
+            from indexer_exp.github_accounts gu
                      left join public.auth_users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.login = :githubLogin
