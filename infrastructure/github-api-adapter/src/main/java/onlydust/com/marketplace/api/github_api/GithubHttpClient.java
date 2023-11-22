@@ -98,7 +98,7 @@ public class GithubHttpClient {
     public final URI buildURI(String path) {
         String baseUri = config.baseUri;
         if (config.baseUri.endsWith("/")) {
-            baseUri = config.baseUri.substring(0, config.baseUri.length() - 2);
+            baseUri = config.baseUri.substring(0, config.baseUri.length() - 1);
         }
         return URI.create(baseUri + path);
     }
