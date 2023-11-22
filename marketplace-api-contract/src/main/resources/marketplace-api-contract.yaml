@@ -197,6 +197,31 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/project-claims/{projectId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Claim project
+      operationId: claimProject
+      description: |
+        Claim project
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "204":
+          description: 'This project was successfully claimed. The caller is now a leader of the project.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/rewards:
     get:

@@ -243,4 +243,9 @@ public class MeRestApi implements MeApi {
         return githubAccounts.isEmpty() ? ResponseEntity.notFound().build() :
                 ResponseEntity.ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
     }
+
+    @Override
+    public ResponseEntity<Void> claimProject(UUID projectId) {
+        return ResponseEntity.ok().build();
+    }
 }
