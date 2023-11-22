@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.github_api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -70,13 +71,28 @@ public class GithubHttpClient {
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
                 case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
-                case 403, 404 -> Optional.empty();
-                default -> throw OnlyDustException.internalServerError("Unable to fetch github API: " + path, null);
+                case 403, 404 ->
+                    // Should be considered as an internal server error because it happens due to wrong github PAT or
+                    // rate limiting exceeded,
+                    // but never due to a user action
+                        throw OnlyDustException.internalServerError(deserializeErrorMessage(httpResponse));
+                default ->
+                        throw OnlyDustException.internalServerError("Unable to fetch github API: " + path + " for " +
+                                                                    "error message " + deserializeErrorMessage(httpResponse), null);
             };
         } catch (JsonProcessingException e) {
             throw internalServerError("Fail to serialize request", e);
         } catch (IOException | InterruptedException e) {
             throw internalServerError("Fail send request", e);
+        }
+    }
+
+    private final String deserializeErrorMessage(final HttpResponse<byte[]> httpResponse) {
+        try {
+            return decode(httpResponse.body(), JsonNode.class).toString();
+        } catch (Exception e) {
+            LOGGER.error("Error while deserializing error message from Github response");
+            return "No error message from Github";
         }
     }
 
