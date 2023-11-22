@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
+import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
@@ -30,8 +31,8 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                 new ArrayList<>(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPersonalToken))
                         .stream()
                         .map(githubAccount -> githubAccount.toBuilder()
-                                .isCurrentUserAdmin(githubSearchPort.isGithubUserAdminOfOrganization(githubPersonalToken
-                                        , authenticatedUser.getLogin(), githubAccount.getLogin()))
+                                .isCurrentUserAdmin(githubSearchPort.getGithubUserMembershipForOrganization(githubPersonalToken
+                                        , authenticatedUser.getLogin(), githubAccount.getLogin()).equals(GithubMembership.ADMIN))
                                 .build()
                         )
                         .collect(Collectors.toList());

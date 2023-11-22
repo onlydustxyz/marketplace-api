@@ -17,5 +17,6 @@ public class ProjectOrganizationView {
     Long installationId;
     @Builder.Default
     Set<ProjectOrganizationRepoView> repos = new HashSet<>();
-    Boolean isInstalled;
+    @Builder.Default
+    Boolean isInstalled = false;
 }

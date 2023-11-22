@@ -76,8 +76,8 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     }
 
     @Override
-    public boolean isGithubUserAdminOfOrganization(String githubPersonalToken, String userLogin,
-                                                   String organizationLogin) {
+    public boolean getGithubUserMembershipForOrganization(String githubPersonalToken, String userLogin,
+                                                          String organizationLogin) {
         return client.get(String.format("/orgs/%s/memberships/%s", organizationLogin, userLogin),
                         GetOrgaMembershipsResponseDTO.class, githubPersonalToken)
                 .filter(dto -> nonNull(dto.getRole()) && nonNull(dto.getState()))

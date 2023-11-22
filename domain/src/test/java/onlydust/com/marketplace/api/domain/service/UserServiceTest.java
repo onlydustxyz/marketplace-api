@@ -4,18 +4,15 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.api.domain.view.RewardItemView;
-import onlydust.com.marketplace.api.domain.view.RewardView;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,12 +23,22 @@ public class UserServiceTest {
 
     private final Faker faker = new Faker();
     private final DeterministicDateProvider dateProvider = new DeterministicDateProvider();
+    private UserStoragePort userStoragePort;
+    private ProjectStoragePort projectStoragePort;
+    private GithubSearchPort githubSearchPort;
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        userStoragePort = mock(UserStoragePort.class);
+        projectStoragePort = mock(ProjectStoragePort.class);
+        githubSearchPort = mock(GithubSearchPort.class);
+        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort);
+    }
 
     @Test
     void should_find_user_given_a_github_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final User user =
@@ -61,8 +68,6 @@ public class UserServiceTest {
     @Test
     void should_find_user_given_a_github_id_with_no_payment_requests() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final User user =
@@ -94,8 +99,6 @@ public class UserServiceTest {
     @Test
     void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
 
@@ -112,8 +115,6 @@ public class UserServiceTest {
     @Test
     void should_find_user_profile_given_an_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserProfileView userProfileView =
                 UserProfileView.builder().id(userId).avatarUrl(faker.pokemon().name()).githubId(faker.number().randomNumber()).login(faker.hacker().verb()).build();
@@ -129,8 +130,6 @@ public class UserServiceTest {
     @Test
     void should_find_user_profile_given_a_github_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final Long githubUserId = faker.number().randomNumber();
         final UserProfileView userProfileView =
@@ -147,8 +146,6 @@ public class UserServiceTest {
     @Test
     void should_find_user_profile_given_a_github_login() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final Long githubUserId = faker.number().randomNumber();
         final String login = faker.name().username();
@@ -167,8 +164,6 @@ public class UserServiceTest {
     void should_markUserAsOnboarded() {
         // Given
         dateProvider.setNow(faker.date().birthday(0, 1));
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
 
         // When
@@ -182,8 +177,6 @@ public class UserServiceTest {
     void should_updateTermsAndConditionsAcceptanceDate() {
         // Given
         dateProvider.setNow(faker.date().birthday(0, 1));
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
 
         // When
@@ -196,8 +189,6 @@ public class UserServiceTest {
     @Test
     void should_accept_lead_invitation() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID projectId = UUID.randomUUID();
         final Long githubUserId = faker.number().randomNumber();
 
@@ -211,8 +202,6 @@ public class UserServiceTest {
     @Test
     void should_apply_on_project() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID projectId = UUID.randomUUID();
         final UUID userId = UUID.randomUUID();
 
@@ -226,15 +215,14 @@ public class UserServiceTest {
     @Test
     void should_update_profile() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
 
         final UserProfile profile =
                 UserProfile.builder().bio(faker.lorem().sentence())
                         .website(faker.internet().url()).location(faker.address().city())
                         .cover(UserProfileCover.CYAN)
-                        .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(), faker.programmingLanguage().name(), faker.number().randomNumber()))
+                        .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(),
+                                faker.programmingLanguage().name(), faker.number().randomNumber()))
                         .contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
 
         final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
@@ -252,8 +240,6 @@ public class UserServiceTest {
     @Test
     void should_validate_user_payout_profile_before_updating_it_given_wrong_aptos_address() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(faker.rickAndMorty().character()).build()).build();
@@ -275,8 +261,6 @@ public class UserServiceTest {
     @Test
     void should_validate_user_payout_profile_before_updating_it_given_wrong_eth_address() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethAddress(faker.rickAndMorty().character()).build()).build();
@@ -298,8 +282,6 @@ public class UserServiceTest {
     @Test
     void should_validate_user_payout_profile_before_updating_it_given_wrong_stark_address() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().starknetAddress(faker.rickAndMorty().character()).build()).build();
@@ -321,8 +303,6 @@ public class UserServiceTest {
     @Test
     void should_validate_user_payout_info_before_updating_it_given_wrong_optimism_address() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().optimismAddress(faker.rickAndMorty().character()).build()).build();
@@ -344,8 +324,6 @@ public class UserServiceTest {
     @Test
     void should_validate_user_payout_info_and_update_it_given_valid_wallet_addresses() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder()
@@ -365,8 +343,6 @@ public class UserServiceTest {
     @Test
     void should_validate_reward_is_linked_to_user_given_a_valid_recipient_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
         final RewardView expectedReward =
@@ -385,8 +361,6 @@ public class UserServiceTest {
     @Test
     void should_validate_reward_is_linked_to_user_given_a_invalid_recipient_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
         final RewardView expectedReward =
@@ -411,8 +385,6 @@ public class UserServiceTest {
     @Test
     void should_validate_reward_items_are_linked_to_user_given_a_valid_recipient_id() {
         // Given
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 2L;
         final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
@@ -435,8 +407,6 @@ public class UserServiceTest {
 
     @Test
     void should_validate_reward_items_are_linked_to_user_given_a_invalid_recipient_id() {
-        final UserStoragePort userStoragePort = mock(UserStoragePort.class);
-        final UserFacadePort userService = new UserService(userStoragePort, dateProvider);
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 3L;
         final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
@@ -463,5 +433,153 @@ public class UserServiceTest {
         assertEquals("Only recipient user can read it's own reward", onlyDustException.getMessage());
     }
 
+    @Test
+    void should_fail_to_claim_project_with_project_leads() {
+        // Given
+        final UUID projectId = UUID.randomUUID();
 
+        // When
+        when(projectStoragePort.getById(projectId))
+                .thenReturn(ProjectDetailsView.builder().leaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Project must have no project (pending) leads to be claimable", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_fail_to_claim_project_with_pending_project_leads() {
+        // Given
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getById(projectId))
+                .thenReturn(ProjectDetailsView.builder().invitedLeaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Project must have no project (pending) leads to be claimable", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_fail_to_claim_project_with_no_organizations() {
+        // Given
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getById(projectId))
+                .thenReturn(ProjectDetailsView.builder().build());
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Project must have at least one organization to be claimable", onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_fail_to_claim_project_if_user_not_github_admin_on_every_orga() {
+        // Given
+        final String githubAccessToken = faker.rickAndMorty().character();
+        final User user = User.builder().login(faker.pokemon().name()).build();
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getById(projectId))
+                .thenReturn(ProjectDetailsView.builder()
+                        .organizations(Set.of(
+                                ProjectOrganizationView.builder()
+                                        .login("org1")
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org2")
+                                        .isInstalled(true)
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org3")
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org4")
+                                        .isInstalled(true)
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org5")
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org6")
+                                        .isInstalled(true)
+                                        .build()
+                        ))
+                        .build());
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org4")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org5")).thenReturn(GithubMembership.EXTERNAL);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org6")).thenReturn(GithubMembership.EXTERNAL);
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("User must be github admin on every organizations not installed and at least member on every " +
+                     "organization already installed linked to the project",
+                onlyDustException.getMessage());
+    }
+
+    @Test
+    void should_claim_project() {
+        final String githubAccessToken = faker.rickAndMorty().character();
+        final User user = User.builder().id(UUID.randomUUID()).login(faker.pokemon().name()).build();
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getById(projectId))
+                .thenReturn(ProjectDetailsView.builder()
+                        .organizations(Set.of(
+                                ProjectOrganizationView.builder()
+                                        .login("org1")
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org2")
+                                        .isInstalled(true)
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org3")
+                                        .isInstalled(true)
+                                        .build()
+                        ))
+                        .build());
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
+        userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
+
+        // Then
+        verify(userStoragePort, times(1)).claimProject(user.getId(), projectId);
+    }
 }

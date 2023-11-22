@@ -246,6 +246,10 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> claimProject(UUID projectId) {
+        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+        userFacadePort.claimProjectForAuthenticatedUserAndGithubPersonalToken(
+                projectId, hasuraAuthentication.getUser(), hasuraAuthentication.getClaims().getGithubAccessToken()
+        );
         return ResponseEntity.ok().build();
     }
 }

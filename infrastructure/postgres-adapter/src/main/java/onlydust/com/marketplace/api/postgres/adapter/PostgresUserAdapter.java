@@ -66,7 +66,8 @@ public class PostgresUserAdapter implements UserStoragePort {
         return hasuraUser.map(u -> {
             final List<ProjectLedIdViewEntity> projectLedIdsByUserId =
                     projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
-            return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(), projectLedIdsByUserId);
+            return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+                    projectLedIdsByUserId);
         });
     }
 
@@ -283,5 +284,11 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 .build())
                         .isRegistered(entity.getIsRegistered())
                         .build()).toList();
+    }
+
+    @Override
+    @Transactional
+    public void claimProject(UUID userId, UUID projectId) {
+        projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
     }
 }
