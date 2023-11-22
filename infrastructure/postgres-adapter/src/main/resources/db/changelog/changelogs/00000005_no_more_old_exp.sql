@@ -18,8 +18,7 @@ FROM projects_pending_contributors
 WHERE completed_contribution_count > 0;
 
 
-DROP VIEW registered_users;
-CREATE VIEW registered_users AS
+CREATE OR REPLACE VIEW registered_users AS
 SELECT au.id,
        au.github_user_id,
        COALESCE(ga.login, au.login_at_signup)                                   AS login,
