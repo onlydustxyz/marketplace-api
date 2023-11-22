@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -50,10 +51,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
                 filters.getStatuses().stream().map(Enum::name).toList(),
-                PageRequest.of(page, pageSize, Sort.by(
-                        direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC,
-                        sortBy(sort).toArray(String[]::new)
-                )));
+                PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
 
         return Page.<ContributionView>builder()
                 .content(contributionPage.getContent().stream().map(ContributionViewEntity::toView).toList())
@@ -74,11 +72,12 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
     }
 
-    private List<String> sortBy(ContributionView.Sort sort) {
+    private Sort sortBy(ContributionView.Sort sort, Sort.Direction direction) {
         return switch (sort) {
-            case CREATED_AT -> List.of("created_at");
-            case PROJECT_REPO_NAME -> List.of("project_name", "repo_name");
-            case GITHUB_NUMBER_TITLE -> List.of("github_number", "github_title");
+            case CREATED_AT -> Sort.by(direction, "created_at");
+            case PROJECT_REPO_NAME -> Sort.by(direction, "project_name", "repo_name");
+            case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
+            case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links)), 0)");
         };
     }
 

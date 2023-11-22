@@ -35,7 +35,7 @@ public class ContributionView {
     PullRequestReviewState prReviewState;
 
     public enum Sort {
-        CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE
+        CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE, LINKS_COUNT
     }
 
     @Value

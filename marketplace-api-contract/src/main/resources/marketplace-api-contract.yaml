@@ -2978,6 +2978,7 @@ components:
         - CREATED_AT
         - PROJECT_REPO_NAME
         - GITHUB_NUMBER_TITLE
+        - LINKS_COUNT
 
     GithubIssueStatus:
       type: string
