@@ -97,8 +97,7 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                           "commitsCount": 1,
                           "userCommitsCount": null,
                           "commentsCount": null,
-                          "codeReviewOutcome": null,
-                          "status": "OPEN"
+                          "status": "MERGED"
                         }
                         """);
     }

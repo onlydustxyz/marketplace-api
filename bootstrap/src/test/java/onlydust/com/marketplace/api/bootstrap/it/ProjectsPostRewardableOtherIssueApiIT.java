@@ -97,8 +97,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "commitsCount": null,
                           "userCommitsCount": null,
                           "commentsCount": 2,
-                          "codeReviewOutcome": null,
-                          "status": "OPEN"
+                          "status": "COMPLETED"
                         }
                         """);
     }

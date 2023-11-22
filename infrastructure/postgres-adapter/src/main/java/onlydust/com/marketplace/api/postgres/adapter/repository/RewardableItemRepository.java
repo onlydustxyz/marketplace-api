@@ -14,7 +14,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
     @Query(value = """
             select c.id as contribution_id,
                    c.type,
-                   coalesce(c.pull_request_id, c.issue_id, c.code_review_id) id,
+                   coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) id,
                    c.status                                             status,
                    c.github_number                                      number,
                    c.github_html_url                                    html_url,
@@ -26,7 +26,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    (select gprcc.commit_count
                     from indexer_exp.github_pull_request_commit_counts gprcc
                     where gprcc.pull_request_id = pull_request.id and gprcc.author_id = :githubUserId)      user_commits_count,
-                   c.github_comments_count,
+                   c.github_comments_count                                                                  comments_count,
                    ic.contribution_id is not null                                                           ignored
             from public.project_github_repos pgr
                      join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id

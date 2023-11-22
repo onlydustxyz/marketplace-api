@@ -99,7 +99,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                            'url', ga.html_url
                            ))
                     from project_leads pl
-                             left join auth_users u on u.id = pl.user_id
+                             join auth_users u on u.id = pl.user_id
                              left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                     as project_leads,

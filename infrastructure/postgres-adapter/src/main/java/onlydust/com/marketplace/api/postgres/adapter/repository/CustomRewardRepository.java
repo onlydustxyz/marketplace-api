@@ -208,7 +208,7 @@ public class CustomRewardRepository {
                                                coalesce(gpr.closed_at, gpr.merged_at)       end_date,
                                                gpr.author_id                                author_id,
                                                gpr.author_login                             author_login,
-                                               gpr.author_avatar_url                        avatar_url,
+                                               gpr.author_avatar_url                        author_avatar_url,
                                                gpr.author_html_url                          author_github_url,
                                                gpr.commit_count                             commits_count
                                         from indexer_exp.github_pull_requests gpr),
@@ -222,7 +222,7 @@ public class CustomRewardRepository {
                                               gi.closed_at  end_date,
                                               gi.author_id         author_id,
                                               gi.author_login      author_login,
-                                              gi.author_avatar_url avatar_url,
+                                              gi.author_avatar_url author_avatar_url,
                                               gi.author_html_url   author_github_url,
                                               gi.comments_count
                                        from indexer_exp.github_issues gi),
@@ -237,7 +237,7 @@ public class CustomRewardRepository {
                                               gprr.submitted_at          end_date,
                                               gprr.author_id             author_id,
                                               gprr.author_login          author_login,
-                                              gprr.author_avatar_url     avatar_url,
+                                              gprr.author_avatar_url     author_avatar_url,
                                               gprr.author_html_url       author_github_url
                                        from indexer_exp.github_code_reviews gprr)
             select distinct wi.type,
@@ -251,7 +251,7 @@ public class CustomRewardRepository {
                             coalesce(pull_request.end_date, issue.end_date, code_review.end_date)             end_date,
                             coalesce(pull_request.author_id, issue.author_id, code_review.author_id)          author_id,
                             coalesce(pull_request.author_login, issue.author_login, code_review.author_login) author_login,
-                            coalesce(pull_request.avatar_url, issue.avatar_url, code_review.avatar_url)       avatar_url,
+                            coalesce(pull_request.author_avatar_url, issue.author_avatar_url, code_review.author_avatar_url)       author_avatar_url,
                             coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
                             coalesce(pull_request.author_github_url, issue.author_github_url, code_review.author_github_url) author_github_url,
                             pull_request.commits_count,

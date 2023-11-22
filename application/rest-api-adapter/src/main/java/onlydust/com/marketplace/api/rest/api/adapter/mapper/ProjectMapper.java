@@ -71,9 +71,9 @@ public interface ProjectMapper {
             repos.addAll(organization.getRepos().stream()
                     .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
                     .map(ProjectMapper::mapRepo)
-                    .sorted(Comparator.comparing(GithubRepoResponse::getId))
                     .toList());
         }
+        repos.sort(Comparator.comparing(GithubRepoResponse::getId));
         projectResponse.setRepos(repos);
 
         return projectResponse;

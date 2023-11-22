@@ -29,3 +29,34 @@ SELECT au.id,
        au.admin
 FROM auth_users au
          LEFT JOIN indexer_exp.github_accounts ga ON ga.id = au.github_user_id;
+
+
+ALTER TYPE public.contribution_type RENAME VALUE 'pull_request' TO 'PULL_REQUEST';
+ALTER TYPE public.contribution_type RENAME VALUE 'code_review' TO 'CODE_REVIEW';
+ALTER TYPE public.contribution_type RENAME VALUE 'issue' TO 'ISSUE';
+
+
+INSERT INTO indexer.user_indexing_jobs (user_id)
+SELECT github_user_id
+FROM auth_users
+ON CONFLICT DO NOTHING;
+
+
+CREATE OR REPLACE FUNCTION public.insert_user_indexing_jobs_from_auth_users()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    -- Insert or update a row into table github_user_indexes when a row is inserted in auth.user_providers
+    INSERT INTO indexer.user_indexing_jobs (user_id)
+    VALUES (NEW.github_user_id)
+    ON CONFLICT DO NOTHING;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_user_indexing_jobs_from_auth_users_trigger
+    AFTER INSERT
+    ON auth_users
+    FOR EACH ROW
+EXECUTE FUNCTION public.insert_user_indexing_jobs_from_auth_users();

@@ -70,7 +70,7 @@ public class CustomUserRepository {
                                  count(DISTINCT c.code_review_id) FILTER (WHERE c.type = 'CODE_REVIEW')     AS code_review_count,
                                  count(DISTINCT c.pull_request_id) FILTER (WHERE c.type = 'PULL_REQUEST')   AS pull_request_count
                           FROM indexer_exp.contributions c
-                          where c.status = 'complete'
+                          where c.status = 'COMPLETED'
                             and c.contributor_id = gu.id
                           GROUP BY year, week) as cc)      counts,
                         
@@ -149,25 +149,21 @@ public class CustomUserRepository {
                     where pd.project_id = p.project_id
                       and b.currency = 'usd')            total_granted,
                       
-                   (select rc.completed_contribution_count
+                   (select sum(rc.completed_contribution_count)
                     from project_github_repos pgr
                     join indexer_exp.repos_contributors rc on rc.repo_id = pgr.github_repo_id and rc.contributor_id = :githubUserId
                     where pgr.project_id = p.project_id) user_contributions_count,
                     
-                   (select c.completed_at
+                   (select max(c.completed_at)
                     from project_github_repos pgr
                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id
-                    order by c.completed_at desc
-                    limit 1)                             last_contribution_date,
+                    where pgr.project_id = p.project_id) last_contribution_date,
                     
                     
-                   (select c.completed_at
+                   (select min(c.completed_at)
                     from project_github_repos pgr
                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id
-                    order by c.completed_at asc
-                    limit 1)                             first_contribution_date
+                    where pgr.project_id = p.project_id) first_contribution_date
                    
             from ((select distinct pd.project_id, false is_lead, cast(null as timestamp) as assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from indexer_exp.repos_contributors rc

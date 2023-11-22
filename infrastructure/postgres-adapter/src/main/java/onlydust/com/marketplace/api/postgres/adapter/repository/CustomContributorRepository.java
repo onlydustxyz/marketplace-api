@@ -89,13 +89,13 @@ public class CustomContributorRepository {
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
                      left join users u on u.github_user_id = ga.id
                      left join (select count(distinct c.id)                                          total_count,
-                                       count(distinct c.id) filter ( where c.type = 'pull_request' ) pull_request_count,
-                                       count(distinct c.id) filter ( where c.type = 'code_review' )  code_review_count,
-                                       count(distinct c.id) filter ( where c.type = 'issue' )        issue_count,
+                                       count(distinct c.id) filter ( where c.type = 'PULL_REQUEST' ) pull_request_count,
+                                       count(distinct c.id) filter ( where c.type = 'CODE_REVIEW' )  code_review_count,
+                                       count(distinct c.id) filter ( where c.type = 'ISSUE' )        issue_count,
                                        c.contributor_id
                                 from project_github_repos pgr
                                          left join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
-                                         left join work_items wi on wi.id = coalesce(c.issue_id,c.pull_request_id,c.code_review_id) and wi.recipient_id = c.contributor_id
+                                         left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
                                          left join ignored_contributions ic on ic.contribution_id = c.id
                                 where pgr.project_id = :projectId
                                   and c.status = 'COMPLETED'
@@ -110,7 +110,7 @@ public class CustomContributorRepository {
                                                 pr.recipient_id
                                          from payment_requests pr
                                          where pr.project_id = :projectId
-                                         group by pr.recipient_id) amounts on amounts.recipient_id = gu.id
+                                         group by pr.recipient_id) amounts on amounts.recipient_id = ga.id
                               left join crypto_usd_quotes cuq_eth on cuq_eth.currency = 'eth'
                               left join crypto_usd_quotes cuq_apt on cuq_apt.currency = 'apt'
                               left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'stark'
@@ -134,6 +134,7 @@ public class CustomContributorRepository {
                 ga.id as github_user_id,
                 ga.login,
                 ga.avatar_url,
+                ga.html_url,
                 u.github_user_id IS NOT NULL as is_registered
             FROM indexer_exp.github_accounts ga
                 LEFT JOIN users u on u.github_user_id = ga.id

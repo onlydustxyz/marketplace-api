@@ -1406,6 +1406,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 26,
               "nextPageIndex": 0
             }
+            
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {

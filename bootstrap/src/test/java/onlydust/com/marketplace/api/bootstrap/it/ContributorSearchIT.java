@@ -96,7 +96,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(17)
+                .jsonPath("$.internalContributors.length()").isEqualTo(18)
                 .jsonPath("$.externalContributors.length()").isEqualTo(0);
     }
 
@@ -109,7 +109,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.internalContributors.length()").isEqualTo(21)
+                .jsonPath("$.internalContributors.length()").isEqualTo(22)
                 .jsonPath("$.externalContributors.length()").isEqualTo(0);
     }
 
