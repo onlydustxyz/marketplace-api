@@ -62,13 +62,11 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                       gi.title,
                                       gi.created_at start_date
                                from indexer_exp.github_issues gi),
-                 get_code_review as (select gpr.number,
+                 get_code_review as (select gcr.number,
                                             gcr.id,
-                                            gpr.title,
-                                            gpr.created_at   start_date
-                                     from indexer_exp.github_code_reviews gcr
-                                              left join indexer_exp.github_pull_requests gpr
-                                                        on gpr.id = gcr.pull_request_id)
+                                            gcr.title,
+                                            gcr.requested_at   start_date
+                                     from indexer_exp.github_code_reviews gcr)
             select count(c.id)
             from public.project_github_repos pgr
                      join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
@@ -100,11 +98,9 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                       gi.created_at start_date,
                                       gi.closed_at  end_date,
                                       gi.comments_count,
-                                      repo.name repo_name,
-                                      ga.login  repo_owner
-                               from indexer_exp.github_issues gi
-                               join indexer_exp.github_repos repo on repo.id = gi.repo_id
-                               join indexer_exp.github_accounts ga on ga.id = repo.owner_id)
+                                      gi.repo_name,
+                                      gi.repo_owner_login  repo_owner
+                               from indexer_exp.github_issues gi)
             select issue.id,
                    NULL as contribution_id,
                    'ISSUE' as type,
@@ -135,17 +131,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                    gpr.html_url,
                                    gpr.title,
                                    gpr.status,
-            --                        gpr.draft,
                                    gpr.created_at                         start_date,
                                    coalesce(gpr.closed_at, gpr.merged_at) end_date,
-                                   (select count(c.pull_request_id)
-                                    from github_pull_request_commits c
-                                    where c.pull_request_id = gpr.id)     commits_count,
-                                   repo.name repo_name,
-                                   ga.login  repo_owner
-                            from indexer_exp.github_pull_requests gpr
-                               join indexer_exp.github_repos repo on repo.id = gpr.repo_id
-                               join indexer_exp.github_accounts ga on ga.id = repo.owner_id)
+                                   gpr.commit_count     commits_count,
+                                   gpr.repo_name,
+                                   gpr.repo_owner_login  repo_owner
+                            from indexer_exp.github_pull_requests gpr)
             select pr.id,
                    NULL as contribution_id,
                    'PULL_REQUEST' as type,
