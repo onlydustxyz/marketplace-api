@@ -250,6 +250,6 @@ public class MeRestApi implements MeApi {
         userFacadePort.claimProjectForAuthenticatedUserAndGithubPersonalToken(
                 projectId, hasuraAuthentication.getUser(), hasuraAuthentication.getClaims().getGithubAccessToken()
         );
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

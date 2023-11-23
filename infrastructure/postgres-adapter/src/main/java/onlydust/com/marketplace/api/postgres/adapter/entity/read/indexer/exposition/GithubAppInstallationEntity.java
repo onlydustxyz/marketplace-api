@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
@@ -12,6 +11,9 @@ import java.util.Set;
 @Entity
 @Table(schema = "indexer_exp", name = "github_app_installations")
 @Immutable
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GithubAppInstallationEntity {
     @Id
     Long id;

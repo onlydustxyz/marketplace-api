@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Table(name = "authorized_github_repos", schema = "indexer_exp")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class GithubAuthorizedRepoEntity {
     @EmbeddedId
     @EqualsAndHashCode.Include
