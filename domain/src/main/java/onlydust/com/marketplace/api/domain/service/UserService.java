@@ -156,6 +156,9 @@ public class UserService implements UserFacadePort {
     }
 
     private boolean cannotBeClaimedByUser(User user, String githubAccessToken, ProjectOrganizationView org) {
+        if (org.getId().equals(user.getGithubUserId())) {
+            return false;
+        }
         final GithubMembership githubMembership =
                 githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken,
                         user.getLogin(), org.getLogin());

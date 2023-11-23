@@ -554,7 +554,9 @@ public class UserServiceTest {
     @Test
     void should_claim_project() {
         final String githubAccessToken = faker.rickAndMorty().character();
-        final User user = User.builder().id(UUID.randomUUID()).login(faker.pokemon().name()).build();
+        final User user = User.builder().id(UUID.randomUUID())
+                .githubUserId(faker.random().nextLong())
+                .login(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -563,20 +565,30 @@ public class UserServiceTest {
                         .organizations(Set.of(
                                 ProjectOrganizationView.builder()
                                         .login("org1")
+                                        .id(1L)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org2")
+                                        .id(2L)
                                         .isInstalled(true)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org3")
+                                        .id(3l)
                                         .isInstalled(true)
+                                        .build(),
+                                ProjectOrganizationView.builder()
+                                        .login("org4")
+                                        .id(4L)
+                                        .isInstalled(true)
+                                        .id(user.getGithubUserId())
                                         .build()
                         ))
                         .build());
         when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
         when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
         when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org4")).thenReturn(GithubMembership.EXTERNAL);
         userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
 
         // Then
