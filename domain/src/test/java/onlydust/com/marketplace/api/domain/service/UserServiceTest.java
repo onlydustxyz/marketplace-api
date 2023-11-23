@@ -500,7 +500,7 @@ public class UserServiceTest {
     void should_fail_to_claim_project_if_user_not_github_admin_on_every_orga() {
         // Given
         final String githubAccessToken = faker.rickAndMorty().character();
-        final User user = User.builder().login(faker.pokemon().name()).build();
+        final User user = User.builder().githubUserId(faker.random().nextLong()).login(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -509,23 +509,29 @@ public class UserServiceTest {
                         .organizations(Set.of(
                                 ProjectOrganizationView.builder()
                                         .login("org1")
+                                        .id(1L)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org2")
+                                        .id(2L)
                                         .isInstalled(true)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org3")
+                                        .id(3L)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org4")
+                                        .id(4L)
                                         .isInstalled(true)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org5")
+                                        .id(5L)
                                         .build(),
                                 ProjectOrganizationView.builder()
                                         .login("org6")
+                                        .id(6L)
                                         .isInstalled(true)
                                         .build()
                         ))
