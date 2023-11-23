@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
+import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
@@ -125,10 +126,10 @@ public class GithubAccountServiceTest {
         );
         when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, authenticatedUser.getLogin(), "org1"))
-                .thenReturn(true);
-        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, authenticatedUser.getLogin(), "org2"))
-                .thenReturn(false);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, authenticatedUser.getLogin(), "org1"))
+                .thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, authenticatedUser.getLogin(), "org2"))
+                .thenReturn(GithubMembership.MEMBER);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L))).thenReturn(List.of());
         final List<GithubAccount> organizationsForGithubPersonalToken =
                 githubAccountService.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(githubPAT,
@@ -160,10 +161,10 @@ public class GithubAccountServiceTest {
         );
         when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, user.getLogin(), "org1"))
-                .thenReturn(true);
-        when(githubSearchPort.isGithubUserAdminOfOrganization(githubPAT, user.getLogin(), "org2"))
-                .thenReturn(false);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, user.getLogin(), "org1"))
+                .thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, user.getLogin(), "org2"))
+                .thenReturn(GithubMembership.EXTERNAL);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L, 5L))).thenReturn(List.of(
                 GithubAccount.builder()
                         .id(2L)

@@ -27,6 +27,7 @@ public class ProjectRepoEntity {
     @NoArgsConstructor
     @EqualsAndHashCode
     @Data
+    @Builder
     public static class PrimaryKey implements Serializable {
         @Column(name = "project_id", nullable = false, updatable = false)
         UUID projectId;

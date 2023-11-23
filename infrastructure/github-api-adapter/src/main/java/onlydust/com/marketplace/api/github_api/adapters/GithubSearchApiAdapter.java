@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
+import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
@@ -76,12 +77,20 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     }
 
     @Override
-    public boolean isGithubUserAdminOfOrganization(String githubPersonalToken, String userLogin,
-                                                   String organizationLogin) {
+    public GithubMembership getGithubUserMembershipForOrganization(String githubPersonalToken, String userLogin,
+                                                                   String organizationLogin) {
         return client.get(String.format("/orgs/%s/memberships/%s", organizationLogin, userLogin),
                         GetOrgaMembershipsResponseDTO.class, githubPersonalToken)
                 .filter(dto -> nonNull(dto.getRole()) && nonNull(dto.getState()))
-                .map(dto -> dto.getRole().equals("admin") && dto.getState().equals("active"))
-                .orElse(false);
+                .map(dto -> {
+                    if (dto.getRole().equals("admin") && dto.getState().equals("active")) {
+                        return GithubMembership.ADMIN;
+                    }
+                    if (dto.getRole().equals("member") && dto.getState().equals("active")) {
+                        return GithubMembership.MEMBER;
+                    }
+                    return GithubMembership.EXTERNAL;
+                })
+                .orElse(GithubMembership.EXTERNAL);
     }
 }

@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;

@@ -5,6 +5,8 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -18,6 +20,8 @@ public class UserService implements UserFacadePort {
 
     private final UserStoragePort userStoragePort;
     private final DateProvider dateProvider;
+    private final ProjectStoragePort projectStoragePort;
+    private final GithubSearchPort githubSearchPort;
 
     @Override
     public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity) {
@@ -127,5 +131,40 @@ public class UserService implements UserFacadePort {
     @Override
     public List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId) {
         return userStoragePort.findPendingInvoiceRewardsForRecipientId(githubUserId);
+    }
+
+    @Override
+    public void claimProjectForAuthenticatedUserAndGithubPersonalToken(UUID projectId, User user,
+                                                                       String githubAccessToken) {
+        final ProjectDetailsView projectDetails = projectStoragePort.getById(projectId);
+        if (!projectDetails.getLeaders().isEmpty() || !projectDetails.getInvitedLeaders().isEmpty()) {
+            throw OnlyDustException.forbidden("Project must have no project (pending) leads to be claimable");
+        }
+        if (projectDetails.getOrganizations().isEmpty()) {
+            throw OnlyDustException.forbidden("Project must have at least one organization to be claimable");
+        }
+
+        final boolean isNotClaimable = projectDetails.getOrganizations().stream()
+                .anyMatch(org -> cannotBeClaimedByUser(user, githubAccessToken, org));
+        if (isNotClaimable) {
+            throw OnlyDustException.forbidden("User must be github admin on every organizations not installed and at " +
+                                              "least member on every organization already installed linked to the " +
+                                              "project");
+
+        }
+        userStoragePort.saveProjectLead(user.getId(), projectId);
+    }
+
+    private boolean cannotBeClaimedByUser(User user, String githubAccessToken, ProjectOrganizationView org) {
+        final GithubMembership githubMembership =
+                githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken,
+                        user.getLogin(), org.getLogin());
+        if (org.getIsInstalled() && (githubMembership.equals(GithubMembership.MEMBER) || githubMembership.equals(GithubMembership.ADMIN))) {
+            return false;
+        }
+        if (!org.getIsInstalled() && githubMembership.equals(GithubMembership.ADMIN)) {
+            return false;
+        }
+        return true;
     }
 }
