@@ -3721,6 +3721,7 @@ components:
         - number
         - id
         - ignored
+        - htmlUrl
       properties:
         number:
           type: integer
@@ -3762,6 +3763,8 @@ components:
         ignored:
           type: boolean
           description: True if the contribution is ignored in the project
+        htmlUrl:
+          type: string
 
     ReceiptType:
       type: string
