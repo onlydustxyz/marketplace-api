@@ -11,9 +11,6 @@ import java.util.Set;
 @Entity
 @Table(schema = "indexer_exp", name = "github_accounts")
 @Immutable
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class GithubAccountEntity {
     @Id
     @EqualsAndHashCode.Include

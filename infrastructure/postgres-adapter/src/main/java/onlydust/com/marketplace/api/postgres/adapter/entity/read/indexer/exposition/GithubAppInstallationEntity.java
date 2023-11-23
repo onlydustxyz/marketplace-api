@@ -11,9 +11,6 @@ import java.util.Set;
 @Entity
 @Table(schema = "indexer_exp", name = "github_app_installations")
 @Immutable
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class GithubAppInstallationEntity {
     @Id
     Long id;
