@@ -17,12 +17,12 @@ public interface ProjectStoragePort {
 
     ProjectDetailsView getBySlug(String slug);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
+    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                        UUID userId, String search,
                                                                        ProjectCardView.SortBy sort, Boolean mine,
                                                                        Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
+    Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                  String search, ProjectCardView.SortBy sort,
                                                                  Integer pageIndex, Integer pageSize);
 

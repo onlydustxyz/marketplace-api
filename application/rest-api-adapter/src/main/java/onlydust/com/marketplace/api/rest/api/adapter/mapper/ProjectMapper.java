@@ -80,7 +80,7 @@ public interface ProjectMapper {
     }
 
     static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
-                                                             final boolean includeAllAvailableRepos) {
+                                                      final boolean includeAllAvailableRepos) {
         final var organization = new GithubOrganizationResponse();
         organization.setId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
@@ -141,14 +141,21 @@ public interface ProjectMapper {
     static ProjectPageResponse mapProjectCards(final Page<ProjectCardView> page, final Integer pageIndex) {
         final ProjectPageResponse projectPageResponse = new ProjectPageResponse();
         final List<ProjectPageItemResponse> projectPageItemResponses = new ArrayList<>();
-        final Set<String> technologies = page.getFilters().get(ProjectCardView.FilterBy.TECHNOLOGIES.name());
-        final Set<String> sponsorNames = page.getFilters().get(ProjectCardView.FilterBy.SPONSORS.name());
+        final Set<String> technologies = page.getFilters().get(ProjectCardView.FilterBy.TECHNOLOGIES.name())
+                .stream()
+                .map(String.class::cast)
+                .collect(Collectors.toSet());
+        final Set<SponsorResponse> sponsors = page.getFilters().get(ProjectCardView.FilterBy.SPONSORS.name())
+                .stream()
+                .map(SponsorView.class::cast)
+                .map(ProjectMapper::mapSponsor)
+                .collect(Collectors.toSet());
         for (ProjectCardView projectCardView : page.getContent()) {
             projectPageItemResponses.add(mapProjectCard(projectCardView));
         }
         projectPageResponse.setProjects(projectPageItemResponses);
         projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
-        projectPageResponse.setSponsors(sponsorNames.stream().sorted().toList());
+        projectPageResponse.setSponsors(sponsors.stream().sorted(Comparator.comparing(SponsorResponse::getName)).toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
