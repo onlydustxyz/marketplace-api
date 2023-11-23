@@ -16,7 +16,7 @@ public class UpdateProjectCommand {
     List<Long> githubUserIdsAsProjectLeadersToInvite;
     List<UUID> projectLeadersToKeep;
     List<Long> githubRepoIds;
-    List<ProjectMoreInfoLink> moreInfos;
+    List<MoreInfoLink> moreInfos;
     Boolean isLookingForContributors;
     String imageUrl;
     ProjectRewardSettings rewardSettings;

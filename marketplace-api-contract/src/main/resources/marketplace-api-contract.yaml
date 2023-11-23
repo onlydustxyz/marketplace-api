@@ -2421,7 +2421,7 @@ components:
         - shortDescription
         - longDescription
         - logoUrl
-        - moreInfoUrl
+        - moreInfos
         - hiring
         - visibility
         - contributorCount
@@ -2454,11 +2454,10 @@ components:
           format: url
           description: Direct URL to project's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
-        moreInfoUrl:
-          type: string
-          format: url
-          description: External link to get more information about the project
-          example: 'https://t.me/my-super-project'
+        moreInfos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MoreInfo'
         hiring:
           type: boolean
           description: Is the project currently hiring?
@@ -3329,7 +3328,7 @@ components:
         - name
         - shortDescription
         - longDescription
-        - moreInfo
+        - moreInfos
         - isLookingForContributors
         - inviteGithubUserIdsAsProjectLeads
         - githubRepoIds
@@ -3340,7 +3339,7 @@ components:
           type: string
         longDescription:
           type: string
-        moreInfo:
+        moreInfos:
           type: array
           items:
             $ref: '#/components/schemas/MoreInfo'
@@ -3386,7 +3385,7 @@ components:
           type: string
         longDescription:
           type: string
-        moreInfo:
+        moreInfos:
           type: array
           items:
             $ref: '#/components/schemas/MoreInfo'
@@ -3467,6 +3466,8 @@ components:
           type: string
     MoreInfo:
       type: object
+      required:
+        - url
       properties:
         url:
           type: string

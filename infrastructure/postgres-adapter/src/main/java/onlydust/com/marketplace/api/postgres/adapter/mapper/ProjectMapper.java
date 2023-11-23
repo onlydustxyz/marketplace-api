@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
@@ -64,7 +65,7 @@ public interface ProjectMapper {
                 .slug(projectEntity.getKey())
                 .name(projectEntity.getName())
                 .createdAt(Date.from(projectEntity.getCreatedAt()))
-                .moreInfoUrl(projectEntity.getTelegramLink())
+                .moreInfos(mapMoreInfosWithDefaultValue(projectEntity))
                 .visibility(projectVisibilityToDomain(projectEntity.getVisibility()))
                 .rewardSettings(
                         new ProjectRewardSettings(
@@ -128,5 +129,22 @@ public interface ProjectMapper {
                 .hiring(project.getHiring())
                 .visibility(projectVisibilityToDomain(project.getVisibility()))
                 .build();
+    }
+
+    static List<MoreInfoLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
+        if (isNull(projectViewEntity.getMoreInfos()) || projectViewEntity.getMoreInfos().isEmpty()) {
+            if (nonNull(projectViewEntity.getTelegramLink())) {
+                return List.of(MoreInfoLink.builder()
+                        .value(projectViewEntity.getTelegramLink())
+                        .build());
+            }
+        } else {
+            return projectViewEntity.getMoreInfos().stream()
+                    .map(projectMoreInfoEntity -> MoreInfoLink.builder()
+                            .value(projectMoreInfoEntity.getName())
+                            .url(projectMoreInfoEntity.getId().getUrl()).build())
+                    .toList();
+        }
+        return List.of();
     }
 }

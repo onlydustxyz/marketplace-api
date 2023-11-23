@@ -9,3 +9,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000003_ignored_contributions.sql
   - include:
       file: db/changelog/changelogs/00000004_add_projects_createdAt.sql
+  - include:
+      file: db/changelog/changelogs/00000005_create_project_more_infos_table.sql
+

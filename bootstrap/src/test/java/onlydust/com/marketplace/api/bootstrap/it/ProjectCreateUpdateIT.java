@@ -72,7 +72,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Super Project",
                           "shortDescription": "This is a super project",
                           "longDescription": "This is a super awesome project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
                               "url": "https://t.me/foobar",
                               "value": "foobar"
@@ -116,7 +116,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome project with a nice description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/16590657?v=4")
                 .jsonPath("$.hiring").isEqualTo(true)
-                .jsonPath("$.moreInfoUrl").isEqualTo("https://t.me/foobar")
+                .jsonPath("$.moreInfos[0].url").isEqualTo("https://t.me/foobar")
+                .jsonPath("$.moreInfos[0].value").isEqualTo("foobar")
+                .jsonPath("$.moreInfos.length()").isEqualTo(1)
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("PierreOucif")
                 .jsonPath("$.invitedLeaders.length()").isEqualTo(2)
@@ -213,10 +215,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -264,10 +266,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -306,10 +308,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -342,10 +344,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -383,10 +385,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -427,10 +429,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfo": [
+                          "moreInfos": [
                             {
-                              "url": "https://t.me/foobar-updated",
-                              "value": "foobar"
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -460,7 +462,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                                                          "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
-                .jsonPath("$.moreInfoUrl").isEqualTo("https://t.me/foobar-updated")
+                .jsonPath("$.moreInfos[0].url").isEqualTo("https://t.me/foobar/updated")
+                .jsonPath("$.moreInfos[0].value").isEqualTo("foobar-updated")
+                .jsonPath("$.moreInfos.length()").isEqualTo(1)
 
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("ofux")

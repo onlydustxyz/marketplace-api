@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ProjectMoreInfoLink {
+public class MoreInfoLink {
     String url;
     String value;
 }

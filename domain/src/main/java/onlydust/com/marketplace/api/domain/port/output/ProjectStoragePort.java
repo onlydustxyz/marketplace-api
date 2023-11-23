@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -27,13 +27,13 @@ public interface ProjectStoragePort {
                                                                  Integer pageIndex, Integer pageSize);
 
     String createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                         Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                         Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                          List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                          ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings);
 
     void updateProject(UUID id, String name, String shortDescription, String longDescription,
-                       Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                       Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                        List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
 

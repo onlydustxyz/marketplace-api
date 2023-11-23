@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -27,8 +27,8 @@ public interface ProjectMapper {
                 .githubUserIdsAsProjectLeadersToInvite(createProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .githubRepoIds(createProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(createProjectRequest.getIsLookingForContributors())
-                .moreInfos(createProjectRequest.getMoreInfo().stream()
-                        .map(moreInfo -> ProjectMoreInfoLink.builder()
+                .moreInfos(createProjectRequest.getMoreInfos().stream()
+                        .map(moreInfo -> MoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(createProjectRequest.getLogoUrl())
                 .build();
@@ -46,8 +46,8 @@ public interface ProjectMapper {
                 .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
                 .githubRepoIds(updateProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
-                .moreInfos(updateProjectRequest.getMoreInfo().stream()
-                        .map(moreInfo -> ProjectMoreInfoLink.builder()
+                .moreInfos(updateProjectRequest.getMoreInfos().stream()
+                        .map(moreInfo -> MoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
                 .build();
@@ -80,7 +80,7 @@ public interface ProjectMapper {
     }
 
     static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
-                                                             final boolean includeAllAvailableRepos) {
+                                                      final boolean includeAllAvailableRepos) {
         final var organization = new GithubOrganizationResponse();
         organization.setId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
@@ -106,7 +106,8 @@ public interface ProjectMapper {
         project.setShortDescription(projectDetailsView.getShortDescription());
         project.setLongDescription(projectDetailsView.getLongDescription());
         project.setLogoUrl(projectDetailsView.getLogoUrl());
-        project.setMoreInfoUrl(projectDetailsView.getMoreInfoUrl());
+        project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null : projectDetailsView.getMoreInfos().stream()
+                .map(moreInfo -> new MoreInfo().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
         project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());
