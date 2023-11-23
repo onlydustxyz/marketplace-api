@@ -49,11 +49,11 @@ public class ProjectPageItemViewEntity {
     @Type(type = "jsonb")
     List<Map<String, Long>> technologies;
 
-    public static String getSponsorsJsonPath(List<String> sponsors) {
-        if (isNull(sponsors) || sponsors.isEmpty()) {
+    public static String getSponsorsJsonPath(List<UUID> sponsorIds) {
+        if (isNull(sponsorIds) || sponsorIds.isEmpty()) {
             return null;
         }
-        return "$[*] ? (" + String.join(" || ", sponsors.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
+        return "$[*] ? (" + String.join(" || ", sponsorIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
     }
 
     public static String getTechnologiesJsonPath(List<String> technologies) {

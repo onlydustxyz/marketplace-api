@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -20,7 +21,7 @@ public class ProjectPageItemViewEntityTest {
         @Test
         void given_no_sponsors() {
             // Given
-            final List<String> sponsors = null;
+            final List<UUID> sponsors = null;
 
             // When
             final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
@@ -32,28 +33,28 @@ public class ProjectPageItemViewEntityTest {
         @Test
         void given_one_sponsor() {
             // Given
-            final String sponsor1 = faker.rickAndMorty().character();
-            final List<String> sponsors = List.of(sponsor1);
+            final UUID sponsorId1 = UUID.randomUUID();
+            final List<UUID> sponsors = List.of(sponsorId1);
 
             // When
             final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
 
             // Then
-            assertEquals("$[*] ? (@.name == \"" + sponsor1 + "\")", sponsorsJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + sponsorId1 + "\")", sponsorsJsonPath);
         }
 
         @Test
         void given_two_sponsors() {
             // Given
-            final String sponsor1 = faker.rickAndMorty().character();
-            final String sponsor2 = faker.pokemon().name();
-            final List<String> sponsors = List.of(sponsor1, sponsor2);
+            final UUID sponsorId1 = UUID.randomUUID();
+            final UUID sponsorId2 = UUID.randomUUID();
+            final List<UUID> sponsorIds = List.of(sponsorId1, sponsorId2);
 
             // When
-            final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+            final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
 
             // Then
-            assertEquals("$[*] ? (@.name == \"" + sponsor1 + "\" || @.name == \"" + sponsor2 + "\")", sponsorsJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + sponsorId1 + "\" || @.id == \"" + sponsorId2 + "\")", sponsorsJsonPath);
         }
 
 

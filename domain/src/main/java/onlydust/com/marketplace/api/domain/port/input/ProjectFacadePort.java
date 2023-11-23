@@ -19,12 +19,12 @@ public interface ProjectFacadePort {
 
     ProjectDetailsView getBySlug(String slug);
 
-    Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<String> sponsors,
+    Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                       String search, ProjectCardView.SortBy sort,
                                                                       UUID userId, Boolean mine,
                                                                       Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<String> sponsors,
+    Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                 String search, ProjectCardView.SortBy sort,
                                                                 Integer pageIndex, Integer pageSize);
 

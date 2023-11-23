@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.SponsorView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -12,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -45,10 +47,10 @@ public class ProjectPageItemFiltersViewEntity {
         String name;
     }
 
-    public static Map<String, Set<String>> entitiesToFilters(final List<ProjectPageItemFiltersViewEntity> filtersViewEntities) {
-        final Map<String, Set<String>> filters = new HashMap<>();
+    public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersViewEntity> filtersViewEntities) {
+        final Map<String, Set<Object>> filters = new HashMap<>();
         final Set<String> technologyNames = new HashSet<>();
-        final Set<String> sponsorNames = new HashSet<>();
+        final Set<SponsorView> sponsors = new HashSet<>();
         for (ProjectPageItemFiltersViewEntity filtersViewEntity : filtersViewEntities) {
             if (nonNull(filtersViewEntity.technologies)) {
                 filtersViewEntity.technologies.stream()
@@ -59,11 +61,18 @@ public class ProjectPageItemFiltersViewEntity {
             if (nonNull(filtersViewEntity.sponsors)) {
                 filtersViewEntity.sponsors.stream()
                         .filter(sponsor -> nonNull(sponsor.name))
-                        .map(s -> s.name).forEach(sponsorNames::add);
+                        .map(sponsor -> SponsorView.builder()
+                                .id(sponsor.id)
+                                .url(sponsor.url)
+                                .logoUrl(sponsor.logoUrl)
+                                .name(sponsor.name).build())
+                        .forEach(sponsors::add);
             }
         }
-        filters.put(ProjectCardView.FilterBy.TECHNOLOGIES.name(), technologyNames);
-        filters.put(ProjectCardView.FilterBy.SPONSORS.name(), sponsorNames);
+        filters.put(ProjectCardView.FilterBy.TECHNOLOGIES.name(),
+                technologyNames.stream().map(Object.class::cast).collect(Collectors.toSet()));
+        filters.put(ProjectCardView.FilterBy.SPONSORS.name(),
+                sponsors.stream().map(Object.class::cast).collect(Collectors.toSet()));
         return filters;
     }
 

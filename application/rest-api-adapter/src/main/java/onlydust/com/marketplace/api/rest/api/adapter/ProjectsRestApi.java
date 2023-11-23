@@ -73,7 +73,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex, final Integer pageSize,
                                                            final String sort, final List<String> technologies,
-                                                           final List<String> sponsors, final Boolean mine,
+                                                           final List<UUID> sponsorId, final Boolean mine,
                                                            final String search) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -81,10 +81,10 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final Page<ProjectCardView> projectCardViewPage =
                 optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
-                                sponsors, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
+                                sponsorId, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
                                 sanitizedPageSize))
                         .orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies,
-                                sponsors, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
+                                sponsorId, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }
 
