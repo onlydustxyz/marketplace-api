@@ -48,5 +48,5 @@ public interface UserStoragePort {
 
     List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 
-    void claimProject(UUID userId, UUID projectId);
+    void saveProjectLead(UUID userId, UUID projectId);
 }

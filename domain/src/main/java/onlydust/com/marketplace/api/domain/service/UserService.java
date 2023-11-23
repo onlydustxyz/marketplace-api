@@ -152,7 +152,7 @@ public class UserService implements UserFacadePort {
                                               "project");
 
         }
-        userStoragePort.claimProject(user.getId(), projectId);
+        userStoragePort.saveProjectLead(user.getId(), projectId);
     }
 
     private boolean cannotBeClaimedByUser(User user, String githubAccessToken, ProjectOrganizationView org) {

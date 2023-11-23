@@ -288,7 +288,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public void claimProject(UUID userId, UUID projectId) {
+    public void saveProjectLead(UUID userId, UUID projectId) {
         projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
     }
 }

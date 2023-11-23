@@ -580,6 +580,6 @@ public class UserServiceTest {
         userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
 
         // Then
-        verify(userStoragePort, times(1)).claimProject(user.getId(), projectId);
+        verify(userStoragePort, times(1)).saveProjectLead(user.getId(), projectId);
     }
 }
