@@ -135,7 +135,7 @@ public interface ProjectMapper {
         if (isNull(projectViewEntity.getMoreInfos()) || projectViewEntity.getMoreInfos().isEmpty()) {
             if (nonNull(projectViewEntity.getTelegramLink())) {
                 return List.of(MoreInfoLink.builder()
-                        .value(projectViewEntity.getTelegramLink())
+                        .url(projectViewEntity.getTelegramLink())
                         .build());
             }
         } else {
