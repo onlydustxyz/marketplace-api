@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.ProjectMoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
@@ -50,6 +51,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardableItemRepository rewardableItemRepository;
+    private final ProjectMoreInfoRepository projectMoreInfoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -161,7 +163,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional
     public String createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                                Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                                Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                                 List<Long> githubRepoIds, UUID firstProjectLeaderId,
                                 List<Long> githubUserIdsAsProjectLeads,
                                 ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
@@ -179,15 +181,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
                         .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
                         .rank(0)
-                        .telegramLink(isNull(moreInfos) ? null :
-                                moreInfos.stream().findFirst().map(ProjectMoreInfoLink::getUrl).orElse(null))
                         .build();
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
         this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
 
-        if (!isNull(githubUserIdsAsProjectLeads)) {
+        if (nonNull(githubUserIdsAsProjectLeads)) {
             projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
                     .map(githubUserId -> new ProjectLeaderInvitationEntity(
                             UUID.randomUUID(),
@@ -196,11 +196,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .collect(Collectors.toSet()));
         }
 
-        if (!isNull(githubRepoIds)) {
+        if (nonNull(githubRepoIds)) {
             projectRepoRepository.saveAll(githubRepoIds.stream()
                     .map(repoId -> new ProjectRepoEntity(projectId, repoId))
                     .collect(Collectors.toSet()));
         }
+        projectMoreInfoRepository.saveAll(moreInfos.stream()
+                .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
+                        .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
+                        .name(moreInfoLink.getValue()).build()).collect(Collectors.toList()));
 
         return projectRepository.getKeyById(projectId);
     }
@@ -209,7 +213,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void updateProject(UUID projectId, String name, String shortDescription,
                               String longDescription,
-                              Boolean isLookingForContributors, List<ProjectMoreInfoLink> moreInfos,
+                              Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                               List<UUID> projectLeadersToKeep, String imageUrl,
                               ProjectRewardSettings rewardSettings) {
@@ -228,8 +232,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             project.setIgnoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore());
         }
 
-        project.setTelegramLink(isNull(moreInfos) ? null :
-                moreInfos.stream().findFirst().map(ProjectMoreInfoLink::getUrl).orElse(null));
+        if (nonNull(project.getMoreInfos())) {
+            project.getMoreInfos().stream()
+                    .filter(existingMoreInfo -> moreInfos.stream().noneMatch(moreInfoLink -> moreInfoLink.getUrl().equals(existingMoreInfo.getId().getUrl())))
+                    .forEach(projectMoreInfoRepository::delete);
+
+            moreInfos.stream()
+                    .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
+                            .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
+                            .name(moreInfoLink.getValue()).build())
+                    .forEach(projectMoreInfoRepository::save);
+        }
 
         final var projectLeaderInvitations = project.getProjectLeaderInvitations();
         if (!isNull(githubUserIdsAsProjectLeadersToInvite)) {
@@ -375,12 +388,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
-                                                                                              ContributionType contributionType,
-                                                                                              Long githubUserid,
-                                                                                              int pageIndex,
-                                                                                              int pageSize,
-                                                                                              String search,
-                                                                                              Boolean includeIgnoredItems) {
+                                                                                                  ContributionType contributionType,
+                                                                                                  Long githubUserid,
+                                                                                                  int pageIndex,
+                                                                                                  int pageSize,
+                                                                                                  String search,
+                                                                                                  Boolean includeIgnoredItems) {
         final String type = isNull(contributionType) ? null :
                 switch (contributionType) {
                     case ISSUE -> RewardableItemViewEntity.ContributionType.ISSUE.name();

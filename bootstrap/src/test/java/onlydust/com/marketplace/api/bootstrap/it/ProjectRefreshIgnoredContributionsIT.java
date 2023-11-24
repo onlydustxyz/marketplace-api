@@ -588,7 +588,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                           "name": "%s",
                           "shortDescription": "This is a super project",
                           "longDescription": "This is a super awesome project with a nice description",
-                          "moreInfo": [],
+                          "moreInfos": [],
                           "isLookingForContributors": true,
                           "inviteGithubUserIdsAsProjectLeads": [],
                           "githubRepoIds": [
@@ -614,7 +614,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                           "name": "%s",
                           "shortDescription": "This is a super project",
                           "longDescription": "This is a super awesome project with a nice description",
-                          "moreInfo": [],
+                          "moreInfos": [],
                           "isLookingForContributors": true,
                           "inviteGithubUserIdsAsProjectLeads": [],
                           "githubRepoIds": %s,

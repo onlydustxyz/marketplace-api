@@ -82,4 +82,11 @@ public class ProjectEntity {
     @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
     @EqualsAndHashCode.Exclude
     Set<ProjectRepoEntity> repos;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
+    Set<ProjectMoreInfoEntity> moreInfos;
+
+
 }

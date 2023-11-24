@@ -50,7 +50,8 @@ public class PostgresConfiguration {
                                                          final CustomRewardRepository customRewardRepository,
                                                          final ProjectsPageRepository projectsPageRepository,
                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
-                                                         final RewardableItemRepository rewardableItemRepository) {
+                                                         final RewardableItemRepository rewardableItemRepository,
+                                                         final ProjectMoreInfoRepository projectMoreInfoRepository) {
         return new PostgresProjectAdapter(projectRepository,
                 projectViewRepository,
                 projectIdRepository,
@@ -65,7 +66,8 @@ public class PostgresConfiguration {
                 customRewardRepository,
                 projectsPageRepository,
                 projectsPageFiltersRepository,
-                rewardableItemRepository
+                rewardableItemRepository,
+                projectMoreInfoRepository
         );
     }
 

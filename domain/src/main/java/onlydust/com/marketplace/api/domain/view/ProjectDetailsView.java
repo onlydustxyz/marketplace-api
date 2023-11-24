@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
@@ -20,7 +21,7 @@ public class ProjectDetailsView {
     String shortDescription;
     String longDescription;
     String logoUrl;
-    String moreInfoUrl;
+    List<MoreInfoLink> moreInfos;
     Boolean hiring;
     ProjectVisibility visibility;
     Integer contributorCount;
