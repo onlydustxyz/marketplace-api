@@ -19,13 +19,14 @@ public interface RewardableItemMapper {
                 .userCommitsCount(rewardableItemViewEntity.getUserCommitsCount())
                 .number(rewardableItemViewEntity.getNumber())
                 .ignored(rewardableItemViewEntity.getIgnored())
-                .lastUpdateAt(rewardableItemViewEntity.getCompletedAt())
+                .completedAt(rewardableItemViewEntity.getCompletedAt())
                 .type(switch (rewardableItemViewEntity.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case PULL_REQUEST -> ContributionType.PULL_REQUEST;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;
                 })
                 .repoName(rewardableItemViewEntity.getRepoName())
+                .repoId(rewardableItemViewEntity.getRepoId())
                 .status(githubStatusToDomain(rewardableItemViewEntity.getStatus()))
                 .build();
     }

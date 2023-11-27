@@ -15,12 +15,13 @@ public class RewardableItemView {
     ContributionType type;
     RewardItemStatus status;
     Date createdAt;
-    Date lastUpdateAt;
+    Date completedAt;
     Integer commentsCount;
     Integer commitsCount;
     Integer userCommitsCount;
     Long number;
     String repoName;
+    Long repoId;
     String githubUrl;
     String title;
     Boolean ignored;

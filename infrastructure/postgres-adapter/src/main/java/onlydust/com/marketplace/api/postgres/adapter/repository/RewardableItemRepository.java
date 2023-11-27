@@ -20,6 +20,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    c.github_html_url                                    html_url,
                    c.github_title                                       title,
                    c.repo_name,
+                   c.repo_id,
                    c.created_at                                         start_date,
                    c.completed_at                                       end_date,
                    pull_request.commit_count                            commits_count,
@@ -102,6 +103,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                       gi.closed_at  end_date,
                                       gi.comments_count,
                                       gi.repo_name,
+                                      gi.repo_id,
                                       gi.repo_owner_login  repo_owner
                                from indexer_exp.github_issues gi)
             select issue.id,
@@ -113,6 +115,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    issue.html_url,
                    issue.title,
                    issue.repo_name,
+                   issue.repo_id,
                    issue.start_date,
                    issue.end_date,
                    issue.html_url,
@@ -138,6 +141,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                    coalesce(gpr.closed_at, gpr.merged_at) end_date,
                                    gpr.commit_count     commits_count,
                                    gpr.repo_name,
+                                   gpr.repo_id,
                                    gpr.repo_owner_login  repo_owner
                             from indexer_exp.github_pull_requests gpr)
             select pr.id,
@@ -149,6 +153,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    pr.html_url,
                    pr.title,
                    pr.repo_name,
+                   pr.repo_id,
                    pr.start_date,
                    pr.end_date,
                    pr.html_url,

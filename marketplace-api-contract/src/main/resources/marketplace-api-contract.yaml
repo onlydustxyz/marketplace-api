@@ -3710,9 +3710,9 @@ components:
       type: object
       required:
         - title
-        - githubUrl
         - createdAt
         - repoName
+        - repoId
         - type
         - status
         - number
@@ -3732,16 +3732,16 @@ components:
           description: Id of the contribution (if any) related to this rewardable item.
         title:
           type: string
-        githubUrl:
-          type: string
         createdAt:
           type: string
           format: date-time
-        lastUpdateAt:
+        completedAt:
           type: string
           format: date-time
         repoName:
           type: string
+        repoId:
+          $ref: '#/components/schemas/GithubRepoId'
         type:
           $ref: '#/components/schemas/ContributionType'
         commitsCount:

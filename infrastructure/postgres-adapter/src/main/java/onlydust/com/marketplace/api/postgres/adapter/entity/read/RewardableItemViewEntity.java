@@ -42,6 +42,8 @@ public class RewardableItemViewEntity {
     String githubUrl;
     @Column(name = "repo_name")
     String repoName;
+    @Column(name = "repo_id")
+    Long repoId;
     @Column(name = "commits_count")
     Integer commitsCount;
     @Column(name = "user_commits_count")

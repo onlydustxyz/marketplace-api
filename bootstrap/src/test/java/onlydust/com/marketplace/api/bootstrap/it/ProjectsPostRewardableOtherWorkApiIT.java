@@ -281,16 +281,19 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         {
                           "number": 25,
                           "id": "1840630179",
+                          "contributionId": null,
                           "title": "%s",
-                          "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25",
                           "createdAt": "2023-08-08T06:11:35Z",
-                          "lastUpdateAt": "2023-08-08T06:13:08Z",
+                          "completedAt": "2023-08-08T06:13:08Z",
                           "repoName": "marketplace-frontend",
+                          "repoId": 498695724,
                           "type": "ISSUE",
                           "commitsCount": null,
                           "userCommitsCount": null,
                           "commentsCount": 0,
-                          "status": "CLOSED"
+                          "status": "CLOSED",
+                          "ignored": false,
+                          "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25"
                         }
                         """.formatted(title));
     }

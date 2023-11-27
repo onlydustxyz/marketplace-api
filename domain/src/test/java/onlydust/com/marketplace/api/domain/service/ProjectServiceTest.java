@@ -640,6 +640,8 @@ public class ProjectServiceTest {
         final String title = faker.pokemon().name();
         final String description = faker.lorem().paragraph();
         final Long issueNumber = 1234L;
+        final GithubRepo repo =
+                GithubRepo.builder().id(githubRepoId).owner(githubRepoOwner).name(githubRepoName).build();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
@@ -652,9 +654,9 @@ public class ProjectServiceTest {
                         .owner(githubRepoOwner)
                         .name(githubRepoName)
                         .build()));
-        when(dustyBotStoragePort.createIssue(githubRepoOwner, githubRepoName, title, description))
+        when(dustyBotStoragePort.createIssue(repo, title, description))
                 .thenReturn(RewardableItemView.builder().number(issueNumber).build());
-        when(dustyBotStoragePort.closeIssue(githubRepoOwner, githubRepoName, issueNumber))
+        when(dustyBotStoragePort.closeIssue(repo, issueNumber))
                 .thenReturn(RewardableItemView.builder().number(issueNumber).build());
 
         final CreateAndCloseIssueCommand createAndCloseIssueCommand = CreateAndCloseIssueCommand.builder()
@@ -667,8 +669,8 @@ public class ProjectServiceTest {
         projectService.createAndCloseIssueForProjectIdAndRepositoryId(createAndCloseIssueCommand);
 
         // Then
-        verify(dustyBotStoragePort, times(1)).createIssue(githubRepoOwner, githubRepoName, title, description);
-        verify(dustyBotStoragePort, times(1)).closeIssue(githubRepoOwner, githubRepoName, issueNumber);
+        verify(dustyBotStoragePort, times(1)).createIssue(repo, title, description);
+        verify(dustyBotStoragePort, times(1)).closeIssue(repo, issueNumber);
     }
 
     @Test
