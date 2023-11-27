@@ -138,6 +138,8 @@ public interface ContributionMapper {
                 .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))
                 .commentsCount(contribution.getGithubCommentsCount())
+                .commitsCount(contribution.getGithubCommitsCount())
+                .userCommitsCount(contribution.getGithubUserCommitsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
     }

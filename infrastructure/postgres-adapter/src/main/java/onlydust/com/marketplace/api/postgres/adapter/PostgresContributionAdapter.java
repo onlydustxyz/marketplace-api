@@ -62,8 +62,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
-        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
+    public ContributionDetailsView findContributionById(UUID projectId, String contributionId, Long githubUserId) {
+        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId, githubUserId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
 
         final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,

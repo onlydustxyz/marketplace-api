@@ -100,6 +100,8 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             "visibility": "PUBLIC"
                           },
                           "commentsCount": 0,
+                          "commitsCount": 1,
+                          "userCommitsCount": 1,
                           "links": [],
                           "githubPullRequestReviewState": "PENDING_REVIEWER",
                           "rewards": [
