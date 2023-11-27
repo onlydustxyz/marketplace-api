@@ -22,211 +22,218 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String BRETZEL_OVERVIEW_JSON = """
             {
-                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                 "slug": "bretzel",
-                 "name": "Bretzel",
-                 "createdAt": "2023-02-21T09:15:09.603Z",
-                 "shortDescription": "A project for people who love fruits",
-                 "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
-                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                 "moreInfos": [
-                   {
-                     "url": null,
-                     "value": "https://bretzel.club/"
-                   }
-                 ],
-                 "hiring": true,
-                 "visibility": "PUBLIC",
-                 "contributorCount": 2,
-                 "topContributors": [
-                   {
-                     "githubUserId": 74653697,
-                     "login": "antiyro",
-                     "htmlUrl": "https://github.com/antiyro",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
-                   },
-                   {
-                     "githubUserId": 8642470,
-                     "login": "gregcha",
-                     "htmlUrl": "https://github.com/gregcha",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
-                   }
-                 ],
-                 "repos": [
-                   {
-                     "id": 659718526,
-                     "owner": "KasarLabs",
-                     "name": "deoxys-telemetry",
-                     "description": "Deoxys Telemetry service",
-                     "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                     "stars": 0,
-                     "forkCount": 1,
-                     "hasIssues": false,
-                     "isIncludedInProject": null,
-                     "isAuthorizedInGithubApp": false
-                   },
-                   {
-                     "id": 380954304,
-                     "owner": "gregcha",
-                     "name": "bretzel-app",
-                     "description": null,
-                     "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                     "stars": 0,
-                     "forkCount": 0,
-                     "hasIssues": true,
-                     "isIncludedInProject": null,
-                     "isAuthorizedInGithubApp": false
-                   },
-                   {
-                     "id": 452047076,
-                     "owner": "gregcha",
-                     "name": "bretzel-site",
-                     "description": null,
-                     "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                     "stars": 0,
-                     "forkCount": 0,
-                     "hasIssues": true,
-                     "isIncludedInProject": null,
-                     "isAuthorizedInGithubApp": false
-                   },
-                   {
-                     "id": 466482535,
-                     "owner": "gregcha",
-                     "name": "bretzel-ressources",
-                     "description": null,
-                     "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                     "stars": 0,
-                     "forkCount": 0,
-                     "hasIssues": true,
-                     "isIncludedInProject": null,
-                     "isAuthorizedInGithubApp": false
-                   }
-                 ],
-                 "organizations": [
-                   {
-                     "id": 8642470,
-                     "login": "gregcha",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                     "htmlUrl": "https://github.com/gregcha",
-                     "name": "Grégoire CHARLES",
-                     "repos": [
-                       {
-                         "id": 380954304,
-                         "owner": "gregcha",
-                         "name": "bretzel-app",
-                         "description": null,
-                         "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                         "stars": 0,
-                         "forkCount": 0,
-                         "hasIssues": true,
-                         "isIncludedInProject": true,
-                         "isAuthorizedInGithubApp": false
-                       },
-                       {
-                         "id": 452047076,
-                         "owner": "gregcha",
-                         "name": "bretzel-site",
-                         "description": null,
-                         "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                         "stars": 0,
-                         "forkCount": 0,
-                         "hasIssues": true,
-                         "isIncludedInProject": true,
-                         "isAuthorizedInGithubApp": false
-                       },
-                       {
-                         "id": 466482535,
-                         "owner": "gregcha",
-                         "name": "bretzel-ressources",
-                         "description": null,
-                         "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                         "stars": 0,
-                         "forkCount": 0,
-                         "hasIssues": true,
-                         "isIncludedInProject": true,
-                         "isAuthorizedInGithubApp": false
-                       }
-                     ],
-                     "installed": false,
-                     "isCurrentUserAdmin": null,
-                     "isPersonal": null,
-                     "installationId": null
-                   },
-                   {
-                     "id": 119948009,
-                     "login": "KasarLabs",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
-                     "htmlUrl": "https://github.com/KasarLabs",
-                     "name": "KasarLabs",
-                     "repos": [
-                       {
-                         "id": 659718526,
-                         "owner": "KasarLabs",
-                         "name": "deoxys-telemetry",
-                         "description": "Deoxys Telemetry service",
-                         "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                         "stars": 0,
-                         "forkCount": 1,
-                         "hasIssues": false,
-                         "isIncludedInProject": true,
-                         "isAuthorizedInGithubApp": false
-                       }
-                     ],
-                     "installed": false,
-                     "isCurrentUserAdmin": null,
-                     "isPersonal": null,
-                     "installationId": null
-                   }
-                 ],
-                 "leaders": [
-                   {
-                     "githubUserId": 8642470,
-                     "login": "gregcha",
-                     "htmlUrl": "https://github.com/gregcha",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                     "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                   },
-                   {
-                     "githubUserId": 98735421,
-                     "login": "pacovilletard",
-                     "htmlUrl": "https://github.com/pacovilletard",
-                     "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                     "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
-                   }
-                 ],
-                 "invitedLeaders": [],
-                 "sponsors": [
-                   {
-                     "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                     "name": "OGC Nissa Ineos",
-                     "url": "https://www.ogcnice.com/fr/",
-                     "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                   },
-                   {
-                     "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                     "name": "Coca Cola",
-                     "url": null,
-                     "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                   }
-                 ],
-                 "technologies": {
-                   "TypeScript": 189275,
-                   "Dockerfile": 1982,
-                   "CSS": 422216,
-                   "Shell": 732,
-                   "Rust": 407023,
-                   "SCSS": 98360,
-                   "JavaScript": 62717,
-                   "HTML": 121906
-                 },
-                 "remainingUsdBudget": 99250.00,
-                 "rewardSettings": {
-                   "ignorePullRequests": false,
-                   "ignoreIssues": false,
-                   "ignoreCodeReviews": false,
-                   "ignoreContributionsBefore": null
-                 }
-               }
+              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+              "slug": "bretzel",
+              "name": "Bretzel",
+              "createdAt": "2023-02-21T09:15:09.603Z",
+              "shortDescription": "A project for people who love fruits",
+              "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
+              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+              "moreInfos": [
+                {
+                  "url": "https://bretzel.club/",
+                  "value": null
+                }
+              ],
+              "hiring": true,
+              "visibility": "PUBLIC",
+              "contributorCount": 4,
+              "topContributors": [
+                {
+                  "githubUserId": 117665867,
+                  "login": "gilbertVDB17",
+                  "htmlUrl": "https://github.com/gilbertVDB17",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4"
+                },
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                },
+                {
+                  "githubUserId": 139852598,
+                  "login": "mat-yas",
+                  "htmlUrl": "https://github.com/mat-yas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4"
+                }
+              ],
+              "repos": [
+                {
+                  "id": 380954304,
+                  "owner": "gregcha",
+                  "name": "bretzel-app",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 452047076,
+                  "owner": "gregcha",
+                  "name": "bretzel-site",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 466482535,
+                  "owner": "gregcha",
+                  "name": "bretzel-ressources",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 659718526,
+                  "owner": "KasarLabs",
+                  "name": "deoxys-telemetry",
+                  "description": "Deoxys Telemetry service",
+                  "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                  "stars": 0,
+                  "forkCount": 1,
+                  "hasIssues": false,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": false
+                }
+              ],
+              "organizations": [
+                {
+                  "id": 8642470,
+                  "login": "gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "name": "Grégoire CHARLES",
+                  "repos": [
+                    {
+                      "id": 380954304,
+                      "owner": "gregcha",
+                      "name": "bretzel-app",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    },
+                    {
+                      "id": 452047076,
+                      "owner": "gregcha",
+                      "name": "bretzel-site",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    },
+                    {
+                      "id": 466482535,
+                      "owner": "gregcha",
+                      "name": "bretzel-ressources",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    }
+                  ],
+                  "installed": true,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": 44378743
+                },
+                {
+                  "id": 119948009,
+                  "login": "KasarLabs",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
+                  "htmlUrl": "https://github.com/KasarLabs",
+                  "name": "KasarLabs",
+                  "repos": [
+                    {
+                      "id": 659718526,
+                      "owner": "KasarLabs",
+                      "name": "deoxys-telemetry",
+                      "description": "Deoxys Telemetry service",
+                      "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                      "stars": 0,
+                      "forkCount": 1,
+                      "hasIssues": false,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": false
+                    }
+                  ],
+                  "installed": false,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": null
+                }
+              ],
+              "leaders": [
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                },
+                {
+                  "githubUserId": 98735421,
+                  "login": "pacovilletard",
+                  "htmlUrl": "https://github.com/pacovilletard",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                }
+              ],
+              "invitedLeaders": [],
+              "sponsors": [
+                {
+                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                  "name": "OGC Nissa Ineos",
+                  "url": "https://www.ogcnice.com/fr/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                },
+                {
+                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                  "name": "Coca Cola",
+                  "url": null,
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                }
+              ],
+              "technologies": {
+                "TypeScript": 189275,
+                "Dockerfile": 1982,
+                "CSS": 422216,
+                "Shell": 732,
+                "Rust": 407023,
+                "SCSS": 98360,
+                "JavaScript": 62717,
+                "HTML": 121906
+              },
+              "remainingUsdBudget": 99250.00,
+              "rewardSettings": {
+                "ignorePullRequests": false,
+                "ignoreIssues": false,
+                "ignoreCodeReviews": false,
+                "ignoreContributionsBefore": null
+              }
+            }
+                        
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
             {
@@ -240,7 +247,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 4,
-                  "contributorCount": 2,
+                  "contributorCount": 4,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -293,7 +300,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 17,
+                  "contributorCount": 18,
                   "leaders": [
                     {
                       "githubUserId": 16590657,
@@ -313,11 +320,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3116340,
+                    "TypeScript": 3148661,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
-                    "JavaScript": 23835,
+                    "JavaScript": 24023,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -329,6 +336,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "Dockerfile",
                 "HTML",
                 "JavaScript",
+                "MDX",
                 "PLpgSQL",
                 "Rust",
                 "SCSS",
@@ -354,6 +362,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 2,
               "nextPageIndex": 0
             }
+                        
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE = """
             {
@@ -372,7 +381,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
-                      "htmlUrl": "https://github.com/gaetanrecly",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
@@ -428,7 +437,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
-                      "htmlUrl": "https://github.com/gaetanrecly",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
@@ -494,7 +503,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 134486697,
                       "login": "axelbconseil",
-                      "htmlUrl": "https://github.com/axelbconseil",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134486697?v=4",
                       "id": "83612081-949a-47c4-a467-6f28f6adad6d"
                     }
@@ -519,7 +528,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 4,
-                  "contributorCount": 2,
+                  "contributorCount": 4,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -601,7 +610,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 506,
+                  "contributorCount": 546,
                   "leaders": [
                     {
                       "githubUserId": 117665867,
@@ -614,9 +623,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 108632,
-                    "TypeScript": 6877827,
+                    "TypeScript": 6926417,
                     "Dockerfile": 2591,
-                    "CSS": 39918,
+                    "CSS": 41229,
                     "Shell": 6831,
                     "Procfile": 37,
                     "JavaScript": 56193,
@@ -656,7 +665,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 33,
+                  "contributorCount": 36,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -674,7 +683,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 20,
+                  "contributorCount": 21,
                   "leaders": [
                     {
                       "githubUserId": 43467246,
@@ -687,12 +696,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3534042,
+                    "TypeScript": 3566363,
                     "CSS": 6065,
                     "Shell": 12431,
                     "Cairo": 72428,
                     "PLpgSQL": 1372,
-                    "JavaScript": 25920,
+                    "JavaScript": 26108,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -707,7 +716,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 2100,
+                  "contributorCount": 20,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -733,23 +742,19 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "CSS": 70077,
-                    "C++": 46516,
+                    "CSS": 6065,
+                    "C++": 2226,
                     "Rust": 453557,
-                    "C": 5227,
                     "CMake": 460,
                     "PLpgSQL": 1372,
-                    "Makefile": 189,
-                    "HTML": 122306,
+                    "HTML": 1520,
                     "Kotlin": 1381,
-                    "TypeScript": 3137811,
+                    "TypeScript": 3148661,
                     "Dockerfile": 325,
-                    "Shell": 14636,
-                    "CoffeeScript": 17480,
-                    "JavaScript": 4159225,
+                    "Shell": 12431,
+                    "JavaScript": 24365,
                     "Objective-C": 38,
                     "Swift": 404,
-                    "Python": 259,
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
@@ -764,7 +769,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 17,
+                  "contributorCount": 18,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -777,12 +782,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3116340,
+                    "TypeScript": 3148661,
                     "Dockerfile": 325,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
-                    "JavaScript": 24177,
+                    "JavaScript": 24365,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -797,7 +802,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 8,
+                  "contributorCount": 10,
                   "leaders": [
                     {
                       "githubUserId": 43467246,
@@ -824,7 +829,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 423,
+                  "contributorCount": 455,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -835,13 +840,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898,
                     "Kotlin": 1381,
                     "Shell": 8324,
-                    "Solidity": 836334,
+                    "Solidity": 836789,
                     "SCSS": 102453,
-                    "JavaScript": 1104253,
+                    "JavaScript": 1093630,
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Python": 6718,
+                    "Python": 6719,
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
@@ -856,7 +861,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 2,
+                  "contributorCount": 3,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -879,7 +884,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 621,
+                  "contributorCount": 884,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -912,7 +917,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 134493681,
                       "login": "croziflette74",
-                      "htmlUrl": "https://github.com/croziflette74",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
                     }
@@ -922,26 +927,26 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "C++": 23419,
                     "CSS": 1396,
                     "Jinja": 2398,
-                    "Rust": 527,
                     "C": 1425,
+                    "Rust": 527,
                     "CMake": 18862,
                     "Makefile": 2213,
                     "HTML": 7303,
                     "Jupyter Notebook": 577371,
                     "Kotlin": 140,
                     "TypeScript": 631356,
-                    "Dockerfile": 6250,
-                    "Shell": 19545,
-                    "Solidity": 475441,
-                    "Batchfile": 559,
-                    "Cairo": 653633,
+                    "Dockerfile": 6225,
+                    "Shell": 19507,
+                    "Batchfile": 499,
+                    "Solidity": 476140,
+                    "Cairo": 655545,
                     "JavaScript": 4071194,
                     "Objective-C": 38,
                     "Swift": 2384,
                     "Nix": 85,
                     "Ruby": 2803,
-                    "Python": 1693999,
-                    "Dart": 204844
+                    "Dart": 204844,
+                    "Python": 1694938
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -955,7 +960,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 17,
+                  "contributorCount": 18,
                   "leaders": [
                     {
                       "githubUserId": 16590657,
@@ -975,11 +980,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3116340,
+                    "TypeScript": 3148661,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
-                    "JavaScript": 23835,
+                    "JavaScript": 24023,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -1044,15 +1049,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 38,
+                  "contributorCount": 44,
                   "leaders": [
-                    {
-                      "githubUserId": 141839618,
-                      "login": "Blumebee",
-                      "htmlUrl": "https://github.com/Blumebee",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
-                      "id": "46fec596-7a91-422e-8532-5f479e790217"
-                    },
                     {
                       "githubUserId": 139852598,
                       "login": "mat-yas",
@@ -1061,18 +1059,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
                     },
                     {
-                      "githubUserId": 122993337,
-                      "login": "GregGamb",
-                      "htmlUrl": "https://github.com/GregGamb",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
-                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
-                    },
-                    {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
                       "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
+                    {
+                      "githubUserId": 122993337,
+                      "login": "GregGamb",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
+                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
                       "githubUserId": 31901905,
@@ -1084,9 +1082,16 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 134493681,
                       "login": "croziflette74",
-                      "htmlUrl": "https://github.com/croziflette74",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                    },
+                    {
+                      "githubUserId": 141839618,
+                      "login": "Blumebee",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
+                      "id": "46fec596-7a91-422e-8532-5f479e790217"
                     }
                   ],
                   "sponsors": [
@@ -1098,13 +1103,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 611060,
+                    "TypeScript": 614458,
                     "Dockerfile": 5694,
-                    "Shell": 3561,
-                    "Rust": 270896,
+                    "Shell": 4352,
+                    "Rust": 258964,
                     "Solidity": 421314,
-                    "Cairo": 787463,
-                    "Makefile": 2264,
+                    "Cairo": 830343,
+                    "Makefile": 2085,
                     "JavaScript": 5356,
                     "HTML": 771,
                     "Nix": 85,
@@ -1155,7 +1160,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 16,
+                  "contributorCount": 18,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -1175,7 +1180,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 421,
+                  "contributorCount": 453,
                   "leaders": [],
                   "sponsors": [
                     {
@@ -1193,11 +1198,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "Shell": 8324,
-                    "Solidity": 836334,
+                    "Solidity": 836789,
                     "Makefile": 1714,
-                    "JavaScript": 1045629,
+                    "JavaScript": 1035006,
                     "Ruby": 255376,
-                    "Python": 6718
+                    "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -1259,7 +1264,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 4,
-                  "contributorCount": 2085,
+                  "contributorCount": 4,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -1271,19 +1276,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "C++": 44290,
-                    "CSS": 64012,
-                    "Scheme": 43698,
-                    "C": 5227,
-                    "Makefile": 189,
-                    "HTML": 120786,
-                    "TypeScript": 21471,
                     "Dockerfile": 325,
-                    "Shell": 2205,
-                    "CoffeeScript": 17480,
-                    "JavaScript": 4135390,
-                    "Haskell": 16365,
-                    "Python": 259
+                    "Scheme": 43698,
+                    "JavaScript": 342,
+                    "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -1297,7 +1293,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 280,
+                  "contributorCount": 297,
                   "leaders": [
                     {
                       "githubUserId": 595505,
@@ -1310,7 +1306,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "Shell": 4429,
-                    "Rust": 2017035,
+                    "Rust": 2017307,
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
@@ -1325,7 +1321,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "COBOL",
                 "CSS",
                 "Cairo",
-                "CoffeeScript",
                 "Dart",
                 "Dockerfile",
                 "HTML",
@@ -1406,7 +1401,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 26,
               "nextPageIndex": 0
             }
-            
+                        
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {
@@ -1420,7 +1415,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 2100,
+                  "contributorCount": 20,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -1446,23 +1441,19 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "CSS": 70077,
-                    "C++": 46516,
+                    "CSS": 6065,
+                    "C++": 2226,
                     "Rust": 453557,
-                    "C": 5227,
                     "CMake": 460,
                     "PLpgSQL": 1372,
-                    "Makefile": 189,
-                    "HTML": 122306,
+                    "HTML": 1520,
                     "Kotlin": 1381,
-                    "TypeScript": 3137811,
+                    "TypeScript": 3148661,
                     "Dockerfile": 325,
-                    "Shell": 14636,
-                    "CoffeeScript": 17480,
-                    "JavaScript": 4159225,
+                    "Shell": 12431,
+                    "JavaScript": 24365,
                     "Objective-C": 38,
                     "Swift": 404,
-                    "Python": 259,
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
@@ -1470,20 +1461,17 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 }
               ],
               "technologies": [
-                "C",
                 "C++",
                 "CMake",
                 "CSS",
-                "CoffeeScript",
                 "Dart",
                 "Dockerfile",
                 "HTML",
                 "JavaScript",
                 "Kotlin",
-                "Makefile",
+                "MDX",
                 "Objective-C",
                 "PLpgSQL",
-                "Python",
                 "Rust",
                 "Shell",
                 "Swift",
@@ -1508,6 +1496,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 1,
               "nextPageIndex": 0
             }
+                        
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE = """
             {
@@ -1526,7 +1515,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
-                      "htmlUrl": "https://github.com/gaetanrecly",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
@@ -1582,7 +1571,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
-                      "htmlUrl": "https://github.com/gaetanrecly",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
@@ -1643,7 +1632,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 4,
-                  "contributorCount": 2,
+                  "contributorCount": 4,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -1725,7 +1714,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 506,
+                  "contributorCount": 546,
                   "leaders": [
                     {
                       "githubUserId": 117665867,
@@ -1738,9 +1727,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 108632,
-                    "TypeScript": 6877827,
+                    "TypeScript": 6926417,
                     "Dockerfile": 2591,
-                    "CSS": 39918,
+                    "CSS": 41229,
                     "Shell": 6831,
                     "Procfile": 37,
                     "JavaScript": 56193,
@@ -1780,7 +1769,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 33,
+                  "contributorCount": 36,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -1798,7 +1787,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 20,
+                  "contributorCount": 21,
                   "leaders": [
                     {
                       "githubUserId": 43467246,
@@ -1811,12 +1800,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3534042,
+                    "TypeScript": 3566363,
                     "CSS": 6065,
                     "Shell": 12431,
                     "Cairo": 72428,
                     "PLpgSQL": 1372,
-                    "JavaScript": 25920,
+                    "JavaScript": 26108,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -1831,7 +1820,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 2100,
+                  "contributorCount": 20,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -1857,23 +1846,19 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "CSS": 70077,
-                    "C++": 46516,
+                    "CSS": 6065,
+                    "C++": 2226,
                     "Rust": 453557,
-                    "C": 5227,
                     "CMake": 460,
                     "PLpgSQL": 1372,
-                    "Makefile": 189,
-                    "HTML": 122306,
+                    "HTML": 1520,
                     "Kotlin": 1381,
-                    "TypeScript": 3137811,
+                    "TypeScript": 3148661,
                     "Dockerfile": 325,
-                    "Shell": 14636,
-                    "CoffeeScript": 17480,
-                    "JavaScript": 4159225,
+                    "Shell": 12431,
+                    "JavaScript": 24365,
                     "Objective-C": 38,
                     "Swift": 404,
-                    "Python": 259,
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
@@ -1888,7 +1873,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 17,
+                  "contributorCount": 18,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -1901,12 +1886,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3116340,
+                    "TypeScript": 3148661,
                     "Dockerfile": 325,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
-                    "JavaScript": 24177,
+                    "JavaScript": 24365,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -1921,7 +1906,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 8,
+                  "contributorCount": 10,
                   "leaders": [
                     {
                       "githubUserId": 43467246,
@@ -1948,7 +1933,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 423,
+                  "contributorCount": 455,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -1959,13 +1944,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898,
                     "Kotlin": 1381,
                     "Shell": 8324,
-                    "Solidity": 836334,
+                    "Solidity": 836789,
                     "SCSS": 102453,
-                    "JavaScript": 1104253,
+                    "JavaScript": 1093630,
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Python": 6718,
+                    "Python": 6719,
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
@@ -1980,7 +1965,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 2,
+                  "contributorCount": 3,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -2003,7 +1988,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 621,
+                  "contributorCount": 884,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -2036,7 +2021,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 134493681,
                       "login": "croziflette74",
-                      "htmlUrl": "https://github.com/croziflette74",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
                     }
@@ -2046,26 +2031,26 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "C++": 23419,
                     "CSS": 1396,
                     "Jinja": 2398,
-                    "Rust": 527,
                     "C": 1425,
+                    "Rust": 527,
                     "CMake": 18862,
                     "Makefile": 2213,
                     "HTML": 7303,
                     "Jupyter Notebook": 577371,
                     "Kotlin": 140,
                     "TypeScript": 631356,
-                    "Dockerfile": 6250,
-                    "Shell": 19545,
-                    "Solidity": 475441,
-                    "Batchfile": 559,
-                    "Cairo": 653633,
+                    "Dockerfile": 6225,
+                    "Shell": 19507,
+                    "Batchfile": 499,
+                    "Solidity": 476140,
+                    "Cairo": 655545,
                     "JavaScript": 4071194,
                     "Objective-C": 38,
                     "Swift": 2384,
                     "Nix": 85,
                     "Ruby": 2803,
-                    "Python": 1693999,
-                    "Dart": 204844
+                    "Dart": 204844,
+                    "Python": 1694938
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -2079,7 +2064,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 17,
+                  "contributorCount": 18,
                   "leaders": [
                     {
                       "githubUserId": 16590657,
@@ -2099,11 +2084,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3116340,
+                    "TypeScript": 3148661,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
-                    "JavaScript": 23835,
+                    "JavaScript": 24023,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
@@ -2168,15 +2153,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 38,
+                  "contributorCount": 44,
                   "leaders": [
-                    {
-                      "githubUserId": 141839618,
-                      "login": "Blumebee",
-                      "htmlUrl": "https://github.com/Blumebee",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
-                      "id": "46fec596-7a91-422e-8532-5f479e790217"
-                    },
                     {
                       "githubUserId": 139852598,
                       "login": "mat-yas",
@@ -2185,18 +2163,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
                     },
                     {
-                      "githubUserId": 122993337,
-                      "login": "GregGamb",
-                      "htmlUrl": "https://github.com/GregGamb",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
-                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
-                    },
-                    {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
                       "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
+                    {
+                      "githubUserId": 122993337,
+                      "login": "GregGamb",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
+                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
                       "githubUserId": 31901905,
@@ -2208,9 +2186,16 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "githubUserId": 134493681,
                       "login": "croziflette74",
-                      "htmlUrl": "https://github.com/croziflette74",
+                      "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                    },
+                    {
+                      "githubUserId": 141839618,
+                      "login": "Blumebee",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
+                      "id": "46fec596-7a91-422e-8532-5f479e790217"
                     }
                   ],
                   "sponsors": [
@@ -2222,13 +2207,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 611060,
+                    "TypeScript": 614458,
                     "Dockerfile": 5694,
-                    "Shell": 3561,
-                    "Rust": 270896,
+                    "Shell": 4352,
+                    "Rust": 258964,
                     "Solidity": 421314,
-                    "Cairo": 787463,
-                    "Makefile": 2264,
+                    "Cairo": 830343,
+                    "Makefile": 2085,
                     "JavaScript": 5356,
                     "HTML": 771,
                     "Nix": 85,
@@ -2279,7 +2264,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 16,
+                  "contributorCount": 18,
                   "leaders": [],
                   "sponsors": [],
                   "technologies": {
@@ -2299,7 +2284,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 421,
+                  "contributorCount": 453,
                   "leaders": [],
                   "sponsors": [
                     {
@@ -2317,11 +2302,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "Shell": 8324,
-                    "Solidity": 836334,
+                    "Solidity": 836789,
                     "Makefile": 1714,
-                    "JavaScript": 1045629,
+                    "JavaScript": 1035006,
                     "Ruby": 255376,
-                    "Python": 6718
+                    "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -2383,7 +2368,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 4,
-                  "contributorCount": 2085,
+                  "contributorCount": 4,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -2395,19 +2380,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "C++": 44290,
-                    "CSS": 64012,
-                    "Scheme": 43698,
-                    "C": 5227,
-                    "Makefile": 189,
-                    "HTML": 120786,
-                    "TypeScript": 21471,
                     "Dockerfile": 325,
-                    "Shell": 2205,
-                    "CoffeeScript": 17480,
-                    "JavaScript": 4135390,
-                    "Haskell": 16365,
-                    "Python": 259
+                    "Scheme": 43698,
+                    "JavaScript": 342,
+                    "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -2421,7 +2397,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 280,
+                  "contributorCount": 297,
                   "leaders": [
                     {
                       "githubUserId": 595505,
@@ -2434,7 +2410,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "Shell": 4429,
-                    "Rust": 2017035,
+                    "Rust": 2017307,
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
@@ -2449,7 +2425,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "COBOL",
                 "CSS",
                 "Cairo",
-                "CoffeeScript",
                 "Dart",
                 "Dockerfile",
                 "HTML",
@@ -2530,6 +2505,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 25,
               "nextPageIndex": 0
             }
+                        
             """;
     @Autowired
     ProjectViewRepository projectViewRepository;

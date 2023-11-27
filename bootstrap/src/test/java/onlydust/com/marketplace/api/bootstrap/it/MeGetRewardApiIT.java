@@ -409,31 +409,32 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "rewardItems": [
-                                {
-                                    "number": 1129,
-                                    "id": "1442413635",
-                                    "title": "First API integration test",
-                                    "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
-                                    "createdAt": "2023-07-20T08:45:18Z",
-                                    "lastUpdateAt": "2023-07-21T13:00:05Z",
-                                    "repoName": "marketplace-frontend",
-                                    "type": "PULL_REQUEST",
-                                    "commitsCount": 39,
-                                    "userCommitsCount": 16,
-                                    "commentsCount": null,
-                                    "status": "MERGED",
-                                    "githubAuthorId": 43467246,
-                                    "authorLogin": "AnthonyBuisset",
-                                    "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                    "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
-                                }
-                            ],
-                            "hasMore": false,
-                            "totalPageNumber": 13,
-                            "totalItemNumber": 25,
-                            "nextPageIndex": 12
-                        }""");
+                          "rewardItems": [
+                            {
+                              "number": 1129,
+                              "id": "1442413635",
+                              "title": "First API integration test",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
+                              "createdAt": "2023-07-20T08:45:18Z",
+                              "lastUpdateAt": "2023-07-21T13:00:05Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 30,
+                              "userCommitsCount": 16,
+                              "commentsCount": null,
+                              "status": "MERGED",
+                              "githubAuthorId": 43467246,
+                              "authorLogin": "AnthonyBuisset",
+                              "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 13,
+                          "totalItemNumber": 25,
+                          "nextPageIndex": 12
+                        }
+                        """);
     }
 
 

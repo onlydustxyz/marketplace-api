@@ -59,6 +59,7 @@ public interface RewardableItemMapper {
                 .number(view.getNumber())
                 .repoName(view.getRepoName())
                 .githubUrl(view.getGithubUrl())
+                .htmlUrl(view.getGithubUrl())
                 .title(view.getTitle())
                 .ignored(Boolean.TRUE.equals(view.getIgnored()));
     }

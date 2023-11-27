@@ -90,15 +90,18 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                           "contributionId": null,
                           "title": "Fix typo in example code",
                           "githubUrl": "https://github.com/tokio-rs/tracing/pull/608",
-                          "createdAt": "2020-02-27T22:03:44Z",
-                          "lastUpdateAt": "2020-02-27T22:29:57Z",
+                          "createdAt": "2020-02-27T21:03:44Z",
+                          "lastUpdateAt": "2020-02-27T21:29:57Z",
                           "repoName": "tracing",
                           "type": "PULL_REQUEST",
                           "commitsCount": 1,
                           "userCommitsCount": null,
                           "commentsCount": null,
-                          "status": "MERGED"
+                          "status": "MERGED",
+                          "ignored": false,
+                          "htmlUrl": "https://github.com/tokio-rs/tracing/pull/608"
                         }
+                                                
                         """);
     }
 }

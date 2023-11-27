@@ -289,64 +289,64 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                  "contributionCount": 56,
+                  "contributionCount": 69,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 56,
-                  "pullRequestToReward": 44,
+                  "contributionToRewardCount": 69,
+                  "pullRequestToReward": 55,
                   "issueToReward": 0,
-                  "codeReviewToReward": 12,
+                  "codeReviewToReward": 14,
                   "isRegistered": false
                 },
                 {
                   "githubUserId": 143011364,
                   "login": "pixelfact",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                  "contributionCount": 72,
+                  "contributionCount": 79,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 72,
-                  "pullRequestToReward": 38,
+                  "contributionToRewardCount": 79,
+                  "pullRequestToReward": 40,
                   "issueToReward": 0,
-                  "codeReviewToReward": 34,
+                  "codeReviewToReward": 39,
                   "isRegistered": false
                 },
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 100,
+                  "contributionCount": 112,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 100,
-                  "pullRequestToReward": 37,
+                  "contributionToRewardCount": 112,
+                  "pullRequestToReward": 41,
                   "issueToReward": 1,
-                  "codeReviewToReward": 62,
+                  "codeReviewToReward": 70,
                   "isRegistered": true
                 },
                 {
                   "githubUserId": 31901905,
                   "login": "kaelsky",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                  "contributionCount": 104,
+                  "contributionCount": 113,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 104,
-                  "pullRequestToReward": 81,
+                  "contributionToRewardCount": 113,
+                  "pullRequestToReward": 85,
                   "issueToReward": 0,
-                  "codeReviewToReward": 23,
+                  "codeReviewToReward": 28,
                   "isRegistered": true
                 },
                 {
@@ -499,32 +499,32 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                  "contributionCount": 56,
+                  "contributionCount": 69,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 56,
-                  "pullRequestToReward": 44,
+                  "contributionToRewardCount": 69,
+                  "pullRequestToReward": 55,
                   "issueToReward": 0,
-                  "codeReviewToReward": 12,
+                  "codeReviewToReward": 14,
                   "isRegistered": false
                 },
                 {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 100,
+                  "contributionCount": 112,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 100,
-                  "pullRequestToReward": 37,
+                  "contributionToRewardCount": 112,
+                  "pullRequestToReward": 41,
                   "issueToReward": 1,
-                  "codeReviewToReward": 62,
+                  "codeReviewToReward": 70,
                   "isRegistered": true
                 }
               ]
@@ -670,7 +670,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                  "contributionCount": 56,
+                  "contributionCount": 69,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -686,7 +686,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 143011364,
                   "login": "pixelfact",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                  "contributionCount": 72,
+                  "contributionCount": 79,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -702,7 +702,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 100,
+                  "contributionCount": 112,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -718,7 +718,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 31901905,
                   "login": "kaelsky",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                  "contributionCount": 104,
+                  "contributionCount": 113,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -834,7 +834,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 }
               ]
             }
-                        
+                
             """;
 
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS_LOGIN_LE = """
@@ -880,7 +880,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 17259618,
                   "login": "alexbeno",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                  "contributionCount": 56,
+                  "contributionCount": 69,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -896,7 +896,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 5160414,
                   "login": "haydencleary",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 100,
+                  "contributionCount": 112,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -910,7 +910,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 }
               ]
             }
-                        
+                
             """;
     private static final String GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES = """
             {
