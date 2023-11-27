@@ -94,10 +94,12 @@ public class CustomContributorRepository {
                                        count(distinct c.id) filter ( where c.type = 'ISSUE' )        issue_count,
                                        c.contributor_id
                                 from project_github_repos pgr
-                                         left join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
+                                         join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                         left join indexer_exp.contributions c on c.repo_id = gr.id
                                          left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
                                          left join ignored_contributions ic on ic.contribution_id = c.id
                                 where pgr.project_id = :projectId
+                                  and gr.visibility = 'PUBLIC'
                                   and c.status = 'COMPLETED'
                                   and wi.id is null
                                   and ic.project_id is null

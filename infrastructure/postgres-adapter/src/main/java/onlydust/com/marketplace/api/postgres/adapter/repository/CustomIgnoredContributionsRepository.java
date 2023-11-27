@@ -20,7 +20,8 @@ public interface CustomIgnoredContributionsRepository extends JpaRepository<Cust
             where cic.project_id = ?1 and cic.contribution_id not in (
                 select c.id
                 from indexer_exp.contributions c
-                join project_github_repos pgr on pgr.project_id = ?1 and pgr.github_repo_id = c.repo_id
+                join indexer_exp.github_repos gr on gr.id = c.repo_id and gr.visibility = 'PUBLIC'
+                join project_github_repos pgr on pgr.project_id = ?1 and pgr.github_repo_id = gr.id
             )
             """, nativeQuery = true)
     void deleteContributionsThatAreNotPartOfTheProjectAnymore(UUID projectId);

@@ -42,7 +42,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.pr_review_state
             FROM 
                 indexer_exp.contributions c
-            INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = c.repo_id
+            INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
+            INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
             INNER JOIN public.project_details p on p.project_id = pgr.project_id        
             LEFT JOIN LATERAL (
                 SELECT 

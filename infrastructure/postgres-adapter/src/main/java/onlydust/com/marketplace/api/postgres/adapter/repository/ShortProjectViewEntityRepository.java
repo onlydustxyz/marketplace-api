@@ -26,9 +26,11 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                     SELECT 1 
                     FROM 
                         project_github_repos pgr
-                    INNER JOIN indexer_exp.contributions c on c.repo_id = pgr.github_repo_id 
+                    JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                    INNER JOIN indexer_exp.contributions c on c.repo_id = gr.id 
                     WHERE 
                         p.project_id = pgr.project_id AND
+                        gr.visibility = 'PUBLIC' AND
                         contributor_id = :contributorId AND 
                         (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN (:repoIds))
                 )

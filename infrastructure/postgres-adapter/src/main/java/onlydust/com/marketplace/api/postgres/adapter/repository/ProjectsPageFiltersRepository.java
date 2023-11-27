@@ -17,7 +17,8 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
             from project_details p
                      left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
                                  from project_github_repos pgr
-                                          left join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                          join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                where gr.visibility = 'PUBLIC'
                                  group by pgr.project_id) ) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -31,7 +32,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                 group by ps.project_id) s on s.project_id = p.project_id
             where (select count(github_repo_id)
                    from project_github_repos pgr_count
-                   where pgr_count.project_id = p.project_id) > 0
+                   join indexer_exp.github_repos gr on pgr_count.github_repo_id = gr.id
+                   where pgr_count.project_id = p.project_id
+                   and gr.visibility = 'PUBLIC') > 0
               and p.visibility = 'PUBLIC'
               and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
               and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))

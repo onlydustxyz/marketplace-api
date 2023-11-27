@@ -43,6 +43,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                 left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                             from project_github_repos pgr
                             join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                            where gr.visibility = 'PUBLIC'
                             group by pgr.project_id) as t on t.project_id = p.project_id
                 left join (select ps.project_id,
                                            jsonb_agg(jsonb_build_object(
@@ -56,6 +57,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                     group by ps.project_id) s on s.project_id = p.project_id
                 left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
+                                join indexer_exp.github_repos gr on gr.id = pgr_count.github_repo_id
+                                where gr.visibility = 'PUBLIC'
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
                 left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                     from public.projects_contributors pc_count
@@ -108,12 +111,14 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
                    (select count(pgr.github_repo_id) > count(agr.repo_id)
                            from project_github_repos pgr
-                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
-                           where pgr.project_id = p.project_id)        as is_missing_github_app_installation
+                                    join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
+                                    join indexer_exp.github_repos gr2 on gr2.id = agr.repo_id
+                           where pgr.project_id = p.project_id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
             from project_details p
                      left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                                 from project_github_repos pgr
                                 join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                where gr.visibility = 'PUBLIC'
                                 group by pgr.project_id) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -127,6 +132,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
+                                join indexer_exp.github_repos gr3 on gr3.id = pgr_count.github_repo_id
+                                where gr3.visibility ='PUBLIC'
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
                      left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                 from public.projects_contributors pc_count
@@ -188,6 +195,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                         left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                                     from project_github_repos pgr
                                     join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                    where gr.visibility = 'PUBLIC'
                                     group by pgr.project_id) as t on t.project_id = p.project_id
                         left join (select ps.project_id,
                                                    jsonb_agg(jsonb_build_object(
@@ -201,7 +209,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                             group by ps.project_id) s on s.project_id = p.project_id
                         where (select count(github_repo_id)
                                            from project_github_repos pgr_count
-                                           where pgr_count.project_id = p.project_id) > 0
+                                           join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
+                                           where pgr_count.project_id = p.project_id and gr2.visibility = 'PUBLIC') > 0
                                        and p.visibility = 'PUBLIC'
                                        and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
                                        and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
@@ -218,6 +227,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                      left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
                                  from project_github_repos pgr
                                  join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                                 where gr.visibility = 'PUBLIC'
                                  group by pgr.project_id) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -231,6 +241,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
+                                join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
+                                where gr2.visibility = 'PUBLIC'
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.project_id
                      left join (select pc_count.project_id, count(pc_count.github_user_id) as contributors_count
                                 from public.projects_contributors pc_count

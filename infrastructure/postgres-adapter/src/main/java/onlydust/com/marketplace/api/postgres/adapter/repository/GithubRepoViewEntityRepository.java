@@ -27,9 +27,11 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 EXISTS(
                     SELECT 1 
                     FROM indexer_exp.contributions c 
+                    INNER JOIN indexer_exp.github_repos gr on gr.id = c.repo_id
                     INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
                     WHERE 
-                        c.repo_id = r.id AND contributor_id = :contributorId AND 
+                        c.repo_id = r.id AND contributor_id = :contributorId 
+                        AND gr.visibility = 'PUBLIC' AND
                         (COALESCE(:projectIds) IS NULL OR pgr.project_id IN (:projectIds))
                 ) 
                 AND (COALESCE(:repoIds) IS NULL OR r.id IN (:repoIds))
@@ -53,7 +55,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                  indexer_exp.github_repos r
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
             WHERE
-                r.id = :repoId
+                r.id = :repoId and r.visibility = 'PUBLIC'
             """, nativeQuery = true)
     @NonNull
     Optional<GithubRepoViewEntity> findById(@NonNull Long repoId);

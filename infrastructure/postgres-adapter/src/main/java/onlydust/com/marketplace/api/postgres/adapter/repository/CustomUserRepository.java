@@ -151,25 +151,29 @@ public class CustomUserRepository {
                       
                    (select sum(rc.completed_contribution_count)
                     from project_github_repos pgr
-                    join indexer_exp.repos_contributors rc on rc.repo_id = pgr.github_repo_id and rc.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id) user_contributions_count,
+                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id and gr.visibility = 'PUBLIC'
+                    join indexer_exp.repos_contributors rc on rc.repo_id = gr.id and rc.contributor_id = :githubUserId
+                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') user_contributions_count,
                     
                    (select max(c.completed_at)
                     from project_github_repos pgr
-                    join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id) last_contribution_date,
+                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                    join indexer_exp.contributions c on c.repo_id = gr.id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId            
+                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') last_contribution_date,
                     
                     
                    (select min(c.completed_at)
                     from project_github_repos pgr
+                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
-                    where pgr.project_id = p.project_id) first_contribution_date
+                    where pgr.project_id = p.project_id and gr.visibility = 'PUBLIC') first_contribution_date
                    
             from ((select distinct pd.project_id, false is_lead, cast(null as timestamp) as assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from indexer_exp.repos_contributors rc
-                            join project_github_repos gpr on gpr.github_repo_id = rc.repo_id
+                            join indexer_exp.github_repos gr on gr.id = rc.repo_id
+                            join project_github_repos gpr on gpr.github_repo_id = gr.id
                             join project_details pd on pd.project_id = gpr.project_id
-                   where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0)
+                   where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0 and gr.visibility = 'PUBLIC')
                   UNION
                   (select distinct pd.project_id, true is_lead, pl.assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from auth_users u
