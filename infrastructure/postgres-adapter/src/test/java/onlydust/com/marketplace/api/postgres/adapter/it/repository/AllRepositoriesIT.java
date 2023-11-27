@@ -164,6 +164,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         authUserRepository.deleteAll();
         final AuthUserEntity expected = AuthUserEntity.builder()
                 .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber())
                 .createdAt(new Date())
                 .avatarUrlAtSignup(faker.pokemon().name())
                 .email("test@gmail.com")
@@ -234,7 +235,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .paymentId(UUID.randomUUID())
                         .build())
                 .id(faker.pokemon().location())
-                .contributionType(ContributionTypeEnumEntity.pull_request)
+                .contributionType(ContributionTypeEnumEntity.PULL_REQUEST)
                 .projectId(UUID.randomUUID())
                 .recipientId(faker.number().randomNumber())
                 .build();
