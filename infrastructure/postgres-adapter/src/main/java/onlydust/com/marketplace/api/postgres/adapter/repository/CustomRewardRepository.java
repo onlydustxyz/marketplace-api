@@ -13,8 +13,6 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class CustomRewardRepository {
-    private final EntityManager entityManager;
-
     private static final String FIND_PROJECT_REWARD_BY_ID = """
             select pr.requested_at,
                    r.processed_at,
@@ -36,14 +34,13 @@ public class CustomRewardRepository {
                        end                                                                                  status,
                        r.receipt
             from payment_requests pr
-                     left join github_users gu_recipient on gu_recipient.id = pr.recipient_id
+                     left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
                      left join public.auth_users au on pr.recipient_id = au.github_user_id
                      left join auth_users au_requestor on au_requestor.id = pr.requestor_id
-                     left join github_users gu_requestor on gu_requestor.id = au_requestor.github_user_id
+                     left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = au_requestor.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
                      where pr.id = :rewardId""";
-
     private static final String FIND_USER_REWARD_BY_ID = """
             with payout_checks as (select pr.id,
                                           pr.recipient_id,
@@ -186,16 +183,92 @@ public class CustomRewardRepository {
                        end                                                                                  status,
                        r.receipt
             from payment_requests pr
-                     left join github_users gu_recipient on gu_recipient.id = pr.recipient_id
+                     left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
                      left join auth_users au on pr.recipient_id = au.github_user_id
                      left join auth_users au_requestor on au_requestor.id = pr.requestor_id
-                     left join github_users gu_requestor on gu_requestor.id = au_requestor.github_user_id
+                     left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = au_requestor.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
                      left join payout_checks on payout_checks.user_id = au.id and payout_checks.id = pr.id
                      where pr.id = :rewardId""";
+    private static final String COUNT_REWARD_ITEMS = """
+            select count(distinct wi.id)
+            from payment_requests pr
+                     join public.work_items wi on wi.payment_id = pr.id
+            where pr.id = :rewardId""";
+    private static final String FIND_REWARD_ITEMS = """
+            with get_pr as              (select gpr.number,
+                                               gpr.id,
+                                               gpr.html_url,
+                                               gpr.title,
+                                               gpr.status,
+                                               gpr.draft,
+                                               gpr.repo_name                                repo_name,
+                                               gpr.created_at                               start_date,
+                                               coalesce(gpr.closed_at, gpr.merged_at)       end_date,
+                                               gpr.author_id                                author_id,
+                                               gpr.author_login                             author_login,
+                                               gpr.author_avatar_url                        author_avatar_url,
+                                               gpr.author_html_url                          author_github_url,
+                                               gpr.commit_count                             commits_count
+                                        from indexer_exp.github_pull_requests gpr),
+                 get_issue as           (select gi.number,
+                                              gi.id,
+                                              gi.status,
+                                              gi.html_url,
+                                              gi.title,
+                                              gi.repo_name       repo_name,
+                                              gi.created_at start_date,
+                                              gi.closed_at  end_date,
+                                              gi.author_id         author_id,
+                                              gi.author_login      author_login,
+                                              gi.author_avatar_url author_avatar_url,
+                                              gi.author_html_url   author_github_url,
+                                              gi.comments_count
+                                       from indexer_exp.github_issues gi),
+                 get_code_review as    (select gprr.number,
+                                              gprr.id,
+                                              gprr.state status,
+                                              gprr.html_url,
+                                              gprr.title,
+                                              gprr.state outcome,
+                                              gprr.repo_name             repo_name,
+                                              gprr.requested_at          start_date,
+                                              gprr.submitted_at          end_date,
+                                              gprr.author_id             author_id,
+                                              gprr.author_login          author_login,
+                                              gprr.author_avatar_url     author_avatar_url,
+                                              gprr.author_html_url       author_github_url
+                                       from indexer_exp.github_code_reviews gprr)
+            select distinct wi.type,
+                            coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             contribution_id,
+                            coalesce(cast(pull_request.status as text), cast(issue.status as text), cast(code_review.status as text)) status,
+                            coalesce(pull_request.number, issue.number, code_review.number)                   number,
+                            coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
+                            coalesce(pull_request.title, issue.title, code_review.title)                      title,
+                            coalesce(pull_request.repo_name, issue.repo_name, code_review.repo_name)          repo_name,
+                            coalesce(pull_request.start_date, issue.start_date, code_review.start_date)       start_date,
+                            coalesce(pull_request.end_date, issue.end_date, code_review.end_date)             end_date,
+                            coalesce(pull_request.author_id, issue.author_id, code_review.author_id)          author_id,
+                            coalesce(pull_request.author_login, issue.author_login, code_review.author_login) author_login,
+                            coalesce(pull_request.author_avatar_url, issue.author_avatar_url, code_review.author_avatar_url)       author_avatar_url,
+                            coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
+                            coalesce(pull_request.author_github_url, issue.author_github_url, code_review.author_github_url) author_github_url,
+                            pull_request.commits_count,
+                            (select gprcc.commit_count
+                             from indexer_exp.github_pull_request_commit_counts gprcc
+                             where gprcc.pull_request_id = pull_request.id and gprcc.author_id = pr.recipient_id) user_commits_count,
+                            issue.comments_count,
+                            pr.recipient_id
+            from payment_requests pr
+                     join public.work_items wi on wi.payment_id = pr.id
+                     left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
+                     left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
+                     left join get_code_review code_review on code_review.id = wi.id
+            where pr.id = :rewardId
+            order by start_date desc, end_date desc offset :offset limit :limit""";
 
-
+    private final EntityManager entityManager;
 
     public RewardViewEntity findProjectRewardViewEntityByd(final UUID rewardId) {
         try {
@@ -217,14 +290,6 @@ public class CustomRewardRepository {
         }
     }
 
-
-
-    private static final String COUNT_REWARD_ITEMS = """
-            select count(distinct wi.id)
-            from payment_requests pr
-                     join public.work_items wi on wi.payment_id = pr.id
-            where pr.id = :rewardId""";
-
     public Integer countRewardItemsForRewardId(UUID rewardId) {
         final var query = entityManager
                 .createNativeQuery(COUNT_REWARD_ITEMS)
@@ -232,94 +297,9 @@ public class CustomRewardRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    private static final String FIND_REWARD_ITEMS = """
-            with get_pr as (select gpr.number,
-                                   gpr.id,
-                                   gpr.html_url,
-                                   gpr.title,
-                                   gpr.status,
-                                   gpr.draft,
-                                   gr.name                                repo_name,
-                                   gpr.created_at                         start_date,
-                                   coalesce(gpr.closed_at, gpr.merged_at) end_date,
-                                   gu.id                                  author_id,
-                                   gu.login                               author_login,
-                                   gu.avatar_url                          avatar_url,
-                                   gu.html_url                            author_github_url,
-                                   (select count(c.pull_request_id)
-                                    from github_pull_request_commits c
-                                    where c.pull_request_id = gpr.id)     commits_count
-                            from github_pull_requests gpr
-                                     left join github_users gu on gu.id = gpr.author_id
-                                     left join github_repos gr on gr.id = gpr.repo_id),
-                 get_issue as (select gi.number,
-                                      gi.id,
-                                      gi.status,
-                                      gi.html_url,
-                                      gi.title,
-                                      gr.name       repo_name,
-                                      gi.created_at start_date,
-                                      gi.closed_at  end_date,
-                                      gu.id         author_id,
-                                      gu.login      author_login,
-                                      gu.avatar_url avatar_url,
-                                      gu.html_url   author_github_url,
-                                      gi.comments_count
-                               from github_issues gi
-                                        left join github_users gu on gu.id = gi.author_id
-                                        left join github_repos gr on gr.id = gi.repo_id),
-                 get_code_review as (select gpr.number,
-                                            gprr.id,
-                                            gprr.status,
-                                            gpr.html_url,
-                                            gpr.title,
-                                            gprr.outcome,
-                                            gr.name           repo_name,
-                                            gpr.created_at    start_date,
-                                            gprr.submitted_at end_date,
-                                            gu.id             author_id,
-                                            gu.login          author_login,
-                                            gu.avatar_url     avatar_url,
-                                            gu.html_url       author_github_url
-                                     from github_pull_request_reviews gprr
-                                              left join github_users gu on gu.id = gprr.reviewer_id
-                                              left join github_pull_requests gpr on gpr.id = gprr.pull_request_id
-                                              left join github_repos gr on gr.id = gpr.repo_id)
-            select distinct wi.type,
-                            coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             contribution_id,
-                            coalesce(cast(pull_request.status as text), cast(issue.status as text), cast(code_review.status as text))                   status,
-                            pull_request.draft,
-                            coalesce(pull_request.number, issue.number, code_review.number)                   number,
-                            coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
-                            coalesce(pull_request.title, issue.title, code_review.title)                      title,
-                            coalesce(pull_request.repo_name, issue.repo_name, code_review.repo_name)          repo_name,
-                            coalesce(pull_request.start_date, issue.start_date, code_review.start_date)       start_date,
-                            coalesce(pull_request.end_date, issue.end_date, code_review.end_date)             end_date,
-                            coalesce(pull_request.author_id, issue.author_id, code_review.author_id)          author_id,
-                            coalesce(pull_request.author_login, issue.author_login, code_review.author_login) author_login,
-                            coalesce(pull_request.avatar_url, issue.avatar_url, code_review.avatar_url)       avatar_url,
-                            coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
-                            coalesce(pull_request.author_github_url, issue.author_github_url, code_review.author_github_url) author_github_url,
-                            pull_request.commits_count,
-                            (select count(c.pull_request_id)
-                             from github_pull_request_commits c
-                             where c.pull_request_id = pull_request.id
-                               and c.author_id = pr.recipient_id)                                             user_commits_count,
-                            issue.comments_count,
-                            code_review.outcome cr_outcome,
-                            pr.recipient_id,
-                            issue.id
-            from payment_requests pr
-                     join public.work_items wi on wi.payment_id = pr.id
-                     left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
-                     left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
-                     left join get_code_review code_review on code_review.id = wi.id
-            where pr.id = :rewardId
-            order by start_date desc, end_date desc offset :offset limit :limit""";
-
     public List<RewardItemViewEntity> findRewardItemsByRewardId(UUID rewardId, int pageIndex, int pageSize) {
-        return entityManager.createNativeQuery(FIND_REWARD_ITEMS,RewardItemViewEntity.class)
-                .setParameter("rewardId",rewardId)
+        return entityManager.createNativeQuery(FIND_REWARD_ITEMS, RewardItemViewEntity.class)
+                .setParameter("rewardId", rewardId)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList()

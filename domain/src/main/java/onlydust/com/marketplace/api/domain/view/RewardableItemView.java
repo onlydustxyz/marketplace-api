@@ -23,6 +23,5 @@ public class RewardableItemView {
     String repoName;
     String githubUrl;
     String title;
-    CodeReviewOutcome outcome;
     Boolean ignored;
 }

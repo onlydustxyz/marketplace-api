@@ -290,7 +290,6 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                           "commitsCount": null,
                           "userCommitsCount": null,
                           "commentsCount": 0,
-                          "codeReviewOutcome": null,
                           "status": "CLOSED"
                         }
                         """.formatted(title));

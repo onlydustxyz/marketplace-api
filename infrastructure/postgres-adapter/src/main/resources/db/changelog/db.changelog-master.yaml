@@ -11,4 +11,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000004_add_projects_createdAt.sql
   - include:
       file: db/changelog/changelogs/00000005_create_project_more_infos_table.sql
-
+  - include:
+      file: db/changelog/changelogs/00000006_no_more_old_exp.sql

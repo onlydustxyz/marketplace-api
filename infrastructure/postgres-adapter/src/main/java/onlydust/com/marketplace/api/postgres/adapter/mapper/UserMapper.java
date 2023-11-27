@@ -4,10 +4,10 @@ import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectLedView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
@@ -28,9 +28,9 @@ import static java.util.Objects.nonNull;
 
 public interface UserMapper {
 
-    static ContributorLinkView mapToContributorLinkView(GithubUserViewEntity user) {
+    static ContributorLinkView mapToContributorLinkView(ContributorViewEntity user) {
         return ContributorLinkView.builder()
-                .githubUserId(user.getGithubId())
+                .githubUserId(user.getGithubUserId())
                 .login(user.getLogin())
                 .avatarUrl(user.getAvatarUrl())
                 .url(user.getHtmlUrl())

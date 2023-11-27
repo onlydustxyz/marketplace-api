@@ -6,12 +6,12 @@ import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectOrganizationView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.GithubUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
@@ -27,7 +27,7 @@ import static java.util.Objects.nonNull;
 public interface ProjectMapper {
 
     static ProjectDetailsView mapToProjectDetailsView(ProjectViewEntity projectEntity,
-                                                      List<GithubUserViewEntity> topContributors,
+                                                      List<ContributorViewEntity> topContributors,
                                                       Integer contributorCount,
                                                       List<ProjectLeadViewEntity> leaders,
                                                       List<SponsorEntity> sponsors,

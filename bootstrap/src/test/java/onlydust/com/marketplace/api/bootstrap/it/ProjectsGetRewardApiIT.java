@@ -215,49 +215,51 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "rewardItems": [
-                                {
-                                    "number": 1232,
-                                    "id": "1511546916",
-                                    "title": "Addin sitemap.xml in robots.txt",
-                                    "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1232",
-                                    "createdAt": "2023-09-12T07:38:04Z",
-                                    "lastUpdateAt": "2023-09-12T07:45:12Z",
-                                    "repoName": "marketplace-frontend",
-                                    "type": "PULL_REQUEST",
-                                    "commitsCount": 1,
-                                    "userCommitsCount": 1,
-                                    "commentsCount": null,
-                                    "status": "MERGED",
-                                    "githubAuthorId": 16590657,
-                                    "authorLogin": "PierreOucif",
-                                    "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                    "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                },
-                                {
-                                    "number": 1225,
-                                    "id": "1507455279",
-                                    "title": "E 730 migrate oscar frontend documentation",
-                                    "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1225",
-                                    "createdAt": "2023-09-08T08:14:32Z",
-                                    "lastUpdateAt": "2023-09-08T08:19:55Z",
-                                    "repoName": "marketplace-frontend",
-                                    "type": "PULL_REQUEST",
-                                    "commitsCount": 3,
-                                    "userCommitsCount": 3,
-                                    "commentsCount": null,
-                                    "status": "MERGED",
-                                    "githubAuthorId": 16590657,
-                                    "authorLogin": "PierreOucif",
-                                    "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                    "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                                }
-                            ],
-                            "hasMore": true,
-                            "totalPageNumber": 13,
-                            "totalItemNumber": 25,
-                            "nextPageIndex": 1
-                        }""");
+                          "rewardItems": [
+                            {
+                              "number": 1232,
+                              "id": "1511546916",
+                              "title": "Addin sitemap.xml in robots.txt",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1232",
+                              "createdAt": "2023-09-12T07:38:04Z",
+                              "lastUpdateAt": "2023-09-12T07:45:12Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 1,
+                              "userCommitsCount": 1,
+                              "commentsCount": null,
+                              "status": "MERGED",
+                              "githubAuthorId": 16590657,
+                              "authorLogin": "PierreOucif",
+                              "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                            },
+                            {
+                              "number": 1225,
+                              "id": "1507455279",
+                              "title": "E 730 migrate oscar frontend documentation",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1225",
+                              "createdAt": "2023-09-08T08:14:32Z",
+                              "lastUpdateAt": "2023-09-08T08:19:55Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 3,
+                              "userCommitsCount": 3,
+                              "commentsCount": null,
+                              "status": "MERGED",
+                              "githubAuthorId": 16590657,
+                              "authorLogin": "PierreOucif",
+                              "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 13,
+                          "totalItemNumber": 25,
+                          "nextPageIndex": 1
+                        }
+                                                
+                        """);
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "12")))
@@ -268,32 +270,35 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
-                        {
-                           "rewardItems": [
-                             {
-                               "number": 1129,
-                               "id": "1442413635",
-                               "title": "First API integration test",
-                               "githubUrl": "https://github.com/onlydustxyz/marketplace/pull/1129",
-                               "createdAt": "2023-07-20T08:45:18Z",
-                               "lastUpdateAt": "2023-07-21T13:00:05Z",
-                               "repoName": "marketplace-frontend",
-                               "type": "PULL_REQUEST",
-                               "commitsCount": 39,
-                               "userCommitsCount": 16,
-                               "commentsCount": null,
-                               "status": "MERGED",
-                               "githubAuthorId": 43467246,
-                               "authorLogin": "AnthonyBuisset",
-                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                               "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
-                             }
-                           ],
-                           "hasMore": false,
-                           "totalPageNumber": 13,
-                           "totalItemNumber": 25,
-                           "nextPageIndex": 12
-                         }""");
+                                            
+                            {
+                          "rewardItems": [
+                            {
+                              "number": 1129,
+                              "id": "1442413635",
+                              "title": "First API integration test",
+                              "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
+                              "createdAt": "2023-07-20T08:45:18Z",
+                              "lastUpdateAt": "2023-07-21T13:00:05Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "PULL_REQUEST",
+                              "commitsCount": 30,
+                              "userCommitsCount": 16,
+                              "commentsCount": null,
+                              "status": "MERGED",
+                              "githubAuthorId": 43467246,
+                              "authorLogin": "AnthonyBuisset",
+                              "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 13,
+                          "totalItemNumber": 25,
+                          "nextPageIndex": 12
+                        }
+                                            
+                        """);
     }
 
 

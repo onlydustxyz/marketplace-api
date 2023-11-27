@@ -31,6 +31,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     HasuraUserHelper userHelper;
     @Autowired
     ProjectLeadRepository projectLeadRepository;
+    @Autowired
+    ProjectRepoRepository projectRepoRepository;
 
     @Test
     void should_update_onboarding_state() {
@@ -256,9 +258,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isNotFound();
     }
 
-    @Autowired
-    ProjectRepoRepository projectRepoRepository;
-
     @Test
     void should_return_projects_led() {
         // Given
@@ -288,7 +287,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[1].contributorCount").isEqualTo(18)
                 .jsonPath("$.projectsLed[0].id").isEqualTo("7d04163c-4187-4313-8066-61504d34fc56")
                 .jsonPath("$.projectsLed[0].name").isEqualTo("Bretzel")
-                .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(6)
+                .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(4)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
                                                                 ".com/5003677688814069549.png")
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")

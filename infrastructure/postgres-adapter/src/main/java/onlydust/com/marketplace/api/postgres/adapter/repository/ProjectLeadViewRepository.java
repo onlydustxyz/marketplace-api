@@ -40,18 +40,6 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
             UNION
             (
             select
-                gu.id as github_user_id,
-                NULL as id,
-                gu.login,
-                gu.avatar_url,
-                gu.html_url,
-                false as has_accepted_invitation
-            from github_users gu
-            join pending_project_leader_invitations pli on pli.github_user_id = gu.id and pli.project_id = :projectId
-            )
-            UNION
-            (
-            select
                 ga.id as github_user_id,
                 NULL as id,
                 ga.login,

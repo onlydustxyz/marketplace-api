@@ -90,16 +90,18 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "contributionId": null,
                           "title": "feature: soluce command in the CLI",
                           "githubUrl": "https://github.com/onlydustxyz/starklings/issues/100",
-                          "createdAt": "2022-05-10T21:49:36Z",
-                          "lastUpdateAt": "2022-05-12T16:10:19Z",
+                          "createdAt": "2022-05-10T19:49:36Z",
+                          "lastUpdateAt": "2022-05-12T14:10:19Z",
                           "repoName": "starklings",
                           "type": "ISSUE",
                           "commitsCount": null,
                           "userCommitsCount": null,
                           "commentsCount": 2,
-                          "codeReviewOutcome": null,
-                          "status": "OPEN"
+                          "status": "COMPLETED",
+                          "ignored": false,
+                          "htmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
                         }
+                                                
                         """);
     }
 }

@@ -64,14 +64,14 @@ public class CustomUserRepository {
                            'code_review_count', cc.code_review_count,
                            'pull_request_count', cc.pull_request_count
                                      ))
-                    FROM (SELECT date_part('isoyear', c.created_at)                                  AS year,
-                                 date_part('week', c.created_at)                                     AS week,
-                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'issue')        AS issue_count,
-                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'code_review')  AS code_review_count,
-                                 count(DISTINCT c.details_id) FILTER (WHERE c.type = 'pull_request') AS pull_request_count
-                          FROM contributions c
-                          where c.status = 'complete'
-                            and c.user_id = gu.id
+                    FROM (SELECT date_part('isoyear', c.created_at)                                         AS year,
+                                 date_part('week', c.created_at)                                            AS week,
+                                 count(DISTINCT c.issue_id) FILTER (WHERE c.type = 'ISSUE')                 AS issue_count,
+                                 count(DISTINCT c.code_review_id) FILTER (WHERE c.type = 'CODE_REVIEW')     AS code_review_count,
+                                 count(DISTINCT c.pull_request_id) FILTER (WHERE c.type = 'PULL_REQUEST')   AS pull_request_count
+                          FROM indexer_exp.contributions c
+                          where c.status = 'COMPLETED'
+                            and c.contributor_id = gu.id
                           GROUP BY year, week) as cc)      counts,
                         
                         
@@ -101,29 +101,28 @@ public class CustomUserRepository {
                           where pr.recipient_id = gu.id
                           group by pr.currency) as prs)    totals_earned,
                         
-                   (select count(distinct c.id)
-                    from contributions c
-                    where c.user_id = gu.id
-                      and c.status = 'complete')           contributions_count
+                   (select sum(rc.completed_contribution_count)
+                    from indexer_exp.repos_contributors rc
+                    where rc.contributor_id = gu.id)           contributions_count
                 
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
             from public.auth_users u
-                     join public.github_users gu on gu.id = u.github_user_id
+                     join indexer_exp.github_accounts gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where u.id = :userId
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
-            from public.github_users gu
+            from indexer_exp.github_accounts gu
                      left join public.auth_users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.id = :githubUserId
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
-            from public.github_users gu
+            from indexer_exp.github_accounts gu
                      left join public.auth_users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.login = :githubLogin
@@ -150,31 +149,27 @@ public class CustomUserRepository {
                     where pd.project_id = p.project_id
                       and b.currency = 'usd')            total_granted,
                       
-                   (select count(distinct c.id)
+                   (select sum(rc.completed_contribution_count)
                     from project_github_repos pgr
-                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.user_id = :githubUserId
+                    join indexer_exp.repos_contributors rc on rc.repo_id = pgr.github_repo_id and rc.contributor_id = :githubUserId
                     where pgr.project_id = p.project_id) user_contributions_count,
                     
-                   (select c.closed_at
+                   (select max(c.completed_at)
                     from project_github_repos pgr
-                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
-                    where pgr.project_id = p.project_id
-                    order by c.closed_at desc
-                    limit 1)                             last_contribution_date,
+                    join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
+                    where pgr.project_id = p.project_id) last_contribution_date,
                     
                     
-                   (select c.closed_at
+                   (select min(c.completed_at)
                     from project_github_repos pgr
-                             join contributions c on c.repo_id = pgr.github_repo_id and c.status = 'complete' and c.closed_at is not null and c.user_id = :githubUserId
-                    where pgr.project_id = p.project_id
-                    order by c.closed_at asc
-                    limit 1)                             first_contribution_date
+                    join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id and c.status = 'COMPLETED' and c.completed_at is not null and c.contributor_id = :githubUserId
+                    where pgr.project_id = p.project_id) first_contribution_date
                    
             from ((select distinct pd.project_id, false is_lead, cast(null as timestamp) as assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
-                   from contributions c
-                            join project_github_repos gpr on gpr.github_repo_id = c.repo_id
+                   from indexer_exp.repos_contributors rc
+                            join project_github_repos gpr on gpr.github_repo_id = rc.repo_id
                             join project_details pd on pd.project_id = gpr.project_id
-                   where c.user_id = :githubUserId and c.status = 'complete')
+                   where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0)
                   UNION
                   (select distinct pd.project_id, true is_lead, pl.assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
                    from auth_users u

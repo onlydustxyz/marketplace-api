@@ -30,7 +30,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_0 = """
             {
               "totalPageNumber": 6,
-              "totalItemNumber": 17,
+              "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 1,
               "contributors": [
@@ -38,7 +38,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                  "contributionCount": 853,
+                  "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -54,7 +54,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 595505,
                   "login": "ofux",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
-                  "contributionCount": 537,
+                  "contributionCount": 570,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -70,7 +70,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                  "contributionCount": 363,
+                  "contributionCount": 375,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -84,421 +84,457 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 }
               ]
             }
+                        
             """;
     private static final String GET_PROJECT_CONTRIBUTORS_PAGE_1 = """
             {
-               "totalPageNumber": 6,
-               "totalItemNumber": 17,
-               "hasMore": true,
-               "nextPageIndex": 2,
-               "contributors": [
-                 {
-                   "githubUserId": 21149076,
-                   "login": "oscarwroche",
-                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                   "contributionCount": 211,
-                   "rewardCount": 0,
-                   "earned": {
+              "totalPageNumber": 6,
+              "totalItemNumber": 18,
+              "hasMore": true,
+              "nextPageIndex": 2,
+              "contributors": [
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null,
-                   "isRegistered": true
-                 },
-                 {
-                   "githubUserId": 34384633,
-                   "login": "tdelabro",
-                   "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
-                   "contributionCount": 143,
-                   "rewardCount": 0,
-                   "earned": {
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 34384633,
+                  "login": "tdelabro",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
+                  "contributionCount": 146,
+                  "rewardCount": 0,
+                  "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null,
-                   "isRegistered": false
-                 },
-                 {
-                   "githubUserId": 16590657,
-                   "login": "PierreOucif",
-                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                   "contributionCount": 92,
-                   "rewardCount": 6,
-                   "earned": {
-                           "totalAmount": 6000,
-                           "details": [
-                             {
-                               "totalAmount": 6000,
-                               "totalDollarsEquivalent": 6000,
-                               "currency": "USD"
-                             }
-                           ]
-                         },
-                   "contributionToRewardCount": null,
-                   "pullRequestToReward": null,
-                   "issueToReward": null,
-                   "codeReviewToReward": null,
-                   "isRegistered": true
-                 }
-               ]
-             }""";
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "contributionCount": 133,
+                  "rewardCount": 6,
+                  "earned": {
+                    "totalAmount": 6000,
+                    "details": [
+                      {
+                        "totalAmount": 6000,
+                        "totalDollarsEquivalent": 6000,
+                        "currency": "USD"
+                      }
+                    ]
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                }
+              ]
+            }
+            """;
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD = """
             {
-                "totalPageNumber": 1,
-                "totalItemNumber": 17,
-                "hasMore": false,
-                "nextPageIndex": 0,
-                "contributors": [
-                  {
-                    "githubUserId": 102823832,
-                    "login": "SamuelKer",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
-                    "contributionCount": 1,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 1,
-                    "pullRequestToReward": 1,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 0,
-                    "isRegistered": false
+              "totalPageNumber": 1,
+              "totalItemNumber": 18,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "contributors": [
+                {
+                  "githubUserId": 102823832,
+                  "login": "SamuelKer",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/102823832?v=4",
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 129528947,
-                    "login": "VeryDustyBot",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
-                    "contributionCount": 1,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 1,
-                    "pullRequestToReward": 0,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 1,
-                    "isRegistered": false
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 1,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 0,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 129528947,
+                  "login": "VeryDustyBot",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
+                  "contributionCount": 1,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 698957,
-                    "login": "ltoussaint",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
-                    "contributionCount": 2,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 2,
-                    "pullRequestToReward": 0,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 2,
-                    "isRegistered": false
+                  "contributionToRewardCount": 1,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 1,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 698957,
+                  "login": "ltoussaint",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/698957?v=4",
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 112474158,
-                    "login": "onlydust-contributor",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                    "contributionCount": 2,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 2,
-                    "pullRequestToReward": 1,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 1,
-                    "isRegistered": true
+                  "contributionToRewardCount": 2,
+                  "pullRequestToReward": 0,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 2,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 112474158,
+                  "login": "onlydust-contributor",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                  "contributionCount": 2,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 143011364,
-                    "login": "pixelfact",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                    "contributionCount": 5,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 5,
-                    "pullRequestToReward": 2,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 3,
-                    "isRegistered": false
+                  "contributionToRewardCount": 2,
+                  "pullRequestToReward": 1,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 1,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 98529704,
+                  "login": "tekkac",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
+                  "contributionCount": 20,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 98529704,
-                    "login": "tekkac",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
-                    "contributionCount": 19,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 19,
-                    "pullRequestToReward": 6,
-                    "issueToReward": 1,
-                    "codeReviewToReward": 12,
-                    "isRegistered": false
+                  "contributionToRewardCount": 20,
+                  "pullRequestToReward": 7,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 12,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 45264458,
+                  "login": "abdelhamidbakhta",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                  "contributionCount": 21,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 45264458,
-                    "login": "abdelhamidbakhta",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                    "contributionCount": 21,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 21,
-                    "pullRequestToReward": 8,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 13,
-                    "isRegistered": false
+                  "contributionToRewardCount": 21,
+                  "pullRequestToReward": 8,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 13,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 5160414,
-                    "login": "haydencleary",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                    "contributionCount": 27,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 27,
-                    "pullRequestToReward": 7,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 20,
-                    "isRegistered": true
+                  "contributionToRewardCount": 36,
+                  "pullRequestToReward": 25,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 11,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 10167015,
-                    "login": "lechinoix",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
-                    "contributionCount": 36,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 36,
-                    "pullRequestToReward": 25,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 11,
-                    "isRegistered": false
+                  "contributionToRewardCount": 46,
+                  "pullRequestToReward": 34,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 12,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "contributionCount": 69,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 31901905,
-                    "login": "kaelsky",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                    "contributionCount": 42,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 42,
-                    "pullRequestToReward": 35,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 7,
-                    "isRegistered": true
+                  "contributionToRewardCount": 69,
+                  "pullRequestToReward": 55,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 14,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 143011364,
+                  "login": "pixelfact",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                  "contributionCount": 79,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 10922658,
-                    "login": "alexbensimon",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                    "contributionCount": 44,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 44,
-                    "pullRequestToReward": 32,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 12,
-                    "isRegistered": true
+                  "contributionToRewardCount": 79,
+                  "pullRequestToReward": 40,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 39,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "contributionCount": 112,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 16590657,
-                    "login": "PierreOucif",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                    "contributionCount": 92,
-                    "rewardCount": 6,
-                    "earned": {
-                      "totalAmount": 6000,
-                      "details": [
-                        {
-                          "totalAmount": 6000,
-                          "totalDollarsEquivalent": 6000,
-                          "currency": "USD"
-                        }
-                      ]
-                    },
-                    "contributionToRewardCount": 72,
-                    "pullRequestToReward": 1,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 71,
-                    "isRegistered": true
+                  "contributionToRewardCount": 112,
+                  "pullRequestToReward": 41,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 70,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 31901905,
+                  "login": "kaelsky",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                  "contributionCount": 113,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 34384633,
-                    "login": "tdelabro",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
-                    "contributionCount": 143,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 143,
-                    "pullRequestToReward": 105,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 38,
-                    "isRegistered": false
+                  "contributionToRewardCount": 113,
+                  "pullRequestToReward": 85,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 28,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "contributionCount": 133,
+                  "rewardCount": 6,
+                  "earned": {
+                    "totalAmount": 6000,
+                    "details": [
+                      {
+                        "totalAmount": 6000,
+                        "totalDollarsEquivalent": 6000,
+                        "currency": "USD"
+                      }
+                    ]
                   },
-                  {
-                    "githubUserId": 21149076,
-                    "login": "oscarwroche",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                    "contributionCount": 211,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 151,
-                    "pullRequestToReward": 55,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 96,
-                    "isRegistered": true
+                  "contributionToRewardCount": 108,
+                  "pullRequestToReward": 4,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 104,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 34384633,
+                  "login": "tdelabro",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
+                  "contributionCount": 146,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 4435377,
-                    "login": "Bernardstanislas",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                    "contributionCount": 363,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 362,
-                    "pullRequestToReward": 107,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 255,
-                    "isRegistered": true
+                  "contributionToRewardCount": 146,
+                  "pullRequestToReward": 107,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 39,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 21149076,
+                  "login": "oscarwroche",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                  "contributionCount": 213,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 595505,
-                    "login": "ofux",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
-                    "contributionCount": 537,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 537,
-                    "pullRequestToReward": 221,
-                    "issueToReward": 2,
-                    "codeReviewToReward": 314,
-                    "isRegistered": true
+                  "contributionToRewardCount": 153,
+                  "pullRequestToReward": 57,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 96,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                  "contributionCount": 375,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 43467246,
-                    "login": "AnthonyBuisset",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                    "contributionCount": 853,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 771,
-                    "pullRequestToReward": 405,
-                    "issueToReward": 11,
-                    "codeReviewToReward": 355,
-                    "isRegistered": true
-                  }
-                ]
-              }
+                  "contributionToRewardCount": 374,
+                  "pullRequestToReward": 115,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 259,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 595505,
+                  "login": "ofux",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                  "contributionCount": 570,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 569,
+                  "pullRequestToReward": 247,
+                  "issueToReward": 2,
+                  "codeReviewToReward": 320,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                  "contributionCount": 885,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 797,
+                  "pullRequestToReward": 416,
+                  "issueToReward": 11,
+                  "codeReviewToReward": 370,
+                  "isRegistered": true
+                }
+              ]
+            }
+                        
             """;
 
     private static final String GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD_LOGIN_LE = """
             {
-                "totalPageNumber": 1,
-                "totalItemNumber": 3,
-                "hasMore": false,
-                "nextPageIndex": 0,
-                "contributors": [
-                  {
-                    "githubUserId": 5160414,
-                    "login": "haydencleary",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                    "contributionCount": 27,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 27,
-                    "pullRequestToReward": 7,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 20,
-                    "isRegistered": true
+              "totalPageNumber": 1,
+              "totalItemNumber": 4,
+              "hasMore": false,
+              "nextPageIndex": 0,
+              "contributors": [
+                {
+                  "githubUserId": 10167015,
+                  "login": "lechinoix",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                  "contributionCount": 36,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 10167015,
-                    "login": "lechinoix",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
-                    "contributionCount": 36,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 36,
-                    "pullRequestToReward": 25,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 11,
-                    "isRegistered": false
+                  "contributionToRewardCount": 36,
+                  "pullRequestToReward": 25,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 11,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
                   },
-                  {
-                    "githubUserId": 10922658,
-                    "login": "alexbensimon",
-                    "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                    "contributionCount": 44,
-                    "rewardCount": 0,
-                    "earned": {
-                      "totalAmount": 0,
-                      "details": null
-                    },
-                    "contributionToRewardCount": 44,
-                    "pullRequestToReward": 32,
-                    "issueToReward": 0,
-                    "codeReviewToReward": 12,
-                    "isRegistered": true
-                  }
-                ]
-              }
+                  "contributionToRewardCount": 46,
+                  "pullRequestToReward": 34,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 12,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "contributionCount": 69,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 69,
+                  "pullRequestToReward": 55,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 14,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "contributionCount": 112,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": 112,
+                  "pullRequestToReward": 41,
+                  "issueToReward": 1,
+                  "codeReviewToReward": 70,
+                  "isRegistered": true
+                }
+              ]
+            }
+                        
             """;
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS = """
             {
               "totalPageNumber": 1,
-              "totalItemNumber": 17,
+              "totalItemNumber": 18,
               "hasMore": false,
               "nextPageIndex": 0,
               "contributors": [
@@ -567,26 +603,10 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "isRegistered": true
                 },
                 {
-                  "githubUserId": 143011364,
-                  "login": "pixelfact",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                  "contributionCount": 5,
-                  "rewardCount": 0,
-                  "earned": {
-                    "totalAmount": 0,
-                    "details": null
-                  },
-                  "contributionToRewardCount": null,
-                  "pullRequestToReward": null,
-                  "issueToReward": null,
-                  "codeReviewToReward": null,
-                  "isRegistered": false
-                },
-                {
                   "githubUserId": 98529704,
                   "login": "tekkac",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4",
-                  "contributionCount": 19,
+                  "contributionCount": 20,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -615,22 +635,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "isRegistered": false
                 },
                 {
-                  "githubUserId": 5160414,
-                  "login": "haydencleary",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 27,
-                  "rewardCount": 0,
-                  "earned": {
-                    "totalAmount": 0,
-                    "details": null
-                  },
-                  "contributionToRewardCount": null,
-                  "pullRequestToReward": null,
-                  "issueToReward": null,
-                  "codeReviewToReward": null,
-                  "isRegistered": true
-                },
-                {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
@@ -647,10 +651,10 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "isRegistered": false
                 },
                 {
-                  "githubUserId": 31901905,
-                  "login": "kaelsky",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                  "contributionCount": 42,
+                  "githubUserId": 10922658,
+                  "login": "alexbensimon",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                  "contributionCount": 46,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -663,10 +667,58 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "isRegistered": true
                 },
                 {
-                  "githubUserId": 10922658,
-                  "login": "alexbensimon",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                  "contributionCount": 44,
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "contributionCount": 69,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 143011364,
+                  "login": "pixelfact",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                  "contributionCount": 79,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "contributionCount": 112,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 31901905,
+                  "login": "kaelsky",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                  "contributionCount": 113,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -682,7 +734,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                  "contributionCount": 92,
+                  "contributionCount": 133,
                   "rewardCount": 6,
                   "earned": {
                     "totalAmount": 6000,
@@ -704,7 +756,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 34384633,
                   "login": "tdelabro",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
-                  "contributionCount": 143,
+                  "contributionCount": 146,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -720,7 +772,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 21149076,
                   "login": "oscarwroche",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                  "contributionCount": 211,
+                  "contributionCount": 213,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -736,7 +788,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 4435377,
                   "login": "Bernardstanislas",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
-                  "contributionCount": 363,
+                  "contributionCount": 375,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -752,7 +804,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 595505,
                   "login": "ofux",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
-                  "contributionCount": 537,
+                  "contributionCount": 570,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -768,7 +820,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                  "contributionCount": 853,
+                  "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -782,31 +834,16 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 }
               ]
             }
+                
             """;
 
     private static final String GET_PROJECT_CONTRIBUTORS_ANONYMOUS_LOGIN_LE = """
             {
               "totalPageNumber": 1,
-              "totalItemNumber": 3,
+              "totalItemNumber": 4,
               "hasMore": false,
               "nextPageIndex": 0,
               "contributors": [
-                {
-                  "githubUserId": 5160414,
-                  "login": "haydencleary",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                  "contributionCount": 27,
-                  "rewardCount": 0,
-                  "earned": {
-                    "totalAmount": 0,
-                    "details": null
-                  },
-                  "contributionToRewardCount": null,
-                  "pullRequestToReward": null,
-                  "issueToReward": null,
-                  "codeReviewToReward": null,
-                  "isRegistered": true
-                },
                 {
                   "githubUserId": 10167015,
                   "login": "lechinoix",
@@ -827,7 +864,39 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 10922658,
                   "login": "alexbensimon",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
-                  "contributionCount": 44,
+                  "contributionCount": 46,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": true
+                },
+                {
+                  "githubUserId": 17259618,
+                  "login": "alexbeno",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                  "contributionCount": 69,
+                  "rewardCount": 0,
+                  "earned": {
+                    "totalAmount": 0,
+                    "details": null
+                  },
+                  "contributionToRewardCount": null,
+                  "pullRequestToReward": null,
+                  "issueToReward": null,
+                  "codeReviewToReward": null,
+                  "isRegistered": false
+                },
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "contributionCount": 112,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
@@ -841,11 +910,12 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 }
               ]
             }
+                
             """;
     private static final String GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES = """
             {
               "totalPageNumber": 9,
-              "totalItemNumber": 17,
+              "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 1,
               "contributors": [
@@ -853,7 +923,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                  "contributionCount": 92,
+                  "contributionCount": 133,
                   "rewardCount": 6,
                   "earned": {
                     "totalAmount": 35190.00,
@@ -885,36 +955,37 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       }
                     ]
                   },
-                  "contributionToRewardCount": 72,
-                  "pullRequestToReward": 1,
+                  "contributionToRewardCount": 108,
+                  "pullRequestToReward": 4,
                   "issueToReward": 0,
-                  "codeReviewToReward": 71,
+                  "codeReviewToReward": 104,
                   "isRegistered": true
                 },
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                  "contributionCount": 853,
+                  "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 771,
-                  "pullRequestToReward": 405,
+                  "contributionToRewardCount": 797,
+                  "pullRequestToReward": 416,
                   "issueToReward": 11,
-                  "codeReviewToReward": 355,
+                  "codeReviewToReward": 370,
                   "isRegistered": true
                 }
               ]
             }
+                        
             """;
 
     private static final String GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES_AND_IGNORED_CONTRIBUTIONS = """
             {
               "totalPageNumber": 9,
-              "totalItemNumber": 17,
+              "totalItemNumber": 18,
               "hasMore": true,
               "nextPageIndex": 1,
               "contributors": [
@@ -922,7 +993,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 16590657,
                   "login": "PierreOucif",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                  "contributionCount": 92,
+                  "contributionCount": 133,
                   "rewardCount": 6,
                   "earned": {
                     "totalAmount": 35190.00,
@@ -954,30 +1025,31 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       }
                     ]
                   },
-                  "contributionToRewardCount": 70,
-                  "pullRequestToReward": 0,
+                  "contributionToRewardCount": 106,
+                  "pullRequestToReward": 3,
                   "issueToReward": 0,
-                  "codeReviewToReward": 70,
+                  "codeReviewToReward": 103,
                   "isRegistered": true
                 },
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                  "contributionCount": 853,
+                  "contributionCount": 885,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": null
                   },
-                  "contributionToRewardCount": 771,
-                  "pullRequestToReward": 405,
+                  "contributionToRewardCount": 797,
+                  "pullRequestToReward": 416,
                   "issueToReward": 11,
-                  "codeReviewToReward": 355,
+                  "codeReviewToReward": 370,
                   "isRegistered": true
                 }
               ]
             }
+                        
             """;
 
 

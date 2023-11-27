@@ -10,8 +10,6 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
-
 public interface RewardableItemMapper {
 
     static RewardableItemsPageResponse pageToResponse(final int pageIndex, Page<RewardableItemView> page) {
@@ -47,8 +45,11 @@ public interface RewardableItemMapper {
                     case OPEN -> GithubStatus.OPEN;
                     case MERGED -> GithubStatus.MERGED;
                     case CLOSED -> GithubStatus.CLOSED;
+                    case COMMENTED -> GithubStatus.COMMENTED;
+                    case APPROVED -> GithubStatus.APPROVED;
                     case CHANGES_REQUESTED -> GithubStatus.CHANGES_REQUESTED;
                     case COMPLETED -> GithubStatus.COMPLETED;
+                    case DISMISSED -> GithubStatus.DISMISSED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
                 .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
@@ -58,11 +59,8 @@ public interface RewardableItemMapper {
                 .number(view.getNumber())
                 .repoName(view.getRepoName())
                 .githubUrl(view.getGithubUrl())
+                .htmlUrl(view.getGithubUrl())
                 .title(view.getTitle())
-                .ignored(Boolean.TRUE.equals(view.getIgnored()))
-                .codeReviewOutcome(isNull(view.getOutcome()) ? null : switch (view.getOutcome()) {
-                    case approved -> RewardableItemResponse.CodeReviewOutcomeEnum.APPROVED;
-                    case changeRequested -> RewardableItemResponse.CodeReviewOutcomeEnum.CHANGE_REQUESTED;
-                });
+                .ignored(Boolean.TRUE.equals(view.getIgnored()));
     }
 }
