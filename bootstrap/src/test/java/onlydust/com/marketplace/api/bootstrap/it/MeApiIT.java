@@ -279,7 +279,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.projectsLed[1].id").isEqualTo("f39b827f-df73-498c-8853-99bc3f562723")
                 .jsonPath("$.projectsLed[1].name").isEqualTo("QA new contributions")
                 .jsonPath("$.projectsLed[1].logoUrl").isEqualTo(null)
@@ -293,7 +292,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0);
 
-        projectRepoRepository.save(new ProjectRepoEntity(projectIdWithoutRepo, 1L));
+        // Public repo
+        projectRepoRepository.save(new ProjectRepoEntity(projectIdWithoutRepo, 593218280L));
 
         // When
         client.get()
@@ -304,13 +304,13 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.pendingProjectsLed[0].id").isEqualTo("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")
                 .jsonPath("$.pendingProjectsLed[0].name").isEqualTo("Red bull")
                 .jsonPath("$.pendingProjectsLed[0].contributorCount").isEqualTo(0)
                 .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent" +
                                                                        ".com/cZCHED10RzuEloOXuk7A")
-                .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull");
+                .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull")
+                .jsonPath("$.pendingProjectsLed.length()").isEqualTo(1);
 
 
     }

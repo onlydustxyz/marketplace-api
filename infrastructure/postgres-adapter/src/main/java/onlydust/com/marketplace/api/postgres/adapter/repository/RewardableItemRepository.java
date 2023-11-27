@@ -29,10 +29,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    c.github_comments_count                                                                  comments_count,
                    ic.contribution_id is not null                                                           ignored
             from public.project_github_repos pgr
-                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
+                     JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
+                     join indexer_exp.contributions c on c.repo_id = gr.id
                      left join indexer_exp.github_pull_requests pull_request on pull_request.id = c.pull_request_id
                      left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
             where pgr.project_id = :projectId
+              and gr.visibility = 'PUBLIC'
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
@@ -69,13 +71,14 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                      from indexer_exp.github_code_reviews gcr)
             select count(c.id)
             from public.project_github_repos pgr
-                     join indexer_exp.contributions c on c.repo_id = pgr.github_repo_id
+                     join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
+                     join indexer_exp.contributions c on c.repo_id = repo.id
                      left join get_code_review code_review on code_review.id = c.code_review_id
                      left join get_issue issue on issue.id = c.issue_id
                      left join get_pr pull_request on pull_request.id = c.pull_request_id
-                     left join indexer_exp.github_repos repo on repo.id = pgr.github_repo_id
                      left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
             where pgr.project_id = :projectId
+              and repo.visibility = 'PUBLIC'
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
               and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))

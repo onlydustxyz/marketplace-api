@@ -23,7 +23,9 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                       join project_details pd on pd.project_id = pl.project_id
              where pl.user_id = :userId and (select count(pgr2.github_repo_id)
                                                 from public.project_github_repos pgr2
-                                                where pgr2.project_id = pd.project_id) > 0)
+                                                join indexer_exp.github_repos gr on pgr2.github_repo_id = gr.id
+                                                where pgr2.project_id = pd.project_id
+                                                and gr.visibility = 'PUBLIC' ) > 0)
             union
             (select au.id,
                     pd.project_id,
@@ -39,6 +41,8 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                       join project_details pd on pd.project_id = ppli.project_id
              where au.id = :userId and (select count(pgr2.github_repo_id)
                                            from public.project_github_repos pgr2
-                                           where pgr2.project_id = pd.project_id) > 0)""", nativeQuery = true)
+                                           join indexer_exp.github_repos gr on pgr2.github_repo_id = gr.id
+                                                where pgr2.project_id = pd.project_id
+                                                and gr.visibility = 'PUBLIC') > 0)""", nativeQuery = true)
     List<ProjectLedIdViewEntity> findProjectLedIdsByUserId(final UUID userId);
 }

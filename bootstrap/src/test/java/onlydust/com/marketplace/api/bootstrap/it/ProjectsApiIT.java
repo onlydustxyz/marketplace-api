@@ -695,8 +695,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3566363,
+                    "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
                     "Cairo": 72428,
@@ -715,7 +715,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
                   "hiring": false,
                   "visibility": "PUBLIC",
-                  "repoCount": 5,
+                  "repoCount": 4,
                   "contributorCount": 20,
                   "leaders": [
                     {
@@ -742,8 +742,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "CSS": 6065,
                     "C++": 2226,
+                    "CSS": 6065,
                     "Rust": 453557,
                     "CMake": 460,
                     "PLpgSQL": 1372,
@@ -818,7 +818,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": true
+                  "isMissingGithubAppInstallation": false
                 },
                 {
                   "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
@@ -846,8 +846,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Python": 6719,
-                    "Dart": 121265
+                    "Dart": 121265,
+                    "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -1263,7 +1263,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "logoUrl": null,
                   "hiring": false,
                   "visibility": "PUBLIC",
-                  "repoCount": 4,
+                  "repoCount": 3,
                   "contributorCount": 4,
                   "leaders": [
                     {
@@ -1401,102 +1401,100 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 26,
               "nextPageIndex": 0
             }
-                        
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {
-              "projects": [
-                {
-                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                  "slug": "mooooooonlight",
-                  "name": "Mooooooonlight",
-                  "shortDescription": "hello la team",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                  "hiring": false,
-                  "visibility": "PUBLIC",
-                  "repoCount": 5,
-                  "contributorCount": 20,
-                  "leaders": [
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    }
-                  ],
-                  "sponsors": [
-                    {
-                      "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                      "name": "Theodo",
-                      "url": null,
-                      "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                    },
-                    {
-                      "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                      "name": "Starknet Foundation",
-                      "url": "https://starknet.io",
-                      "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                    }
-                  ],
-                  "technologies": {
-                    "MDX": 2520,
-                    "CSS": 6065,
-                    "C++": 2226,
-                    "Rust": 453557,
-                    "CMake": 460,
-                    "PLpgSQL": 1372,
-                    "HTML": 1520,
-                    "Kotlin": 1381,
-                    "TypeScript": 3148661,
-                    "Dockerfile": 325,
-                    "Shell": 12431,
-                    "JavaScript": 24365,
-                    "Objective-C": 38,
-                    "Swift": 404,
-                    "Dart": 121265
-                  },
-                  "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
-                }
-              ],
-              "technologies": [
-                "C++",
-                "CMake",
-                "CSS",
-                "Dart",
-                "Dockerfile",
-                "HTML",
-                "JavaScript",
-                "Kotlin",
-                "MDX",
-                "Objective-C",
-                "PLpgSQL",
-                "Rust",
-                "Shell",
-                "Swift",
-                "TypeScript"
-              ],
-              "sponsors": [
-                {
-                  "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                  "name": "Starknet Foundation",
-                  "url": "https://starknet.io",
-                  "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                },
-                {
-                  "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                  "name": "Theodo",
-                  "url": null,
-                  "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                }
-              ],
-              "hasMore": false,
-              "totalPageNumber": 1,
-              "totalItemNumber": 1,
-              "nextPageIndex": 0
-            }
-                        
+               "projects": [
+                 {
+                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                   "slug": "mooooooonlight",
+                   "name": "Mooooooonlight",
+                   "shortDescription": "hello la team",
+                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                   "hiring": false,
+                   "visibility": "PUBLIC",
+                   "repoCount": 4,
+                   "contributorCount": 20,
+                   "leaders": [
+                     {
+                       "githubUserId": 8642470,
+                       "login": "gregcha",
+                       "htmlUrl": "https://github.com/gregcha",
+                       "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                     }
+                   ],
+                   "sponsors": [
+                     {
+                       "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                       "name": "Theodo",
+                       "url": null,
+                       "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                     },
+                     {
+                       "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                       "name": "Starknet Foundation",
+                       "url": "https://starknet.io",
+                       "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                     }
+                   ],
+                   "technologies": {
+                     "MDX": 2520,
+                     "C++": 2226,
+                     "CSS": 6065,
+                     "Rust": 453557,
+                     "CMake": 460,
+                     "PLpgSQL": 1372,
+                     "HTML": 1520,
+                     "Kotlin": 1381,
+                     "TypeScript": 3148661,
+                     "Dockerfile": 325,
+                     "Shell": 12431,
+                     "JavaScript": 24365,
+                     "Objective-C": 38,
+                     "Swift": 404,
+                     "Dart": 121265
+                   },
+                   "isInvitedAsProjectLead": false,
+                   "isMissingGithubAppInstallation": null
+                 }
+               ],
+               "technologies": [
+                 "C++",
+                 "CMake",
+                 "CSS",
+                 "Dart",
+                 "Dockerfile",
+                 "HTML",
+                 "JavaScript",
+                 "Kotlin",
+                 "MDX",
+                 "Objective-C",
+                 "PLpgSQL",
+                 "Rust",
+                 "Shell",
+                 "Swift",
+                 "TypeScript"
+               ],
+               "sponsors": [
+                 {
+                   "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                   "name": "Starknet Foundation",
+                   "url": "https://starknet.io",
+                   "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                 },
+                 {
+                   "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                   "name": "Theodo",
+                   "url": null,
+                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                 }
+               ],
+               "hasMore": false,
+               "totalPageNumber": 1,
+               "totalItemNumber": 1,
+               "nextPageIndex": 0
+             }
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE = """
             {
@@ -1799,8 +1797,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3566363,
+                    "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
                     "Cairo": 72428,
@@ -1819,7 +1817,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
                   "hiring": false,
                   "visibility": "PUBLIC",
-                  "repoCount": 5,
+                  "repoCount": 4,
                   "contributorCount": 20,
                   "leaders": [
                     {
@@ -1846,8 +1844,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "CSS": 6065,
                     "C++": 2226,
+                    "CSS": 6065,
                     "Rust": 453557,
                     "CMake": 460,
                     "PLpgSQL": 1372,
@@ -1950,8 +1948,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Python": 6719,
-                    "Dart": 121265
+                    "Dart": 121265,
+                    "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -2367,7 +2365,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "logoUrl": null,
                   "hiring": false,
                   "visibility": "PUBLIC",
-                  "repoCount": 4,
+                  "repoCount": 3,
                   "contributorCount": 4,
                   "leaders": [
                     {
@@ -2505,7 +2503,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 25,
               "nextPageIndex": 0
             }
-                        
             """;
     @Autowired
     ProjectViewRepository projectViewRepository;

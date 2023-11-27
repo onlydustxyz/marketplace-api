@@ -36,7 +36,9 @@ public interface ProjectMapper {
         final var organizationEntities = new HashMap<Long, GithubAccountEntity>();
         projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().getId(), repo.getOwner()));
         final var repoIdsIncludedInProject =
-                projectEntity.getRepos().stream().map(GithubRepoEntity::getId).collect(Collectors.toSet());
+                projectEntity.getRepos().stream()
+                        .filter(GithubRepoEntity::isPublic)
+                        .map(GithubRepoEntity::getId).collect(Collectors.toSet());
 
         final var organizations = organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
                 .id(entity.getId())
@@ -47,6 +49,7 @@ public interface ProjectMapper {
                 .installationId(isNull(entity.getInstallation()) ? null : entity.getInstallation().getId())
                 .isInstalled(nonNull(entity.getInstallation()))
                 .repos(entity.getRepos().stream()
+                        .filter(GithubRepoEntity::isPublic)
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.getInstallation() != null &&

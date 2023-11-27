@@ -19,7 +19,8 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
             insert into ignored_contributions (project_id, contribution_id)
                select pgr.project_id, c.id
                from indexer_exp.contributions c
-               join project_github_repos pgr on pgr.github_repo_id = c.repo_id
+               join indexer_exp.github_repos gr on gr.id = c.repo_id
+               join project_github_repos pgr on gr.id = c.repo_id
                join project_details pd on pd.project_id = pgr.project_id
                left join custom_ignored_contributions cic on cic.contribution_id = c.id
                                                            and cic.project_id = pgr.project_id
@@ -27,6 +28,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                where
                    c.repo_id in ?1
                    and cic.contribution_id is null
+                   and gr.visibility = 'PUBLIC'
                    and (
                        (pd.reward_ignore_contributions_before_date_by_default is not null
                            and c.created_at < pd.reward_ignore_contributions_before_date_by_default)
@@ -45,7 +47,8 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
             where (ic.project_id, ic.contribution_id) in (
                 select pgr.project_id, c.id
                 from indexer_exp.contributions c
-                join project_github_repos pgr on pgr.github_repo_id = c.repo_id
+                join indexer_exp.github_repos gr on gr.id = c.repo_id
+                join project_github_repos pgr on gr.id = c.repo_id
                 join project_details pd on pd.project_id = pgr.project_id
                 left join custom_ignored_contributions cic on cic.contribution_id = c.id
                                                             and cic.project_id = pgr.project_id
@@ -53,6 +56,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                 where
                     c.repo_id in ?1
                     and cic.contribution_id is null
+                    and gr.visibility = 'PUBLIC'
                     and (
                         (pd.reward_ignore_contributions_before_date_by_default is null
                             or c.created_at >= pd.reward_ignore_contributions_before_date_by_default)
@@ -70,7 +74,9 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
             where ic.project_id = ?1 and ic.contribution_id not in (
                 select c.id
                 from indexer_exp.contributions c
-                join project_github_repos pgr on pgr.project_id = ?1 and pgr.github_repo_id = c.repo_id
+                join indexer_exp.github_repos gr on gr.id = c.repo_id
+                join project_github_repos pgr on pgr.project_id = ?1 and pgr.github_repo_id = gr.id
+                where gr.visibility = 'PUBLIC'
             )
              """, nativeQuery = true)
     void deleteContributionsThatAreNotPartOfTheProjectAnymore(UUID projectId);
