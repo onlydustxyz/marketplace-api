@@ -52,13 +52,13 @@ public interface RewardableItemMapper {
                     case DISMISSED -> GithubStatus.DISMISSED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
-                .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
+                .completedAt(DateMapper.toZoneDateTime(view.getCompletedAt()))
                 .commentsCount(view.getCommentsCount())
                 .commitsCount(view.getCommitsCount())
                 .userCommitsCount(view.getUserCommitsCount())
                 .number(view.getNumber())
                 .repoName(view.getRepoName())
-                .githubUrl(view.getGithubUrl())
+                .repoId(view.getRepoId())
                 .htmlUrl(view.getGithubUrl())
                 .title(view.getTitle())
                 .ignored(Boolean.TRUE.equals(view.getIgnored()));

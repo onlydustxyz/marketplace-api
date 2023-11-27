@@ -182,13 +182,13 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
-                                                                                           ContributionType contributionType,
-                                                                                           UUID projectLeadId,
-                                                                                           Long githubUserid,
-                                                                                           int pageIndex,
-                                                                                           int pageSize,
-                                                                                           String search,
-                                                                                           Boolean includeIgnoredItems) {
+                                                                                               ContributionType contributionType,
+                                                                                               UUID projectLeadId,
+                                                                                               Long githubUserid,
+                                                                                               int pageIndex,
+                                                                                               int pageSize,
+                                                                                               String search,
+                                                                                               Boolean includeIgnoredItems) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
                     contributionType, githubUserid, pageIndex, pageSize, search, includeIgnoredItems);
@@ -203,10 +203,9 @@ public class ProjectService implements ProjectFacadePort {
             if (permissionService.isRepoLinkedToProject(command.getProjectId(), command.getGithubRepoId())) {
                 final var repo = githubStoragePort.findRepoById(command.getGithubRepoId()).orElseThrow(() ->
                         OnlyDustException.notFound("Repo not found"));
-                final RewardableItemView issue = dustyBotStoragePort.createIssue(repo.getOwner(),
-                        repo.getName(), command.getTitle(), command.getDescription());
-                return dustyBotStoragePort.closeIssue(repo.getOwner(),
-                        repo.getName(), issue.getNumber());
+                final RewardableItemView issue = dustyBotStoragePort.createIssue(repo, command.getTitle(),
+                        command.getDescription());
+                return dustyBotStoragePort.closeIssue(repo, issue.getNumber());
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
                                                   "project");

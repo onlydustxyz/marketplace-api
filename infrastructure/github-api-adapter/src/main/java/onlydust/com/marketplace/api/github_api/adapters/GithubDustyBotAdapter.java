@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.port.output.DustyBotStoragePort;
 import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
@@ -15,30 +16,28 @@ public class GithubDustyBotAdapter implements DustyBotStoragePort {
     private final GithubHttpClient dustyBotClient;
 
     @Override
-    public RewardableItemView createIssue(final String repoOwner,
-                                          final String repoName,
+    public RewardableItemView createIssue(final GithubRepo repo,
                                           final String title,
                                           final String description) {
         final IssueResponseDTO createdIssueDTO = dustyBotClient.post(
-                String.format("/repos/%s/%s/issues", repoOwner, repoName),
+                String.format("/repos/%s/%s/issues", repo.getOwner(), repo.getName()),
                 CreateIssueRequestDTO.builder()
                         .body(description)
                         .title(title)
                         .build(),
                 IssueResponseDTO.class
         ).orElseThrow(() -> OnlyDustException.internalServerError("Failed to create issue"));
-        return createdIssueDTO.toView(repoName);
+        return createdIssueDTO.toView(repo.getName(), repo.getId());
     }
 
     @Override
-    public RewardableItemView closeIssue(final String repoOwner,
-                                         final String repoName,
+    public RewardableItemView closeIssue(final GithubRepo repo,
                                          final Long issueNumber) {
         final IssueResponseDTO closedIssueDTO = dustyBotClient.post(
-                String.format("/repos/%s/%s/issues/%d", repoOwner, repoName, issueNumber),
+                String.format("/repos/%s/%s/issues/%d", repo.getOwner(), repo.getName(), issueNumber),
                 CloseIssueRequestDTO.builder().build(),
                 IssueResponseDTO.class
         ).orElseThrow(() -> OnlyDustException.internalServerError("Failed to close issue"));
-        return closedIssueDTO.toView(repoName);
+        return closedIssueDTO.toView(repo.getName(), repo.getId());
     }
 }

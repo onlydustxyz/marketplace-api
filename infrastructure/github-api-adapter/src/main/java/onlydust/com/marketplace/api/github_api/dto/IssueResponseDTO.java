@@ -31,17 +31,18 @@ public class IssueResponseDTO {
     @JsonProperty("html_url")
     String htmlUrl;
 
-    public RewardableItemView toView(final String repoName) {
+    public RewardableItemView toView(final String repoName, final Long repoId) {
         assert this.id != null;
         return RewardableItemView.builder()
                 .id(this.id.toString())
                 .type(ContributionType.ISSUE)
                 .status(this.toStatus())
                 .createdAt(this.createdAt)
-                .lastUpdateAt(this.updatedAt)
+                .completedAt(State.closed.equals(this.state) ? this.closedAt : this.updatedAt)
                 .commentsCount(this.comments)
                 .number(this.number)
                 .repoName(repoName)
+                .repoId(repoId)
                 .githubUrl(this.htmlUrl)
                 .title(this.title)
                 .ignored(false)
