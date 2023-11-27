@@ -818,7 +818,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false
+                  "isMissingGithubAppInstallation": true
                 },
                 {
                   "id": "b0f54343-3732-4118-8054-dba40f1ffb85",

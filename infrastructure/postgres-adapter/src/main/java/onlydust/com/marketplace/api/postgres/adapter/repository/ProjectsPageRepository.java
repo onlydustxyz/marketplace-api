@@ -111,8 +111,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
                    (select count(pgr.github_repo_id) > count(agr.repo_id)
                            from project_github_repos pgr
-                                    join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
-                                    join indexer_exp.github_repos gr2 on gr2.id = agr.repo_id
+                                    join indexer_exp.github_repos gr2 on gr2.id = pgr.github_repo_id
+                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                            where pgr.project_id = p.project_id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
             from project_details p
                      left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
