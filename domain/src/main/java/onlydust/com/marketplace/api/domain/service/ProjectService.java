@@ -74,7 +74,8 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
-        indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+        indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()),
+                Set.of());
 
         final UUID projectId = uuidGeneratorPort.generate();
         final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
@@ -236,9 +237,11 @@ public class ProjectService implements ProjectFacadePort {
             if (permissionService.isRepoLinkedToProject(command.getProjectId(), command.getGithubRepoId())) {
                 final var repo = githubStoragePort.findRepoById(command.getGithubRepoId()).orElseThrow(() ->
                         OnlyDustException.notFound("Repo not found"));
-                final RewardableItemView issue = dustyBotStoragePort.createIssue(repo, command.getTitle(),
+                final var openedIssue = dustyBotStoragePort.createIssue(repo, command.getTitle(),
                         command.getDescription());
-                return dustyBotStoragePort.closeIssue(repo, issue.getNumber());
+                final RewardableItemView closedIssue = dustyBotStoragePort.closeIssue(repo, openedIssue.getNumber());
+                indexerPort.indexIssue(repo.getOwner(), repo.getName(), closedIssue.getNumber());
+                return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
                                                   "project");
