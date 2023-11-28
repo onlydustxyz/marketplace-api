@@ -258,8 +258,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 16,
-                          "totalItemNumber": 157,
+                          "totalPageNumber": 14,
+                          "totalItemNumber": 131,
                           "nextPageIndex": 1
                         }
                                                 
@@ -280,295 +280,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewardableItems": [
                             {
-                              "number": 1159,
-                              "id": "3eb2f30036713457510488c091bc982539caeda203f12456dc621ad3938be5d2",
-                              "contributionId": "32c4bee9d2a4f4ae233b7dac8720d3dec154fb3077f50a99c64e9ba8dc0df1c0",
-                              "title": "[E-616] Enhance panel stacking",
-                              "createdAt": "2023-08-07T09:50:28Z",
-                              "completedAt": "2023-08-07T10:09:54Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1159"
-                            },
-                            {
-                              "number": 1158,
-                              "id": "6b3ddd609f472f970e6994ef53f4b15faf8e859f925a98f9ead99fcbfa7dd41a",
-                              "contributionId": "b938c7a6954bf4e00496cf4052bc0e63478fd6aa190cddc9c8c862e1c1334e51",
-                              "title": "[E-660] Responsive on large screen",
-                              "createdAt": "2023-08-07T09:48:36Z",
-                              "completedAt": "2023-08-07T09:57:22Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1158"
-                            },
-                            {
-                              "number": 1160,
-                              "id": "a01b1db7c72cbf64ea460730bf45428b0e7047813ee0ef7ef30db33187016d3b",
-                              "contributionId": "01dfb88a627380d946ac1826d02ad84bf76ca192655e1579024c1982f2cfccae",
-                              "title": "encode jwt in test to have dynamic expiry date",
-                              "createdAt": "2023-08-07T09:21:46Z",
-                              "completedAt": "2023-08-07T09:22:38Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1160"
-                            },
-                            {
-                              "number": 1157,
-                              "id": "1462592330",
-                              "contributionId": "8ee7c70189d929860f9e059bdc8ca1ad8541a8a2b1fc3fa1afce29af6295e0c0",
-                              "title": "Add close issue on create issue action",
-                              "createdAt": "2023-08-04T09:07:22Z",
-                              "completedAt": "2023-08-09T08:04:19Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "PULL_REQUEST",
-                              "commitsCount": 14,
-                              "userCommitsCount": 14,
-                              "commentsCount": 20,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1157"
-                            },
-                            {
-                              "number": 1157,
-                              "id": "a6f0ef781a5c1eda4d191884aaf05260f06b8857d2172c78d44b080674f20da3",
-                              "contributionId": "9b5d5c722322b821e1cfb14eb77b6c107c0a339b92aedd2bbbf505a489816ae1",
-                              "title": "Add close issue on create issue action",
-                              "createdAt": "2023-08-04T09:07:22Z",
-                              "completedAt": "2023-08-09T08:04:19Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 20,
-                              "status": "CANCELLED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1157"
-                            },
-                            {
-                              "number": 1156,
-                              "id": "2fb3f0cbd6af7f17b71555bf3f83598435faed6bbaaa52e6b436e15a9ae3f1d8",
-                              "contributionId": "43d0fc77c7896c9073d33c2f2b1c47a3881c2737136b997aa2de291ee266e95e",
-                              "title": "[E-661] Show NotFound page if project doesn't exist",
-                              "createdAt": "2023-08-03T16:38:49Z",
-                              "completedAt": "2023-08-09T09:11:07Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1156"
-                            },
-                            {
-                              "number": 1155,
-                              "id": "4d9e6152887128542dbe97c85d23af4ae69b0108cb658bf9a13ee2a0f1cbc873",
-                              "contributionId": "f852c9511d21d4132c42b93f51def3273b6810307705bd8f746fa69d38856e2b",
-                              "title": "(E-651) Fix inconsistent page title",
-                              "createdAt": "2023-08-03T11:11:04Z",
-                              "completedAt": "2023-08-04T09:57:20Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1155"
-                            },
-                            {
-                              "number": 1154,
-                              "id": "5f12f156f6576626832110790529eaec4ae659cfd6433e1d21950b3eb80950fb",
-                              "contributionId": "f767584cdbea25c03578589ff6735620dbd338abf7675f893445d29e33190c85",
-                              "title": "Responsive app improvements",
-                              "createdAt": "2023-08-02T17:43:53Z",
-                              "completedAt": "2023-08-03T09:04:26Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1154"
-                            },
-                            {
-                              "number": 1153,
-                              "id": "e1376e0f7e5ebd666772199dc030a9db779f330d309760a7a773a2ee61f1403a",
-                              "contributionId": "978eb90a010e91661d4c8df1cffbb6498c4aeadbd6f4f6c841ee3f4903bbd6ed",
-                              "title": "Prevent auto-zoom when focus input on mobile",
-                              "createdAt": "2023-08-01T19:27:28Z",
-                              "completedAt": "2023-08-02T09:47:22Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1153"
-                            },
-                            {
-                              "number": 1152,
-                              "id": "c716bf6091234a7a3a377bed4adca0041df290dd18e6904af9166e7ac03401b9",
-                              "contributionId": "1106e2603a0cf7db2030358e3475b87ed8527db2ac2b6415fb3f69b44ee2857c",
-                              "title": "[E-642] Index extra fields in github pull requests",
-                              "createdAt": "2023-08-01T14:26:33Z",
-                              "completedAt": "2023-08-07T07:47:51Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 3,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1152"
-                            }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 16,
-                          "totalItemNumber": 157,
-                          "nextPageIndex": 14
-                        }
-                                                
-                        """);
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
-                        pierre.user().getGithubUserId().toString(),
-                        "pageIndex", "15", "pageSize", "10")))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isEqualTo(206)
-                .expectBody()
-                .json("""
-                        {
-                          "rewardableItems": [
-                            {
-                              "number": 1138,
-                              "id": "1449825806",
-                              "contributionId": "b7ce941d8509b13d6cbf525dbf34c7062207a8c94607a4b06277faa5196159b2",
-                              "title": "Adding gitguardian pre-commit",
-                              "createdAt": "2023-07-26T09:04:28Z",
-                              "completedAt": "2023-07-26T11:38:35Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "PULL_REQUEST",
-                              "commitsCount": 1,
-                              "userCommitsCount": 1,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1138"
-                            },
-                            {
-                              "number": 1137,
-                              "id": "a63fac01ffc310b448a084c8d1c4085f3a5dc7f38f6b0e58ab3a296f0069ad38",
-                              "contributionId": "a866d0b8349fd8626464b7e54f73ffa2bc3d7cd133fb8bd2c641b7e7cddf8f41",
-                              "title": "[E-582] Have sexy URLs for projects, profiles and others pages",
-                              "createdAt": "2023-07-26T08:38:53Z",
-                              "completedAt": "2023-07-26T12:28:13Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1137"
-                            },
-                            {
-                              "number": 1135,
-                              "id": "443bd5d30b4683967133b283b2f5bcc205e618d8a16366d69b3ac54fc1eff4e8",
-                              "contributionId": "ed389486455bfb37e70963dbc2c3f6370d220a669bb9eb62adcfedf9baf7af96",
-                              "title": "Fix impersonation",
-                              "createdAt": "2023-07-24T15:26:03Z",
-                              "completedAt": "2023-07-24T15:40:33Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1135"
-                            },
-                            {
-                              "number": 1133,
-                              "id": "5a82f37e298feb5f0b869dac45cd22aba5c7f71c9922ef5a3119307c63753773",
-                              "contributionId": "f434009b52172d9812155a7c73d9d3a1fc2873858ef4e3cda003e9a086f8cb00",
-                              "title": "e 609 restore credentials check at s3 connect time",
-                              "createdAt": "2023-07-21T15:39:00Z",
-                              "completedAt": "2023-07-26T04:46:50Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1133"
-                            },
-                            {
-                              "number": 1129,
-                              "id": "1442413635",
-                              "contributionId": "6d709dd5f85a8b8eaff9cc8837ab837ef9a1a1109ead76580490c0a730a87d9d",
-                              "title": "First API integration test",
-                              "createdAt": "2023-07-20T08:45:18Z",
-                              "completedAt": "2023-07-21T13:00:05Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "PULL_REQUEST",
-                              "commitsCount": 30,
-                              "userCommitsCount": 16,
-                              "commentsCount": 8,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129"
-                            },
-                            {
-                              "number": 1129,
-                              "id": "04f41f00e4e36373d3e3f1b70ae3a88f4178338655200fa93a60897577fb10f8",
-                              "contributionId": "72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f",
-                              "title": "First API integration test",
-                              "createdAt": "2023-07-20T08:45:18Z",
-                              "completedAt": "2023-07-21T12:59:15Z",
-                              "repoName": "marketplace-frontend",
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 8,
-                              "status": "COMPLETED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129"
-                            },
-                            {
                               "number": 1105,
                               "id": "b3bd439120c942adf4ad78fa805ca9f9445475ef686ed860d25d29f314a06f83",
                               "contributionId": "ea209c984e15e5abadb98867658595c359578f391d272f1246bd744b1bb2de6f",
@@ -576,6 +287,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-07-12T11:54:35Z",
                               "completedAt": "2023-07-12T16:17:16Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -586,9 +298,49 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": false,
-                          "totalPageNumber": 16,
-                          "totalItemNumber": 157,
-                          "nextPageIndex": 15
+                          "totalPageNumber": 14,
+                          "totalItemNumber": 131,
+                          "nextPageIndex": 13
+                        }
+                                                
+                        """);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
+                        pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "13", "pageSize", "10")))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(206)
+                .expectBody()
+                .json("""
+                        {
+                          "rewardableItems": [
+                            {
+                              "number": 1105,
+                              "id": "b3bd439120c942adf4ad78fa805ca9f9445475ef686ed860d25d29f314a06f83",
+                              "contributionId": "ea209c984e15e5abadb98867658595c359578f391d272f1246bd744b1bb2de6f",
+                              "title": "allow running our stack in a container",
+                              "createdAt": "2023-07-12T11:54:35Z",
+                              "completedAt": "2023-07-12T16:17:16Z",
+                              "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": null,
+                              "commentsCount": 6,
+                              "status": "COMPLETED",
+                              "ignored": false,
+                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1105"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 14,
+                          "totalItemNumber": 131,
+                          "nextPageIndex": 13
                         }
                                                 
                         """);
@@ -615,6 +367,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-16T14:47:21Z",
                               "completedAt": "2023-11-16T14:49:35Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 4,
                               "userCommitsCount": 3,
@@ -631,6 +384,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-06T15:15:28Z",
                               "completedAt": "2023-11-07T07:53:38Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 3,
                               "userCommitsCount": 1,
@@ -647,6 +401,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-06T14:56:30Z",
                               "completedAt": "2023-11-06T14:57:34Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 1,
                               "userCommitsCount": 1,
@@ -663,6 +418,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-10-25T09:39:26Z",
                               "completedAt": "2023-10-30T09:56:58Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 3,
                               "userCommitsCount": 1,
@@ -679,6 +435,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-10-24T19:32:31Z",
                               "completedAt": "2023-10-24T19:36:49Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 27,
                               "userCommitsCount": 12,
@@ -695,6 +452,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-10-16T11:51:28Z",
                               "completedAt": "2023-10-16T11:51:55Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 27,
                               "userCommitsCount": 12,
@@ -711,6 +469,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-10-16T07:07:41Z",
                               "completedAt": "2023-10-19T07:03:27Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 1,
                               "userCommitsCount": 1,
@@ -727,6 +486,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-09-22T14:04:48Z",
                               "completedAt": "2023-09-22T15:25:55Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 27,
                               "userCommitsCount": 12,
@@ -743,6 +503,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-09-18T08:24:21Z",
                               "completedAt": "2023-09-18T09:53:37Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 23,
                               "userCommitsCount": 13,
@@ -752,25 +513,26 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1238"
                             },
                             {
-                              "number": 1232,
-                              "id": "1511546916",
-                              "contributionId": "a290ea203b1264105bf581aebbdf3e79edfdd89811da50dc6bd076272d810b2e",
-                              "title": "Addin sitemap.xml in robots.txt",
-                              "createdAt": "2023-09-12T07:38:04Z",
-                              "completedAt": "2023-09-12T07:45:12Z",
+                              "number": 1226,
+                              "id": "1507701129",
+                              "contributionId": "3ecff6bfaa190bdbb8b42f0a842fda14bf34f93ee245e4b0ea0069af5cf74d1f",
+                              "title": "Add noir language",
+                              "createdAt": "2023-09-08T11:09:48Z",
+                              "completedAt": "2023-09-08T11:20:32Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 1,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "CANCELLED",
                               "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1232"
+                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1226"
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 5,
-                          "totalItemNumber": 41,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 15,
                           "nextPageIndex": 1
                         }
                                                 
@@ -1279,8 +1041,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 31,
-                          "totalItemNumber": 151,
+                          "totalPageNumber": 25,
+                          "totalItemNumber": 125,
                           "nextPageIndex": 1
                         }
                                                 
@@ -1308,6 +1070,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-22T17:23:45Z",
                               "completedAt": "2023-11-23T08:18:18Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1324,6 +1087,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-22T14:04:05Z",
                               "completedAt": "2023-11-22T14:04:28Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1340,6 +1104,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-21T12:47:23Z",
                               "completedAt": "2023-11-21T13:31:44Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1356,6 +1121,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-21T09:47:22Z",
                               "completedAt": "2023-11-21T09:47:42Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1372,6 +1138,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-21T09:23:56Z",
                               "completedAt": "2023-11-21T09:25:28Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1388,6 +1155,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-21T09:11:49Z",
                               "completedAt": "2023-11-21T09:12:10Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1404,6 +1172,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-16T16:43:47Z",
                               "completedAt": "2023-11-16T16:44:18Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1420,6 +1189,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-16T14:47:21Z",
                               "completedAt": "2023-11-16T14:49:35Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "PULL_REQUEST",
                               "commitsCount": 4,
                               "userCommitsCount": 3,
@@ -1436,6 +1206,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-13T18:00:02Z",
                               "completedAt": "2023-11-13T18:02:06Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1452,6 +1223,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "createdAt": "2023-11-13T16:57:21Z",
                               "completedAt": "2023-11-13T17:06:54Z",
                               "repoName": "marketplace-frontend",
+                              "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
@@ -1462,8 +1234,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 16,
-                          "totalItemNumber": 157,
+                          "totalPageNumber": 14,
+                          "totalItemNumber": 131,
                           "nextPageIndex": 1
                         }
                                                 
@@ -1518,7 +1290,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewardableIssues.length()").isEqualTo(0)
-                .jsonPath("$.rewardablePullRequests.length()").isEqualTo(29)
+                .jsonPath("$.rewardablePullRequests.length()").isEqualTo(4)
                 .jsonPath("$.rewardablePullRequests[?(@.status!='COMPLETED')]").doesNotExist()
                 .jsonPath("$.rewardableCodeReviews.length()").isEqualTo(99)
                 .jsonPath("$.rewardableCodeReviews[?(@.status!='COMPLETED')]").doesNotExist()
