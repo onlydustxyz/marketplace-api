@@ -95,9 +95,9 @@ public class CustomContributorRepository {
                                        c.contributor_id
                                 from project_github_repos pgr
                                          join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                         left join indexer_exp.contributions c on c.repo_id = gr.id
+                                         join indexer_exp.contributions c on c.repo_id = gr.id
                                          left join work_items wi on wi.id = coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) and wi.recipient_id = c.contributor_id
-                                         left join ignored_contributions ic on ic.contribution_id = c.id
+                                         left join ignored_contributions ic on ic.contribution_id = c.id and ic.project_id = :projectId
                                 where pgr.project_id = :projectId
                                   and gr.visibility = 'PUBLIC'
                                   and c.status = 'COMPLETED'
