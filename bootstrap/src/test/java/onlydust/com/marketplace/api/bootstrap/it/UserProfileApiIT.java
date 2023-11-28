@@ -215,7 +215,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     }
                   ]
                 },
-                "contributionCount": 1339,
+                "contributionCount": 1310,
                 "contributionCountPerWeeks": [
                   {
                     "year": 2022,
@@ -1028,7 +1028,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     }
                   ]
                 },
-                "contributionCount": 1339,
+                "contributionCount": 1310,
                 "contributionCountPerWeeks": [
                   {
                     "year": 2022,
