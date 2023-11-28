@@ -15,10 +15,8 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -102,6 +100,7 @@ public class ProjectServiceTest {
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
         verify(eventStoragePort).saveEvent(new ProjectCreatedEvent(projectIdentity.getLeft()));
+        verify(indexerPort).onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
 
 
@@ -130,7 +129,7 @@ public class ProjectServiceTest {
                 .moreInfos(List.of(MoreInfoLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
                 .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
                 .projectLeadersToKeep(List.of(UUID.randomUUID()))
-                .githubRepoIds(List.of(faker.number().randomNumber()))
+                .githubRepoIds(List.of(faker.number().numberBetween(10L, 20L)))
                 .imageUrl(imageUrl)
                 .rewardSettings(
                         new ProjectRewardSettings(
@@ -143,6 +142,8 @@ public class ProjectServiceTest {
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(new HashSet<>(Arrays.asList(1L, 2L, 3L)));
+        when(projectStoragePort.removeUsedRepos(Set.of(1L, 2L, 3L))).thenReturn(Set.of(1L, 2L));
         projectService.updateProject(projectLeadId, command);
 
         // Then
@@ -157,6 +158,7 @@ public class ProjectServiceTest {
                 command.getRewardSettings()
         );
         verify(contributionStoragePort, times(1)).refreshIgnoredContributions(projectId);
+        verify(indexerPort).onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L));
     }
 
     @Test
