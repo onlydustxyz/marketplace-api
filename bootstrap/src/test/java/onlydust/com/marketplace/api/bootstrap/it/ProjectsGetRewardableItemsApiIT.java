@@ -1098,6 +1098,50 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                         }
                                                 
                         """);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
+                        pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "0", "pageSize", "10", "search", "qa", "type", "PULL_REQUEST")))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(200)
+                .expectBody()
+                .json("""
+                        {
+                          "rewardableItems": [],
+                          "hasMore": false,
+                          "totalPageNumber": 0,
+                          "totalItemNumber": 0,
+                          "nextPageIndex": 0
+                        }
+                                                
+                        """);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
+                        pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "0", "pageSize", "10", "search", "1133", "type", "PULL_REQUEST")))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "rewardableItems": [],
+                          "hasMore": false,
+                          "totalPageNumber": 0,
+                          "totalItemNumber": 0,
+                          "nextPageIndex": 0
+                        }
+                                                
+                        """);
     }
 
     @Test
