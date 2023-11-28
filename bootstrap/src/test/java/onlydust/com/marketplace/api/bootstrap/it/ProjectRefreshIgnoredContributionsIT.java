@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
@@ -8,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgno
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -64,6 +66,11 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Autowired
     PostgresProjectAdapter postgresProjectAdapter;
 
+    @BeforeEach
+    void beforeEach() {
+        indexerApiWireMockServer.stubFor(WireMock.post("/api/v1/events/on-repo-link-changed")
+                .willReturn(WireMock.noContent()));
+    }
 
     @Test
     void refreshIgnoredContributions_should_ignore_nothing() {

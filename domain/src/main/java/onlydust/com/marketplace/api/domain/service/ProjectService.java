@@ -14,8 +14,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -72,6 +74,8 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
+        indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+
         final UUID projectId = uuidGeneratorPort.generate();
         final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
@@ -82,6 +86,7 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
+
 
         eventStoragePort.saveEvent(new ProjectCreatedEvent(projectId));
         return Pair.of(projectId, projectSlug);
@@ -97,6 +102,19 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
+        if (command.getGithubRepoIds() != null) {
+            final var previousRepos = projectStoragePort.getProjectRepoIds(command.getId());
+            final var removedRepos = previousRepos.stream()
+                    .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
+                    .collect(Collectors.toSet());
+
+            final var newRepos = command.getGithubRepoIds().stream()
+                    .filter(repoId -> !previousRepos.contains(repoId))
+                    .collect(Collectors.toSet());
+
+            indexerPort.onRepoLinkChanged(newRepos, this.projectStoragePort.removeUsedRepos(removedRepos));
+        }
+
         this.projectStoragePort.updateProject(command.getId(),
                 command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
@@ -105,7 +123,6 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
-
 
         if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
             contributionStoragePort.refreshIgnoredContributions(command.getId());

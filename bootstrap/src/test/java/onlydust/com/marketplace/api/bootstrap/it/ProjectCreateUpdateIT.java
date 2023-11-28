@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,6 +62,16 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(1)
     public void should_create_a_new_project() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                        .withRequestBody(WireMock.equalToJson("""
+                                {
+                                  "linkedRepoIds": [498695724, 602953043],
+                                  "unlinkedRepoIds": []
+                                }
+                                """, true, false))
+                .willReturn(WireMock.noContent()));
+
         // When
 
         final var response = client.post()
@@ -206,6 +217,15 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(10)
     public void should_update_the_project() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                                {
+                                  "linkedRepoIds": [452047076],
+                                  "unlinkedRepoIds": []
+                                }
+                                """, true, false))
+                .willReturn(WireMock.noContent()));
 
         // And When
         client.put()

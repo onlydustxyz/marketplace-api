@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -70,4 +71,6 @@ public interface ProjectStoragePort {
     RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
 
     RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
+
+    Set<Long> removeUsedRepos(Collection<Long> repoIds);
 }
