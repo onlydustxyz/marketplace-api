@@ -41,8 +41,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
               and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))
               and (coalesce(:contributionType) is null or c.type = cast(cast(:contributionType as text) as indexer_exp.contribution_type))
                and (coalesce(:search) is null
-                    or c.github_title ilike '%' || cast(:search as text) || '%')
-                    or cast(c.github_number as text) ilike '%' || cast(:search as text) || '%'
+                    or c.github_title ilike '%' || cast(:search as text) || '%'
+                    or cast(c.github_number as text) ilike '%' || cast(:search as text) || '%')
              order by c.created_at desc
               offset :offset limit :limit
               """, nativeQuery = true)
@@ -87,8 +87,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
               and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))
               and (coalesce(:contributionType) is null or c.type = cast(cast(:contributionType as text) as indexer_exp.contribution_type))
                and (coalesce(:search) is null
-                    or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
-                    or cast(coalesce(pull_request.number, issue.number, code_review.number) as text) ilike '%' || cast(:search as text) || '%'
+                    or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%'
+                    or cast(coalesce(pull_request.number, issue.number, code_review.number) as text) ilike '%' || cast(:search as text) || '%')
               """, nativeQuery = true)
     Long countByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
                                          final @Param("githubUserId") Long githubUserId,
