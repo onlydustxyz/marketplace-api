@@ -112,15 +112,17 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
 
-        final var removedRepos = previousRepos.stream()
-                .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
-                .collect(Collectors.toSet());
+        if (command.getGithubRepoIds() != null) {
+            final var removedRepos = previousRepos.stream()
+                    .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
+                    .collect(Collectors.toSet());
 
-        final var newRepos = command.getGithubRepoIds().stream()
-                .filter(repoId -> !previousRepos.contains(repoId))
-                .collect(Collectors.toSet());
+            final var newRepos = command.getGithubRepoIds().stream()
+                    .filter(repoId -> !previousRepos.contains(repoId))
+                    .collect(Collectors.toSet());
 
-        indexerPort.onRepoLinkChanged(newRepos, this.projectStoragePort.removeUsedRepos(removedRepos));
+            indexerPort.onRepoLinkChanged(newRepos, this.projectStoragePort.removeUsedRepos(removedRepos));
+        }
 
         if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
             contributionStoragePort.refreshIgnoredContributions(command.getId());
