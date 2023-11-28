@@ -32,7 +32,7 @@ public class RestApiConfiguration {
 
     @Bean
     public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort
-            , final ContributorFacadePort contributorFacadePort,final GithubAccountService githubAccountService) {
+            , final ContributorFacadePort contributorFacadePort, final GithubAccountService githubAccountService) {
         return new MeRestApi(authenticationService, userFacadePort, contributorFacadePort, githubAccountService);
     }
 
@@ -64,6 +64,11 @@ public class RestApiConfiguration {
     @Bean
     public EventsRestApi eventsRestApi(final ContributionFacadePort contributionFacadePort) {
         return new EventsRestApi(contributionFacadePort);
+    }
+
+    @Bean
+    public BackofficeRestApi backofficeRestApi() {
+        return new BackofficeRestApi();
     }
 
 }
