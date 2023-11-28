@@ -228,6 +228,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                                          Integer pageSize,
                                                                                          String search,
                                                                                          RewardType type,
+                                                                                         ContributionStatus status,
                                                                                          Boolean includeIgnoredItems) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
@@ -237,9 +238,15 @@ public class ProjectsRestApi implements ProjectsApi {
             case PULL_REQUEST -> ContributionType.PULL_REQUEST;
             case CODE_REVIEW -> ContributionType.CODE_REVIEW;
         };
+        final onlydust.com.marketplace.api.domain.model.ContributionStatus contributionStatus = isNull(status) ?
+                null : switch (status) {
+            case IN_PROGRESS -> onlydust.com.marketplace.api.domain.model.ContributionStatus.IN_PROGRESS;
+            case COMPLETED -> onlydust.com.marketplace.api.domain.model.ContributionStatus.COMPLETED;
+            case CANCELLED -> onlydust.com.marketplace.api.domain.model.ContributionStatus.CANCELLED;
+        };
         final Page<RewardableItemView> rewardableItemsPage =
                 projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
-                        contributionType,
+                        contributionType, contributionStatus,
                         authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
                         isNull(includeIgnoredItems) ? false : includeIgnoredItems);
         final RewardableItemsPageResponse rewardableItemsPageResponse =
@@ -248,6 +255,18 @@ public class ProjectsRestApi implements ProjectsApi {
         return rewardableItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardableItemsPageResponse) :
                 ResponseEntity.ok(rewardableItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<AllRewardableItemsResponse> getAllCompletedProjectRewardableContributions(UUID projectId,
+                                                                                                    Long githubUserId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final List<RewardableItemView> rewardableItems =
+                projectFacadePort.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId,
+                        authenticatedUser.getId(), githubUserId);
+        final AllRewardableItemsResponse response =
+                RewardableItemMapper.listToResponse(rewardableItems);
+        return ResponseEntity.ok(response);
     }
 
     @Override
@@ -312,4 +331,5 @@ public class ProjectsRestApi implements ProjectsApi {
         );
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
+
 }

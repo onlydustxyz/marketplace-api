@@ -512,12 +512,12 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, projectLeadId,
+        projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, null, projectLeadId,
                 12345L, 0, 50, null, null);
 
         // Then
         verify(projectStoragePort, times(1)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
-                null, 12345L, 0, 50, null, null);
+                null, null, 12345L, 0, 50, null, null);
     }
 
     @Test
@@ -536,14 +536,68 @@ public class ProjectServiceTest {
                 .thenReturn(List.of(UUID.randomUUID()));
         OnlyDustException onlyDustException = null;
         try {
-            projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null,
+            projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, null,
                     UUID.randomUUID(), 1234L, 0, 50, null, null);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        verify(projectStoragePort, times(0)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(any(),
+                any(), any(), any(), anyInt(), anyInt(), any(), anyBoolean());
+        assertNotNull(onlyDustException);
+        assertEquals(403, onlyDustException.getStatus());
+        assertEquals("Only project leads can read rewardable items on their projects", onlyDustException.getMessage());
+    }
+
+
+    @Test
+    void should_check_project_lead_permissions_when_getting_completed_rewardable_items_given_a_valid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+        projectService.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId, projectLeadId, 12345L);
+
+        // Then
+        verify(projectStoragePort, times(1)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
+                null, ContributionStatus.COMPLETED, 12345L, 0, 1_000_000, null, false);
+    }
+
+    @Test
+    void should_throw_forbidden_exception_when_getting_completed_rewardable_items_given_an_invalid_project_lead() {
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+        final PermissionService permissionService = new PermissionService(projectStoragePort, contributionStoragePort);
+        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+                mock(UUIDGeneratorPort.class), permissionService, mock(IndexerPort.class), dateProvider,
+                mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
+                mock(GithubStoragePort.class));
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        OnlyDustException onlyDustException = null;
+        try {
+            projectService.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId, UUID.randomUUID(),
+                    1234L);
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+
+        // Then
+        verify(projectStoragePort, times(0)).getProjectRewardableItemsByTypeForProjectLeadAndContributorId(any(),
+                any(), any(), any(), anyInt(), anyInt(), any(), anyBoolean());
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewardable items on their projects", onlyDustException.getMessage());

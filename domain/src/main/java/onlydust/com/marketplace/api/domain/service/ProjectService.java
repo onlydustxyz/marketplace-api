@@ -183,6 +183,7 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                                ContributionType contributionType,
+                                                                                               ContributionStatus contributionStatus,
                                                                                                UUID projectLeadId,
                                                                                                Long githubUserid,
                                                                                                int pageIndex,
@@ -191,7 +192,22 @@ public class ProjectService implements ProjectFacadePort {
                                                                                                Boolean includeIgnoredItems) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
-                    contributionType, githubUserid, pageIndex, pageSize, search, includeIgnoredItems);
+                    contributionType, contributionStatus, githubUserid, pageIndex, pageSize, search,
+                    includeIgnoredItems);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
+        }
+    }
+
+    @Override
+    public List<RewardableItemView> getAllCompletedRewardableItemsForProjectLeadAndContributorId(UUID projectId,
+                                                                                                 UUID projectLeadId,
+                                                                                                 Long githubUserId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            final var allCompletedRewardableItems =
+                    projectStoragePort.getProjectRewardableItemsByTypeForProjectLeadAndContributorId(projectId,
+                            null, ContributionStatus.COMPLETED, githubUserId, 0, 1_000_000, null, false);
+            return allCompletedRewardableItems != null ? allCompletedRewardableItems.getContent() : List.of();
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewardable items on their projects");
         }

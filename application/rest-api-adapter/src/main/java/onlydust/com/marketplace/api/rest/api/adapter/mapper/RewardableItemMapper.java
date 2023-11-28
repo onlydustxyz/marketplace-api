@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributionType;
-import onlydust.com.marketplace.api.contract.model.GithubStatus;
-import onlydust.com.marketplace.api.contract.model.RewardableItemResponse;
-import onlydust.com.marketplace.api.contract.model.RewardableItemsPageResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.List;
+
+import static onlydust.com.marketplace.api.domain.model.ContributionType.*;
 
 public interface RewardableItemMapper {
 
@@ -62,5 +61,16 @@ public interface RewardableItemMapper {
                 .htmlUrl(view.getGithubUrl())
                 .title(view.getTitle())
                 .ignored(Boolean.TRUE.equals(view.getIgnored()));
+    }
+
+    static AllRewardableItemsResponse listToResponse(List<RewardableItemView> rewardableItems) {
+        final AllRewardableItemsResponse allRewardableItemsResponse = new AllRewardableItemsResponse();
+        allRewardableItemsResponse.setRewardableIssues(rewardableItems.stream().filter(item -> ISSUE.equals(item.getType()))
+                .map(RewardableItemMapper::itemToResponse).toList());
+        allRewardableItemsResponse.setRewardablePullRequests(rewardableItems.stream().filter(item -> PULL_REQUEST.equals(item.getType()))
+                .map(RewardableItemMapper::itemToResponse).toList());
+        allRewardableItemsResponse.setRewardableCodeReviews(rewardableItems.stream().filter(item -> CODE_REVIEW.equals(item.getType()))
+                .map(RewardableItemMapper::itemToResponse).toList());
+        return allRewardableItemsResponse;
     }
 }

@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -59,16 +56,22 @@ public interface ProjectFacadePort {
                                                               int pageIndex, int pageSize);
 
     Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
-                                                                                    ContributionType contributionType,
-                                                                                    UUID projectLeadId,
-                                                                                    Long githubUserid,
-                                                                                    int pageIndex, int pageSize,
-                                                                                    String search,
-                                                                                    Boolean includeIgnoredItems);
+                                                                                        ContributionType contributionType,
+                                                                                        ContributionStatus contributionStatus,
+                                                                                        UUID projectLeadId,
+                                                                                        Long githubUserid,
+                                                                                        int pageIndex, int pageSize,
+                                                                                        String search,
+                                                                                        Boolean includeIgnoredItems);
+
+    List<RewardableItemView> getAllCompletedRewardableItemsForProjectLeadAndContributorId(UUID projectId,
+                                                                                          UUID projectLeadId,
+                                                                                          Long githubUserId);
 
     RewardableItemView createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand createAndCloseIssueCommand);
 
     RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl);
 
     RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl);
+
 }

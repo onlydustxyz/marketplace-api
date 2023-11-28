@@ -15,7 +15,10 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @IdClass(ContributionViewEntity.PrimaryKey.class)
@@ -116,14 +119,20 @@ public class ContributionViewEntity {
                 .build();
     }
 
-    @EqualsAndHashCode
-    public static class PrimaryKey implements Serializable {
-        String id;
-        UUID projectId;
-    }
-
     public enum Type {
         PULL_REQUEST, ISSUE, CODE_REVIEW;
+
+        public static Type fromView(ContributionType contributionType) {
+            return contributionType == null ? null : switch (contributionType) {
+                case PULL_REQUEST -> Type.PULL_REQUEST;
+                case ISSUE -> Type.ISSUE;
+                case CODE_REVIEW -> Type.CODE_REVIEW;
+            };
+        }
+
+        public static String fromViewToString(ContributionType contributionType) {
+            return Type.fromView(contributionType) != null ? Type.fromView(contributionType).name() : null;
+        }
 
         public ContributionType toView() {
             return switch (this) {
@@ -137,6 +146,18 @@ public class ContributionViewEntity {
     public enum Status {
         IN_PROGRESS, COMPLETED, CANCELLED;
 
+        public static Status fromView(ContributionStatus contributionStatus) {
+            return contributionStatus == null ? null : switch (contributionStatus) {
+                case IN_PROGRESS -> Status.IN_PROGRESS;
+                case COMPLETED -> Status.COMPLETED;
+                case CANCELLED -> Status.CANCELLED;
+            };
+        }
+
+        public static String fromViewToString(ContributionStatus contributionStatus) {
+            return Status.fromView(contributionStatus) != null ? Status.fromView(contributionStatus).name() : null;
+        }
+
         public ContributionStatus toView() {
             return switch (this) {
                 case IN_PROGRESS -> ContributionStatus.IN_PROGRESS;
@@ -144,5 +165,11 @@ public class ContributionViewEntity {
                 case CANCELLED -> ContributionStatus.CANCELLED;
             };
         }
+    }
+
+    @EqualsAndHashCode
+    public static class PrimaryKey implements Serializable {
+        String id;
+        UUID projectId;
     }
 }

@@ -1359,6 +1359,10 @@ paths:
           schema:
             $ref: '#/components/schemas/RewardType'
         - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/ContributionStatus'
+        - in: query
           name: include_ignored_items
           schema:
             type: boolean
@@ -1371,6 +1375,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RewardableItemsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectId}/rewardable-items/all-completed:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get ALL completed rewardable contributions of a user within the project
+      operationId: getAllCompletedProjectRewardableContributions
+      description: |
+        Get ALL (without pagination) completed rewardable contributions of a user within the project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: githubUserId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      responses:
+        "200":
+          description: 'Rewardable contributions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllRewardableItemsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -3710,6 +3751,27 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+
+    AllRewardableItemsResponse:
+      type: object
+      required:
+        - rewardableIssues
+        - rewardablePullRequests
+        - rewardableCodeReviews
+      properties:
+        rewardableIssues:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardableItemResponse'
+        rewardablePullRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardableItemResponse'
+        rewardableCodeReviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardableItemResponse'
+
     RewardableItemResponse:
       type: object
       required:

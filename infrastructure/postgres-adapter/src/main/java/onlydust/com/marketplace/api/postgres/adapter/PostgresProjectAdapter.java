@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -389,25 +386,26 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                                   ContributionType contributionType,
+                                                                                                  ContributionStatus contributionStatus,
                                                                                                   Long githubUserid,
                                                                                                   int pageIndex,
                                                                                                   int pageSize,
                                                                                                   String search,
                                                                                                   Boolean includeIgnoredItems) {
-        final String type = isNull(contributionType) ? null :
-                switch (contributionType) {
-                    case ISSUE -> RewardableItemViewEntity.ContributionType.ISSUE.name();
-                    case PULL_REQUEST -> RewardableItemViewEntity.ContributionType.PULL_REQUEST.name();
-                    case CODE_REVIEW -> RewardableItemViewEntity.ContributionType.CODE_REVIEW.name();
-                };
+
         final List<RewardableItemView> rewardableItemViews =
-                rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid, type, search,
+                rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid,
+                                ContributionViewEntity.Type.fromViewToString(contributionType),
+                                ContributionViewEntity.Status.fromViewToString(contributionStatus),
+                                search,
                                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                                 pageSize, includeIgnoredItems)
                         .stream()
                         .map(RewardableItemMapper::itemToDomain)
                         .toList();
-        final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid, type,
+        final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid,
+                ContributionViewEntity.Type.fromViewToString(contributionType),
+                ContributionViewEntity.Status.fromViewToString(contributionStatus),
                 search, includeIgnoredItems);
         return Page.<RewardableItemView>builder()
                 .content(rewardableItemViews)
