@@ -141,7 +141,9 @@ public class CustomContributorRepository {
             FROM indexer_exp.github_accounts ga
                 LEFT JOIN users u on u.github_user_id = ga.id
             WHERE
-                EXISTS(select 1 from indexer_exp.repos_contributors rc where rc.repo_id in :reposIds and rc.contributor_id = ga.id)
+                EXISTS(select 1 from indexer_exp.repos_contributors rc 
+                join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
+                where rc.repo_id in :reposIds and rc.contributor_id = ga.id)
                 AND ga.login ilike '%' || :login ||'%'
             ORDER BY ga.login
             LIMIT :limit

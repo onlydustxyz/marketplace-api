@@ -106,6 +106,7 @@ public class CustomUserRepository {
                         
                    (select sum(rc.completed_contribution_count)
                     from indexer_exp.repos_contributors rc
+                    join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
                     where rc.contributor_id = gu.id)           contributions_count
                 
             """;
