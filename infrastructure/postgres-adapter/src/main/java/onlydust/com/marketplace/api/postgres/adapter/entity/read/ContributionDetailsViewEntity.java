@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.array.EnumArrayType;
-import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
@@ -10,12 +8,14 @@ import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
-import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Entity
 @IdClass(ContributionDetailsViewEntity.PrimaryKey.class)
@@ -46,6 +46,8 @@ public class ContributionDetailsViewEntity {
     String githubAuthorHtmlUrl;
     String githubAuthorAvatarUrl;
     Integer githubCommentsCount;
+    Integer githubCommitsCount;
+    Integer githubUserCommitsCount;
 
     @Id
     UUID projectId;
@@ -122,6 +124,8 @@ public class ContributionDetailsViewEntity {
                 .githubHtmlUrl(githubHtmlUrl)
                 .githubBody(githubBody)
                 .githubCommentsCount(githubCommentsCount)
+                .githubUserCommitsCount(githubUserCommitsCount)
+                .githubCommitsCount(githubCommitsCount)
                 .githubAuthor(author)
                 .project(project)
                 .githubRepo(repo)

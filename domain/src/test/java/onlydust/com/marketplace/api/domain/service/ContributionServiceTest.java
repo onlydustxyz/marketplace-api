@@ -34,7 +34,7 @@ class ContributionServiceTest {
 
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(true);
-        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        when(contributionStoragePort.findContributionById(projectId, contributionId, githubUserId)).thenReturn(expectedContribution);
         final var contribution = contributionService.getContribution(projectId, contributionId, githubUserId);
 
         // Then

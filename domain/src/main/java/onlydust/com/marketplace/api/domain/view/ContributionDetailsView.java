@@ -24,6 +24,8 @@ public class ContributionDetailsView {
     String githubHtmlUrl;
     String githubBody;
     Integer githubCommentsCount;
+    Integer githubCommitsCount;
+    Integer githubUserCommitsCount;
     UserLinkView githubAuthor;
     GithubRepo githubRepo;
     Project project;

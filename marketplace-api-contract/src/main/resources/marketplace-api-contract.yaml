@@ -3235,6 +3235,10 @@ components:
             commentsCount:
               type: integer
               description: Number of comments on the contribution
+            commitsCount:
+              type: integer
+            userCommitsCount:
+              type: integer
             links:
               type: array
               description: Related contributions
