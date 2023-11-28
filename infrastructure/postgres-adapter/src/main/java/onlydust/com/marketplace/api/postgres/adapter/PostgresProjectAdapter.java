@@ -22,10 +22,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoR
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -91,6 +88,18 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(format("Pull request %s/%s#%d not found", repoOwner,
                         repoName,
                         pullRequestNumber)));
+    }
+
+    @Override
+    public Set<Long> removeUsedRepos(Collection<Long> repoIds) {
+        final var usedRepos = projectRepoRepository.findAllByRepoId(repoIds).stream()
+                .map(ProjectRepoEntity::getPrimaryKey)
+                .map(ProjectRepoEntity.PrimaryKey::getRepoId)
+                .collect(Collectors.toUnmodifiableSet());
+
+        return repoIds.stream()
+                .filter(repoId -> !usedRepos.contains(repoId))
+                .collect(Collectors.toSet());
     }
 
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
