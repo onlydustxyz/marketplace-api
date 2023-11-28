@@ -140,7 +140,7 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("Amount must be superior to 0", onlyDustException.getMessage());
+        Assertions.assertEquals("Amount must be greater than 0", onlyDustException.getMessage());
         verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
     }
 
