@@ -262,6 +262,9 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         """))
                 .willReturn(okJson(String.format(CLOSE_ISSUE_RESPONSE_JSON, title))));
 
+        indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/%s/%s/issues/%s".formatted(owner, repoName, 25)))
+                .willReturn(ok()));
+
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId)))
                 .contentType(APPLICATION_JSON)
                 .bodyValue(String.format("""
