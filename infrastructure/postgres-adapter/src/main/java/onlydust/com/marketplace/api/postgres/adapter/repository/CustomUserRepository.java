@@ -34,7 +34,10 @@ public class CustomUserRepository {
     private static final String SELECT_USER_PROFILE = """
             select gu.id as                                github_user_id,
                    u.id,
-                   u.email,
+                    coalesce((select ci.contact
+                                    from public.contact_informations ci
+                                    where ci.user_id = u.id
+                                      and ci.channel = 'email'), u.email) as email,
                    u.last_seen,
                    u.created_at,
                    gu.login,
