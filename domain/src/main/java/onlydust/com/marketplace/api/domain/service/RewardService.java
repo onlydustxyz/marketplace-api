@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
 
@@ -16,6 +17,7 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
     private final RewardStoragePort<Authentication> rewardStoragePort;
     private final ProjectStoragePort projectStoragePort;
     private final PermissionService permissionService;
+    private final IndexerPort indexerPort;
 
     @Override
     public UUID requestPayment(Authentication authentication, UUID projectLeadId,
@@ -23,9 +25,8 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId)) {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }
-        final int amountComparedToZero = command.getAmount().compareTo(BigDecimal.ZERO);
-        if (amountComparedToZero != 1){
-            throw OnlyDustException.forbidden("Amount must be superior to 0");
+        if (command.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw OnlyDustException.forbidden("Amount must be greater than 0");
         }
         final var budgets = projectStoragePort.findBudgets(command.getProjectId()).getBudgets();
         if (budgets.stream().noneMatch(budget -> budget.getCurrency() == command.getCurrency() &&
@@ -35,6 +36,7 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
                     .formatted(command.getCurrency(), command.getProjectId(), command.getAmount()));
         }
 
+        indexerPort.indexUser(command.getRecipientId());
         return rewardStoragePort.requestPayment(authentication, command);
     }
 
