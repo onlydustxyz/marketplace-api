@@ -180,6 +180,12 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .build())
                 ));
 
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
 
         client.post()
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
@@ -191,6 +197,188 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(200)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(newRewardId.toString());
+    }
+
+    @Test
+    void should_fail_to_request_reward_when_old_api_is_down() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final RewardRequest rewardRequest = new RewardRequest()
+                .amount(BigDecimal.valueOf(12.95))
+                .currency(CurrencyContract.ETH)
+                .recipientId(pierre.user().getGithubUserId())
+                .items(List.of(
+                        new RewardItemRequest().id("pr1")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(1L)
+                                .repoId(2L),
+                        new RewardItemRequest().id("issue1")
+                                .type(RewardType.ISSUE)
+                                .number(2L)
+                                .repoId(3L),
+                        new RewardItemRequest().id("codeReview1")
+                                .type(RewardType.CODE_REVIEW)
+                                .number(3L)
+                                .repoId(4L)
+                ));
+
+        // When
+        rustApiWireMockServer.stubFor(WireMock.post(
+                        WireMock.urlEqualTo("/api/payments"))
+                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-rust-api-key"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                          "recipientId": 16590657,
+                          "amount": 12.95,
+                          "currency": "ETH",
+                          "reason": {
+                            "workItems": [
+                              {
+                                "id": "pr1",
+                                "type": "PULL_REQUEST",
+                                "repoId": 2,
+                                "number": 1
+                              },
+                              {
+                                "id": "issue1",
+                                "type": "ISSUE",
+                                "repoId": 3,
+                                "number": 2
+                              },
+                              {
+                                "id": "codeReview1",
+                                "type": "CODE_REVIEW",
+                                "repoId": 4,
+                                "number": 3
+                              }
+                            ]
+                          }
+                        }""")
+                ).willReturn(
+                        ResponseDefinitionBuilder.like(ResponseDefinitionBuilder.jsonResponse("""
+                                {
+                                  "error": "Internal Server Error",
+                                  "message": "Internal Server Error",
+                                  "status": 500
+                                }""", 500))
+                ));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(rewardRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("INTERNAL_SERVER_ERROR");
+    }
+
+    @Test
+    void should_fail_to_request_reward_when_indexer_is_down() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final String jwt = pierre.jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final RewardRequest rewardRequest = new RewardRequest()
+                .amount(BigDecimal.valueOf(12.95))
+                .currency(CurrencyContract.ETH)
+                .recipientId(pierre.user().getGithubUserId())
+                .items(List.of(
+                        new RewardItemRequest().id("pr1")
+                                .type(RewardType.PULL_REQUEST)
+                                .number(1L)
+                                .repoId(2L),
+                        new RewardItemRequest().id("issue1")
+                                .type(RewardType.ISSUE)
+                                .number(2L)
+                                .repoId(3L),
+                        new RewardItemRequest().id("codeReview1")
+                                .type(RewardType.CODE_REVIEW)
+                                .number(3L)
+                                .repoId(4L)
+                ));
+
+        final var newRewardId = UUID.randomUUID();
+
+        // When
+        rustApiWireMockServer.stubFor(WireMock.post(
+                        WireMock.urlEqualTo("/api/payments"))
+                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-rust-api-key"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
+                          "recipientId": 16590657,
+                          "amount": 12.95,
+                          "currency": "ETH",
+                          "reason": {
+                            "workItems": [
+                              {
+                                "id": "pr1",
+                                "type": "PULL_REQUEST",
+                                "repoId": 2,
+                                "number": 1
+                              },
+                              {
+                                "id": "issue1",
+                                "type": "ISSUE",
+                                "repoId": 3,
+                                "number": 2
+                              },
+                              {
+                                "id": "codeReview1",
+                                "type": "CODE_REVIEW",
+                                "repoId": 4,
+                                "number": 3
+                              }
+                            ]
+                          }
+                        }""")
+                ).willReturn(
+                        ResponseDefinitionBuilder.okForJson(RequestRewardResponseDTO.builder()
+                                .commandId(UUID.randomUUID())
+                                .paymentId(newRewardId)
+                                .build())
+                ));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.like(ResponseDefinitionBuilder.jsonResponse("""
+                        {
+                          "error": "Internal Server Error",
+                          "message": "Internal Server Error",
+                          "status": 500
+                        }""", 500)
+                )));
+
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(rewardRequest))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is5xxServerError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("INTERNAL_SERVER_ERROR");
     }
 
     @Test
@@ -265,6 +453,12 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .paymentId(newRewardId)
                                 .build())
                 ));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/11111"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
 
         client.post()

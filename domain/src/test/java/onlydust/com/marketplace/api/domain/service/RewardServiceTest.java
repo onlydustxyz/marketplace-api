@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
@@ -25,9 +26,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -55,6 +57,7 @@ public class RewardServiceTest {
 
         // Then
         assertThat(rewardId).isEqualTo(newRewardId);
+        verify(indexerPort, times(1)).indexUser(requestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -63,8 +66,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -94,6 +99,7 @@ public class RewardServiceTest {
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
         Assertions.assertEquals("User must be project lead to request a reward", onlyDustException.getMessage());
+        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -102,8 +108,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -132,9 +140,9 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(403, onlyDustException.getStatus());
-        Assertions.assertEquals("Amount must be superior to 0", onlyDustException.getMessage());
+        Assertions.assertEquals("Amount must be greater than 0", onlyDustException.getMessage());
+        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
     }
-
 
 
     @Test
@@ -143,8 +151,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -173,6 +183,7 @@ public class RewardServiceTest {
         Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
+        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -181,8 +192,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -214,6 +227,7 @@ public class RewardServiceTest {
         Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
+        verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
     }
 
     @Test
@@ -222,8 +236,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
@@ -244,8 +260,10 @@ public class RewardServiceTest {
         final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService);
+                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
