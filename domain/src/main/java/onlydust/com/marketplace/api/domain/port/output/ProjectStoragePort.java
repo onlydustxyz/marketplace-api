@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -61,11 +58,12 @@ public interface ProjectStoragePort {
     Set<Long> getProjectRepoIds(UUID projectId);
 
     Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
-                                                                                       ContributionType contributionType,
-                                                                                       Long githubUserid,
-                                                                                       int pageIndex, int pageSize,
-                                                                                       String search,
-                                                                                       Boolean includeIgnoredItems);
+                                                                                           ContributionType contributionType,
+                                                                                           ContributionStatus contributionStatus,
+                                                                                           Long githubUserid,
+                                                                                           int pageIndex, int pageSize,
+                                                                                           String search,
+                                                                                           Boolean includeIgnoredItems);
 
     String getProjectSlugById(UUID projectId);
 

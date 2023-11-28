@@ -38,7 +38,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
               and gr.visibility = 'PUBLIC'
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
-              and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
+              and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))
+              and (coalesce(:contributionType) is null or c.type = cast(cast(:contributionType as text) as indexer_exp.contribution_type))
                and (coalesce(:search) is null
                     or c.github_title ilike '%' || cast(:search as text) || '%')
                     or cast(c.github_number as text) ilike '%' || cast(:search as text) || '%'
@@ -48,6 +49,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
     List<RewardableItemViewEntity> findByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
                                                                   final @Param("githubUserId") Long githubUserId,
                                                                   final @Param("contributionType") String contributionType,
+                                                                  final @Param("contributionStatus") String contributionStatus,
                                                                   final @Param("search") String search,
                                                                   final @Param("offset") int offset,
                                                                   final @Param("limit") int limit,
@@ -82,7 +84,8 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
               and repo.visibility = 'PUBLIC'
               and c.contributor_id = :githubUserId
               and (:includeIgnoredItems is true or ic.contribution_id is null)
-              and (coalesce(:contributionType) is null or cast(c.type as text) = cast(:contributionType as text))
+              and (coalesce(:contributionStatus) is null or c.status = cast(cast(:contributionStatus as text) as indexer_exp.contribution_status))
+              and (coalesce(:contributionType) is null or c.type = cast(cast(:contributionType as text) as indexer_exp.contribution_type))
                and (coalesce(:search) is null
                     or coalesce(pull_request.title, issue.title, code_review.title) ilike '%' || cast(:search as text) || '%')
                     or cast(coalesce(pull_request.number, issue.number, code_review.number) as text) ilike '%' || cast(:search as text) || '%'
@@ -90,6 +93,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
     Long countByProjectIdAndGithubUserId(final @Param("projectId") UUID projectId,
                                          final @Param("githubUserId") Long githubUserId,
                                          final @Param("contributionType") String contributionType,
+                                         final @Param("contributionStatus") String contributionStatus,
                                          final @Param("search") String search,
                                          final @Param("includeIgnoredItems") boolean includeIgnoredItems);
 

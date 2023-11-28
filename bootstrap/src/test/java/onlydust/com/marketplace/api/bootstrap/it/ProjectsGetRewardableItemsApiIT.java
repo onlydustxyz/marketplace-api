@@ -1043,6 +1043,61 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                         }
                                                 
                         """);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
+                        pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "0", "pageSize", "10", "search", "qa", "status", "COMPLETED")))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(200)
+                .expectBody()
+                .json("""
+                        {
+                          "rewardableItems": [
+                            {
+                              "number": 1352,
+                              "id": "74a21ee1b10b6bc89602d0cc86d7d7e3acf9bc2cdd08436c9e868661023996cb",
+                              "contributionId": "a93a3eec8f658a0fb0fb81dd86cc76e9d918be84e6fffab926a374ceaf1d3fdb",
+                              "title": "feat: payout side panel QA",
+                              "createdAt": "2023-10-31T17:21:25Z",
+                              "completedAt": "2023-11-02T08:11:27Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": null,
+                              "commentsCount": 1,
+                              "status": "COMPLETED",
+                              "ignored": false,
+                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1352"
+                            },
+                            {
+                              "number": 1351,
+                              "id": "cdbe805e392331a053120e46b0d0b09b89b92ba552bc11c9152bc7c6ad6ca13b",
+                              "contributionId": "331574dd3aa78737d775eb4948491ea306ec153f5a999b3dbf85b76d21ae4021",
+                              "title": "Multi currencies QA 01",
+                              "createdAt": "2023-10-31T15:45:53Z",
+                              "completedAt": "2023-10-31T17:55:18Z",
+                              "repoName": "marketplace-frontend",
+                              "type": "CODE_REVIEW",
+                              "commitsCount": null,
+                              "userCommitsCount": null,
+                              "commentsCount": 1,
+                              "status": "COMPLETED",
+                              "ignored": false,
+                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1351"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "nextPageIndex": 0
+                        }
+                                                
+                        """);
     }
 
     @Test
@@ -1369,5 +1424,66 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                         }
                                                 
                          """);
+    }
+
+    @Test
+    @Order(30)
+    void should_get_all_completed_rewardable_items_given_a_project_lead_and_ignored_contributions() {
+        // Given
+        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        ignoredContributionsRepository.saveAll(List.of(
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d")
+                        .projectId(projectId)
+                        .build()),
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("803254a420051b6b04c8cb2030922f3a93cfe2bfbac34c61b56dde93184dbd70")
+                        .projectId(projectId)
+                        .build()),
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("938c879cca27fb6e59ef30658ea5587d2c830dd8bf52a3ec0192b5a780fea267")
+                        .projectId(projectId)
+                        .build()),
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("c6ffc682726fc0ffd3a41a9bee04d62d288761501b5906968577bcd132e36cbf")
+                        .projectId(projectId)
+                        .build()),
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("4b44061840a2f8185f80f2fa381c2aa1bd228e56bde84ab8e9a243ca6da7b073")
+                        .projectId(projectId)
+                        .build()),
+                new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
+                        .contributionId("abc741ada4822926f7f92fb99441868664ae850006629864d6562726f7a53f59")
+                        .projectId(projectId)
+                        .build())
+        ));
+
+
+        // When
+        // @formatter:off
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_ALL_COMPLETED_REWARDABLE_ITEMS, projectId), Map.of(
+                        "githubUserId",
+                        pierre.user().getGithubUserId().toString())))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewardableIssues.length()").isEqualTo(0)
+                .jsonPath("$.rewardablePullRequests.length()").isEqualTo(29)
+                .jsonPath("$.rewardablePullRequests[?(@.status!='COMPLETED')]").doesNotExist()
+                .jsonPath("$.rewardableCodeReviews.length()").isEqualTo(99)
+                .jsonPath("$.rewardableCodeReviews[?(@.status!='COMPLETED')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='803254a420051b6b04c8cb2030922f3a93cfe2bfbac34c61b56dde93184dbd70')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='938c879cca27fb6e59ef30658ea5587d2c830dd8bf52a3ec0192b5a780fea267')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='c6ffc682726fc0ffd3a41a9bee04d62d288761501b5906968577bcd132e36cbf')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='4b44061840a2f8185f80f2fa381c2aa1bd228e56bde84ab8e9a243ca6da7b073')]").doesNotExist()
+                .jsonPath("$..[?(@.contributionId=='abc741ada4822926f7f92fb99441868664ae850006629864d6562726f7a53f59')]").doesNotExist();
+        // @formatter:on
     }
 }

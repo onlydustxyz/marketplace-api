@@ -58,6 +58,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_REWARD = "/api/v1/projects/%s/rewards/%s";
     protected static final String PROJECTS_GET_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
     protected static final String PROJECTS_GET_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items";
+    protected static final String PROJECTS_GET_ALL_COMPLETED_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items" +
+                                                                                "/all-completed";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_WORK = "/api/v1/projects/%s/rewardable-items/other" +
                                                                         "-works";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_ISSUE = "/api/v1/projects/%s/rewardable-items/other" +
