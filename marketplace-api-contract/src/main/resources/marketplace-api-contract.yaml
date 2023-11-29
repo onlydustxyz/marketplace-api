@@ -3374,7 +3374,6 @@ components:
         - name
         - shortDescription
         - longDescription
-        - moreInfos
         - isLookingForContributors
         - inviteGithubUserIdsAsProjectLeads
         - githubRepoIds
