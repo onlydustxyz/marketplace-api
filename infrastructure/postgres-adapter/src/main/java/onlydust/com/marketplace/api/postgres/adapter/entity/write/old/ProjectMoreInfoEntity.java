@@ -21,6 +21,7 @@ public class ProjectMoreInfoEntity {
     @EmbeddedId
     Id id;
     String name;
+    Integer rank;
 
     @EqualsAndHashCode.Exclude
     @CreationTimestamp

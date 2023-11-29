@@ -284,6 +284,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             {
                               "url": "https://t.me/foobar/updated",
                               "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -358,12 +362,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfos": [
-                            {
-                              "url": "https://t.me/foobar/updated",
-                              "value": "foobar-updated"
-                            }
-                          ],
                           "isLookingForContributors": false,
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
@@ -400,10 +398,48 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
+                          "isLookingForContributors": false,
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
+
+        // And Then
+        assertProjectWasUpdated();
+    }
+
+    @Test
+    @Order(13)
+    public void should_update_and_preserve_order_of_more_infos() {
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
                           "moreInfos": [
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
+                            },
                             {
                               "url": "https://t.me/foobar/updated",
                               "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://yolo.croute",
+                              "value": "yolo-croute"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -419,7 +455,21 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectSlug").isEqualTo("updated-project");
 
         // And Then
-        assertProjectWasUpdated();
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.moreInfos.length()").isEqualTo(3)
+                .jsonPath("$.moreInfos[0].url").isEqualTo("https://foobar.com")
+                .jsonPath("$.moreInfos[0].value").isEqualTo("foobar-updated2")
+                .jsonPath("$.moreInfos[1].url").isEqualTo("https://t.me/foobar/updated")
+                .jsonPath("$.moreInfos[1].value").isEqualTo("foobar-updated")
+                .jsonPath("$.moreInfos[2].url").isEqualTo("https://yolo.croute")
+                .jsonPath("$.moreInfos[2].value").isEqualTo("yolo-croute");
     }
 
     @Test
@@ -604,9 +654,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                                                          "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
+                .jsonPath("$.moreInfos.length()").isEqualTo(2)
                 .jsonPath("$.moreInfos[0].url").isEqualTo("https://t.me/foobar/updated")
                 .jsonPath("$.moreInfos[0].value").isEqualTo("foobar-updated")
-                .jsonPath("$.moreInfos.length()").isEqualTo(1)
+                .jsonPath("$.moreInfos[1].url").isEqualTo("https://foobar.com")
+                .jsonPath("$.moreInfos[1].value").isEqualTo("foobar-updated2")
 
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("ofux")

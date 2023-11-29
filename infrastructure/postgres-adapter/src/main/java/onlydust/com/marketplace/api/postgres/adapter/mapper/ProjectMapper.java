@@ -12,13 +12,13 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEnti
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -143,11 +143,28 @@ public interface ProjectMapper {
             }
         } else {
             return projectViewEntity.getMoreInfos().stream()
+                    .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
                     .map(projectMoreInfoEntity -> MoreInfoLink.builder()
                             .value(projectMoreInfoEntity.getName())
                             .url(projectMoreInfoEntity.getId().getUrl()).build())
                     .toList();
         }
         return List.of();
+    }
+
+    static List<ProjectMoreInfoEntity> moreInfosToEntities(final List<MoreInfoLink> moreInfos, final UUID projectId) {
+        final List<ProjectMoreInfoEntity> entities = new ArrayList<>();
+        for (int i = 0; i < moreInfos.size(); i++) {
+            final var moreInfo = moreInfos.get(i);
+            entities.add(ProjectMoreInfoEntity.builder()
+                    .id(ProjectMoreInfoEntity.Id.builder()
+                            .projectId(projectId)
+                            .url(moreInfo.getUrl())
+                            .build())
+                    .name(moreInfo.getValue())
+                    .rank(i)
+                    .build());
+        }
+        return entities;
     }
 }
