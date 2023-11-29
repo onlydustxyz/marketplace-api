@@ -207,10 +207,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .map(repoId -> new ProjectRepoEntity(projectId, repoId))
                     .collect(Collectors.toSet()));
         }
-        projectMoreInfoRepository.saveAll(moreInfos.stream()
-                .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
-                        .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
-                        .name(moreInfoLink.getValue()).build()).collect(Collectors.toList()));
+        if (nonNull(moreInfos)) {
+            projectMoreInfoRepository.saveAll(moreInfos.stream()
+                    .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
+                            .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
+                            .name(moreInfoLink.getValue()).build()).collect(Collectors.toList()));
+        }
 
         return projectRepository.getKeyById(projectId);
     }

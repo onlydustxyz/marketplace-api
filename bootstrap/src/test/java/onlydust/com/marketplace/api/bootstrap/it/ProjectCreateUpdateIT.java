@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,12 +63,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     public void should_create_a_new_project() {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
-                        .withRequestBody(WireMock.equalToJson("""
-                                {
-                                  "linkedRepoIds": [498695724, 602953043],
-                                  "unlinkedRepoIds": []
-                                }
-                                """, true, false))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [498695724, 602953043],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
                 .willReturn(WireMock.noContent()));
 
         // When
@@ -220,11 +219,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
-                                {
-                                  "linkedRepoIds": [452047076],
-                                  "unlinkedRepoIds": []
-                                }
-                                """, true, false))
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
                 .willReturn(WireMock.noContent()));
 
         // And When
@@ -465,6 +464,56 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .isForbidden();
+    }
+
+    @Test
+    @Order(30)
+    void should_create_project_without_more_infos() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [498695724, 602953043],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+
+        // When
+        final CreateProjectResponse responseBody = client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Super Project 2",
+                          "shortDescription": "This is a super project 2",
+                          "longDescription": "This is a super awesome project with a nice description 2",
+                          "isLookingForContributors": true,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505, 43467246
+                          ],
+                          "githubRepoIds": [
+                            498695724, 602953043
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(CreateProjectResponse.class)
+                .returnResult().getResponseBody();
+
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + responseBody.getProjectId()))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.moreInfos").isEmpty();
     }
 
     private void assertProjectWasUpdated() {
