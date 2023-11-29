@@ -32,19 +32,19 @@ public interface ContributionMapper {
     }
 
 
-    static ContributionPageResponse mapContributionPageResponse(Integer pageIndex,
-                                                                Page<ContributionView> contributions) {
+    static UserContributionPageResponse mapUserContributionPageResponse(Integer pageIndex,
+                                                                        Page<ContributionView> contributions) {
 
-        return new ContributionPageResponse()
-                .contributions(contributions.getContent().stream().map(ContributionMapper::mapContribution).toList())
+        return new UserContributionPageResponse()
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapUserContributionPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
                 .totalPageNumber(contributions.getTotalPageNumber())
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
     }
 
-    static ContributionPageItemResponse mapContribution(ContributionView contributionView) {
-        return new ContributionPageItemResponse()
+    static UserContributionPageItemResponse mapUserContributionPageItemResponse(ContributionView contributionView) {
+        return new UserContributionPageItemResponse()
                 .id(contributionView.getId())
                 .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
                 .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
@@ -55,7 +55,7 @@ public interface ContributionMapper {
                 .githubTitle(contributionView.getGithubTitle())
                 .githubHtmlUrl(contributionView.getGithubHtmlUrl())
                 .githubBody(contributionView.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(contributionView.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(contributionView.getGithubAuthor()))
                 .githubPullRequestReviewState(Optional.ofNullable(contributionView.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contributionView.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
@@ -91,7 +91,7 @@ public interface ContributionMapper {
                 .githubTitle(link.getGithubTitle())
                 .githubHtmlUrl(link.getGithubHtmlUrl())
                 .githubBody(link.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(link.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(link.getGithubAuthor()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()))
                 .isMine(link.getIsMine());
     }
@@ -133,7 +133,7 @@ public interface ContributionMapper {
                 .githubTitle(contribution.getGithubTitle())
                 .githubHtmlUrl(contribution.getGithubHtmlUrl())
                 .githubBody(contribution.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(contribution.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(contribution.getGithubAuthor()))
                 .githubPullRequestReviewState(Optional.ofNullable(contribution.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))

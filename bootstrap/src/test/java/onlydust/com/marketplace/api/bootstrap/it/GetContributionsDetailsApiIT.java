@@ -112,13 +112,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -133,13 +133,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -154,13 +154,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -175,13 +175,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -196,13 +196,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -217,13 +217,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -238,13 +238,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
@@ -259,13 +259,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "dollarsEquivalent": 1000,
                               "status": "PROCESSING",
                               "from": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null
                               },
                               "to": {
-                                "id": 43467246,
+                                "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
                                 "isRegistered": null

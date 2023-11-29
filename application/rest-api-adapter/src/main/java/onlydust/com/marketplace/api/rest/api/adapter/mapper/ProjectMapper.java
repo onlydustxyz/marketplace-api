@@ -56,13 +56,13 @@ public interface ProjectMapper {
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
         final ProjectResponse projectResponse = mapProjectDetailsMetadata(project);
-        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapUserLink).collect(Collectors.toList()));
-        projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
-        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapUserLinkToRegisteredUserLink).collect(Collectors.toList()));
+        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapGithubUser).collect(Collectors.toList()));
+        projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
+        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
-                .sorted(Comparator.comparing(GithubOrganizationResponse::getId))
+                .sorted(Comparator.comparing(GithubOrganizationResponse::getGithubUserId))
                 .collect(Collectors.toList()));
         projectResponse.setTechnologies(project.getTechnologies());
 
@@ -83,10 +83,10 @@ public interface ProjectMapper {
     static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
                                                       final boolean includeAllAvailableRepos) {
         final var organization = new GithubOrganizationResponse();
-        organization.setId(projectOrganizationView.getId());
+        organization.setGithubUserId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
         organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
-        organization.setHtmlUrl(projectOrganizationView.getHtmlUrl());
+        organization.setHtmlUrl(URI.create(projectOrganizationView.getHtmlUrl()));
         organization.setName(projectOrganizationView.getName());
         organization.setInstallationId(projectOrganizationView.getInstallationId());
         organization.setInstalled(projectOrganizationView.getIsInstalled());
@@ -168,7 +168,7 @@ public interface ProjectMapper {
     private static ProjectPageItemResponse mapProjectCard(ProjectCardView projectCardView) {
         final ProjectPageItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
-            projectListItemResponse.addLeadersItem(mapUserLinkToRegisteredUserLink(leader));
+            projectListItemResponse.addLeadersItem(mapRegisteredUser(leader));
         }
         for (SponsorView sponsor : projectCardView.getSponsors()) {
             projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
@@ -223,27 +223,27 @@ public interface ProjectMapper {
         return repoResponse;
     }
 
-    private static RegisteredUserLinkResponse mapUserLinkToRegisteredUserLink(final ProjectLeaderLinkView projectLeader) {
-        final var userLink = new RegisteredUserLinkResponse();
-        userLink.setId(projectLeader.getId());
-        userLink.setGithubUserId(projectLeader.getGithubUserId());
-        userLink.setAvatarUrl(projectLeader.getAvatarUrl());
-        userLink.setLogin(projectLeader.getLogin());
+    private static RegisteredUserResponse mapRegisteredUser(final ProjectLeaderLinkView projectLeader) {
+        final var user = new RegisteredUserResponse();
+        user.setId(projectLeader.getId());
+        user.setGithubUserId(projectLeader.getGithubUserId());
+        user.setAvatarUrl(projectLeader.getAvatarUrl());
+        user.setLogin(projectLeader.getLogin());
         if (projectLeader.getUrl() != null) {
-            userLink.setHtmlUrl(URI.create(projectLeader.getUrl()));
+            user.setHtmlUrl(URI.create(projectLeader.getUrl()));
         }
-        return userLink;
+        return user;
     }
 
-    static UserLinkResponse mapUserLink(final UserLinkView userLinkView) {
-        final var userLink = new UserLinkResponse();
-        userLink.setGithubUserId(userLinkView.getGithubUserId());
-        userLink.setAvatarUrl(userLinkView.getAvatarUrl());
-        userLink.setLogin(userLinkView.getLogin());
+    static GithubUserResponse mapGithubUser(final UserLinkView userLinkView) {
+        final var user = new GithubUserResponse();
+        user.setGithubUserId(userLinkView.getGithubUserId());
+        user.setAvatarUrl(userLinkView.getAvatarUrl());
+        user.setLogin(userLinkView.getLogin());
         if (userLinkView.getUrl() != null) {
-            userLink.setHtmlUrl(URI.create(userLinkView.getUrl()));
+            user.setHtmlUrl(URI.create(userLinkView.getUrl()));
         }
-        return userLink;
+        return user;
     }
 
     static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.api.domain.model.ProjectVisibility visibility) {

@@ -47,14 +47,14 @@ public interface RewardMapper {
 
     static RewardDetailsResponse rewardDetailsToResponse(RewardView rewardView) {
         return new RewardDetailsResponse()
-                .from(new GithubUserResponse()
-                        .id(rewardView.getFrom().getGithubUserId())
+                .from(new ContributorResponse()
+                        .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
                         .login(rewardView.getFrom().getGithubLogin())
                 )
                 .to(
-                        new GithubUserResponse()
-                                .id(rewardView.getTo().getGithubUserId())
+                        new ContributorResponse()
+                                .githubUserId(rewardView.getTo().getGithubUserId())
                                 .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
                                 .login(rewardView.getTo().getGithubLogin())
                 )
@@ -81,14 +81,14 @@ public interface RewardMapper {
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
         return new RewardResponse()
-                .from(new GithubUserResponse()
-                        .id(rewardView.getFrom().getGithubUserId())
+                .from(new ContributorResponse()
+                        .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
                         .login(rewardView.getFrom().getGithubLogin())
                 )
                 .to(
-                        new GithubUserResponse()
-                                .id(rewardView.getTo().getGithubUserId())
+                        new ContributorResponse()
+                                .githubUserId(rewardView.getTo().getGithubUserId())
                                 .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
                                 .login(rewardView.getTo().getGithubLogin())
                 )

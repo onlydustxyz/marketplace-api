@@ -225,7 +225,7 @@ public interface UserMapper {
 
     static GetMeResponse userToGetMeResponse(final User authenticatedUser) {
         final GetMeResponse getMeResponse = new GetMeResponse();
-        getMeResponse.setId(authenticatedUser.getId().toString());
+        getMeResponse.setId(authenticatedUser.getId());
         getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
         getMeResponse.setAvatarUrl(authenticatedUser.getAvatarUrl());
         getMeResponse.setLogin(authenticatedUser.getLogin());

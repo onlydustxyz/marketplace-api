@@ -134,7 +134,7 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<ContributionPageResponse> getMyContributions(List<ContributionType> types,
+    public ResponseEntity<UserContributionPageResponse> getMyContributions(List<ContributionType> types,
                                                                        List<ContributionStatus> statuses,
                                                                        List<UUID> projects,
                                                                        List<Long> repositories,
@@ -161,7 +161,7 @@ public class MeRestApi implements MeApi {
                 sanitizedPageIndex,
                 sanitizedPageSize);
 
-        final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
+        final var contributionPageResponse = ContributionMapper.mapUserContributionPageResponse(
                 sanitizedPageIndex,
                 contributions);
 
