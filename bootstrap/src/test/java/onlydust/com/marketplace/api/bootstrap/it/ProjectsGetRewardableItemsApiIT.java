@@ -99,7 +99,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "PENDING",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1444"
                             },
@@ -116,7 +116,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1434"
                             },
@@ -133,7 +133,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1420"
                             },
@@ -150,7 +150,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1419"
                             },
@@ -167,7 +167,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1418"
                             },
@@ -184,7 +184,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1417"
                             },
@@ -201,7 +201,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1409"
                             },
@@ -218,7 +218,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 4,
                               "userCommitsCount": 3,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1407"
                             },
@@ -235,7 +235,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1401"
                             },
@@ -252,7 +252,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1400"
                             }
@@ -292,7 +292,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 6,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1105"
                             }
@@ -332,7 +332,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 6,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1105"
                             }
@@ -372,7 +372,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 4,
                               "userCommitsCount": 3,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1407"
                             },
@@ -389,7 +389,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 3,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "MERGED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1378"
                             },
@@ -406,7 +406,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 1,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "MERGED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1377"
                             },
@@ -423,7 +423,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 3,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1319"
                             },
@@ -440,7 +440,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 27,
                               "userCommitsCount": 12,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1318"
                             },
@@ -457,7 +457,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 27,
                               "userCommitsCount": 12,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1301"
                             },
@@ -474,7 +474,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 1,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "MERGED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1300"
                             },
@@ -491,7 +491,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 27,
                               "userCommitsCount": 12,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "MERGED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1259"
                             },
@@ -508,7 +508,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 23,
                               "userCommitsCount": 13,
                               "commentsCount": 2,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1238"
                             },
@@ -525,7 +525,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 1,
                               "userCommitsCount": 1,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1226"
                             }
@@ -577,7 +577,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "PENDING",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1444"
                             },
@@ -593,7 +593,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1434"
                             },
@@ -609,7 +609,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1420"
                             },
@@ -625,7 +625,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1419"
                             },
@@ -641,7 +641,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1418"
                             },
@@ -657,7 +657,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1417"
                             },
@@ -673,7 +673,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1409"
                             },
@@ -689,7 +689,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1401"
                             },
@@ -705,7 +705,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1400"
                             },
@@ -721,7 +721,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1393"
                             }
@@ -761,7 +761,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "PENDING",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1354"
                             },
@@ -777,7 +777,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1352"
                             },
@@ -793,7 +793,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1351"
                             }
@@ -832,7 +832,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1352"
                             },
@@ -848,7 +848,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1351"
                             }
@@ -967,7 +967,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "PENDING",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1444"
                             },
@@ -984,7 +984,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1434"
                             },
@@ -1001,7 +1001,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1420"
                             },
@@ -1018,7 +1018,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1419"
                             },
@@ -1035,7 +1035,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1418"
                             }
@@ -1075,7 +1075,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "PENDING",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1444"
                             },
@@ -1092,7 +1092,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1434"
                             },
@@ -1109,7 +1109,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1420"
                             },
@@ -1126,7 +1126,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1419"
                             },
@@ -1143,7 +1143,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1418"
                             },
@@ -1160,7 +1160,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1417"
                             },
@@ -1177,7 +1177,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": true,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1409"
                             },
@@ -1194,7 +1194,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": 4,
                               "userCommitsCount": 3,
                               "commentsCount": 1,
-                              "status": "CANCELLED",
+                              "status": "CLOSED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1407"
                             },
@@ -1211,7 +1211,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1401"
                             },
@@ -1228,7 +1228,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                               "commitsCount": null,
                               "userCommitsCount": null,
                               "commentsCount": 1,
-                              "status": "COMPLETED",
+                              "status": "APPROVED",
                               "ignored": false,
                               "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1400"
                             }
@@ -1291,9 +1291,9 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewardableIssues.length()").isEqualTo(0)
                 .jsonPath("$.rewardablePullRequests.length()").isEqualTo(4)
-                .jsonPath("$.rewardablePullRequests[?(@.status!='COMPLETED')]").doesNotExist()
+                .jsonPath("$.rewardablePullRequests[?(@.status != 'MERGED')]").doesNotExist()
                 .jsonPath("$.rewardableCodeReviews.length()").isEqualTo(99)
-                .jsonPath("$.rewardableCodeReviews[?(@.status!='COMPLETED')]").doesNotExist()
+                .jsonPath("$.rewardableCodeReviews[?(@.status nin ['APPROVED', 'CHANGES_REQUESTED'])]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d')]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='803254a420051b6b04c8cb2030922f3a93cfe2bfbac34c61b56dde93184dbd70')]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='938c879cca27fb6e59ef30658ea5587d2c830dd8bf52a3ec0192b5a780fea267')]").doesNotExist()

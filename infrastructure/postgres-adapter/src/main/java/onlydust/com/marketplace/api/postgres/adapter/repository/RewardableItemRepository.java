@@ -15,7 +15,7 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
             select c.id as contribution_id,
                    c.type,
                    coalesce(cast(c.pull_request_id as text), cast(c.issue_id as text), c.code_review_id) id,
-                   c.status                                             status,
+                   c.github_status                                      status,
                    c.github_number                                      number,
                    c.github_html_url                                    html_url,
                    c.github_title                                       title,
