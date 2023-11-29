@@ -66,9 +66,4 @@ public class RestApiConfiguration {
         return new EventsRestApi(contributionFacadePort);
     }
 
-    @Bean
-    public BackofficeRestApi backofficeRestApi() {
-        return new BackofficeRestApi();
-    }
-
 }

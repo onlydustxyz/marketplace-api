@@ -1,3 +1,4 @@
+
 openapi: 3.0.3
 info:
   title: OnlyDust Backoffice API
@@ -143,9 +144,7 @@ components:
         name:
           type: string
         technologies:
-          type: array
-          items:
-            $ref: '#/components/schemas/Technologies'
+          $ref: '#/components/schemas/Technologies'
         projectId:
           type: string
           format: uuid

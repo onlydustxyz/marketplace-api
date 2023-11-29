@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -165,5 +166,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresEventStorageAdapter postgresEventStorageAdapter(final EventRepository eventRepository) {
         return new PostgresEventStorageAdapter(eventRepository);
+    }
+
+    @Bean
+    public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository) {
+        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository);
     }
 }
