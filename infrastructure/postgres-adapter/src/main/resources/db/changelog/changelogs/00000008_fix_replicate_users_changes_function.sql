@@ -16,3 +16,5 @@ CREATE OR REPLACE TRIGGER insert_user_indexing_jobs_from_auth_users_trigger
     ON auth.user_providers
     FOR EACH ROW
 EXECUTE FUNCTION public.insert_user_indexing_jobs_from_auth_users();
+
+DROP TRIGGER insert_user_indexing_jobs_from_auth_users_trigger ON auth_users;
