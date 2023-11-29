@@ -25,9 +25,9 @@ import static java.util.Objects.isNull;
 public class ProjectService implements ProjectFacadePort {
 
     private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
-            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)");
+            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
-            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)");
+            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
 
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
