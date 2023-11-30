@@ -11,7 +11,9 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
         JpaSpecificationExecutor<NotificationEntity> {
 
     @Query(value = """
-            SELECT n FROM NotificationEntity n WHERE n.status = 'PENDING' OR n.status = 'FAILED' ORDER BY n.id ASC
+            SELECT next_notif
+            FROM NotificationEntity next_notif
+            WHERE next_notif.id = (SELECT min(n.id) FROM NotificationEntity n WHERE n.status = 'PENDING' OR n.status = 'FAILED')
             """)
     Optional<NotificationEntity> findNextToProcess();
 }
