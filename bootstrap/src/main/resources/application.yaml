@@ -19,7 +19,7 @@ application:
         retry-count: 20
         retry-interval: 500
   cron:
-    notification-job-delay: 10000 # 10s
+    notification-job-delay: 60000 # 1 minute
 
 spring:
   application:
