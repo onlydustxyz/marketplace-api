@@ -42,6 +42,58 @@ class PostgresNotificationAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
+    void should_peek_the_first_pending_notification() {
+        // Given
+        final Notification notification1 = new ProjectLeaderAssigned(UUID.randomUUID(), UUID.randomUUID(),
+                faker.date().birthday());
+        final Notification notification2 = new ProjectLeaderAssigned(UUID.randomUUID(), UUID.randomUUID(),
+                faker.date().birthday());
+        final Notification notification3 = new ProjectLeaderAssigned(UUID.randomUUID(), UUID.randomUUID(),
+                faker.date().birthday());
+
+        // When
+        postgresNotificationAdapter.push(notification1);
+        postgresNotificationAdapter.push(notification2);
+        postgresNotificationAdapter.push(notification3);
+        var notificationPeeked = postgresNotificationAdapter.peek();
+
+        // Then
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get()).isEqualTo(notification1);
+
+        // When
+        postgresNotificationAdapter.ack();
+        notificationPeeked = postgresNotificationAdapter.peek();
+
+        // Then
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get()).isEqualTo(notification2);
+
+        // When
+        postgresNotificationAdapter.nack("Some error");
+        notificationPeeked = postgresNotificationAdapter.peek();
+
+        // Then
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get()).isEqualTo(notification2);
+
+        // When
+        postgresNotificationAdapter.ack();
+        notificationPeeked = postgresNotificationAdapter.peek();
+
+        // Then
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get()).isEqualTo(notification3);
+
+        // When
+        postgresNotificationAdapter.ack();
+        notificationPeeked = postgresNotificationAdapter.peek();
+
+        // Then
+        assertThat(notificationPeeked).isNotPresent();
+    }
+
+    @Test
     void should_get_nothing_when_there_is_no_notifications() {
         // When
         final var notificationPeeked = postgresNotificationAdapter.peek();
