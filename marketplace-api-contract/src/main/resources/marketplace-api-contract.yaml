@@ -3702,7 +3702,7 @@ components:
         createdAt:
           type: string
           format: date-time
-        lastUpdateAt:
+        completedAt:
           type: string
           format: date-time
         repoName:

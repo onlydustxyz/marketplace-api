@@ -159,7 +159,7 @@ public interface RewardMapper {
                     case DISMISSED -> GithubStatus.DISMISSED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
-                .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
+                .completedAt(DateMapper.toZoneDateTime(view.getCompletedAt()))
                 .commentsCount(view.getCommentsCount())
                 .commitsCount(view.getCommitsCount())
                 .userCommitsCount(view.getUserCommitsCount())

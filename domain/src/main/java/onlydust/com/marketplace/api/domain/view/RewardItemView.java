@@ -15,7 +15,7 @@ public class RewardItemView {
     String title;
     String githubUrl;
     Date createdAt;
-    Date lastUpdateAt;
+    Date completedAt;
     String repoName;
     ContributionType type;
     RewardItemStatus status;
