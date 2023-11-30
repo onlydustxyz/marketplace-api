@@ -86,3 +86,4 @@ infrastructure:
         api-key: ${INDEXER_API_KEY}
   webhook:
     url: ${BACKOFFICE_WEBHOOK_URL}
+    environment: ${ENV}

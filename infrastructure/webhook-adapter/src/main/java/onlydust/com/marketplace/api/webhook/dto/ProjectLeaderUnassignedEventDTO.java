@@ -17,23 +17,23 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectLeaderUnassignedEventDTO {
 
-    @JsonProperty("Project")
-    Project project;
+    @JsonProperty("aggregate_name")
+    String aggregateName = "Project";
+
+    @JsonProperty("event_name")
+    String eventName = "LeaderUnassigned";
+
+    @JsonProperty("environment")
+    String environment;
+
+    @JsonProperty("payload")
+    Payload payload;
 
     @Value
     @Builder(access = AccessLevel.PRIVATE)
     @AllArgsConstructor
     @NoArgsConstructor(force = true)
-    public static class Project {
-        @JsonProperty("LeaderUnassigned")
-        LeaderUnassigned leaderUnassigned;
-    }
-
-    @Value
-    @Builder(access = AccessLevel.PRIVATE)
-    @AllArgsConstructor
-    @NoArgsConstructor(force = true)
-    public static class LeaderUnassigned {
+    public static class Payload {
         @JsonProperty("id")
         UUID projectId;
 
@@ -45,14 +45,14 @@ public class ProjectLeaderUnassignedEventDTO {
         Date unassignedAt;
     }
 
-    public static ProjectLeaderUnassignedEventDTO of(ProjectLeaderUnassigned projectLeaderUnassigned) {
+    public static ProjectLeaderUnassignedEventDTO of(ProjectLeaderUnassigned projectLeaderUnassigned,
+                                                     String environment) {
         return ProjectLeaderUnassignedEventDTO.builder()
-                .project(Project.builder()
-                        .leaderUnassigned(LeaderUnassigned.builder()
-                                .projectId(projectLeaderUnassigned.getProjectId())
-                                .leaderId(projectLeaderUnassigned.getLeaderId())
-                                .unassignedAt(projectLeaderUnassigned.getUnassignedAt())
-                                .build())
+                .environment(environment)
+                .payload(Payload.builder()
+                        .projectId(projectLeaderUnassigned.getProjectId())
+                        .leaderId(projectLeaderUnassigned.getLeaderId())
+                        .unassignedAt(projectLeaderUnassigned.getUnassignedAt())
                         .build())
                 .build();
     }

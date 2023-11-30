@@ -277,8 +277,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         waitAtLeastOneCycleOfNotificationProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.Project.LeaderUnassigned.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.Project.LeaderUnassigned.leader_id",
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderUnassigned")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.leader_id",
                         equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
         );
     }
