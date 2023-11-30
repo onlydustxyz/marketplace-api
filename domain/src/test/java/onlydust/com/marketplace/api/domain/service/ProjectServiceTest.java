@@ -5,10 +5,8 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.api.domain.view.RewardableItemView;
+import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +40,7 @@ public class ProjectServiceTest {
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
-            eventStoragePort,contributionStoragePort, dustyBotStoragePort,
+            eventStoragePort, contributionStoragePort, dustyBotStoragePort,
             githubStoragePort);
 
     @BeforeEach
@@ -725,5 +725,64 @@ public class ProjectServiceTest {
         // Then
         verify(indexerPort, never()).indexPullRequest(anyString(), anyString(), anyLong());
         verify(projectStoragePort, never()).getRewardablePullRequest(anyString(), anyString(), anyLong());
+    }
+
+    @Test
+    void should_forbid_access_to_contributions_for_non_leaders() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLead = User.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber())
+                .build();
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLead.getId())).thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> projectService.contributions(projectId, projectLead, null, null, null, null, null))
+                .isInstanceOf(OnlyDustException.class).hasMessage("Only project leads can list project contributions");
+    }
+
+    @Test
+    void should_list_project_contributions() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLead = User.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber())
+                .build();
+        final var filters = ContributionView.Filters.builder()
+                .contributors(List.of(faker.number().randomNumber()))
+                .projects(List.of(projectId))
+                .from(Date.from(Instant.now().minusSeconds(3600)))
+                .from(Date.from(Instant.now()))
+                .types(List.of(ContributionType.ISSUE))
+                .statuses(List.of(ContributionStatus.COMPLETED))
+                .repos(List.of(faker.number().randomNumber()))
+                .build();
+
+        final var sort = ContributionView.Sort.CONTRIBUTOR_LOGIN;
+        final var direction = SortDirection.asc;
+        final var page = 1;
+        final var pageSize = 10;
+
+        final var expectedContributions = Page.<ContributionView>builder()
+                .content(List.of(ContributionView.builder()
+                        .id(UUID.randomUUID().toString())
+                        .build()))
+                .totalItemNumber(1)
+                .totalPageNumber(1)
+                .build();
+
+        when(contributionStoragePort.findContributions(projectLead.getGithubUserId(), filters, sort, direction, page, pageSize))
+                .thenReturn(expectedContributions);
+
+        // When
+        final var contributions = projectService.contributions(projectId, projectLead, filters, sort, direction,
+                page, pageSize);
+
+        // Then
+        assertEquals(expectedContributions, contributions);
     }
 }

@@ -51,7 +51,7 @@ public class ContributorService implements ContributorFacadePort {
                                                 SortDirection direction,
                                                 Integer page,
                                                 Integer pageSize) {
-        return contributionStoragePort.findContributionsForUser(
+        return contributionStoragePort.findContributions(
                 contributorId, filters, sort, direction, page, pageSize);
     }
 
