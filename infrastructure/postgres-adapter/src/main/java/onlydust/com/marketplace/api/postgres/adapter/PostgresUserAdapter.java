@@ -195,6 +195,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public void createApplicationOnProject(UUID userId, UUID projectId) {
+        final var applicationId = UUID.randomUUID();
         projectIdRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
@@ -205,11 +206,11 @@ public class PostgresUserAdapter implements UserStoragePort {
                         () -> applicationRepository.save(ApplicationEntity.builder()
                                 .applicantId(userId)
                                 .projectId(projectId)
-                                .id(UUID.randomUUID())
+                                .id(applicationId)
                                 .receivedAt(new Date())
                                 .build())
                 );
-        notificationPort.push(new UserAppliedOnProject(projectId, userId, new Date()));
+        notificationPort.push(new UserAppliedOnProject(applicationId, projectId, userId, new Date()));
     }
 
     @Transactional

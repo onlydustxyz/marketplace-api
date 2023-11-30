@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
+import onlydust.com.marketplace.api.domain.job.NotificationJob;
+import onlydust.com.marketplace.api.domain.job.WebhookNotificationJob;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
@@ -98,5 +100,11 @@ public class DomainConfiguration {
     public GithubAccountService githubAccountService(final GithubSearchPort githubSearchPort,
                                                      final GithubStoragePort githubStoragePort) {
         return new GithubAccountService(githubStoragePort, githubSearchPort);
+    }
+
+    @Bean
+    public NotificationJob notificationJob(final NotificationPort notificationPort,
+                                           final WebhookPort webhookPort) {
+        return new WebhookNotificationJob(notificationPort, webhookPort);
     }
 }

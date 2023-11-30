@@ -13,6 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class UserAppliedOnProject extends Notification {
+    UUID applicationId;
     UUID projectId;
     UUID userId;
     Date appliedAt;
