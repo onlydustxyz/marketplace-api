@@ -147,6 +147,7 @@ public class MeRestApi implements MeApi {
         final int sanitizedPageIndex = sanitizePageIndex(page);
 
         final var filters = ContributionView.Filters.builder()
+                .contributors(List.of(authenticatedUser.getGithubUserId()))
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())

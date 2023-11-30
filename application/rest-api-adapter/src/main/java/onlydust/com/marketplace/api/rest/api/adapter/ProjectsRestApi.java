@@ -18,10 +18,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardableItemMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -31,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -332,4 +330,51 @@ public class ProjectsRestApi implements ProjectsApi {
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
 
+    @Override
+    public ResponseEntity<ProjectContributionPageResponse> getProjectContributions(UUID projectId,
+                                                                                   List<onlydust.com.marketplace.api.contract.model.ContributionType> types,
+                                                                                   List<ContributionStatus> statuses,
+                                                                                   List<Long> repositories,
+                                                                                   String fromDate,
+                                                                                   String toDate,
+                                                                                   List<Long> contributorIds,
+                                                                                   ProjectContributionSort sort,
+                                                                                   String direction,
+                                                                                   Integer pageIndex,
+                                                                                   Integer pageSize) {
+        try {
+            final User authenticatedUser = authenticationService.getAuthenticatedUser();
+            final int sanitizedPageSize = sanitizePageSize(pageSize);
+            final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+            final ContributionView.Filters filters = ContributionView.Filters.builder()
+                    .contributors(Optional.ofNullable(contributorIds).orElse(List.of()))
+                    .projects(List.of(projectId))
+                    .repos(Optional.ofNullable(repositories).orElse(List.of()))
+                    .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
+                    .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
+                    .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                    .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
+                    .build();
+
+            final var contributions = projectFacadePort.contributions(
+                    projectId,
+                    authenticatedUser,
+                    filters,
+                    ContributionMapper.mapSort(sort),
+                    SortDirectionMapper.requestToDomain(direction),
+                    sanitizedPageIndex,
+                    sanitizedPageSize);
+
+            final var contributionPageResponse = ContributionMapper.mapProjectContributionPageResponse(
+                    sanitizedPageIndex,
+                    contributions);
+
+            return contributionPageResponse.getTotalPageNumber() > 1 ?
+                    ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
+                    : ResponseEntity.ok(contributionPageResponse);
+        } catch (ParseException e) {
+            throw OnlyDustException.badRequest("Invalid date format");
+        }
+    }
 }

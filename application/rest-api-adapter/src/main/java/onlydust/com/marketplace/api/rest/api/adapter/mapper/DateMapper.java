@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import org.apache.commons.lang3.time.DateParser;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,7 +16,7 @@ public interface DateMapper {
         return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
     }
 
-    static Instant parseInstant(final String date) {
-        return DateTimeFormatter.ofPattern("yyyy-MM-dd").parse(date, Instant::from);
+    static Date parse(final String date) throws ParseException {
+        return new SimpleDateFormat("yyyy-MM-dd").parse(date);
     }
 }
