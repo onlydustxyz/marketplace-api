@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -36,7 +37,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresProjectAdapter postgresProjectAdapter(final ProjectRepository projectRepository,
+    public PostgresProjectAdapter postgresProjectAdapter(final NotificationPort notificationPort,
+                                                         final ProjectRepository projectRepository,
                                                          final ProjectViewRepository projectViewRepository,
                                                          final ProjectIdRepository projectIdRepository,
                                                          final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
@@ -52,7 +54,8 @@ public class PostgresConfiguration {
                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                          final RewardableItemRepository rewardableItemRepository,
                                                          final ProjectMoreInfoRepository projectMoreInfoRepository) {
-        return new PostgresProjectAdapter(projectRepository,
+        return new PostgresProjectAdapter(notificationPort,
+                projectRepository,
                 projectViewRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
@@ -83,7 +86,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
+    public PostgresUserAdapter postgresUserAdapter(final NotificationPort notificationPort,
+                                                   final CustomUserRepository customUserRepository,
                                                    final CustomContributorRepository customContributorRepository,
                                                    final UserRepository userRepository,
                                                    final UserViewRepository userViewRepository,
@@ -101,7 +105,8 @@ public class PostgresConfiguration {
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository) {
-        return new PostgresUserAdapter(customUserRepository,
+        return new PostgresUserAdapter(notificationPort,
+                customUserRepository,
                 customContributorRepository,
                 userRepository,
                 userViewRepository,
@@ -165,5 +170,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresEventStorageAdapter postgresEventStorageAdapter(final EventRepository eventRepository) {
         return new PostgresEventStorageAdapter(eventRepository);
+    }
+
+    @Bean
+    public PostgresNotificationAdapter postgresNotificationAdapter(final NotificationRepository notificationRepository) {
+        return new PostgresNotificationAdapter(notificationRepository);
     }
 }

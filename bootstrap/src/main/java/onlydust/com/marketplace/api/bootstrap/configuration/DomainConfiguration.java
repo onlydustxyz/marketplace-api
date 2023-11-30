@@ -10,11 +10,13 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Configuration
+@EnableRetry
 public class DomainConfiguration {
 
 
