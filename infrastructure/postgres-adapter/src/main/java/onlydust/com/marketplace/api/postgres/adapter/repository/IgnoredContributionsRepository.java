@@ -48,7 +48,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                 select pgr.project_id, c.id
                 from indexer_exp.contributions c
                 join indexer_exp.github_repos gr on gr.id = c.repo_id
-                join project_github_repos pgr on gr.id = c.repo_id
+                join project_github_repos pgr on pgr.github_repo_id = c.repo_id
                 join project_details pd on pd.project_id = pgr.project_id
                 left join custom_ignored_contributions cic on cic.contribution_id = c.id
                                                             and cic.project_id = pgr.project_id
