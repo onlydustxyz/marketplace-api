@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderUnassigned;
+import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -30,6 +32,7 @@ import static java.util.Objects.nonNull;
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
+    private final NotificationPort notificationPort;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;
@@ -271,7 +274,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         if (!isNull(projectLeadersToKeep)) {
             projectLeaders.stream()
                     .filter(projectLeader -> !projectLeadersToKeep.contains(projectLeader.getPrimaryKey().getUserId()))
-                    .forEach(projectLeadRepository::delete);
+                    .forEach(entity -> {
+                        projectLeadRepository.delete(entity);
+                        notificationPort.push(new ProjectLeaderUnassigned(projectId,
+                                entity.getPrimaryKey().getUserId(), new Date()));
+                    });
 
             if (projectLeadersToKeep.stream()
                     .anyMatch(userId -> projectLeaders.stream()

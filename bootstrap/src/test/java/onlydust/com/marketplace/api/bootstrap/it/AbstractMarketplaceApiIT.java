@@ -43,7 +43,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
-        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri")
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
+        @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -112,11 +113,18 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("dustyBot")
     protected WireMockServer dustyBotApiWireMockServer;
+    @InjectWireMock("webhook")
+    protected WireMockServer webhookWireMockServer;
 
     @LocalServerPort
     int port;
     @Autowired
     WebTestClient client;
+
+    protected static void waitAtLeastOneCycleOfNotificationProcessing() throws InterruptedException {
+        Thread.sleep(2000);
+    }
+
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {

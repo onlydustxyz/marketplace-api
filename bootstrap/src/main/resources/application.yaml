@@ -18,6 +18,8 @@ application:
       retry:
         retry-count: 20
         retry-interval: 500
+  cron:
+    notification-job-delay: 60000 # 1 minute
 
 spring:
   application:
@@ -82,3 +84,5 @@ infrastructure:
       client:
         base-uri: ${INDEXER_API_BASE_URL}
         api-key: ${INDEXER_API_KEY}
+  webhook:
+    url: ${BACKOFFICE_WEBHOOK_URL}

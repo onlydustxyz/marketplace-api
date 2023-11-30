@@ -17,3 +17,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000007_fix_pending_project_contributors_view.sql
   - include:
       file: db/changelog/changelogs/00000008_fix_replicate_users_changes_function.sql
+  - include:
+      file: db/changelog/changelogs/00000009_notifications.sql

@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>rest-api-adapter</module>
+        <module>cron-adapter</module>
     </modules>
 
     <properties>
