@@ -11,6 +11,8 @@ infrastructure:
     api:
       client:
         api-key: "some-indexer-api-key"
+  webhook:
+    environment: "local-it"
 spring:
   main:
     allow-bean-definition-overriding: true

@@ -17,23 +17,24 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAppliedOnProjectEventDTO {
 
-    @JsonProperty("Application")
-    Application application;
+
+    @JsonProperty("aggregate_name")
+    String aggregateName = "Application";
+
+    @JsonProperty("event_name")
+    String eventName = "Received";
+
+    @JsonProperty("environment")
+    String environment;
+
+    @JsonProperty("payload")
+    Payload payload;
 
     @Value
     @Builder(access = AccessLevel.PRIVATE)
     @AllArgsConstructor
     @NoArgsConstructor(force = true)
-    public static class Application {
-        @JsonProperty("Received")
-        Received received;
-    }
-
-    @Value
-    @Builder(access = AccessLevel.PRIVATE)
-    @AllArgsConstructor
-    @NoArgsConstructor(force = true)
-    public static class Received {
+    public static class Payload {
         @JsonProperty("id")
         UUID id;
 
@@ -48,15 +49,14 @@ public class UserAppliedOnProjectEventDTO {
         Date receivedAt;
     }
 
-    public static UserAppliedOnProjectEventDTO of(UserAppliedOnProject userAppliedOnProject) {
+    public static UserAppliedOnProjectEventDTO of(UserAppliedOnProject userAppliedOnProject, String environment) {
         return UserAppliedOnProjectEventDTO.builder()
-                .application(Application.builder()
-                        .received(Received.builder()
-                                .id(userAppliedOnProject.getApplicationId())
-                                .projectId(userAppliedOnProject.getProjectId())
-                                .applicantId(userAppliedOnProject.getUserId())
-                                .receivedAt(userAppliedOnProject.getAppliedAt())
-                                .build())
+                .environment(environment)
+                .payload(Payload.builder()
+                        .id(userAppliedOnProject.getApplicationId())
+                        .projectId(userAppliedOnProject.getProjectId())
+                        .applicantId(userAppliedOnProject.getUserId())
+                        .receivedAt(userAppliedOnProject.getAppliedAt())
                         .build())
                 .build();
     }

@@ -3,13 +3,10 @@ package onlydust.com.marketplace.api.webhook;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -44,9 +41,5 @@ public class WebhookHttpClient {
         }
     }
 
-    @ToString
-    @Data
-    public static class Config {
-        private URI url;
-    }
+
 }

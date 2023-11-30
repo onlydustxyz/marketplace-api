@@ -17,23 +17,23 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectLeaderAssignedEventDTO {
 
-    @JsonProperty("Project")
-    Project project;
+    @JsonProperty("aggregate_name")
+    String aggregateName = "Project";
+
+    @JsonProperty("event_name")
+    String eventName = "LeaderAssigned";
+
+    @JsonProperty("environment")
+    String environment;
+
+    @JsonProperty("payload")
+    Payload payload;
 
     @Value
     @Builder(access = AccessLevel.PRIVATE)
     @AllArgsConstructor
     @NoArgsConstructor(force = true)
-    public static class Project {
-        @JsonProperty("LeaderAssigned")
-        LeaderAssigned leaderAssigned;
-    }
-
-    @Value
-    @Builder(access = AccessLevel.PRIVATE)
-    @AllArgsConstructor
-    @NoArgsConstructor(force = true)
-    public static class LeaderAssigned {
+    public static class Payload {
         @JsonProperty("id")
         UUID projectId;
 
@@ -45,14 +45,13 @@ public class ProjectLeaderAssignedEventDTO {
         Date assignedAt;
     }
 
-    public static ProjectLeaderAssignedEventDTO of(ProjectLeaderAssigned projectLeaderAssigned) {
+    public static ProjectLeaderAssignedEventDTO of(ProjectLeaderAssigned projectLeaderAssigned, String environment) {
         return ProjectLeaderAssignedEventDTO.builder()
-                .project(Project.builder()
-                        .leaderAssigned(LeaderAssigned.builder()
-                                .projectId(projectLeaderAssigned.getProjectId())
-                                .leaderId(projectLeaderAssigned.getLeaderId())
-                                .assignedAt(projectLeaderAssigned.getAssignedAt())
-                                .build())
+                .environment(environment)
+                .payload(Payload.builder()
+                        .projectId(projectLeaderAssigned.getProjectId())
+                        .leaderId(projectLeaderAssigned.getLeaderId())
+                        .assignedAt(projectLeaderAssigned.getAssignedAt())
                         .build())
                 .build();
     }
