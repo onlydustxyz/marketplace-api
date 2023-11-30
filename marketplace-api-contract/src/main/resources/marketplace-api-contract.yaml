@@ -3257,7 +3257,7 @@ components:
             - links
           properties:
             contributor:
-              $ref: '#/components/schemas/RegisteredUserResponse'
+              $ref: '#/components/schemas/ContributorResponse'
             links:
               type: array
               description: Related contributions
