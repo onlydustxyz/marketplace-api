@@ -142,8 +142,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         waitAtLeastOneCycleOfNotificationProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.LeaderAssigned.id", equalTo(projectId)))
-                .withRequestBody(matchingJsonPath("$.LeaderAssigned.leader_id", equalTo(userId.toString()))));
+                .withRequestBody(matchingJsonPath("$.Project.LeaderAssigned.id", equalTo(projectId)))
+                .withRequestBody(matchingJsonPath("$.Project.LeaderAssigned.leader_id", equalTo(userId.toString()))));
     }
 
     @Test
@@ -209,8 +209,8 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         waitAtLeastOneCycleOfNotificationProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.Received.project_id", equalTo(projectId)))
-                .withRequestBody(matchingJsonPath("$.Received.applicant_id", equalTo(userId.toString()))));
+                .withRequestBody(matchingJsonPath("$.Application.Received.project_id", equalTo(projectId)))
+                .withRequestBody(matchingJsonPath("$.Application.Received.applicant_id", equalTo(userId.toString()))));
     }
 
     @Test

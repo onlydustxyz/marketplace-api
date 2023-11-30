@@ -17,9 +17,17 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserAppliedOnProjectEventDTO {
 
+    @JsonProperty("Application")
+    Application application;
 
-    @JsonProperty("Received")
-    Received received;
+    @Value
+    @Builder(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true)
+    public static class Application {
+        @JsonProperty("Received")
+        Received received;
+    }
 
     @Value
     @Builder(access = AccessLevel.PRIVATE)
@@ -42,11 +50,13 @@ public class UserAppliedOnProjectEventDTO {
 
     public static UserAppliedOnProjectEventDTO of(UserAppliedOnProject userAppliedOnProject) {
         return UserAppliedOnProjectEventDTO.builder()
-                .received(Received.builder()
-                        .id(userAppliedOnProject.getApplicationId())
-                        .projectId(userAppliedOnProject.getProjectId())
-                        .applicantId(userAppliedOnProject.getUserId())
-                        .receivedAt(userAppliedOnProject.getAppliedAt())
+                .application(Application.builder()
+                        .received(Received.builder()
+                                .id(userAppliedOnProject.getApplicationId())
+                                .projectId(userAppliedOnProject.getProjectId())
+                                .applicantId(userAppliedOnProject.getUserId())
+                                .receivedAt(userAppliedOnProject.getAppliedAt())
+                                .build())
                         .build())
                 .build();
     }

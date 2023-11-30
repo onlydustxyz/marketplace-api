@@ -122,7 +122,7 @@ public class AbstractMarketplaceApiIT {
     WebTestClient client;
 
     protected static void waitAtLeastOneCycleOfNotificationProcessing() throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(2000);
     }
 
 

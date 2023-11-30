@@ -17,9 +17,17 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectLeaderUnassignedEventDTO {
 
+    @JsonProperty("Project")
+    Project project;
 
-    @JsonProperty("LeaderUnassigned")
-    LeaderUnassigned leaderUnassigned;
+    @Value
+    @Builder(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor(force = true)
+    public static class Project {
+        @JsonProperty("LeaderUnassigned")
+        LeaderUnassigned leaderUnassigned;
+    }
 
     @Value
     @Builder(access = AccessLevel.PRIVATE)
@@ -39,10 +47,12 @@ public class ProjectLeaderUnassignedEventDTO {
 
     public static ProjectLeaderUnassignedEventDTO of(ProjectLeaderUnassigned projectLeaderUnassigned) {
         return ProjectLeaderUnassignedEventDTO.builder()
-                .leaderUnassigned(LeaderUnassigned.builder()
-                        .projectId(projectLeaderUnassigned.getProjectId())
-                        .leaderId(projectLeaderUnassigned.getLeaderId())
-                        .unassignedAt(projectLeaderUnassigned.getUnassignedAt())
+                .project(Project.builder()
+                        .leaderUnassigned(LeaderUnassigned.builder()
+                                .projectId(projectLeaderUnassigned.getProjectId())
+                                .leaderId(projectLeaderUnassigned.getLeaderId())
+                                .unassignedAt(projectLeaderUnassigned.getUnassignedAt())
+                                .build())
                         .build())
                 .build();
     }
