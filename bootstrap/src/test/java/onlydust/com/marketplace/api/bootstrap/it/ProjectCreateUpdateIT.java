@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
@@ -14,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -213,6 +214,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is5xxServerError();
     }
 
+    @SneakyThrows
     @Test
     @Order(10)
     public void should_update_the_project() {
@@ -271,6 +273,14 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And Then
         assertProjectWasUpdated();
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.LeaderUnassigned.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.LeaderUnassigned.leader_id",
+                        equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
+        );
     }
 
     @Test
