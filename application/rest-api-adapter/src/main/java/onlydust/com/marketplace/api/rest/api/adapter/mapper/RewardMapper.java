@@ -140,6 +140,7 @@ public interface RewardMapper {
     private static RewardItemResponse itemToResponse(final RewardItemView view) {
         return new RewardItemResponse()
                 .id(view.getId())
+                .contributionId(view.getContributionId())
                 .type(switch (view.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;
