@@ -110,7 +110,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               ],
               "organizations": [
                 {
-                  "id": 8642470,
+                  "githubUserId": 8642470,
                   "login": "gregcha",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "htmlUrl": "https://github.com/gregcha",
@@ -159,7 +159,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "installationId": 44378743
                 },
                 {
-                  "id": 119948009,
+                  "githubUserId": 119948009,
                   "login": "KasarLabs",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
                   "htmlUrl": "https://github.com/KasarLabs",

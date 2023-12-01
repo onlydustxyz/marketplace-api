@@ -386,7 +386,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributionPageResponse'
+                $ref: '#/components/schemas/UserContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1285,10 +1285,10 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Projects
-      summary: Get contributions of a user within the project
+      summary: Get all contributions of a project
       operationId: getProjectContributions
       description: |
-        Get contributions of a user on a given project. The caller must be a leader of the project.
+        Get contributions of a given project. The caller must be a leader of the project.
       parameters:
         - in: path
           name: projectId
@@ -1296,17 +1296,77 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
-          name: githubUserId
-          required: true
+          name: types
+          description: Contribution type filter
           schema:
-            $ref: '#/components/schemas/GithubUserId'
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionType'
+        - in: query
+          name: statuses
+          description: Contribution status filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionStatus'
+        - in: query
+          name: repositories
+          description: Repository filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: fromDate
+          description: Contribution date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          description: Contribution date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: contributorIds
+          description: Contributor filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+        - in: query
+          name: sort
+          description: Sorting field
+          schema:
+            $ref: '#/components/schemas/ProjectContributionSort'
+        - in: query
+          name: direction
+          description: Sort direction
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: pageIndex
+          description: Page number
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: integer
+
       responses:
         "200":
           description: 'Contribution list'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContributionPageResponse'
+                $ref: '#/components/schemas/ProjectContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1802,7 +1862,7 @@ components:
       example: 123456
 
     # RESPONSES ==================================================================
-    UserLinkResponse:
+    GithubUserResponse:
       type: object
       required:
         - githubUserId
@@ -1825,11 +1885,11 @@ components:
           description: Direct URL to user's avatar image
           example: 'https://avatars.githubusercontent.com/u/595505?v=4'
 
-    RegisteredUserLinkResponse:
+    RegisteredUserResponse:
       required:
         - id
       allOf:
-        - $ref: '#/components/schemas/UserLinkResponse'
+        - $ref: '#/components/schemas/GithubUserResponse'
         - type: object
           properties:
             id:
@@ -2041,7 +2101,7 @@ components:
         mapping:
           privateUserProfileResponse: '#/components/schemas/PrivateUserProfileResponse'
       allOf:
-        - $ref: '#/components/schemas/UserLinkResponse'
+        - $ref: '#/components/schemas/GithubUserResponse'
         - type: object
           required:
             - id
@@ -2235,34 +2295,22 @@ components:
         internalContributors:
           type: array
           items:
-            $ref: '#/components/schemas/ContributorSearchItemResponse'
+            $ref: '#/components/schemas/ContributorResponse'
         externalContributors:
           type: array
           items:
-            $ref: '#/components/schemas/ContributorSearchItemResponse'
+            $ref: '#/components/schemas/ContributorResponse'
 
-    ContributorSearchItemResponse:
-      type: object
-      required:
-        - githubUserId
-        - login
-        - avatarUrl
-        - isRegistered
-      properties:
-        githubUserId:
-          $ref: '#/components/schemas/GithubUserId'
-        login:
-          type: string
-          description: User's Github login
-          example: ofux
-        avatarUrl:
-          type: string
-          format: url
-          description: Direct URL to user's avatar image
-          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
-        isRegistered:
-          type: boolean
-          description: True if the user is registered on OnlyDust
+    ContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          required:
+            - isRegistered
+          properties:
+            isRegistered:
+              type: boolean
+              description: True if the user is registered on OnlyDust
 
     ContributorsPageResponse:
       type: object
@@ -2288,53 +2336,37 @@ components:
             $ref: '#/components/schemas/ContributorPageItemResponse'
 
     ContributorPageItemResponse:
-      type: object
-      required:
-        - id
-        - githubUserId
-        - login
-        - avatarUrl
-        - contributionCount
-        - rewardCount
-        - earned
-        - isRegistered
-      properties:
-        githubUserId:
-          $ref: '#/components/schemas/GithubUserId'
-        login:
-          type: string
-          description: User's Github login
-          example: ofux
-        avatarUrl:
-          type: string
-          format: url
-          description: Direct URL to user's avatar image
-          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
-        contributionCount:
-          type: integer
-          description: Total number of contributions the contributor made on this project.
-          example: 22
-        rewardCount:
-          type: integer
-          description: Total number of rewards the contributor got on this project.
-          example: 10
-        earned:
-          $ref: '#/components/schemas/RewardTotalAmountsResponse'
-        contributionToRewardCount:
-          type: integer
-          description: Total number of contributions the contributor was not rewarded for on this project.
-          example: 9
-        pullRequestToReward:
-          type: integer
-          example: 2
-        issueToReward:
-          type: integer
-          example: 4
-        codeReviewToReward:
-          type: integer
-          example: 3
-        isRegistered:
-          type: boolean
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          required:
+            - contributionCount
+            - rewardCount
+            - earned
+          properties:
+            contributionCount:
+              type: integer
+              description: Total number of contributions the contributor made on this project.
+              example: 22
+            rewardCount:
+              type: integer
+              description: Total number of rewards the contributor got on this project.
+              example: 10
+            earned:
+              $ref: '#/components/schemas/RewardTotalAmountsResponse'
+            contributionToRewardCount:
+              type: integer
+              description: Total number of contributions the contributor was not rewarded for on this project.
+              example: 9
+            pullRequestToReward:
+              type: integer
+              example: 2
+            issueToReward:
+              type: integer
+              example: 4
+            codeReviewToReward:
+              type: integer
+              example: 3
 
     SponsorResponse:
       type: object
@@ -2440,7 +2472,7 @@ components:
         leaders:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserLinkResponse'
+            $ref: '#/components/schemas/RegisteredUserResponse'
         sponsors:
           type: array
           items:
@@ -2514,7 +2546,7 @@ components:
           description: The top 3 contributors (by contribution count) of this project
           maxItems: 3
           items:
-            $ref: '#/components/schemas/UserLinkResponse'
+            $ref: '#/components/schemas/GithubUserResponse'
         # For now, we let the flatten repos list here to avoid breaking changes. However, it is marked as deprecated.
         # The 'organizations' field should be used instead.
         repos:
@@ -2529,11 +2561,11 @@ components:
         leaders:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserLinkResponse'
+            $ref: '#/components/schemas/RegisteredUserResponse'
         invitedLeaders:
           type: array
           items:
-            $ref: '#/components/schemas/RegisteredUserLinkResponse'
+            $ref: '#/components/schemas/RegisteredUserResponse'
         sponsors:
           type: array
           items:
@@ -2582,52 +2614,34 @@ components:
       description: Is the project visible to anyone?
 
     GithubOrganizationResponse:
-      type: object
-      required:
-        - id
-        - login
-        - avatarUrl
-        - htmlUrl
-        - name
-        - repos
-        - installed
-        - canBeInstalled
-        - isCurrentUserAdmin
-      properties:
-        id:
-          $ref: '#/components/schemas/GithubUserId'
-        login:
-          type: string
-          description: Organization's Github login
-          example: onlydustxyz
-        avatarUrl:
-          type: string
-          format: url
-          description: Direct URL to organization's avatar image
-          example: 'https://avatars.githubusercontent.com/u/98735558?v=4'
-        htmlUrl:
-          type: string
-          format: url
-          description: The public Github URL of the organization
-          example: 'https://github.com/onlydustxyz'
-        name:
-          type: string
-          example: OnlyDust
-        repos:
-          type: array
-          description: Github repos linked to installed organization
-          items:
-            $ref: '#/components/schemas/GithubRepoResponse'
-        installed:
-          type: boolean
-          description: False if this organization is not installed
-        isCurrentUserAdmin:
-          type: boolean
-        isPersonal:
-          type: boolean
-        installationId:
-          type: integer
-          format: int64
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          required:
+            - name
+            - repos
+            - installed
+            - canBeInstalled
+            - isCurrentUserAdmin
+          properties:
+            name:
+              type: string
+              example: OnlyDust
+            repos:
+              type: array
+              description: Github repos linked to installed organization
+              items:
+                $ref: '#/components/schemas/GithubRepoResponse'
+            installed:
+              type: boolean
+              description: False if this organization is not installed
+            isCurrentUserAdmin:
+              type: boolean
+            isPersonal:
+              type: boolean
+            installationId:
+              type: integer
+              format: int64
 
     ShortGithubRepoResponse:
       discriminator:
@@ -2939,7 +2953,7 @@ components:
           type: string
           description: The body of the pull request.
         author:
-          $ref: '#/components/schemas/UserLinkResponse'
+          $ref: '#/components/schemas/GithubUserResponse'
         repository:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         commentCount:
@@ -2993,7 +3007,7 @@ components:
           type: string
           description: The body of the issue.
         author:
-          $ref: '#/components/schemas/UserLinkResponse'
+          $ref: '#/components/schemas/GithubUserResponse'
         repository:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         commentCount:
@@ -3028,7 +3042,7 @@ components:
           format: date-time
           description: When the code review was submitted.
         author:
-          $ref: '#/components/schemas/UserLinkResponse'
+          $ref: '#/components/schemas/GithubUserResponse'
 
     ContributionType:
       type: string
@@ -3043,6 +3057,16 @@ components:
       enum:
         - CREATED_AT
         - PROJECT_REPO_NAME
+        - GITHUB_NUMBER_TITLE
+        - LINKS_COUNT
+
+    ProjectContributionSort:
+      type: string
+      default: CREATED_AT
+      enum:
+        - CREATED_AT
+        - REPO_NAME
+        - CONTRIBUTOR_LOGIN
         - GITHUB_NUMBER_TITLE
         - LINKS_COUNT
 
@@ -3109,7 +3133,7 @@ components:
         - STARK
         - OP
 
-    ContributionPageResponse:
+    UserContributionPageResponse:
       type: object
       required:
         - contributions
@@ -3121,7 +3145,31 @@ components:
         contributions:
           type: array
           items:
-            $ref: '#/components/schemas/ContributionPageItemResponse'
+            $ref: '#/components/schemas/UserContributionPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    ProjectContributionPageResponse:
+      type: object
+      required:
+        - contributions
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        contributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributionPageItemResponse'
         hasMore:
           type: boolean
           example: true
@@ -3161,8 +3209,6 @@ components:
             - id
             - createdAt
             - status
-            - project
-            - links
             - rewardIds
           properties:
             id:
@@ -3178,13 +3224,6 @@ components:
               description: When the contribution was completed
             status:
               $ref: '#/components/schemas/ContributionStatus'
-            project:
-              $ref: '#/components/schemas/ShortProjectResponse'
-            links:
-              type: array
-              description: Related contributions
-              items:
-                $ref: '#/components/schemas/ContributionLinkResponse'
             githubPullRequestReviewState:
               $ref: '#/components/schemas/GithubPullRequestReviewState'
             rewardIds:
@@ -3193,6 +3232,37 @@ components:
               items:
                 $ref: '#/components/schemas/RewardId'
 
+    UserContributionPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionPageItemResponse'
+        - type: object
+          required:
+            - project
+            - links
+          properties:
+            project:
+              $ref: '#/components/schemas/ShortProjectResponse'
+            links:
+              type: array
+              description: Related contributions
+              items:
+                $ref: '#/components/schemas/ContributionLinkResponse'
+
+    ProjectContributionPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionPageItemResponse'
+        - type: object
+          required:
+            - contributor
+            - links
+          properties:
+            contributor:
+              $ref: '#/components/schemas/RegisteredUserResponse'
+            links:
+              type: array
+              description: Related contributions
+              items:
+                $ref: '#/components/schemas/ContributionResponse'
 
     ContributionLinkResponse:
       allOf:
@@ -3221,7 +3291,7 @@ components:
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         githubAuthor:
-          $ref: '#/components/schemas/UserLinkResponse'
+          $ref: '#/components/schemas/GithubUserResponse'
         githubNumber:
           type: integer
           format: int64
@@ -3294,42 +3364,31 @@ components:
                 $ref: '#/components/schemas/RewardResponse'
 
     GetMeResponse:
-      type: object
-      required:
-        - id
-        - githubUserId
-        - login
-        - avatarUrl
-        - hasSeenOnboardingWizard
-        - hasAcceptedLatestTermsAndConditions
-      properties:
-        id:
-          type: string
-          pattern: uuid
-        githubUserId:
-          $ref: '#/components/schemas/GithubUserId'
-        login:
-          type: string
-        avatarUrl:
-          type: string
-          pattern: uri
-        hasSeenOnboardingWizard:
-          type: boolean
-          description: True if the user has seen the onboarding process
-        hasAcceptedLatestTermsAndConditions:
-          type: boolean
-          description: True if the user has accepted the latest version of terms and conditions
-        hasValidPayoutInfos:
-          type: boolean
-          description: False if the user has invalid payout information
-        projectsLed:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLedShortResponse'
-        pendingProjectsLed:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLedShortResponse'
+      allOf:
+        - $ref: '#/components/schemas/RegisteredUserResponse'
+        - type: object
+          required:
+            - hasSeenOnboardingWizard
+            - hasAcceptedLatestTermsAndConditions
+          properties:
+            hasSeenOnboardingWizard:
+              type: boolean
+              description: True if the user has seen the onboarding process
+            hasAcceptedLatestTermsAndConditions:
+              type: boolean
+              description: True if the user has accepted the latest version of terms and conditions
+            hasValidPayoutInfos:
+              type: boolean
+              description: False if the user has invalid payout information
+            projectsLed:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLedShortResponse'
+            pendingProjectsLed:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLedShortResponse'
+
     ProjectLedShortResponse:
       type: object
       required:
@@ -3350,6 +3409,7 @@ components:
         contributorCount:
           type: integer
           format: int64
+
     PatchMeContract:
       type: object
       properties:
@@ -3521,20 +3581,7 @@ components:
     GithubUserListResponse:
       type: array
       items:
-        $ref: '#/components/schemas/GithubUserResponse'
-    GithubUserResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        login:
-          type: string
-        avatarUrl:
-          type: string
-          format: url
-        isRegistered:
-          type: boolean
+        $ref: '#/components/schemas/ContributorResponse'
 
     InstallationResponse:
       type: object
@@ -3637,9 +3684,9 @@ components:
         status:
           $ref: '#/components/schemas/RewardStatus'
         from:
-          $ref: '#/components/schemas/GithubUserResponse'
+          $ref: '#/components/schemas/ContributorResponse'
         to:
-          $ref: '#/components/schemas/GithubUserResponse'
+          $ref: '#/components/schemas/ContributorResponse'
         createdAt:
           type: string
           format: date-time

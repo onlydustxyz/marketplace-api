@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.ContributorSearchItemResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 
@@ -21,8 +21,8 @@ public class ContributorSearchResponseMapper {
                 );
     }
 
-    static ContributorSearchItemResponse of(Contributor contributor) {
-        return new ContributorSearchItemResponse()
+    static ContributorResponse of(Contributor contributor) {
+        return new ContributorResponse()
                 .githubUserId(contributor.getId().getGithubUserId())
                 .login(contributor.getId().getGithubLogin())
                 .avatarUrl(contributor.getId().getGithubAvatarUrl())

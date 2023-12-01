@@ -20,7 +20,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
             {
               "id": 44300036,
               "organization": {
-                "id": 98735558,
+                "githubUserId": 98735558,
                 "login": "onlydustxyz",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/98735558?v=4",
                 "htmlUrl": "https://github.com/onlydustxyz",
@@ -915,7 +915,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         [
                           {
-                            "id": 98735558,
+                            "githubUserId": 98735558,
                             "login": "onlydustxyz",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/98735558?v=4",
                             "htmlUrl": "https://github.com/onlydustxyz",
@@ -1552,7 +1552,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                             "installationId": 44300036
                           },
                           {
-                            "id": 105865802,
+                            "githubUserId": 105865802,
                             "login": "symeo-io",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/105865802?v=4",
                             "htmlUrl": "https://github.com/symeo-io",
@@ -1685,7 +1685,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                             "installationId": 44300041
                           },
                           {
-                            "id": 16590657,
+                            "githubUserId": 16590657,
                             "login": "PierreOucif",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                             "htmlUrl": "https://github.com/PierreOucif",
