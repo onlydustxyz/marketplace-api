@@ -3,6 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
+import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderInvitationCancelled;
+import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderInvited;
 import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderUnassigned;
 import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -195,8 +198,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
         this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
+        notificationPort.push(new ProjectLeaderAssigned(projectId, firstProjectLeaderId, new Date()));
 
         if (nonNull(githubUserIdsAsProjectLeads)) {
+            githubUserIdsAsProjectLeads.forEach(githubUserId ->
+                    notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date())));
+
             projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
                     .map(githubUserId -> new ProjectLeaderInvitationEntity(
                             UUID.randomUUID(),
@@ -259,15 +266,20 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         if (!isNull(githubUserIdsAsProjectLeadersToInvite)) {
             projectLeaderInvitations.stream()
                     .filter(invitation -> !githubUserIdsAsProjectLeadersToInvite.contains(invitation.getGithubUserId()))
-                    .forEach(projectLeaderInvitationRepository::delete);
+                    .forEach(invitation -> {
+                        projectLeaderInvitationRepository.delete(invitation);
+                        notificationPort.push(new ProjectLeaderInvitationCancelled(projectId,
+                                invitation.getGithubUserId(), new Date()));
+                    });
 
             githubUserIdsAsProjectLeadersToInvite.stream()
                     .filter(githubUserId -> projectLeaderInvitations.stream()
                             .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId)))
-                    .forEach(githubUserId -> projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(
-                            UUID.randomUUID(),
-                            projectId,
-                            githubUserId)));
+                    .forEach(githubUserId -> {
+                        projectLeaderInvitationRepository.save(
+                                new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId));
+                        notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date()));
+                    });
         }
 
         final var projectLeaders = project.getProjectLeaders();

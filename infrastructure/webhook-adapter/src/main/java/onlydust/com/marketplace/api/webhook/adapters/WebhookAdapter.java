@@ -1,16 +1,11 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.notification.Notification;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderUnassigned;
-import onlydust.com.marketplace.api.domain.model.notification.UserAppliedOnProject;
+import onlydust.com.marketplace.api.domain.model.notification.*;
 import onlydust.com.marketplace.api.domain.port.output.WebhookPort;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.WebhookHttpClient;
-import onlydust.com.marketplace.api.webhook.dto.ProjectLeaderAssignedEventDTO;
-import onlydust.com.marketplace.api.webhook.dto.ProjectLeaderUnassignedEventDTO;
-import onlydust.com.marketplace.api.webhook.dto.UserAppliedOnProjectEventDTO;
+import onlydust.com.marketplace.api.webhook.dto.*;
 
 @AllArgsConstructor
 public class WebhookAdapter implements WebhookPort {
@@ -27,6 +22,11 @@ public class WebhookAdapter implements WebhookPort {
                     config.getEnvironment()));
         } else if (notification instanceof UserAppliedOnProject userAppliedOnProject) {
             webhookHttpClient.post(UserAppliedOnProjectEventDTO.of(userAppliedOnProject, config.getEnvironment()));
+        } else if (notification instanceof ProjectLeaderInvited projectLeaderInvited) {
+            webhookHttpClient.post(ProjectLeaderInvitedEventDTO.of(projectLeaderInvited, config.getEnvironment()));
+        } else if (notification instanceof ProjectLeaderInvitationCancelled projectLeaderInvitationCancelled) {
+            webhookHttpClient.post(ProjectLeaderInvitationCancelledEventDTO.of(projectLeaderInvitationCancelled,
+                    config.getEnvironment()));
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(notification));
         }
