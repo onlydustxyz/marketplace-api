@@ -171,6 +171,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Created")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
                 .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
                 .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
                 .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
@@ -321,6 +328,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertProjectWasUpdated();
 
         waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Updated")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+        );
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))

@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderInvitationCancelled;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderInvited;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderUnassigned;
+import onlydust.com.marketplace.api.domain.model.notification.*;
 import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -198,6 +195,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
+        notificationPort.push(new ProjectCreated(projectId, new Date()));
+
         this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
         notificationPort.push(new ProjectLeaderAssigned(projectId, firstProjectLeaderId, new Date()));
 
@@ -308,6 +307,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                             repoId)));
         }
 
+        notificationPort.push(new ProjectUpdated(projectId, new Date()));
         this.projectRepository.save(project);
     }
 
