@@ -3742,6 +3742,9 @@ components:
           format: int64
         id:
           type: string
+        contributionId:
+          type: string
+          description: Id of the contribution (if any) related to this reward item.
         title:
           type: string
         githubUrl:

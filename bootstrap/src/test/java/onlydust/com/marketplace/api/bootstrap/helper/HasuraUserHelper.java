@@ -95,6 +95,11 @@ public class HasuraUserHelper {
     }
 
     @NonNull
+    public AuthenticatedUser authenticateGregoire() {
+        return authenticateUser(8642470L, null);
+    }
+
+    @NonNull
     public AuthenticatedUser authenticateUser(Long githubUserId) {
         final AuthUserEntity user = authUserRepository.findByGithubUserId(githubUserId).orElseThrow();
         return authenticateUser(user);
@@ -105,7 +110,6 @@ public class HasuraUserHelper {
         final AuthUserEntity user = authUserRepository.findByGithubUserId(githubUserId).orElseThrow();
         return authenticateUser(user, githubPAT);
     }
-
 
 
     @NonNull

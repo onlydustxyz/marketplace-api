@@ -359,6 +359,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 {
                                     "number": 1232,
                                     "id": "1511546916",
+                                    "contributionId": "a290ea203b1264105bf581aebbdf3e79edfdd89811da50dc6bd076272d810b2e",
                                     "title": "Addin sitemap.xml in robots.txt",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1232",
                                     "createdAt": "2023-09-12T07:38:04Z",
@@ -413,6 +414,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                             {
                               "number": 1129,
                               "id": "1442413635",
+                              "contributionId": "6d709dd5f85a8b8eaff9cc8837ab837ef9a1a1109ead76580490c0a730a87d9d",
                               "title": "First API integration test",
                               "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
                               "createdAt": "2023-07-20T08:45:18Z",
