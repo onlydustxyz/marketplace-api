@@ -47,7 +47,8 @@ public interface ProjectMapper {
                 .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
                 .githubRepoIds(updateProjectRequest.getGithubRepoIds())
                 .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
-                .moreInfos(updateProjectRequest.getMoreInfos().stream()
+                .moreInfos(isNull(updateProjectRequest.getMoreInfos()) ? null :
+                        updateProjectRequest.getMoreInfos().stream()
                         .map(moreInfo -> MoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
@@ -107,7 +108,8 @@ public interface ProjectMapper {
         project.setShortDescription(projectDetailsView.getShortDescription());
         project.setLongDescription(projectDetailsView.getLongDescription());
         project.setLogoUrl(projectDetailsView.getLogoUrl());
-        project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null : projectDetailsView.getMoreInfos().stream()
+        project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null :
+                projectDetailsView.getMoreInfos().stream()
                 .map(moreInfo -> new MoreInfo().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
         project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));

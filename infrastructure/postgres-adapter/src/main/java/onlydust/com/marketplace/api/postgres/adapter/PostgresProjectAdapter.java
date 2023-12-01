@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
@@ -218,10 +219,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .collect(Collectors.toSet()));
         }
         if (nonNull(moreInfos)) {
-            projectMoreInfoRepository.saveAll(moreInfos.stream()
-                    .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
-                            .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
-                            .name(moreInfoLink.getValue()).build()).collect(Collectors.toList()));
+            projectMoreInfoRepository.saveAll(moreInfosToEntities(moreInfos, projectId));
         }
 
         return projectRepository.getKeyById(projectId);
@@ -250,16 +248,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             project.setIgnoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore());
         }
 
-        if (nonNull(project.getMoreInfos())) {
+        if (nonNull(project.getMoreInfos()) && nonNull(moreInfos)) {
             project.getMoreInfos().stream()
                     .filter(existingMoreInfo -> moreInfos.stream().noneMatch(moreInfoLink -> moreInfoLink.getUrl().equals(existingMoreInfo.getId().getUrl())))
                     .forEach(projectMoreInfoRepository::delete);
 
-            moreInfos.stream()
-                    .map(moreInfoLink -> ProjectMoreInfoEntity.builder()
-                            .id(ProjectMoreInfoEntity.Id.builder().url(moreInfoLink.getUrl()).projectId(projectId).build())
-                            .name(moreInfoLink.getValue()).build())
-                    .forEach(projectMoreInfoRepository::save);
+            projectMoreInfoRepository.saveAll(moreInfosToEntities(moreInfos, projectId));
         }
 
         final var projectLeaderInvitations = project.getProjectLeaderInvitations();

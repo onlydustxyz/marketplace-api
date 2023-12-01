@@ -19,3 +19,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000008_fix_replicate_users_changes_function.sql
   - include:
       file: db/changelog/changelogs/00000009_notifications.sql
+  - include:
+      file: db/changelog/changelogs/00000010_order_more_infos.sql
+
