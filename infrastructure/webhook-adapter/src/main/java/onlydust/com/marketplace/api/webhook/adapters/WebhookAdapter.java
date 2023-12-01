@@ -15,7 +15,11 @@ public class WebhookAdapter implements WebhookPort {
 
     @Override
     public void send(Notification notification) {
-        if (notification instanceof ProjectLeaderAssigned projectLeaderAssigned) {
+        if (notification instanceof ProjectCreated projectCreated) {
+            webhookHttpClient.post(ProjectCreatedEventDTO.of(projectCreated, config.getEnvironment()));
+        } else if (notification instanceof ProjectUpdated projectUpdated) {
+            webhookHttpClient.post(ProjectUpdatedEventDTO.of(projectUpdated, config.getEnvironment()));
+        } else if (notification instanceof ProjectLeaderAssigned projectLeaderAssigned) {
             webhookHttpClient.post(ProjectLeaderAssignedEventDTO.of(projectLeaderAssigned, config.getEnvironment()));
         } else if (notification instanceof ProjectLeaderUnassigned projectLeaderUnassigned) {
             webhookHttpClient.post(ProjectLeaderUnassignedEventDTO.of(projectLeaderUnassigned,
