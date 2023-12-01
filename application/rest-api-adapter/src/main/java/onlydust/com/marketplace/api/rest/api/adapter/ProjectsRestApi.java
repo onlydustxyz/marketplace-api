@@ -342,39 +342,35 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                                    String direction,
                                                                                    Integer pageIndex,
                                                                                    Integer pageSize) {
-        try {
-            final User authenticatedUser = authenticationService.getAuthenticatedUser();
-            final int sanitizedPageSize = sanitizePageSize(pageSize);
-            final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
-            final ContributionView.Filters filters = ContributionView.Filters.builder()
-                    .contributors(Optional.ofNullable(contributorIds).orElse(List.of()))
-                    .projects(List.of(projectId))
-                    .repos(Optional.ofNullable(repositories).orElse(List.of()))
-                    .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
-                    .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
-                    .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
-                    .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
-                    .build();
+        final ContributionView.Filters filters = ContributionView.Filters.builder()
+                .contributors(Optional.ofNullable(contributorIds).orElse(List.of()))
+                .projects(List.of(projectId))
+                .repos(Optional.ofNullable(repositories).orElse(List.of()))
+                .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
+                .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
+                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
+                .build();
 
-            final var contributions = projectFacadePort.contributions(
-                    projectId,
-                    authenticatedUser,
-                    filters,
-                    ContributionMapper.mapSort(sort),
-                    SortDirectionMapper.requestToDomain(direction),
-                    sanitizedPageIndex,
-                    sanitizedPageSize);
+        final var contributions = projectFacadePort.contributions(
+                projectId,
+                authenticatedUser,
+                filters,
+                ContributionMapper.mapSort(sort),
+                SortDirectionMapper.requestToDomain(direction),
+                sanitizedPageIndex,
+                sanitizedPageSize);
 
-            final var contributionPageResponse = ContributionMapper.mapProjectContributionPageResponse(
-                    sanitizedPageIndex,
-                    contributions);
+        final var contributionPageResponse = ContributionMapper.mapProjectContributionPageResponse(
+                sanitizedPageIndex,
+                contributions);
 
-            return contributionPageResponse.getTotalPageNumber() > 1 ?
-                    ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
-                    : ResponseEntity.ok(contributionPageResponse);
-        } catch (ParseException e) {
-            throw OnlyDustException.badRequest("Invalid date format");
-        }
+        return contributionPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
+                : ResponseEntity.ok(contributionPageResponse);
     }
 }
