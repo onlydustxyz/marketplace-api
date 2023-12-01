@@ -9,13 +9,15 @@ import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import java.net.URI;
 import java.util.Comparator;
 
+import static java.util.Objects.nonNull;
+
 public interface GithubMapper {
     static InstallationResponse mapToInstallationResponse(Long installationId, GithubAccount githubAccount) {
         var organization = new GithubOrganizationResponse();
         organization.setGithubUserId(githubAccount.getId());
         organization.setLogin(githubAccount.getLogin());
         organization.setAvatarUrl(githubAccount.getAvatarUrl());
-        organization.setHtmlUrl(URI.create(githubAccount.getHtmlUrl()));
+        organization.setHtmlUrl(nonNull(githubAccount.getHtmlUrl()) ? URI.create(githubAccount.getHtmlUrl()) : null);
         organization.setName(githubAccount.getName());
         organization.setInstalled(githubAccount.getInstalled());
         organization.setRepos(
@@ -43,7 +45,7 @@ public interface GithubMapper {
         organization.setGithubUserId(githubAccount.getId());
         organization.setLogin(githubAccount.getLogin());
         organization.setAvatarUrl(githubAccount.getAvatarUrl());
-        organization.setHtmlUrl(URI.create(githubAccount.getHtmlUrl()));
+        organization.setHtmlUrl(nonNull(githubAccount.getHtmlUrl()) ? URI.create(githubAccount.getHtmlUrl()) : null);
         organization.setName(githubAccount.getName());
         organization.setInstalled(githubAccount.getInstalled());
         organization.setInstallationId(githubAccount.getInstallationId());
