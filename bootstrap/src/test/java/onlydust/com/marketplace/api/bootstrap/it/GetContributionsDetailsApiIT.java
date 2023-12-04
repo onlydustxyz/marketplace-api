@@ -388,7 +388,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_403_when_not_mine() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userHelper.authenticateHayden().jwt();
 
         // When
         client.get()
@@ -400,5 +400,22 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isForbidden();
+    }
+
+    @Test
+    void should_return_200_when_leader() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
+                        "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                        "2eba1ee6dd0e0a3acb2f0d411eea52500eb572b1eec6f2ccf45bc53e8cd77bd6")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 }

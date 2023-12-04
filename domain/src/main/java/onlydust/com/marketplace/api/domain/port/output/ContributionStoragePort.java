@@ -18,7 +18,7 @@ public interface ContributionStoragePort {
                                              Integer page,
                                              Integer pageSize);
 
-    ContributionDetailsView findContributionById(UUID projectId, String contributionId, Long githubUserId);
+    ContributionDetailsView findContributionById(UUID projectId, String contributionId);
 
     List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters);
 

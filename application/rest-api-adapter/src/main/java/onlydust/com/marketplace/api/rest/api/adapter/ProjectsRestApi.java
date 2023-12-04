@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -272,7 +271,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
         final var contribution = contributionsFacadePort.getContribution(projectId, contributionId,
-                authenticatedUser.getGithubUserId());
+                authenticatedUser);
 
         return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution));
     }
