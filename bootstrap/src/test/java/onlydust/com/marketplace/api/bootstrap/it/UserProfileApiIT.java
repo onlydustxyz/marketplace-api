@@ -833,8 +833,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     "issueCount": 0,
                     "pullRequestCount": 20
                   }
-                ],
-                "contributionCountVariationSinceLastWeek": -30
+                ]
               },
               "allocatedTimeToContribute": "NONE",
               "isLookingForAJob": false
@@ -1646,8 +1645,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     "issueCount": 0,
                     "pullRequestCount": 20
                   }
-                ],
-                "contributionCountVariationSinceLastWeek": -30
+                ]
               }
             }
                         
