@@ -94,7 +94,7 @@ public interface ProjectMapper {
         organization.setRepos(projectOrganizationView.getRepos().stream()
                 .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
                 .map(ProjectMapper::mapOrganizationRepo)
-                .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))
+                .sorted(Comparator.comparing(GithubRepoResponse::getId))
                 .toList());
         return organization;
     }
