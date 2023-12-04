@@ -38,7 +38,7 @@ public class SwaggerConfiguration {
                 .securityContexts(Collections.singletonList(securityContext()))
                 .securitySchemes(List.of(apiKey()))
                 .select()
-                .paths(PathSelectors.regex("(/api/.*)"))
+                .paths(PathSelectors.regex("(/api/.*|/bo/.*)"))
                 .build()
                 .pathMapping("/");
     }
