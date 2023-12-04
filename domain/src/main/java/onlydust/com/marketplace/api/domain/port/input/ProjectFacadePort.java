@@ -74,4 +74,7 @@ public interface ProjectFacadePort {
 
     RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl);
 
+    Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
+                                         ContributionView.Sort sort, SortDirection direction,
+                                         Integer page, Integer pageSize);
 }

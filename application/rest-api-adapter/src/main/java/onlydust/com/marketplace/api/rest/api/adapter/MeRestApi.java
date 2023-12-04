@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
@@ -21,10 +22,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
@@ -135,22 +139,27 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<UserContributionPageResponse> getMyContributions(List<ContributionType> types,
-                                                                       List<ContributionStatus> statuses,
-                                                                       List<UUID> projects,
-                                                                       List<Long> repositories,
-                                                                       ContributionSort sort,
-                                                                       String direction,
-                                                                       Integer page,
-                                                                       Integer pageSize) {
+                                                                           List<ContributionStatus> statuses,
+                                                                           List<UUID> projects,
+                                                                           List<Long> repositories,
+                                                                           String fromDate,
+                                                                           String toDate,
+                                                                           ContributionSort sort,
+                                                                           String direction,
+                                                                           Integer page,
+                                                                           Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(page);
 
         final var filters = ContributionView.Filters.builder()
+                .contributors(List.of(authenticatedUser.getGithubUserId()))
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
+                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
 
         final var contributions = contributorFacadePort.contributions(
@@ -168,6 +177,7 @@ public class MeRestApi implements MeApi {
         return contributionPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
                 : ResponseEntity.ok(contributionPageResponse);
+
     }
 
     @Override

@@ -39,7 +39,10 @@ public class ContributionViewEntity {
     @Enumerated(EnumType.STRING)
     @org.hibernate.annotations.Type(type = "contribution_status")
     Status status;
-
+    Long contributorId;
+    String contributorLogin;
+    String contributorHtmlUrl;
+    String contributorAvatarUrl;
     Long githubNumber;
     String githubStatus;
     String githubTitle;
@@ -105,6 +108,12 @@ public class ContributionViewEntity {
                 .completedAt(completedAt)
                 .type(type.toView())
                 .status(status.toView())
+                .contributor(ContributorLinkView.builder()
+                        .githubUserId(contributorId)
+                        .login(contributorLogin)
+                        .url(contributorHtmlUrl)
+                        .avatarUrl(contributorAvatarUrl)
+                        .build())
                 .githubNumber(githubNumber)
                 .githubStatus(githubStatus)
                 .githubTitle(githubTitle)

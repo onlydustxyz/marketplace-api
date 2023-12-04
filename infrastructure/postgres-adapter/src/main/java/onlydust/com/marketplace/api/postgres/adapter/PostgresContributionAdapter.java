@@ -21,8 +21,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresContributionAdapter implements ContributionStoragePort {
@@ -39,18 +42,22 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ContributionView> findContributionsForUser(Long contributorId,
-                                                           ContributionView.Filters filters,
-                                                           ContributionView.Sort sort,
-                                                           SortDirection direction,
-                                                           Integer page,
-                                                           Integer pageSize) {
-        final var contributionPage = contributionViewEntityRepository.findContributionsForContributor(
+    public Page<ContributionView> findContributions(Long contributorId,
+                                                    ContributionView.Filters filters,
+                                                    ContributionView.Sort sort,
+                                                    SortDirection direction,
+                                                    Integer page,
+                                                    Integer pageSize) {
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var contributionPage = contributionViewEntityRepository.findContributions(
                 contributorId,
+                filters.getContributors(),
                 filters.getProjects(),
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
                 filters.getStatuses().stream().map(Enum::name).toList(),
+                isNull(filters.getFrom()) ? null : format.format(filters.getFrom()),
+                isNull(filters.getTo()) ? null : format.format(filters.getTo()),
                 PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
 
         return Page.<ContributionView>builder()
@@ -77,6 +84,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
             case CREATED_AT -> Sort.by(direction, "created_at");
             case PROJECT_REPO_NAME -> Sort.by(direction, "project_name", "repo_name");
             case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
+            case CONTRIBUTOR_LOGIN -> Sort.by(direction, "contributor_login");
             case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links)), 0)");
         };
     }

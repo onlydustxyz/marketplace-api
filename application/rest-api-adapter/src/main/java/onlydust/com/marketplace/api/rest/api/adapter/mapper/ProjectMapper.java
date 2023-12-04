@@ -87,7 +87,7 @@ public interface ProjectMapper {
         organization.setGithubUserId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
         organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
-        organization.setHtmlUrl(URI.create(projectOrganizationView.getHtmlUrl()));
+        organization.setHtmlUrl(nonNull(projectOrganizationView.getHtmlUrl()) ? URI.create(projectOrganizationView.getHtmlUrl()) : null);
         organization.setName(projectOrganizationView.getName());
         organization.setInstallationId(projectOrganizationView.getInstallationId());
         organization.setInstalled(projectOrganizationView.getIsInstalled());

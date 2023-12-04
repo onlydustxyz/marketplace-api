@@ -2,10 +2,16 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Temporal;
 
+import javax.persistence.TemporalType;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,6 +24,10 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.completed_at,
                 c.type,
                 c.status,
+                c.contributor_id,
+                c.contributor_login,
+                c.contributor_html_url,
+                c.contributor_avatar_url,
                 c.github_number,
                 c.github_status,
                 c.github_title,
@@ -58,7 +68,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', i.author_login,
                         'github_author_html_url', i.author_html_url,
                         'github_author_avatar_url', i.author_avatar_url,
-                        'is_mine', c.contributor_id = i.author_id,
+                        'is_mine', :contributorId = i.author_id,
                         'repo_id', i.repo_id,
                         'repo_owner', i.repo_owner_login,
                         'repo_name', i.repo_name,
@@ -86,7 +96,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', pr.author_avatar_url,
-                        'is_mine', c.contributor_id = pr.author_id,
+                        'is_mine', :contributorId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -114,7 +124,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', pr.author_avatar_url,
-                        'is_mine', c.contributor_id = pr.author_id,
+                        'is_mine', :contributorId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -140,16 +150,21 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                     pr.project_id = p.project_id
             ) AS rewards ON TRUE
             WHERE 
-                contributor_id = :contributorId AND
+                (COALESCE(:contributorIds) IS NULL OR c.contributor_id IN (:contributorIds)) AND
                 (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds)) AND
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND
                 (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
-                (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses))
+                (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
+                (:fromDate IS NULL OR c.created_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                (:toDate IS NULL OR c.created_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<ContributionViewEntity> findContributionsForContributor(Long contributorId,
-                                                                 List<UUID> projectIds,
-                                                                 List<Long> repoIds,
-                                                                 List<String> types,
-                                                                 List<String> statuses,
-                                                                 Pageable pageable);
+    Page<ContributionViewEntity> findContributions(Long contributorId,
+                                                   List<Long> contributorIds,
+                                                   List<UUID> projectIds,
+                                                   List<Long> repoIds,
+                                                   List<String> types,
+                                                   List<String> statuses,
+                                                   String fromDate,
+                                                   String toDate,
+                                                   Pageable pageable);
 }
