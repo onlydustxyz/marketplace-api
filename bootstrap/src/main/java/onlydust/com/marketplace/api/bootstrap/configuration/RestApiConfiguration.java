@@ -42,8 +42,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public TechnologiesRestApi technologiesRestApi() {
-        return new TechnologiesRestApi();
+    public TechnologiesRestApi technologiesRestApi(final AuthenticationService authenticationService, final TechnologiesPort technologiesPort) {
+        return new TechnologiesRestApi(technologiesPort, authenticationService);
     }
 
     @Bean
