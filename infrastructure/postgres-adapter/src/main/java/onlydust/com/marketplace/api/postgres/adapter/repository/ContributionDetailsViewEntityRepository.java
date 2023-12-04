@@ -49,7 +49,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                    case
                        when c.type = 'PULL_REQUEST' then (select gprcc.commit_count
                                                           from indexer_exp.github_pull_request_commit_counts gprcc
-                                                          where gprcc.pull_request_id = c.pull_request_id and gprcc.author_id = :githubUserId)
+                                                          where gprcc.pull_request_id = c.pull_request_id and gprcc.author_id = c.contributor_id)
                        end                                                                                   as github_user_commits_count
                 FROM
                    indexer_exp.contributions c
@@ -154,5 +154,5 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                     c.id = :contributionId AND
                     p.project_id = :projectId
             """, nativeQuery = true)
-    Optional<ContributionDetailsViewEntity> findContributionById(UUID projectId, String contributionId, Long githubUserId);
+    Optional<ContributionDetailsViewEntity> findContributionById(UUID projectId, String contributionId);
 }

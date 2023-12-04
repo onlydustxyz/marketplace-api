@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
+import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
 import org.junit.jupiter.api.Test;
@@ -28,32 +29,59 @@ class ContributionServiceTest {
         // Given
         final var projectId = UUID.randomUUID();
         final var contributionId = faker.pokemon().name();
+        final var userId = UUID.randomUUID();
         final var githubUserId = faker.number().randomNumber();
         final var expectedContribution =
                 ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
 
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(true);
-        when(contributionStoragePort.findContributionById(projectId, contributionId, githubUserId)).thenReturn(expectedContribution);
-        final var contribution = contributionService.getContribution(projectId, contributionId, githubUserId);
+        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
+        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        final var contribution = contributionService.getContribution(projectId, contributionId,
+                User.builder().id(userId).githubUserId(githubUserId).build());
 
         // Then
         assertThat(contribution).isEqualTo(expectedContribution);
     }
 
     @Test
-    void getContribution_should_return_401_when_caller_is_not_the_contributor() {
+    void getContribution_should_return_contribution_when_caller_is_project_leader() {
         // Given
         final var projectId = UUID.randomUUID();
         final var contributionId = faker.pokemon().name();
+        final var userId = UUID.randomUUID();
+        final var githubUserId = faker.number().randomNumber();
+        final var expectedContribution =
+                ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
+
+        // When
+        when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(false);
+        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
+        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        final var contribution = contributionService.getContribution(projectId, contributionId,
+                User.builder().id(userId).githubUserId(githubUserId).build());
+
+        // Then
+        assertThat(contribution).isEqualTo(expectedContribution);
+    }
+
+    @Test
+    void getContribution_should_return_401_when_caller_is_not_the_contributor_nor_a_project_leader() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var contributionId = faker.pokemon().name();
+        final var userId = UUID.randomUUID();
         final var githubUserId = faker.number().randomNumber();
 
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(false);
+        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
 
-        assertThatThrownBy(() -> contributionService.getContribution(projectId, contributionId, githubUserId))
+        assertThatThrownBy(() -> contributionService.getContribution(projectId, contributionId,
+                User.builder().id(userId).githubUserId(githubUserId).build()))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User is not a contributor of this contribution");
+                .hasMessage("User is not the contributor of this contribution, nor a project leader of this project");
     }
 
     @Test

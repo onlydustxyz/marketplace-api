@@ -58,7 +58,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getStatuses().stream().map(Enum::name).toList(),
                 isNull(filters.getFrom()) ? null : format.format(filters.getFrom()),
                 isNull(filters.getTo()) ? null : format.format(filters.getTo()),
-                PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
+                PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC :
+                        Sort.Direction.DESC)));
 
         return Page.<ContributionView>builder()
                 .content(contributionPage.getContent().stream().map(ContributionViewEntity::toView).toList())
@@ -69,8 +70,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public ContributionDetailsView findContributionById(UUID projectId, String contributionId, Long githubUserId) {
-        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId, githubUserId)
+    public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
+        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
 
         final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
@@ -85,7 +86,9 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
             case PROJECT_REPO_NAME -> Sort.by(direction, "project_name", "repo_name");
             case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
             case CONTRIBUTOR_LOGIN -> Sort.by(direction, "contributor_login");
-            case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links,closing_pull_requests.links, reviewed_pull_requests.links)), 0)");
+            case LINKS_COUNT ->
+                    JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links," +
+                                              "closing_pull_requests.links, reviewed_pull_requests.links)), 0)");
         };
     }
 
