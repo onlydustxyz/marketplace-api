@@ -145,8 +145,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 1410,
-                          "totalItemNumber": 4230,
+                          "totalPageNumber": 1413,
+                          "totalItemNumber": 4238,
                           "nextPageIndex": 1
                         }
                                                 
@@ -172,7 +172,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.hasMore").isEqualTo(true)
                 .jsonPath("$.totalPageNumber").isEqualTo(42)
-                .jsonPath("$.totalItemNumber").isEqualTo(2083)
+                .jsonPath("$.totalItemNumber").isEqualTo(2087)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
         ;
     }
@@ -242,11 +242,11 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody().consumeWith(System.out::println)
-                .jsonPath("$.contributions.length()").isEqualTo(3)
+                .jsonPath("$.contributions.length()").isEqualTo(2)
                 .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
                 .jsonPath("$.hasMore").isEqualTo(false)
                 .jsonPath("$.totalPageNumber").isEqualTo(1)
-                .jsonPath("$.totalItemNumber").isEqualTo(3)
+                .jsonPath("$.totalItemNumber").isEqualTo(2)
                 .jsonPath("$.nextPageIndex").isEqualTo(0)
         ;
     }
@@ -369,8 +369,8 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1318")
-                .jsonPath("$.contributions[0].githubTitle").isEqualTo("This is a test PR for development purposes")
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1477")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("Contribution type upper case")
         ;
     }
 

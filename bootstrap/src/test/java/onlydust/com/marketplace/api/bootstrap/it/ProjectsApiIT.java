@@ -52,10 +52,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
                 },
                 {
-                  "githubUserId": 139852598,
-                  "login": "mat-yas",
-                  "htmlUrl": "https://github.com/mat-yas",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4"
+                  "githubUserId": 52197971,
+                  "login": "jb1011",
+                  "htmlUrl": "https://github.com/jb1011",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
                 }
               ],
               "repos": [
@@ -156,7 +156,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "installed": true,
                   "isCurrentUserAdmin": null,
                   "isPersonal": null,
-                  "installationId": 44378743
+                  "installationId": 44637372
                 },
                 {
                   "githubUserId": 119948009,
@@ -216,14 +216,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 }
               ],
               "technologies": {
-                "TypeScript": 189275,
+                "TypeScript": 190809,
                 "Dockerfile": 1982,
-                "CSS": 422216,
+                "CSS": 423688,
                 "Shell": 732,
-                "Rust": 407023,
+                "Rust": 408641,
                 "SCSS": 98360,
-                "JavaScript": 62717,
-                "HTML": 121906
+                "JavaScript": 62716,
+                "HTML": 121874
               },
               "remainingUsdBudget": 99250.00,
               "rewardSettings": {
@@ -279,14 +279,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 189275,
+                    "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 422216,
+                    "CSS": 423688,
                     "Shell": 732,
-                    "Rust": 407023,
+                    "Rust": 408641,
                     "SCSS": 98360,
-                    "JavaScript": 62717,
-                    "HTML": 121906
+                    "JavaScript": 62716,
+                    "HTML": 121874
                   },
                   "isInvitedAsProjectLead": true,
                   "isMissingGithubAppInstallation": null
@@ -320,7 +320,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -560,14 +560,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 189275,
+                    "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 422216,
+                    "CSS": 423688,
                     "Shell": 732,
-                    "Rust": 407023,
+                    "Rust": 408641,
                     "SCSS": 98360,
-                    "JavaScript": 62717,
-                    "HTML": 121906
+                    "JavaScript": 62716,
+                    "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -610,7 +610,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 546,
+                  "contributorCount": 559,
                   "leaders": [
                     {
                       "githubUserId": 117665867,
@@ -622,13 +622,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "MDX": 108632,
-                    "TypeScript": 6926417,
+                    "MDX": 109316,
+                    "TypeScript": 7052833,
                     "Dockerfile": 2591,
                     "CSS": 41229,
                     "Shell": 6831,
                     "Procfile": 37,
-                    "JavaScript": 56193,
+                    "JavaScript": 56416,
                     "PHP": 1205,
                     "HTML": 119986
                   },
@@ -695,7 +695,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "TypeScript": 3566363,
+                    "TypeScript": 3592913,
                     "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
@@ -749,7 +749,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "PLpgSQL": 1372,
                     "HTML": 1520,
                     "Kotlin": 1381,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "Dockerfile": 325,
                     "Shell": 12431,
                     "JavaScript": 24365,
@@ -782,7 +782,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "Dockerfile": 325,
                     "CSS": 6065,
                     "Shell": 12431,
@@ -840,9 +840,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898,
                     "Kotlin": 1381,
                     "Shell": 8324,
-                    "Solidity": 836789,
+                    "Solidity": 837904,
                     "SCSS": 102453,
-                    "JavaScript": 1093630,
+                    "JavaScript": 1085801,
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
@@ -884,7 +884,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 884,
+                  "contributorCount": 886,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -935,18 +935,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Jupyter Notebook": 577371,
                     "Kotlin": 140,
                     "TypeScript": 631356,
-                    "Dockerfile": 6225,
-                    "Shell": 19507,
-                    "Batchfile": 499,
+                    "Dockerfile": 6263,
+                    "Shell": 20110,
+                    "Batchfile": 478,
                     "Solidity": 476140,
-                    "Cairo": 655545,
+                    "Cairo": 654593,
                     "JavaScript": 4071194,
                     "Objective-C": 38,
                     "Swift": 2384,
                     "Nix": 85,
                     "Ruby": 2803,
                     "Dart": 204844,
-                    "Python": 1694938
+                    "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -980,7 +980,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -1049,7 +1049,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 44,
+                  "contributorCount": 45,
                   "leaders": [
                     {
                       "githubUserId": 139852598,
@@ -1103,12 +1103,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 614458,
+                    "TypeScript": 617035,
                     "Dockerfile": 5694,
                     "Shell": 4352,
-                    "Rust": 258964,
+                    "Rust": 255905,
                     "Solidity": 421314,
-                    "Cairo": 830343,
+                    "Cairo": 797556,
                     "Makefile": 2085,
                     "JavaScript": 5356,
                     "HTML": 771,
@@ -1198,9 +1198,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "Shell": 8324,
-                    "Solidity": 836789,
+                    "Solidity": 837904,
                     "Makefile": 1714,
-                    "JavaScript": 1035006,
+                    "JavaScript": 1027177,
                     "Ruby": 255376,
                     "Python": 6719
                   },
@@ -1447,7 +1447,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      "PLpgSQL": 1372,
                      "HTML": 1520,
                      "Kotlin": 1381,
-                     "TypeScript": 3148661,
+                     "TypeScript": 3175211,
                      "Dockerfile": 325,
                      "Shell": 12431,
                      "JavaScript": 24365,
@@ -1662,14 +1662,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 189275,
+                    "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 422216,
+                    "CSS": 423688,
                     "Shell": 732,
-                    "Rust": 407023,
+                    "Rust": 408641,
                     "SCSS": 98360,
-                    "JavaScript": 62717,
-                    "HTML": 121906
+                    "JavaScript": 62716,
+                    "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -1712,7 +1712,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 546,
+                  "contributorCount": 559,
                   "leaders": [
                     {
                       "githubUserId": 117665867,
@@ -1724,13 +1724,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "MDX": 108632,
-                    "TypeScript": 6926417,
+                    "MDX": 109316,
+                    "TypeScript": 7052833,
                     "Dockerfile": 2591,
                     "CSS": 41229,
                     "Shell": 6831,
                     "Procfile": 37,
-                    "JavaScript": 56193,
+                    "JavaScript": 56416,
                     "PHP": 1205,
                     "HTML": 119986
                   },
@@ -1797,7 +1797,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "sponsors": [],
                   "technologies": {
-                    "TypeScript": 3566363,
+                    "TypeScript": 3592913,
                     "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
@@ -1851,7 +1851,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "PLpgSQL": 1372,
                     "HTML": 1520,
                     "Kotlin": 1381,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "Dockerfile": 325,
                     "Shell": 12431,
                     "JavaScript": 24365,
@@ -1884,7 +1884,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "Dockerfile": 325,
                     "CSS": 6065,
                     "Shell": 12431,
@@ -1942,9 +1942,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898,
                     "Kotlin": 1381,
                     "Shell": 8324,
-                    "Solidity": 836789,
+                    "Solidity": 837904,
                     "SCSS": 102453,
-                    "JavaScript": 1093630,
+                    "JavaScript": 1085801,
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
@@ -1986,7 +1986,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 884,
+                  "contributorCount": 886,
                   "leaders": [
                     {
                       "githubUserId": 21149076,
@@ -2037,18 +2037,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Jupyter Notebook": 577371,
                     "Kotlin": 140,
                     "TypeScript": 631356,
-                    "Dockerfile": 6225,
-                    "Shell": 19507,
-                    "Batchfile": 499,
+                    "Dockerfile": 6263,
+                    "Shell": 20110,
+                    "Batchfile": 478,
                     "Solidity": 476140,
-                    "Cairo": 655545,
+                    "Cairo": 654593,
                     "JavaScript": 4071194,
                     "Objective-C": 38,
                     "Swift": 2384,
                     "Nix": 85,
                     "Ruby": 2803,
                     "Dart": 204844,
-                    "Python": 1694938
+                    "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null
@@ -2082,7 +2082,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "sponsors": [],
                   "technologies": {
                     "MDX": 2520,
-                    "TypeScript": 3148661,
+                    "TypeScript": 3175211,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -2151,7 +2151,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 3,
-                  "contributorCount": 44,
+                  "contributorCount": 45,
                   "leaders": [
                     {
                       "githubUserId": 139852598,
@@ -2205,12 +2205,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 614458,
+                    "TypeScript": 617035,
                     "Dockerfile": 5694,
                     "Shell": 4352,
-                    "Rust": 258964,
+                    "Rust": 255905,
                     "Solidity": 421314,
-                    "Cairo": 830343,
+                    "Cairo": 797556,
                     "Makefile": 2085,
                     "JavaScript": 5356,
                     "HTML": 771,
@@ -2300,9 +2300,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "Shell": 8324,
-                    "Solidity": 836789,
+                    "Solidity": 837904,
                     "Makefile": 1714,
-                    "JavaScript": 1035006,
+                    "JavaScript": 1027177,
                     "Ruby": 255376,
                     "Python": 6719
                   },
