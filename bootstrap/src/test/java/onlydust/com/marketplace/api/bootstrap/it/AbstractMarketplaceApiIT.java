@@ -44,7 +44,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri"),
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
-        @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url")
+        @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url"),
+        @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -93,6 +94,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
     protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
+    protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
 
     @Container
     static PostgreSQLContainer postgresSQLContainer =
@@ -116,6 +118,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer dustyBotApiWireMockServer;
     @InjectWireMock("webhook")
     protected WireMockServer webhookWireMockServer;
+    @InjectWireMock("linear")
+    protected WireMockServer linearWireMockServer;
 
     @LocalServerPort
     int port;

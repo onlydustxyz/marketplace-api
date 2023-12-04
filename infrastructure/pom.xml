@@ -21,6 +21,7 @@
         <module>aws-s3-adapter</module>
         <module>od-rust-api-client-adapter</module>
         <module>webhook-adapter</module>
+        <module>linear-adapter</module>
     </modules>
 
     <properties>

@@ -107,4 +107,9 @@ public class DomainConfiguration {
                                            final WebhookPort webhookPort) {
         return new WebhookNotificationJob(notificationPort, webhookPort);
     }
+
+    @Bean
+    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
+        return new TechnologiesService(trackingIssuePort);
+    }
 }

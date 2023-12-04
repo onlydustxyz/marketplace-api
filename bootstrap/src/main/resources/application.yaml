@@ -84,6 +84,18 @@ infrastructure:
       client:
         base-uri: ${INDEXER_API_BASE_URL}
         api-key: ${INDEXER_API_KEY}
+  linear:
+    base-uri: https://api.linear.app
+    api-key: ${LINEAR_API_KEY}
+    labels:
+      tech-stuff:
+        id: "08975455-9a1b-427d-9824-c4e172ada649"
+    teams:
+      engineering:
+        id: "fac4208d-473d-47c4-9356-c277878146a8"
+        states:
+          backlog:
+            id: "35c07f98-74f2-4b43-bfd1-d394addf337b"
   webhook:
     url: ${BACKOFFICE_WEBHOOK_URL}
     environment: ${ENV}
