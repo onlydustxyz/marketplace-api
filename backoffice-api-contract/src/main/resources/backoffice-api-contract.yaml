@@ -18,8 +18,8 @@ paths:
 
   /bo/v1/repositories:
     get:
-      security:
-        - apiKey: [ ]
+#      security:
+#        - apiKey: [ ]
       tags:
         - Backoffice
       summary: Get github repository page
