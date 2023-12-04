@@ -31,7 +31,7 @@ public interface GithubMapper {
                             installedRepo.setDescription(repo.getDescription());
                             return installedRepo;
                         })
-                        .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))
+                        .sorted(Comparator.comparing(GithubRepoResponse::getId))
                         .toList());
 
         var installation = new InstallationResponse();
@@ -61,7 +61,7 @@ public interface GithubMapper {
                             installedRepo.setIsAuthorizedInGithubApp(true);
                             return installedRepo;
                         })
-                        .sorted(Comparator.comparing(ShortGithubRepoResponse::getId))
+                        .sorted(Comparator.comparing(GithubRepoResponse::getId))
                         .toList());
         organization.setIsPersonal(githubAccount.getIsPersonal());
         organization.setIsCurrentUserAdmin(githubAccount.getIsCurrentUserAdmin());

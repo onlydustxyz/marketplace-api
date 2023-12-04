@@ -2656,10 +2656,6 @@ components:
               format: int64
 
     ShortGithubRepoResponse:
-      discriminator:
-        propertyName: type
-        mapping:
-          projectGithubOrganizationRepoResponse: '#/components/schemas/GithubOrganizationResponse'
       type: object
       required:
         - id
