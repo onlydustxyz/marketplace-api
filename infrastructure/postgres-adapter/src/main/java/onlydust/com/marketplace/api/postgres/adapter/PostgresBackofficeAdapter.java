@@ -24,6 +24,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                                 .id(entity.getId())
                                 .name(entity.getName())
                                 .owner(entity.getOwner())
+                                .technologies(entity.getTechnologies())
                                 .build()
                 ).toList())
                 .totalItemNumber((int) page.getTotalElements())
