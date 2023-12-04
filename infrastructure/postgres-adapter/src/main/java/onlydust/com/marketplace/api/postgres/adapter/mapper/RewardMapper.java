@@ -129,6 +129,7 @@ public interface RewardMapper {
     static RewardItemView itemToDomain(RewardItemViewEntity rewardItemViewEntity) {
         return RewardItemView.builder()
                 .id(rewardItemViewEntity.getId())
+                .contributionId(rewardItemViewEntity.getContributionId())
                 .recipientId(rewardItemViewEntity.getRecipientId())
                 .authorAvatarUrl(rewardItemViewEntity.getAuthorAvatarUrl())
                 .createdAt(rewardItemViewEntity.getCreatedAt())
@@ -140,7 +141,7 @@ public interface RewardMapper {
                 .commitsCount(rewardItemViewEntity.getCommitsCount())
                 .userCommitsCount(rewardItemViewEntity.getUserCommitsCount())
                 .number(rewardItemViewEntity.getNumber())
-                .lastUpdateAt(rewardItemViewEntity.getCompletedAt())
+                .completedAt(rewardItemViewEntity.getCompletedAt())
                 .type(switch (rewardItemViewEntity.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case PULL_REQUEST -> ContributionType.PULL_REQUEST;

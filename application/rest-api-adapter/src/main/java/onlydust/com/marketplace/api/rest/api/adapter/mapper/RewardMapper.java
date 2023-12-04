@@ -47,14 +47,14 @@ public interface RewardMapper {
 
     static RewardDetailsResponse rewardDetailsToResponse(RewardView rewardView) {
         return new RewardDetailsResponse()
-                .from(new GithubUserResponse()
-                        .id(rewardView.getFrom().getGithubUserId())
+                .from(new ContributorResponse()
+                        .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
                         .login(rewardView.getFrom().getGithubLogin())
                 )
                 .to(
-                        new GithubUserResponse()
-                                .id(rewardView.getTo().getGithubUserId())
+                        new ContributorResponse()
+                                .githubUserId(rewardView.getTo().getGithubUserId())
                                 .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
                                 .login(rewardView.getTo().getGithubLogin())
                 )
@@ -81,14 +81,14 @@ public interface RewardMapper {
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
         return new RewardResponse()
-                .from(new GithubUserResponse()
-                        .id(rewardView.getFrom().getGithubUserId())
+                .from(new ContributorResponse()
+                        .githubUserId(rewardView.getFrom().getGithubUserId())
                         .avatarUrl(rewardView.getFrom().getGithubAvatarUrl())
                         .login(rewardView.getFrom().getGithubLogin())
                 )
                 .to(
-                        new GithubUserResponse()
-                                .id(rewardView.getTo().getGithubUserId())
+                        new ContributorResponse()
+                                .githubUserId(rewardView.getTo().getGithubUserId())
                                 .avatarUrl(rewardView.getTo().getGithubAvatarUrl())
                                 .login(rewardView.getTo().getGithubLogin())
                 )
@@ -140,6 +140,7 @@ public interface RewardMapper {
     private static RewardItemResponse itemToResponse(final RewardItemView view) {
         return new RewardItemResponse()
                 .id(view.getId())
+                .contributionId(view.getContributionId())
                 .type(switch (view.getType()) {
                     case ISSUE -> ContributionType.ISSUE;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;
@@ -159,7 +160,7 @@ public interface RewardMapper {
                     case DISMISSED -> GithubStatus.DISMISSED;
                 })
                 .createdAt(DateMapper.toZoneDateTime(view.getCreatedAt()))
-                .lastUpdateAt(DateMapper.toZoneDateTime(view.getLastUpdateAt()))
+                .completedAt(DateMapper.toZoneDateTime(view.getCompletedAt()))
                 .commentsCount(view.getCommentsCount())
                 .commitsCount(view.getCommitsCount())
                 .userCommitsCount(view.getUserCommitsCount())

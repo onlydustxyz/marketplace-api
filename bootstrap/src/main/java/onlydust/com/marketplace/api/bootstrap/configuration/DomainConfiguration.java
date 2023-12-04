@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
+import onlydust.com.marketplace.api.domain.job.NotificationJob;
+import onlydust.com.marketplace.api.domain.job.WebhookNotificationJob;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
@@ -10,11 +12,13 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Configuration
+@EnableRetry
 public class DomainConfiguration {
 
 
@@ -96,5 +100,16 @@ public class DomainConfiguration {
     public GithubAccountService githubAccountService(final GithubSearchPort githubSearchPort,
                                                      final GithubStoragePort githubStoragePort) {
         return new GithubAccountService(githubStoragePort, githubSearchPort);
+    }
+
+    @Bean
+    public NotificationJob notificationJob(final NotificationPort notificationPort,
+                                           final WebhookPort webhookPort) {
+        return new WebhookNotificationJob(notificationPort, webhookPort);
+    }
+
+    @Bean
+    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
+        return new TechnologiesService(trackingIssuePort);
     }
 }

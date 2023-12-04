@@ -15,4 +15,10 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000006_no_more_old_exp.sql
   - include:
       file: db/changelog/changelogs/00000007_fix_pending_project_contributors_view.sql
+  - include:
+      file: db/changelog/changelogs/00000008_fix_replicate_users_changes_function.sql
+  - include:
+      file: db/changelog/changelogs/00000009_notifications.sql
+  - include:
+      file: db/changelog/changelogs/00000010_order_more_infos.sql
 

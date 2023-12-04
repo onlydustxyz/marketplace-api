@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ContributionStoragePort {
-    Page<ContributionView> findContributionsForUser(Long contributorId,
-                                                    ContributionView.Filters filters,
-                                                    ContributionView.Sort sort,
-                                                    SortDirection direction,
-                                                    Integer page,
-                                                    Integer pageSize);
+    Page<ContributionView> findContributions(Long contributorId,
+                                             ContributionView.Filters filters,
+                                             ContributionView.Sort sort,
+                                             SortDirection direction,
+                                             Integer page,
+                                             Integer pageSize);
 
     ContributionDetailsView findContributionById(UUID projectId, String contributionId, Long githubUserId);
 

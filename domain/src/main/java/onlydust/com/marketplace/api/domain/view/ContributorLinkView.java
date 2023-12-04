@@ -10,4 +10,5 @@ public class ContributorLinkView implements UserLinkView {
     String login;
     String avatarUrl;
     String url;
+    Boolean isRegistered;
 }

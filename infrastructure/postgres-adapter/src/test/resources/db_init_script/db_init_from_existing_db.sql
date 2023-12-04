@@ -20,6 +20,11 @@ begin
 end;
 $$;
 
+create table auth.user_providers
+(
+    provider_user_id text not null
+);
+
 create aggregate public.jsonb_concat_agg(jsonb) (
     sfunc = jsonb_concat,
     stype = jsonb,

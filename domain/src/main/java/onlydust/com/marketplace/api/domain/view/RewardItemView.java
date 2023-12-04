@@ -12,10 +12,11 @@ import java.util.Date;
 public class RewardItemView {
     Long number;
     String id;
+    String contributionId;
     String title;
     String githubUrl;
     Date createdAt;
-    Date lastUpdateAt;
+    Date completedAt;
     String repoName;
     ContributionType type;
     RewardItemStatus status;

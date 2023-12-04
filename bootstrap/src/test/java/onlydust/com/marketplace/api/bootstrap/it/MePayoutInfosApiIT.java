@@ -221,9 +221,10 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_user_payout_info_given_impersonate_user() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
+        final var githubUserId = faker.number().randomNumber();
+        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId, faker.rickAndMorty().character(),
                 faker.internet().url(), true).jwt();
-        userHelper.authenticateUser(2L);
+        userHelper.authenticateUser(githubUserId);
         final String impersonatePierreHeader =
                 userHelper.getImpersonationHeaderToImpersonatePierre();
 

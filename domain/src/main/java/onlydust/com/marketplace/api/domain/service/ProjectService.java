@@ -25,9 +25,9 @@ import static java.util.Objects.isNull;
 public class ProjectService implements ProjectFacadePort {
 
     private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
-            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)");
+            "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
-            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)");
+            "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
 
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
@@ -283,5 +283,15 @@ public class ProjectService implements ProjectFacadePort {
 
         indexerPort.indexPullRequest(repoOwner, repoName, pullRequestNumber);
         return projectStoragePort.getRewardablePullRequest(repoOwner, repoName, pullRequestNumber);
+    }
+
+    @Override
+    public Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
+                                                       ContributionView.Sort sort, SortDirection direction,
+                                                       Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+            throw OnlyDustException.forbidden("Only project leads can list project contributions");
+        }
+        return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page, pageSize);
     }
 }

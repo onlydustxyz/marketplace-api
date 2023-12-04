@@ -74,13 +74,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                             "dollarsEquivalent": 1000,
                             "status": "PROCESSING",
                             "from": {
-                                "id": 16590657,
+                                "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": null
                             },
                             "to": {
-                                "id": 16590657,
+                                "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": null
@@ -121,13 +121,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
                            "from": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
                            "to": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
@@ -165,13 +165,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
                            "from": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
                            "to": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
@@ -209,13 +209,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
                            "from": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
                            "to": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
@@ -252,13 +252,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
                            "from": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
                            "to": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
@@ -296,13 +296,13 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
                            "from": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
                            },
                            "to": {
-                             "id": 16590657,
+                             "githubUserId": 16590657,
                              "login": "PierreOucif",
                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                              "isRegistered": null
@@ -359,10 +359,11 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 {
                                     "number": 1232,
                                     "id": "1511546916",
+                                    "contributionId": "a290ea203b1264105bf581aebbdf3e79edfdd89811da50dc6bd076272d810b2e",
                                     "title": "Addin sitemap.xml in robots.txt",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1232",
                                     "createdAt": "2023-09-12T07:38:04Z",
-                                    "lastUpdateAt": "2023-09-12T07:45:12Z",
+                                    "completedAt": "2023-09-12T07:45:12Z",
                                     "repoName": "marketplace-frontend",
                                     "type": "PULL_REQUEST",
                                     "commitsCount": 1,
@@ -380,7 +381,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                     "title": "E 730 migrate oscar frontend documentation",
                                     "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1225",
                                     "createdAt": "2023-09-08T08:14:32Z",
-                                    "lastUpdateAt": "2023-09-08T08:19:55Z",
+                                    "completedAt": "2023-09-08T08:19:55Z",
                                     "repoName": "marketplace-frontend",
                                     "type": "PULL_REQUEST",
                                     "commitsCount": 3,
@@ -413,10 +414,11 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                             {
                               "number": 1129,
                               "id": "1442413635",
+                              "contributionId": "6d709dd5f85a8b8eaff9cc8837ab837ef9a1a1109ead76580490c0a730a87d9d",
                               "title": "First API integration test",
                               "githubUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1129",
                               "createdAt": "2023-07-20T08:45:18Z",
-                              "lastUpdateAt": "2023-07-21T13:00:05Z",
+                              "completedAt": "2023-07-21T13:00:05Z",
                               "repoName": "marketplace-frontend",
                               "type": "PULL_REQUEST",
                               "commitsCount": 30,

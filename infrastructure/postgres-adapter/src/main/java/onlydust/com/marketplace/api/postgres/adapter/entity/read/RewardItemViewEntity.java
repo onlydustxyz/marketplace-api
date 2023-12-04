@@ -18,8 +18,10 @@ import java.util.Date;
 public class RewardItemViewEntity {
 
     @Id
-    @Column(name = "contribution_id")
+    @Column(name = "reward_id")
     String id;
+    @Column(name = "contribution_id")
+    String contributionId;
     @Column(name = "start_date")
     Date createdAt;
     @Column(name = "end_date")

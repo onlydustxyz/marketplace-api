@@ -34,6 +34,7 @@ public interface UserMapper {
                 .login(user.getLogin())
                 .avatarUrl(user.getAvatarUrl())
                 .url(user.getHtmlUrl())
+                .isRegistered(user.getIsRegistered())
                 .build();
     }
 

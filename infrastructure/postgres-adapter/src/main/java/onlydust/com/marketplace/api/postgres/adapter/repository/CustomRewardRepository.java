@@ -241,7 +241,8 @@ public class CustomRewardRepository {
                                               gprr.author_html_url       author_github_url
                                        from indexer_exp.github_code_reviews gprr)
             select distinct wi.type,
-                            coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             contribution_id,
+                            coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             reward_id,
+                            c.id                                                                                                      contribution_id,
                             coalesce(cast(pull_request.status as text), cast(issue.status as text), cast(code_review.status as text)) status,
                             coalesce(pull_request.number, issue.number, code_review.number)                   number,
                             coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
@@ -265,6 +266,12 @@ public class CustomRewardRepository {
                      left join get_issue issue on issue.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                      left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                      left join get_code_review code_review on code_review.id = wi.id
+                     left join indexer_exp.contributions c on c.contributor_id = pr.recipient_id and c.repo_id = wi.repo_id and
+                                                              -- check that the repo is still part of the project (if it's not, then the contribution doesn't belong to the project)
+                                                              exists (select 1 from project_github_repos pgr where pgr.github_repo_id = c.repo_id and pgr.project_id = pr.project_id) and
+                                                              ((issue.id IS NOT NULL and c.issue_id = issue.id) or
+                                                              (pull_request.id IS NOT NULL and c.pull_request_id = pull_request.id) or
+                                                              (code_review.id IS NOT NULL and c.code_review_id = code_review.id))
             where pr.id = :rewardId
             order by start_date desc, end_date desc offset :offset limit :limit""";
 

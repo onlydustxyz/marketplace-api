@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it;
 
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Date;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -104,6 +106,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true);
     }
 
+    @SneakyThrows
     @Test
     void should_accept_valid_project_leader_invitation() {
         // Given
@@ -135,6 +138,15 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", githubUserId)).exists();
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId)))
+                .withRequestBody(matchingJsonPath("$.payload.leader_id", equalTo(userId.toString()))));
     }
 
     @Test
@@ -170,6 +182,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", githubUserId)).doesNotExist();
     }
 
+    @SneakyThrows
     @Test
     void should_apply_to_project() {
         // Given
@@ -195,6 +208,15 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Application")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Received")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.project_id", equalTo(projectId)))
+                .withRequestBody(matchingJsonPath("$.payload.applicant_id", equalTo(userId.toString()))));
     }
 
     @Test

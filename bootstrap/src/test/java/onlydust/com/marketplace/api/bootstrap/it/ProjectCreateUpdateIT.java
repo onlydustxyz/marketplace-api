@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
@@ -14,8 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,17 +59,18 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .willReturn(ResponseDefinitionBuilder.responseDefinition().withStatus(500)));
     }
 
+    @SneakyThrows
     @Test
     @Order(1)
     public void should_create_a_new_project() {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
-                        .withRequestBody(WireMock.equalToJson("""
-                                {
-                                  "linkedRepoIds": [498695724, 602953043],
-                                  "unlinkedRepoIds": []
-                                }
-                                """, true, false))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [498695724, 602953043],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
                 .willReturn(WireMock.noContent()));
 
         // When
@@ -164,8 +165,44 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(event.getAggregateId()).isEqualTo(projectId);
         assertThat(event.getAggregateName()).isEqualTo("PROJECT");
         assertThat(event.getPayload()).isEqualTo("{\"Created\": {\"id\": \"%s\"}}".formatted(response.getProjectId()));
+
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Created")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.leader_id",
+                        equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("595505")))
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("43467246")))
+        );
     }
 
+    @SneakyThrows
     @Test
     @Order(2)
     public void accept_leader_invitation_for_next_tests() {
@@ -185,6 +222,18 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists();
+
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderAssigned")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.leader_id",
+                        equalTo("e461c019-ba23-4671-9b6c-3a5a18748af9"))) // ofux
+        );
     }
 
     @Test
@@ -214,17 +263,18 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .is5xxServerError();
     }
 
+    @SneakyThrows
     @Test
     @Order(10)
     public void should_update_the_project() {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
-                                {
-                                  "linkedRepoIds": [452047076],
-                                  "unlinkedRepoIds": []
-                                }
-                                """, true, false))
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
                 .willReturn(WireMock.noContent()));
 
         // And When
@@ -241,6 +291,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             {
                               "url": "https://t.me/foobar/updated",
                               "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -272,6 +326,40 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         // And Then
         assertProjectWasUpdated();
+
+        waitAtLeastOneCycleOfNotificationProcessing();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("Updated")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderUnassigned")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.leader_id",
+                        equalTo("fc92397c-3431-4a84-8054-845376b630a0"))) // PierreOucif
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvited")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("16590657")))
+        );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvitationCancelled")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("43467246")))
+        );
     }
 
     @Test
@@ -288,12 +376,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
-                          "moreInfos": [
-                            {
-                              "url": "https://t.me/foobar/updated",
-                              "value": "foobar-updated"
-                            }
-                          ],
                           "isLookingForContributors": false,
                           "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
                           "rewardSettings": {
@@ -330,10 +412,48 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "name": "Updated Project",
                           "shortDescription": "This is a super updated project",
                           "longDescription": "This is a super awesome updated project with a nice description",
+                          "isLookingForContributors": false,
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
+
+        // And Then
+        assertProjectWasUpdated();
+    }
+
+    @Test
+    @Order(13)
+    public void should_update_and_preserve_order_of_more_infos() {
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
                           "moreInfos": [
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
+                            },
                             {
                               "url": "https://t.me/foobar/updated",
                               "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://yolo.croute",
+                              "value": "yolo-croute"
                             }
                           ],
                           "isLookingForContributors": false,
@@ -349,7 +469,21 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectSlug").isEqualTo("updated-project");
 
         // And Then
-        assertProjectWasUpdated();
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.moreInfos.length()").isEqualTo(3)
+                .jsonPath("$.moreInfos[0].url").isEqualTo("https://foobar.com")
+                .jsonPath("$.moreInfos[0].value").isEqualTo("foobar-updated2")
+                .jsonPath("$.moreInfos[1].url").isEqualTo("https://t.me/foobar/updated")
+                .jsonPath("$.moreInfos[1].value").isEqualTo("foobar-updated")
+                .jsonPath("$.moreInfos[2].url").isEqualTo("https://yolo.croute")
+                .jsonPath("$.moreInfos[2].value").isEqualTo("yolo-croute");
     }
 
     @Test
@@ -467,6 +601,56 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .isForbidden();
     }
 
+    @Test
+    @Order(30)
+    void should_create_project_without_more_infos() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [498695724, 602953043],
+                          "unlinkedRepoIds": []
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+
+        // When
+        final CreateProjectResponse responseBody = client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Super Project 2",
+                          "shortDescription": "This is a super project 2",
+                          "longDescription": "This is a super awesome project with a nice description 2",
+                          "isLookingForContributors": true,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505, 43467246
+                          ],
+                          "githubRepoIds": [
+                            498695724, 602953043
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(CreateProjectResponse.class)
+                .returnResult().getResponseBody();
+
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + responseBody.getProjectId()))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.moreInfos").isEmpty();
+    }
+
     private void assertProjectWasUpdated() {
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
@@ -484,9 +668,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                                                          "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
+                .jsonPath("$.moreInfos.length()").isEqualTo(2)
                 .jsonPath("$.moreInfos[0].url").isEqualTo("https://t.me/foobar/updated")
                 .jsonPath("$.moreInfos[0].value").isEqualTo("foobar-updated")
-                .jsonPath("$.moreInfos.length()").isEqualTo(1)
+                .jsonPath("$.moreInfos[1].url").isEqualTo("https://foobar.com")
+                .jsonPath("$.moreInfos[1].value").isEqualTo("foobar-updated2")
 
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("ofux")

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -96,6 +97,16 @@ public class OnlydustExceptionRestHandler {
         return handleOnlyDustException(new OnlyDustException(
                 HttpStatus.UNAUTHORIZED.value(),
                 "Missing authentication",
+                exception
+        ));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public ResponseEntity<OnlyDustError> badRequest(ConstraintViolationException exception) {
+        return handleOnlyDustException(new OnlyDustException(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad request",
                 exception
         ));
     }

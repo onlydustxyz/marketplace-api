@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
-import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
-import onlydust.com.marketplace.api.domain.view.ContributionView;
-import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -32,19 +29,19 @@ public interface ContributionMapper {
     }
 
 
-    static ContributionPageResponse mapContributionPageResponse(Integer pageIndex,
-                                                                Page<ContributionView> contributions) {
+    static UserContributionPageResponse mapUserContributionPageResponse(Integer pageIndex,
+                                                                        Page<ContributionView> contributions) {
 
-        return new ContributionPageResponse()
-                .contributions(contributions.getContent().stream().map(ContributionMapper::mapContribution).toList())
+        return new UserContributionPageResponse()
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapUserContributionPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
                 .totalPageNumber(contributions.getTotalPageNumber())
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
     }
 
-    static ContributionPageItemResponse mapContribution(ContributionView contributionView) {
-        return new ContributionPageItemResponse()
+    static UserContributionPageItemResponse mapUserContributionPageItemResponse(ContributionView contributionView) {
+        return new UserContributionPageItemResponse()
                 .id(contributionView.getId())
                 .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
                 .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
@@ -55,7 +52,7 @@ public interface ContributionMapper {
                 .githubTitle(contributionView.getGithubTitle())
                 .githubHtmlUrl(contributionView.getGithubHtmlUrl())
                 .githubBody(contributionView.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(contributionView.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(contributionView.getGithubAuthor()))
                 .githubPullRequestReviewState(Optional.ofNullable(contributionView.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contributionView.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
@@ -72,17 +69,6 @@ public interface ContributionMapper {
         };
     }
 
-    static GithubCodeReviewState mapGithubCodeReviewState(String githubStatus) {
-        return switch (githubStatus) {
-            case "APPROVED" -> GithubCodeReviewState.APPROVED;
-            case "CHANGES_REQUESTED" -> GithubCodeReviewState.CHANGES_REQUESTED;
-            case "COMMENTED" -> GithubCodeReviewState.COMMENTED;
-            case "DISMISSED" -> GithubCodeReviewState.DISMISSED;
-            case "PENDING" -> GithubCodeReviewState.PENDING;
-            default -> null;
-        };
-    }
-
     static ContributionLinkResponse mapContributionLink(ContributionLinkView link) {
         return new ContributionLinkResponse()
                 .type(mapContributionTypeToResponse(link.getType()))
@@ -91,7 +77,7 @@ public interface ContributionMapper {
                 .githubTitle(link.getGithubTitle())
                 .githubHtmlUrl(link.getGithubHtmlUrl())
                 .githubBody(link.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(link.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(link.getGithubAuthor()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()))
                 .isMine(link.getIsMine());
     }
@@ -121,6 +107,16 @@ public interface ContributionMapper {
         };
     }
 
+    static ContributionView.Sort mapSort(ProjectContributionSort sort) {
+        return switch (sort) {
+            case CREATED_AT -> ContributionView.Sort.CREATED_AT;
+            case GITHUB_NUMBER_TITLE -> ContributionView.Sort.GITHUB_NUMBER_TITLE;
+            case LINKS_COUNT -> ContributionView.Sort.LINKS_COUNT;
+            case REPO_NAME -> ContributionView.Sort.PROJECT_REPO_NAME;
+            case CONTRIBUTOR_LOGIN -> ContributionView.Sort.CONTRIBUTOR_LOGIN;
+        };
+    }
+
     static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution) {
         return new ContributionDetailsResponse()
                 .id(contribution.getId())
@@ -133,7 +129,7 @@ public interface ContributionMapper {
                 .githubTitle(contribution.getGithubTitle())
                 .githubHtmlUrl(contribution.getGithubHtmlUrl())
                 .githubBody(contribution.getGithubBody())
-                .githubAuthor(ProjectMapper.mapUserLink(contribution.getGithubAuthor()))
+                .githubAuthor(ProjectMapper.mapGithubUser(contribution.getGithubAuthor()))
                 .githubPullRequestReviewState(Optional.ofNullable(contribution.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
                 .project(ProjectMapper.mapShortProjectResponse(contribution.getProject()))
                 .repo(GithubRepoMapper.mapRepoToShortResponse(contribution.getGithubRepo()))
@@ -142,5 +138,46 @@ public interface ContributionMapper {
                 .userCommitsCount(contribution.getGithubUserCommitsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
                 .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
+    }
+
+    static ProjectContributionPageResponse mapProjectContributionPageResponse(Integer pageIndex, Page<ContributionView> contributions) {
+        return new ProjectContributionPageResponse()
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapProjectContributionPageItemResponse).toList())
+                .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
+                .totalPageNumber(contributions.getTotalPageNumber())
+                .totalItemNumber(contributions.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
+    }
+
+    static ProjectContributionPageItemResponse mapProjectContributionPageItemResponse(ContributionView contributionView) {
+        return new ProjectContributionPageItemResponse()
+                .id(contributionView.getId())
+                .contributor(ContributorMapper.of(contributionView.getContributor()))
+                .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
+                .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
+                .type(mapContributionTypeToResponse(contributionView.getType()))
+                .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
+                .githubNumber(contributionView.getGithubNumber())
+                .githubStatus(GithubStatus.valueOf(contributionView.getGithubStatus()))
+                .githubTitle(contributionView.getGithubTitle())
+                .githubHtmlUrl(contributionView.getGithubHtmlUrl())
+                .githubBody(contributionView.getGithubBody())
+                .githubAuthor(ProjectMapper.mapGithubUser(contributionView.getGithubAuthor()))
+                .githubPullRequestReviewState(Optional.ofNullable(contributionView.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
+                .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
+                .links(contributionView.getLinks().stream().map(ContributionMapper::mapProjectContributionLink).toList())
+                .rewardIds(contributionView.getRewardIds());
+    }
+
+    static ContributionResponse mapProjectContributionLink(ContributionLinkView link) {
+        return new ContributionResponse()
+                .type(mapContributionTypeToResponse(link.getType()))
+                .githubNumber(link.getGithubNumber())
+                .githubStatus(GithubStatus.valueOf(link.getGithubStatus()))
+                .githubTitle(link.getGithubTitle())
+                .githubHtmlUrl(link.getGithubHtmlUrl())
+                .githubBody(link.getGithubBody())
+                .githubAuthor(ProjectMapper.mapGithubUser(link.getGithubAuthor()))
+                .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()));
     }
 }

@@ -11,6 +11,10 @@ infrastructure:
     api:
       client:
         api-key: "some-indexer-api-key"
+  webhook:
+    environment: "local-it"
+  linear:
+    api-key: "some-linear-api-key"
 spring:
   main:
     allow-bean-definition-overriding: true
@@ -18,7 +22,9 @@ application:
   web:
     machine-to-machine:
       api-key: "some-api-key"
-      
+  cron:
+    notification-job-delay: 500
+
 # Uncomment lines below if you want to see Hibernate SQL queries in the console
 #  jpa:
 #    show-sql: true
