@@ -5,14 +5,15 @@ import onlydust.com.marketplace.api.domain.service.GithubAccountService;
 import onlydust.com.marketplace.api.domain.service.RewardService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
-import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustExceptionRestHandler;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Date;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("api")
 public class RestApiConfiguration {
 
     @Bean
@@ -37,11 +38,6 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public VersionRestApi versionRestApi(final Date startingDate) {
-        return new VersionRestApi(startingDate);
-    }
-
-    @Bean
     public TechnologiesRestApi technologiesRestApi(final AuthenticationService authenticationService, final TechnologiesPort technologiesPort) {
         return new TechnologiesRestApi(technologiesPort, authenticationService);
     }
@@ -52,18 +48,14 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public OnlydustExceptionRestHandler onlydustExceptionRestHandler() {
-        return new OnlydustExceptionRestHandler();
-    }
-
-    @Bean
-    public AppRestApi appRestApi() {
-        return new AppRestApi();
-    }
-
-    @Bean
     public EventsRestApi eventsRestApi(final ContributionFacadePort contributionFacadePort) {
         return new EventsRestApi(contributionFacadePort);
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.machine-to-machine")
+    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
+        return new ApiKeyAuthenticationService.Config();
     }
 
 }

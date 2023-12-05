@@ -99,12 +99,6 @@ public class WebSecurityConfiguration {
         return new Auth0Properties();
     }
 
-    @Bean
-    @ConfigurationProperties("application.web.machine-to-machine")
-    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
-        return new ApiKeyAuthenticationService.Config();
-    }
-
     @Data
     public static class WebCorsProperties {
         private String[] hosts;

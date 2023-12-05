@@ -13,6 +13,7 @@ infrastructure:
         api-key: "some-indexer-api-key"
   webhook:
     environment: "local-it"
+    url: http://fake.test
   linear:
     api-key: "some-linear-api-key"
 spring:
@@ -22,6 +23,8 @@ application:
   web:
     machine-to-machine:
       api-key: "some-api-key"
+    back-office:
+      api-key: "bo-api-key"
   cron:
     notification-job-delay: 500
 
