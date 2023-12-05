@@ -72,8 +72,8 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 3604,
-                          "totalItemNumber": 3604,
+                          "totalPageNumber": 3765,
+                          "totalItemNumber": 3765,
                           "nextPageIndex": 1
                         }
                         """);

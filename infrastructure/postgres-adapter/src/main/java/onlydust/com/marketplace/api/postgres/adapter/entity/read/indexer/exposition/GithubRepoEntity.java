@@ -9,6 +9,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -52,6 +53,9 @@ public class GithubRepoEntity {
     @org.hibernate.annotations.Type(type = "github_repo_visibility")
     Visibility visibility;
 
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "id")
+    GithubRepoStatsEntity stats;
 
     public enum Visibility {
         PUBLIC, PRIVATE
