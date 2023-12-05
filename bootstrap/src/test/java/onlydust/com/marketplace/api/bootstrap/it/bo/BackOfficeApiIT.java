@@ -48,8 +48,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Shell": 8324,
                                 "Python": 6719,
                                 "Makefile": 1714,
-                                "Solidity": 836789,
-                                "JavaScript": 1035006
+                                "Solidity": 837904,
+                                "JavaScript": 1027177
                               },
                               "projectId": "467cb27c-9726-4f94-818e-6aa49bbf5e75"
                             },
@@ -74,8 +74,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Shell": 8324,
                                 "Python": 6719,
                                 "Makefile": 1714,
-                                "Solidity": 836789,
-                                "JavaScript": 1035006
+                                "Solidity": 837904,
+                                "JavaScript": 1027177
                               },
                               "projectId": "b0f54343-3732-4118-8054-dba40f1ffb85"
                             },
@@ -135,8 +135,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Shell": 8324,
                                 "Python": 6719,
                                 "Makefile": 1714,
-                                "Solidity": 836789,
-                                "JavaScript": 1035006
+                                "Solidity": 837904,
+                                "JavaScript": 1027177
                               },
                               "projectId": "467cb27c-9726-4f94-818e-6aa49bbf5e75"
                             },
@@ -161,8 +161,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Shell": 8324,
                                 "Python": 6719,
                                 "Makefile": 1714,
-                                "Solidity": 836789,
-                                "JavaScript": 1035006
+                                "Solidity": 837904,
+                                "JavaScript": 1027177
                               },
                               "projectId": "b0f54343-3732-4118-8054-dba40f1ffb85"
                             },
@@ -182,6 +182,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             }
                           ]
                         }
+                        
                         """);
 
     }
