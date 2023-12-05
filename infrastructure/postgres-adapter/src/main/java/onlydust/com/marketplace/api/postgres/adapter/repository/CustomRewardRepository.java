@@ -267,8 +267,6 @@ public class CustomRewardRepository {
                      left join get_pr pull_request on pull_request.id = (case when wi.id ~ '^[0-9]+$' then cast(wi.id as bigint) else -1 end)
                      left join get_code_review code_review on code_review.id = wi.id
                      left join indexer_exp.contributions c on c.contributor_id = pr.recipient_id and c.repo_id = wi.repo_id and
-                                                              -- check that the repo is still part of the project (if it's not, then the contribution doesn't belong to the project)
-                                                              exists (select 1 from project_github_repos pgr where pgr.github_repo_id = c.repo_id and pgr.project_id = pr.project_id) and
                                                               ((issue.id IS NOT NULL and c.issue_id = issue.id) or
                                                               (pull_request.id IS NOT NULL and c.pull_request_id = pull_request.id) or
                                                               (code_review.id IS NOT NULL and c.code_review_id = code_review.id))

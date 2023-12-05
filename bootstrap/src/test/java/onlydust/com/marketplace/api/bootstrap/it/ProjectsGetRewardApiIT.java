@@ -352,26 +352,4 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
-    @Test
-    void should_return_reward_items_with_null_contributionId_when_contribution_belongs_to_another_project() {
-        // Given
-        final String jwt = userHelper.authenticateUser(21149076L).jwt();
-        final UUID projectId = UUID.fromString("6d955622-c1ce-4227-85ea-51cb1b3207b1");
-        final UUID rewardId = UUID.fromString("f4b7c3e4-4a45-47c7-bcba-87d6d767c3de");
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "200",
-                        "pageIndex", "0")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.rewardItems[?(@.id==1092315108)]").exists()
-                .jsonPath("$.rewardItems[?(@.id==1092315108)].title").isEqualTo(":sparkles: Implement stack pop_n")
-                .jsonPath("$.rewardItems[?(@.id==1092315108)].contributionId").isEqualTo(null);
-    }
-
 }
