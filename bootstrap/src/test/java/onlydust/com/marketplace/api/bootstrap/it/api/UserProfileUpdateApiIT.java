@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
     HasuraUserHelper userHelper;
 
     @Test
-    void should_update_user_profile() throws JsonProcessingException {
+    void should_update_user_profile() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
 
@@ -29,6 +28,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.location").isEqualTo("Vence, France")
                 .jsonPath("$.bio").isEqualTo("FullStack engineerr")
+                .jsonPath("$.avatarUrl").isEqualTo(
+                        "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp")
                 .jsonPath("$.website").isEqualTo("https://linktr.ee/abuisset")
                 .jsonPath("$.cover").isEqualTo("BLUE")
                 .jsonPath("$.technologies.length()").isEqualTo(14)
@@ -52,6 +53,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
+                            "avatarUrl": "https://foobar.org/plop.jpg",
                             "location": "Paris, France",
                             "bio": "FullStack engineer",
                             "website": "https://croute.org",
@@ -83,6 +85,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.location").isEqualTo("Paris, France")
                 .jsonPath("$.bio").isEqualTo("FullStack engineer")
+                .jsonPath("$.avatarUrl").isEqualTo("https://foobar.org/plop.jpg")
                 .jsonPath("$.website").isEqualTo("https://croute.org")
                 .jsonPath("$.cover").isEqualTo("YELLOW")
                 .jsonPath("$.technologies.length()").isEqualTo(3)
@@ -103,7 +106,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_an_unauthorized_error() throws JsonProcessingException {
+    void should_return_an_unauthorized_error() {
         // Given
 
         // When
