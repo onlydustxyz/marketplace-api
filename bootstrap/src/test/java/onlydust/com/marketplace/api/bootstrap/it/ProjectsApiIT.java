@@ -326,7 +326,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "installed": true,
                   "isCurrentUserAdmin": null,
                   "isPersonal": null,
-                  "installationId": 44378743
+                  "installationId": 44637372
                 },
                 {
                   "githubUserId": 121887739,
