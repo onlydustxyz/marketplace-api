@@ -17,7 +17,7 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
                 u.github_user_id,
                 u.id,
                 u.login,
-                u.avatar_url,
+                user_avatar_url(u.github_user_id, u.avatar_url) as avatar_url,
                 u.html_url,
                 true as has_accepted_invitation
             from registered_users u
@@ -31,7 +31,7 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
                 u.github_user_id,
                 u.id,
                 u.login,
-                u.avatar_url,
+                user_avatar_url(u.github_user_id, u.avatar_url) as avatar_url,
                 u.html_url,
                 true as has_accepted_invitation
             from registered_users u
@@ -43,7 +43,7 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadView
                 ga.id as github_user_id,
                 NULL as id,
                 ga.login,
-                ga.avatar_url,
+                user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                 ga.html_url,
                 false as has_accepted_invitation
             from indexer_exp.github_accounts ga

@@ -110,6 +110,7 @@ public interface UserMapper {
 
     static UserProfileInfoEntity mapUserProfileToEntity(UUID userId, UserProfile userProfile) {
         return UserProfileInfoEntity.builder()
+                .avatarUrl(userProfile.getAvatarUrl())
                 .bio(userProfile.getBio())
                 .location(userProfile.getLocation())
                 .website(userProfile.getWebsite())

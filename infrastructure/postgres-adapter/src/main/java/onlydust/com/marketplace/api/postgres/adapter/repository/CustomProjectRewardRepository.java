@@ -20,7 +20,7 @@ public class CustomProjectRewardRepository {
     protected static final String FIND_PROJECT_REWARDS = """
                 select pr.requested_at,
                    gu.login,
-                   gu.avatar_url,
+                   user_avatar_url(gu.id, gu.avatar_url) as avatar_url,
                    pr.id,
                    pr.amount,
                    pr.currency,

@@ -150,11 +150,11 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                    else 'PROCESSING'
                    end AS status,
                 requestor.login AS requestor_login,
-                requestor.avatar_url AS requestor_avatar_url,
+                user_avatar_url(requestor.id, requestor.avatar_url) AS requestor_avatar_url,
                 requestor.id AS requestor_id,
                 recipient.login AS recipient_login,
-                recipient.avatar_url AS recipient_avatar_url,
-                recipient.id AS recipient_id 
+                user_avatar_url(recipient.id, recipient.avatar_url) AS recipient_avatar_url,
+                recipient.id AS recipient_id
             FROM
                 indexer_exp.contributions c
             JOIN public.work_items wi ON wi.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id)

@@ -2121,6 +2121,11 @@ components:
     UserProfileRequest:
       type: object
       properties:
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
         location:
           type: string
           description: User location as in Github profile

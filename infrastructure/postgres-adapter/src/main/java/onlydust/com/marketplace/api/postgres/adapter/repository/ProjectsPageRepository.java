@@ -29,7 +29,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
                            'login', COALESCE(ga.login, u.login_at_signup),
-                           'avatarUrl', COALESCE(ga.avatar_url, u.avatar_url_at_signup),
+                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.avatar_url_at_signup)),
                            'url', ga.html_url
                            ))
                     from project_leads pl
@@ -98,7 +98,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
                            'login', COALESCE(ga.login, u.login_at_signup),
-                           'avatarUrl', COALESCE(ga.avatar_url, u.avatar_url_at_signup),
+                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.avatar_url_at_signup)),
                            'url', ga.html_url
                            ))
                     from project_leads pl

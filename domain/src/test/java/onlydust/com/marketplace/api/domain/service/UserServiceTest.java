@@ -225,7 +225,9 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         final UserProfile profile =
-                UserProfile.builder().bio(faker.lorem().sentence())
+                UserProfile.builder()
+                        .avatarUrl(faker.internet().avatar())
+                        .bio(faker.lorem().sentence())
                         .website(faker.internet().url()).location(faker.address().city())
                         .cover(UserProfileCover.CYAN)
                         .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(),
