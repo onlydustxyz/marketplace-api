@@ -326,7 +326,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "installed": true,
                   "isCurrentUserAdmin": null,
                   "isPersonal": null,
-                  "installationId": 44378743
+                  "installationId": 44637372
                 },
                 {
                   "githubUserId": 121887739,
@@ -2681,6 +2681,17 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(BRETZEL_OVERVIEW_JSON);
+
+        // When user is authenticated
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(BRETZEL_OVERVIEW_JSON);
     }
 
     @Test
@@ -2692,6 +2703,17 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(BRETZEL_OVERVIEW_JSON);
+
+        // When user is authenticated
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
