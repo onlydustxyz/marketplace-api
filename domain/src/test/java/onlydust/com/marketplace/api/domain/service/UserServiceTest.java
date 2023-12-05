@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -12,6 +13,9 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +30,7 @@ public class UserServiceTest {
     private UserStoragePort userStoragePort;
     private ProjectStoragePort projectStoragePort;
     private GithubSearchPort githubSearchPort;
+    private ImageStoragePort imageStoragePort;
     private UserService userService;
 
     @BeforeEach
@@ -33,7 +38,9 @@ public class UserServiceTest {
         userStoragePort = mock(UserStoragePort.class);
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
-        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort);
+        imageStoragePort = mock(ImageStoragePort.class);
+        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort,
+                imageStoragePort);
     }
 
     @Test
@@ -599,5 +606,19 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, times(1)).saveProjectLead(user.getId(), projectId);
+    }
+
+    @Test
+    void should_upload_avatar() throws MalformedURLException {
+        // Given
+        final InputStream imageInputStream = mock(InputStream.class);
+        final String imageUrl = faker.internet().image();
+
+        // When
+        when(imageStoragePort.storeImage(imageInputStream)).thenReturn(new URL(imageUrl));
+        final URL url = userService.saveAvatarImage(imageInputStream);
+
+        // Then
+        assertThat(url.toString()).isEqualTo(imageUrl);
     }
 }

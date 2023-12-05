@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,9 +45,12 @@ public interface UserFacadePort {
 
     RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 
-    Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex, int pageSize);
+    Page<RewardItemView> getRewardItemsPageByIdForRecipientId(UUID rewardId, Long recipientId, int pageIndex,
+                                                              int pageSize);
 
     List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
 
     void claimProjectForAuthenticatedUserAndGithubPersonalToken(UUID projectId, User user, String githubAccessToken);
+
+    URL saveAvatarImage(InputStream imageInputStream);
 }
