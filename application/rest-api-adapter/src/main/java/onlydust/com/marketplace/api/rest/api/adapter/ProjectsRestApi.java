@@ -55,14 +55,16 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
-        final var project = projectFacadePort.getById(projectId);
+        final var userId = authenticationService.tryGetAuthenticatedUser().map(User::getId).orElse(null);
+        final var project = projectFacadePort.getById(projectId, userId);
         final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
         return ResponseEntity.ok(projectResponse);
     }
 
     @Override
     public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
-        final var project = projectFacadePort.getBySlug(slug);
+        final var userId = authenticationService.tryGetAuthenticatedUser().map(User::getId).orElse(null);
+        final var project = projectFacadePort.getBySlug(slug, userId);
         final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
         return ResponseEntity.ok(projectResponse);
     }

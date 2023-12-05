@@ -22,4 +22,12 @@ public class PermissionService {
     public boolean isRepoLinkedToProject(UUID projectId, Long githubRepoId) {
         return projectStoragePort.getProjectRepoIds(projectId).contains(githubRepoId);
     }
+
+    public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
+        return projectStoragePort.hasUserAccessToProject(projectId, userId);
+    }
+
+    public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
+        return projectStoragePort.hasUserAccessToProject(projectSlug, userId);
+    }
 }

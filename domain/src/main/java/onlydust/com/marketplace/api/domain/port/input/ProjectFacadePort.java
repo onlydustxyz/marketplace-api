@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProjectFacadePort {
-    ProjectDetailsView getById(UUID projectId);
+    ProjectDetailsView getById(UUID projectId, UUID userId);
 
-    ProjectDetailsView getBySlug(String slug);
+    ProjectDetailsView getBySlug(String slug, UUID userId);
 
     Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                       String search, ProjectCardView.SortBy sort,

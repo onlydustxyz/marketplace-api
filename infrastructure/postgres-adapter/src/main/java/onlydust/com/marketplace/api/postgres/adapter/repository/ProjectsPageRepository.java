@@ -142,11 +142,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 from project_leads pl_me
                                 where pl_me.user_id = :userId
                                 group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
-                     left join (select pc_me.project_id, case count(*) when 0 then false else true end is_c
-                                from projects_contributors pc_me
-                                         left join auth_users me on me.github_user_id = pc_me.github_user_id
-                                where me.id = :userId
-                                group by pc_me.project_id) is_contributor on is_contributor.project_id = p.project_id
                      left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
                                          left join auth_users me on me.github_user_id = ppc.github_user_id
@@ -163,7 +158,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC'
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
-                    and (coalesce(is_contributor.is_c, false) or coalesce(is_pending_pl.is_p_pl, false) or
+                    and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
                    jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
@@ -251,11 +246,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 from project_leads pl_me
                                 where pl_me.user_id = :userId
                                 group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
-                     left join (select pc_me.project_id, case count(*) when 0 then false else true end is_c
-                                from projects_contributors pc_me
-                                         left join auth_users me on me.github_user_id = pc_me.github_user_id
-                                where me.id = :userId
-                                group by pc_me.project_id) is_contributor on is_contributor.project_id = p.project_id
                      left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
                                          left join auth_users me on me.github_user_id = ppc.github_user_id
@@ -272,7 +262,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC'
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
-                    and (coalesce(is_contributor.is_c, false) or coalesce(is_pending_pl.is_p_pl, false) or
+                    and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
                    jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
