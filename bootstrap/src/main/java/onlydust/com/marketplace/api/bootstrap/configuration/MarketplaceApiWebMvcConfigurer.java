@@ -21,7 +21,5 @@ public class MarketplaceApiWebMvcConfigurer implements WebMvcConfigurer {
                 .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
                 .allowedOrigins(this.webCorsProperties.getHosts());
     }
-
-
 }
 

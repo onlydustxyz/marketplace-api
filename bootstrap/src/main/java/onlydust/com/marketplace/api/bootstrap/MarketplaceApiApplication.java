@@ -2,6 +2,9 @@ package onlydust.com.marketplace.api.bootstrap;
 
 import com.onlydust.marketplace.api.cron.JobScheduler;
 import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfiguration;
+import onlydust.com.marketplace.api.rest.api.adapter.AppRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.VersionRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.exception.OnlydustExceptionRestHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,4 +40,20 @@ public class MarketplaceApiApplication {
     public Date startingDate() {
         return new Date();
     }
+
+    @Bean
+    public AppRestApi appRestApi() {
+        return new AppRestApi();
+    }
+
+    @Bean
+    public VersionRestApi versionRestApi(final Date startingDate) {
+        return new VersionRestApi(startingDate);
+    }
+
+    @Bean
+    public OnlydustExceptionRestHandler onlydustExceptionRestHandler() {
+        return new OnlydustExceptionRestHandler();
+    }
+
 }
