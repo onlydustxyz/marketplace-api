@@ -49,7 +49,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 8642470,
                   "login": "gregcha",
                   "htmlUrl": "https://github.com/gregcha",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4"
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
                 },
                 {
                   "githubUserId": 52197971,
@@ -189,7 +189,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 8642470,
                   "login": "gregcha",
                   "htmlUrl": "https://github.com/gregcha",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                 },
                 {
@@ -261,7 +261,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "htmlUrl": "https://github.com/AnthonyBuisset",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                 },
                 {
                   "githubUserId": 4435377,
@@ -273,7 +273,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 595505,
                   "login": "ofux",
                   "htmlUrl": "https://github.com/ofux",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
                 }
               ],
               "repos": [
@@ -408,7 +408,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -468,7 +468,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -537,7 +537,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
@@ -586,14 +586,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
@@ -635,7 +635,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -689,7 +689,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -742,7 +742,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -844,7 +844,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 43467246,
                       "login": "AnthonyBuisset",
                       "htmlUrl": "https://github.com/AnthonyBuisset",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
@@ -877,7 +877,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -963,7 +963,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 43467246,
                       "login": "AnthonyBuisset",
                       "htmlUrl": "https://github.com/AnthonyBuisset",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
@@ -1059,7 +1059,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -1128,7 +1128,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -1174,7 +1174,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -1217,14 +1217,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
                       "githubUserId": 122993337,
                       "login": "GregGamb",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
                       "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
@@ -1245,7 +1245,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 141839618,
                       "login": "Blumebee",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
                       "id": "46fec596-7a91-422e-8532-5f479e790217"
                     }
                   ],
@@ -1288,7 +1288,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 595505,
                       "login": "ofux",
                       "htmlUrl": "https://github.com/ofux",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
@@ -1377,7 +1377,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -1401,7 +1401,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -1454,7 +1454,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 595505,
                       "login": "ofux",
                       "htmlUrl": "https://github.com/ofux",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
@@ -1575,7 +1575,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                        "githubUserId": 8642470,
                        "login": "gregcha",
                        "htmlUrl": "https://github.com/gregcha",
-                       "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                       "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                        "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                      }
                    ],
@@ -1669,7 +1669,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
@@ -1718,14 +1718,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
                       "githubUserId": 26790304,
                       "login": "gaetanrecly",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/26790304?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
@@ -1767,7 +1767,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -1791,7 +1791,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -1844,7 +1844,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -1946,7 +1946,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 43467246,
                       "login": "AnthonyBuisset",
                       "htmlUrl": "https://github.com/AnthonyBuisset",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
@@ -1979,7 +1979,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -2065,7 +2065,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 43467246,
                       "login": "AnthonyBuisset",
                       "htmlUrl": "https://github.com/AnthonyBuisset",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
@@ -2161,7 +2161,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -2230,7 +2230,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -2276,7 +2276,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
@@ -2319,14 +2319,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     },
                     {
                       "githubUserId": 122993337,
                       "login": "GregGamb",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/122993337?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
                       "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
@@ -2347,7 +2347,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 141839618,
                       "login": "Blumebee",
                       "htmlUrl": null,
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/141839618?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
                       "id": "46fec596-7a91-422e-8532-5f479e790217"
                     }
                   ],
@@ -2390,7 +2390,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 595505,
                       "login": "ofux",
                       "htmlUrl": "https://github.com/ofux",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
@@ -2479,7 +2479,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -2503,7 +2503,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 8642470,
                       "login": "gregcha",
                       "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
@@ -2556,7 +2556,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "githubUserId": 595505,
                       "login": "ofux",
                       "htmlUrl": "https://github.com/ofux",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],

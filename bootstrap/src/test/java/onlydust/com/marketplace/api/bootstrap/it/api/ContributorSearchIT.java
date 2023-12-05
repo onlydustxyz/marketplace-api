@@ -20,7 +20,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                   "isRegistered": true
                 }
               ],
