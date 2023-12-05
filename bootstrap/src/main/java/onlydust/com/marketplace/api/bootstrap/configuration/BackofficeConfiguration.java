@@ -25,7 +25,6 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-//    @Profile("bo")
     @ConfigurationProperties("application.web.back-office")
     public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
         return new ApiKeyAuthenticationService.Config();
