@@ -1,1 +1,1 @@
-web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=api,bo,hasura_auth
+web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=api,hasura_auth
