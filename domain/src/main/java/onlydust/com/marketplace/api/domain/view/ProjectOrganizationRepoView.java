@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.domain.view;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 @Data
@@ -19,4 +21,5 @@ public class ProjectOrganizationRepoView {
     Boolean isIncludedInProject;
     Boolean isAuthorizedInGithubApp;
     Map<String, Long> technologies;
+    ZonedDateTime indexedAt;
 }

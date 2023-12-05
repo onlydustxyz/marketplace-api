@@ -2,6 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.view.ProjectOrganizationRepoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsEntity;
+
+import java.util.Optional;
 
 public interface RepoMapper {
 
@@ -19,6 +22,7 @@ public interface RepoMapper {
                 .isIncludedInProject(isIncludedInProject)
                 .isAuthorizedInGithubApp(isAuthorizedInGithubApp)
                 .technologies(repo.getLanguages())
+                .indexedAt(Optional.ofNullable(repo.getStats()).map(GithubRepoStatsEntity::getLastIndexedAt).orElse(null))
                 .build();
     }
 

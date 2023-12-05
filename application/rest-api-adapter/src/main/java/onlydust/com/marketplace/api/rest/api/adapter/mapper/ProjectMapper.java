@@ -67,6 +67,10 @@ public interface ProjectMapper {
                 .collect(Collectors.toList()));
         projectResponse.setTechnologies(project.getTechnologies());
 
+        final var reposIndexedTimes = project.getOrganizations().stream().map(ProjectOrganizationView::getRepos).flatMap(Collection::stream).map(ProjectOrganizationRepoView::getIndexedAt).toList();
+        projectResponse.setIndexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull));
+        projectResponse.setIndexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null));
+
         //TODO: this list is kept for backwards compatibility with the old API
         final var repos = new ArrayList<GithubRepoResponse>();
         for (ProjectOrganizationView organization : project.getOrganizations()) {

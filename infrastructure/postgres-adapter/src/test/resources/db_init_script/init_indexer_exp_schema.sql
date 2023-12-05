@@ -302,3 +302,9 @@ create table indexer_exp.github_pull_request_commit_counts
     primary key (pull_request_id, author_id)
 );
 
+CREATE TABLE indexer_exp.github_repos_stats
+(
+    id              BIGINT PRIMARY KEY REFERENCES indexer_exp.github_repos (id),
+    last_indexed_at TIMESTAMP
+);
+

@@ -231,7 +231,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "ignoreIssues": false,
                 "ignoreCodeReviews": false,
                 "ignoreContributionsBefore": null
-              }
+              },
+              "indexingComplete": true,
+              "indexedAt": "2023-12-04T14:34:49.384525Z"
             }
                         
             """;
