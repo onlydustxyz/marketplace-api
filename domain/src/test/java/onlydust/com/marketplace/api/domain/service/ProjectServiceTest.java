@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,18 +52,34 @@ public class ProjectServiceTest {
     void should_get_a_project_by_slug() {
         // Given
         final String slug = faker.pokemon().name();
+        final UUID userId = UUID.randomUUID();
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
                 .id(UUID.randomUUID())
                 .slug(slug)
                 .build();
+        when(permissionService.hasUserAccessToProject(slug, userId)).thenReturn(true);
         when(projectStoragePort.getBySlug(slug))
                 .thenReturn(expectedProject);
-        final var project = projectService.getBySlug(slug);
+        final var project = projectService.getBySlug(slug, userId);
 
         // Then
         assertEquals(project, expectedProject);
+    }
+
+    @Test
+    void should_not_get_a_private_project_when_not_logged() {
+        // Given
+        final String slug = faker.pokemon().name();
+
+        // When
+        when(permissionService.hasUserAccessToProject(slug, null)).thenReturn(false);
+
+        // Then
+        assertThatThrownBy(() -> projectService.getBySlug(slug, null))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Project %s is private and user null cannot access it".formatted(slug));
     }
 
     @Test
@@ -775,7 +790,8 @@ public class ProjectServiceTest {
                 .totalPageNumber(1)
                 .build();
 
-        when(contributionStoragePort.findContributions(projectLead.getGithubUserId(), filters, sort, direction, page, pageSize))
+        when(contributionStoragePort.findContributions(projectLead.getGithubUserId(), filters, sort, direction, page,
+                pageSize))
                 .thenReturn(expectedContributions);
 
         // When

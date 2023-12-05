@@ -40,4 +40,96 @@ public class CustomProjectRepository {
         return budgets.isEmpty() ? null : (BigDecimal) budgets.get(0);
 
     }
+
+    public boolean isProjectPublic(UUID projectId) {
+        final var isProjectPublic = entityManager.createNativeQuery("""
+                        select 1
+                        from project_details p
+                        where p.project_id = :projectId
+                          and p.visibility = 'PUBLIC'
+                        """)
+                .setParameter("projectId", projectId)
+                .getResultList();
+        return !isProjectPublic.isEmpty();
+    }
+
+    public boolean isProjectPublic(String projectSlug) {
+        final var isProjectPublic = entityManager.createNativeQuery("""
+                        select 1
+                        from project_details p
+                        where p.key = :projectSlug
+                          and p.visibility = 'PUBLIC'
+                        """)
+                .setParameter("projectSlug", projectSlug)
+                .getResultList();
+        return !isProjectPublic.isEmpty();
+    }
+
+    public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
+        final var hasAccessToProject = entityManager.createNativeQuery("""
+                        select 1
+                        from project_details p
+                        left join (select pl_me.project_id, case count(*) when 0 then false else true end is_lead
+                                from project_leads pl_me
+                                where pl_me.user_id = :userId
+                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
+                        left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
+                                from projects_pending_contributors ppc
+                                         left join auth_users me on me.github_user_id = ppc.github_user_id
+                                where me.id = :userId
+                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
+                        left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
+                                from pending_project_leader_invitations ppli
+                                         left join auth_users me on me.github_user_id = ppli.github_user_id
+                                where me.id = :userId
+                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
+                        left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
+                                from project_leads pl_count
+                                group by pl_count.project_id) pl_count on pl_count.project_id = p.project_id
+                        where p.project_id = :projectId
+                            and
+                            ((pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
+                                and (coalesce(is_pending_pl.is_p_pl, false) or
+                                     coalesce(is_me_lead.is_lead, false) or
+                                     coalesce(is_pending_contributor.is_p_c, false)))
+                        """)
+                .setParameter("projectId", projectId)
+                .setParameter("userId", userId)
+                .getResultList();
+        return !hasAccessToProject.isEmpty();
+    }
+
+    public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
+        final var hasAccessToProject = entityManager.createNativeQuery("""
+                        select 1
+                        from project_details p
+                        left join (select pl_me.project_id, case count(*) when 0 then false else true end is_lead
+                                from project_leads pl_me
+                                where pl_me.user_id = :userId
+                                group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
+                        left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
+                                from projects_pending_contributors ppc
+                                         left join auth_users me on me.github_user_id = ppc.github_user_id
+                                where me.id = :userId
+                                group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
+                        left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
+                                from pending_project_leader_invitations ppli
+                                         left join auth_users me on me.github_user_id = ppli.github_user_id
+                                where me.id = :userId
+                                group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
+                        left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
+                                from project_leads pl_count
+                                group by pl_count.project_id) pl_count on pl_count.project_id = p.project_id
+                        where p.key = :projectSlug
+                            and
+                            ((pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
+                                and (coalesce(is_pending_pl.is_p_pl, false) or
+                                     coalesce(is_me_lead.is_lead, false) or
+                                     coalesce(is_pending_contributor.is_p_c, false)))
+                        """)
+                .setParameter("projectSlug", projectSlug)
+                .setParameter("userId", userId)
+                .getResultList();
+        return !hasAccessToProject.isEmpty();
+    }
 }

@@ -237,6 +237,159 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
             }
                         
             """;
+
+    private static final String B_CONSEIL_OVERVIEW_JSON = """
+            {
+              "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+              "slug": "b-conseil",
+              "name": "B Conseil",
+              "createdAt": "2023-05-24T09:55:04.729Z",
+              "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
+              "longDescription": "Nous sommes **pure player** du financement et du management de l’innovation. Avec une présence physique à Paris nous adressons des entreprises **sur tout le territoire** jusque dans les départements d'outre mer.  \\nNotre équipe d’**ingénieurs pluridisciplinaire** (École des Mines, Arts et métiers, Centrale Nantes, École centrale d’Electronique, Polytech, Epitech, etc.) nous permet d’adresser **tous les secteurs de l’Innovation et de la recherche**. Nous avons également une parfaite maîtrise de la valorisation des sciences humaines et sociales.",
+              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
+              "moreInfos": [
+                {
+                  "url": "https://www.bconseil.fr/",
+                  "value": null
+                }
+              ],
+              "hiring": true,
+              "visibility": "PRIVATE",
+              "contributorCount": 3,
+              "topContributors": [
+                {
+                  "githubUserId": 43467246,
+                  "login": "AnthonyBuisset",
+                  "htmlUrl": "https://github.com/AnthonyBuisset",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "htmlUrl": "https://github.com/Bernardstanislas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
+                },
+                {
+                  "githubUserId": 595505,
+                  "login": "ofux",
+                  "htmlUrl": "https://github.com/ofux",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                }
+              ],
+              "repos": [
+                {
+                  "id": 302082426,
+                  "owner": "gregcha",
+                  "name": "crew-app",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/crew-app",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 602953043,
+                  "owner": "od-mocks",
+                  "name": "cool-repo-A",
+                  "description": "This is repo A for our e2e tests",
+                  "htmlUrl": "https://github.com/od-mocks/cool-repo-A",
+                  "stars": 1,
+                  "forkCount": 2,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": false
+                }
+              ],
+              "organizations": [
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "name": "Grégoire CHARLES",
+                  "repos": [
+                    {
+                      "id": 302082426,
+                      "owner": "gregcha",
+                      "name": "crew-app",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/crew-app",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    }
+                  ],
+                  "installed": true,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": 44378743
+                },
+                {
+                  "githubUserId": 121887739,
+                  "login": "od-mocks",
+                  "htmlUrl": "https://github.com/od-mocks",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/121887739?v=4",
+                  "name": "OD Mocks",
+                  "repos": [
+                    {
+                      "id": 602953043,
+                      "owner": "od-mocks",
+                      "name": "cool-repo-A",
+                      "description": "This is repo A for our e2e tests",
+                      "htmlUrl": "https://github.com/od-mocks/cool-repo-A",
+                      "stars": 1,
+                      "forkCount": 2,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": false
+                    }
+                  ],
+                  "installed": false,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": null
+                }
+              ],
+              "leaders": [
+                {
+                  "githubUserId": 134486697,
+                  "login": "axelbconseil",
+                  "htmlUrl": "https://github.com/axelbconseil",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/134486697?v=4",
+                  "id": "83612081-949a-47c4-a467-6f28f6adad6d"
+                }
+              ],
+              "invitedLeaders": [
+                {
+                  "githubUserId": 5160414,
+                  "login": "haydencleary",
+                  "htmlUrl": "https://github.com/haydencleary",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                  "id": null
+                }
+              ],
+              "sponsors": [],
+              "technologies": {
+                "CSS": 323507,
+                "Rust": 527,
+                "SCSS": 102453,
+                "JavaScript": 58624,
+                "HTML": 169898
+              },
+              "remainingUsdBudget": 50000,
+              "rewardSettings": {
+                "ignorePullRequests": false,
+                "ignoreIssues": false,
+                "ignoreCodeReviews": false,
+                "ignoreContributionsBefore": null
+              }
+            }
+                        
+            """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
             {
               "projects": [
@@ -2613,5 +2766,101 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(8)
+    public void should_get_a_private_project_by_slug() {
+        // Given
+        final String slug = "b-conseil";
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isForbidden();
+
+        // When a contributor gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When a lead gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateUser(134486697L).jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When an invited lead gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
+    }
+
+    @Test
+    @Order(9)
+    public void should_get_a_private_project_by_id() {
+        // Given
+        final String id = "27ca7e18-9e71-468f-8825-c64fe6b79d66";
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isForbidden();
+
+        // When a contributor gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When a lead gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateUser(134486697L).jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When an invited lead gets the project
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json(B_CONSEIL_OVERVIEW_JSON);
     }
 }

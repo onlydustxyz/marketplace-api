@@ -103,6 +103,18 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
+        return userId == null ? customProjectRepository.isProjectPublic(projectId) :
+                customProjectRepository.hasUserAccessToProject(projectId, userId);
+    }
+
+    @Override
+    public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
+        return userId == null ? customProjectRepository.isProjectPublic(projectSlug) :
+                customProjectRepository.hasUserAccessToProject(projectSlug, userId);
+    }
+
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);

@@ -41,12 +41,20 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
-    public ProjectDetailsView getById(UUID projectId) {
+    public ProjectDetailsView getById(UUID projectId, UUID userId) {
+        if (!permissionService.hasUserAccessToProject(projectId, userId)) {
+            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId,
+                    userId));
+        }
         return projectStoragePort.getById(projectId);
     }
 
     @Override
-    public ProjectDetailsView getBySlug(String slug) {
+    public ProjectDetailsView getBySlug(String slug, UUID userId) {
+        if (!permissionService.hasUserAccessToProject(slug, userId)) {
+            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
+                    userId));
+        }
         return projectStoragePort.getBySlug(slug);
     }
 
@@ -287,11 +295,12 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
-                                                       ContributionView.Sort sort, SortDirection direction,
-                                                       Integer page, Integer pageSize) {
+                                                ContributionView.Sort sort, SortDirection direction,
+                                                Integer page, Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw OnlyDustException.forbidden("Only project leads can list project contributions");
         }
-        return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page, pageSize);
+        return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page,
+                pageSize);
     }
 }
