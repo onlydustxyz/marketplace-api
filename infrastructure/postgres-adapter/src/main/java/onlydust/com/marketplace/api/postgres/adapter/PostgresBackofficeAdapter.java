@@ -8,6 +8,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.Githu
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+
+import static java.util.Objects.nonNull;
+
 @AllArgsConstructor
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
@@ -15,13 +20,17 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectRepositoryView> findProjectRepositoryPage(Integer pageIndex, Integer pageSize) {
-        final var page = githubRepositoryLinkedToProjectRepository.findAllPublic(PageRequest.of(pageIndex, pageSize));
+    public Page<ProjectRepositoryView> findProjectRepositoryPage(Integer pageIndex, Integer pageSize,
+                                                                 List<UUID> projectIds) {
+        final var page = (nonNull(projectIds) && !projectIds.isEmpty()) ?
+                githubRepositoryLinkedToProjectRepository.findAllPublicForProjectsIds(PageRequest.of(pageIndex,
+                        pageSize), projectIds) :
+                githubRepositoryLinkedToProjectRepository.findAllPublic(PageRequest.of(pageIndex, pageSize));
         return Page.<ProjectRepositoryView>builder()
                 .content(page.getContent().stream().map(entity ->
                         ProjectRepositoryView.builder()
-                                .projectId(entity.getProjectId())
-                                .id(entity.getId())
+                                .projectId(entity.getId().getProjectId())
+                                .id(entity.getId().getId())
                                 .name(entity.getName())
                                 .owner(entity.getOwner())
                                 .technologies(entity.getTechnologies())

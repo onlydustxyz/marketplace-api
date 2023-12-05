@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @Tags(@Tag(name = "Backoffice"))
 @AllArgsConstructor
@@ -22,11 +25,12 @@ public class BackofficeRestApi implements BackofficeApi {
     private final BackofficeFacadePort backofficeFacadePort;
 
     @Override
-    public ResponseEntity<GithubRepositoryPage> getGithubRepositoryPage(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<GithubRepositoryPage> getGithubRepositoryPage(Integer pageIndex, Integer pageSize,
+                                                                        List<UUID> projectIds) {
         final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         Page<ProjectRepositoryView> projectRepositoryViewPage =
-                backofficeFacadePort.getProjectRepositoryPage(sanitizedPageIndex, sanitizedPageSize);
+                backofficeFacadePort.getProjectRepositoryPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
 
         final GithubRepositoryPage githubRepositoryPage = new GithubRepositoryPage();
         for (ProjectRepositoryView projectRepositoryView : projectRepositoryViewPage.getContent()) {
