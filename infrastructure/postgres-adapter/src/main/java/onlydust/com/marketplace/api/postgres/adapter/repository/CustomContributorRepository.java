@@ -31,7 +31,7 @@ public class CustomContributorRepository {
             SELECT
             		ga.id AS github_user_id,
             		ga.login,
-            		ga.avatar_url,
+            		user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
             		ga.html_url,
                     u.github_user_id IS NOT NULL as is_registered
             FROM
@@ -62,7 +62,7 @@ public class CustomContributorRepository {
             )
             select ga.id,
                    ga.login,
-                   ga.avatar_url,
+                   user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                    pc.completed_contribution_count                 contribution_count,
                    u.github_user_id is not null is_registered,
                    (select count(distinct pr.id)
@@ -135,7 +135,7 @@ public class CustomContributorRepository {
             SELECT
                 ga.id as github_user_id,
                 ga.login,
-                ga.avatar_url,
+                user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                 ga.html_url,
                 u.github_user_id IS NOT NULL as is_registered
             FROM indexer_exp.github_accounts ga

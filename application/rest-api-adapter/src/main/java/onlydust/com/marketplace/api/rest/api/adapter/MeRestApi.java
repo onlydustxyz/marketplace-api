@@ -18,12 +18,14 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
-import java.util.Date;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -261,5 +263,20 @@ public class MeRestApi implements MeApi {
                 projectId, hasuraAuthentication.getUser(), hasuraAuthentication.getClaims().getGithubAccessToken()
         );
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<UploadImageResponse> uploadAvatar(Resource image) {
+        InputStream imageInputStream;
+        try {
+            imageInputStream = image.getInputStream();
+        } catch (IOException e) {
+            throw OnlyDustException.badRequest("Error while reading image data", e);
+        }
+
+        final URL imageUrl = userFacadePort.saveAvatarImage(imageInputStream);
+        final UploadImageResponse response = new UploadImageResponse();
+        response.url(imageUrl.toString());
+        return ResponseEntity.ok(response);
     }
 }

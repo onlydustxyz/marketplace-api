@@ -49,8 +49,8 @@ public interface ProjectMapper {
                 .isLookingForContributors(updateProjectRequest.getIsLookingForContributors())
                 .moreInfos(isNull(updateProjectRequest.getMoreInfos()) ? null :
                         updateProjectRequest.getMoreInfos().stream()
-                        .map(moreInfo -> MoreInfoLink.builder()
-                                .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
+                                .map(moreInfo -> MoreInfoLink.builder()
+                                        .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
                 .build();
     }
@@ -59,7 +59,10 @@ public interface ProjectMapper {
         final ProjectResponse projectResponse = mapProjectDetailsMetadata(project);
         projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapGithubUser).collect(Collectors.toList()));
         projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
-        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
+        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream()
+                .map(ProjectMapper::mapRegisteredUser)
+                .sorted(Comparator.comparing(RegisteredUserResponse::getGithubUserId))
+                .collect(Collectors.toList()));
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
@@ -67,7 +70,8 @@ public interface ProjectMapper {
                 .collect(Collectors.toList()));
         projectResponse.setTechnologies(project.getTechnologies());
 
-        final var reposIndexedTimes = project.getOrganizations().stream().map(ProjectOrganizationView::getRepos).flatMap(Collection::stream).map(ProjectOrganizationRepoView::getIndexedAt).toList();
+        final var reposIndexedTimes =
+                project.getOrganizations().stream().map(ProjectOrganizationView::getRepos).flatMap(Collection::stream).map(ProjectOrganizationRepoView::getIndexedAt).toList();
         projectResponse.setIndexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull));
         projectResponse.setIndexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null));
 
@@ -91,7 +95,8 @@ public interface ProjectMapper {
         organization.setGithubUserId(projectOrganizationView.getId());
         organization.setLogin(projectOrganizationView.getLogin());
         organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
-        organization.setHtmlUrl(nonNull(projectOrganizationView.getHtmlUrl()) ? URI.create(projectOrganizationView.getHtmlUrl()) : null);
+        organization.setHtmlUrl(nonNull(projectOrganizationView.getHtmlUrl()) ?
+                URI.create(projectOrganizationView.getHtmlUrl()) : null);
         organization.setName(projectOrganizationView.getName());
         organization.setInstallationId(projectOrganizationView.getInstallationId());
         organization.setInstalled(projectOrganizationView.getIsInstalled());
@@ -114,7 +119,7 @@ public interface ProjectMapper {
         project.setLogoUrl(projectDetailsView.getLogoUrl());
         project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null :
                 projectDetailsView.getMoreInfos().stream()
-                .map(moreInfo -> new MoreInfo().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
+                        .map(moreInfo -> new MoreInfo().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
         project.setHiring(projectDetailsView.getHiring());
         project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
         project.setContributorCount(projectDetailsView.getContributorCount());

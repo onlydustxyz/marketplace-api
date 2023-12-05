@@ -20,6 +20,7 @@ public interface UserMapper {
 
     static UserProfile userProfileRequestToDomain(final UserProfileRequest userProfileRequest) {
         return UserProfile.builder()
+                .avatarUrl(userProfileRequest.getAvatarUrl())
                 .bio(userProfileRequest.getBio())
                 .website(userProfileRequest.getWebsite())
                 .location(userProfileRequest.getLocation())
@@ -82,11 +83,10 @@ public interface UserMapper {
     static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {
         final PrivateUserProfileResponse userProfileResponse = new PrivateUserProfileResponse();
         userProfileResponse.setGithubUserId(userProfileView.getGithubId());
-        userProfileResponse.setBio(userProfileView.getBio());
-        userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
         userProfileResponse.setId(userProfileView.getId());
         userProfileResponse.setLogin(userProfileView.getLogin());
         userProfileResponse.setAvatarUrl(userProfileView.getAvatarUrl());
+        userProfileResponse.setBio(userProfileView.getBio());
         userProfileResponse.setWebsite(userProfileView.getWebsite());
         userProfileResponse.setHtmlUrl((isNull(userProfileView.getHtmlUrl()) ? null :
                 URI.create(userProfileView.getHtmlUrl())));

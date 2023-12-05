@@ -69,8 +69,10 @@ public class DomainConfiguration {
     public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
-                                         final GithubSearchPort githubSearchPort) {
-        return new UserService(postgresUserAdapter, dateProvider, projectStoragePort, githubSearchPort);
+                                         final GithubSearchPort githubSearchPort,
+                                         final ImageStoragePort imageStoragePort) {
+        return new UserService(postgresUserAdapter, dateProvider, projectStoragePort, githubSearchPort,
+                imageStoragePort);
     }
 
     @Bean

@@ -2,16 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.Temporal;
 
-import javax.persistence.TemporalType;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +21,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.contributor_id,
                 c.contributor_login,
                 c.contributor_html_url,
-                c.contributor_avatar_url,
+                user_avatar_url(c.contributor_id, c.contributor_avatar_url) as contributor_avatar_url,
                 c.github_number,
                 c.github_status,
                 c.github_title,
@@ -36,7 +30,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.github_author_id,
                 c.github_author_login,
                 c.github_author_html_url,
-                c.github_author_avatar_url,
+                user_avatar_url(c.github_author_id, c.github_author_avatar_url) as github_author_avatar_url,
                 p.project_id as project_id,
                 p.name as project_name,
                 p.key as project_key,
@@ -67,7 +61,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', i.author_id,
                         'github_author_login', i.author_login,
                         'github_author_html_url', i.author_html_url,
-                        'github_author_avatar_url', i.author_avatar_url,
+                        'github_author_avatar_url', user_avatar_url(i.author_id, i.author_avatar_url),
                         'is_mine', :contributorId = i.author_id,
                         'repo_id', i.repo_id,
                         'repo_owner', i.repo_owner_login,
@@ -95,7 +89,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', pr.author_id,
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
-                        'github_author_avatar_url', pr.author_avatar_url,
+                        'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
                         'is_mine', :contributorId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
@@ -123,7 +117,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_id', pr.author_id,
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
-                        'github_author_avatar_url', pr.author_avatar_url,
+                        'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
                         'is_mine', :contributorId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,

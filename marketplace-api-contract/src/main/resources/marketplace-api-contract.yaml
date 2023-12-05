@@ -124,6 +124,44 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/profile/avatar:
+    post:
+      security:
+        - { }
+      tags:
+        - Me
+      summary: Upload a profile avatar
+      operationId: uploadAvatar
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/payout-info:
     get:
       security:
@@ -2083,6 +2121,11 @@ components:
     UserProfileRequest:
       type: object
       properties:
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
         location:
           type: string
           description: User location as in Github profile
@@ -3948,12 +3991,12 @@ components:
     SuggestTechnologyRequest:
       type: object
       required:
-          - technology
+        - technology
       properties:
-          technology:
-            type: string
-            description: Technology name
-            example: Rust
+        technology:
+          type: string
+          description: Technology name
+          example: Rust
 
     AddOtherWorkRequest:
       type: object

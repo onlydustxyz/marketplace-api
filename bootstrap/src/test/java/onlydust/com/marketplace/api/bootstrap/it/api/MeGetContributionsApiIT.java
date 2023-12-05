@@ -45,7 +45,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "htmlUrl": "https://github.com/ofux",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
                               },
                               "githubNumber": 1,
                               "githubStatus": "DRAFT",
@@ -82,7 +82,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "htmlUrl": "https://github.com/AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                               },
                               "githubNumber": 2,
                               "githubStatus": "MERGED",
@@ -119,7 +119,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "htmlUrl": "https://github.com/ofux",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
                               },
                               "githubNumber": 3,
                               "githubStatus": "MERGED",

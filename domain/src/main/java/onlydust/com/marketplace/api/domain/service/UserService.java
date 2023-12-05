@@ -6,12 +6,15 @@ import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +25,7 @@ public class UserService implements UserFacadePort {
     private final DateProvider dateProvider;
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
+    private final ImageStoragePort imageStoragePort;
 
     @Override
     public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity) {
@@ -153,6 +157,11 @@ public class UserService implements UserFacadePort {
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);
+    }
+
+    @Override
+    public URL saveAvatarImage(InputStream imageInputStream) {
+        return this.imageStoragePort.storeImage(imageInputStream);
     }
 
     private boolean cannotBeClaimedByUser(User user, String githubAccessToken, ProjectOrganizationView org) {

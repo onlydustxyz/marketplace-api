@@ -427,8 +427,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "status": "MERGED",
                               "githubAuthorId": 43467246,
                               "authorLogin": "AnthonyBuisset",
-                              "authorAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                              "authorAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                              "authorGithubUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                             }
                           ],
                           "hasMore": false,

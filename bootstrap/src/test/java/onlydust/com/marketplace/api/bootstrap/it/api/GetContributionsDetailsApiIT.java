@@ -114,13 +114,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:01:47.616674Z",
@@ -135,13 +135,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:00:46.580407Z",
@@ -156,13 +156,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:00:18.005344Z",
@@ -177,13 +177,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:02:53.470663Z",
@@ -198,13 +198,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:01:16.850492Z",
@@ -219,13 +219,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T07:59:47.012001Z",
@@ -240,13 +240,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T07:59:16.657487Z",
@@ -261,13 +261,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "from": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "to": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": null
                               },
                               "createdAt": "2023-09-20T08:02:18.711143Z",
@@ -310,7 +310,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             "githubUserId": 43467246,
                             "login": "AnthonyBuisset",
                             "htmlUrl": "https://github.com/AnthonyBuisset",
-                            "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                           },
                           "githubNumber": 17,
                           "githubStatus": "APPROVED",

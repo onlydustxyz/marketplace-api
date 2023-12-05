@@ -13,6 +13,7 @@ import java.util.Map;
 @Builder(toBuilder = true)
 @ToString
 public class UserProfile {
+    private String avatarUrl;
     private String location;
     private String bio;
     private String website;
