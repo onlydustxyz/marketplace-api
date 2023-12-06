@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
@@ -40,4 +41,8 @@ public class RegisteredUserViewEntity {
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private OnboardingEntity onboarding;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserProfileInfoEntity profile;
 }

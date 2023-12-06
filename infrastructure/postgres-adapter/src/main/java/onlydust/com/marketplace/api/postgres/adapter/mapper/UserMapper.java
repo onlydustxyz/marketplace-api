@@ -53,7 +53,8 @@ public interface UserMapper {
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
                 .login(user.getGithubLogin())
-                .avatarUrl(user.getGithubAvatarUrl())
+                .avatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
+                        user.getProfile().getAvatarUrl() : user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
                                                      && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
@@ -69,7 +70,8 @@ public interface UserMapper {
                 .id(user.getId())
                 .githubUserId(user.getGithubId())
                 .login(user.getLogin())
-                .avatarUrl(user.getAvatarUrl())
+                .avatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
+                        user.getProfile().getAvatarUrl() : user.getAvatarUrl())
                 .roles(Boolean.TRUE.equals(user.getAdmin()) ? List.of(UserRole.USER, UserRole.ADMIN) :
                         List.of(UserRole.USER))
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
