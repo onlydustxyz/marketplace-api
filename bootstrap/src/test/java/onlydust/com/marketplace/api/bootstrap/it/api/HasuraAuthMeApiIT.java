@@ -142,4 +142,40 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.id").isEqualTo(userId.toString());
     }
+
+    @Test
+    @Order(4)
+    void should_get_current_user_with_custom_avatar() throws JsonProcessingException {
+        // Given
+        Long githubUserId = 595505L;
+        String login = "ofux";
+        UUID userId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(userId)
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(githubUserId)
+                        .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
+                        .login(login)
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.login").isEqualTo(login)
+                .jsonPath("$.githubUserId").isEqualTo(githubUserId)
+                .jsonPath("$.avatarUrl").isEqualTo(
+                        "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp")
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
+                .jsonPath("$.id").isEqualTo(userId.toString());
+    }
 }

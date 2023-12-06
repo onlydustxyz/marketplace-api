@@ -6,6 +6,7 @@ import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -53,6 +54,10 @@ public class UserViewEntity {
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private OnboardingEntity onboarding;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserProfileInfoEntity profile;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
