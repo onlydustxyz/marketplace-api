@@ -60,7 +60,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     }
 
 
-    protected static final String GET_GITHUB_REPO = "/bo/v1/repositories";
+    protected static final String GET_GITHUB_REPOS = "/bo/v1/repositories";
+    protected static final String GET_BUDGETS = "/bo/v1/budgets";
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()

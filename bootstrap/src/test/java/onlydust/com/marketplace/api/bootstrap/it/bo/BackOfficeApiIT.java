@@ -12,10 +12,20 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     ApiKeyAuthenticationService.Config config;
 
     @Test
-    void should_raise_missing_authentication_given_no_api_key() {
+    void should_raise_missing_authentication_given_no_api_key_when_getting_github_repos() {
         // When
         client.get()
-                .uri(getApiURI(GET_GITHUB_REPO, Map.of("pageIndex", "0", "pageSize", "5")))
+                .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+    }
+
+    @Test
+    void should_raise_missing_authentication_given_no_api_key_when_getting_budgets() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5")))
                 .exchange()
                 .expectStatus()
                 .isUnauthorized();
@@ -25,7 +35,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     void should_get_github_repositories() {
         // When
         client.get()
-                .uri(getApiURI(GET_GITHUB_REPO, Map.of("pageIndex", "0", "pageSize", "5")))
+                .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5")))
                 .header("Api-Key", config.getApiKey())
                 // Then
                 .exchange()
@@ -112,7 +122,10 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
         client.get()
-                .uri(getApiURI(GET_GITHUB_REPO, Map.of("pageIndex", "0", "pageSize", "5", "projectIds","467cb27c-9726-4f94-818e-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
+                .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds", "467cb27c" +
+                                                                                                         "-9726-4f94" +
+                                                                                                         "-818e" +
+                                                                                                         "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
                 .header("Api-Key", config.getApiKey())
                 // Then
                 .exchange()
@@ -182,8 +195,127 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             }
                           ]
                         }
-                        
+                                                
+                        """);
+    }
+
+    @Test
+    void should_get_budgets() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 14,
+                          "totalItemNumber": 70,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "budgets": [
+                            {
+                              "id": "4b702cb1-28d2-49ef-8a7b-48f23ebe5ddd",
+                              "currency": null,
+                              "initialAmount": 1789654,
+                              "remainingAmount": 1789654,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 1789654,
+                              "initialAmountDollarsEquivalent": 1789654,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "ccf90dcf-a91b-42c6-b5ca-49d687b4401a"
+                            },
+                            {
+                              "id": "c3c492f8-e853-44af-a2f5-a413c200dd79",
+                              "currency": null,
+                              "initialAmount": 15000,
+                              "remainingAmount": 15000,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 15000,
+                              "initialAmountDollarsEquivalent": 15000,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "8daa34b4-563a-4ef5-8c1c-4bcffdfbc4f6"
+                            },
+                            {
+                              "id": "6bdc7650-266c-4854-ac20-1073c0218774",
+                              "currency": null,
+                              "initialAmount": 1789654,
+                              "remainingAmount": 1789654,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 1789654,
+                              "initialAmountDollarsEquivalent": 1789654,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "56504731-0398-441f-80ac-90edbd14675f"
+                            },
+                            {
+                              "id": "20254f76-c3e9-4430-b04c-5cb3c715e38b",
+                              "currency": null,
+                              "initialAmount": 10000,
+                              "remainingAmount": 10000,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 10000,
+                              "initialAmountDollarsEquivalent": 10000,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17"
+                            },
+                            {
+                              "id": "ed9d26bc-8497-49e6-861d-883e4b23b175",
+                              "currency": null,
+                              "initialAmount": 1789654,
+                              "remainingAmount": 1789654,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 1789654,
+                              "initialAmountDollarsEquivalent": 1789654,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "c44930eb-d292-4de0-99b3-85957e1a7a1a"
+                            }
+                          ]
+                        }
                         """);
 
+        client.get()
+                .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds",
+                        "ccf90dcf-a91b-42c6-b5ca-49d687b4401a,56504731-0398-441f-80ac-90edbd14675f")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "budgets": [
+                            {
+                              "id": "4b702cb1-28d2-49ef-8a7b-48f23ebe5ddd",
+                              "currency": null,
+                              "initialAmount": 1789654,
+                              "remainingAmount": 1789654,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 1789654,
+                              "initialAmountDollarsEquivalent": 1789654,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "ccf90dcf-a91b-42c6-b5ca-49d687b4401a"
+                            },
+                            {
+                              "id": "6bdc7650-266c-4854-ac20-1073c0218774",
+                              "currency": null,
+                              "initialAmount": 1789654,
+                              "remainingAmount": 1789654,
+                              "spentAmount": 0,
+                              "remainingAmountDollarsEquivalent": 1789654,
+                              "initialAmountDollarsEquivalent": 1789654,
+                              "spentAmountDollarsEquivalent": 0,
+                              "projectId": "56504731-0398-441f-80ac-90edbd14675f"
+                            }
+                          ]
+                        }
+                        """);
     }
 }
