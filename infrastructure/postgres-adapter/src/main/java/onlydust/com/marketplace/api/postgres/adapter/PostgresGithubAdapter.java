@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @AllArgsConstructor
 public class PostgresGithubAdapter implements GithubStoragePort {
 

@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Data
@@ -19,4 +20,5 @@ public class GithubAppInstallationEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "installationId", referencedColumnName = "id", updatable = false, insertable = false)
     Set<GithubAuthorizedRepoEntity> authorizedRepos;
+    ZonedDateTime suspendedAt;
 }
