@@ -229,7 +229,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "budgets": [
                             {
                               "id": "4b702cb1-28d2-49ef-8a7b-48f23ebe5ddd",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 1789654,
                               "remainingAmount": 1789654,
                               "spentAmount": 0,
@@ -240,7 +240,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "c3c492f8-e853-44af-a2f5-a413c200dd79",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 15000,
                               "remainingAmount": 15000,
                               "spentAmount": 0,
@@ -251,7 +251,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "6bdc7650-266c-4854-ac20-1073c0218774",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 1789654,
                               "remainingAmount": 1789654,
                               "spentAmount": 0,
@@ -262,7 +262,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "20254f76-c3e9-4430-b04c-5cb3c715e38b",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 10000,
                               "remainingAmount": 10000,
                               "spentAmount": 0,
@@ -273,7 +273,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "ed9d26bc-8497-49e6-861d-883e4b23b175",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 1789654,
                               "remainingAmount": 1789654,
                               "spentAmount": 0,
@@ -304,7 +304,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "budgets": [
                             {
                               "id": "4b702cb1-28d2-49ef-8a7b-48f23ebe5ddd",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 1789654,
                               "remainingAmount": 1789654,
                               "spentAmount": 0,
@@ -315,7 +315,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "6bdc7650-266c-4854-ac20-1073c0218774",
-                              "currency": null,
+                              "currency": "USD",
                               "initialAmount": 1789654,
                               "remainingAmount": 1789654,
                               "spentAmount": 0,

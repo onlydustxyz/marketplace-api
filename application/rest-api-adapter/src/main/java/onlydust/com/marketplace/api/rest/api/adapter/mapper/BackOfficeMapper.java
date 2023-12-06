@@ -37,6 +37,13 @@ public interface BackOfficeMapper {
                     .remainingAmount(view.getRemainingAmount())
                     .spentAmount(view.getSpentAmount())
                     .id(view.getId())
+                    .currency(switch (view.getCurrency()) {
+                        case Stark -> BudgetResponse.CurrencyEnum.STARK;
+                        case Usd -> BudgetResponse.CurrencyEnum.USD;
+                        case Apt -> BudgetResponse.CurrencyEnum.APT;
+                        case Op -> BudgetResponse.CurrencyEnum.OP;
+                        case Eth -> BudgetResponse.CurrencyEnum.ETH;
+                    })
                     .projectId(view.getProjectId())
                     .initialAmountDollarsEquivalent(view.getInitialAmountDollarsEquivalent())
                     .remainingAmountDollarsEquivalent(view.getRemainingAmountDollarsEquivalent())
