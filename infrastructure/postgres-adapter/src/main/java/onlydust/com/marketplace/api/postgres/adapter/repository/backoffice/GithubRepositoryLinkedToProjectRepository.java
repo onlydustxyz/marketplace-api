@@ -21,21 +21,10 @@ public interface GithubRepositoryLinkedToProjectRepository extends JpaRepository
             FROM indexer_exp.github_repos AS gr
                      JOIN project_github_repos pgr ON pgr.github_repo_id = gr.id
             WHERE gr.visibility = 'PUBLIC'
+            AND (COALESCE(:projectIds) IS NULL OR pgr.project_id IN (:projectIds))
             """, nativeQuery = true)
-    Page<GithubRepositoryLinkedToProjectEntity> findAllPublic(final Pageable pageable);
-
-    @Query(value = """
-            SELECT gr.id,
-                   gr.owner_login AS owner,
-                   gr.name,
-                   gr.languages   AS technologies,
-                   pgr.project_id
-            FROM indexer_exp.github_repos AS gr
-                     JOIN project_github_repos pgr ON pgr.github_repo_id = gr.id
-            WHERE gr.visibility = 'PUBLIC'
-            AND pgr.project_id IN (:projectIds)
-            """, nativeQuery = true)
-    Page<GithubRepositoryLinkedToProjectEntity> findAllPublicForProjectsIds(final Pageable pageable, final List<UUID> projectIds);
+    Page<GithubRepositoryLinkedToProjectEntity> findAllPublicForProjectsIds(final Pageable pageable,
+                                                                            final List<UUID> projectIds);
 
 
 }

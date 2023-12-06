@@ -57,6 +57,89 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /bo/v1/budgets:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get budget page
+      operationId: getBudgetPage
+      description: |
+        Get budget page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+      responses:
+        "200":
+          description: 'Budget page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/project-lead-invitations:
+      get:
+        security:
+          - apiKey: [ ]
+        tags:
+          - Backoffice
+        summary: Get project lead invitations page
+        operationId: getProjectLeadInvitationPage
+        description: |
+          Get project lead invitations page
+        parameters:
+          - in: query
+            name: pageIndex
+            required: true
+            schema:
+              type: integer
+          - in: query
+            name: pageSize
+            required: true
+            schema:
+              type: integer
+          - in: query
+            name: ids
+            required: false
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            style: simple
+        responses:
+          "200":
+            description: 'Project Lead Invitation page'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProjectLeadInvitationPage'
+          "401":
+            $ref: '#/components/responses/UnauthorizedError'
+          "500":
+            $ref: '#/components/responses/InternalServerError'
+
 
 
 components:
@@ -131,7 +214,7 @@ components:
         githubRepositories:
           type: array
           items:
-            $ref: '#/components/schemas/GithubRepository'
+            $ref: '#/components/schemas/GithubRepositoryResponse'
     Technologies:
       type: object
       description: List fo technologies ordered by mastering level (the higher the better) or usage (ie. line count of a language)
@@ -142,7 +225,7 @@ components:
         Rust: 91283
         Go: 12388
         Java: 1233
-    GithubRepository:
+    GithubRepositoryResponse:
       type: object
       properties:
         id:
@@ -157,3 +240,90 @@ components:
         projectId:
           type: string
           format: uuid
+
+    BudgetPage:
+      type: object
+      required:
+        - contributors
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        budgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetResponse'
+    BudgetResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+          enum:
+            - USD
+            - ETH
+            - APT
+            - STARK
+            - OP
+        initialAmount:
+          type: number
+        remainingAmount:
+          type: number
+        spentAmount:
+          type: number
+        remainingAmountDollarsEquivalent:
+          type: number
+        initialAmountDollarsEquivalent:
+          type: number
+        spentAmountDollarsEquivalent:
+          type: number
+        projectId:
+          type: string
+          format: uuid
+
+    ProjectLeadInvitationPage:
+      type: object
+      required:
+        - contributors
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        project_lead_invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLeadInvitationResponse'
+    ProjectLeadInvitationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        githubUserId:
+          type: integer
+          format: int64
