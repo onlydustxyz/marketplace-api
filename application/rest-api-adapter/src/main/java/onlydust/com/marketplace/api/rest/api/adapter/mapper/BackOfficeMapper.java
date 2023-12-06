@@ -1,17 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.backoffice.api.contract.model.BudgetPage;
-import onlydust.com.backoffice.api.contract.model.BudgetResponse;
-import onlydust.com.backoffice.api.contract.model.GithubRepositoryPage;
-import onlydust.com.backoffice.api.contract.model.GithubRepositoryResponse;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
+import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 public interface BackOfficeMapper {
 
-    static GithubRepositoryPage mapGithubRepositoryPageToContract(Page<ProjectRepositoryView> projectRepositoryViewPage, int sanitizedPageIndex) {
+    static GithubRepositoryPage mapGithubRepositoryPageToResponse(Page<ProjectRepositoryView> projectRepositoryViewPage,
+                                                                  int sanitizedPageIndex) {
         final GithubRepositoryPage githubRepositoryPage = new GithubRepositoryPage();
         for (ProjectRepositoryView projectRepositoryView : projectRepositoryViewPage.getContent()) {
             githubRepositoryPage.addGithubRepositoriesItem(new GithubRepositoryResponse()
@@ -30,7 +29,7 @@ public interface BackOfficeMapper {
         return githubRepositoryPage;
     }
 
-    static BudgetPage mapBudgetPageToContract(Page<ProjectBudgetView> projectBudgetViewPage, int sanitizedPageIndex) {
+    static BudgetPage mapBudgetPageToResponse(Page<ProjectBudgetView> projectBudgetViewPage, int sanitizedPageIndex) {
         final BudgetPage budgetPage = new BudgetPage();
         for (ProjectBudgetView view : projectBudgetViewPage.getContent()) {
             budgetPage.addBudgetsItem(new BudgetResponse()
@@ -50,5 +49,23 @@ public interface BackOfficeMapper {
         budgetPage.setHasMore(PaginationHelper.hasMore(sanitizedPageIndex,
                 projectBudgetViewPage.getTotalPageNumber()));
         return budgetPage;
+    }
+
+    static ProjectLeadInvitationPage mapProjectLeadInvitationPageToContract(final Page<ProjectLeadInvitationView> projectLeadInvitationViewPage,
+                                                                            int sanitizedPageIndex) {
+        final ProjectLeadInvitationPage projectLeadInvitationPage = new ProjectLeadInvitationPage();
+        for (ProjectLeadInvitationView view : projectLeadInvitationViewPage.getContent()) {
+            projectLeadInvitationPage.addProjectLeadInvitationsItem(new ProjectLeadInvitationResponse()
+                    .id(view.getId())
+                    .projectId(view.getProjectId())
+                    .githubUserId(view.getGithubUserId()));
+        }
+        projectLeadInvitationPage.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex,
+                projectLeadInvitationViewPage.getTotalPageNumber()));
+        projectLeadInvitationPage.setTotalPageNumber(projectLeadInvitationViewPage.getTotalPageNumber());
+        projectLeadInvitationPage.setTotalItemNumber(projectLeadInvitationViewPage.getTotalItemNumber());
+        projectLeadInvitationPage.setHasMore(PaginationHelper.hasMore(sanitizedPageIndex,
+                projectLeadInvitationViewPage.getTotalPageNumber()));
+        return projectLeadInvitationPage;
     }
 }

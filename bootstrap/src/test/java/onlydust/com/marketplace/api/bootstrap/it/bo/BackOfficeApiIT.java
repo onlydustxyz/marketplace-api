@@ -32,6 +32,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    void should_raise_missing_authentication_given_no_api_key_when_getting_project_lead_invitations() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+    }
+
+    @Test
     void should_get_github_repositories() {
         // When
         client.get()
@@ -318,4 +328,85 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_get_project_lead_invitations() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "totalPageNumber": 3,
+                           "totalItemNumber": 12,
+                           "hasMore": true,
+                           "nextPageIndex": 1,
+                           "project_lead_invitations": [
+                             {
+                               "id": "b18b3ed7-b4c7-40b7-8d7d-5e6a136374fe",
+                               "projectId": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                               "githubUserId": 34384633
+                             },
+                             {
+                               "id": "03d6f190-f898-49fa-a1e5-e6174295d3e8",
+                               "projectId": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                               "githubUserId": 117665867
+                             },
+                             {
+                               "id": "da72cae6-839b-4f4f-918c-02c3607aa3a2",
+                               "projectId": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
+                               "githubUserId": 8480969
+                             },
+                             {
+                               "id": "16def485-d98f-4619-801a-ca147c8c64a6",
+                               "projectId": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                               "githubUserId": 595505
+                             },
+                             {
+                               "id": "32831076-613a-4c10-9f04-ef6fbcff5e63",
+                               "projectId": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                               "githubUserId": 134487694
+                             }
+                           ]
+                         }
+                        """);
+
+        client.get()
+                .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5", "ids",
+                        "03d6f190-f898-49fa-a1e5-e6174295d3e8,16def485-d98f-4619-801a-ca147c8c64a6")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "project_lead_invitations": [
+                            {
+                              "id": "03d6f190-f898-49fa-a1e5-e6174295d3e8",
+                              "projectId": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "githubUserId": 117665867
+                            },
+                            {
+                              "id": "16def485-d98f-4619-801a-ca147c8c64a6",
+                              "projectId": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                              "githubUserId": 595505
+                            }
+                          ]
+                        }
+                        
+                        """);
+    }
+
+
 }

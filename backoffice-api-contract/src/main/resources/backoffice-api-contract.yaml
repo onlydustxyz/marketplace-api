@@ -98,6 +98,47 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /bo/v1/project-lead-invitations:
+      get:
+        security:
+          - apiKey: [ ]
+        tags:
+          - Backoffice
+        summary: Get project lead invitations page
+        operationId: getProjectLeadInvitationPage
+        description: |
+          Get project lead invitations page
+        parameters:
+          - in: query
+            name: pageIndex
+            required: true
+            schema:
+              type: integer
+          - in: query
+            name: pageSize
+            required: true
+            schema:
+              type: integer
+          - in: query
+            name: ids
+            required: false
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            style: simple
+        responses:
+          "200":
+            description: 'Project Lead Invitation page'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ProjectLeadInvitationPage'
+          "401":
+            $ref: '#/components/responses/UnauthorizedError'
+          "500":
+            $ref: '#/components/responses/InternalServerError'
 
 
 
@@ -251,3 +292,38 @@ components:
         projectId:
           type: string
           format: uuid
+
+    ProjectLeadInvitationPage:
+      type: object
+      required:
+        - contributors
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        project_lead_invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLeadInvitationResponse'
+    ProjectLeadInvitationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        githubUserId:
+          type: integer
+          format: int64
