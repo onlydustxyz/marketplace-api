@@ -28,6 +28,7 @@ public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
 
         linearWireMockServer.stubFor(post(urlEqualTo("/graphql"))
                 .withHeader("Authorization", equalTo("some-linear-api-key"))
+                .withHeader("Content-type", equalTo("application/json"))
                 .withRequestBody(equalToJson("""
                         {
                             "query" : "mutation($title: String!, $description: String!, $teamId: String!, $stateId: String!, $labelId: String!) {\\n    issueCreate(input: { title: $title, description: $description, teamId: $teamId, stateId: $stateId, labelIds: [$labelId] }) {\\n        success\\n  \s }\\n}\\n",
