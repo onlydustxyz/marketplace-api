@@ -42,6 +42,7 @@ public class LinearGraphqlClient {
                     .uri(uri)
                     .method(method, bodyPublisher)
                     .header("Authorization", config.apiKey)
+                    .header("Content-Type", "application/json")
                     .build();
 
             return httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
