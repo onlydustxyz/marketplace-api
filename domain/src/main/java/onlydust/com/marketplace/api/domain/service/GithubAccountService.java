@@ -60,7 +60,7 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                         .map(githubAccount -> githubAccount.toBuilder()
                                 .isPersonal(userGithubAccount.getIsPersonal())
                                 .isCurrentUserAdmin(userGithubAccount.getIsCurrentUserAdmin())
-                                .installed(true).build())
+                                .installed(githubAccount.getInstalled()).build())
                         .orElse(userGithubAccount));
             }
             return updatedUserGithubAccounts;

@@ -1920,7 +1920,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                                 "isAuthorizedInGithubApp": true
                               }
                             ],
-                            "installed": true,
+                            "installed": false,
                             "isCurrentUserAdmin": true,
                             "isPersonal": true,
                             "installationId": 44300050
