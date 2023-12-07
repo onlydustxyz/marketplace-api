@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationEventRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +14,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostgresOldEventAdapterIT extends AbstractPostgresIT {
+class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
     @Autowired
-    PostgresOutboxAdapter postgresOutboxAdapter;
+    PostgresOutboxAdapter<NotificationEventEntity> postgresOutboxAdapter;
     @Autowired
-    NotificationRepository notificationRepository;
+    NotificationEventRepository notificationEventRepository;
 
     @BeforeEach
     void setUp() {
-        notificationRepository.deleteAll();
+        notificationEventRepository.deleteAll();
     }
 
     @Test
@@ -120,8 +120,8 @@ class PostgresOldEventAdapterIT extends AbstractPostgresIT {
         postgresOutboxAdapter.ack();
         assertThat(postgresOutboxAdapter.peek()).isNotPresent();
 
-        final var entity = notificationRepository.findAll().get(0);
-        assertThat(entity.getStatus()).isEqualTo(NotificationEntity.Status.PROCESSED);
+        final var entity = notificationEventRepository.findAll().get(0);
+        assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.PROCESSED);
         assertThat(entity.getError()).isNull();
     }
 
@@ -144,8 +144,8 @@ class PostgresOldEventAdapterIT extends AbstractPostgresIT {
         assertThat(notificationPeeked).isPresent();
         assertThat(notificationPeeked.get()).isEqualTo(event);
 
-        final var entity = notificationRepository.findAll().get(0);
-        assertThat(entity.getStatus()).isEqualTo(NotificationEntity.Status.FAILED);
+        final var entity = notificationEventRepository.findAll().get(0);
+        assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.FAILED);
         assertThat(entity.getError()).isEqualTo("Some error");
     }
 

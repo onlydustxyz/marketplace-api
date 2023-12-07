@@ -1,7 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import onlydust.com.marketplace.api.postgres.adapter.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
@@ -182,8 +183,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresOutboxAdapter<NotificationEntity> postgresNotificationAdapter(final NotificationRepository notificationRepository) {
-        return new PostgresOutboxAdapter<>(notificationRepository);
+    public PostgresOutboxAdapter<NotificationEventEntity> notificationOutbox(final NotificationEventRepository notificationEventRepository) {
+        return new PostgresOutboxAdapter<>(notificationEventRepository);
+    }
+
+    @Bean
+    public PostgresOutboxAdapter<IndexerEventEntity> indexerOutbox(final IndexerEventRepository indexerEventRepository) {
+        return new PostgresOutboxAdapter<>(indexerEventRepository);
     }
 
     @Bean

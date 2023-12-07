@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
+import onlydust.com.marketplace.api.domain.job.IndexerApiJob;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationJob;
@@ -116,8 +117,19 @@ public class DomainConfiguration {
     }
 
     @Bean
+    public OutboxConsumerJob indexerOutboxJob(final OutboxPort indexerOutbox,
+                                              final OutboxConsumer indexerApiJob) {
+        return new OutboxConsumerJob(indexerOutbox, indexerApiJob);
+    }
+
+    @Bean
     public OutboxConsumer webhookNotificationJob(final WebhookPort webhookPort) {
         return new WebhookNotificationJob(webhookPort);
+    }
+
+    @Bean
+    public OutboxConsumer indexerApiJob(final IndexerPort indexerPort) {
+        return new IndexerApiJob(indexerPort);
     }
 
     @Bean
@@ -128,8 +140,8 @@ public class DomainConfiguration {
     @Bean
     public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
                                                    final ContributionStoragePort contributionStoragePort,
-                                                   final IndexerPort indexerPort) {
-        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerPort);
+                                                   final OutboxPort indexerOutbox) {
+        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox);
     }
 
 

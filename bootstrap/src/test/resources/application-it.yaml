@@ -27,6 +27,8 @@ application:
       api-key: "bo-api-key"
   cron:
     notification-job-delay: 500
+    indexer-sync-job-delay: 500
+
 
 #logging:
 #  level:
