@@ -15,9 +15,9 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
                     pr.currency,
                     sum(pr.amount)                  AS spent_amount,
                     sum(pr.amount) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS spent_usd_amount,
-                    count(DISTINCT pr.recipient_id) AS reward_recipients_count,
-                    count(DISTINCT pr.id)           AS rewards_count,
-                    count(DISTINCT wi.id)           AS reward_items_count
+                    COUNT(DISTINCT pr.recipient_id) AS reward_recipients_count,
+                    COUNT(DISTINCT pr.id)           AS rewards_count,
+                    COUNT(DISTINCT wi.id)           AS reward_items_count
                FROM payment_requests pr
                JOIN public.work_items wi ON pr.id = wi.payment_id
                LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency
@@ -29,13 +29,13 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
             )
             SELECT
                 1 AS ID,
-                CASE WHEN :currency IS NOT NULL THEN SUM(b.remaining_amount) END AS remaining_amount,
-                SUM(b.remaining_amount * CASE WHEN b.currency = 'usd' THEN 1 ELSE cuq.price END) AS remaining_usd_amount,
-                CASE WHEN :currency IS NOT NULL THEN SUM(rs.spent_amount) END AS spent_amount,
+                CASE WHEN :currency IS NOT NULL THEN COALESCE(SUM(b.remaining_amount), 0) END AS remaining_amount,
+                SUM(COALESCE(b.remaining_amount, 0) * CASE WHEN b.currency = 'usd' THEN 1 ELSE cuq.price END) AS remaining_usd_amount,
+                CASE WHEN :currency IS NOT NULL THEN COALESCE(SUM(rs.spent_amount), 0) END AS spent_amount,
                 SUM(rs.spent_usd_amount) AS spent_usd_amount,
-                SUM(rs.rewards_count) AS rewards_count,
-                SUM(rs.reward_items_count) AS reward_items_count,
-                SUM(rs.reward_recipients_count) AS reward_recipients_count
+                COALESCE(SUM(rs.rewards_count), 0) AS rewards_count,
+                COALESCE(SUM(rs.reward_items_count), 0) AS reward_items_count,
+                COALESCE(SUM(rs.reward_recipients_count), 0) AS reward_recipients_count
             FROM
                  budgets b
             JOIN projects_budgets pb ON pb.budget_id = b.id

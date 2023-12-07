@@ -521,5 +521,35 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(5)
     void should_return_empty_state_when_no_result_found() {
+
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "fromDate", "2023-09-25",
+                        "toDate", "2023-09-25",
+                        "currency", "OP"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.rewards").isEmpty()
+                .jsonPath("$.remainingBudget.amount").isEqualTo(17000)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("OP")
+                .jsonPath("$.remainingBudget.usdEquivalent").doesNotExist()
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("OP")
+                .jsonPath("$.spentAmount.usdEquivalent").doesNotExist()
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0);
     }
 }
