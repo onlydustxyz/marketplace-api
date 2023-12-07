@@ -2885,4 +2885,294 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(B_CONSEIL_OVERVIEW_JSON);
     }
+
+    @Test
+    @Order(10)
+    public void should_update_project_ranking(){
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET,Map.of("pageIndex","0","pageSize","5","sort","RANK")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                           "projects": [
+                             {
+                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                               "slug": "calcom",
+                               "name": "Cal.com",
+                               "shortDescription": "Scheduling infrastructure for everyone.",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png",
+                               "hiring": true,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 559,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 117665867,
+                                   "login": "gilbertVDB17",
+                                   "htmlUrl": "https://github.com/gilbertVDB17",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4",
+                                   "id": "9a779f53-5762-4110-94b8-5596bbbd74ec"
+                                 }
+                               ],
+                               "sponsors": [],
+                               "technologies": {
+                                 "MDX": 109316,
+                                 "TypeScript": 7052833,
+                                 "Dockerfile": 2591,
+                                 "CSS": 41229,
+                                 "Shell": 6831,
+                                 "Procfile": 37,
+                                 "JavaScript": 56416,
+                                 "PHP": 1205,
+                                 "HTML": 119986
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null
+                             },
+                             {
+                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                               "slug": "qa-new-contributions",
+                               "name": "QA new contributions",
+                               "shortDescription": "QA new contributions",
+                               "logoUrl": null,
+                               "hiring": false,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 18,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 16590657,
+                                   "login": "PierreOucif",
+                                   "htmlUrl": "https://github.com/PierreOucif",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                   "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                 },
+                                 {
+                                   "githubUserId": 8642470,
+                                   "login": "gregcha",
+                                   "htmlUrl": "https://github.com/gregcha",
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                 }
+                               ],
+                               "sponsors": [],
+                               "technologies": {
+                                 "MDX": 2520,
+                                 "TypeScript": 3175211,
+                                 "CSS": 6065,
+                                 "Shell": 12431,
+                                 "PLpgSQL": 1372,
+                                 "JavaScript": 24023,
+                                 "HTML": 1520
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null
+                             },
+                             {
+                               "id": "61076487-6ec5-4751-ab0d-3b876c832239",
+                               "slug": "toto",
+                               "name": "toto",
+                               "shortDescription": "to",
+                               "logoUrl": null,
+                               "hiring": true,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 1,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 595505,
+                                   "login": "ofux",
+                                   "htmlUrl": "https://github.com/ofux",
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                   "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                                 }
+                               ],
+                               "sponsors": [
+                                 {
+                                   "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                                   "name": "PSG",
+                                   "url": "https://www.psg.fr/",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                                 }
+                               ],
+                               "technologies": {
+                                 "Rust": 23314
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null
+                             },
+                             {
+                               "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                               "slug": "aiolia-du-lion",
+                               "name": "Aiolia du Lion",
+                               "shortDescription": "An interactive tutorial to get you up and running with Starknet",
+                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
+                               "hiring": true,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 3,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 26790304,
+                                   "login": "gaetanrecly",
+                                   "htmlUrl": null,
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
+                                   "id": "f2215429-83c7-49ce-954b-66ed453c3315"
+                                 }
+                               ],
+                               "sponsors": [
+                                 {
+                                   "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                                   "name": "AS Nancy Lorraine",
+                                   "url": null,
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                                 },
+                                 {
+                                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                                   "name": "OGC Nissa Ineos",
+                                   "url": "https://www.ogcnice.com/fr/",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                 },
+                                 {
+                                   "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                   "name": "Coca Cola",
+                                   "url": null,
+                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                 },
+                                 {
+                                   "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                                   "name": "Coca Colax",
+                                   "url": "https://www.coca-cola-france.fr/",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                                 }
+                               ],
+                               "technologies": {},
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null
+                             },
+                             {
+                               "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
+                               "slug": "zero-title-5",
+                               "name": "Zero title 5",
+                               "shortDescription": "Missing short description",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
+                               "hiring": false,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 297,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 595505,
+                                   "login": "ofux",
+                                   "htmlUrl": "https://github.com/ofux",
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                   "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                                 }
+                               ],
+                               "sponsors": [],
+                               "technologies": {
+                                 "Shell": 4429,
+                                 "Rust": 2017307,
+                                 "HTML": 871
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null
+                             }
+                           ],
+                           "technologies": [
+                             "Batchfile",
+                             "C",
+                             "C++",
+                             "CMake",
+                             "COBOL",
+                             "CSS",
+                             "Cairo",
+                             "Dart",
+                             "Dockerfile",
+                             "HTML",
+                             "Haskell",
+                             "JavaScript",
+                             "Jinja",
+                             "Jupyter Notebook",
+                             "Kotlin",
+                             "MDX",
+                             "Makefile",
+                             "Nix",
+                             "Objective-C",
+                             "PHP",
+                             "PLpgSQL",
+                             "Procfile",
+                             "Python",
+                             "Ruby",
+                             "Rust",
+                             "SCSS",
+                             "Scheme",
+                             "Shell",
+                             "Solidity",
+                             "Swift",
+                             "TypeScript"
+                           ],
+                           "sponsors": [
+                             {
+                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                               "name": "AS Nancy Lorraine",
+                               "url": null,
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                             },
+                             {
+                               "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                               "name": "Coca Cola",
+                               "url": null,
+                               "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                             },
+                             {
+                               "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                               "name": "Coca Colax",
+                               "url": "https://www.coca-cola-france.fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                             },
+                             {
+                               "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                               "name": "OGC Nissa Ineos",
+                               "url": "https://www.ogcnice.com/fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                             },
+                             {
+                               "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                               "name": "PSG",
+                               "url": "https://www.psg.fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                             },
+                             {
+                               "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                               "name": "Red Bull",
+                               "url": "https://www.redbull.com/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                             },
+                             {
+                               "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                               "name": "Starknet Foundation",
+                               "url": "https://starknet.io",
+                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                             },
+                             {
+                               "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                               "name": "Theodo",
+                               "url": null,
+                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                             }
+                           ],
+                           "hasMore": true,
+                           "totalPageNumber": 5,
+                           "totalItemNumber": 25,
+                           "nextPageIndex": 1
+                         }
+                         
+                        """);
+    }
 }

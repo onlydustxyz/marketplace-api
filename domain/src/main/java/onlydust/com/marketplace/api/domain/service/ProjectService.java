@@ -303,4 +303,9 @@ public class ProjectService implements ProjectFacadePort {
         return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page,
                 pageSize);
     }
+
+    @Override
+    public void updateProjectsRanking() {
+        projectStoragePort.updateProjectsRanking();
+    }
 }

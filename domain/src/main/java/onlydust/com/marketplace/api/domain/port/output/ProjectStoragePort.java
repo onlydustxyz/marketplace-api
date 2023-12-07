@@ -77,4 +77,6 @@ public interface ProjectStoragePort {
     boolean hasUserAccessToProject(UUID projectId, UUID userId);
 
     boolean hasUserAccessToProject(String projectSlug, UUID userId);
+
+    void updateProjectsRanking();
 }

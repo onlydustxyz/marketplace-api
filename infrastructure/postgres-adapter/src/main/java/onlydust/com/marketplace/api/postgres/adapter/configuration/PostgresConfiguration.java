@@ -56,7 +56,8 @@ public class PostgresConfiguration {
                                                          final ProjectsPageRepository projectsPageRepository,
                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                          final RewardableItemRepository rewardableItemRepository,
-                                                         final ProjectMoreInfoRepository projectMoreInfoRepository) {
+                                                         final ProjectMoreInfoRepository projectMoreInfoRepository,
+                                                         final CustomProjectRankingRepository customProjectRankingRepository) {
         return new PostgresProjectAdapter(notificationPort,
                 projectRepository,
                 projectViewRepository,
@@ -73,7 +74,8 @@ public class PostgresConfiguration {
                 projectsPageRepository,
                 projectsPageFiltersRepository,
                 rewardableItemRepository,
-                projectMoreInfoRepository
+                projectMoreInfoRepository,
+                customProjectRankingRepository
         );
     }
 
@@ -186,5 +188,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresNotificationAdapter postgresNotificationAdapter(final NotificationRepository notificationRepository) {
         return new PostgresNotificationAdapter(notificationRepository);
+    }
+
+    @Bean
+    public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager){
+        return new CustomProjectRankingRepository(entityManager);
     }
 }

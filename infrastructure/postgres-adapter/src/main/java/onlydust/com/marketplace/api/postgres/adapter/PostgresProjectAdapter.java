@@ -50,6 +50,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardableItemRepository rewardableItemRepository;
     private final ProjectMoreInfoRepository projectMoreInfoRepository;
+    private final CustomProjectRankingRepository customProjectRankingRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -457,5 +458,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
                 .map(repo -> repo.getPrimaryKey().getRepoId())
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    @Transactional
+    public void updateProjectsRanking() {
+        customProjectRankingRepository.updateProjectsRanking();
     }
 }
