@@ -26,5 +26,6 @@ public class ProjectRewardsPageView {
     public static class Money {
         BigDecimal amount;
         Currency currency;
+        BigDecimal usdEquivalent;
     }
 }

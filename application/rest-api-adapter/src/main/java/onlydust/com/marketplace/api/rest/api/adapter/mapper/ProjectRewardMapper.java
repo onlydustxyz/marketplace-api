@@ -12,7 +12,8 @@ public interface ProjectRewardMapper {
 
     private static Money mapMoney(ProjectRewardsPageView.Money money) {
         return new Money().amount(money.getAmount())
-                .currency(ProjectBudgetMapper.mapCurrency(money.getCurrency()));
+                .currency(ProjectBudgetMapper.mapCurrency(money.getCurrency()))
+                .usdEquivalent(money.getUsdEquivalent());
     }
 
     static RewardsPageResponse mapProjectRewardPageToResponse(Integer pageIndex, ProjectRewardsPageView page) {

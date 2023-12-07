@@ -1938,6 +1938,7 @@ components:
       required:
           - amount
           - currency
+          - usdEquivalent
       properties:
           amount:
             type: number
@@ -1945,6 +1946,10 @@ components:
             example: 100
           currency:
             $ref: '#/components/schemas/CurrencyContract'
+          usdEquivalent:
+            type: number
+            description: USD equivalent of the amount
+            example: 100
 
 
     # RESPONSES ==================================================================

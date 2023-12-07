@@ -26,7 +26,9 @@ public class BudgetStatsEntity {
     @Type(type = "currency")
     CurrencyEnumEntity currency;
     BigDecimal spentAmount;
+    BigDecimal spentUsdAmount;
     BigDecimal remainingAmount;
+    BigDecimal remainingUsdAmount;
     Integer rewardsCount;
     Integer rewardItemsCount;
     Integer rewardRecipientsCount;

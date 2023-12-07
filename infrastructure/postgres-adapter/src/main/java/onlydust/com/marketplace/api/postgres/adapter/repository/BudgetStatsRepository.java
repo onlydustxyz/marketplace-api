@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, CurrencyEnumEntity> {
     @Query(value = """
             WITH reward_stats AS (
-                SELECT 
+                SELECT
                     pr.project_id,
                     pr.currency,
                     count(DISTINCT pr.recipient_id) AS reward_recipients_count,
@@ -23,13 +23,16 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
             SELECT
                 b.currency,
                 b.remaining_amount,
+                b.remaining_amount * CASE WHEN b.currency = 'usd' THEN 1 ELSE cuq.price END AS remaining_usd_amount,
                 b.initial_amount - b.remaining_amount AS spent_amount,
+                b.initial_amount - b.remaining_amount * CASE WHEN b.currency = 'usd' THEN 1 ELSE cuq.price END AS spent_usd_amount,
                 rs.rewards_count,
                 rs.reward_items_count,
                 rs.reward_recipients_count
             FROM
-                 budgets b 
-            JOIN projects_budgets pb ON pb.budget_id = b.id             
+                 budgets b
+            JOIN projects_budgets pb ON pb.budget_id = b.id
+            LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = b.currency
             JOIN reward_stats rs ON rs.project_id = pb.project_id AND rs.currency = b.currency
             WHERE b.currency = 'usd' AND pb.project_id = :projectId
             """, nativeQuery = true)
