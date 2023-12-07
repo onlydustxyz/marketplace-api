@@ -8,11 +8,13 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.Objects;
 
+import static java.util.Objects.nonNull;
+
 public interface ProjectRewardMapper {
 
     private static Money mapMoney(ProjectRewardsPageView.Money money) {
         return new Money().amount(money.getAmount())
-                .currency(ProjectBudgetMapper.mapCurrency(money.getCurrency()))
+                .currency(nonNull(money.getCurrency()) ? ProjectBudgetMapper.mapCurrency(money.getCurrency()) : null)
                 .usdEquivalent(money.getUsdEquivalent());
     }
 

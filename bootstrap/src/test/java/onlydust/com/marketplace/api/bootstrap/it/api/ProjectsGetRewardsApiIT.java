@@ -261,11 +261,11 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECT_REWARDS_JSON_RESPONSE)
-                .jsonPath("$.remainingBudget.amount").isNumber()
-                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.remainingBudget.amount").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
                 .jsonPath("$.remainingBudget.usdEquivalent").isNumber()
-                .jsonPath("$.spentAmount.amount").isNumber()
-                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.usdEquivalent").isNumber()
                 .jsonPath("$.sentRewardsCount").isNumber()
                 .jsonPath("$.rewardedContributionsCount").isNumber()
@@ -460,7 +460,6 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
                         "pageIndex", "0",
                         "pageSize", "10000",
-                        "currency", "USD",
                         "contributors", "8642470"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -470,12 +469,11 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
-                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
-                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(99250)
-                .jsonPath("$.spentAmount.amount").isEqualTo(9000)
-                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
-                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(9000)
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(13500)
                 .jsonPath("$.sentRewardsCount").isEqualTo(9)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
                 .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
@@ -485,6 +483,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(4)
     void should_get_projects_rewards_filtered_by_date() {
+
     }
 
 
