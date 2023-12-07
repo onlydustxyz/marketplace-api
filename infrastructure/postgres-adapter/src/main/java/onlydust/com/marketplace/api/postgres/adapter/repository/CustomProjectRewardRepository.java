@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class CustomProjectRewardRepository {
@@ -39,8 +40,8 @@ public class CustomProjectRewardRepository {
                      left join payments r on r.request_id = pr.id
             where 
                 pr.project_id = :projectId and 
-                pr.currency = CAST(:currency AS currency) and 
-                coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)
+                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds))
             order by %order_by% offset :offset limit :limit
             """;
     private static final String COUNT_PROJECT_REWARDS = """
@@ -48,8 +49,8 @@ public class CustomProjectRewardRepository {
             from payment_requests pr
             where
                 pr.project_id = :projectId and 
-                pr.currency = CAST(:currency AS currency) and 
-                coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)
+                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds))
             """;
     private final EntityManager entityManager;
 
@@ -68,7 +69,7 @@ public class CustomProjectRewardRepository {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
                 .setParameter("projectId", projectId)
-                .setParameter("currency", currency.toString())
+                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
                 .setParameter("contributorsIds", contributorsIds);
         return ((Number) query.getSingleResult()).intValue();
     }
@@ -78,7 +79,7 @@ public class CustomProjectRewardRepository {
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)
-                .setParameter("currency", currency.toString())
+                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
                 .setParameter("contributorsIds", contributorsIds)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))

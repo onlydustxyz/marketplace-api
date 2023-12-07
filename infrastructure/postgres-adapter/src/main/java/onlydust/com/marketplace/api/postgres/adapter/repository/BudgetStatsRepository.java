@@ -39,7 +39,9 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
             JOIN projects_budgets pb ON pb.budget_id = b.id
             JOIN reward_stats rs ON rs.project_id = pb.project_id AND rs.currency = b.currency
             LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = b.currency
-            WHERE pb.project_id = :projectId AND b.currency = CAST(:currency AS currency) 
+            WHERE 
+                pb.project_id = :projectId AND 
+                (:currency IS NULL OR b.currency = CAST(CAST(:currency AS TEXT) AS currency))
             """, nativeQuery = true)
     BudgetStatsEntity findByProject(UUID projectId, String currency, List<Long> contributorIds);
 }

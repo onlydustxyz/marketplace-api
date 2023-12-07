@@ -380,7 +380,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
                                               ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                               int pageIndex, int pageSize) {
-        final var currency = CurrencyEnumEntity.of(filters.getCurrency());
+        final var currency = nonNull(filters.getCurrency()) ? CurrencyEnumEntity.of(filters.getCurrency()) : null;
 
         final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors());
         final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency, filters.getContributors(),
@@ -388,7 +388,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, currency.toString(), filters.getContributors());
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ? currency.toString() : null, filters.getContributors());
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()

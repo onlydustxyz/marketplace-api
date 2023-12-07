@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
@@ -162,8 +163,8 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
         final var filters = ProjectRewardView.Filters.builder()
-                .currency(mapCurrency(currency))
-                .contributors(contributors)
+                .currency(nonNull(currency) ? mapCurrency(currency) : null)
+                .contributors(Optional.ofNullable(contributors).orElse(List.of()))
                 .build();
 
         final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,
