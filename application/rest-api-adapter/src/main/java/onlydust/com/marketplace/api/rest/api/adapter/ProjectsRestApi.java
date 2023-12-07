@@ -159,7 +159,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
-        Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(),
+        final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(),
                 sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 

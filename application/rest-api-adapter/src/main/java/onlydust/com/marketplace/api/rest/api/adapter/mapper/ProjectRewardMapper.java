@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardsPageView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -9,15 +10,27 @@ import java.util.Objects;
 
 public interface ProjectRewardMapper {
 
-    static RewardsPageResponse mapProjectRewardPageToResponse(Integer pageIndex, Page<ProjectRewardView> page) {
-        final RewardsPageResponse rewardsPageResponse = new RewardsPageResponse();
-        rewardsPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
-        rewardsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
-        rewardsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
-        rewardsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex,page.getTotalPageNumber()));
-        page.getContent().stream()
+    private static Money mapMoney(ProjectRewardsPageView.Money money) {
+        return new Money().amount(money.getAmount())
+                .currency(ProjectBudgetMapper.mapCurrency(money.getCurrency()));
+    }
+
+    static RewardsPageResponse mapProjectRewardPageToResponse(Integer pageIndex, ProjectRewardsPageView page) {
+        final RewardsPageResponse rewardsPageResponse = new RewardsPageResponse()
+                .hasMore(PaginationHelper.hasMore(pageIndex, page.getRewards().getTotalPageNumber()))
+                .totalPageNumber(page.getRewards().getTotalPageNumber())
+                .totalItemNumber(page.getRewards().getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getRewards().getTotalPageNumber()))
+                .remainingBudget(mapMoney(page.getRemainingBudget()))
+                .spentAmount(mapMoney(page.getSpentAmount()))
+                .sentRewardsCount(page.getSentRewardsCount())
+                .rewardedContributionsCount(page.getRewardedContributionsCount())
+                .rewardedContributorsCount(page.getRewardedContributorsCount());
+
+        page.getRewards().getContent().stream()
                 .map(ProjectRewardMapper::mapProjectRewardViewToResponse)
                 .forEach(rewardsPageResponse::addRewardsItem);
+
         return rewardsPageResponse;
     }
 

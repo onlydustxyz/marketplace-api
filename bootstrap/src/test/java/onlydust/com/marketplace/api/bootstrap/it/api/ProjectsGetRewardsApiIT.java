@@ -256,7 +256,15 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json(GET_PROJECT_REWARDS_JSON_RESPONSE);
+                .json(GET_PROJECT_REWARDS_JSON_RESPONSE)
+                .jsonPath("$.remainingBudget.amount").isNumber()
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.amount").isNumber()
+                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.sentRewardsCount").isNumber()
+                .jsonPath("$.rewardedContributionsCount").isNumber()
+                .jsonPath("$.rewardedContributorsCount").isNumber()
+        ;
 
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("pageIndex", "0", "pageSize",

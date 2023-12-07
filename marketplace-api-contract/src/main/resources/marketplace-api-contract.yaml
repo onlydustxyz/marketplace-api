@@ -1932,6 +1932,21 @@ components:
       description: Github installation ID
       example: 123456
 
+    Money:
+      type: object
+      description: Money value object
+      required:
+          - amount
+          - currency
+      properties:
+          amount:
+            type: number
+            description: Amount of money
+            example: 100
+          currency:
+            $ref: '#/components/schemas/CurrencyContract'
+
+
     # RESPONSES ==================================================================
     GithubUserResponse:
       type: object
@@ -2814,6 +2829,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RewardPageItemResponse'
+        remainingBudget:
+          $ref: '#/components/schemas/Money'
+        spentAmount:
+          $ref: '#/components/schemas/Money'
+        sentRewardsCount:
+          type: integer
+          description: Number of rewards that have been sent
+        rewardedContributionsCount:
+          type: integer
+          description: Number of contributions that have been rewarded
+        rewardedContributorsCount:
+          type: integer
+          description: Number of contributors that have been rewarded
         hasMore:
           type: boolean
           example: true

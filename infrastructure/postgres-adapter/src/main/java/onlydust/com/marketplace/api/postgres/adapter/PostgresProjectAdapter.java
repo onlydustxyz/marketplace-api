@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.notification.*;
 import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -51,6 +52,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final RewardableItemRepository rewardableItemRepository;
     private final ProjectMoreInfoRepository projectMoreInfoRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
+    private final BudgetStatsRepository budgetStatsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -374,18 +376,28 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
-                                               SortDirection sortDirection, int pageIndex,
-                                               int pageSize) {
+    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
+                                              SortDirection sortDirection, int pageIndex,
+                                              int pageSize) {
         final Integer count = customProjectRewardRepository.getCount(projectId);
         final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
-        return Page.<ProjectRewardView>builder()
-                .content(projectRewardViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+
+        final var budgetStats = budgetStatsRepository.findByProject(projectId);
+
+        return ProjectRewardsPageView.builder().
+                rewards(Page.<ProjectRewardView>builder()
+                        .content(projectRewardViews)
+                        .totalItemNumber(count)
+                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .build())
+                .remainingBudget(new ProjectRewardsPageView.Money(budgetStats.getRemainingAmount(), budgetStats.getCurrency().toDomain()))
+                .spentAmount(new ProjectRewardsPageView.Money(budgetStats.getSpentAmount(),budgetStats.getCurrency().toDomain()))
+                .sentRewardsCount(budgetStats.getRewardsCount())
+                .rewardedContributionsCount(budgetStats.getRewardItemsCount())
+                .rewardedContributorsCount(budgetStats.getRewardRecipientsCount())
                 .build();
     }
 
