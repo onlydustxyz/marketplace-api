@@ -37,13 +37,19 @@ public class CustomProjectRewardRepository {
                      left join public.auth_users au on gu.id = au.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-            where pr.project_id = :projectId and pr.currency = CAST(:currency AS currency)
+            where 
+                pr.project_id = :projectId and 
+                pr.currency = CAST(:currency AS currency) and 
+                coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)
             order by %order_by% offset :offset limit :limit
             """;
     private static final String COUNT_PROJECT_REWARDS = """
             select count(*)
             from payment_requests pr
-            where pr.project_id = :projectId and pr.currency = CAST(:currency AS currency)
+            where
+                pr.project_id = :projectId and 
+                pr.currency = CAST(:currency AS currency) and 
+                coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)
             """;
     private final EntityManager entityManager;
 
@@ -58,20 +64,22 @@ public class CustomProjectRewardRepository {
         return FIND_PROJECT_REWARDS.replace("%order_by%", sort);
     }
 
-    public Integer getCount(UUID projectId, CurrencyEnumEntity currency) {
+    public Integer getCount(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds) {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
                 .setParameter("projectId", projectId)
-                .setParameter("currency", currency.toString());
+                .setParameter("currency", currency.toString())
+                .setParameter("contributorsIds", contributorsIds);
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, CurrencyEnumEntity currency,
+    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds,
                                                          ProjectRewardView.SortBy sortBy, final SortDirection sortDirection,
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)
                 .setParameter("currency", currency.toString())
+                .setParameter("contributorsIds", contributorsIds)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList();

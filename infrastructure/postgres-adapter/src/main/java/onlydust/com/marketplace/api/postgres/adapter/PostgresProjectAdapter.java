@@ -382,13 +382,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                               int pageIndex, int pageSize) {
         final var currency = CurrencyEnumEntity.of(filters.getCurrency());
 
-        final Integer count = customProjectRewardRepository.getCount(projectId, currency);
-        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency,
+        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors());
+        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency, filters.getContributors(),
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, currency.toString());
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, currency.toString(), filters.getContributors());
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()

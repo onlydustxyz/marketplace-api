@@ -155,7 +155,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 CurrencyContract currency,
+                                                                 CurrencyContract currency, List<Long> contributors,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -163,6 +163,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
         final var filters = ProjectRewardView.Filters.builder()
                 .currency(mapCurrency(currency))
+                .contributors(contributors)
                 .build();
 
         final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,

@@ -435,7 +435,6 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
                 .jsonPath("$.remainingBudget.amount").isEqualTo(28)
@@ -447,5 +446,50 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
                 .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
         ;
+    }
+
+    @Test
+    @Order(3)
+    void should_get_projects_rewards_filtered_by_contributors() {
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "currency", "USD",
+                        "contributors", "8642470"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(99250)
+                .jsonPath("$.spentAmount.amount").isEqualTo(9000)
+                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(9000)
+                .jsonPath("$.sentRewardsCount").isEqualTo(9)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
+        ;
+    }
+
+    @Test
+    @Order(4)
+    void should_get_projects_rewards_filtered_by_date() {
+    }
+
+
+    @Test
+    @Order(5)
+    void should_return_empty_state_when_no_result_found() {
     }
 }

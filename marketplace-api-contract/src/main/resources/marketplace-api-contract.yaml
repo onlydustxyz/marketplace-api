@@ -1161,6 +1161,13 @@ paths:
           schema:
             $ref: '#/components/schemas/CurrencyContract'
         - in: query
+          name: contributors
+          description: Contributor filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+        - in: query
           name: sort
           description: Sort order
           schema:
