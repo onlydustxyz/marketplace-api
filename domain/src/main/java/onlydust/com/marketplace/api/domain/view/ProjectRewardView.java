@@ -43,5 +43,7 @@ public class ProjectRewardView {
         Currency currency;
         @Builder.Default
         List<Long> contributors = List.of();
+        Date from;
+        Date to;
     }
 }

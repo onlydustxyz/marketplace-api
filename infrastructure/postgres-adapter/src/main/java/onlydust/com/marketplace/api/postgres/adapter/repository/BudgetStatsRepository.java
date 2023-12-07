@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,7 +21,10 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
                FROM payment_requests pr
                JOIN public.work_items wi ON pr.id = wi.payment_id
                LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency
-               WHERE COALESCE(:contributorIds) IS NULL OR pr.recipient_id IN (:contributorIds)
+               WHERE 
+                    COALESCE(:contributorIds) IS NULL OR pr.recipient_id IN (:contributorIds) AND
+                    (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                    (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
                GROUP BY pr.project_id, pr.currency, cuq.price
             )
             SELECT
@@ -43,5 +45,6 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
                 pb.project_id = :projectId AND 
                 (:currency IS NULL OR b.currency = CAST(CAST(:currency AS TEXT) AS currency))
             """, nativeQuery = true)
-    BudgetStatsEntity findByProject(UUID projectId, String currency, List<Long> contributorIds);
+    BudgetStatsEntity findByProject(UUID projectId, String currency, List<Long> contributorIds,
+                                    String fromDate, String toDate);
 }

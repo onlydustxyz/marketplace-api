@@ -157,6 +157,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
                                                                  CurrencyContract currency, List<Long> contributors,
+                                                                 String fromDate, String toDate,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -165,6 +166,8 @@ public class ProjectsRestApi implements ProjectsApi {
         final var filters = ProjectRewardView.Filters.builder()
                 .currency(nonNull(currency) ? mapCurrency(currency) : null)
                 .contributors(Optional.ofNullable(contributors).orElse(List.of()))
+                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
                 .build();
 
         final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,

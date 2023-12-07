@@ -483,9 +483,40 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(4)
     void should_get_projects_rewards_filtered_by_date() {
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "fromDate", "2023-09-25",
+                        "toDate", "2023-09-25"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // we have at least one correct date
+                .jsonPath("$.rewards[?(@.requestedAt >= '2023-09-25')]").exists()
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-26')]").exists()
+                // we do not have any incorrect date
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-25')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(15000)
+                .jsonPath("$.sentRewardsCount").isEqualTo(10)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
+        ;
     }
-
 
     @Test
     @Order(5)

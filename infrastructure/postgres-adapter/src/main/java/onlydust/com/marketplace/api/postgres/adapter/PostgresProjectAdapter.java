@@ -23,6 +23,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoR
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -381,14 +382,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                               ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                               int pageIndex, int pageSize) {
         final var currency = nonNull(filters.getCurrency()) ? CurrencyEnumEntity.of(filters.getCurrency()) : null;
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
+        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
-        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors());
+        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors(), fromDate, toDate);
         final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency, filters.getContributors(),
+                        fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ? currency.toString() : null, filters.getContributors());
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ? currency.toString() : null, filters.getContributors(),
+                fromDate, toDate);
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()
