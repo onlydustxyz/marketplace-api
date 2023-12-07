@@ -16,9 +16,9 @@ public interface ProjectObserverPort {
 
     void onLeaderInvitationCancelled(UUID projectId, Long githubUserId);
 
-    void onContributionsChanged(UUID projectId);
-
     void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
 
     void onRewardSettingsChanged(UUID projectId);
+
+    void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
 }

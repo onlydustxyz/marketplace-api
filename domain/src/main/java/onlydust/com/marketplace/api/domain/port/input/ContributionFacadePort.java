@@ -12,6 +12,4 @@ public interface ContributionFacadePort {
     void ignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds);
 
     void unignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds);
-
-    void refreshIgnoredContributions(List<Long> repoIds);
 }

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -33,7 +32,6 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
-    private final ProjectObserverPort projectObserverPort;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;

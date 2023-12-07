@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.EventsApi;
 import onlydust.com.marketplace.api.contract.model.OnContributionsChangeEvent;
-import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.ContributionObserverPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class EventsRestApi implements EventsApi {
 
-    private final ContributionFacadePort contributionFacadePort;
+    private final ContributionObserverPort contributionObserverPort;
 
     @Override
     public ResponseEntity<Void> onContributionsChange(OnContributionsChangeEvent onContributionsChangeEvent) {
-        contributionFacadePort.refreshIgnoredContributions(onContributionsChangeEvent.getRepoIds());
+        contributionObserverPort.onContributionsChanged(onContributionsChangeEvent.getRepoIds());
         return ResponseEntity.noContent().build();
     }
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserService implements UserFacadePort {
 
+    private final ProjectObserverPort projectObserverPort;
     private final UserStoragePort userStoragePort;
     private final DateProvider dateProvider;
     private final ProjectStoragePort projectStoragePort;
@@ -94,12 +96,14 @@ public class UserService implements UserFacadePort {
 
     @Override
     public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
-        userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
+        final var leaderId = userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
+        projectObserverPort.onLeaderAssigned(projectId, leaderId);
     }
 
     @Override
     public void applyOnProject(UUID userId, UUID projectId) {
-        userStoragePort.createApplicationOnProject(userId, projectId);
+        final var applicationId = userStoragePort.createApplicationOnProject(userId, projectId);
+        projectObserverPort.onUserApplied(projectId, userId, applicationId);
     }
 
     @Override
@@ -157,6 +161,7 @@ public class UserService implements UserFacadePort {
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);
+        projectObserverPort.onLeaderAssigned(projectId, user.getId());
     }
 
     @Override

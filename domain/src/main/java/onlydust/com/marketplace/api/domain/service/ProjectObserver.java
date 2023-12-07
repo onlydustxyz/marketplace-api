@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.notification.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
 
 import java.util.Date;
@@ -15,6 +16,7 @@ public class ProjectObserver implements ProjectObserverPort {
 
     private final OutboxPort notificationOutbox;
     private final ContributionStoragePort contributionStoragePort;
+    private final IndexerPort indexerPort;
 
     @Override
     public void onProjectCreated(UUID projectId) {
@@ -47,17 +49,18 @@ public class ProjectObserver implements ProjectObserverPort {
     }
 
     @Override
-    public void onContributionsChanged(UUID projectId) {
-
-    }
-
-    @Override
     public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
         contributionStoragePort.refreshIgnoredContributions(projectId);
+        indexerPort.onRepoLinkChanged(linkedRepoIds, unlinkedRepoIds);
     }
 
     @Override
     public void onRewardSettingsChanged(UUID projectId) {
         contributionStoragePort.refreshIgnoredContributions(projectId);
+    }
+
+    @Override
+    public void onUserApplied(UUID projectId, UUID userId, UUID applicationId) {
+        notificationOutbox.push(new UserAppliedOnProject(applicationId, projectId, userId, new Date()));
     }
 }

@@ -108,9 +108,6 @@ public class ProjectService implements ProjectFacadePort {
         }
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
-            //TODO : put this in an observer
-            indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()),
-                    Set.of());
         }
         return Pair.of(projectId, projectSlug);
     }
@@ -159,8 +156,6 @@ public class ProjectService implements ProjectFacadePort {
                     .collect(Collectors.toSet());
 
             projectObserverPort.onLinkedReposChanged(command.getId(), newRepos, removedRepos);
-            // TODO: put this in an observer
-            indexerPort.onRepoLinkChanged(newRepos, removedRepos);
         }
 
         this.projectStoragePort.updateProject(command.getId(),

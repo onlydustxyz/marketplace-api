@@ -69,12 +69,14 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter,
+    public UserFacadePort userFacadePort(final ProjectObserverPort projectObserverPort,
+                                         final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort) {
-        return new UserService(postgresUserAdapter, dateProvider, projectStoragePort, githubSearchPort,
+        return new UserService(projectObserverPort, postgresUserAdapter, dateProvider, projectStoragePort,
+                githubSearchPort,
                 imageStoragePort);
     }
 
@@ -121,6 +123,19 @@ public class DomainConfiguration {
     @Bean
     public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
         return new TechnologiesService(trackingIssuePort);
+    }
+
+    @Bean
+    public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
+                                                   final ContributionStoragePort contributionStoragePort,
+                                                   final IndexerPort indexerPort) {
+        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerPort);
+    }
+
+
+    @Bean
+    public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort) {
+        return new ContributionObserver(contributionStoragePort);
     }
 
 }

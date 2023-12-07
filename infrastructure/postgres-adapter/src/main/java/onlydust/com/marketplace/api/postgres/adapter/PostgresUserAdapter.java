@@ -3,9 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
-import onlydust.com.marketplace.api.domain.model.notification.UserAppliedOnProject;
-import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -35,7 +32,6 @@ import static java.lang.String.format;
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
 
-    private final OutboxPort notificationOutbox;
     private final CustomUserRepository customUserRepository;
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
@@ -179,7 +175,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public void acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
+    public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project leader invitation not found for project" +
                                                                      " %s and user %d", projectId, githubUserId)));
@@ -189,12 +185,12 @@ public class PostgresUserAdapter implements UserStoragePort {
 
         projectLeaderInvitationRepository.delete(invitation);
         projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
-        notificationOutbox.push(new ProjectLeaderAssigned(projectId, user.getId(), new Date()));
+        return user.getId();
     }
 
     @Override
     @Transactional
-    public void createApplicationOnProject(UUID userId, UUID projectId) {
+    public UUID createApplicationOnProject(UUID userId, UUID projectId) {
         final var applicationId = UUID.randomUUID();
         projectIdRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
@@ -210,7 +206,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 .receivedAt(new Date())
                                 .build())
                 );
-        notificationOutbox.push(new UserAppliedOnProject(applicationId, projectId, userId, new Date()));
+        return applicationId;
     }
 
     @Transactional
@@ -297,6 +293,5 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void saveProjectLead(UUID userId, UUID projectId) {
         projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
-        notificationOutbox.push(new ProjectLeaderAssigned(projectId, userId, new Date()));
     }
 }

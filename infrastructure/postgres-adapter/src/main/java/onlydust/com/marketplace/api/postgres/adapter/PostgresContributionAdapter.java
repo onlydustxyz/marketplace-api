@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -41,7 +40,6 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     private final IgnoredContributionsRepository ignoredContributionsRepository;
     private final ProjectRepository projectRepository;
-    private final ProjectRepoRepository projectRepoRepository;
 
     @Override
     @Transactional(readOnly = true)
