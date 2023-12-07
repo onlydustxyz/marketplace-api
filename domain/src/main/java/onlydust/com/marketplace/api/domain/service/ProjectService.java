@@ -5,12 +5,14 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class ProjectService implements ProjectFacadePort {
@@ -29,6 +32,7 @@ public class ProjectService implements ProjectFacadePort {
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
 
+    private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
@@ -77,11 +81,13 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
+    @Transactional
     public Pair<UUID, String> createProject(CreateProjectCommand command) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
+        //TODO : put this in an observer
         indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()),
                 Set.of());
 
@@ -97,7 +103,11 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
 
 
-        eventStoragePort.saveEvent(new ProjectCreatedEvent(projectId));
+        eventStoragePort.saveEvent(new ProjectCreatedOldEvent(projectId));
+
+        if (nonNull(command.getGithubRepoIds())) {
+            projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
+        }
         return Pair.of(projectId, projectSlug);
     }
 
@@ -121,7 +131,9 @@ public class ProjectService implements ProjectFacadePort {
                     .filter(repoId -> !previousRepos.contains(repoId))
                     .collect(Collectors.toSet());
 
-            indexerPort.onRepoLinkChanged(newRepos, this.projectStoragePort.removeUsedRepos(removedRepos));
+            projectObserverPort.onLinkedReposChanged(command.getId(), newRepos, removedRepos);
+            // TODO: put this in an observer
+            indexerPort.onRepoLinkChanged(newRepos, removedRepos);
         }
 
         this.projectStoragePort.updateProject(command.getId(),
@@ -133,8 +145,8 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
 
-        if (!isNull(command.getRewardSettings()) || !isNull(command.getGithubRepoIds())) {
-            contributionStoragePort.refreshIgnoredContributions(command.getId());
+        if (!isNull(command.getRewardSettings())) {
+            projectObserverPort.onRewardSettingsChanged(command.getId());
         }
         final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
         return Pair.of(command.getId(), slug);

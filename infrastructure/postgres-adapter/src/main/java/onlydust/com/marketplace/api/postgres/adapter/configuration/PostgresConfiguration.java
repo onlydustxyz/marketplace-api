@@ -1,7 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
+import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
+import onlydust.com.marketplace.api.domain.service.ProjectObserver;
 import onlydust.com.marketplace.api.postgres.adapter.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
@@ -40,7 +44,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresProjectAdapter postgresProjectAdapter(final NotificationPort notificationPort,
+    public PostgresProjectAdapter postgresProjectAdapter(final ProjectObserverPort projectObserverPort,
                                                          final ProjectRepository projectRepository,
                                                          final ProjectViewRepository projectViewRepository,
                                                          final ProjectIdRepository projectIdRepository,
@@ -59,7 +63,7 @@ public class PostgresConfiguration {
                                                          final ProjectMoreInfoRepository projectMoreInfoRepository,
                                                          final CustomProjectRankingRepository customProjectRankingRepository,
                                                          final BudgetStatsRepository budgetStatsRepository) {
-        return new PostgresProjectAdapter(notificationPort,
+        return new PostgresProjectAdapter(projectObserverPort,
                 projectRepository,
                 projectViewRepository,
                 projectIdRepository,
@@ -93,7 +97,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresUserAdapter postgresUserAdapter(final NotificationPort notificationPort,
+    public PostgresUserAdapter postgresUserAdapter(final OutboxPort notificationOutbox,
                                                    final CustomUserRepository customUserRepository,
                                                    final CustomContributorRepository customContributorRepository,
                                                    final UserRepository userRepository,
@@ -112,7 +116,7 @@ public class PostgresConfiguration {
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository) {
-        return new PostgresUserAdapter(notificationPort,
+        return new PostgresUserAdapter(notificationOutbox,
                 customUserRepository,
                 customContributorRepository,
                 userRepository,
@@ -162,11 +166,13 @@ public class PostgresConfiguration {
                                                                    final CustomContributorRepository customContributorRepository,
                                                                    final CustomIgnoredContributionsRepository customIgnoredContributionsRepository,
                                                                    final IgnoredContributionsRepository ignoredContributionsRepository,
-                                                                   final ProjectRepository projectRepository) {
+                                                                   final ProjectRepository projectRepository,
+                                                                   final ProjectRepoRepository projectRepoRepository) {
         return new PostgresContributionAdapter(contributionViewEntityRepository, shortProjectViewEntityRepository,
                 githubRepoViewEntityRepository, contributionDetailsViewEntityRepository,
                 contributionRewardViewEntityRepository, customContributorRepository,
-                customIgnoredContributionsRepository, ignoredContributionsRepository, projectRepository);
+                customIgnoredContributionsRepository, ignoredContributionsRepository, projectRepository,
+                projectRepoRepository);
     }
 
     @Bean
@@ -188,8 +194,15 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresNotificationAdapter postgresNotificationAdapter(final NotificationRepository notificationRepository) {
-        return new PostgresNotificationAdapter(notificationRepository);
+    public PostgresOutboxAdapter<NotificationEntity> postgresNotificationAdapter(final NotificationRepository notificationRepository) {
+        return new PostgresOutboxAdapter<>(notificationRepository);
+    }
+
+
+    @Bean
+    public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
+                                                   final ContributionStoragePort contributionStoragePort) {
+        return new ProjectObserver(notificationOutbox, contributionStoragePort);
     }
 
     @Bean

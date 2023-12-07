@@ -13,9 +13,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRew
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -39,6 +41,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     private final IgnoredContributionsRepository ignoredContributionsRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectRepoRepository projectRepoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -86,9 +89,9 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
             case PROJECT_REPO_NAME -> Sort.by(direction, "project_name", "repo_name");
             case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
             case CONTRIBUTOR_LOGIN -> Sort.by(direction, "contributor_login");
-            case LINKS_COUNT ->
-                    JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links," +
-                                              "closing_pull_requests.links, reviewed_pull_requests.links)), 0)");
+            case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links," +
+                                                          "closing_pull_requests.links, reviewed_pull_requests.links)" +
+                                                          "), 0)");
         };
     }
 
@@ -170,7 +173,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         final var repoIds = projectRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound("project %s not found".formatted(projectId)))
                 .getRepos().stream()
-                .map(repo -> repo.getPrimaryKey().getRepoId())
+                .map(ProjectRepoEntity::getRepoId)
                 .toList();
 
         ignoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId);

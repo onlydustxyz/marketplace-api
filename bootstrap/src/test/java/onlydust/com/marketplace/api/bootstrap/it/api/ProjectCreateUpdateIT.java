@@ -272,7 +272,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "linkedRepoIds": [452047076],
-                          "unlinkedRepoIds": []
+                          "unlinkedRepoIds": [602953043]
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));

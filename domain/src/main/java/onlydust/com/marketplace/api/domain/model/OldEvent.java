@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public abstract class Event {
+public abstract class OldEvent {
     final public String aggregateName;
     final public UUID aggregateId;
     final public String payload;

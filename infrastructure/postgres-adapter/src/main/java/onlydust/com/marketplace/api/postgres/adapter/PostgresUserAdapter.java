@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
 import onlydust.com.marketplace.api.domain.model.notification.UserAppliedOnProject;
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
+import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -35,7 +35,7 @@ import static java.lang.String.format;
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
 
-    private final NotificationPort notificationPort;
+    private final OutboxPort notificationOutbox;
     private final CustomUserRepository customUserRepository;
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
@@ -189,7 +189,7 @@ public class PostgresUserAdapter implements UserStoragePort {
 
         projectLeaderInvitationRepository.delete(invitation);
         projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
-        notificationPort.push(new ProjectLeaderAssigned(projectId, user.getId(), new Date()));
+        notificationOutbox.push(new ProjectLeaderAssigned(projectId, user.getId(), new Date()));
     }
 
     @Override
@@ -210,7 +210,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 .receivedAt(new Date())
                                 .build())
                 );
-        notificationPort.push(new UserAppliedOnProject(applicationId, projectId, userId, new Date()));
+        notificationOutbox.push(new UserAppliedOnProject(applicationId, projectId, userId, new Date()));
     }
 
     @Transactional
@@ -297,6 +297,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void saveProjectLead(UUID userId, UUID projectId) {
         projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
-        notificationPort.push(new ProjectLeaderAssigned(projectId, userId, new Date()));
+        notificationOutbox.push(new ProjectLeaderAssigned(projectId, userId, new Date()));
     }
 }

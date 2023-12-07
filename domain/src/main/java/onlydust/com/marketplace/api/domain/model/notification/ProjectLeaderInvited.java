@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ProjectLeaderInvited extends Notification {
+public class ProjectLeaderInvited extends Event {
     UUID projectId;
     Long githubUserId;
     Date invitedAt;

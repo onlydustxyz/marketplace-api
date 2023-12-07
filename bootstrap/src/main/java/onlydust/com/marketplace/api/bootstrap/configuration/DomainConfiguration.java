@@ -1,7 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
-import onlydust.com.marketplace.api.domain.job.NotificationJob;
+import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
+import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationJob;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
@@ -34,7 +35,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ProjectFacadePort projectFacadePort(final PostgresProjectAdapter postgresProjectAdapter,
+    public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
+                                               final PostgresProjectAdapter postgresProjectAdapter,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
@@ -44,7 +46,8 @@ public class DomainConfiguration {
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
                                                final GithubStoragePort githubStoragePort) {
-        return new ProjectService(postgresProjectAdapter, imageStoragePort, uuidGeneratorPort, permissionService,
+        return new ProjectService(projectObserverPort, postgresProjectAdapter, imageStoragePort, uuidGeneratorPort,
+                permissionService,
                 indexerPort, dateProvider, eventStoragePort, contributionStoragePort, dustyBotStoragePort,
                 githubStoragePort);
     }
@@ -105,13 +108,19 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public NotificationJob notificationJob(final NotificationPort notificationPort,
-                                           final WebhookPort webhookPort) {
-        return new WebhookNotificationJob(notificationPort, webhookPort);
+    public OutboxConsumerJob notificationOutboxJob(final OutboxPort notificationOutbox,
+                                                   final OutboxConsumer webhookNotificationJob) {
+        return new OutboxConsumerJob(notificationOutbox, webhookNotificationJob);
+    }
+
+    @Bean
+    public OutboxConsumer webhookNotificationJob(final WebhookPort webhookPort) {
+        return new WebhookNotificationJob(webhookPort);
     }
 
     @Bean
     public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
         return new TechnologiesService(trackingIssuePort);
     }
+
 }

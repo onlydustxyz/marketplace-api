@@ -3,9 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.notification.*;
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
+import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -36,7 +34,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
-    private final NotificationPort notificationPort;
+    private final ProjectObserverPort projectObserverPort;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;
@@ -99,8 +97,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Set<Long> removeUsedRepos(Collection<Long> repoIds) {
         final var usedRepos = projectRepoRepository.findAllByRepoId(repoIds).stream()
-                .map(ProjectRepoEntity::getPrimaryKey)
-                .map(ProjectRepoEntity.PrimaryKey::getRepoId)
+                .map(ProjectRepoEntity::getRepoId)
                 .collect(Collectors.toUnmodifiableSet());
 
         return repoIds.stream()
@@ -207,19 +204,22 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .ignoreIssues(rewardSettings.getIgnoreIssues())
                         .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
                         .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
+                        .repos(githubRepoIds == null ? null : githubRepoIds.stream()
+                                .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                                .collect(Collectors.toSet()))
                         .rank(0)
                         .build();
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
-        notificationPort.push(new ProjectCreated(projectId, new Date()));
+        projectObserverPort.onProjectCreated(projectId);
 
         this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
-        notificationPort.push(new ProjectLeaderAssigned(projectId, firstProjectLeaderId, new Date()));
+        projectObserverPort.onLeaderAssigned(projectId, firstProjectLeaderId);
 
         if (nonNull(githubUserIdsAsProjectLeads)) {
             githubUserIdsAsProjectLeads.forEach(githubUserId ->
-                    notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date())));
+                    projectObserverPort.onLeaderInvited(projectId, githubUserId));
 
             projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
                     .map(githubUserId -> new ProjectLeaderInvitationEntity(
@@ -230,9 +230,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         }
 
         if (nonNull(githubRepoIds)) {
-            projectRepoRepository.saveAll(githubRepoIds.stream()
-                    .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                    .collect(Collectors.toSet()));
+            projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(githubRepoIds), Set.of());
         }
         if (nonNull(moreInfos)) {
             projectMoreInfoRepository.saveAll(moreInfosToEntities(moreInfos, projectId));
@@ -278,8 +276,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .filter(invitation -> !githubUserIdsAsProjectLeadersToInvite.contains(invitation.getGithubUserId()))
                     .forEach(invitation -> {
                         projectLeaderInvitationRepository.delete(invitation);
-                        notificationPort.push(new ProjectLeaderInvitationCancelled(projectId,
-                                invitation.getGithubUserId(), new Date()));
+                        projectObserverPort.onLeaderInvitationCancelled(projectId, invitation.getGithubUserId());
                     });
 
             githubUserIdsAsProjectLeadersToInvite.stream()
@@ -288,7 +285,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .forEach(githubUserId -> {
                         projectLeaderInvitationRepository.save(
                                 new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId));
-                        notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date()));
+                        projectObserverPort.onLeaderInvited(projectId, githubUserId);
                     });
         }
 
@@ -298,8 +295,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .filter(projectLeader -> !projectLeadersToKeep.contains(projectLeader.getPrimaryKey().getUserId()))
                     .forEach(entity -> {
                         projectLeadRepository.delete(entity);
-                        notificationPort.push(new ProjectLeaderUnassigned(projectId,
-                                entity.getPrimaryKey().getUserId(), new Date()));
+                        projectObserverPort.onLeaderUnassigned(projectId, entity.getPrimaryKey().getUserId());
                     });
 
             if (projectLeadersToKeep.stream()
@@ -310,21 +306,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             }
         }
 
-        final var repos = project.getRepos();
         if (!isNull(githubRepoIds)) {
-            repos.stream()
-                    .filter(repo -> !githubRepoIds.contains(repo.getPrimaryKey().getRepoId()))
-                    .forEach(projectRepoRepository::delete);
-
-            githubRepoIds.stream()
-                    .filter(repoId -> repos.stream()
-                            .noneMatch(repo -> repo.getPrimaryKey().getRepoId().equals(repoId)))
-                    .forEach(repoId -> projectRepoRepository.save(new ProjectRepoEntity(
-                            projectId,
-                            repoId)));
+            project.getRepos().clear();
+            project.getRepos().addAll(githubRepoIds.stream()
+                    .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                    .collect(Collectors.toSet()));
         }
 
-        notificationPort.push(new ProjectUpdated(projectId, new Date()));
+        projectObserverPort.onProjectDetailsUpdated(projectId);
         this.projectRepository.save(project);
     }
 
@@ -477,7 +466,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public Set<Long> getProjectRepoIds(UUID projectId) {
         final var project = projectRepository.getById(projectId);
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
-                .map(repo -> repo.getPrimaryKey().getRepoId())
+                .map(ProjectRepoEntity::getRepoId)
                 .collect(Collectors.toSet());
     }
 

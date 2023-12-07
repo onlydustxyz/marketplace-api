@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.Event;
+import onlydust.com.marketplace.api.domain.model.OldEvent;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
 @Builder
 @Table(name = "events", schema = "public")
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-public class EventEntity {
+public class OldEventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long index;
@@ -32,12 +32,12 @@ public class EventEntity {
     @Column(columnDefinition = "jsonb", nullable = false)
     String payload;
 
-    public static EventEntity of(Event event) {
-        return EventEntity.builder()
+    public static OldEventEntity of(OldEvent oldEvent) {
+        return OldEventEntity.builder()
                 .timestamp(new Date())
-                .aggregateName(event.aggregateName)
-                .aggregateId(event.aggregateId)
-                .payload(event.payload)
+                .aggregateName(oldEvent.aggregateName)
+                .aggregateId(oldEvent.aggregateId)
+                .payload(oldEvent.payload)
                 .build();
     }
 }

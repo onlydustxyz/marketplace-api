@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.notification.Notification;
+import onlydust.com.marketplace.api.domain.model.notification.Event;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -21,11 +21,11 @@ import java.time.Instant;
 @EqualsAndHashCode
 @Builder
 @Data
-@Table(name = "notifications", schema = "public")
+@Table(name = "notification_outbox_events", schema = "public")
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "notification_status", typeClass = PostgreSQLEnumType.class)
-public class NotificationEntity {
+@TypeDef(name = "outbox_event_status", typeClass = PostgreSQLEnumType.class)
+public class NotificationEntity implements EventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,8 +35,8 @@ public class NotificationEntity {
     private Payload payload;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "notification_status")
-    private Status status;
+    @Type(type = "outbox_event_status")
+    private EventEntity.Status status;
 
     private String error;
 
@@ -50,9 +50,14 @@ public class NotificationEntity {
     @Column(name = "updated_at", nullable = false)
     Instant updatedAt;
 
-    public NotificationEntity(Notification notification) {
-        this.payload = new Payload(notification);
+    public NotificationEntity(Event event) {
+        this.payload = new Payload(event);
         this.status = Status.PENDING;
+    }
+
+    @Override
+    public Event getEvent() {
+        return payload.getEvent();
     }
 
     @Data
@@ -61,10 +66,6 @@ public class NotificationEntity {
     public static class Payload implements Serializable {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
-        private Notification notification;
-    }
-
-    public enum Status {
-        PENDING, PROCESSED, FAILED
+        private Event event;
     }
 }

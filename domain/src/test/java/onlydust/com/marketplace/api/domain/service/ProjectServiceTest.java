@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -37,7 +38,9 @@ public class ProjectServiceTest {
     private final UUIDGeneratorPort uuidGeneratorPort = mock(UUIDGeneratorPort.class);
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
-    private final ProjectService projectService = new ProjectService(projectStoragePort, imageStoragePort,
+    private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
+    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
+            imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
             eventStoragePort, contributionStoragePort, dustyBotStoragePort,
             githubStoragePort);
@@ -119,7 +122,7 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        verify(eventStoragePort).saveEvent(new ProjectCreatedEvent(projectIdentity.getLeft()));
+        verify(eventStoragePort).saveEvent(new ProjectCreatedOldEvent(projectIdentity.getLeft()));
         verify(indexerPort).onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
 
@@ -628,7 +631,8 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
+                mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
                 mock(GithubStoragePort.class));
@@ -700,7 +704,8 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(projectStoragePort, mock(ImageStoragePort.class),
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
+                mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
                 mock(GithubStoragePort.class));
