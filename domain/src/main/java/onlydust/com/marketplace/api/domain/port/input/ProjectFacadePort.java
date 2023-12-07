@@ -77,4 +77,6 @@ public interface ProjectFacadePort {
     Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
                                          ContributionView.Sort sort, SortDirection direction,
                                          Integer page, Integer pageSize);
+
+    void updateProjectsRanking();
 }

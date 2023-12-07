@@ -128,7 +128,6 @@ public class AbstractMarketplaceApiIT {
         Thread.sleep(1000);
     }
 
-
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgresSQLContainer::getJdbcUrl);

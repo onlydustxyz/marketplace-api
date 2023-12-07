@@ -22,6 +22,7 @@ application:
         retry-interval: 500
   cron:
     notification-job-delay: 60000 # 1 minute
+    update-projects-ranking: 7200000 # 2 hours
 
 spring:
   application:
