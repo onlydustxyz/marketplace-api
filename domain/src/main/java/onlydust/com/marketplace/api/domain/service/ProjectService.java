@@ -87,10 +87,6 @@ public class ProjectService implements ProjectFacadePort {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
         }
 
-        //TODO : put this in an observer
-        indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()),
-                Set.of());
-
         final UUID projectId = uuidGeneratorPort.generate();
         final String projectSlug = this.projectStoragePort.createProject(projectId, command.getName(),
                 command.getShortDescription(), command.getLongDescription(),
@@ -102,23 +98,54 @@ public class ProjectService implements ProjectFacadePort {
                 command.getImageUrl(),
                 ProjectRewardSettings.defaultSettings(dateProvider.now()));
 
-
         eventStoragePort.saveEvent(new ProjectCreatedOldEvent(projectId));
 
+        projectObserverPort.onProjectCreated(projectId);
+        projectObserverPort.onLeaderAssigned(projectId, command.getFirstProjectLeaderId());
+        if (nonNull(command.getGithubUserIdsAsProjectLeadersToInvite())) {
+            command.getGithubUserIdsAsProjectLeadersToInvite().forEach(githubUserId ->
+                    projectObserverPort.onLeaderInvited(projectId, githubUserId));
+        }
         if (nonNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(projectId, Set.copyOf(command.getGithubRepoIds()), Set.of());
+            //TODO : put this in an observer
+            indexerPort.onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()),
+                    Set.of());
         }
         return Pair.of(projectId, projectSlug);
     }
 
     @Override
+    @Transactional
     public Pair<UUID, String> updateProject(UUID projectLeadId, UpdateProjectCommand command) {
         if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
 
+        if (command.getProjectLeadersToKeep() != null) {
+            final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
+            if (command.getProjectLeadersToKeep().stream()
+                    .anyMatch(userId -> projectLeadIds.stream()
+                            .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
+                throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
+                                                   "leaders");
+            }
+            projectLeadIds.stream()
+                    .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
+                    .forEach(leaderId -> projectObserverPort.onLeaderUnassigned(command.getId(), leaderId));
+        }
+
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
+
+            final var projectInvitedLeadIds = projectStoragePort.getProjectInvitedLeadIds(command.getId());
+            projectInvitedLeadIds.stream()
+                    .filter(leaderId -> !command.getGithubUserIdsAsProjectLeadersToInvite().contains(leaderId))
+                    .forEach(leaderId -> projectObserverPort.onLeaderInvitationCancelled(command.getId(), leaderId));
+
+            command.getGithubUserIdsAsProjectLeadersToInvite().stream()
+                    .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId))
+                    .forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));
         }
 
         if (command.getGithubRepoIds() != null) {
@@ -145,6 +172,8 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
 
+
+        projectObserverPort.onProjectDetailsUpdated(command.getId());
         if (!isNull(command.getRewardSettings())) {
             projectObserverPort.onRewardSettingsChanged(command.getId());
         }

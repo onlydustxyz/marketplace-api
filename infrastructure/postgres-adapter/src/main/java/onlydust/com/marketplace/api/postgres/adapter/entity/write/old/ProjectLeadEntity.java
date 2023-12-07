@@ -11,33 +11,32 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder
 @Table(name = "project_leads", schema = "public")
+@IdClass(ProjectLeadEntity.PrimaryKey.class)
 public class ProjectLeadEntity {
-    @EmbeddedId
-    @EqualsAndHashCode.Include
-    private PrimaryKey primaryKey;
+    @Id
+    @Column(name = "project_id", nullable = false, updatable = false)
+    UUID projectId;
+    @Id
+    @Column(name = "user_id", nullable = false, updatable = false)
+    UUID userId;
 
     @CreationTimestamp
     @Column(name = "assigned_at", nullable = false, updatable = false)
     private Date assignedAt;
 
     public ProjectLeadEntity(UUID projectId, UUID userId) {
-        this.primaryKey = new PrimaryKey(projectId, userId);
+        this.projectId = projectId;
+        this.userId = userId;
     }
 
-    @Embeddable
-    @AllArgsConstructor
     @NoArgsConstructor
-    @EqualsAndHashCode
-    @Data
-    @Builder
+    @AllArgsConstructor
     public static class PrimaryKey implements Serializable {
-        @Column(name = "project_id", nullable = false, updatable = false)
         UUID projectId;
-        @Column(name = "user_id", nullable = false, updatable = false)
         UUID userId;
     }
 }

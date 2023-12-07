@@ -49,7 +49,6 @@ public class PostgresConfiguration {
                                                          final ProjectViewRepository projectViewRepository,
                                                          final ProjectIdRepository projectIdRepository,
                                                          final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
-                                                         final ProjectLeadRepository projectLeadRepository,
                                                          final ProjectRepoRepository projectRepoRepository,
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
@@ -60,7 +59,6 @@ public class PostgresConfiguration {
                                                          final ProjectsPageRepository projectsPageRepository,
                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                          final RewardableItemRepository rewardableItemRepository,
-                                                         final ProjectMoreInfoRepository projectMoreInfoRepository,
                                                          final CustomProjectRankingRepository customProjectRankingRepository,
                                                          final BudgetStatsRepository budgetStatsRepository) {
         return new PostgresProjectAdapter(projectObserverPort,
@@ -68,7 +66,6 @@ public class PostgresConfiguration {
                 projectViewRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
-                projectLeadRepository,
                 projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
@@ -79,7 +76,6 @@ public class PostgresConfiguration {
                 projectsPageRepository,
                 projectsPageFiltersRepository,
                 rewardableItemRepository,
-                projectMoreInfoRepository,
                 customProjectRankingRepository,
                 budgetStatsRepository
         );

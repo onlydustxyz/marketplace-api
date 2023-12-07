@@ -16,10 +16,13 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "project_more_infos", schema = "public")
+@IdClass(ProjectMoreInfoEntity.PrimaryKey.class)
 public class ProjectMoreInfoEntity {
 
-    @EmbeddedId
-    Id id;
+    @Id
+    UUID projectId;
+    @Id
+    String url;
     String name;
     Integer rank;
 
@@ -33,13 +36,7 @@ public class ProjectMoreInfoEntity {
     @Column(name = "updated_at", nullable = false)
     Instant updatedAt;
 
-    @Embeddable
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Data
-    public static class Id implements Serializable {
-        @Column(name = "project_id")
+    public static class PrimaryKey implements Serializable {
         UUID projectId;
         String url;
     }

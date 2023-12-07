@@ -221,7 +221,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists();
+                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists()
+                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 16590657L)).exists();
 
 
         waitAtLeastOneCycleOfNotificationProcessing();
