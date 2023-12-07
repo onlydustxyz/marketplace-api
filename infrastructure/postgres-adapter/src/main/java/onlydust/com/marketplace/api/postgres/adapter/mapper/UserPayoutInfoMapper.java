@@ -139,8 +139,8 @@ public interface UserPayoutInfoMapper {
                 final CompanyJsonEntity companyJsonEntity = OBJECT_MAPPER.treeToValue(identity,
                         CompanyJsonEntity.class);
                 final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
-                        .lastName(companyJsonEntity.getValue().getOwner().getLastName())
-                        .firstName(companyJsonEntity.getValue().getOwner().getFirstName())
+                        .lastName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getLastName() : null)
+                        .firstName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getFirstName() : null)
                         .build();
                 userPayoutInformation = userPayoutInformation.toBuilder()
                         .isACompany(true)
