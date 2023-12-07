@@ -34,4 +34,14 @@ public interface ProjectBudgetMapper {
             case Stark -> CurrencyContract.STARK;
         };
     }
+
+    static Currency mapCurrency(CurrencyContract currency) {
+        return switch (currency) {
+            case ETH -> Currency.Eth;
+            case APT -> Currency.Apt;
+            case OP -> Currency.Op;
+            case USD -> Currency.Usd;
+            case STARK -> Currency.Stark;
+        };
+    }
 }

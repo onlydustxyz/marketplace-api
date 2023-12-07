@@ -45,8 +45,10 @@ public interface ProjectFacadePort {
                                                                       Integer pageIndex,
                                                                       Integer pageSize);
 
-    ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize,
-                                       ProjectRewardView.SortBy sortBy, SortDirection sortDirection);
+    ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId,
+                                      ProjectRewardView.Filters filters,
+                                      Integer pageIndex, Integer pageSize,
+                                      ProjectRewardView.SortBy sortBy, SortDirection sortDirection);
 
     ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId);
 

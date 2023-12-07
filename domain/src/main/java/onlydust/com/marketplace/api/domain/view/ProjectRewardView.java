@@ -35,4 +35,10 @@ public class ProjectRewardView {
     public enum SortBy {
         requestedAt, status, contribution, amount
     }
+
+    @Builder
+    @Data
+    public static class Filters {
+        Currency currency;
+    }
 }

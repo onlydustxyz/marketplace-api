@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import org.intellij.lang.annotations.Language;
 
@@ -36,12 +37,13 @@ public class CustomProjectRewardRepository {
                      left join public.auth_users au on gu.id = au.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-            where pr.project_id = :projectId order by %order_by% offset :offset limit :limit
+            where pr.project_id = :projectId and pr.currency = CAST(:currency AS currency)
+            order by %order_by% offset :offset limit :limit
             """;
     private static final String COUNT_PROJECT_REWARDS = """
             select count(*)
             from payment_requests pr
-            where pr.project_id = :projectId
+            where pr.project_id = :projectId and pr.currency = CAST(:currency AS currency)
             """;
     private final EntityManager entityManager;
 
@@ -56,18 +58,20 @@ public class CustomProjectRewardRepository {
         return FIND_PROJECT_REWARDS.replace("%order_by%", sort);
     }
 
-    public Integer getCount(UUID projectId) {
+    public Integer getCount(UUID projectId, CurrencyEnumEntity currency) {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
-                .setParameter("projectId", projectId);
+                .setParameter("projectId", projectId)
+                .setParameter("currency", currency.toString());
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, ProjectRewardView.SortBy sortBy,
-                                                         final SortDirection sortDirection,
+    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, CurrencyEnumEntity currency,
+                                                         ProjectRewardView.SortBy sortBy, final SortDirection sortDirection,
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)
+                .setParameter("currency", currency.toString())
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList();

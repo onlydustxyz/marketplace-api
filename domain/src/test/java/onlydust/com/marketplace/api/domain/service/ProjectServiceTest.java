@@ -278,14 +278,15 @@ public class ProjectServiceTest {
         final int pageIndex = 1;
         final int pageSize = 1;
         final SortDirection sortDirection = SortDirection.desc;
+        final ProjectRewardView.Filters filters = ProjectRewardView.Filters.builder().build();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getRewards(projectId, projectLeadId, pageIndex, pageSize, sortBy, sortDirection);
+        projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
 
         // Then
-        verify(projectStoragePort, times(1)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
+        verify(projectStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
     }
 
     @Test
@@ -296,18 +297,19 @@ public class ProjectServiceTest {
         final int pageIndex = 1;
         final int pageSize = 1;
         final SortDirection sortDirection = SortDirection.asc;
+        final ProjectRewardView.Filters filters = ProjectRewardView.Filters.builder().build();
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
         OnlyDustException onlyDustException = null;
         try {
-            projectService.getRewards(projectId, projectLeadId, pageIndex, pageSize, sortBy, sortDirection);
+            projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
+        verify(projectStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());

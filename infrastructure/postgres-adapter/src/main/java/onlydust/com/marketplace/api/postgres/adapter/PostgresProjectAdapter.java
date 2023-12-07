@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -376,16 +377,18 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
-                                              SortDirection sortDirection, int pageIndex,
-                                              int pageSize) {
-        final Integer count = customProjectRewardRepository.getCount(projectId);
-        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
+    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
+                                              ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+                                              int pageIndex, int pageSize) {
+        final var currency = CurrencyEnumEntity.of(filters.getCurrency());
+
+        final Integer count = customProjectRewardRepository.getCount(projectId, currency);
+        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId);
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, currency.toString());
 
         return ProjectRewardsPageView.builder().
                 rewards(Page.<ProjectRewardView>builder()

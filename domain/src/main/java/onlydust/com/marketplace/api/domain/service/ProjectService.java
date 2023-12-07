@@ -169,10 +169,12 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId, Integer pageIndex, Integer pageSize
-            , ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
+    public ProjectRewardsPageView getRewards(UUID projectId, UUID projectLeadId,
+                                             ProjectRewardView.Filters filters,
+                                             Integer pageIndex, Integer pageSize,
+                                             ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findRewards(projectId, sortBy, sortDirection, pageIndex, pageSize);
+            return projectStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
         }
