@@ -225,7 +225,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "JavaScript": 62716,
                 "HTML": 121874
               },
-              "remainingUsdBudget": 99250.00,
+              "hasRemainingBudget": true,
               "rewardSettings": {
                 "ignorePullRequests": false,
                 "ignoreIssues": false,
@@ -380,7 +380,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "JavaScript": 58624,
                 "HTML": 169898
               },
-              "remainingUsdBudget": 50000,
+              "hasRemainingBudget": true,
               "rewardSettings": {
                 "ignorePullRequests": false,
                 "ignoreIssues": false,
