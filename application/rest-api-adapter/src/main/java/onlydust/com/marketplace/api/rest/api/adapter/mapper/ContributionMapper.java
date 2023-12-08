@@ -121,6 +121,7 @@ public interface ContributionMapper {
     static ContributionDetailsResponse mapContributionDetails(ContributionDetailsView contribution) {
         return new ContributionDetailsResponse()
                 .id(contribution.getId())
+                .contributor(ContributorMapper.of(contribution.getContributor()))
                 .createdAt(DateMapper.toZoneDateTime(contribution.getCreatedAt()))
                 .completedAt(DateMapper.toZoneDateTime(contribution.getCompletedAt()))
                 .type(mapContributionTypeToResponse(contribution.getType()))
