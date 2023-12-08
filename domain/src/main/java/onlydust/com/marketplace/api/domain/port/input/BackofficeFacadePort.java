@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
+import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
@@ -14,4 +15,6 @@ public interface BackofficeFacadePort {
     Page<ProjectBudgetView> getBudgetPage(int sanitizedPageIndex, int sanitizedPageSize, List<UUID> projectIds);
 
     Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids);
+
+    Page<PaymentView> listPayments(int pageIndex, int pageSize);
 }

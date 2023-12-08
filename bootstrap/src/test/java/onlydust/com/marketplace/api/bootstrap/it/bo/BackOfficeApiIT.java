@@ -409,4 +409,118 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
 
+    @Test
+    void should_get_payments() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                           "totalPageNumber": 48,
+                           "totalItemNumber": 240,
+                           "hasMore": true,
+                           "nextPageIndex": 1,
+                           "payments": [
+                             {
+                               "id": "0341317f-b831-412a-9cec-a5a16a9d749c",
+                               "budgetId": "cad5d63e-d570-497e-acef-11a57691d589",
+                               "projectId": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                               "amount": 1000,
+                               "currency": "USD",
+                               "recipientId": 8642470,
+                               "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                               "items": [
+                                 "https://github.com/MaximeBeasse/KeyDecoder/pull/1"
+                               ],
+                               "requestedAt": "2023-05-26T09:30:42.881962Z",
+                               "processedAt": "2023-06-19T21:40:42.314436Z",
+                               "pullRequestsCount": 1,
+                               "issuesCount": 0,
+                               "dustyIssuesCount": 0,
+                               "codeReviewsCount": 0
+                             },
+                             {
+                               "id": "047bcb92-dfbf-45c0-970d-509781237b2e",
+                               "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
+                               "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                               "amount": 500,
+                               "currency": "USD",
+                               "recipientId": 116729712,
+                               "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                               "items": [
+                                 "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                               ],
+                               "requestedAt": "2022-12-23T13:46:18.624338Z",
+                               "processedAt": "2022-12-23T13:46:18.666452Z",
+                               "pullRequestsCount": 1,
+                               "issuesCount": 0,
+                               "dustyIssuesCount": 0,
+                               "codeReviewsCount": 0
+                             },
+                             {
+                               "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
+                               "budgetId": "cad5d63e-d570-497e-acef-11a57691d589",
+                               "projectId": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                               "amount": 1000,
+                               "currency": "USD",
+                               "recipientId": 43467246,
+                               "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                               "items": [
+                                 "https://github.com/od-mocks/cool-repo-A/pull/397"
+                               ],
+                               "requestedAt": "2023-05-15T12:15:54.25529Z",
+                               "processedAt": "2023-07-27T10:27:14.522708Z",
+                               "pullRequestsCount": 1,
+                               "issuesCount": 0,
+                               "dustyIssuesCount": 0,
+                               "codeReviewsCount": 0
+                             },
+                             {
+                               "id": "079df81a-d9f4-4e46-80cf-c17f400fe88f",
+                               "budgetId": "915814c3-981c-4d32-a965-7a3c1dc96fbd",
+                               "projectId": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
+                               "amount": 438,
+                               "currency": "USD",
+                               "recipientId": 4435377,
+                               "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                               "items": [
+                                 "https://github.com/ArkProjectNFTs/ark-lane/pull/54"
+                               ],
+                               "requestedAt": "2023-02-06T13:55:13.928436Z",
+                               "processedAt": null,
+                               "pullRequestsCount": 1,
+                               "issuesCount": 0,
+                               "dustyIssuesCount": 0,
+                               "codeReviewsCount": 0
+                             },
+                             {
+                               "id": "07e75bb9-87fc-4a22-9bea-1232c27e56d4",
+                               "budgetId": "a419c321-469a-4464-b6e1-56e800b53952",
+                               "projectId": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                               "amount": 10,
+                               "currency": "USD",
+                               "recipientId": 30843220,
+                               "requestorId": "6115f024-159a-4b1f-b713-1e2ad5c6063e",
+                               "items": [
+                                 "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                               ],
+                               "requestedAt": "2022-12-23T11:19:28.353471Z",
+                               "processedAt": "2022-12-23T11:19:28.395366Z",
+                               "pullRequestsCount": 1,
+                               "issuesCount": 0,
+                               "dustyIssuesCount": 0,
+                               "codeReviewsCount": 0
+                             }
+                           ]
+                         }
+                        """);
+    }
+
 }
