@@ -140,7 +140,38 @@ paths:
           "500":
             $ref: '#/components/responses/InternalServerError'
 
-
+  /bo/v1/payments:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get payment page
+      operationId: getPaymentPage
+      description: |
+        Get payment page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Payment page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -270,14 +301,7 @@ components:
           type: string
           format: uuid
         currency:
-          type: string
-          enum:
-            - USD
-            - ETH
-            - APT
-            - STARK
-            - OP
-            - LORDS
+          $ref: '#/components/schemas/Currency'
         initialAmount:
           type: number
         remainingAmount:
@@ -328,3 +352,76 @@ components:
         githubUserId:
           type: integer
           format: int64
+
+    PaymentPage:
+      type: object
+      required:
+        - payments
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentPageItemResponse'
+    PaymentPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        budgetId:
+          type: string
+          format: uuid
+        projectId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/Currency'
+        recipientId:
+          type: integer
+          format: int64
+        requestorId:
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            type: string
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        pullRequestsCount:
+          type: integer
+        issuesCount:
+          type: integer
+        dustyIssuesCount:
+          type: integer
+        codeReviewsCount:
+          type: integer
+
+    Currency:
+      type: string
+      enum:
+        - USD
+        - ETH
+        - APT
+        - STARK
+        - OP
+        - LORDS

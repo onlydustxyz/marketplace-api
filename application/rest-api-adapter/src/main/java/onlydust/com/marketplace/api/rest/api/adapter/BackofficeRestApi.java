@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
+import onlydust.com.backoffice.api.contract.ApiUtil;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.BudgetPage;
 import onlydust.com.backoffice.api.contract.model.GithubRepositoryPage;
+import onlydust.com.backoffice.api.contract.model.PaymentPage;
 import onlydust.com.backoffice.api.contract.model.ProjectLeadInvitationPage;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
@@ -14,12 +17,18 @@ import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 
 @RestController
@@ -32,8 +41,8 @@ public class BackofficeRestApi implements BackofficeApi {
     @Override
     public ResponseEntity<GithubRepositoryPage> getGithubRepositoryPage(Integer pageIndex, Integer pageSize,
                                                                         List<UUID> projectIds) {
-        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectRepositoryView> projectRepositoryViewPage =
                 backofficeFacadePort.getProjectRepositoryPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
 
@@ -47,8 +56,8 @@ public class BackofficeRestApi implements BackofficeApi {
 
     @Override
     public ResponseEntity<BudgetPage> getBudgetPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
-        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectBudgetView> budgetViewPage =
                 backofficeFacadePort.getBudgetPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
 
@@ -63,8 +72,8 @@ public class BackofficeRestApi implements BackofficeApi {
     @Override
     public ResponseEntity<ProjectLeadInvitationPage> getProjectLeadInvitationPage(Integer pageIndex, Integer pageSize
             , List<UUID> ids) {
-        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectLeadInvitationView> projectLeadInvitationViewPage =
                 backofficeFacadePort.getProjectLeadInvitationPage(sanitizedPageIndex, sanitizedPageSize, ids);
 
@@ -75,5 +84,16 @@ public class BackofficeRestApi implements BackofficeApi {
         return projectLeadInvitationPage.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(projectLeadInvitationPage) :
                 ResponseEntity.ok(projectLeadInvitationPage);
+    }
+
+    @Override
+    public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var response = mapPaymentPageToContract(paymentsPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
     }
 }

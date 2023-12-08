@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEn
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoPaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectLeadInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -177,9 +178,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository,
                                                                final ProjectBudgetRepository projectBudgetRepository,
-                                                               final ProjectLeadInvitationRepository projectLeadInvitationRepository) {
+                                                               final ProjectLeadInvitationRepository projectLeadInvitationRepository,
+                                                               final BoPaymentRepository boPaymentRepository) {
         return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository,
-                projectLeadInvitationRepository);
+                projectLeadInvitationRepository, boPaymentRepository);
     }
 
     @Bean

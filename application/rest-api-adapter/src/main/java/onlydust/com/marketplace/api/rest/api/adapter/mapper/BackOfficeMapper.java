@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
 
 public interface BackOfficeMapper {
 
@@ -20,11 +24,11 @@ public interface BackOfficeMapper {
                     .technologies(projectRepositoryView.getTechnologies())
                     .name(projectRepositoryView.getName()));
         }
-        githubRepositoryPage.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex,
+        githubRepositoryPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
                 projectRepositoryViewPage.getTotalPageNumber()));
         githubRepositoryPage.setTotalPageNumber(projectRepositoryViewPage.getTotalPageNumber());
         githubRepositoryPage.setTotalItemNumber(projectRepositoryViewPage.getTotalItemNumber());
-        githubRepositoryPage.setHasMore(PaginationHelper.hasMore(sanitizedPageIndex,
+        githubRepositoryPage.setHasMore(hasMore(sanitizedPageIndex,
                 projectRepositoryViewPage.getTotalPageNumber()));
         return githubRepositoryPage;
     }
@@ -37,26 +41,30 @@ public interface BackOfficeMapper {
                     .remainingAmount(view.getRemainingAmount())
                     .spentAmount(view.getSpentAmount())
                     .id(view.getId())
-                    .currency(switch (view.getCurrency()) {
-                        case Stark -> BudgetResponse.CurrencyEnum.STARK;
-                        case Usd -> BudgetResponse.CurrencyEnum.USD;
-                        case Apt -> BudgetResponse.CurrencyEnum.APT;
-                        case Op -> BudgetResponse.CurrencyEnum.OP;
-                        case Eth -> BudgetResponse.CurrencyEnum.ETH;
-                        case Lords -> BudgetResponse.CurrencyEnum.LORDS;
-                    })
+                    .currency(mapCurrency(view.getCurrency()))
                     .projectId(view.getProjectId())
                     .initialAmountDollarsEquivalent(view.getInitialAmountDollarsEquivalent())
                     .remainingAmountDollarsEquivalent(view.getRemainingAmountDollarsEquivalent())
                     .spentAmountDollarsEquivalent(view.getSpentAmountDollarsEquivalent()));
         }
-        budgetPage.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex,
+        budgetPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
                 projectBudgetViewPage.getTotalPageNumber()));
         budgetPage.setTotalPageNumber(projectBudgetViewPage.getTotalPageNumber());
         budgetPage.setTotalItemNumber(projectBudgetViewPage.getTotalItemNumber());
-        budgetPage.setHasMore(PaginationHelper.hasMore(sanitizedPageIndex,
+        budgetPage.setHasMore(hasMore(sanitizedPageIndex,
                 projectBudgetViewPage.getTotalPageNumber()));
         return budgetPage;
+    }
+
+    static Currency mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
+        return switch (currency) {
+            case Stark -> Currency.STARK;
+            case Usd -> Currency.USD;
+            case Apt -> Currency.APT;
+            case Op -> Currency.OP;
+            case Eth -> Currency.ETH;
+            case Lords -> Currency.LORDS;
+        };
     }
 
     static ProjectLeadInvitationPage mapProjectLeadInvitationPageToContract(final Page<ProjectLeadInvitationView> projectLeadInvitationViewPage,
@@ -68,12 +76,36 @@ public interface BackOfficeMapper {
                     .projectId(view.getProjectId())
                     .githubUserId(view.getGithubUserId()));
         }
-        projectLeadInvitationPage.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex,
+        projectLeadInvitationPage.setNextPageIndex(nextPageIndex(sanitizedPageIndex,
                 projectLeadInvitationViewPage.getTotalPageNumber()));
         projectLeadInvitationPage.setTotalPageNumber(projectLeadInvitationViewPage.getTotalPageNumber());
         projectLeadInvitationPage.setTotalItemNumber(projectLeadInvitationViewPage.getTotalItemNumber());
-        projectLeadInvitationPage.setHasMore(PaginationHelper.hasMore(sanitizedPageIndex,
+        projectLeadInvitationPage.setHasMore(hasMore(sanitizedPageIndex,
                 projectLeadInvitationViewPage.getTotalPageNumber()));
         return projectLeadInvitationPage;
+    }
+
+    static PaymentPage mapPaymentPageToContract(final Page<PaymentView> paymentPage, int pageIndex) {
+        return new PaymentPage()
+                .payments(paymentPage.getContent().stream().map(payment -> new PaymentPageItemResponse()
+                        .id(payment.getId())
+                        .budgetId(payment.getBudgetId())
+                        .projectId(payment.getProjectId())
+                        .amount(payment.getAmount())
+                        .currency(mapCurrency(payment.getCurrency()))
+                        .recipientId(payment.getRecipientId())
+                        .requestorId(payment.getRequestorId())
+                        .items(payment.getItems())
+                        .requestedAt(payment.getRequestedAt())
+                        .processedAt(payment.getProcessedAt())
+                        .pullRequestsCount(payment.getPullRequestsCount())
+                        .issuesCount(payment.getIssuesCount())
+                        .dustyIssuesCount(payment.getDustyIssuesCount())
+                        .codeReviewsCount(payment.getCodeReviewsCount())
+                ).toList())
+                .totalPageNumber(paymentPage.getTotalPageNumber())
+                .totalItemNumber(paymentPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, paymentPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, paymentPage.getTotalPageNumber()));
     }
 }
