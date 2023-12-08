@@ -5,9 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 
 import javax.persistence.EntityManager;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 @Slf4j
@@ -29,16 +30,16 @@ public class CustomProjectRepository {
                 .getResultList();
     }
 
-    public BigDecimal getUSDBudget(final UUID projectId) {
-        final List budgets = entityManager.createNativeQuery("""
-                        select b.remaining_amount
+    public Boolean hasRemainingBudget(final UUID projectId) {
+        final List remainingBudgets = entityManager.createNativeQuery("""
+                        select 1
                         from projects_budgets pb
-                                 join budgets b on pb.budget_id = b.id
-                        where b.currency = 'usd' and pb.project_id = :projectId""")
+                        join budgets b on pb.budget_id = b.id
+                        where b.remaining_amount > 0
+                        and pb.project_id = :projectId""")
                 .setParameter("projectId", projectId)
                 .getResultList();
-        return budgets.isEmpty() ? null : (BigDecimal) budgets.get(0);
-
+        return isNull(remainingBudgets) || remainingBudgets.isEmpty() ? false : true;
     }
 
     public boolean isProjectPublic(UUID projectId) {

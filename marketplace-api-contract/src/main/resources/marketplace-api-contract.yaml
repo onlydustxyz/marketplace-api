@@ -2624,7 +2624,7 @@ components:
         - invitedLeaders
         - sponsors
         - technologies
-        - remainingUsdBudget
+        - hasRemainingBudget
         - indexingComplete
         - indexedAt
       properties:
@@ -2694,9 +2694,8 @@ components:
             $ref: '#/components/schemas/SponsorResponse'
         technologies:
           $ref: '#/components/schemas/Technologies'
-        remainingUsdBudget:
-          type: number
-          example: 20.0
+        hasRemainingBudget:
+          type: boolean
         rewardSettings:
           $ref: '#/components/schemas/ProjectRewardSettings'
         indexingComplete:

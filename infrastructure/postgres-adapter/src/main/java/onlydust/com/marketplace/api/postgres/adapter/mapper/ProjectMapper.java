@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMor
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public interface ProjectMapper {
                                                       Integer contributorCount,
                                                       List<ProjectLeadViewEntity> leaders,
                                                       List<SponsorEntity> sponsors,
-                                                      final BigDecimal remainingUsdBudget) {
+                                                      final Boolean hasRemainingBudget) {
 
         final var organizationEntities = new HashMap<Long, GithubAccountEntity>();
         projectEntity.getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().getId(), repo.getOwner()));
@@ -88,7 +87,7 @@ public interface ProjectMapper {
                         .map(UserMapper::mapToProjectLeaderLinkView)
                         .collect(Collectors.toSet()))
                 .sponsors(sponsors.stream().map(SponsorMapper::mapToSponsorView).collect(Collectors.toSet()))
-                .remainingUsdBudget(remainingUsdBudget)
+                .hasRemainingBudget(hasRemainingBudget)
                 .build();
 
         for (ProjectOrganizationView organization : organizations) {

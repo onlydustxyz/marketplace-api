@@ -119,9 +119,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
-        final BigDecimal remainingUsdBudget = customProjectRepository.getUSDBudget(projectView.getId());
+        final Boolean hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
         return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders
-                , sponsors, remainingUsdBudget);
+                , sponsors, hasRemainingBudget);
     }
 
     @Override

@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Data
@@ -39,7 +38,7 @@ public class ProjectDetailsView {
     @Builder.Default
     @Setter(AccessLevel.NONE)
     Map<String, Long> technologies = new HashMap<>();
-    BigDecimal remainingUsdBudget;
+    Boolean hasRemainingBudget;
     ProjectRewardSettings rewardSettings;
 
     public void addOrganization(final ProjectOrganizationView organization) {
