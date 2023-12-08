@@ -161,11 +161,11 @@ public class ProjectService implements ProjectFacadePort {
                                        Set<Long> unlinkedRepoIds) {
         if (command.getGithubRepoIds() != null) {
             final var previousRepos = projectStoragePort.getProjectRepoIds(command.getId());
-            linkedRepoIds.addAll(previousRepos.stream()
+            unlinkedRepoIds.addAll(previousRepos.stream()
                     .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
                     .collect(Collectors.toSet()));
 
-            unlinkedRepoIds.addAll(command.getGithubRepoIds().stream()
+            linkedRepoIds.addAll(command.getGithubRepoIds().stream()
                     .filter(repoId -> !previousRepos.contains(repoId))
                     .collect(Collectors.toSet()));
         }
@@ -175,8 +175,6 @@ public class ProjectService implements ProjectFacadePort {
                                              Set<Long> invitationCancelledLeaderGithubIds,
                                              Set<Long> invitedLeaderGithubIds) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
-            indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
-
             final var projectInvitedLeadIds = projectStoragePort.getProjectInvitedLeadIds(command.getId());
             invitationCancelledLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
                     .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId))
