@@ -51,7 +51,7 @@ public class CustomUserRewardRepository {
                                                                  left join payments p_eth on p_eth.request_id = pr_eth.id
                                                                  left join wallets w_eth
                                                                            on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
-                                                        where pr_eth.currency = 'eth'
+                                                        where pr_eth.currency in ('eth','lords')
                                                           and pr_eth.id = pr.id
                                                           and pr_eth.recipient_id = au.github_user_id
                                                           and p_eth is null
@@ -143,7 +143,7 @@ public class CustomUserRewardRepository {
                        case
                            when r.id is not null then 'COMPLETE'
                            when (case
-                                     when pr.currency = 'eth' then
+                                     when pr.currency in ('eth','lords') then
                                              not payout_checks.valid_location or
                                              (not payout_checks.valid_company and not payout_checks.valid_person) or
                                              not payout_checks.valid_eth_wallet
@@ -207,7 +207,7 @@ public class CustomUserRewardRepository {
                                                              left join payments p_eth on p_eth.request_id = pr_eth.id
                                                              left join wallets w_eth
                                                                        on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
-                                                    where pr_eth.currency = 'eth'
+                                                    where pr_eth.currency in ('eth','lords')
                                                       and pr_eth.id = pr.id
                                                       and pr_eth.recipient_id = au.github_user_id
                                                       and p_eth is null
@@ -308,7 +308,7 @@ public class CustomUserRewardRepository {
               and (case
                        when r.id is not null then 'COMPLETE'
                        when (case
-                                 when pr.currency = 'eth' then
+                                 when pr.currency in ('eth','lords') then
                                          not payout_checks.valid_location or
                                          (not payout_checks.valid_company and not payout_checks.valid_person) or
                                          not payout_checks.valid_eth_wallet

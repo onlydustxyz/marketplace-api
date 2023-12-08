@@ -185,6 +185,7 @@ public interface UserMapper {
                     case Eth -> CurrencyContract.ETH;
                     case Stark -> CurrencyContract.STARK;
                     case Usd -> CurrencyContract.USD;
+                    case Lords -> CurrencyContract.LORDS;
                 });
             }
             response.addDetailsItem(myRewardAmountResponse);

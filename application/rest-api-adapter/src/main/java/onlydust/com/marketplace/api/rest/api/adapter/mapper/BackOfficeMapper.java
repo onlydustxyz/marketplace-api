@@ -43,6 +43,7 @@ public interface BackOfficeMapper {
                         case Apt -> BudgetResponse.CurrencyEnum.APT;
                         case Op -> BudgetResponse.CurrencyEnum.OP;
                         case Eth -> BudgetResponse.CurrencyEnum.ETH;
+                        case Lords -> BudgetResponse.CurrencyEnum.LORDS;
                     })
                     .projectId(view.getProjectId())
                     .initialAmountDollarsEquivalent(view.getInitialAmountDollarsEquivalent())

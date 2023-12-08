@@ -63,6 +63,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                                     case stark -> Currency.Stark;
                                     case usd -> Currency.Usd;
                                     case op -> Currency.Op;
+                                    case lords -> Currency.Lords;
                                 })
                                 .initialAmount(entity.getInitialAmount())
                                 .remainingAmount(entity.getRemainingAmount())

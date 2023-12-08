@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1749,7 +1748,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_get_private_user_profile() throws JsonProcessingException {
+    void should_get_private_user_profile() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
 

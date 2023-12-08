@@ -112,7 +112,7 @@ public class CustomUserPayoutInfoRepository {
                              from payment_requests pr_eth
                                       left join payments p_eth on p_eth.request_id = pr_eth.id
                                       left join wallets w_eth on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
-                             where pr_eth.currency = 'eth'
+                             where pr_eth.currency in ('eth','lords')
                                and pr_eth.recipient_id = au.github_user_id
                                and p_eth is null
                              limit 1), true)                                                         valid_eth_wallet

@@ -3270,6 +3270,7 @@ components:
         - APT
         - STARK
         - OP
+        - LORDS
 
     UserContributionPageResponse:
       type: object

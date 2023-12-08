@@ -54,6 +54,7 @@ public interface MyRewardMapper {
             case Eth -> CurrencyContract.ETH;
             case Stark -> CurrencyContract.STARK;
             case Usd -> CurrencyContract.USD;
+            case Lords -> CurrencyContract.LORDS;
         });
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());
@@ -84,6 +85,7 @@ public interface MyRewardMapper {
                         case Eth -> CurrencyContract.ETH;
                         case Usd -> CurrencyContract.USD;
                         case Stark -> CurrencyContract.STARK;
+                        case Lords -> CurrencyContract.LORDS;
                     }));
         }
         return myRewardTotalAmountsResponse;

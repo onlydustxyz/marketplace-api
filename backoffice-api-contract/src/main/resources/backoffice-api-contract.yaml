@@ -277,6 +277,7 @@ components:
             - APT
             - STARK
             - OP
+            - LORDS
         initialAmount:
           type: number
         remainingAmount:
