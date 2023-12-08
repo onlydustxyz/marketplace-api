@@ -33,16 +33,17 @@ public interface ContributionMapper {
                                                                         Page<ContributionView> contributions) {
 
         return new UserContributionPageResponse()
-                .contributions(contributions.getContent().stream().map(ContributionMapper::mapUserContributionPageItemResponse).toList())
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapContributionPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
                 .totalPageNumber(contributions.getTotalPageNumber())
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
     }
 
-    static UserContributionPageItemResponse mapUserContributionPageItemResponse(ContributionView contributionView) {
-        return new UserContributionPageItemResponse()
+    static ContributionPageItemResponse mapContributionPageItemResponse(ContributionView contributionView) {
+        return new ContributionPageItemResponse()
                 .id(contributionView.getId())
+                .contributor(ContributorMapper.of(contributionView.getContributor()))
                 .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
                 .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
                 .type(mapContributionTypeToResponse(contributionView.getType()))
@@ -142,42 +143,10 @@ public interface ContributionMapper {
 
     static ProjectContributionPageResponse mapProjectContributionPageResponse(Integer pageIndex, Page<ContributionView> contributions) {
         return new ProjectContributionPageResponse()
-                .contributions(contributions.getContent().stream().map(ContributionMapper::mapProjectContributionPageItemResponse).toList())
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapContributionPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
                 .totalPageNumber(contributions.getTotalPageNumber())
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
-    }
-
-    static ProjectContributionPageItemResponse mapProjectContributionPageItemResponse(ContributionView contributionView) {
-        return new ProjectContributionPageItemResponse()
-                .id(contributionView.getId())
-                .contributor(ContributorMapper.of(contributionView.getContributor()))
-                .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
-                .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
-                .type(mapContributionTypeToResponse(contributionView.getType()))
-                .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
-                .githubNumber(contributionView.getGithubNumber())
-                .githubStatus(GithubStatus.valueOf(contributionView.getGithubStatus()))
-                .githubTitle(contributionView.getGithubTitle())
-                .githubHtmlUrl(contributionView.getGithubHtmlUrl())
-                .githubBody(contributionView.getGithubBody())
-                .githubAuthor(ProjectMapper.mapGithubUser(contributionView.getGithubAuthor()))
-                .githubPullRequestReviewState(Optional.ofNullable(contributionView.getPrReviewState()).map(ContributionMapper::mapGithubPullRequestReviewState).orElse(null))
-                .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()))
-                .links(contributionView.getLinks().stream().map(ContributionMapper::mapProjectContributionLink).toList())
-                .rewardIds(contributionView.getRewardIds());
-    }
-
-    static ContributionResponse mapProjectContributionLink(ContributionLinkView link) {
-        return new ContributionResponse()
-                .type(mapContributionTypeToResponse(link.getType()))
-                .githubNumber(link.getGithubNumber())
-                .githubStatus(GithubStatus.valueOf(link.getGithubStatus()))
-                .githubTitle(link.getGithubTitle())
-                .githubHtmlUrl(link.getGithubHtmlUrl())
-                .githubBody(link.getGithubBody())
-                .githubAuthor(ProjectMapper.mapGithubUser(link.getGithubAuthor()))
-                .repo(GithubRepoMapper.mapRepoToShortResponse(link.getGithubRepo()));
     }
 }

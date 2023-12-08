@@ -34,6 +34,13 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                           "contributions": [
                             {
                               "type": "PULL_REQUEST",
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "htmlUrl": "https://github.com/AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -71,6 +78,13 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "type": "PULL_REQUEST",
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "htmlUrl": "https://github.com/AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -108,6 +122,13 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "type": "PULL_REQUEST",
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "htmlUrl": "https://github.com/AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -149,7 +170,6 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 4238,
                           "nextPageIndex": 1
                         }
-                                                
                         """);
     }
 
