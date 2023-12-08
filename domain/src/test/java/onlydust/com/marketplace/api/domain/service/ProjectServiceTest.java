@@ -123,7 +123,8 @@ public class ProjectServiceTest {
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
         verify(eventStoragePort).saveEvent(new ProjectCreatedOldEvent(projectIdentity.getLeft()));
-        verify(indexerPort).onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+        verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
+                command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
 
 
@@ -142,7 +143,7 @@ public class ProjectServiceTest {
                 .isLookingForContributors(false)
                 .moreInfos(List.of(MoreInfoLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
                 .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
-                .projectLeadersToKeep(List.of(UUID.randomUUID()))
+                .projectLeadersToKeep(List.of(projectLeadId))
                 .githubRepoIds(List.of(faker.number().numberBetween(10L, 20L)))
                 .imageUrl(imageUrl)
                 .rewardSettings(
@@ -156,8 +157,8 @@ public class ProjectServiceTest {
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(projectLeadId));
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(new HashSet<>(Arrays.asList(1L, 2L, 3L)));
-        when(projectStoragePort.removeUsedRepos(Set.of(1L, 2L, 3L))).thenReturn(Set.of(1L, 2L));
         projectService.updateProject(projectLeadId, command);
 
         // Then
@@ -171,8 +172,8 @@ public class ProjectServiceTest {
                 imageUrl,
                 command.getRewardSettings()
         );
-        verify(contributionStoragePort, times(1)).refreshIgnoredContributions(projectId);
-        verify(indexerPort).onRepoLinkChanged(command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L));
+        verify(projectObserverPort).onLinkedReposChanged(projectId,
+                command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
     }
 
     @Test

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -118,45 +119,19 @@ public class ProjectService implements ProjectFacadePort {
         if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
-
-        if (command.getProjectLeadersToKeep() != null) {
-            final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
-            if (command.getProjectLeadersToKeep().stream()
-                    .anyMatch(userId -> projectLeadIds.stream()
-                            .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
-                throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                                   "leaders");
-            }
-            projectLeadIds.stream()
-                    .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
-                    .forEach(leaderId -> projectObserverPort.onLeaderUnassigned(command.getId(), leaderId));
-        }
-
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
-
-            final var projectInvitedLeadIds = projectStoragePort.getProjectInvitedLeadIds(command.getId());
-            projectInvitedLeadIds.stream()
-                    .filter(leaderId -> !command.getGithubUserIdsAsProjectLeadersToInvite().contains(leaderId))
-                    .forEach(leaderId -> projectObserverPort.onLeaderInvitationCancelled(command.getId(), leaderId));
-
-            command.getGithubUserIdsAsProjectLeadersToInvite().stream()
-                    .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId))
-                    .forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));
         }
 
-        if (command.getGithubRepoIds() != null) {
-            final var previousRepos = projectStoragePort.getProjectRepoIds(command.getId());
-            final var removedRepos = previousRepos.stream()
-                    .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
-                    .collect(Collectors.toSet());
+        final Set<UUID> unassignedLeaderIds = getUnassignedLeaderIds(command);
 
-            final var newRepos = command.getGithubRepoIds().stream()
-                    .filter(repoId -> !previousRepos.contains(repoId))
-                    .collect(Collectors.toSet());
+        final Set<Long> invitedLeaderGithubIds = new HashSet<>();
+        final Set<Long> invitationCancelledLeaderGithubIds = new HashSet<>();
+        getLeaderInvitationsChanges(command, invitationCancelledLeaderGithubIds, invitedLeaderGithubIds);
 
-            projectObserverPort.onLinkedReposChanged(command.getId(), newRepos, removedRepos);
-        }
+        final Set<Long> linkedRepoIds = new HashSet<>();
+        final Set<Long> unlinkedRepoIds = new HashSet<>();
+        getLinkedReposChanges(command, linkedRepoIds, unlinkedRepoIds);
 
         this.projectStoragePort.updateProject(command.getId(),
                 command.getName(),
@@ -167,13 +142,65 @@ public class ProjectService implements ProjectFacadePort {
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
                 command.getRewardSettings());
 
-
         projectObserverPort.onProjectDetailsUpdated(command.getId());
+        invitedLeaderGithubIds.forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));
+        invitationCancelledLeaderGithubIds.forEach(leaderId ->
+                projectObserverPort.onLeaderInvitationCancelled(command.getId(), leaderId));
+        unassignedLeaderIds.forEach(leaderId -> projectObserverPort.onLeaderUnassigned(command.getId(), leaderId));
+        if (!isNull(command.getGithubRepoIds())) {
+            projectObserverPort.onLinkedReposChanged(command.getId(), linkedRepoIds, unlinkedRepoIds);
+        }
         if (!isNull(command.getRewardSettings())) {
             projectObserverPort.onRewardSettingsChanged(command.getId());
         }
         final String slug = this.projectStoragePort.getProjectSlugById(command.getId());
         return Pair.of(command.getId(), slug);
+    }
+
+    private void getLinkedReposChanges(UpdateProjectCommand command, Set<Long> linkedRepoIds,
+                                       Set<Long> unlinkedRepoIds) {
+        if (command.getGithubRepoIds() != null) {
+            final var previousRepos = projectStoragePort.getProjectRepoIds(command.getId());
+            linkedRepoIds.addAll(previousRepos.stream()
+                    .filter(repoId -> !command.getGithubRepoIds().contains(repoId))
+                    .collect(Collectors.toSet()));
+
+            unlinkedRepoIds.addAll(command.getGithubRepoIds().stream()
+                    .filter(repoId -> !previousRepos.contains(repoId))
+                    .collect(Collectors.toSet()));
+        }
+    }
+
+    private void getLeaderInvitationsChanges(UpdateProjectCommand command,
+                                             Set<Long> invitationCancelledLeaderGithubIds,
+                                             Set<Long> invitedLeaderGithubIds) {
+        if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
+            indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
+
+            final var projectInvitedLeadIds = projectStoragePort.getProjectInvitedLeadIds(command.getId());
+            invitationCancelledLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
+                    .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId))
+                    .toList());
+            invitedLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
+                    .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId)).toList());
+        }
+    }
+
+    private Set<UUID> getUnassignedLeaderIds(UpdateProjectCommand command) {
+        if (command.getProjectLeadersToKeep() == null) {
+            return Set.of();
+        }
+
+        final var projectLeadIds = projectStoragePort.getProjectLeadIds(command.getId());
+        if (command.getProjectLeadersToKeep().stream()
+                .anyMatch(userId -> projectLeadIds.stream()
+                        .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
+            throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
+                                               "leaders");
+        }
+        return projectLeadIds.stream()
+                .filter(leaderId -> !command.getProjectLeadersToKeep().contains(leaderId))
+                .collect(Collectors.toSet());
     }
 
     @Override

@@ -86,9 +86,9 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
-        assertTrue(projectLeadRepository.findById(new ProjectLeadEntity.PrimaryKey(
-                pierre.user().getId(),
-                projectId)).isPresent());
+        assertTrue(projectLeadRepository.findById(new ProjectLeadEntity.PrimaryKey(projectId,
+                pierre.user().getId()
+        )).isPresent());
     }
 
     private static final String GET_PIERRE_BARBICANE_GITHUB_MEMBERSHIP_JSON_RESPONSE = """
