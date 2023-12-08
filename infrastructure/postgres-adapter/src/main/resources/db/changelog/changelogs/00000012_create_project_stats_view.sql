@@ -70,16 +70,16 @@ with budget_stats as (select pb.project_id,
                             group by pgr.project_id)
 select pd2.project_id,
        pd2.created_at,
-       cs.pr_count,
-       cs.pr_count_last_3_months,
-       cs.open_pr_count,
-       cs.issue_count,
-       cs.issue_count_last_3_months,
-       cs.open_issue_count,
-       cs.cr_count,
-       cs.cr_count_last_3_months,
-       cs.open_cr_count,
-       cs.contributor_count,
+       coalesce(cs.pr_count,0) as pr_count,
+       coalesce(cs.pr_count_last_3_months,0) as pr_count_last_3_months,
+       coalesce(cs.open_pr_count,0) as open_pr_count,
+       coalesce(cs.issue_count,0) as issue_count,
+       coalesce(cs.issue_count_last_3_months,0) as issue_count_last_3_months,
+       coalesce(cs.open_issue_count,0) as open_issue_count,
+       coalesce(cs.cr_count,0) as cr_count,
+       coalesce(cs.cr_count_last_3_months,0) as cr_count_last_3_months,
+       coalesce(cs.open_cr_count,0) as open_cr_count,
+       coalesce(cs.contributor_count,0) as contributor_count,
        coalesce(rs.distinct_recipient_number_last_1_month, 0)             as distinct_recipient_number_last_1_months,
        coalesce(rs.usd_spent_amount_last_1_month, 0)                      as usd_spent_amount,
        coalesce(rs.op_spent_amount_last_1_month, 0)                       as op_spent_amount,
@@ -105,7 +105,7 @@ select pd2.project_id,
                 bs.stark_dollars_equivalent_remaining_amount, 0)          as total_dollars_equivalent_remaining_amount
 
 from project_details pd2
-         join contribution_stats cs on cs.project_id = pd2.project_id
+         left join contribution_stats cs on cs.project_id = pd2.project_id
          left join reward_stats rs on rs.project_id = pd2.project_id
          left join budget_stats bs on bs.project_id = pd2.project_id
 where (EXISTS(select 1

@@ -53,7 +53,7 @@ public class CustomProjectRankingRepository {
                                       normalized_values.normalized_number_of_open_issues +
                                       normalized_values.normalized_total_grants +
                                       normalized_values.normalized_volume_of_pull_requests
-                                         ) AS total_normalized_score
+                                         ) * 100 AS total_normalized_score
                               from project_details pd
                                        join (select project_stats.project_id,
                                                     LEAST((project_stats.pr_count - s.avg_volume_of_pull_requests_last_3_months) /
