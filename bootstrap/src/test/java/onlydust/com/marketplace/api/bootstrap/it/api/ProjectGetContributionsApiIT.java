@@ -66,7 +66,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "abdelhamidbakhta",
                                 "htmlUrl": "https://github.com/abdelhamidbakhta",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                                "isRegistered": null
+                                "isRegistered": false
                               },
                               "links": []
                             }

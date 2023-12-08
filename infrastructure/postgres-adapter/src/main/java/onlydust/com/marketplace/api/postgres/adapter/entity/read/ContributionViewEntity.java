@@ -43,6 +43,7 @@ public class ContributionViewEntity {
     String contributorLogin;
     String contributorHtmlUrl;
     String contributorAvatarUrl;
+    Boolean contributorIsRegistered;
     Long githubNumber;
     String githubStatus;
     String githubTitle;
@@ -113,6 +114,7 @@ public class ContributionViewEntity {
                         .login(contributorLogin)
                         .url(contributorHtmlUrl)
                         .avatarUrl(contributorAvatarUrl)
+                        .isRegistered(contributorIsRegistered)
                         .build())
                 .githubNumber(githubNumber)
                 .githubStatus(githubStatus)
