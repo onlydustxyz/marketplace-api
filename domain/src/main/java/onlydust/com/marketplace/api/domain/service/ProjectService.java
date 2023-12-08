@@ -176,8 +176,8 @@ public class ProjectService implements ProjectFacadePort {
                                              Set<Long> invitedLeaderGithubIds) {
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
             final var projectInvitedLeadIds = projectStoragePort.getProjectInvitedLeadIds(command.getId());
-            invitationCancelledLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
-                    .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId))
+            invitationCancelledLeaderGithubIds.addAll(projectInvitedLeadIds.stream()
+                    .filter(leaderId -> !command.getGithubUserIdsAsProjectLeadersToInvite().contains(leaderId))
                     .toList());
             invitedLeaderGithubIds.addAll(command.getGithubUserIdsAsProjectLeadersToInvite().stream()
                     .filter(leaderId -> !projectInvitedLeadIds.contains(leaderId)).toList());
