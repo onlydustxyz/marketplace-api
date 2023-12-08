@@ -17,7 +17,11 @@ with budget_stats as (select pb.project_id,
                              coalesce(sum(b.remaining_amount) filter ( where b.currency = 'eth' ),
                                       0) eth_remaining_amount,
                              coalesce(sum(b.remaining_amount * cuq.price) filter ( where b.currency = 'eth' ),
-                                      0) eth_dollars_equivalent_remaining_amount
+                                      0) eth_dollars_equivalent_remaining_amount,
+                             coalesce(sum(b.remaining_amount) filter ( where b.currency = 'lords' ),
+                                      0) lords_remaining_amount,
+                             coalesce(sum(b.remaining_amount * cuq.price) filter ( where b.currency = 'lords' ),
+                                      0) lords_dollars_equivalent_remaining_amount
                       from projects_budgets pb
                                left join budgets b on pb.budget_id = b.id
                                left join crypto_usd_quotes cuq on cuq.currency = b.currency
@@ -36,7 +40,10 @@ with budget_stats as (select pb.project_id,
                                       0)                                                        apt_spent_amount_dollars_equivalent_last_1_month,
                              coalesce(sum(pr.amount) filter ( where pr.currency = 'stark' ), 0) stark_spent_amount_last_1_month,
                              coalesce(sum(pr.amount * cuq.price) filter ( where pr.currency = 'stark' ),
-                                      0)                                                        stark_spent_amount_dollars_equivalent_last_1_month
+                                      0)                                                        stark_spent_amount_dollars_equivalent_last_1_month,
+                             coalesce(sum(pr.amount) filter ( where pr.currency = 'lords' ), 0) lords_spent_amount_last_1_month,
+                             coalesce(sum(pr.amount * cuq.price) filter ( where pr.currency = 'lords' ),
+                                      0)                                                        lords_spent_amount_dollars_equivalent_last_1_month
                       from payment_requests pr
                                left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                       where pr.requested_at > CURRENT_DATE - INTERVAL '1 months'
@@ -70,16 +77,16 @@ with budget_stats as (select pb.project_id,
                             group by pgr.project_id)
 select pd2.project_id,
        pd2.created_at,
-       coalesce(cs.pr_count,0) as pr_count,
-       coalesce(cs.pr_count_last_3_months,0) as pr_count_last_3_months,
-       coalesce(cs.open_pr_count,0) as open_pr_count,
-       coalesce(cs.issue_count,0) as issue_count,
-       coalesce(cs.issue_count_last_3_months,0) as issue_count_last_3_months,
-       coalesce(cs.open_issue_count,0) as open_issue_count,
-       coalesce(cs.cr_count,0) as cr_count,
-       coalesce(cs.cr_count_last_3_months,0) as cr_count_last_3_months,
-       coalesce(cs.open_cr_count,0) as open_cr_count,
-       coalesce(cs.contributor_count,0) as contributor_count,
+       coalesce(cs.pr_count, 0)                                           as pr_count,
+       coalesce(cs.pr_count_last_3_months, 0)                             as pr_count_last_3_months,
+       coalesce(cs.open_pr_count, 0)                                      as open_pr_count,
+       coalesce(cs.issue_count, 0)                                        as issue_count,
+       coalesce(cs.issue_count_last_3_months, 0)                          as issue_count_last_3_months,
+       coalesce(cs.open_issue_count, 0)                                   as open_issue_count,
+       coalesce(cs.cr_count, 0)                                           as cr_count,
+       coalesce(cs.cr_count_last_3_months, 0)                             as cr_count_last_3_months,
+       coalesce(cs.open_cr_count, 0)                                      as open_cr_count,
+       coalesce(cs.contributor_count, 0)                                  as contributor_count,
        coalesce(rs.distinct_recipient_number_last_1_month, 0)             as distinct_recipient_number_last_1_months,
        coalesce(rs.usd_spent_amount_last_1_month, 0)                      as usd_spent_amount,
        coalesce(rs.op_spent_amount_last_1_month, 0)                       as op_spent_amount,
@@ -90,8 +97,11 @@ select pd2.project_id,
        coalesce(rs.apt_spent_amount_dollars_equivalent_last_1_month, 0)   as apt_spent_amount_dollars_equivalent,
        coalesce(rs.stark_spent_amount_last_1_month, 0)                    as stark_spent_amount,
        coalesce(rs.stark_spent_amount_dollars_equivalent_last_1_month, 0) as stark_spent_amount_dollars_equivalent,
+       coalesce(rs.lords_spent_amount_last_1_month, 0)                    as lords_spent_amount,
+       coalesce(rs.lords_spent_amount_dollars_equivalent_last_1_month, 0) as lords_spent_amount_dollars_equivalent,
        coalesce(rs.stark_spent_amount_dollars_equivalent_last_1_month +
                 rs.op_spent_amount_dollars_equivalent_last_1_month +
+                rs.lords_spent_amount_dollars_equivalent_last_1_month +
                 rs.apt_spent_amount_dollars_equivalent_last_1_month + rs.usd_spent_amount_last_1_month +
                 rs.eth_spent_amount_dollars_equivalent_last_1_month,
                 0)                                                        as total_dollars_equivalent_spent_last_1_month,
@@ -100,10 +110,11 @@ select pd2.project_id,
        coalesce(bs.stark_remaining_amount, 0)                             as stark_remaining_amount,
        coalesce(bs.apt_remaining_amount, 0)                               as apt_remaining_amount,
        coalesce(bs.eth_remaining_amount, 0)                               as eth_remaining_amount,
+       coalesce(bs.lords_remaining_amount, 0)                             as lords_remaining_amount,
        coalesce(bs.apt_dollars_equivalent_remaining_amount + bs.usd_remaining_amount +
                 bs.op_dollars_equivalent_remaining_amount + bs.eth_dollars_equivalent_remaining_amount +
+                bs.lords_dollars_equivalent_remaining_amount +
                 bs.stark_dollars_equivalent_remaining_amount, 0)          as total_dollars_equivalent_remaining_amount
-
 from project_details pd2
          left join contribution_stats cs on cs.project_id = pd2.project_id
          left join reward_stats rs on rs.project_id = pd2.project_id
