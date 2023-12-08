@@ -483,6 +483,47 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
         assertEquals(true, userPayoutInfoValidationEntity.getHasPendingPayments());
     }
 
+    @Test
+    void should_invalidate_eth_payout_settings_given_payment_request_on_lords_with_no_linked_wallet() {
+        // Given
+        final AuthUserEntity user = authUserRepository.save(AuthUserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().numberBetween(1L, 1000L))
+                .isAdmin(false)
+                .loginAtSignup(faker.rickAndMorty().character())
+                .createdAt(new Date())
+                .build());
+        userPayoutInfoRepository.save(UserPayoutInfoEntity.builder()
+                .userId(user.getId())
+                .build());
+        paymentRequestRepository.saveAll(
+                List.of(
+                        PaymentRequestEntity.builder()
+                                .id(UUID.randomUUID())
+                                .projectId(UUID.randomUUID())
+                                .recipientId(user.getGithubUserId())
+                                .requestorId(UUID.randomUUID())
+                                .hoursWorked(1)
+                                .currency(CurrencyEnumEntity.lords)
+                                .requestedAt(new Date())
+                                .amount(BigDecimal.ONE)
+                                .build()
+                )
+        );
+
+        // When
+        final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
+                customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(user.getId());
+
+        // Then
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidAptosWallet());
+        assertEquals(false, userPayoutInfoValidationEntity.getHasValidEthWallet());
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidOptimismWallet());
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidStarknetWallet());
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidUsdcWallet());
+        assertEquals(true, userPayoutInfoValidationEntity.getHasValidBakingAccount());
+        assertEquals(true, userPayoutInfoValidationEntity.getHasPendingPayments());
+    }
 
     @Test
     void should_invalidate_missing_banking_account_for_usd() {

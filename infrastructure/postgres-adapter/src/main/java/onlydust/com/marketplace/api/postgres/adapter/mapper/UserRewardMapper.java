@@ -40,6 +40,7 @@ public interface UserRewardMapper {
                         case usd -> Currency.Usd;
                         case eth -> Currency.Eth;
                         case stark -> Currency.Stark;
+                        case lords -> Currency.Lords;
                     })
                     .build());
         }

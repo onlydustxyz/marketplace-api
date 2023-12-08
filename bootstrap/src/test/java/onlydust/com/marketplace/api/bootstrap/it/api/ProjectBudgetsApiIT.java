@@ -63,6 +63,11 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .price(BigDecimal.valueOf(120))
                 .currency(CurrencyEnumEntity.apt)
                 .build());
+        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
+                .updatedAt(new Date())
+                .price(BigDecimal.valueOf(1.11))
+                .currency(CurrencyEnumEntity.lords)
+                .build());
         final BudgetEntity budget1 = budgetRepository.save(BudgetEntity.builder()
                 .id(UUID.randomUUID())
                 .initialAmount(BigDecimal.valueOf(3000))
@@ -75,6 +80,12 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .remainingAmount(BigDecimal.valueOf(0))
                 .currency(CurrencyEnumEntity.apt)
                 .build());
+        final BudgetEntity budget3 = budgetRepository.save(BudgetEntity.builder()
+                .id(UUID.randomUUID())
+                .initialAmount(BigDecimal.valueOf(412))
+                .remainingAmount(BigDecimal.valueOf(212))
+                .currency(CurrencyEnumEntity.lords)
+                .build());
         projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
                 .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
                         .budgetId(budget1.getId())
@@ -84,6 +95,12 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
                 .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
                         .budgetId(budget2.getId())
+                        .projectId(projectId)
+                        .build())
+                .build());
+        projectToBudgetIdRepository.save(ProjectToBudgetEntity.builder()
+                .id(ProjectToBudgetEntity.ProjectToBudgetIdEntity.builder()
+                        .budgetId(budget3.getId())
                         .projectId(projectId)
                         .build())
                 .build());
@@ -99,8 +116,8 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "initialDollarsEquivalent": 370000,
-                            "remainingDollarsEquivalent": 304000,
+                            "initialDollarsEquivalent": 370457.32,
+                            "remainingDollarsEquivalent": 304235.32,
                             "budgets": [
                                 {
                                     "currency": "USD",
@@ -133,6 +150,14 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                                     "remainingDollarsEquivalent": 300000,
                                     "initialDollarsEquivalent": 300000,
                                     "dollarsConversionRate": 1500
+                                },
+                                {
+                                    "currency": "LORDS",
+                                    "initialAmount": 412,
+                                    "remaining": 212,
+                                    "remainingDollarsEquivalent": 235.32,
+                                    "initialDollarsEquivalent": 457.32,
+                                    "dollarsConversionRate": 1.11
                                 }
                             ]
                         }""");

@@ -26,6 +26,7 @@ public interface RewardMapper {
                     case USD -> Currency.Usd;
                     case ETH -> Currency.Eth;
                     case STARK -> Currency.Stark;
+                    case LORDS -> Currency.Lords;
                 })
                 .recipientId(rewardRequest.getRecipientId())
                 .items(rewardRequest.getItems().stream().map(RewardMapper::rewardItemRequestToDomain).toList())
@@ -67,6 +68,7 @@ public interface RewardMapper {
                     case Op -> CurrencyContract.OP;
                     case Eth -> CurrencyContract.ETH;
                     case Usd -> CurrencyContract.USD;
+                    case Lords -> CurrencyContract.LORDS;
                 })
                 .status(switch (rewardView.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;
@@ -101,6 +103,7 @@ public interface RewardMapper {
                     case Op -> CurrencyContract.OP;
                     case Eth -> CurrencyContract.ETH;
                     case Usd -> CurrencyContract.USD;
+                    case Lords -> CurrencyContract.LORDS;
                 })
                 .status(switch (rewardView.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
 import onlydust.com.marketplace.api.domain.model.Currency;
 
 public enum CurrencyEnumEntity {
-    usd, eth, op, apt, stark;
+    usd, eth, op, apt, stark, lords;
 
     public static CurrencyEnumEntity of(Currency currency) {
         return switch (currency) {
@@ -12,6 +12,7 @@ public enum CurrencyEnumEntity {
             case Op -> CurrencyEnumEntity.op;
             case Usd -> CurrencyEnumEntity.usd;
             case Stark -> CurrencyEnumEntity.stark;
+            case Lords -> CurrencyEnumEntity.lords;
         };
     }
 
@@ -22,6 +23,7 @@ public enum CurrencyEnumEntity {
             case usd -> Currency.Usd;
             case eth -> Currency.Eth;
             case stark -> Currency.Stark;
+            case lords -> Currency.Lords;
         };
     }
 }

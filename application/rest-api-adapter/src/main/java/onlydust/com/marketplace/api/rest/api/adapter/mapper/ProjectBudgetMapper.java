@@ -32,6 +32,7 @@ public interface ProjectBudgetMapper {
             case Op -> CurrencyContract.OP;
             case Usd -> CurrencyContract.USD;
             case Stark -> CurrencyContract.STARK;
+            case Lords -> CurrencyContract.LORDS;
         };
     }
 
@@ -42,6 +43,7 @@ public interface ProjectBudgetMapper {
             case OP -> Currency.Op;
             case USD -> Currency.Usd;
             case STARK -> Currency.Stark;
+            case LORDS -> Currency.Lords;
         };
     }
 }

@@ -1108,3 +1108,6 @@ BEGIN
     RETURN NEW;
 END;
 $$ language 'plpgsql';
+
+ALTER TYPE currency
+    ADD VALUE IF NOT EXISTS 'lords';

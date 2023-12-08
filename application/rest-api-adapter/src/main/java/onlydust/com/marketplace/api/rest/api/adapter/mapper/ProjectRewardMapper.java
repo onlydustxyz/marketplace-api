@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardsPageView;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.Objects;
@@ -62,6 +61,7 @@ public interface ProjectRewardMapper {
             case Eth -> CurrencyContract.ETH;
             case Stark -> CurrencyContract.STARK;
             case Usd -> CurrencyContract.USD;
+            case Lords -> CurrencyContract.LORDS;
         });
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());

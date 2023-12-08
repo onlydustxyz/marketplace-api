@@ -34,6 +34,7 @@ public interface RewardMapper {
                     case eth -> Currency.Eth;
                     case usd -> Currency.Usd;
                     case stark -> Currency.Stark;
+                    case lords -> Currency.Lords;
                 })
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
                 .status(switch (rewardViewEntityByd.getStatus()) {
@@ -66,6 +67,7 @@ public interface RewardMapper {
                     case eth -> Currency.Eth;
                     case usd -> Currency.Usd;
                     case stark -> Currency.Stark;
+                    case lords -> Currency.Lords;
                 })
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
                 .status(switch (rewardViewEntityByd.getStatus()) {

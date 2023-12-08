@@ -82,8 +82,11 @@ public class CustomContributorRepository {
                           coalesce(amounts.apt * cuq_apt.price, 0)   apt_usd,
                           amounts.op,
                           coalesce(amounts.op * cuq_op.price, 0)    op_usd,
+                          amounts.lords,
+                          coalesce(amounts.lords * cuq_lords.price, 0)    lords_usd,
                           coalesce(amounts.eth * cuq_eth.price, 0) + coalesce(amounts.stark * cuq_stark.price, 0) +
                           coalesce(amounts.apt * cuq_apt.price, 0) + coalesce(amounts.op * cuq_op.price, 0) +
+                          coalesce(amounts.lords * cuq_lords.price, 0) +
                           coalesce(amounts.usd, 0)                   earned
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
@@ -109,6 +112,7 @@ public class CustomContributorRepository {
                                                 sum(pr.amount) filter (where pr.currency = 'stark') stark,
                                                 sum(pr.amount) filter (where pr.currency = 'op')    op,
                                                 sum(pr.amount) filter (where pr.currency = 'eth')   eth,
+                                                sum(pr.amount) filter (where pr.currency = 'lords')   lords,
                                                 pr.recipient_id
                                          from payment_requests pr
                                          where pr.project_id = :projectId
@@ -117,6 +121,7 @@ public class CustomContributorRepository {
                               left join crypto_usd_quotes cuq_apt on cuq_apt.currency = 'apt'
                               left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'stark'
                               left join crypto_usd_quotes cuq_op on cuq_op.currency = 'op'
+                              left join crypto_usd_quotes cuq_lords on cuq_lords.currency = 'lords'
             where pc.project_id = :projectId
               and ga.login ilike '%' || :login || '%'
             order by %order_by%

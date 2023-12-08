@@ -16,6 +16,7 @@ public interface BudgetMapper {
                     case eth -> Currency.Eth;
                     case usd -> Currency.Usd;
                     case stark -> Currency.Stark;
+                    case lords -> Currency.Lords;
                 })
                 .initialAmount(entity.getInitialAmount())
                 .remainingDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())

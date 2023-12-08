@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -26,10 +25,6 @@ import static java.util.Objects.isNull;
 @AllArgsConstructor
 @Slf4j
 public class CustomUserRepository {
-
-    private static final String SELECT_PROJECT_LEADERS = """
-            select u.* from registered_users u join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
-            """;
 
     private static final String SELECT_USER_PROFILE = """
             select gu.id as                                github_user_id,
@@ -225,6 +220,7 @@ public class CustomUserRepository {
                                                                             case op -> Currency.Op;
                                                                             case apt -> Currency.Apt;
                                                                             case stark -> Currency.Stark;
+                                                                            case lords -> Currency.Lords;
                                                                         })
                                                                 .totalAmount(detail.getTotalAmount())
                                                                 .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
@@ -284,13 +280,6 @@ public class CustomUserRepository {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public List<RegisteredUserViewEntity> findProjectLeaders(UUID projectId) {
-        return entityManager
-                .createNativeQuery(SELECT_PROJECT_LEADERS, RegisteredUserViewEntity.class)
-                .setParameter("projectId", projectId)
-                .getResultList();
     }
 
     public Optional<UserProfileView> findProfileById(final UUID userId) {

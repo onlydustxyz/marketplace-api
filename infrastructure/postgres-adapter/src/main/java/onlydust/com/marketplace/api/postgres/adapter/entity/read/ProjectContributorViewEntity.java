@@ -57,6 +57,9 @@ public class ProjectContributorViewEntity {
     BigDecimal starkAmount;
     @Column(name = "stark_usd")
     BigDecimal starkDollarsEquivalentAmount;
-
+    @Column(name = "lords")
+    BigDecimal lordsAmount;
+    @Column(name = "lords_usd")
+    BigDecimal lordsDollarsEquivalentAmount;
 
 }

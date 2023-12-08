@@ -72,6 +72,12 @@ public interface ProjectContributorsMapper {
                     .totalAmount(contributorViewEntity.getUsdAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getUsdAmount()).build());
         }
+        if (nonNull(contributorViewEntity.getLordsAmount())) {
+            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
+                    .currency(Currency.Lords)
+                    .totalAmount(contributorViewEntity.getLordsAmount())
+                    .totalDollarsEquivalent(contributorViewEntity.getLordsDollarsEquivalentAmount()).build());
+        }
         return totalsEarned;
     }
 

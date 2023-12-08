@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
@@ -148,7 +149,11 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
                             BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark)));
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark),
+                    new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), individualIgithubUserId, new Date(),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords)
+            ));
+
 
             // When
             final List<UserRewardViewEntity> viewEntities =
@@ -157,7 +162,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -168,6 +173,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("PROCESSING", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -192,7 +199,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -203,6 +210,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("PROCESSING", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -218,7 +227,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -229,6 +238,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -244,7 +255,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("PROCESSING", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -255,6 +266,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("PROCESSING", viewEntities.get(5).getStatus());
         }
     }
 
@@ -291,14 +304,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
                             BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark)));
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark),
+                    new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), companyGithubUserId, new Date(),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords)
+            ));
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("PENDING_INVOICE", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -309,6 +325,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("PENDING_INVOICE", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -331,7 +349,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             viewEntities = customUserRewardRepository.getViewEntities(companyUserId, UserRewardView.SortBy.amount,
                     SortDirection.desc, 0, 100);
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("COMPLETE", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -342,6 +360,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("COMPLETE", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("PENDING_INVOICE", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -356,7 +376,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("COMPLETE", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
@@ -367,6 +387,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("COMPLETE", viewEntities.get(3).getStatus());
             assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(5).getStatus());
         }
 
         @Test
@@ -395,7 +417,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
-            assertEquals(5, viewEntities.size());
+            assertEquals(6, viewEntities.size());
             assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
             assertEquals("COMPLETE", viewEntities.get(0).getStatus());
             assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
@@ -406,6 +428,38 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
             assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
             assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(5).getStatus());
+        }
+
+        @Test
+        @Order(5)
+        void should_complete_lords_payment() {
+            // Given
+            final UUID lordsPaymentRequestId = customUserRewardRepository.getViewEntities(companyUserId,
+                            UserRewardView.SortBy.amount, SortDirection.desc, 0, 100)
+                    .get(5).getId();
+            paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "LORDS",
+                    JacksonUtil.toJsonNode("{}"), lordsPaymentRequestId, new Date()));
+
+            // When
+            final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+            // Then
+            assertEquals(6, viewEntities.size());
+            assertEquals(CurrencyEnumEntity.usd, viewEntities.get(0).getCurrency());
+            assertEquals("COMPLETE", viewEntities.get(0).getStatus());
+            assertEquals(CurrencyEnumEntity.apt, viewEntities.get(2).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(2).getStatus());
+            assertEquals(CurrencyEnumEntity.op, viewEntities.get(3).getCurrency());
+            assertEquals("COMPLETE", viewEntities.get(3).getStatus());
+            assertEquals(CurrencyEnumEntity.stark, viewEntities.get(4).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(4).getStatus());
+            assertEquals(CurrencyEnumEntity.eth, viewEntities.get(1).getCurrency());
+            assertEquals("MISSING_PAYOUT_INFO", viewEntities.get(1).getStatus());
+            assertEquals(CurrencyEnumEntity.lords, viewEntities.get(5).getCurrency());
+            assertEquals("COMPLETE", viewEntities.get(5).getStatus());
         }
     }
 
@@ -449,8 +503,10 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .ethName(faker.random().hex())
                                     .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO).build()).build());
             final UUID completedReward = UUID.randomUUID();
-            final UUID pendingInvoiceRewardId = UUID.randomUUID();
-            paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(pendingInvoiceRewardId, UUID.randomUUID(),
+            final UUID pendingInvoiceRewardIdUsdc = UUID.randomUUID();
+            final UUID pendingInvoiceRewardIdLords = UUID.randomUUID();
+            paymentRequestRepository.saveAll(List.of(
+                    new PaymentRequestEntity(pendingInvoiceRewardIdUsdc, UUID.randomUUID(),
                             githubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
                             CurrencyEnumEntity.usd),
                     new PaymentRequestEntity(completedReward, UUID.randomUUID(), githubUserId, new Date(),
@@ -460,7 +516,10 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
                             BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op),
                     new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId, new Date(),
-                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark)));
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark),
+                    new PaymentRequestEntity(pendingInvoiceRewardIdLords, UUID.randomUUID(), githubUserId, new Date(),
+                            BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords)
+            ));
             paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STARK",
                     JacksonUtil.toJsonNode("{}"), completedReward, new Date()));
 
@@ -469,9 +528,13 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId);
 
             // Then
-            assertEquals(1, pendingInvoicesViewEntities.size());
+            assertEquals(2, pendingInvoicesViewEntities.size());
             assertEquals("PENDING_INVOICE", pendingInvoicesViewEntities.get(0).getStatus());
-            assertEquals(pendingInvoiceRewardId, pendingInvoicesViewEntities.get(0).getId());
+            assertTrue(List.of(pendingInvoiceRewardIdUsdc, pendingInvoiceRewardIdLords, pendingInvoiceRewardIdUsdc)
+                    .contains(pendingInvoicesViewEntities.get(0).getId()));
+            assertEquals("PENDING_INVOICE", pendingInvoicesViewEntities.get(1).getStatus());
+            assertTrue(List.of(pendingInvoiceRewardIdUsdc, pendingInvoiceRewardIdLords, pendingInvoiceRewardIdUsdc)
+                    .contains(pendingInvoicesViewEntities.get(1).getId()));
 
         }
 
