@@ -3436,6 +3436,7 @@ components:
         - type: object
           required:
             - id
+            - contributor
             - createdAt
             - status
             - project
@@ -3447,6 +3448,8 @@ components:
             id:
               type: string
               description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
+            contributor:
+              $ref: '#/components/schemas/ContributorResponse'
             createdAt:
               type: string
               format: date-time

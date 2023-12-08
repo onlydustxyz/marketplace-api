@@ -17,7 +17,7 @@ public class ContributionDetailsView {
     Date completedAt;
     ContributionType type;
     ContributionStatus status;
-    GithubUserIdentity contributor;
+    ContributorLinkView contributor;
     Long githubNumber;
     String githubStatus;
     String githubTitle;

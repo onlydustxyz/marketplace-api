@@ -66,7 +66,9 @@ public class ContributionDetailsViewEntity {
 
     String contributorLogin;
     String contributorAvatarUrl;
+    String contributorHtmlUrl;
     Long contributorId;
+    Boolean contributorIsRegistered;
 
     @org.hibernate.annotations.Type(type = "jsonb")
     List<ContributionLinkViewEntity> links;
@@ -82,10 +84,12 @@ public class ContributionDetailsViewEntity {
     }
 
     public ContributionDetailsView toView() {
-        final var contributor = GithubUserIdentity.builder()
-                .githubLogin(contributorLogin)
-                .githubAvatarUrl(contributorAvatarUrl)
+        final var contributor = ContributorLinkView.builder()
+                .login(contributorLogin)
+                .url(contributorHtmlUrl)
+                .avatarUrl(contributorAvatarUrl)
                 .githubUserId(contributorId)
+                .isRegistered(contributorIsRegistered)
                 .build();
 
         final var project = Project.builder()

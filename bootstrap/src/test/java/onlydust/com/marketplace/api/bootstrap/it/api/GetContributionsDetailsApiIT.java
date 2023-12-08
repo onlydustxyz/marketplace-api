@@ -68,6 +68,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "type": "PULL_REQUEST",
+                          "contributor": {
+                            "githubUserId": 43467246,
+                            "login": "AnthonyBuisset",
+                            "htmlUrl": "https://github.com/AnthonyBuisset",
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                            "isRegistered": true
+                          },
                           "repo": {
                             "id": 498695724,
                             "owner": "onlydustxyz",
@@ -299,6 +306,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "type": "CODE_REVIEW",
+                          "contributor": {
+                            "githubUserId": 43467246,
+                            "login": "AnthonyBuisset",
+                            "htmlUrl": "https://github.com/AnthonyBuisset",
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                            "isRegistered": true
+                          },
                           "repo": {
                             "id": 493591124,
                             "owner": "onlydustxyz",
