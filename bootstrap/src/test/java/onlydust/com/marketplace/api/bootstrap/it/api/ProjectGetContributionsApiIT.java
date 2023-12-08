@@ -36,6 +36,14 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                           "contributions": [
                             {
                               "type": "PULL_REQUEST",
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "logoUrl": null,
+                                "visibility": "PUBLIC"
+                              },
                               "repo": {
                                 "id": 493591124,
                                 "owner": "onlydustxyz",
@@ -66,7 +74,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "abdelhamidbakhta",
                                 "htmlUrl": "https://github.com/abdelhamidbakhta",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                                "isRegistered": null
+                                "isRegistered": false
                               },
                               "links": []
                             }

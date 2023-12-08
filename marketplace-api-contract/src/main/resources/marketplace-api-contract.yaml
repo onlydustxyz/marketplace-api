@@ -3284,7 +3284,7 @@ components:
         contributions:
           type: array
           items:
-            $ref: '#/components/schemas/UserContributionPageItemResponse'
+            $ref: '#/components/schemas/ContributionPageItemResponse'
         hasMore:
           type: boolean
           example: true
@@ -3308,7 +3308,7 @@ components:
         contributions:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectContributionPageItemResponse'
+            $ref: '#/components/schemas/ContributionPageItemResponse'
         hasMore:
           type: boolean
           example: true
@@ -3349,6 +3349,9 @@ components:
             - createdAt
             - status
             - rewardIds
+            - project
+            - contributor
+            - links
           properties:
             id:
               type: string
@@ -3370,38 +3373,15 @@ components:
               description: Rewards granted for this contribution
               items:
                 $ref: '#/components/schemas/RewardId'
-
-    UserContributionPageItemResponse:
-      allOf:
-        - $ref: '#/components/schemas/ContributionPageItemResponse'
-        - type: object
-          required:
-            - project
-            - links
-          properties:
             project:
               $ref: '#/components/schemas/ShortProjectResponse'
-            links:
-              type: array
-              description: Related contributions
-              items:
-                $ref: '#/components/schemas/ContributionLinkResponse'
-
-    ProjectContributionPageItemResponse:
-      allOf:
-        - $ref: '#/components/schemas/ContributionPageItemResponse'
-        - type: object
-          required:
-            - contributor
-            - links
-          properties:
             contributor:
               $ref: '#/components/schemas/ContributorResponse'
             links:
               type: array
               description: Related contributions
               items:
-                $ref: '#/components/schemas/ContributionResponse'
+                $ref: '#/components/schemas/ContributionLinkResponse'
 
     ContributionLinkResponse:
       allOf:
