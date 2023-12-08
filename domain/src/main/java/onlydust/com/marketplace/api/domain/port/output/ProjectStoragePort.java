@@ -47,6 +47,8 @@ public interface ProjectStoragePort {
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
+    Set<Long> getProjectInvitedLeadIds(UUID projectId);
+
     ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
                                        ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                         int pageIndex, int pageSize);

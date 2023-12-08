@@ -9,29 +9,22 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder
 @Table(name = "project_github_repos", schema = "public")
+@IdClass(ProjectRepoEntity.PrimaryKey.class)
 public class ProjectRepoEntity {
-    @EmbeddedId
-    @EqualsAndHashCode.Include
-    private PrimaryKey primaryKey;
+    @Id
+    @Column(name = "project_id", nullable = false, updatable = false)
+    UUID projectId;
 
-    public ProjectRepoEntity(UUID projectId, Long repoId) {
-        this.primaryKey = new PrimaryKey(projectId, repoId);
-    }
+    @Id
+    @Column(name = "github_repo_id", nullable = false, updatable = false)
+    Long repoId;
 
-    @Embeddable
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @EqualsAndHashCode
-    @Data
-    @Builder
     public static class PrimaryKey implements Serializable {
-        @Column(name = "project_id", nullable = false, updatable = false)
         UUID projectId;
-        @Column(name = "github_repo_id", nullable = false, updatable = false)
         Long repoId;
     }
 }

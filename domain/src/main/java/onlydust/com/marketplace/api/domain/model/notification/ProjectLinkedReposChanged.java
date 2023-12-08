@@ -5,14 +5,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ProjectUpdated extends Event {
+public class ProjectLinkedReposChanged extends Event {
     UUID projectId;
-    Date updatedAt;
+    java.util.Set<Long> linkedRepoIds;
+    Set<Long> unlinkedRepoIds;
 }

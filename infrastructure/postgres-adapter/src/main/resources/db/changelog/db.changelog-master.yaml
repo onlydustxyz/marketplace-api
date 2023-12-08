@@ -25,5 +25,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000011_user_avatar_function.sql
   - include:
       file: db/changelog/changelogs/00000012_create_project_stats_view.sql
-
+  - include:
+      file: db/changelog/changelogs/00000013_outbox.sql
 

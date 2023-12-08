@@ -167,7 +167,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(event.getPayload()).isEqualTo("{\"Created\": {\"id\": \"%s\"}}".formatted(response.getProjectId()));
 
 
-        waitAtLeastOneCycleOfNotificationProcessing();
+        waitAtLeastOneCycleOfOutboxEventProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
@@ -221,10 +221,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists();
+                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists()
+                .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 16590657L)).exists();
 
 
-        waitAtLeastOneCycleOfNotificationProcessing();
+        waitAtLeastOneCycleOfOutboxEventProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
@@ -272,7 +273,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "linkedRepoIds": [452047076],
-                          "unlinkedRepoIds": []
+                          "unlinkedRepoIds": [602953043]
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
@@ -327,7 +328,16 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And Then
         assertProjectWasUpdated();
 
-        waitAtLeastOneCycleOfNotificationProcessing();
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": [602953043]
+                        }
+                        """))
+        );
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))

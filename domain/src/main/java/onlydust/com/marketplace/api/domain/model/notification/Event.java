@@ -5,5 +5,5 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 
 @EqualsAndHashCode
-public abstract class Notification implements Serializable {
+public abstract class Event implements Serializable {
 }

@@ -3,42 +3,40 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
-import lombok.*;
-import onlydust.com.marketplace.api.domain.model.notification.Notification;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.notification.Event;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
-@Entity
-@AllArgsConstructor
+@MappedSuperclass
 @NoArgsConstructor
 @EqualsAndHashCode
-@Builder
 @Data
-@Table(name = "notifications", schema = "public")
-@EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "notification_status", typeClass = PostgreSQLEnumType.class)
-public class NotificationEntity {
+@TypeDef(name = "outbox_event_status", typeClass = PostgreSQLEnumType.class)
+public abstract class EventEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb", nullable = false)
-    private Payload payload;
+    Payload payload;
 
     @Enumerated(EnumType.STRING)
-    @Type(type = "notification_status")
-    private Status status;
+    @Type(type = "outbox_event_status")
+    Status status;
 
-    private String error;
+    String error;
 
     @EqualsAndHashCode.Exclude
     @CreationTimestamp
@@ -50,9 +48,13 @@ public class NotificationEntity {
     @Column(name = "updated_at", nullable = false)
     Instant updatedAt;
 
-    public NotificationEntity(Notification notification) {
-        this.payload = new Payload(notification);
+    public EventEntity(Event event) {
+        this.payload = new Payload(event);
         this.status = Status.PENDING;
+    }
+
+    public Event getEvent() {
+        return payload.getEvent();
     }
 
     @Data
@@ -61,7 +63,7 @@ public class NotificationEntity {
     public static class Payload implements Serializable {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
-        private Notification notification;
+        private Event event;
     }
 
     public enum Status {

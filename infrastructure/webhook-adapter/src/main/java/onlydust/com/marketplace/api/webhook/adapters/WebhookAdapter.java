@@ -14,25 +14,25 @@ public class WebhookAdapter implements WebhookPort {
     private final Config config;
 
     @Override
-    public void send(Notification notification) {
-        if (notification instanceof ProjectCreated projectCreated) {
+    public void send(Event event) {
+        if (event instanceof ProjectCreated projectCreated) {
             webhookHttpClient.post(ProjectCreatedEventDTO.of(projectCreated, config.getEnvironment()));
-        } else if (notification instanceof ProjectUpdated projectUpdated) {
+        } else if (event instanceof ProjectUpdated projectUpdated) {
             webhookHttpClient.post(ProjectUpdatedEventDTO.of(projectUpdated, config.getEnvironment()));
-        } else if (notification instanceof ProjectLeaderAssigned projectLeaderAssigned) {
+        } else if (event instanceof ProjectLeaderAssigned projectLeaderAssigned) {
             webhookHttpClient.post(ProjectLeaderAssignedEventDTO.of(projectLeaderAssigned, config.getEnvironment()));
-        } else if (notification instanceof ProjectLeaderUnassigned projectLeaderUnassigned) {
+        } else if (event instanceof ProjectLeaderUnassigned projectLeaderUnassigned) {
             webhookHttpClient.post(ProjectLeaderUnassignedEventDTO.of(projectLeaderUnassigned,
                     config.getEnvironment()));
-        } else if (notification instanceof UserAppliedOnProject userAppliedOnProject) {
+        } else if (event instanceof UserAppliedOnProject userAppliedOnProject) {
             webhookHttpClient.post(UserAppliedOnProjectEventDTO.of(userAppliedOnProject, config.getEnvironment()));
-        } else if (notification instanceof ProjectLeaderInvited projectLeaderInvited) {
+        } else if (event instanceof ProjectLeaderInvited projectLeaderInvited) {
             webhookHttpClient.post(ProjectLeaderInvitedEventDTO.of(projectLeaderInvited, config.getEnvironment()));
-        } else if (notification instanceof ProjectLeaderInvitationCancelled projectLeaderInvitationCancelled) {
+        } else if (event instanceof ProjectLeaderInvitationCancelled projectLeaderInvitationCancelled) {
             webhookHttpClient.post(ProjectLeaderInvitationCancelledEventDTO.of(projectLeaderInvitationCancelled,
                     config.getEnvironment()));
         } else {
-            throw new IllegalArgumentException("Unknown notification type %s".formatted(notification));
+            throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }
     }
 }

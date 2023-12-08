@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ProjectLeaderInvitationCancelled extends Notification {
+public class ProjectLeaderInvitationCancelled extends Event {
     UUID projectId;
     Long githubUserId;
     Date cancelledAt;

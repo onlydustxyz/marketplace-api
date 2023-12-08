@@ -139,7 +139,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", githubUserId)).exists();
 
-        waitAtLeastOneCycleOfNotificationProcessing();
+        waitAtLeastOneCycleOfOutboxEventProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
@@ -209,7 +209,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        waitAtLeastOneCycleOfNotificationProcessing();
+        waitAtLeastOneCycleOfOutboxEventProcessing();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Application")))

@@ -21,7 +21,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder
 @Table(name = "project_details", schema = "public")
@@ -80,7 +80,6 @@ public class ProjectViewEntity {
     )
     List<GithubRepoEntity> repos;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectMoreInfoEntity> moreInfos;
 }

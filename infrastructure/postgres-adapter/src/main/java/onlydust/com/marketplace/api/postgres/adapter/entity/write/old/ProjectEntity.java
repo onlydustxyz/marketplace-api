@@ -5,6 +5,7 @@ import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.*;
@@ -68,24 +69,16 @@ public class ProjectEntity {
     @Column(name = "updated_at", nullable = false)
     Instant updatedAt;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "projectId")
     Set<ProjectLeaderInvitationEntity> projectLeaderInvitations;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "projectId")
     Set<ProjectLeadEntity> projectLeaders;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "projectId")
     Set<ProjectRepoEntity> repos;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id", insertable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "projectId")
     Set<ProjectMoreInfoEntity> moreInfos;
 
 

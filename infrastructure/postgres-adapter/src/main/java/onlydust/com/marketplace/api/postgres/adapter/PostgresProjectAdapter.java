@@ -3,9 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.notification.*;
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -17,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +32,10 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 public class PostgresProjectAdapter implements ProjectStoragePort {
 
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
-    private final NotificationPort notificationPort;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
-    private final ProjectLeadRepository projectLeadRepository;
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
@@ -52,7 +46,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardableItemRepository rewardableItemRepository;
-    private final ProjectMoreInfoRepository projectMoreInfoRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
     private final BudgetStatsRepository budgetStatsRepository;
 
@@ -99,8 +92,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Set<Long> removeUsedRepos(Collection<Long> repoIds) {
         final var usedRepos = projectRepoRepository.findAllByRepoId(repoIds).stream()
-                .map(ProjectRepoEntity::getPrimaryKey)
-                .map(ProjectRepoEntity.PrimaryKey::getRepoId)
+                .map(ProjectRepoEntity::getRepoId)
                 .collect(Collectors.toUnmodifiableSet());
 
         return repoIds.stream()
@@ -207,36 +199,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .ignoreIssues(rewardSettings.getIgnoreIssues())
                         .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
                         .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
+                        .repos(githubRepoIds == null ? null : githubRepoIds.stream()
+                                .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                                .collect(Collectors.toSet()))
+                        .moreInfos(moreInfos == null ? null : moreInfosToEntities(moreInfos, projectId))
+                        .projectLeaders(Set.of(new ProjectLeadEntity(projectId, firstProjectLeaderId)))
+                        .projectLeaderInvitations(githubUserIdsAsProjectLeads == null ? null :
+                                githubUserIdsAsProjectLeads.stream()
+                                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(),
+                                                projectId, githubUserId))
+                                        .collect(Collectors.toSet()))
                         .rank(0)
                         .build();
 
         this.projectIdRepository.save(new ProjectIdEntity(projectId));
         this.projectRepository.save(projectEntity);
-        notificationPort.push(new ProjectCreated(projectId, new Date()));
-
-        this.projectLeadRepository.save(new ProjectLeadEntity(projectId, firstProjectLeaderId));
-        notificationPort.push(new ProjectLeaderAssigned(projectId, firstProjectLeaderId, new Date()));
-
-        if (nonNull(githubUserIdsAsProjectLeads)) {
-            githubUserIdsAsProjectLeads.forEach(githubUserId ->
-                    notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date())));
-
-            projectLeaderInvitationRepository.saveAll(githubUserIdsAsProjectLeads.stream()
-                    .map(githubUserId -> new ProjectLeaderInvitationEntity(
-                            UUID.randomUUID(),
-                            projectId,
-                            githubUserId))
-                    .collect(Collectors.toSet()));
-        }
-
-        if (nonNull(githubRepoIds)) {
-            projectRepoRepository.saveAll(githubRepoIds.stream()
-                    .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                    .collect(Collectors.toSet()));
-        }
-        if (nonNull(moreInfos)) {
-            projectMoreInfoRepository.saveAll(moreInfosToEntities(moreInfos, projectId));
-        }
 
         return projectRepository.getKeyById(projectId);
     }
@@ -264,67 +241,52 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             project.setIgnoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore());
         }
 
-        if (nonNull(project.getMoreInfos()) && nonNull(moreInfos)) {
-            project.getMoreInfos().stream()
-                    .filter(existingMoreInfo -> moreInfos.stream().noneMatch(moreInfoLink -> moreInfoLink.getUrl().equals(existingMoreInfo.getId().getUrl())))
-                    .forEach(projectMoreInfoRepository::delete);
-
-            projectMoreInfoRepository.saveAll(moreInfosToEntities(moreInfos, projectId));
+        if (nonNull(moreInfos)) {
+            if (nonNull(project.getMoreInfos())) {
+                project.getMoreInfos().clear();
+                project.getMoreInfos().addAll(moreInfosToEntities(moreInfos, projectId));
+            } else {
+                project.setMoreInfos(moreInfosToEntities(moreInfos, projectId));
+            }
         }
 
         final var projectLeaderInvitations = project.getProjectLeaderInvitations();
         if (!isNull(githubUserIdsAsProjectLeadersToInvite)) {
-            projectLeaderInvitations.stream()
-                    .filter(invitation -> !githubUserIdsAsProjectLeadersToInvite.contains(invitation.getGithubUserId()))
-                    .forEach(invitation -> {
-                        projectLeaderInvitationRepository.delete(invitation);
-                        notificationPort.push(new ProjectLeaderInvitationCancelled(projectId,
-                                invitation.getGithubUserId(), new Date()));
-                    });
-
-            githubUserIdsAsProjectLeadersToInvite.stream()
-                    .filter(githubUserId -> projectLeaderInvitations.stream()
-                            .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId)))
-                    .forEach(githubUserId -> {
-                        projectLeaderInvitationRepository.save(
-                                new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId, githubUserId));
-                        notificationPort.push(new ProjectLeaderInvited(projectId, githubUserId, new Date()));
-                    });
+            if (nonNull(projectLeaderInvitations)) {
+                projectLeaderInvitations.clear();
+                projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
+                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
+                                githubUserId))
+                        .collect(Collectors.toSet()));
+            } else {
+                project.setProjectLeaderInvitations(githubUserIdsAsProjectLeadersToInvite.stream()
+                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
+                                githubUserId))
+                        .collect(Collectors.toSet()));
+            }
         }
 
         final var projectLeaders = project.getProjectLeaders();
         if (!isNull(projectLeadersToKeep)) {
-            projectLeaders.stream()
-                    .filter(projectLeader -> !projectLeadersToKeep.contains(projectLeader.getPrimaryKey().getUserId()))
-                    .forEach(entity -> {
-                        projectLeadRepository.delete(entity);
-                        notificationPort.push(new ProjectLeaderUnassigned(projectId,
-                                entity.getPrimaryKey().getUserId(), new Date()));
-                    });
+            projectLeaders.clear();
+            projectLeaders.addAll(projectLeadersToKeep.stream()
+                    .map(userId -> new ProjectLeadEntity(projectId, userId))
+                    .collect(Collectors.toUnmodifiableSet()));
+        }
 
-            if (projectLeadersToKeep.stream()
-                    .anyMatch(userId -> projectLeaders.stream()
-                            .noneMatch(projectLeader -> projectLeader.getPrimaryKey().getUserId().equals(userId)))) {
-                throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                                   "leaders");
+        if (!isNull(githubRepoIds)) {
+            if (nonNull(project.getRepos())) {
+                project.getRepos().clear();
+                project.getRepos().addAll(githubRepoIds.stream()
+                        .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                        .collect(Collectors.toSet()));
+            } else {
+                project.setRepos(githubRepoIds.stream()
+                        .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                        .collect(Collectors.toSet()));
             }
         }
 
-        final var repos = project.getRepos();
-        if (!isNull(githubRepoIds)) {
-            repos.stream()
-                    .filter(repo -> !githubRepoIds.contains(repo.getPrimaryKey().getRepoId()))
-                    .forEach(projectRepoRepository::delete);
-
-            githubRepoIds.stream()
-                    .filter(repoId -> repos.stream()
-                            .noneMatch(repo -> repo.getPrimaryKey().getRepoId().equals(repoId)))
-                    .forEach(repoId -> projectRepoRepository.save(new ProjectRepoEntity(
-                            projectId,
-                            repoId)));
-        }
-
-        notificationPort.push(new ProjectUpdated(projectId, new Date()));
         this.projectRepository.save(project);
     }
 
@@ -374,6 +336,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .stream()
                 .map(ProjectLeadViewEntity::getId)
                 .toList();
+    }
+
+    @Override
+    public Set<Long> getProjectInvitedLeadIds(UUID projectId) {
+        return projectLeaderInvitationRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(ProjectLeaderInvitationEntity::getGithubUserId)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -477,7 +447,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public Set<Long> getProjectRepoIds(UUID projectId) {
         final var project = projectRepository.getById(projectId);
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
-                .map(repo -> repo.getPrimaryKey().getRepoId())
+                .map(ProjectRepoEntity::getRepoId)
                 .collect(Collectors.toSet());
     }
 

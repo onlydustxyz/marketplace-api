@@ -37,9 +37,4 @@ public class ContributionService implements ContributionFacadePort {
             throw OnlyDustException.forbidden("Only project leaders can edit the list of ignored contributions");
         contributionStoragePort.unignoreContributions(projectId, contributionIds);
     }
-
-    @Override
-    public void refreshIgnoredContributions(List<Long> repoIds) {
-        contributionStoragePort.refreshIgnoredContributions(repoIds);
-    }
 }

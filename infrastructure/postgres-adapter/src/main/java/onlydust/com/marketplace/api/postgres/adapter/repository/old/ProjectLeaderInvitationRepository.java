@@ -4,8 +4,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ProjectLeaderInvitationRepository extends JpaRepository<ProjectLeaderInvitationEntity, UUID> {
     Optional<ProjectLeaderInvitationEntity> findByProjectIdAndGithubUserId(UUID projectId, Long githubUserId);
+
+    Set<ProjectLeaderInvitationEntity> findAllByProjectId(UUID projectId);
 }

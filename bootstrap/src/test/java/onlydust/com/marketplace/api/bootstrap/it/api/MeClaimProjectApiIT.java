@@ -36,16 +36,12 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
         final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre(githubPAT);
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         projectLeadRepository.delete(ProjectLeadEntity.builder()
-                .primaryKey(ProjectLeadEntity.PrimaryKey.builder()
-                        .projectId(projectId)
-                        .userId(pierre.user().getId())
-                        .build())
+                .projectId(projectId)
+                .userId(pierre.user().getId())
                 .build());
         projectLeadRepository.delete(ProjectLeadEntity.builder()
-                .primaryKey(ProjectLeadEntity.PrimaryKey.builder()
-                        .projectId(projectId)
-                        .userId(UUID.fromString("45e98bf6-25c2-4edf-94da-e340daba8964"))
-                        .build())
+                .projectId(projectId)
+                .userId(UUID.fromString("45e98bf6-25c2-4edf-94da-e340daba8964"))
                 .build());
         projectLeaderInvitationRepository.delete(new ProjectLeaderInvitationEntity(UUID.fromString("02615584-4ff6" +
                                                                                                    "-4f82-82f7" +
@@ -90,10 +86,9 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
-        assertTrue(projectLeadRepository.findById(ProjectLeadEntity.PrimaryKey.builder()
-                .userId(pierre.user().getId())
-                .projectId(projectId)
-                .build()).isPresent());
+        assertTrue(projectLeadRepository.findById(new ProjectLeadEntity.PrimaryKey(projectId,
+                pierre.user().getId()
+        )).isPresent());
     }
 
     private static final String GET_PIERRE_BARBICANE_GITHUB_MEMBERSHIP_JSON_RESPONSE = """

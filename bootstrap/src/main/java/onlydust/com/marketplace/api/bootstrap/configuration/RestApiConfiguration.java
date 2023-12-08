@@ -38,7 +38,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public TechnologiesRestApi technologiesRestApi(final AuthenticationService authenticationService, final TechnologiesPort technologiesPort) {
+    public TechnologiesRestApi technologiesRestApi(final AuthenticationService authenticationService,
+                                                   final TechnologiesPort technologiesPort) {
         return new TechnologiesRestApi(technologiesPort, authenticationService);
     }
 
@@ -48,8 +49,8 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public EventsRestApi eventsRestApi(final ContributionFacadePort contributionFacadePort) {
-        return new EventsRestApi(contributionFacadePort);
+    public EventsRestApi eventsRestApi(final ContributionObserverPort contributionObserverPort) {
+        return new EventsRestApi(contributionObserverPort);
     }
 
     @Bean

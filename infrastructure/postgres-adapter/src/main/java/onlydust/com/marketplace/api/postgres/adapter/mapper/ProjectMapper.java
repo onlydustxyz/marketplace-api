@@ -146,21 +146,19 @@ public interface ProjectMapper {
                     .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
                     .map(projectMoreInfoEntity -> MoreInfoLink.builder()
                             .value(projectMoreInfoEntity.getName())
-                            .url(projectMoreInfoEntity.getId().getUrl()).build())
+                            .url(projectMoreInfoEntity.getUrl()).build())
                     .toList();
         }
         return List.of();
     }
 
-    static List<ProjectMoreInfoEntity> moreInfosToEntities(final List<MoreInfoLink> moreInfos, final UUID projectId) {
-        final List<ProjectMoreInfoEntity> entities = new ArrayList<>();
+    static Set<ProjectMoreInfoEntity> moreInfosToEntities(final List<MoreInfoLink> moreInfos, final UUID projectId) {
+        final Set<ProjectMoreInfoEntity> entities = new HashSet<>();
         for (int i = 0; i < moreInfos.size(); i++) {
             final var moreInfo = moreInfos.get(i);
             entities.add(ProjectMoreInfoEntity.builder()
-                    .id(ProjectMoreInfoEntity.Id.builder()
-                            .projectId(projectId)
-                            .url(moreInfo.getUrl())
-                            .build())
+                    .projectId(projectId)
+                    .url(moreInfo.getUrl())
                     .name(moreInfo.getValue())
                     .rank(i)
                     .build());

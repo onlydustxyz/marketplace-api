@@ -31,7 +31,7 @@ import java.util.Map;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-@ActiveProfiles({"it","api"})
+@ActiveProfiles({"it", "api"})
 @AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers
@@ -124,7 +124,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     WebTestClient client;
 
-    protected static void waitAtLeastOneCycleOfNotificationProcessing() throws InterruptedException {
+    protected static void waitAtLeastOneCycleOfOutboxEventProcessing() throws InterruptedException {
         Thread.sleep(1000);
     }
 

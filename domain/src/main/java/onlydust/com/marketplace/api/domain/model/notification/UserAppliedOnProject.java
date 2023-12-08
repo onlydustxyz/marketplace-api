@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UserAppliedOnProject extends Notification {
+public class UserAppliedOnProject extends Event {
     UUID applicationId;
     UUID projectId;
     UUID userId;
