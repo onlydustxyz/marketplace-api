@@ -9,7 +9,7 @@ import org.springframework.retry.annotation.Retryable;
 
 @Slf4j
 @AllArgsConstructor
-public class WebhookNotificationJob implements OutboxConsumer {
+public class WebhookNotificationOutboxConsumer implements OutboxConsumer {
 
     private final WebhookPort webhookPort;
 

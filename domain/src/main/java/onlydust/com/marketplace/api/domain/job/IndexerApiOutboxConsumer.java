@@ -10,7 +10,7 @@ import org.springframework.retry.annotation.Retryable;
 
 @Slf4j
 @AllArgsConstructor
-public class IndexerApiJob implements OutboxConsumer {
+public class IndexerApiOutboxConsumer implements OutboxConsumer {
 
     private final IndexerPort indexerPort;
 

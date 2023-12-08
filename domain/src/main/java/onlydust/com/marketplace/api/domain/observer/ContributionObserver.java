@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.service;
+package onlydust.com.marketplace.api.domain.observer;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.port.input.ContributionObserverPort;

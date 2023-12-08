@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
-import onlydust.com.marketplace.api.domain.job.IndexerApiJob;
+import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
-import onlydust.com.marketplace.api.domain.job.WebhookNotificationJob;
+import onlydust.com.marketplace.api.domain.job.WebhookNotificationOutboxConsumer;
+import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
+import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
@@ -112,24 +114,24 @@ public class DomainConfiguration {
 
     @Bean
     public OutboxConsumerJob notificationOutboxJob(final OutboxPort notificationOutbox,
-                                                   final OutboxConsumer webhookNotificationJob) {
-        return new OutboxConsumerJob(notificationOutbox, webhookNotificationJob);
+                                                   final OutboxConsumer webhookNotificationOutboxConsumer) {
+        return new OutboxConsumerJob(notificationOutbox, webhookNotificationOutboxConsumer);
     }
 
     @Bean
     public OutboxConsumerJob indexerOutboxJob(final OutboxPort indexerOutbox,
-                                              final OutboxConsumer indexerApiJob) {
-        return new OutboxConsumerJob(indexerOutbox, indexerApiJob);
+                                              final OutboxConsumer indexerApiOutboxConsumer) {
+        return new OutboxConsumerJob(indexerOutbox, indexerApiOutboxConsumer);
     }
 
     @Bean
-    public OutboxConsumer webhookNotificationJob(final WebhookPort webhookPort) {
-        return new WebhookNotificationJob(webhookPort);
+    public OutboxConsumer webhookNotificationOutboxConsumer(final WebhookPort webhookPort) {
+        return new WebhookNotificationOutboxConsumer(webhookPort);
     }
 
     @Bean
-    public OutboxConsumer indexerApiJob(final IndexerPort indexerPort) {
-        return new IndexerApiJob(indexerPort);
+    public OutboxConsumer indexerApiOutboxConsumer(final IndexerPort indexerPort) {
+        return new IndexerApiOutboxConsumer(indexerPort);
     }
 
     @Bean

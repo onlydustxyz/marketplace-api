@@ -3,14 +3,13 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.Optional;
 
 @NoRepositoryBean
-public interface OutboxRepository<E extends EventEntity> extends JpaRepository<E, Long>, JpaSpecificationExecutor<E> {
+public interface OutboxRepository<E extends EventEntity> extends JpaRepository<E, Long> {
 
     void saveEvent(Event event);
 
