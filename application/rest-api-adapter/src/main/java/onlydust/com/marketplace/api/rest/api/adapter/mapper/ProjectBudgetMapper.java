@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.BudgetResponse;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.ProjectBudgetsResponse;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
 import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 
@@ -19,14 +20,28 @@ public interface ProjectBudgetMapper {
                     .initialDollarsEquivalent(budget.getInitialDollarsEquivalent())
                     .remainingDollarsEquivalent(budget.getRemainingDollarsEquivalent())
                     .dollarsConversionRate(budget.getDollarsConversionRate())
-                    .currency(switch (budget.getCurrency()) {
-                        case Eth -> CurrencyContract.ETH;
-                        case Apt -> CurrencyContract.APT;
-                        case Op -> CurrencyContract.OP;
-                        case Usd -> CurrencyContract.USD;
-                        case Stark -> CurrencyContract.STARK;
-                    }));
+                    .currency(mapCurrency(budget.getCurrency())));
         }
         return projectBudgetsResponse;
+    }
+
+    static CurrencyContract mapCurrency(Currency currency) {
+        return switch (currency) {
+            case Eth -> CurrencyContract.ETH;
+            case Apt -> CurrencyContract.APT;
+            case Op -> CurrencyContract.OP;
+            case Usd -> CurrencyContract.USD;
+            case Stark -> CurrencyContract.STARK;
+        };
+    }
+
+    static Currency mapCurrency(CurrencyContract currency) {
+        return switch (currency) {
+            case ETH -> Currency.Eth;
+            case APT -> Currency.Apt;
+            case OP -> Currency.Op;
+            case USD -> Currency.Usd;
+            case STARK -> Currency.Stark;
+        };
     }
 }

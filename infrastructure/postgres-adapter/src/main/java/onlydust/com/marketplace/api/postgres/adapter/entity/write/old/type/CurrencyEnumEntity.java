@@ -5,6 +5,16 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 public enum CurrencyEnumEntity {
     usd, eth, op, apt, stark;
 
+    public static CurrencyEnumEntity of(Currency currency) {
+        return switch (currency) {
+            case Eth -> CurrencyEnumEntity.eth;
+            case Apt -> CurrencyEnumEntity.apt;
+            case Op -> CurrencyEnumEntity.op;
+            case Usd -> CurrencyEnumEntity.usd;
+            case Stark -> CurrencyEnumEntity.stark;
+        };
+    }
+
     public Currency toDomain() {
         return switch (this) {
             case op -> Currency.Op;

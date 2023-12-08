@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQ
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -221,6 +223,8 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
     @Autowired
     PaymentRepository paymentRepository;
+    @Autowired
+    BudgetRepository budgetRepository;
 
     @Test
     @Order(0)
@@ -256,7 +260,17 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json(GET_PROJECT_REWARDS_JSON_RESPONSE);
+                .json(GET_PROJECT_REWARDS_JSON_RESPONSE)
+                .jsonPath("$.remainingBudget.amount").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isNumber()
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isNumber()
+                .jsonPath("$.sentRewardsCount").isNumber()
+                .jsonPath("$.rewardedContributionsCount").isNumber()
+                .jsonPath("$.rewardedContributorsCount").isNumber()
+        ;
 
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("pageIndex", "0", "pageSize",
@@ -378,5 +392,164 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[5].amount.currency").isEqualTo("USD")
                 .jsonPath("$.rewards[5].amount.dollarsEquivalent").isEqualTo("1000")
                 .jsonPath("$.rewards[5].requestedAt").isEqualTo("2023-09-19T07:38:52.590518Z");
+    }
+
+    @Test
+    @Order(2)
+    void should_get_projects_rewards_filtered_by_currency() {
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        final var budget = budgetRepository.findById(UUID.fromString("5cd59ea2-f67a-4723-b90f-f5fd9036d6d1"))
+                .orElseThrow();
+        budget.setInitialAmount(BigDecimal.valueOf(30));
+        budget.setRemainingAmount(BigDecimal.valueOf(28));
+        budgetRepository.save(budget);
+
+        cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
+                .currency(CurrencyEnumEntity.eth)
+                .price(BigDecimal.valueOf(1500L))
+                .updatedAt(new Date())
+                .build());
+
+        paymentRequestRepository.saveAll(paymentRequestRepository.findAll()
+                .stream()
+                .filter(p -> p.getProjectId().equals(projectId))
+                .filter(p -> p.getCurrency().equals(CurrencyEnumEntity.usd))
+                .limit(10)
+                .map(p -> p.toBuilder().amount(BigDecimal.valueOf(1)).currency(CurrencyEnumEntity.eth).build())
+                .toList()
+        );
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "currency", "ETH"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
+                .jsonPath("$.remainingBudget.amount").isEqualTo(28)
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(42000)
+                .jsonPath("$.spentAmount.amount").isEqualTo(10)
+                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(15000)
+                .jsonPath("$.sentRewardsCount").isEqualTo(10)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
+        ;
+    }
+
+    @Test
+    @Order(3)
+    void should_get_projects_rewards_filtered_by_contributors() {
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "contributors", "8642470"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(13500)
+                .jsonPath("$.sentRewardsCount").isEqualTo(9)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(1)
+        ;
+    }
+
+    @Test
+    @Order(4)
+    void should_get_projects_rewards_filtered_by_date() {
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "fromDate", "2023-09-25",
+                        "toDate", "2023-09-25"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                // we have at least one correct date
+                .jsonPath("$.rewards[?(@.requestedAt >= '2023-09-25')]").exists()
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-26')]").exists()
+                // we do not have any incorrect date
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-25')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(15000)
+                .jsonPath("$.sentRewardsCount").isEqualTo(10)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(4)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(2)
+        ;
+    }
+
+    @Test
+    @Order(5)
+    void should_return_empty_state_when_no_result_found() {
+
+        // Given
+        final String jwt = userHelper.authenticateGregoire().jwt();
+        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "fromDate", "2023-09-25",
+                        "toDate", "2023-09-25",
+                        "currency", "OP"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.rewards").isEmpty()
+                .jsonPath("$.remainingBudget.amount").isEqualTo(17000)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("OP")
+                .jsonPath("$.remainingBudget.usdEquivalent").doesNotExist()
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("OP")
+                .jsonPath("$.spentAmount.usdEquivalent").doesNotExist()
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0);
     }
 }

@@ -47,7 +47,8 @@ public interface ProjectStoragePort {
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
-    Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+    ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
+                                       ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                         int pageIndex, int pageSize);
 
     ProjectBudgetsView findBudgets(UUID projectId);

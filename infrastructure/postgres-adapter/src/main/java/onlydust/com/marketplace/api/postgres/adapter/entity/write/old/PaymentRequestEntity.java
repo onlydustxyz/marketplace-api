@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "payment_requests", schema = "public")
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 public class PaymentRequestEntity {

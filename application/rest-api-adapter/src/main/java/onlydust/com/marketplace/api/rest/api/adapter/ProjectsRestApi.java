@@ -33,8 +33,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
@@ -154,14 +156,23 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
+                                                                 CurrencyContract currency, List<Long> contributors,
+                                                                 String fromDate, String toDate,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
-        Page<ProjectRewardView> page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(),
-                sanitizedPageIndex,
-                sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
+        final var filters = ProjectRewardView.Filters.builder()
+                .currency(nonNull(currency) ? mapCurrency(currency) : null)
+                .contributors(Optional.ofNullable(contributors).orElse(List.of()))
+                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
+                .build();
+
+        final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,
+                sanitizedPageIndex, sanitizedPageSize,
+                sortBy, SortDirectionMapper.requestToDomain(direction));
 
         final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page);
 

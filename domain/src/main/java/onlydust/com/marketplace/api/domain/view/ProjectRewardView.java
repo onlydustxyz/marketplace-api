@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -34,5 +35,15 @@ public class ProjectRewardView {
 
     public enum SortBy {
         requestedAt, status, contribution, amount
+    }
+
+    @Builder
+    @Data
+    public static class Filters {
+        Currency currency;
+        @Builder.Default
+        List<Long> contributors = List.of();
+        Date from;
+        Date to;
     }
 }

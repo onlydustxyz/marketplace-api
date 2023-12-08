@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.notification.*;
 import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -12,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -21,6 +23,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoR
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final RewardableItemRepository rewardableItemRepository;
     private final ProjectMoreInfoRepository projectMoreInfoRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
+    private final BudgetStatsRepository budgetStatsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -374,18 +378,35 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectRewardView> findRewards(UUID projectId, ProjectRewardView.SortBy sortBy,
-                                               SortDirection sortDirection, int pageIndex,
-                                               int pageSize) {
-        final Integer count = customProjectRewardRepository.getCount(projectId);
-        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
+    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
+                                              ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+                                              int pageIndex, int pageSize) {
+        final var currency = nonNull(filters.getCurrency()) ? CurrencyEnumEntity.of(filters.getCurrency()) : null;
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
+        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
+
+        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors(), fromDate, toDate);
+        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency, filters.getContributors(),
+                        fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
-        return Page.<ProjectRewardView>builder()
-                .content(projectRewardViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ? currency.toString() : null, filters.getContributors(),
+                fromDate, toDate);
+
+        return ProjectRewardsPageView.builder().
+                rewards(Page.<ProjectRewardView>builder()
+                        .content(projectRewardViews)
+                        .totalItemNumber(count)
+                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .build())
+                .remainingBudget(new ProjectRewardsPageView.Money(budgetStats.getRemainingAmount(), filters.getCurrency(), budgetStats.getRemainingUsdAmount()))
+                .spentAmount(new ProjectRewardsPageView.Money(budgetStats.getSpentAmount(), filters.getCurrency(), budgetStats.getSpentUsdAmount()))
+                .sentRewardsCount(budgetStats.getRewardsCount())
+                .rewardedContributionsCount(budgetStats.getRewardItemsCount())
+                .rewardedContributorsCount(budgetStats.getRewardRecipientsCount())
                 .build();
     }
 

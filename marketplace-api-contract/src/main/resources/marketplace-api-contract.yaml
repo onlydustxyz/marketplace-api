@@ -1156,6 +1156,30 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
+          name: currency
+          description: Currency filter
+          schema:
+            $ref: '#/components/schemas/CurrencyContract'
+        - in: query
+          name: contributors
+          description: Contributor filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+        - in: query
+          name: fromDate
+          description: Date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          description: Date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
           name: sort
           description: Sort order
           schema:
@@ -1931,6 +1955,26 @@ components:
       format: int64
       description: Github installation ID
       example: 123456
+
+    Money:
+      type: object
+      description: Money value object
+      required:
+          - amount
+          - currency
+          - usdEquivalent
+      properties:
+          amount:
+            type: number
+            description: Amount of money
+            example: 100
+          currency:
+            $ref: '#/components/schemas/CurrencyContract'
+          usdEquivalent:
+            type: number
+            description: USD equivalent of the amount
+            example: 100
+
 
     # RESPONSES ==================================================================
     GithubUserResponse:
@@ -2814,6 +2858,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RewardPageItemResponse'
+        remainingBudget:
+          $ref: '#/components/schemas/Money'
+        spentAmount:
+          $ref: '#/components/schemas/Money'
+        sentRewardsCount:
+          type: integer
+          description: Number of rewards that have been sent
+        rewardedContributionsCount:
+          type: integer
+          description: Number of contributions that have been rewarded
+        rewardedContributorsCount:
+          type: integer
+          description: Number of contributors that have been rewarded
         hasMore:
           type: boolean
           example: true

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import org.intellij.lang.annotations.Language;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class CustomProjectRewardRepository {
@@ -36,12 +38,23 @@ public class CustomProjectRewardRepository {
                      left join public.auth_users au on gu.id = au.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-            where pr.project_id = :projectId order by %order_by% offset :offset limit :limit
+            where 
+                pr.project_id = :projectId and 
+                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)) and 
+                (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
+            order by %order_by% offset :offset limit :limit
             """;
     private static final String COUNT_PROJECT_REWARDS = """
             select count(*)
             from payment_requests pr
-            where pr.project_id = :projectId
+            where
+                pr.project_id = :projectId and 
+                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)) AND
+                (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """;
     private final EntityManager entityManager;
 
@@ -56,18 +69,27 @@ public class CustomProjectRewardRepository {
         return FIND_PROJECT_REWARDS.replace("%order_by%", sort);
     }
 
-    public Integer getCount(UUID projectId) {
+    public Integer getCount(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds, String from, String to) {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
-                .setParameter("projectId", projectId);
+                .setParameter("projectId", projectId)
+                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
+                .setParameter("contributorsIds", contributorsIds)
+                .setParameter("fromDate", from)
+                .setParameter("toDate", to);
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, ProjectRewardView.SortBy sortBy,
-                                                         final SortDirection sortDirection,
+    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds,
+                                                         String from, String to,
+                                                         ProjectRewardView.SortBy sortBy, final SortDirection sortDirection,
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)
+                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
+                .setParameter("contributorsIds", contributorsIds)
+                .setParameter("fromDate", from)
+                .setParameter("toDate", to)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList();
