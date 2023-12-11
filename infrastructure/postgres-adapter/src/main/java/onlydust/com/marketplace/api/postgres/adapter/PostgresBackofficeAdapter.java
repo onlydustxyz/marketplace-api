@@ -3,16 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
+import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoPaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectLeadInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +23,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final ProjectBudgetRepository projectBudgetRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoPaymentRepository boPaymentRepository;
+    private final BoProjectRepository boProjectRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -106,6 +102,16 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
         final var page = boPaymentRepository.findAll(isNull(projectIds) ? List.of() : projectIds, PageRequest.of(pageIndex, pageSize));
         return Page.<PaymentView>builder()
                 .content(page.getContent().stream().map(BoPaymentEntity::toView).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public Page<ProjectView> listProjects(int pageIndex, int pageSize) {
+        final var page = boProjectRepository.findAll(PageRequest.of(pageIndex, pageSize));
+        return Page.<ProjectView>builder()
+                .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

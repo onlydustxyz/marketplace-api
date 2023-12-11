@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
+import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -107,5 +104,33 @@ public interface BackOfficeMapper {
                 .totalItemNumber(paymentPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, paymentPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, paymentPage.getTotalPageNumber()));
+    }
+
+    static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {
+        return new ProjectPage()
+                .projects(projectViewPage.getContent().stream().map(payment -> new ProjectPageItemResponse()
+                        .id(payment.getId())
+                        .name(payment.getName())
+                        .shortDescription(payment.getShortDescription())
+                        .longDescription(payment.getLongDescription())
+                        .moreInfoLinks(payment.getMoreInfoLinks())
+                        .logoUrl(payment.getLogoUrl())
+                        .hiring(payment.getHiring())
+                        .rank(payment.getRank())
+                        .visibility(mapProjectVisibility(payment.getVisibility()))
+                        .projectLeads(payment.getProjectLeadIds())
+                        .createdAt(payment.getCreatedAt())
+                ).toList())
+                .totalPageNumber(projectViewPage.getTotalPageNumber())
+                .totalItemNumber(projectViewPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, projectViewPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
+    }
+
+    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.api.domain.model.ProjectVisibility visibility) {
+        return switch (visibility) {
+            case PUBLIC -> ProjectVisibility.PUBLIC;
+            case PRIVATE -> ProjectVisibility.PRIVATE;
+        };
     }
 }

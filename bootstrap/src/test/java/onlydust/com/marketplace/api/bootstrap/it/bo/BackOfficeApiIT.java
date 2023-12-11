@@ -641,4 +641,99 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
     }
 
+    @Test
+    void should_get_projects() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_PROJECTS, Map.of("pageIndex", "0", "pageSize", "5")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "totalPageNumber": 15,
+                          "totalItemNumber": 75,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "projects": [
+                            {
+                              "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                              "name": "Cairo foundry",
+                              "shortDescription": "Foundry like framework for starknet contracts",
+                              "longDescription": "",
+                              "moreInfoLinks": null,
+                              "logoUrl": null,
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": [
+                                "6115f024-159a-4b1f-b713-1e2ad5c6063e"
+                              ],
+                              "createdAt": "2022-12-15T08:44:06.319513Z"
+                            },
+                            {
+                              "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "name": "Cairo streams",
+                              "shortDescription": "Stream library in cairo",
+                              "longDescription": "",
+                              "moreInfoLinks": null,
+                              "logoUrl": null,
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": null,
+                              "createdAt": "2023-01-10T13:37:26.545996Z"
+                            },
+                            {
+                              "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                              "name": "DogGPT",
+                              "shortDescription": "Chat GPT for cat lovers",
+                              "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                              "moreInfoLinks": null,
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg",
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": null,
+                              "createdAt": "2023-05-17T14:19:29.07864Z"
+                            },
+                            {
+                              "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
+                              "name": "Bretzel 196",
+                              "shortDescription": "bretzel gives you wings",
+                              "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                              "moreInfoLinks": null,
+                              "logoUrl": null,
+                              "hiring": true,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": [
+                                "45e98bf6-25c2-4edf-94da-e340daba8964"
+                              ],
+                              "createdAt": "2023-05-24T13:54:25.002945Z"
+                            },
+                            {
+                              "id": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                              "name": "kaaper2",
+                              "shortDescription": "Another kaaper",
+                              "longDescription": "",
+                              "moreInfoLinks": null,
+                              "logoUrl": null,
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": [
+                                "6115f024-159a-4b1f-b713-1e2ad5c6063e",
+                                "dd0ab03c-5875-424b-96db-a35522eab365"
+                              ],
+                              "createdAt": "2022-12-23T13:41:08.693859Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
 }
