@@ -123,6 +123,9 @@ public class ProjectServiceTest {
         assertThat(projectIdentity.getRight()).isEqualTo("slug");
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
         verify(eventStoragePort).saveEvent(new ProjectCreatedOldEvent(projectIdentity.getLeft()));
+        verify(projectObserverPort).onProjectCreated(expectedProjectId);
+        verify(projectObserverPort).onLeaderAssigned(expectedProjectId, command.getFirstProjectLeaderId());
+        verify(projectObserverPort).onLeaderInvited(expectedProjectId, usersToInviteAsProjectLeaders.get(0));
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
     }
@@ -172,8 +175,10 @@ public class ProjectServiceTest {
                 imageUrl,
                 command.getRewardSettings()
         );
+        verify(projectObserverPort).onProjectDetailsUpdated(projectId);
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
+        verify(projectObserverPort).onRewardSettingsChanged(projectId);
     }
 
     @Test
@@ -290,7 +295,8 @@ public class ProjectServiceTest {
         projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
 
         // Then
-        verify(projectStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
+        verify(projectStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
+                pageSize);
     }
 
     @Test
@@ -313,7 +319,8 @@ public class ProjectServiceTest {
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
+        verify(projectStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
+                pageSize);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read rewards on their projects", onlyDustException.getMessage());
