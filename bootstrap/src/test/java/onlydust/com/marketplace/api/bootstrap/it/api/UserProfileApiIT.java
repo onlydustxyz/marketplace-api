@@ -847,8 +847,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                      "issueCount": 0,
                      "pullRequestCount": 6
                    }
-                 ],
-                 "contributionCountVariationSinceLastWeek": -29
+                 ]
                },
                "allocatedTimeToContribute": "NONE",
                "isLookingForAJob": false
@@ -1673,8 +1672,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     "issueCount": 0,
                     "pullRequestCount": 6
                   }
-                ],
-                "contributionCountVariationSinceLastWeek": -29
+                ]
               }
             }
             """;
@@ -1719,6 +1717,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").doesNotExist()
+                .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
                 .json(GET_ANTHONY_PUBLIC_PROFILE_JSON_RESPONSE);
     }
 
@@ -1744,6 +1743,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").doesNotExist()
+                .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
                 .json(GET_ANTHONY_PUBLIC_PROFILE_JSON_RESPONSE);
     }
 
@@ -1771,6 +1771,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").exists()
+                .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
     }
 }
