@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID> {
@@ -31,7 +32,9 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
                      LEFT JOIN (SELECT project_id, jsonb_agg(url) urls
                                 FROM project_more_infos pmi
                                 GROUP BY project_id) as more_infos ON more_infos.project_id = p.project_id
+            WHERE 
+                (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
             """, nativeQuery = true)
     @NotNull
-    Page<BoProjectEntity> findAll(final @NotNull Pageable pageable);
+    Page<BoProjectEntity> findAll(final List<UUID> projectIds, final @NotNull Pageable pageable);
 }

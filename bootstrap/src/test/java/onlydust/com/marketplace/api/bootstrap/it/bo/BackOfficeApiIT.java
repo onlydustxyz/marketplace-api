@@ -735,5 +735,54 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_PROJECTS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "projects": [
+                            {
+                              "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "name": "Cairo streams",
+                              "shortDescription": "Stream library in cairo",
+                              "longDescription": "",
+                              "moreInfoLinks": null,
+                              "logoUrl": null,
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": null,
+                              "createdAt": "2023-01-10T13:37:26.545996Z"
+                            },
+                            {
+                              "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                              "name": "DogGPT",
+                              "shortDescription": "Chat GPT for cat lovers",
+                              "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                              "moreInfoLinks": null,
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15366926246018901574.jpg",
+                              "hiring": false,
+                              "rank": 0,
+                              "visibility": "PUBLIC",
+                              "projectLeads": null,
+                              "createdAt": "2023-05-17T14:19:29.07864Z"
+                            }
+                          ]
+                        }
+                        """);
     }
 }

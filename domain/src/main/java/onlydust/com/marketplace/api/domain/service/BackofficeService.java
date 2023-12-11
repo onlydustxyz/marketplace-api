@@ -35,7 +35,7 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<ProjectView> listProjects(int pageIndex, int pageSize) {
-        return backofficeStoragePort.listProjects(pageIndex, pageSize);
+    public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
+        return backofficeStoragePort.listProjects(pageIndex, pageSize, projectIds);
     }
 }

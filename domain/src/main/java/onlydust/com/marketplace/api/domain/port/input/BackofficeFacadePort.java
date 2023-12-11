@@ -15,5 +15,5 @@ public interface BackofficeFacadePort {
 
     Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds);
 
-    Page<ProjectView> listProjects(int pageIndex, int pageSize);
+    Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 }
