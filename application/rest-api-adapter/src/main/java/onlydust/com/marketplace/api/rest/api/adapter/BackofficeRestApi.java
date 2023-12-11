@@ -100,6 +100,17 @@ public class BackofficeRestApi implements BackofficeApi {
     }
 
     @Override
+    public ResponseEntity<UserPage> getUserPage(Integer pageIndex, Integer pageSize) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize));
+        final var response = mapUserPageToContract(usersPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
@@ -120,4 +131,5 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
+
 }

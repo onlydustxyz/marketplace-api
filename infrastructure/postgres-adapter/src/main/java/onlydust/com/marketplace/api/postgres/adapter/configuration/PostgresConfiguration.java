@@ -177,10 +177,11 @@ public class PostgresConfiguration {
                                                                final BoSponsorRepository boSponsorRepository,
                                                                final ProjectBudgetRepository projectBudgetRepository,
                                                                final ProjectLeadInvitationRepository projectLeadInvitationRepository,
+                                                               final BoUserRepository boUserRepository,
                                                                final BoPaymentRepository boPaymentRepository,
                                                                final BoProjectRepository boProjectRepository) {
         return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository, boSponsorRepository,
-                projectLeadInvitationRepository, boPaymentRepository, boProjectRepository);
+                projectLeadInvitationRepository, boUserRepository, boPaymentRepository, boProjectRepository);
     }
 
     @Bean

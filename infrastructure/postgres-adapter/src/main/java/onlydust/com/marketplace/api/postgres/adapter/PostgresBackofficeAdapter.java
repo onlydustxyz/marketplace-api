@@ -6,6 +6,8 @@ import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
@@ -25,6 +27,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final ProjectBudgetRepository projectBudgetRepository;
     private final BoSponsorRepository boSponsorRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
+    private final BoUserRepository boUserRepository;
     private final BoPaymentRepository boPaymentRepository;
     private final BoProjectRepository boProjectRepository;
 
@@ -105,6 +108,16 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                                 .githubUserId(entity.getGithubUserId())
                                 .build()
                 ).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public Page<UserView> listUsers(int pageIndex, int pageSize) {
+        final var page = boUserRepository.findAll(PageRequest.of(pageIndex, pageSize));
+        return Page.<UserView>builder()
+                .content(page.getContent().stream().map(BoUserEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

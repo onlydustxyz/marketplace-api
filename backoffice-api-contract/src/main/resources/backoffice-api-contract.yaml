@@ -191,6 +191,40 @@ paths:
           "500":
             $ref: '#/components/responses/InternalServerError'
 
+
+  /bo/v1/users:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get user page
+      operationId: getUserPage
+      description: |
+        Get user page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'User page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/payments:
     get:
       security:
@@ -497,6 +531,113 @@ components:
           type: integer
           format: int64
 
+
+    UserPage:
+      type: object
+      required:
+        - users
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPageItemResponse'
+    UserPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyName:
+          type: string
+        companyNum:
+          type: string
+        companyFirstname:
+          type: string
+        companyLastname:
+          type: string
+        personFirstname:
+          type: string
+        personLastname:
+          type: string
+        address:
+          type: string
+        postCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        telegram:
+          type: string
+        twitter:
+          type: string
+        discord:
+          type: string
+        linkedin:
+          type: string
+        whatsapp:
+          type: string
+        bic:
+          type: string
+        iban:
+          type: string
+        ens:
+          type: string
+        ethAddress:
+          type: string
+        aptosAddress:
+          type: string
+        optimismAddress:
+          type: string
+        starknetAddress:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastSeenAt:
+          type: string
+          format: date-time
+        email:
+          type: string
+        githubUserId:
+          type: integer
+          format: int64
+        githubLogin:
+          type: string
+        githubHtmlUrl:
+          type: string
+        githubAvatarUrl:
+          type: string
+        bio:
+          type: string
+        location:
+          type: string
+        website:
+          type: string
+        lookingForAJob:
+          type: boolean
+        weeklyAllocatedTime:
+          type: string
+        languages:
+          type: string
+        tcAcceptedAt:
+          type: string
+        onboardingCompletedAt:
+          type: string
+          format: date-time
     PaymentPage:
       type: object
       required:

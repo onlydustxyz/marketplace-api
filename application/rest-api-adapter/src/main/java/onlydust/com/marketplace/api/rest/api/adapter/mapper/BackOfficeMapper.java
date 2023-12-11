@@ -5,6 +5,9 @@ import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
 
@@ -94,6 +97,54 @@ public interface BackOfficeMapper {
         projectLeadInvitationPage.setHasMore(hasMore(sanitizedPageIndex,
                 projectLeadInvitationViewPage.getTotalPageNumber()));
         return projectLeadInvitationPage;
+    }
+
+    static UserPage mapUserPageToContract(final Page<UserView> userPage, int pageIndex) {
+        return new UserPage()
+                .users(userPage.getContent().stream().map(user -> new UserPageItemResponse()
+                        .id(user.getId())
+                        .companyName(user.getCompanyName())
+                        .companyNum(user.getCompanyNum())
+                        .companyFirstname(user.getCompanyFirstname())
+                        .companyLastname(user.getCompanyLastname())
+                        .personFirstname(user.getPersonFirstname())
+                        .personLastname(user.getPersonLastname())
+                        .address(user.getAddress())
+                        .postCode(user.getPostCode())
+                        .city(user.getCity())
+                        .country(user.getCountry())
+                        .telegram(user.getTelegram())
+                        .twitter(user.getTwitter())
+                        .discord(user.getDiscord())
+                        .linkedin(user.getLinkedIn())
+                        .whatsapp(user.getWhatsApp())
+                        .bic(user.getBic())
+                        .iban(user.getIban())
+                        .ens(user.getEns())
+                        .ethAddress(user.getEthAddress())
+                        .optimismAddress(user.getOptimismAddress())
+                        .starknetAddress(user.getStarknetAddress())
+                        .aptosAddress(user.getAptosAddress())
+                        .createdAt(user.getCreatedAt())
+                        .lastSeenAt(user.getLastSeenAt())
+                        .email(user.getEmail())
+                        .githubUserId(user.getGithubUserId())
+                        .githubLogin(user.getGithubLogin())
+                        .githubHtmlUrl(user.getGithubHtmlUrl())
+                        .githubAvatarUrl(user.getGithubAvatarUrl())
+                        .bio(user.getBio())
+                        .location(user.getLocation())
+                        .website(user.getWebsite())
+                        .lookingForAJob(user.getLookingForAJob())
+                        .weeklyAllocatedTime(user.getWeeklyAllocatedTime())
+                        .languages(user.getLanguages())
+                        .tcAcceptedAt(user.getTcAcceptedAt())
+                        .onboardingCompletedAt(user.getOnboardingCompletedAt())
+                ).toList())
+                .totalPageNumber(userPage.getTotalPageNumber())
+                .totalItemNumber(userPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, userPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, userPage.getTotalPageNumber()));
     }
 
     static PaymentPage mapPaymentPageToContract(final Page<PaymentView> paymentPage, int pageIndex) {

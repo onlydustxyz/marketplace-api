@@ -35,6 +35,11 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
+    public Page<UserView> listUsers(int pageIndex, int pageSize) {
+        return backofficeStoragePort.listUsers(pageIndex, pageSize);
+    }
+
+    @Override
     public Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds) {
         return backofficeStoragePort.listPayments(pageIndex, pageSize, projectIds);
     }

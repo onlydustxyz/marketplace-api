@@ -567,6 +567,151 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
 
     @Test
+    void should_get_users() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_USERS, Map.of("pageIndex", "0", "pageSize", "3")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                            "totalPageNumber": 9,
+                            "totalItemNumber": 27,
+                            "hasMore": true,
+                            "nextPageIndex": 1,
+                            "users": [
+                              {
+                                "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d",
+                                "companyName": null,
+                                "companyNum": null,
+                                "companyFirstname": null,
+                                "companyLastname": null,
+                                "personFirstname": null,
+                                "personLastname": null,
+                                "address": null,
+                                "postCode": null,
+                                "city": null,
+                                "country": null,
+                                "telegram": null,
+                                "twitter": "https://twitter.com/OnlyDust_xyz",
+                                "discord": null,
+                                "linkedin": null,
+                                "whatsapp": null,
+                                "bic": null,
+                                "iban": null,
+                                "ens": null,
+                                "ethAddress": null,
+                                "aptosAddress": null,
+                                "optimismAddress": null,
+                                "starknetAddress": null,
+                                "createdAt": "2023-02-01T08:56:05.771022Z",
+                                "lastSeenAt": "2023-02-01T08:56:06.027Z",
+                                "email": "tech@onlydust.xyz",
+                                "githubUserId": 112474158,
+                                "githubLogin": "onlydust-contributor",
+                                "githubHtmlUrl": "https://github.com/onlydust-contributor",
+                                "githubAvatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                "bio": "Get paid to contribute to open source projects on OnlyDust.xyz",
+                                "location": null,
+                                "website": "OnlyDust.xyz",
+                                "lookingForAJob": null,
+                                "weeklyAllocatedTime": null,
+                                "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                                "tcAcceptedAt": null,
+                                "onboardingCompletedAt": null
+                              },
+                              {
+                                "id": "c69f41be-c364-482f-91ae-5e55e3ea719b",
+                                "companyName": null,
+                                "companyNum": null,
+                                "companyFirstname": null,
+                                "companyLastname": null,
+                                "personFirstname": null,
+                                "personLastname": null,
+                                "address": null,
+                                "postCode": null,
+                                "city": null,
+                                "country": null,
+                                "telegram": null,
+                                "twitter": null,
+                                "discord": null,
+                                "linkedin": null,
+                                "whatsapp": null,
+                                "bic": null,
+                                "iban": null,
+                                "ens": null,
+                                "ethAddress": null,
+                                "aptosAddress": null,
+                                "optimismAddress": null,
+                                "starknetAddress": null,
+                                "createdAt": "2023-02-03T08:22:10.897654Z",
+                                "lastSeenAt": "2023-02-03T10:32:13.59Z",
+                                "email": "florian.pautot@gmail.com",
+                                "githubUserId": null,
+                                "githubLogin": null,
+                                "githubHtmlUrl": null,
+                                "githubAvatarUrl": null,
+                                "bio": null,
+                                "location": null,
+                                "website": null,
+                                "lookingForAJob": null,
+                                "weeklyAllocatedTime": null,
+                                "languages": null,
+                                "tcAcceptedAt": null,
+                                "onboardingCompletedAt": null
+                              },
+                              {
+                                "id": "4c392643-6d88-400b-a51a-a6e7cad45844",
+                                "companyName": null,
+                                "companyNum": null,
+                                "companyFirstname": null,
+                                "companyLastname": null,
+                                "personFirstname": null,
+                                "personLastname": null,
+                                "address": null,
+                                "postCode": null,
+                                "city": null,
+                                "country": null,
+                                "telegram": null,
+                                "twitter": null,
+                                "discord": null,
+                                "linkedin": null,
+                                "whatsapp": null,
+                                "bic": null,
+                                "iban": null,
+                                "ens": null,
+                                "ethAddress": null,
+                                "aptosAddress": null,
+                                "optimismAddress": null,
+                                "starknetAddress": null,
+                                "createdAt": "2023-05-24T09:45:04.209683Z",
+                                "lastSeenAt": "2023-05-24T09:45:04.787Z",
+                                "email": "clement.carouge@pm.me",
+                                "githubUserId": null,
+                                "githubLogin": null,
+                                "githubHtmlUrl": null,
+                                "githubAvatarUrl": null,
+                                "bio": null,
+                                "location": null,
+                                "website": null,
+                                "lookingForAJob": null,
+                                "weeklyAllocatedTime": null,
+                                "languages": null,
+                                "tcAcceptedAt": null,
+                                "onboardingCompletedAt": null
+                              }
+                            ]
+                          }
+                        """);
+    }
+
+
+    @Test
     void should_get_payments() {
         // When
         client.get()

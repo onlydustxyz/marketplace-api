@@ -13,6 +13,8 @@ public interface BackofficeFacadePort {
 
     Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids);
 
+    Page<UserView> listUsers(int pageIndex, int pageSize);
+
     Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
