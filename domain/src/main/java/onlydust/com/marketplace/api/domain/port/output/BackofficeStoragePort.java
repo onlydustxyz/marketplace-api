@@ -15,5 +15,7 @@ public interface BackofficeStoragePort {
 
     Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds);
 
+    Page<SponsorView> listSponsors(int pageIndex, int pageSize, List<UUID> projectIds);
+
     Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 }

@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.backoffice.api.contract.ApiUtil;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
@@ -12,15 +10,10 @@ import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +43,21 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(githubRepositoryPage) :
                 ResponseEntity.ok(githubRepositoryPage);
     }
+
+    @Override
+    public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize,
+                                                      List<UUID> projectIds) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var sponsorPage =
+                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
+
+        final var response = mapSponsorPageToContract(sponsorPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
 
     @Override
     public ResponseEntity<BudgetPage> getBudgetPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
