@@ -33,7 +33,7 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<PaymentView> listPayments(int pageIndex, int pageSize) {
-        return backofficeStoragePort.listPayments(pageIndex, pageSize);
+    public Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds) {
+        return backofficeStoragePort.listPayments(pageIndex, pageSize, projectIds);
     }
 }
