@@ -18,7 +18,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeade
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -253,11 +252,16 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var projectLeaderInvitations = project.getProjectLeaderInvitations();
         if (!isNull(githubUserIdsAsProjectLeadersToInvite)) {
             if (nonNull(projectLeaderInvitations)) {
-                projectLeaderInvitations.clear();
+                projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
+                        .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
+                                                   invitation.getProjectId().equals(projectId)));
+
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
+                        .filter(githubUserId -> projectLeaderInvitations.stream()
+                                .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
+                                                         invitation.getProjectId().equals(projectId)))
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
-                                githubUserId))
-                        .collect(Collectors.toSet()));
+                                githubUserId)).toList());
             } else {
                 project.setProjectLeaderInvitations(githubUserIdsAsProjectLeadersToInvite.stream()
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
@@ -356,14 +360,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
-        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors(), fromDate, toDate);
-        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId, currency, filters.getContributors(),
+        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors(),
+                fromDate, toDate);
+        final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
+                        currency, filters.getContributors(),
                         fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ? currency.toString() : null, filters.getContributors(),
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ?
+                        currency.toString() : null, filters.getContributors(),
                 fromDate, toDate);
 
         return ProjectRewardsPageView.builder().
@@ -372,8 +379,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .totalItemNumber(count)
                         .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                         .build())
-                .remainingBudget(new ProjectRewardsPageView.Money(budgetStats.getRemainingAmount(), filters.getCurrency(), budgetStats.getRemainingUsdAmount()))
-                .spentAmount(new ProjectRewardsPageView.Money(budgetStats.getSpentAmount(), filters.getCurrency(), budgetStats.getSpentUsdAmount()))
+                .remainingBudget(new ProjectRewardsPageView.Money(budgetStats.getRemainingAmount(),
+                        filters.getCurrency(), budgetStats.getRemainingUsdAmount()))
+                .spentAmount(new ProjectRewardsPageView.Money(budgetStats.getSpentAmount(), filters.getCurrency(),
+                        budgetStats.getSpentUsdAmount()))
                 .sentRewardsCount(budgetStats.getRewardsCount())
                 .rewardedContributionsCount(budgetStats.getRewardItemsCount())
                 .rewardedContributorsCount(budgetStats.getRewardRecipientsCount())

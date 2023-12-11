@@ -53,6 +53,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/5160414"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/777"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
@@ -92,7 +98,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "isLookingForContributors": true,
                           "inviteGithubUserIdsAsProjectLeads": [
-                            595505, 43467246
+                            595505, 43467246, 5160414
                           ],
                           "githubRepoIds": [
                             498695724, 602953043
@@ -133,9 +139,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.moreInfos.length()").isEqualTo(1)
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("PierreOucif")
-                .jsonPath("$.invitedLeaders.length()").isEqualTo(2)
+                .jsonPath("$.invitedLeaders.length()").isEqualTo(3)
                 .jsonPath("$.invitedLeaders[0].login").isEqualTo("ofux")
-                .jsonPath("$.invitedLeaders[1].login").isEqualTo("AnthonyBuisset")
+                .jsonPath("$.invitedLeaders[1].login").isEqualTo("haydencleary")
+                .jsonPath("$.invitedLeaders[2].login").isEqualTo("AnthonyBuisset")
                 .jsonPath("$.repos.length()").isEqualTo(2)
                 .jsonPath("$.repos[0].id").isEqualTo(498695724)
                 .jsonPath("$.repos[0].name").isEqualTo("marketplace-frontend")
@@ -300,7 +307,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "isLookingForContributors": false,
                           "inviteGithubUserIdsAsProjectLeads": [
-                            16590657
+                            16590657, 43467246
                           ],
                           "projectLeadsToKeep": [
                             "e461c019-ba23-4671-9b6c-3a5a18748af9"
@@ -368,7 +375,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.event_name", equalTo("LeaderInvitationCancelled")))
                 .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
                 .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
-                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("43467246")))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("5160414")))
         );
     }
 
@@ -687,8 +694,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.leaders.length()").isEqualTo(1)
                 .jsonPath("$.leaders[0].login").isEqualTo("ofux")
 
-                .jsonPath("$.invitedLeaders.length()").isEqualTo(1)
+                .jsonPath("$.invitedLeaders.length()").isEqualTo(2)
                 .jsonPath("$.invitedLeaders[0].login").isEqualTo("PierreOucif")
+                .jsonPath("$.invitedLeaders[1].login").isEqualTo("AnthonyBuisset")
 
                 .jsonPath("$.repos.length()").isEqualTo(2)
                 .jsonPath("$.repos[0].name").isEqualTo("bretzel-site")
