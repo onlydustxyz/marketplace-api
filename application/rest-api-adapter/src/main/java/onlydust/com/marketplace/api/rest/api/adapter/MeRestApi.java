@@ -118,14 +118,14 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize, String sort,
                                                               String direction) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final UserRewardView.SortBy sortBy = getSortBy(sort);
-        Page<UserRewardView> page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), sanitizedPageIndex,
+        final var sanitizedPageSize = sanitizePageSize(pageSize);
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var sortBy = getSortBy(sort);
+        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
-        final MyRewardsPageResponse myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);
+        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);
 
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :

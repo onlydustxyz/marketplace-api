@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -50,6 +51,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
+    private final RewardStatsRepository rewardStatsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -224,17 +226,28 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserRewardView> findRewardsForUserId(UUID userId, int pageIndex, int pageSize,
-                                                     UserRewardView.SortBy sortBy, SortDirection sortDirection) {
-        final Integer count = customUserRewardRepository.getCount(userId);
-        final List<UserRewardView> userRewardViews = customUserRewardRepository.getViewEntities(userId,
+    public UserRewardsPageView findRewardsForUserId(UUID userId, int pageIndex, int pageSize,
+                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+        final var count = customUserRewardRepository.getCount(userId);
+        final var userRewardViews = customUserRewardRepository.getViewEntities(userId,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(UserRewardMapper::mapEntityToDomain)
                 .toList();
-        return Page.<UserRewardView>builder()
-                .content(userRewardViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+        final var rewardsStats = rewardStatsRepository.findByUser(userId);
+
+        return UserRewardsPageView.builder()
+                .rewards(Page.<UserRewardView>builder()
+                        .content(userRewardViews)
+                        .totalItemNumber(count)
+                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .build())
+                .rewardedAmount(new Money(rewardsStats.getProcessedAmount(), Currency.Usd,
+                        rewardsStats.getProcessedUsdAmount()))
+                .pendingAmount(new Money(rewardsStats.getPendingAmount(), Currency.Usd,
+                        rewardsStats.getPendingUsdAmount()))
+                .receivedRewardsCount(rewardsStats.getRewardsCount())
+                .rewardedContributionsCount(rewardsStats.getRewardItemsCount())
+                .rewardingProjectsCount(rewardsStats.getProjectsCount())
                 .build();
     }
 

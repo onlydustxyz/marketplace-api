@@ -11,7 +11,7 @@ import static java.util.Objects.nonNull;
 
 public interface ProjectRewardMapper {
 
-    private static Money mapMoney(ProjectRewardsPageView.Money money) {
+    public static Money mapMoney(onlydust.com.marketplace.api.domain.view.Money money) {
         return new Money().amount(money.getAmount())
                 .currency(nonNull(money.getCurrency()) ? ProjectBudgetMapper.mapCurrency(money.getCurrency()) : null)
                 .usdEquivalent(money.getUsdEquivalent());

@@ -104,7 +104,8 @@ public class PostgresConfiguration {
                                                    final WalletRepository walletRepository,
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
-                                                   final ProjectLedIdRepository projectLedIdRepository) {
+                                                   final ProjectLedIdRepository projectLedIdRepository,
+                                                   final RewardStatsRepository rewardStatsRepository) {
         return new PostgresUserAdapter(
                 customUserRepository,
                 customContributorRepository,
@@ -123,7 +124,8 @@ public class PostgresConfiguration {
                 walletRepository,
                 customUserPayoutInfoRepository,
                 customRewardRepository,
-                projectLedIdRepository);
+                projectLedIdRepository,
+                rewardStatsRepository);
     }
 
     @Bean

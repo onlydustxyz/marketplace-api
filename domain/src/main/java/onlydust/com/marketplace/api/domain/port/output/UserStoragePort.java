@@ -35,7 +35,7 @@ public interface UserStoragePort {
 
     UserPayoutInformation savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation);
 
-    Page<UserRewardView> findRewardsForUserId(UUID userId, int pageIndex, int pageSize, UserRewardView.SortBy sortBy,
+    UserRewardsPageView findRewardsForUserId(UUID userId, int pageIndex, int pageSize, UserRewardView.SortBy sortBy,
                                               SortDirection sortDirection);
 
     UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId);

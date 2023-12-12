@@ -107,7 +107,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public Page<UserRewardView> getRewardsForUserId(UUID userId, int pageIndex, int pageSize,
+    public UserRewardsPageView getRewardsForUserId(UUID userId, int pageIndex, int pageSize,
                                                     UserRewardView.SortBy sortBy, SortDirection sortDirection) {
         return userStoragePort.findRewardsForUserId(userId, pageIndex, pageSize, sortBy, sortDirection);
     }

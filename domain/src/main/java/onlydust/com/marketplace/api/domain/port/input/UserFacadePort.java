@@ -35,7 +35,7 @@ public interface UserFacadePort {
 
     void applyOnProject(UUID id, UUID projectId);
 
-    Page<UserRewardView> getRewardsForUserId(UUID userId, int pageIndex, int sanitizedPageSize,
+    UserRewardsPageView getRewardsForUserId(UUID userId, int pageIndex, int sanitizedPageSize,
                                              UserRewardView.SortBy sortBy,
                                              SortDirection sortDirection);
 
