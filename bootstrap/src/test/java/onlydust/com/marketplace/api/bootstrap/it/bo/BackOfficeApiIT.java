@@ -708,6 +708,111 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             ]
                           }
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_USERS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "3",
+                        "userIds", "cde93e0e-99cf-4722-8aaa-2c27b91e270d,747e663f-4e68-4b42-965b-b5aebedcd4c4"
+
+                )))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "users": [
+                            {
+                              "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                              "companyName": null,
+                              "companyNum": null,
+                              "companyFirstname": null,
+                              "companyLastname": null,
+                              "personFirstname": "Anthony",
+                              "personLastname": "BUISSET",
+                              "address": "771 chemin de la sine",
+                              "postCode": "06140",
+                              "city": "Vence",
+                              "country": "France",
+                              "telegram": "https://t.me/abuisset",
+                              "twitter": "https://twitter.com/abuisset",
+                              "discord": "antho",
+                              "linkedin": "",
+                              "whatsapp": "",
+                              "bic": null,
+                              "iban": null,
+                              "ens": "abuisset.eth",
+                              "ethAddress": null,
+                              "aptosAddress": null,
+                              "optimismAddress": null,
+                              "starknetAddress": null,
+                              "createdAt": "2022-12-12T09:51:58.48559Z",
+                              "lastSeenAt": "2023-10-05T19:06:50.034Z",
+                              "email": "abuisset@gmail.com",
+                              "githubUserId": 43467246,
+                              "githubLogin": "AnthonyBuisset",
+                              "githubHtmlUrl": "https://github.com/AnthonyBuisset",
+                              "githubAvatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                              "bio": "FullStack engineerr",
+                              "location": "Vence, France",
+                              "website": "https://linktr.ee/abuisset",
+                              "lookingForAJob": false,
+                              "weeklyAllocatedTime": "none",
+                              "languages": "[\\"TypeScript\\", \\"Rust\\", \\"Python\\", \\"Cairo\\", \\"HCL\\", \\"Nix\\", \\"PLpgSQL\\", \\"Makefile\\", \\"CSS\\", \\"JavaScript\\", \\"Shell\\", \\"Dockerfile\\", \\"Procfile\\", \\"HTML\\"]",
+                              "tcAcceptedAt": "2023-06-16 16:10:53.562624",
+                              "onboardingCompletedAt": "2023-06-28T13:43:28.30742Z"
+                            },
+                            {
+                              "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d",
+                              "companyName": null,
+                              "companyNum": null,
+                              "companyFirstname": null,
+                              "companyLastname": null,
+                              "personFirstname": null,
+                              "personLastname": null,
+                              "address": null,
+                              "postCode": null,
+                              "city": null,
+                              "country": null,
+                              "telegram": null,
+                              "twitter": "https://twitter.com/OnlyDust_xyz",
+                              "discord": null,
+                              "linkedin": null,
+                              "whatsapp": null,
+                              "bic": null,
+                              "iban": null,
+                              "ens": null,
+                              "ethAddress": null,
+                              "aptosAddress": null,
+                              "optimismAddress": null,
+                              "starknetAddress": null,
+                              "createdAt": "2023-02-01T08:56:05.771022Z",
+                              "lastSeenAt": "2023-02-01T08:56:06.027Z",
+                              "email": "tech@onlydust.xyz",
+                              "githubUserId": 112474158,
+                              "githubLogin": "onlydust-contributor",
+                              "githubHtmlUrl": "https://github.com/onlydust-contributor",
+                              "githubAvatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                              "bio": "Get paid to contribute to open source projects on OnlyDust.xyz",
+                              "location": null,
+                              "website": "OnlyDust.xyz",
+                              "lookingForAJob": null,
+                              "weeklyAllocatedTime": null,
+                              "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                              "tcAcceptedAt": null,
+                              "onboardingCompletedAt": null
+                            }
+                          ]
+                        }
+                        """);
     }
 
 

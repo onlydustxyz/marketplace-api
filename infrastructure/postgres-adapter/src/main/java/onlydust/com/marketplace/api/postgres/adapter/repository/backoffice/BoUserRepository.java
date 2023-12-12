@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
@@ -94,8 +95,10 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                      LEFT JOIN onboardings o ON au.id = o.user_id
                      LEFT JOIN repo_languages rl ON rl.contributor_id = au.github_user_id
                      LEFT JOIN user_languages ul ON ul.user_id = au.id
+                WHERE 
+                    COALESCE(:userIds) IS NULL OR au.id IN (:userIds)
             """,
-            countQuery = "SELECT count(*) FROM auth_users", nativeQuery = true)
+            countQuery = "SELECT count(*) FROM auth_users WHERE COALESCE(:userIds) IS NULL OR id IN (:userIds)", nativeQuery = true)
     @NotNull
-    Page<BoUserEntity> findAll(final @NotNull Pageable pageable);
+    Page<BoUserEntity> findAll(final List<UUID> userIds, final @NotNull Pageable pageable);
 }

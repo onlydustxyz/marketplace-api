@@ -52,4 +52,12 @@ public class UserView {
     String languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
+
+    @Value
+    @Builder
+    @EqualsAndHashCode
+    public static class Filters {
+        @Builder.Default
+        List<UUID> users = List.of();
+    }
 }

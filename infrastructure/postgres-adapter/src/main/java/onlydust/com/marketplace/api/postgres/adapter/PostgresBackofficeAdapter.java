@@ -114,8 +114,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    public Page<UserView> listUsers(int pageIndex, int pageSize) {
-        final var page = boUserRepository.findAll(PageRequest.of(pageIndex, pageSize));
+    public Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters) {
+        final var page = boUserRepository.findAll(filters.getUsers(), PageRequest.of(pageIndex, pageSize));
         return Page.<UserView>builder()
                 .content(page.getContent().stream().map(BoUserEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())

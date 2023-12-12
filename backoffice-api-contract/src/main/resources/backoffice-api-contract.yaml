@@ -213,6 +213,14 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: userIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
       responses:
         "200":
           description: 'User page'
