@@ -135,23 +135,25 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
-        return new TechnologiesService(trackingIssuePort);
+    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort,
+                                             final GithubStoragePort githubStoragePort,
+                                             final ProjectStoragePort projectStoragePort) {
+        return new TechnologiesService(trackingIssuePort, githubStoragePort, projectStoragePort);
     }
 
     @Bean
     public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
                                                    final ContributionStoragePort contributionStoragePort,
                                                    final OutboxPort indexerOutbox,
-                                                   final ProjectFacadePort projectFacadePort) {
-        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox, projectFacadePort);
+                                                   final TechnologiesPort technologiesPort) {
+        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox, technologiesPort);
     }
 
 
     @Bean
     public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort,
-                                                             final ProjectFacadePort projectFacadePort) {
-        return new ContributionObserver(contributionStoragePort, projectFacadePort);
+                                                             final TechnologiesPort technologiesPort) {
+        return new ContributionObserver(contributionStoragePort, technologiesPort);
     }
 
 }

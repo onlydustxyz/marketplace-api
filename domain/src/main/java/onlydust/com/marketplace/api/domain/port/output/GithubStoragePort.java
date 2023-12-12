@@ -10,9 +10,9 @@ import java.util.UUID;
 public interface GithubStoragePort {
     Optional<GithubAccount> findAccountByInstallationId(Long installationId);
 
-    Optional<GithubRepo> findRepoById(Long repoId);
+    Optional<GithubRepo> findPublicRepoById(Long repoId);
 
     List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
 
-    List<GithubRepo> findByProjectId(UUID projectId);
+    List<GithubRepo> findPublicReposByProjectId(UUID projectId);
 }

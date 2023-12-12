@@ -41,7 +41,6 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                                                       List<UUID> projectIds,
                                                       List<Long> repoIds);
 
-    @Override
     @Query(value = """
             SELECT
                 r.id,
@@ -60,7 +59,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 r.id = :repoId and r.visibility = 'PUBLIC'
             """, nativeQuery = true)
     @NonNull
-    Optional<GithubRepoViewEntity> findById(@NonNull Long repoId);
+    Optional<GithubRepoViewEntity> findPublicRepoById(@NonNull Long repoId);
 
     @Query(value = """
             SELECT
@@ -78,7 +77,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
             INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
             WHERE
-                pgr.project_id = :projectId
+                pgr.project_id = :projectId and r.visibility = 'PUBLIC'
             """, nativeQuery = true)
-    List<GithubRepoViewEntity> listByProjectId(UUID projectId);
+    List<GithubRepoViewEntity> listPublicReposByProjectId(UUID projectId);
 }

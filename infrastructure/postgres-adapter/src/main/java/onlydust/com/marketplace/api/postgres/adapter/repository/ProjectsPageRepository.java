@@ -36,15 +36,11 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                          left join auth_users u on u.id = pl.user_id
                          left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
-                    group by pl.project_id)                   as   project_leads,
-                   t.technologies as  technologies,
-                   s.sponsor_json                                 sponsors
+                    group by pl.project_id)                   as  project_leads,
+                   pt.technologies                           as  technologies,
+                   s.sponsor_json                             as  sponsors
             from project_details p
-                left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                            from project_github_repos pgr
-                            join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                            where gr.visibility = 'PUBLIC'
-                            group by pgr.project_id) as t on t.project_id = p.project_id
+                left join project_technologies pt on pt.project_id = p.project_id
                 left join (select ps.project_id,
                                            jsonb_agg(jsonb_build_object(
                                                    'url', sponsor.url,
@@ -65,7 +61,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                     group by pc_count.project_id) pc_count on pc_count.project_id = p.project_id
             where r_count.repo_count > 0
               and p.visibility = 'PUBLIC'
-              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
               and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
               order by case
@@ -106,7 +102,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                              left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                     as project_leads,
-                   t.technologies                               as technologies,
+                   pt.technologies                              as technologies,
                    s.sponsor_json                               as sponsors,
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
                    (select count(pgr.github_repo_id) > count(agr.repo_id)
@@ -115,11 +111,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                     left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                            where pgr.project_id = p.project_id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
             from project_details p
-                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                from project_github_repos pgr
-                                join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                where gr.visibility = 'PUBLIC'
-                                group by pgr.project_id) as t on t.project_id = p.project_id
+                     left join project_technologies pt on pt.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -161,7 +153,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
+                   jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
               and (coalesce(:sponsorsJsonPath) is null or
                    jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
@@ -187,11 +179,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
                         select count(p.project_id)
                         from project_details p
-                        left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                    from project_github_repos pgr
-                                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                    where gr.visibility = 'PUBLIC'
-                                    group by pgr.project_id) as t on t.project_id = p.project_id
+                        left join project_technologies pt on pt.project_id = p.project_id
                         left join (select ps.project_id,
                                                    jsonb_agg(jsonb_build_object(
                                                            'url', sponsor.url,
@@ -207,7 +195,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                            join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
                                            where pgr_count.project_id = p.project_id and gr2.visibility = 'PUBLIC') > 0
                                        and p.visibility = 'PUBLIC'
-                                       and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+                                       and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
                                        and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
@@ -219,11 +207,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
             select count(p.project_id)
             from project_details p
-                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                 join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                 where gr.visibility = 'PUBLIC'
-                                 group by pgr.project_id) as t on t.project_id = p.project_id
+                     left join project_technologies pt on pt.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -265,7 +249,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
+                   jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
               and (coalesce(:sponsorsJsonPath) is null or
                    jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or

@@ -81,8 +81,4 @@ public interface ProjectFacadePort {
                                          Integer page, Integer pageSize);
 
     void updateProjectsRanking();
-
-    void refreshTechnologies(UUID projectId);
-
-    void refreshTechnologies(List<Long> repoIds);
 }

@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.port.output.GithubStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.TrackingIssuePort;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +12,8 @@ import static org.mockito.Mockito.verify;
 
 class TechnologiesServiceTest {
     private final TrackingIssuePort trackingIssuePort = mock(TrackingIssuePort.class);
-    private final TechnologiesService technologiesService = new TechnologiesService(trackingIssuePort);
+    private final TechnologiesService technologiesService = new TechnologiesService(trackingIssuePort,
+            mock(GithubStoragePort.class), mock(ProjectStoragePort.class));
     private final Faker faker = new Faker();
 
     @Test
@@ -19,6 +22,7 @@ class TechnologiesServiceTest {
         final var requester = User.builder().login(githubUsername).build();
 
         technologiesService.suggest("Rust", requester);
-        verify(trackingIssuePort).createIssueForTechTeam("New technology suggestion: Rust", "Suggested by: " + githubUsername);
+        verify(trackingIssuePort).createIssueForTechTeam("New technology suggestion: Rust",
+                "Suggested by: " + githubUsername);
     }
 }

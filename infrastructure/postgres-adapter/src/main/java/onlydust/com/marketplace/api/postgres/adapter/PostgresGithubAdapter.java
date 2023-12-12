@@ -29,8 +29,8 @@ public class PostgresGithubAdapter implements GithubStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<GithubRepo> findRepoById(Long repoId) {
-        return githubRepoViewEntityRepository.findById(repoId)
+    public Optional<GithubRepo> findPublicRepoById(Long repoId) {
+        return githubRepoViewEntityRepository.findPublicRepoById(repoId)
                 .map(GithubRepoMapper::map);
     }
 
@@ -44,8 +44,8 @@ public class PostgresGithubAdapter implements GithubStoragePort {
     }
 
     @Override
-    public List<GithubRepo> findByProjectId(UUID projectId) {
-        return githubRepoViewEntityRepository.listByProjectId(projectId)
+    public List<GithubRepo> findPublicReposByProjectId(UUID projectId) {
+        return githubRepoViewEntityRepository.listPublicReposByProjectId(projectId)
                 .stream()
                 .map(GithubRepoMapper::map)
                 .toList();

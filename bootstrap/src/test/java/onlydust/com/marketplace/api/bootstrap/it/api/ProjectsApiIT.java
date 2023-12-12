@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.domain.port.input.TechnologiesPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
@@ -2665,6 +2663,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired
     HasuraUserHelper userHelper;
+    @Autowired
+    TechnologiesPort technologiesPort;
+
+    @BeforeAll
+    public void beforeAll() {
+        technologiesPort.refreshTechnologies();
+    }
 
     @Test
     @Order(1)
@@ -2888,10 +2893,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(10)
-    public void should_update_project_ranking(){
+    public void should_update_project_ranking() {
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET,Map.of("pageIndex","0","pageSize","5","sort","RANK")))
+                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "5", "sort", "RANK")))
                 // Then
                 .exchange()
                 .expectStatus()

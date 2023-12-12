@@ -587,7 +587,7 @@ public class ProjectServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
         when(permissionService.isRepoLinkedToProject(projectId, githubRepoId)).thenReturn(true);
-        when(githubStoragePort.findRepoById(githubRepoId))
+        when(githubStoragePort.findPublicRepoById(githubRepoId))
                 .thenReturn(Optional.of(GithubRepo.builder()
                         .id(githubRepoId)
                         .owner(githubRepoOwner)

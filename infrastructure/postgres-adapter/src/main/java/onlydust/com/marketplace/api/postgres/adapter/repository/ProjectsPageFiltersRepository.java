@@ -11,15 +11,11 @@ import java.util.UUID;
 public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersViewEntity, UUID> {
 
     @Query(value = """
-            select t.technologies,
+            select pt.technologies,
                    s.sponsor_json as sponsors,
                    p.project_id
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                          join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                where gr.visibility = 'PUBLIC'
-                                 group by pgr.project_id) ) as t on t.project_id = p.project_id
+                     left join project_technologies pt on pt.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -36,7 +32,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    where pgr_count.project_id = p.project_id
                    and gr.visibility = 'PUBLIC') > 0
               and p.visibility = 'PUBLIC'
-              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
               and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')""",
             nativeQuery = true)
@@ -46,13 +42,10 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.project_id,
-                   t.technologies                             as technologies,
-                   s.sponsor_json                             as   sponsors
+                   pt.technologies                           as technologies,
+                   s.sponsor_json                             as sponsors
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                          left join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                 group by pgr.project_id)) as t on t.project_id = p.project_id
+                     left join project_technologies pt on pt.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -97,7 +90,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                     and (coalesce(is_contributor.is_c, false) or coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
+                   jsonb_path_exists(pt.technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
               and (coalesce(:sponsorsJsonPath) is null or
                    jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
