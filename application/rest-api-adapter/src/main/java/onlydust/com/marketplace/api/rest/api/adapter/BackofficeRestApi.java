@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
+import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import org.springframework.http.HttpStatus;
@@ -100,6 +101,20 @@ public class BackofficeRestApi implements BackofficeApi {
     }
 
     @Override
+    public ResponseEntity<UserPage> getUserPage(Integer pageIndex, Integer pageSize, List<UUID> userIds) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var filters = UserView.Filters.builder()
+                .users(Optional.ofNullable(userIds).orElse(List.of()))
+                .build();
+        final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
+        final var response = mapUserPageToContract(usersPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
@@ -120,4 +135,5 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
+
 }

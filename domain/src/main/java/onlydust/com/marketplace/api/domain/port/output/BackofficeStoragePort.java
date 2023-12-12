@@ -13,6 +13,8 @@ public interface BackofficeStoragePort {
 
     Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids);
 
+    Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters);
+
     Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
