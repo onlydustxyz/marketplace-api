@@ -521,6 +521,124 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                            ]
                          }
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_PAYMENTS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "8156fc5f-cec5-4f70-a0de-c368772edcd4,6d955622-c1ce-4227-85ea-51cb1b3207b1"
+                )))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                            "totalPageNumber": 12,
+                            "totalItemNumber": 58,
+                            "hasMore": true,
+                            "nextPageIndex": 1,
+                            "payments": [
+                              {
+                                "id": "047bcb92-dfbf-45c0-970d-509781237b2e",
+                                "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
+                                "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                                "amount": 500,
+                                "currency": "USD",
+                                "recipientId": 116729712,
+                                "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "items": [
+                                  "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                                ],
+                                "requestedAt": "2022-12-23T13:46:18.624338Z",
+                                "processedAt": "2022-12-23T13:46:18.666452Z",
+                                "pullRequestsCount": 1,
+                                "issuesCount": 0,
+                                "dustyIssuesCount": 0,
+                                "codeReviewsCount": 0
+                              },
+                              {
+                                "id": "07e75bb9-87fc-4a22-9bea-1232c27e56d4",
+                                "budgetId": "a419c321-469a-4464-b6e1-56e800b53952",
+                                "projectId": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                                "amount": 10,
+                                "currency": "USD",
+                                "recipientId": 30843220,
+                                "requestorId": "6115f024-159a-4b1f-b713-1e2ad5c6063e",
+                                "items": [
+                                  "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                                ],
+                                "requestedAt": "2022-12-23T11:19:28.353471Z",
+                                "processedAt": "2022-12-23T11:19:28.395366Z",
+                                "pullRequestsCount": 1,
+                                "issuesCount": 0,
+                                "dustyIssuesCount": 0,
+                                "codeReviewsCount": 0
+                              },
+                              {
+                                "id": "0e31bf2e-e73d-41e7-ba6d-d0e608c5a7f9",
+                                "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
+                                "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                                "amount": 3000,
+                                "currency": "USD",
+                                "recipientId": 4404287,
+                                "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "items": [
+                                  "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                                ],
+                                "requestedAt": "2022-12-23T13:46:17.48837Z",
+                                "processedAt": "2022-12-23T13:46:17.527921Z",
+                                "pullRequestsCount": 1,
+                                "issuesCount": 0,
+                                "dustyIssuesCount": 0,
+                                "codeReviewsCount": 0
+                              },
+                              {
+                                "id": "1325c03f-348b-48e5-80c9-a589df5fe400",
+                                "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
+                                "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                                "amount": 3000,
+                                "currency": "USD",
+                                "recipientId": 18620296,
+                                "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "items": [
+                                  "https://github.com/kkrt-labs/kakarot/pull/248",
+                                  "https://github.com/kkrt-labs/kakarot/pull/243",
+                                  "https://github.com/kkrt-labs/kakarot/pull/237",
+                                  "https://github.com/kkrt-labs/kakarot/pull/242",
+                                  "https://github.com/kkrt-labs/kakarot/pull/218"
+                                ],
+                                "requestedAt": "2022-12-28T08:23:24.765473Z",
+                                "processedAt": "2022-12-28T08:23:24.828445Z",
+                                "pullRequestsCount": 5,
+                                "issuesCount": 0,
+                                "dustyIssuesCount": 0,
+                                "codeReviewsCount": 0
+                              },
+                              {
+                                "id": "150817bb-8484-4e31-a332-ac8378d0a6e2",
+                                "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
+                                "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
+                                "amount": 500,
+                                "currency": "USD",
+                                "recipientId": 116874460,
+                                "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "items": [
+                                  "https://github.com/onlydustxyz/marketplace-frontend/pull/832"
+                                ],
+                                "requestedAt": "2022-12-23T13:46:21.984512Z",
+                                "processedAt": "2022-12-23T13:46:22.024677Z",
+                                "pullRequestsCount": 1,
+                                "issuesCount": 0,
+                                "dustyIssuesCount": 0,
+                                "codeReviewsCount": 0
+                              }
+                            ]
+                          }
+                        """);
     }
 
 }

@@ -16,5 +16,5 @@ public interface BackofficeStoragePort {
 
     Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids);
 
-    Page<PaymentView> listPayments(int pageIndex, int pageSize);
+    Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds);
 }

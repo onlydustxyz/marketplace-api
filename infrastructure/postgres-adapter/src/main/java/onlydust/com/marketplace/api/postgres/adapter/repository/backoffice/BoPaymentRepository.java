@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID> {
@@ -64,7 +65,9 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             		GROUP BY
             			payment_id
             	) Counters ON (pr.id = Counters.payment_id)
+            WHERE 
+                (COALESCE(:projectIds) IS NULL OR pr.project_id in (:projectIds))
             """, nativeQuery = true)
     @NotNull
-    Page<BoPaymentEntity> findAll(final @NotNull Pageable pageable);
+    Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final @NotNull Pageable pageable);
 }
