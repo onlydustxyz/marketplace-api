@@ -9,10 +9,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -26,6 +23,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.lang.String.format;
@@ -241,13 +239,15 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .totalItemNumber(count)
                         .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                         .build())
-                .rewardedAmount(new Money(rewardsStats.getProcessedAmount(), Currency.Usd,
-                        rewardsStats.getProcessedUsdAmount()))
-                .pendingAmount(new Money(rewardsStats.getPendingAmount(), Currency.Usd,
-                        rewardsStats.getPendingUsdAmount()))
-                .receivedRewardsCount(rewardsStats.getRewardsCount())
-                .rewardedContributionsCount(rewardsStats.getRewardItemsCount())
-                .rewardingProjectsCount(rewardsStats.getProjectsCount())
+                .rewardedAmount(rewardsStats.size() == 1 ?
+                        new Money(rewardsStats.get(0).getProcessedAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getProcessedUsdAmount()) :
+                        new Money(null, Currency.Usd, rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .pendingAmount(rewardsStats.size() == 1 ?
+                        new Money(rewardsStats.get(0).getPendingAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getPendingUsdAmount()) :
+                        new Money(null, Currency.Usd, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardsCount).reduce(0, Integer::sum))
+                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemsCount).reduce(0, Integer::sum))
+                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectsCount).reduce(0, Integer::sum))
                 .build();
     }
 

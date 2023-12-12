@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,10 +10,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, Long> {
+public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, CurrencyEnumEntity> {
     @Query(value = """
             SELECT 
-                1 AS ID,
+                pr.currency,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ), 0) AS processed_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END, 0) AS processed_usd_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_amount,
@@ -31,10 +32,9 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
             ) p ON p.request_id = pr.id
             LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency
             WHERE 
-                pr.currency = 'usd' AND 
                 au.id = :userId
             GROUP BY 
                 pr.currency, cuq.price
             """, nativeQuery = true)
-    RewardStatsEntity findByUser(UUID userId);
+    List<RewardStatsEntity> findByUser(UUID userId);
 }
