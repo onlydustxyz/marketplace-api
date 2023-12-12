@@ -9,17 +9,20 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTechnologiesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -35,7 +38,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectViewRepository projectViewRepository;
     private final ProjectIdRepository projectIdRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
-    private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final CustomProjectRewardRepository customProjectRewardRepository;
@@ -47,6 +49,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final RewardableItemRepository rewardableItemRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
     private final BudgetStatsRepository budgetStatsRepository;
+    private final ProjectTechnologiesRepository projectTechnologiesRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -86,17 +89,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(format("Pull request %s/%s#%d not found", repoOwner,
                         repoName,
                         pullRequestNumber)));
-    }
-
-    @Override
-    public Set<Long> removeUsedRepos(Collection<Long> repoIds) {
-        final var usedRepos = projectRepoRepository.findAllByRepoId(repoIds).stream()
-                .map(ProjectRepoEntity::getRepoId)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return repoIds.stream()
-                .filter(repoId -> !usedRepos.contains(repoId))
-                .collect(Collectors.toSet());
     }
 
     @Override
@@ -464,5 +456,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void updateProjectsRanking() {
         customProjectRankingRepository.updateProjectsRanking();
+    }
+
+    @Override
+    public void updateProjectTechnologies(UUID projectId, Map<String, Long> technologies) {
+        projectTechnologiesRepository.save(new ProjectTechnologiesEntity(projectId, technologies));
+    }
+
+    @Override
+    public Set<UUID> getProjectIdsLinkedToRepoIds(Set<Long> repoIds) {
+        return customProjectRepository.findProjectIdsLinkedToRepoIds(repoIds);
     }
 }

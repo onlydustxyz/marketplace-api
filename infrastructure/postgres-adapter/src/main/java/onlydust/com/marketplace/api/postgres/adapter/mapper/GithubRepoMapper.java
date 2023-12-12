@@ -15,6 +15,7 @@ public interface GithubRepoMapper {
                 .description(repo.getDescription())
                 .starsCount(repo.getStarsCount())
                 .forksCount(repo.getForksCount())
+                .technologies(repo.getLanguages())
                 .build();
     }
 
@@ -28,6 +29,7 @@ public interface GithubRepoMapper {
                 .description(repo.getDescription())
                 .starsCount(repo.getStarsCount())
                 .forksCount(repo.getForksCount())
+                .technologies(repo.getLanguages())
                 .build();
     }
 }

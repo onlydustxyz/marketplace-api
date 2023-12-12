@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Value
 @Builder(toBuilder = true)
@@ -18,4 +20,6 @@ public class GithubRepo {
     String description;
     Long starsCount;
     Long forksCount;
+    @Builder.Default
+    Map<String, Long> technologies = new HashMap<>();
 }

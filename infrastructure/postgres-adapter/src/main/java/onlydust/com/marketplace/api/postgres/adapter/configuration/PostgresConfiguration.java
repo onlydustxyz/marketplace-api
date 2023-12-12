@@ -4,8 +4,8 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectLeadInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -46,7 +46,6 @@ public class PostgresConfiguration {
                                                          final ProjectViewRepository projectViewRepository,
                                                          final ProjectIdRepository projectIdRepository,
                                                          final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
-                                                         final ProjectRepoRepository projectRepoRepository,
                                                          final CustomProjectRepository customProjectRepository,
                                                          final CustomContributorRepository customContributorRepository,
                                                          final CustomProjectRewardRepository customProjectRewardRepository,
@@ -57,13 +56,13 @@ public class PostgresConfiguration {
                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                          final RewardableItemRepository rewardableItemRepository,
                                                          final CustomProjectRankingRepository customProjectRankingRepository,
-                                                         final BudgetStatsRepository budgetStatsRepository) {
+                                                         final BudgetStatsRepository budgetStatsRepository,
+                                                         final ProjectTechnologiesRepository projectTechnologiesRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
                 projectIdRepository,
                 projectLeaderInvitationRepository,
-                projectRepoRepository,
                 customProjectRepository,
                 customContributorRepository,
                 customProjectRewardRepository,
@@ -74,7 +73,8 @@ public class PostgresConfiguration {
                 projectsPageFiltersRepository,
                 rewardableItemRepository,
                 customProjectRankingRepository,
-                budgetStatsRepository
+                budgetStatsRepository,
+                projectTechnologiesRepository
         );
     }
 
@@ -195,7 +195,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager){
+    public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager) {
         return new CustomProjectRankingRepository(entityManager);
     }
 }

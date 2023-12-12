@@ -5,8 +5,8 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,7 +51,7 @@ public interface ProjectStoragePort {
 
     ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
                                        ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
-                                        int pageIndex, int pageSize);
+                                       int pageIndex, int pageSize);
 
     ProjectBudgetsView findBudgets(UUID projectId);
 
@@ -75,11 +75,13 @@ public interface ProjectStoragePort {
 
     RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 
-    Set<Long> removeUsedRepos(Collection<Long> repoIds);
-
     boolean hasUserAccessToProject(UUID projectId, UUID userId);
 
     boolean hasUserAccessToProject(String projectSlug, UUID userId);
 
     void updateProjectsRanking();
+
+    void updateProjectTechnologies(UUID projectId, Map<String, Long> technologies);
+
+    Set<UUID> getProjectIdsLinkedToRepoIds(Set<Long> repoIds);
 }

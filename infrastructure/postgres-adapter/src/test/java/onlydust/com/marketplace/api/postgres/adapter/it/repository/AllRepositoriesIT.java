@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GithubRepoViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
@@ -68,6 +69,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     UserViewRepository userViewRepository;
     @Autowired
     PostgresUserAdapter postgresUserAdapter;
+    @Autowired
+    GithubRepoViewEntityRepository githubRepoEntityRepository;
 
     @Test
     void should_create_user() {

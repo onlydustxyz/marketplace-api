@@ -19,7 +19,8 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 r.updated_at,
                 r.description,
                 r.stars_count,
-                r.forks_count
+                r.forks_count,
+                r.languages
             FROM
                  indexer_exp.github_repos r
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
@@ -50,7 +51,8 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                 r.updated_at,
                 r.description,
                 r.stars_count,
-                r.forks_count
+                r.forks_count,
+                r.languages
             FROM
                  indexer_exp.github_repos r
             INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
@@ -59,4 +61,24 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
             """, nativeQuery = true)
     @NonNull
     Optional<GithubRepoViewEntity> findById(@NonNull Long repoId);
+
+    @Query(value = """
+            SELECT
+                r.id,
+                owner.login as owner,
+                r.name,
+                r.html_url,
+                r.updated_at,
+                r.description,
+                r.stars_count,
+                r.forks_count,
+                r.languages
+            FROM
+                 indexer_exp.github_repos r
+            INNER JOIN indexer_exp.github_accounts owner ON r.owner_id = owner.id
+            INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
+            WHERE
+                pgr.project_id = :projectId
+            """, nativeQuery = true)
+    List<GithubRepoViewEntity> listByProjectId(UUID projectId);
 }

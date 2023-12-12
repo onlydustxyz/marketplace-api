@@ -15,10 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -370,5 +367,24 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public void updateProjectsRanking() {
         projectStoragePort.updateProjectsRanking();
+    }
+
+    @Override
+    public void refreshTechnologies(UUID projectId) {
+        final var aggregatedTechnologies = githubStoragePort.findByProjectId(projectId).stream()
+                .map(GithubRepo::getTechnologies)
+                .filter(Objects::nonNull)
+                .reduce((technologies1, technologies2) -> {
+                    technologies2.forEach((technology, value) -> technologies1.merge(technology, value, Long::sum));
+                    return technologies1;
+                });
+        aggregatedTechnologies.ifPresent(technologies -> projectStoragePort.updateProjectTechnologies(projectId,
+                technologies));
+    }
+
+    @Override
+    public void refreshTechnologies(List<Long> repoIds) {
+        final var projectIds = projectStoragePort.getProjectIdsLinkedToRepoIds(Set.copyOf(repoIds));
+        projectIds.forEach(this::refreshTechnologies);
     }
 }

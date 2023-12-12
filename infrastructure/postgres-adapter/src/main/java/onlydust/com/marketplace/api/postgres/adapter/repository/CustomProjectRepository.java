@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEnt
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -132,5 +133,16 @@ public class CustomProjectRepository {
                 .setParameter("userId", userId)
                 .getResultList();
         return !hasAccessToProject.isEmpty();
+    }
+
+    public Set<UUID> findProjectIdsLinkedToRepoIds(Set<Long> repoIds) {
+        final List<UUID> projectIds = entityManager.createNativeQuery("""
+                        select pgr.project_id
+                        from project_github_repos pgr
+                        where pgr.github_repo_id in :repoIds
+                        """)
+                .setParameter("repoIds", repoIds)
+                .getResultList();
+        return Set.copyOf(projectIds);
     }
 }

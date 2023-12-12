@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.model.GithubRepo;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface GithubStoragePort {
     Optional<GithubAccount> findAccountByInstallationId(Long installationId);
@@ -12,4 +13,6 @@ public interface GithubStoragePort {
     Optional<GithubRepo> findRepoById(Long repoId);
 
     List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
+
+    List<GithubRepo> findByProjectId(UUID projectId);
 }

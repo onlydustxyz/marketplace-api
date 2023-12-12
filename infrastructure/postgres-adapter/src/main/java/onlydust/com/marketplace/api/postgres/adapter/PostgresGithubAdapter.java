@@ -12,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.Objects.isNull;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresGithubAdapter implements GithubStoragePort {
@@ -41,6 +40,14 @@ public class PostgresGithubAdapter implements GithubStoragePort {
         return githubAppInstallationRepository.findAllByAccount_IdIn(userGithubAccountIds)
                 .stream()
                 .map(GithubAccountMapper::map)
+                .toList();
+    }
+
+    @Override
+    public List<GithubRepo> findByProjectId(UUID projectId) {
+        return githubRepoViewEntityRepository.listByProjectId(projectId)
+                .stream()
+                .map(GithubRepoMapper::map)
                 .toList();
     }
 }

@@ -142,14 +142,16 @@ public class DomainConfiguration {
     @Bean
     public ProjectObserverPort projectObserverPort(final OutboxPort notificationOutbox,
                                                    final ContributionStoragePort contributionStoragePort,
-                                                   final OutboxPort indexerOutbox) {
-        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox);
+                                                   final OutboxPort indexerOutbox,
+                                                   final ProjectFacadePort projectFacadePort) {
+        return new ProjectObserver(notificationOutbox, contributionStoragePort, indexerOutbox, projectFacadePort);
     }
 
 
     @Bean
-    public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort) {
-        return new ContributionObserver(contributionStoragePort);
+    public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort,
+                                                             final ProjectFacadePort projectFacadePort) {
+        return new ContributionObserver(contributionStoragePort, projectFacadePort);
     }
 
 }
