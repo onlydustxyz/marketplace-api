@@ -83,8 +83,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
 
     @Override
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = boSponsorRepository.findAll(isNull(projectIds) ? List.of() : projectIds, PageRequest.of(pageIndex, pageSize));
+    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+        final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(), PageRequest.of(pageIndex, pageSize));
         return Page.<SponsorView>builder()
                 .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())

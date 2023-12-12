@@ -9,12 +9,14 @@ import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
+import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
@@ -46,10 +48,16 @@ public class BackofficeRestApi implements BackofficeApi {
 
     @Override
     public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize,
-                                                      List<UUID> projectIds) {
+                                                      List<UUID> projectIds, List<UUID> sponsorIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var filters = SponsorView.Filters.builder()
+                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
+                .sponsors(Optional.ofNullable(sponsorIds).orElse(List.of()))
+                .build();
+
         final var sponsorPage =
-                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
+                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
 
         final var response = mapSponsorPageToContract(sponsorPage, sanitizedPageIndex);
 

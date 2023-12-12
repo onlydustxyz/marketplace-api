@@ -320,6 +320,50 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             }
                         """);
+
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "sponsorIds", "eb04a5de-4802-4071-be7b-9007b563d48d,2639563e-4437-4bde-a4f4-654977c0cb39")
+                ))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                               "totalPageNumber": 1,
+                               "totalItemNumber": 2,
+                               "hasMore": false,
+                               "nextPageIndex": 0,
+                               "sponsors": [
+                                 {
+                                   "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                                   "name": "Starknet Foundation",
+                                   "url": "https://starknet.io",
+                                   "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png",
+                                   "projectIds": [
+                                     "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                     "594ca5ca-48f7-49a8-9c26-84b949d4fdd9"
+                                   ]
+                                 },
+                                 {
+                                   "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                                   "name": "Theodo",
+                                   "url": null,
+                                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
+                                   "projectIds": [
+                                     "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                     "594ca5ca-48f7-49a8-9c26-84b949d4fdd9"
+                                   ]
+                                 }
+                               ]
+                             }
+                        """);
     }
 
     @Test
