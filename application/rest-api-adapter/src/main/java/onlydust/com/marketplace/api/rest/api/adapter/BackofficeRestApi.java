@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.ApiUtil;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
-import onlydust.com.backoffice.api.contract.model.BudgetPage;
-import onlydust.com.backoffice.api.contract.model.GithubRepositoryPage;
-import onlydust.com.backoffice.api.contract.model.PaymentPage;
-import onlydust.com.backoffice.api.contract.model.ProjectLeadInvitationPage;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
@@ -91,6 +88,17 @@ public class BackofficeRestApi implements BackofficeApi {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
         final var response = mapPaymentPageToContract(paymentsPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<ProjectPage> getProjectPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var paymentsPage = backofficeFacadePort.listProjects(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
+        final var response = mapProjectPageToContract(paymentsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :

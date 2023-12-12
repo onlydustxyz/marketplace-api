@@ -4,10 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.GithubRepositoryLinkedToProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoPaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectBudgetRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.ProjectLeadInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -179,9 +176,10 @@ public class PostgresConfiguration {
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository,
                                                                final ProjectBudgetRepository projectBudgetRepository,
                                                                final ProjectLeadInvitationRepository projectLeadInvitationRepository,
-                                                               final BoPaymentRepository boPaymentRepository) {
+                                                               final BoPaymentRepository boPaymentRepository,
+                                                               final BoProjectRepository boProjectRepository) {
         return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository,
-                projectLeadInvitationRepository, boPaymentRepository);
+                projectLeadInvitationRepository, boPaymentRepository, boProjectRepository);
     }
 
     @Bean

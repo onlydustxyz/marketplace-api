@@ -182,6 +182,48 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/projects:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get project page
+      operationId: getProjectPage
+      description: |
+        Get project page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+      responses:
+        "200":
+          description: 'Project page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     apiKey:
@@ -425,6 +467,62 @@ components:
         codeReviewsCount:
           type: integer
 
+
+    ProjectPage:
+      type: object
+      required:
+        - projects
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectPageItemResponse'
+    ProjectPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        shortDescription:
+          type: string
+        longDescription:
+          type: string
+        moreInfoLinks:
+          type: array
+          items:
+            type: string
+        logoUrl:
+          type: string
+        hiring:
+          type: boolean
+        rank:
+          type: integer
+        visibility:
+          $ref: '#/components/schemas/ProjectVisibility'
+        projectLeads:
+          type: array
+          items:
+            type: string
+            format: uuid
+        createdAt:
+            type: string
+            format: date-time
+
     Currency:
       type: string
       enum:
@@ -434,3 +532,9 @@ components:
         - STARK
         - OP
         - LORDS
+
+    ProjectVisibility:
+      type: string
+      enum:
+        - PUBLIC
+        - PRIVATE
