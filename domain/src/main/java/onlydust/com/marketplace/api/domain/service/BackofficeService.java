@@ -25,6 +25,11 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
+    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+        return backofficeStoragePort.listSponsors(pageIndex, pageSize, filters);
+    }
+
+    @Override
     public Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids) {
         return backofficeStoragePort.findProjectLeadInvitationPage(pageIndex, pageSize, ids);
     }

@@ -6,6 +6,8 @@ import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     private final GithubRepositoryLinkedToProjectRepository githubRepositoryLinkedToProjectRepository;
     private final ProjectBudgetRepository projectBudgetRepository;
+    private final BoSponsorRepository boSponsorRepository;
     private final ProjectLeadInvitationRepository projectLeadInvitationRepository;
     private final BoPaymentRepository boPaymentRepository;
     private final BoProjectRepository boProjectRepository;
@@ -78,6 +81,16 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                 .build();
     }
 
+
+    @Override
+    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+        final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(), PageRequest.of(pageIndex, pageSize));
+        return Page.<SponsorView>builder()
+                .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
 
     @Override
     @Transactional(readOnly = true)

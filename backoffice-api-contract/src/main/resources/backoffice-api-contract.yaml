@@ -16,6 +16,57 @@ servers:
 
 paths:
 
+  /bo/v1/sponsors:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get sponsor page
+      operationId: getSponsorPage
+      description: |
+        Get sponsor page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+        - in: query
+          name: sponsorIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+      responses:
+        "200":
+          description: 'Sponsor page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/repositories:
     get:
       security:
@@ -297,6 +348,48 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubRepositoryResponse'
+
+    SponsorPage:
+      type: object
+      required:
+        - sponsors
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        sponsors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorPageItemResponse'
+
+    SponsorPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
+        projectIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
     Technologies:
       type: object
       description: List fo technologies ordered by mastering level (the higher the better) or usage (ie. line count of a language)
