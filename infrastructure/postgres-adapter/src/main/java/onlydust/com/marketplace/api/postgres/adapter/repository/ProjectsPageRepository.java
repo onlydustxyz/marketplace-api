@@ -40,11 +40,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    t.technologies as  technologies,
                    s.sponsor_json                                 sponsors
             from project_details p
-                left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                            from project_github_repos pgr
-                            join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                            where gr.visibility = 'PUBLIC'
-                            group by pgr.project_id) as t on t.project_id = p.project_id
+                left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                            from project_technologies pt
+                            group by pt.project_id)) as t on t.project_id = p.project_id
                 left join (select ps.project_id,
                                            jsonb_agg(jsonb_build_object(
                                                    'url', sponsor.url,
@@ -115,11 +113,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                     left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                            where pgr.project_id = p.project_id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation
             from project_details p
-                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                from project_github_repos pgr
-                                join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                where gr.visibility = 'PUBLIC'
-                                group by pgr.project_id) as t on t.project_id = p.project_id
+                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                                 from project_technologies pt
+                                 group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -187,11 +183,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
                         select count(p.project_id)
                         from project_details p
-                        left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                    from project_github_repos pgr
-                                    join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                    where gr.visibility = 'PUBLIC'
-                                    group by pgr.project_id) as t on t.project_id = p.project_id
+                        left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                                    from project_technologies pt
+                                    group by pt.project_id)) as t on t.project_id = p.project_id
                         left join (select ps.project_id,
                                                    jsonb_agg(jsonb_build_object(
                                                            'url', sponsor.url,
@@ -219,11 +213,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
     @Query(value = """
             select count(p.project_id)
             from project_details p
-                     left join (select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                 join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                 where gr.visibility = 'PUBLIC'
-                                 group by pgr.project_id) as t on t.project_id = p.project_id
+                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                                 from project_technologies pt
+                                 group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
