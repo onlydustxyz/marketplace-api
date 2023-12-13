@@ -47,20 +47,22 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public ProjectDetailsView getById(UUID projectId, UUID userId) {
+        final ProjectDetailsView projectById = projectStoragePort.getById(projectId);
         if (!permissionService.hasUserAccessToProject(projectId, userId)) {
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId,
                     userId));
         }
-        return projectStoragePort.getById(projectId);
+        return projectById;
     }
 
     @Override
     public ProjectDetailsView getBySlug(String slug, UUID userId) {
+        final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug);
         if (!permissionService.hasUserAccessToProject(slug, userId)) {
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
                     userId));
         }
-        return projectStoragePort.getBySlug(slug);
+        return projectBySlug;
     }
 
 
