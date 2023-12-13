@@ -18,10 +18,9 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END, 0) AS processed_usd_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END, 0) AS pending_usd_amount,
-                COUNT(DISTINCT pr.recipient_id) AS reward_recipients_count,
-                COUNT(DISTINCT pr.id) AS rewards_count,
-                COUNT(DISTINCT wi.id) AS reward_items_count,
-                COUNT(DISTINCT pr.project_id) AS projects_count
+                JSONB_AGG(pr.id) AS reward_ids,
+                COALESCE(JSONB_AGG(wi.id) FILTER (WHERE wi.id IS NOT NULL), '[]') AS reward_item_ids,
+                JSONB_AGG(pr.project_id) AS project_ids
             FROM payment_requests pr
             JOIN auth_users au on au.github_user_id = pr.recipient_id
             LEFT JOIN work_items wi ON pr.id = wi.payment_id

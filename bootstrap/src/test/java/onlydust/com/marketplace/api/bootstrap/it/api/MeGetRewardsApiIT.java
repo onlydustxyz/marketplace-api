@@ -152,17 +152,17 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "nextPageIndex": 0,
               "rewardedAmount": {
                 "amount": null,
-                "currency": "USD",
+                "currency": null,
                 "usdEquivalent": 375000
               },
               "pendingAmount": {
                 "amount": null,
-                "currency": "USD",
+                "currency": null,
                 "usdEquivalent": 2750000
               },
               "receivedRewardsCount": 6,
-              "rewardedContributionsCount": 101,
-              "rewardingProjectsCount": 4
+              "rewardedContributionsCount": 26,
+              "rewardingProjectsCount": 1
             }
             """;
     private static final String ME_GET_REWARDS_RESPONSE_JSON = """
@@ -575,8 +575,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(664000)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(10)
-                .jsonPath("$.rewardedContributionsCount").isEqualTo(87)
-                .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(85)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
                 ;
     }
 
@@ -604,10 +604,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").isEqualTo(500)
                 .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(890990.00)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(750000.00)
                 .jsonPath("$.pendingAmount.amount").isEqualTo(1000)
                 .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1781980.00)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1500000.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(2)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(2)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -638,13 +638,13 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(890990.00)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(750000.00)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(2446980.00)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(2165000.00)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
-                .jsonPath("$.rewardedContributionsCount").isEqualTo(90)
-                .jsonPath("$.rewardingProjectsCount").isEqualTo(4)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
         ;
     }
 }

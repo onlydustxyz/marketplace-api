@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -256,9 +257,9 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .pendingAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getPendingAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getPendingUsdAmount()) :
                         new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
-                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardsCount).reduce(0, Integer::sum))
-                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemsCount).reduce(0, Integer::sum))
-                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectsCount).reduce(0, Integer::sum))
+                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 
