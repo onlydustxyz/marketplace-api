@@ -85,11 +85,11 @@ public class BackofficeRestApi implements BackofficeApi {
 
     @Override
     public ResponseEntity<ProjectLeadInvitationPage> getProjectLeadInvitationPage(Integer pageIndex, Integer pageSize
-            , List<UUID> ids) {
+            , List<UUID> ids, List<UUID> projectIds) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectLeadInvitationView> projectLeadInvitationViewPage =
-                backofficeFacadePort.getProjectLeadInvitationPage(sanitizedPageIndex, sanitizedPageSize, ids);
+                backofficeFacadePort.getProjectLeadInvitationPage(sanitizedPageIndex, sanitizedPageSize, ids, projectIds);
 
         final ProjectLeadInvitationPage projectLeadInvitationPage =
                 mapProjectLeadInvitationPageToContract(projectLeadInvitationViewPage

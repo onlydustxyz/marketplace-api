@@ -14,7 +14,9 @@ public interface ProjectLeadInvitationRepository extends JpaRepository<ProjectLe
     @Query(value = """
             SELECT ppli.id, ppli.project_id, ppli.github_user_id
             FROM pending_project_leader_invitations ppli
-            WHERE (COALESCE(:ids) IS NULL OR ppli.id IN (:ids))
+            WHERE 
+                (COALESCE(:ids) IS NULL OR ppli.id IN (:ids)) AND
+                (COALESCE(:projectIds) IS NULL OR ppli.project_id IN (:projectIds))
             """, nativeQuery = true)
-    Page<ProjectLeadInvitationEntity> findAllByIds(final Pageable pageable, final List<UUID> ids);
+    Page<ProjectLeadInvitationEntity> findAllByIds(final Pageable pageable, final List<UUID> ids, final List<UUID> projectIds);
 }

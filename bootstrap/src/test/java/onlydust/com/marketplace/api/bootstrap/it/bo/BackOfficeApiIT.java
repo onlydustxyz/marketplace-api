@@ -563,6 +563,39 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         }
                         
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,298a547f-ecb6-4ab2-8975-68f4e9bf7b39")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "project_lead_invitations": [
+                            {
+                              "id": "03d6f190-f898-49fa-a1e5-e6174295d3e8",
+                              "projectId": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "githubUserId": 117665867
+                            },
+                            {
+                              "id": "16def485-d98f-4619-801a-ca147c8c64a6",
+                              "projectId": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                              "githubUserId": 595505
+                            }
+                          ]
+                        }
+                        
+                        """);
     }
 
 

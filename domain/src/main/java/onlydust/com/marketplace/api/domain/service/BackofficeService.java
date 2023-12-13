@@ -30,8 +30,8 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids) {
-        return backofficeStoragePort.findProjectLeadInvitationPage(pageIndex, pageSize, ids);
+    public Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds) {
+        return backofficeStoragePort.findProjectLeadInvitationPage(pageIndex, pageSize, ids, projectIds);
     }
 
     @Override
