@@ -1791,25 +1791,6 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
-          name: sort
-          description: Sorting field
-          schema:
-            type: string
-            enum:
-              - LOGIN
-              - COMPLETED_PR_COUNT
-              - COMPLETED_ISSUE_COUNT
-              - COMPLETED_CODE_REVIEW_COUNT
-        - in: query
-          name: direction
-          description: Sort direction
-          schema:
-            type: string
-            default: ASC
-            enum:
-              - ASC
-              - DESC
-        - in: query
           name: pageIndex
           required: true
           schema:
@@ -1850,25 +1831,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: sort
-          description: Sorting field
-          schema:
-            type: string
-            enum:
-              - CONTRIBUTOR_LOGIN
-              - GITHUB_REPO_NAME
-              - GITHUB_NUMBER_TITLE
-              - CREATED_AT
-        - in: query
-          name: direction
-          description: Sort direction
-          schema:
-            type: string
-            default: ASC
-            enum:
-              - ASC
-              - DESC
         - in: query
           name: pageIndex
           required: true
