@@ -28,6 +28,7 @@ public class GithubSearchApiAdapterTest {
         final String githubPAT = faker.rickAndMorty().character();
         final GithubOrgaSearchResponseDTO orga1 = new GithubOrgaSearchResponseDTO();
         orga1.setId(1L);
+        orga1.setUrl("https://api.github.com/orgs/foo1");
 
         // When
         when(httpClient.get("/user/orgs?per_page=2&page=1", GithubOrgaSearchResponseDTO[].class, githubPAT))
@@ -40,6 +41,7 @@ public class GithubSearchApiAdapterTest {
         // Then
         assertEquals(1, githubAccounts.size());
         assertEquals(orga1.getId(), githubAccounts.get(0).getId());
+        assertEquals(orga1.getUrl(), "https://api.github.com/orgs/foo1");
     }
 
     @Test
@@ -51,16 +53,19 @@ public class GithubSearchApiAdapterTest {
         final String githubPAT = faker.rickAndMorty().character();
         final GithubOrgaSearchResponseDTO orga1 = new GithubOrgaSearchResponseDTO();
         orga1.setId(1L);
+        orga1.setUrl("https://api.github.com/orgs/foo1");
         final GithubOrgaSearchResponseDTO orga2 = new GithubOrgaSearchResponseDTO();
-        orga1.setId(2L);
+        orga2.setId(2L);
+        orga2.setUrl("https://api.github.com/orgs/foo2");
         final GithubOrgaSearchResponseDTO orga3 = new GithubOrgaSearchResponseDTO();
-        orga1.setId(3L);
+        orga3.setId(3L);
+        orga3.setUrl("https://api.github.com/orgs/foo3");
 
 
         // When
         when(httpClient.get("/user/orgs?per_page=2&page=1", GithubOrgaSearchResponseDTO[].class, githubPAT))
                 .thenReturn(Optional.of(new GithubOrgaSearchResponseDTO[]{
-                        orga1,orga2
+                        orga1, orga2
                 }));
         when(httpClient.get("/user/orgs?per_page=2&page=2", GithubOrgaSearchResponseDTO[].class, githubPAT))
                 .thenReturn(Optional.of(new GithubOrgaSearchResponseDTO[]{
@@ -74,6 +79,9 @@ public class GithubSearchApiAdapterTest {
         assertEquals(orga1.getId(), githubAccounts.get(0).getId());
         assertEquals(orga2.getId(), githubAccounts.get(1).getId());
         assertEquals(orga3.getId(), githubAccounts.get(2).getId());
+        assertEquals(orga1.getUrl(), "https://api.github.com/orgs/foo1");
+        assertEquals(orga2.getUrl(), "https://api.github.com/orgs/foo2");
+        assertEquals(orga3.getUrl(), "https://api.github.com/orgs/foo3");
     }
 
 

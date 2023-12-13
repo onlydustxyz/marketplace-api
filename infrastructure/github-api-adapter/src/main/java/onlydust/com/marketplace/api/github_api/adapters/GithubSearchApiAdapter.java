@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.nonNull;
 
@@ -22,6 +24,9 @@ import static java.util.Objects.nonNull;
 public class GithubSearchApiAdapter implements GithubSearchPort {
     private final GithubHttpClient client;
     private final GithubPaginationProperties githubPaginationProperties;
+
+    private static final Pattern ORG_API_URL_REGEX = Pattern.compile(
+            "https://api\\.github\\.com/orgs/([^/]+)");
 
     @Override
     public List<GithubUserIdentity> searchUsersByLogin(final String login) {
@@ -71,9 +76,17 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
                         .id(githubOrgaSearchResponseDTO.getId())
                         .login(githubOrgaSearchResponseDTO.getLogin())
                         .avatarUrl(githubOrgaSearchResponseDTO.getAvatarUrl())
-                        .htmlUrl(githubOrgaSearchResponseDTO.getUrl())
+                        .htmlUrl(getHtmlUrlFromApiUrl(githubOrgaSearchResponseDTO.getUrl()))
                         .build())
                 .toList();
+    }
+
+    private static String getHtmlUrlFromApiUrl(String apiUrl) {
+        final var matcher = ORG_API_URL_REGEX.matcher(apiUrl);
+        if (!matcher.matches()) {
+            throw OnlyDustException.internalServerError("Github API URL for organization could not be parsed: '%s'".formatted(apiUrl));
+        }
+        return "https://github.com/%s".formatted(matcher.group(1));
     }
 
     @Override
