@@ -274,7 +274,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isEqualTo(206)
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                         {
                           "rewardableItems": [
@@ -658,7 +658,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isEqualTo(206)
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                         {
                           "rewardableItems": [
@@ -863,7 +863,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isEqualTo(206)
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                         {
                           "rewardableItems": [
@@ -1507,7 +1507,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isEqualTo(206)
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                          
                         {

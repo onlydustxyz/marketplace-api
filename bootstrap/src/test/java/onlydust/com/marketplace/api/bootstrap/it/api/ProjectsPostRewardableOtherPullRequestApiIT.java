@@ -82,7 +82,7 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                         {
                           "number": 608,

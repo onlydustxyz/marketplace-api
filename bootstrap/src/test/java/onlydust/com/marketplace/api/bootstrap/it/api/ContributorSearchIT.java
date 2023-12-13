@@ -83,7 +83,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json(PROJECTS_SEARCH_CONTRIBUTORS_RESPONSE);
     }
 
@@ -135,7 +135,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .json("""
                         {
                           "internalContributors": [],
