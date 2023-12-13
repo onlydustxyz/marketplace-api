@@ -28,6 +28,8 @@ public class MeGetContributedReposApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.repos[0].name").isEqualTo("bretzel-ressources")
                 .json("""
                         {
                            "repos": [
