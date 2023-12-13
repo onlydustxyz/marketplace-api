@@ -1690,6 +1690,209 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+
+  /api/v1/projects/{projectId}/insights/contributors/newcomers:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project newcomers
+      operationId: getProjectNewcomers
+      description: |
+        Get the paginated list of all contributors that recently joined the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of project newcomers'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectNewcomersPageResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectId}/insights/contributors/churned:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project churned contributors
+      operationId: getProjectChurnedContributors
+      description: |
+        Get the paginated list of all contributors that recently left the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of project churned contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectChurnedContributorsPageResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectId}/insights/contributors/most-actives:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project most active contributors
+      operationId: getProjectMostActiveContributors
+      description: |
+        Get the paginated list of the most active contributors of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: sort
+          description: Sorting field
+          schema:
+            type: string
+            enum:
+              - LOGIN
+              - COMPLETED_PR_COUNT
+              - COMPLETED_ISSUE_COUNT
+              - COMPLETED_CODE_REVIEW_COUNT
+        - in: query
+          name: direction
+          description: Sort direction
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of project most active contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectContributorActivityPageResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectId}/insights/contributions/staled:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project staled contributions
+      operationId: getProjectStaledContributions
+      description: |
+        Get the paginated list of the staled contributions of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: sort
+          description: Sorting field
+          schema:
+            type: string
+            enum:
+              - CONTRIBUTOR_LOGIN
+              - GITHUB_REPO_NAME
+              - GITHUB_NUMBER_TITLE
+              - CREATED_AT
+        - in: query
+          name: direction
+          description: Sort direction
+          schema:
+            type: string
+            default: ASC
+            enum:
+              - ASC
+              - DESC
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'List of project staled contributions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStaledContributionsPageResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/logos:
     post:
       security:
@@ -3398,8 +3601,8 @@ components:
       required:
         - type
         - repo
-        - githubNumber
         - githubStatus
+        - githubNumber
         - githubAuthor
         - githubTitle
         - githubHtmlUrl
@@ -4069,3 +4272,211 @@ components:
         githubPullRequestHtmlUrl:
           type: string
           format: url
+
+    ContributorCardHeaderResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          properties:
+            cover:
+              $ref: '#/components/schemas/UserProfileCoverColor'
+
+    ProjectNewcomersPageResponse:
+      type: object
+      required:
+        - newcomers
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        newcomers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectNewcomersPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    ProjectNewcomersPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorCardHeaderResponse'
+        - type: object
+          properties:
+            location:
+              type: string
+              description: User location as in Github profile
+              example: Paris, France
+            bio:
+              type: string
+              description: User bio as in Github profile
+              example: Contributing to awesome open source projects.
+            firstContributedAt:
+              type: string
+              format: date-time
+              description: First contribution date to return if user not registered on OD
+
+    ProjectChurnedContributorsPageResponse:
+      type: object
+      required:
+          - contributors
+          - hasMore
+          - totalPageNumber
+          - totalItemNumber
+          - nextPageIndex
+      properties:
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectChurnedContributorsPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    ProjectChurnedContributorsPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorCardHeaderResponse'
+        - type: object
+          required:
+            - lastContribution
+          properties:
+            lastContribution:
+              type: object
+              required:
+                - id
+                - completedAt
+                - project
+              properties:
+                id:
+                  $ref: '#/components/schemas/ContributionId'
+                completedAt:
+                  type: string
+                  format: date-time
+                project:
+                  $ref: '#/components/schemas/ShortProjectResponse'
+
+    ProjectContributorActivityPageResponse:
+      type: object
+      required:
+        - contributors
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorActivityPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    ProjectContributorActivityPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          properties:
+            completedPullRequestCount:
+              type: integer
+            completedIssueCount:
+              type: integer
+            completedCodeReviewCount:
+              type: integer
+            contributionCountPerWeeks:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserContributionStats'
+
+    ProjectStaledContributionsPageResponse:
+      type: object
+      required:
+        - contributions
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        contributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectStaledContributionsPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    ProjectStaledContributionsPageItemResponse:
+      type: object
+      required:
+        - id
+        - contributor
+        - repo
+        - type
+        - status
+        - githubNumber
+        - githubTitle
+        - githubStatus
+        - githubHtmlUrl
+        - githubStatus
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
+        contributor:
+          $ref: '#/components/schemas/ContributorResponse'
+        repo:
+          $ref: '#/components/schemas/ShortGithubRepoResponse'
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        status:
+          $ref: '#/components/schemas/ContributionStatus'
+        githubNumber:
+          type: integer
+          format: int64
+          description: Github item number
+          example: 6
+        githubTitle:
+          type: string
+          description: Github item title
+        githubStatus:
+          $ref: '#/components/schemas/GithubStatus'
+        githubHtmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the contribution.
+        githubBody:
+          type: string
+          description: The body of the contribution.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the contribution was created
