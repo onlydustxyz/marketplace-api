@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -35,6 +37,8 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                         (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN (:repoIds))
                 )
                 AND (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
+            ORDER BY 
+                p.name 
             """, nativeQuery = true)
     List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
                                                            List<UUID> projectIds,

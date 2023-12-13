@@ -299,7 +299,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json(ME_GET_REWARDS_RESPONSE_JSON);
     }
 
@@ -366,7 +365,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json(GET_USER_REWARDS_WITH_MULTI_CURRENCIES_RESPONSE_JSON);
 
     }
@@ -561,7 +559,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 // we have at least one correct date
                 .jsonPath("$.rewards[?(@.requestedAt >= '2023-09-20')]").exists()
                 .jsonPath("$.rewards[?(@.requestedAt < '2023-09-21')]").exists()
@@ -599,7 +596,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[?(@.amount.currency == 'ETH')]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").isEqualTo(500)
@@ -633,7 +629,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()

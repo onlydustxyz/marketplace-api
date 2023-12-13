@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -35,6 +36,8 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                         (COALESCE(:projectIds) IS NULL OR pgr.project_id IN (:projectIds))
                 ) 
                 AND (COALESCE(:repoIds) IS NULL OR r.id IN (:repoIds))
+            ORDER BY 
+                r.name 
             """, nativeQuery = true)
     List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
                                                       List<UUID> projectIds,

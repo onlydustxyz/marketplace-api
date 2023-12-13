@@ -261,7 +261,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody().consumeWith(System.out::println)
+                .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(2)
                 .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
                 .jsonPath("$.hasMore").isEqualTo(false)
@@ -291,7 +291,6 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "contributions": [

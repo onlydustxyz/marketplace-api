@@ -2764,7 +2764,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
     }
 

@@ -577,7 +577,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                             "totalPageNumber": 9,
@@ -722,7 +721,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -827,7 +825,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                            "totalPageNumber": 48,
@@ -941,7 +938,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                             "totalPageNumber": 12,
@@ -1059,7 +1055,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 15,
@@ -1154,7 +1149,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 1,
