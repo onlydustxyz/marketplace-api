@@ -81,4 +81,6 @@ public interface ProjectFacadePort {
                                          Integer page, Integer pageSize);
 
     void updateProjectsRanking();
+
+    Page<ContributionView> staledContributions(UUID projectId, User caller, Integer page, Integer pageSize);
 }

@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.contract.ApiUtil;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
@@ -22,9 +24,14 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -384,5 +391,27 @@ public class ProjectsRestApi implements ProjectsApi {
         return contributionPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
                 : ResponseEntity.ok(contributionPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<ProjectStaledContributionsPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var contributions = projectFacadePort.staledContributions(
+                projectId,
+                authenticatedUser,
+                sanitizedPageIndex,
+                sanitizedPageSize);
+
+        final var contributionPageResponse = ContributionMapper.mapProjectStaledContributionsPageResponse(
+                sanitizedPageIndex,
+                contributions);
+
+        return contributionPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributionPageResponse)
+                : ResponseEntity.ok(contributionPageResponse);
+
     }
 }

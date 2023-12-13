@@ -15,10 +15,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -372,5 +371,16 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public void updateProjectsRanking() {
         projectStoragePort.updateProjectsRanking();
+    }
+
+    @Override
+    public Page<ContributionView> staledContributions(UUID projectId, User caller, Integer page, Integer pageSize) {
+        final var filters = ContributionView.Filters.builder()
+                .projects(List.of(projectId))
+                .statuses(List.of(ContributionStatus.IN_PROGRESS))
+                .to(Date.from(ZonedDateTime.now().minusDays(10).toInstant()))
+                .build();
+
+        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page, pageSize);
     }
 }
