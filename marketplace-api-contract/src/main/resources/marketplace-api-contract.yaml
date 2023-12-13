@@ -652,17 +652,17 @@ paths:
     get:
       tags:
         - Technologies
-      summary: Technologies referenced by OnlyDust
+      summary: Technologies used in OnlyDust projects
       operationId: getTechnologies
       description: |
-        Get the list of all technologies (languages, frameworks, tools, etc.) referenced by OnlyDust
+        Get the list of all technologies (languages, frameworks, tools, etc.) used by at least one OnlyDust project
       responses:
         "200":
           description: 'Technologies'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Technologies'
+                $ref: '#/components/schemas/AllTechnologiesResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -1982,20 +1982,20 @@ components:
       type: object
       description: Money value object
       required:
-          - amount
-          - currency
-          - usdEquivalent
+        - amount
+        - currency
+        - usdEquivalent
       properties:
-          amount:
-            type: number
-            description: Amount of money
-            example: 100
-          currency:
-            $ref: '#/components/schemas/CurrencyContract'
-          usdEquivalent:
-            type: number
-            description: USD equivalent of the amount
-            example: 100
+        amount:
+          type: number
+          description: Amount of money
+          example: 100
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'
+        usdEquivalent:
+          type: number
+          description: USD equivalent of the amount
+          example: 100
 
 
     # RESPONSES ==================================================================
@@ -2857,6 +2857,18 @@ components:
         Rust: 91283
         Go: 12388
         Java: 1233
+
+    AllTechnologiesResponse:
+      type: object
+      properties:
+        technologies:
+          type: array
+          items:
+            type: string
+          example:
+            - Rust
+            - Go
+            - Java
 
     CreateRewardResponse:
       type: object

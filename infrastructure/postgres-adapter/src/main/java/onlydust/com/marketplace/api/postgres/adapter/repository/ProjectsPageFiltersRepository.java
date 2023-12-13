@@ -15,11 +15,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    s.sponsor_json as sponsors,
                    p.project_id
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                          join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                where gr.visibility = 'PUBLIC'
-                                 group by pgr.project_id) ) as t on t.project_id = p.project_id
+                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                                 from project_technologies pt
+                                 group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
@@ -49,10 +47,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    t.technologies                             as technologies,
                    s.sponsor_json                             as   sponsors
             from project_details p
-                     left join ((select pgr.project_id, jsonb_agg(gr.languages) technologies
-                                 from project_github_repos pgr
-                                          left join indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                                 group by pgr.project_id)) as t on t.project_id = p.project_id
+                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
+                                 from project_technologies pt
+                                 group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', sponsor.url,
