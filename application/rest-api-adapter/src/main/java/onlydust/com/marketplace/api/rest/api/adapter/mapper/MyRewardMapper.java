@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.UserRewardsPageView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
@@ -11,20 +12,24 @@ import java.util.List;
 import java.util.Objects;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
 
 public interface MyRewardMapper {
 
     static MyRewardsPageResponse mapMyRewardsToResponse(final int pageIndex,
-                                                        final Page<UserRewardView> page) {
-        final MyRewardsPageResponse myRewardsPageResponse = new MyRewardsPageResponse();
-        myRewardsPageResponse.setHasMore(hasMore(pageIndex, page.getTotalPageNumber()));
-        myRewardsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
-        myRewardsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
-        myRewardsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
-        page.getContent().stream()
-                .map(MyRewardMapper::mapMyRewardViewToResponse)
-                .forEach(myRewardsPageResponse::addRewardsItem);
-        return myRewardsPageResponse;
+                                                        final UserRewardsPageView page) {
+        return new MyRewardsPageResponse()
+                .hasMore(hasMore(pageIndex, page.getRewards().getTotalPageNumber()))
+                .totalPageNumber(page.getRewards().getTotalPageNumber())
+                .totalItemNumber(page.getRewards().getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getRewards().getTotalPageNumber()))
+                .rewards(page.getRewards().getContent().stream().map(MyRewardMapper::mapMyRewardViewToResponse).toList())
+                .pendingAmount(mapMoney(page.getPendingAmount()))
+                .rewardedAmount(mapMoney(page.getRewardedAmount()))
+                .receivedRewardsCount(page.getReceivedRewardsCount())
+                .rewardedContributionsCount(page.getRewardedContributionsCount())
+                .rewardingProjectsCount(page.getRewardingProjectsCount())
+                ;
     }
 
     static MyRewardPageItemResponse mapMyRewardViewToResponse(final UserRewardView view) {

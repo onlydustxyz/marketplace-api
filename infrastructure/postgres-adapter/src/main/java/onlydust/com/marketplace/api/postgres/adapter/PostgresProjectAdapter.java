@@ -379,9 +379,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .totalItemNumber(count)
                         .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                         .build())
-                .remainingBudget(new ProjectRewardsPageView.Money(budgetStats.getRemainingAmount(),
+                .remainingBudget(new Money(budgetStats.getRemainingAmount(),
                         filters.getCurrency(), budgetStats.getRemainingUsdAmount()))
-                .spentAmount(new ProjectRewardsPageView.Money(budgetStats.getSpentAmount(), filters.getCurrency(),
+                .spentAmount(new Money(budgetStats.getSpentAmount(), filters.getCurrency(),
                         budgetStats.getSpentUsdAmount()))
                 .sentRewardsCount(budgetStats.getRewardsCount())
                 .rewardedContributionsCount(budgetStats.getRewardItemsCount())

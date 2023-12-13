@@ -95,6 +95,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
         // When
         final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+                List.of(), List.of(), null, null,
                 UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
         // Then
@@ -157,7 +158,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId, UserRewardView.SortBy.amount,
+                    customUserRewardRepository.getViewEntities(individualIserId,
+                            List.of(), List.of(), null, null,
+                            UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
 
 
@@ -188,6 +191,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .optimismAddress(faker.random().hex()).build()).build());
             List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(individualIserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount,
                     SortDirection.desc, 0, 100);
             paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "USD",
@@ -195,7 +199,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId, UserRewardView.SortBy.amount,
+                    customUserRewardRepository.getViewEntities(individualIserId,
+                            List.of(), List.of(), null, null,
+                            UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
 
             // Then
@@ -223,7 +229,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId, UserRewardView.SortBy.amount,
+                    customUserRewardRepository.getViewEntities(individualIserId,
+                            List.of(), List.of(), null, null,
+                            UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
 
             // Then
@@ -251,7 +259,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId, UserRewardView.SortBy.amount,
+                    customUserRewardRepository.getViewEntities(individualIserId,
+                            List.of(), List.of(), null, null,
+                            UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
 
             // Then
@@ -311,6 +321,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
@@ -334,6 +345,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         void should_return_user_rewards_given_a_user_with_only_usdc_wallet_for_valid_company_and_paid_rewards() {
             // Given
             List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
             paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STARK",
                     JacksonUtil.toJsonNode("{}"), viewEntities.get(0).getId(), new Date()));
@@ -346,7 +358,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     JacksonUtil.toJsonNode("{}"), viewEntities.get(3).getId(), new Date()));
 
             // When
-            viewEntities = customUserRewardRepository.getViewEntities(companyUserId, UserRewardView.SortBy.amount,
+            viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
+                    UserRewardView.SortBy.amount,
                     SortDirection.desc, 0, 100);
             // Then
             assertEquals(6, viewEntities.size());
@@ -373,6 +387,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
@@ -414,6 +429,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then
@@ -437,6 +453,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         void should_complete_lords_payment() {
             // Given
             final UUID lordsPaymentRequestId = customUserRewardRepository.getViewEntities(companyUserId,
+                            List.of(), List.of(), null, null,
                             UserRewardView.SortBy.amount, SortDirection.desc, 0, 100)
                     .get(5).getId();
             paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "LORDS",
@@ -444,6 +461,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
+                    List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
             // Then

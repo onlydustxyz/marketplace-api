@@ -289,6 +289,28 @@ paths:
               - ASC
               - DESC
         - in: query
+          name: currencies
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/CurrencyContract'
+        - in: query
+          name: projects
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
           name: pageIndex
           required: true
           schema:
@@ -2903,6 +2925,19 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+        rewardedAmount:
+          $ref: '#/components/schemas/Money'
+        pendingAmount:
+          $ref: '#/components/schemas/Money'
+        receivedRewardsCount:
+          type: integer
+          description: Number of rewards that have been received
+        rewardedContributionsCount:
+          type: integer
+          description: Number of contributions that have been rewarded
+        rewardingProjectsCount:
+          type: integer
+          description: Number of projects the user has been rewarded for
     MyRewardsListResponse:
       type: object
       required:

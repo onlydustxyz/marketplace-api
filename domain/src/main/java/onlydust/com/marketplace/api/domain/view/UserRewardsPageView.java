@@ -6,11 +6,11 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
 @Data
 @Builder
-public class ProjectRewardsPageView {
-    Page<ProjectRewardView> rewards;
-    Money remainingBudget;
-    Money spentAmount;
-    Integer sentRewardsCount;
+public class UserRewardsPageView {
+    Page<UserRewardView> rewards;
+    Money rewardedAmount;
+    Money pendingAmount;
+    Integer receivedRewardsCount;
     Integer rewardedContributionsCount;
-    Integer rewardedContributorsCount;
+    Integer rewardingProjectsCount;
 }

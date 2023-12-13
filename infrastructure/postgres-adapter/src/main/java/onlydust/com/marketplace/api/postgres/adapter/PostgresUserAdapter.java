@@ -3,20 +3,19 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
@@ -25,9 +24,13 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
@@ -50,6 +53,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
+    private final RewardStatsRepository rewardStatsRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -224,17 +228,38 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserRewardView> findRewardsForUserId(UUID userId, int pageIndex, int pageSize,
-                                                     UserRewardView.SortBy sortBy, SortDirection sortDirection) {
-        final Integer count = customUserRewardRepository.getCount(userId);
-        final List<UserRewardView> userRewardViews = customUserRewardRepository.getViewEntities(userId,
+    public UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
+                                                    int pageIndex, int pageSize,
+                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
+        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
+        final var currencies = filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(CurrencyEnumEntity::toString).toList();
+
+        final var count = customUserRewardRepository.getCount(userId, currencies, filters.getProjectIds(), fromDate, toDate);
+        final var userRewardViews = customUserRewardRepository.getViewEntities(userId,
+                        currencies, filters.getProjectIds(), fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(UserRewardMapper::mapEntityToDomain)
                 .toList();
-        return Page.<UserRewardView>builder()
-                .content(userRewardViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+        final var rewardsStats = rewardStatsRepository.findByUser(userId, currencies, filters.getProjectIds(), fromDate, toDate);
+
+        return UserRewardsPageView.builder()
+                .rewards(Page.<UserRewardView>builder()
+                        .content(userRewardViews)
+                        .totalItemNumber(count)
+                        .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
+                        .build())
+                .rewardedAmount(rewardsStats.size() == 1 ?
+                        new Money(rewardsStats.get(0).getProcessedAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getProcessedUsdAmount()) :
+                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .pendingAmount(rewardsStats.size() == 1 ?
+                        new Money(rewardsStats.get(0).getPendingAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getPendingUsdAmount()) :
+                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 
