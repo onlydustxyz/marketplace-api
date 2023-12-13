@@ -28,6 +28,8 @@ public class MeGetContributedProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.projects[0].slug").isEqualTo("b-conseil")
                 .json("""
                         {
                            "projects": [
