@@ -29,4 +29,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000014_create_project_stats_view.sql
   - include:
       file: db/changelog/changelogs/00000015_create_project_technologies_view.sql
+  - include:
+      file: db/changelog/changelogs/00000016_add_tech_columns_in_user_profiles.sql
 

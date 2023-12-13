@@ -46,6 +46,7 @@ public class BoUserEntity {
     String starknetAddress;
     String aptosAddress;
     ZonedDateTime createdAt;
+    ZonedDateTime updatedAt;
     ZonedDateTime lastSeenAt;
     String email;
     Long githubUserId;
@@ -89,6 +90,7 @@ public class BoUserEntity {
                 .starknetAddress(starknetAddress)
                 .aptosAddress(aptosAddress)
                 .createdAt(createdAt)
+                .updatedAt(updatedAt)
                 .lastSeenAt(lastSeenAt)
                 .email(email)
                 .githubUserId(githubUserId)

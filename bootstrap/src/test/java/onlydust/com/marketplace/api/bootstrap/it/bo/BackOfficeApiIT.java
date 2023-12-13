@@ -577,6 +577,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.users[?(@.updatedAt empty true)]").doesNotExist()
+                .jsonPath("$.users[?(@.updatedAt empty false)]").exists()
                 .json("""
                         {
                             "totalPageNumber": 9,
@@ -609,6 +611,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "optimismAddress": null,
                                 "starknetAddress": null,
                                 "createdAt": "2023-02-01T08:56:05.771022Z",
+                                "updatedAt": "2023-02-01T08:56:05.771022Z",
                                 "lastSeenAt": "2023-02-01T08:56:06.027Z",
                                 "email": "tech@onlydust.xyz",
                                 "githubUserId": 112474158,

@@ -615,6 +615,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
         lastSeenAt:
           type: string
           format: date-time

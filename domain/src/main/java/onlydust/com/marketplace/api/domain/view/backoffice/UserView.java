@@ -38,6 +38,7 @@ public class UserView {
     String starknetAddress;
     String aptosAddress;
     ZonedDateTime createdAt;
+    ZonedDateTime updatedAt;
     ZonedDateTime lastSeenAt;
     String email;
     Long githubUserId;
