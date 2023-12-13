@@ -135,8 +135,9 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort) {
-        return new TechnologiesService(trackingIssuePort);
+    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort,
+                                             final TechnologyStoragePort technologyStoragePort) {
+        return new TechnologiesService(trackingIssuePort, technologyStoragePort);
     }
 
     @Bean

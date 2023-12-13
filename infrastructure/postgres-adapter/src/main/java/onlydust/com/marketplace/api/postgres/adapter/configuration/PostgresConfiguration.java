@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
@@ -180,7 +181,8 @@ public class PostgresConfiguration {
                                                                final BoUserRepository boUserRepository,
                                                                final BoPaymentRepository boPaymentRepository,
                                                                final BoProjectRepository boProjectRepository) {
-        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository, boSponsorRepository,
+        return new PostgresBackofficeAdapter(githubRepositoryLinkedToProjectRepository, projectBudgetRepository,
+                boSponsorRepository,
                 projectLeadInvitationRepository, boUserRepository, boPaymentRepository, boProjectRepository);
     }
 
@@ -195,7 +197,12 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager){
+    public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager) {
         return new CustomProjectRankingRepository(entityManager);
+    }
+
+    @Bean
+    public TechnologyStoragePort technologyStoragePort(final TechnologyViewEntityRepository technologyViewEntityRepository) {
+        return new PostgresTechnologyAdapter(technologyViewEntityRepository);
     }
 }
