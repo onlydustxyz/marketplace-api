@@ -167,4 +167,125 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_get_churned_contributors() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "contributors": [
+                            {
+                              "githubUserId": 21149076,
+                              "login": "oscarwroche",
+                              "htmlUrl": "https://github.com/oscarwroche",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "39f0ee86f57fc94477f7525ca035800e54f79c7c20c8bc2774b916bcc514d921",
+                                "completedAt": "2023-07-13T16:38:18Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 4435377,
+                              "login": "Bernardstanislas",
+                              "htmlUrl": "https://github.com/Bernardstanislas",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "9acd1978a8a8d714edbfe888fe9fa5a053f80b7aa7e283023a852a7a2153474a",
+                                "completedAt": "2023-05-12T15:24:46Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 129528947,
+                              "login": "VeryDustyBot",
+                              "htmlUrl": "https://github.com/VeryDustyBot",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/129528947?v=4",
+                              "isRegistered": false,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "567e9f0026852b91ccd0e790cb408af83be7c6517df88fbeabf46f97e636b2ca",
+                                "completedAt": "2023-03-31T15:54:26Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 112474158,
+                              "login": "onlydust-contributor",
+                              "htmlUrl": "https://github.com/onlydust-contributor",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "b100aafc326213a7e0066918abedda38e14fda8b68331e7d777189eae7d41951",
+                                "completedAt": "2023-01-05T08:31:31Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 63618058,
+                              "login": "0xAurelou",
+                              "htmlUrl": "https://github.com/0xAurelou",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/63618058?v=4",
+                              "isRegistered": false,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "55adb08b558ed5f94541b1ba28e6e5b721aeb29f2afbf23e4065be4f2fdff914",
+                                "completedAt": "2022-11-07T15:36:51Z",
+                                "repo": {
+                                  "id": 493591124,
+                                  "owner": "onlydustxyz",
+                                  "name": "kaaper",
+                                  "description": "Documentation generator for Cairo projects.",
+                                  "htmlUrl": "https://github.com/onlydustxyz/kaaper"
+                                }
+                              }
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 5,
+                          "totalItemNumber": 5,
+                          "nextPageIndex": 1
+                        }
+                        """);
+    }
 }

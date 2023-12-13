@@ -82,4 +82,6 @@ public interface ProjectStoragePort {
     boolean hasUserAccessToProject(String projectSlug, UUID userId);
 
     void updateProjectsRanking();
+
+    Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 }

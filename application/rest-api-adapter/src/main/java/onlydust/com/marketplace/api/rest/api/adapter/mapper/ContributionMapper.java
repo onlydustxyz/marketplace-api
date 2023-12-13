@@ -174,4 +174,11 @@ public interface ContributionMapper {
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
     }
+
+    static ProjectChurnedContributorsPageItemResponseAllOfLastContribution mapChurnedContribution(ChurnedContributorView.Contribution lastContribution) {
+        return new ProjectChurnedContributorsPageItemResponseAllOfLastContribution()
+                .id(lastContribution.getId())
+                .repo(GithubRepoMapper.mapRepoToShortResponse(lastContribution.getRepo()))
+                .completedAt(lastContribution.getCompletedAt());
+    }
 }
