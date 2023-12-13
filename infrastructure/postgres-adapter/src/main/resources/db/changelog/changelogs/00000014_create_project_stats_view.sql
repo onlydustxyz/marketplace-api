@@ -69,7 +69,7 @@ with budget_stats as (select pb.project_id,
                                    coalesce(sum(1)
                                             filter ( where c.type = 'CODE_REVIEW' and c.status = 'IN_PROGRESS' ),
                                             0)                                                  open_cr_count,
-                                   count(distinct c.contributor_id)                             contributor_count
+                                   count(distinct c.contributor_id) FILTER (WHERE c.created_at > (CURRENT_DATE - '1 mon'::interval)) contributor_count
                             from project_github_repos pgr
                                      join indexer_exp.github_repos gr
                                           on pgr.github_repo_id = gr.id and gr.visibility = 'PUBLIC'
