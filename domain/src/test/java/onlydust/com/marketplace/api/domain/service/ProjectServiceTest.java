@@ -72,6 +72,35 @@ public class ProjectServiceTest {
     }
 
     @Test
+    void should_throw_project_not_found_by_slug() {
+        // Given
+        final String slug = faker.pokemon().name();
+
+        // When
+        when(projectStoragePort.getBySlug(slug)).thenThrow(OnlyDustException.class);
+
+        // Then
+        assertThatThrownBy(() -> projectService.getBySlug(slug, null))
+                .isInstanceOf(OnlyDustException.class);
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
+    void should_throw_project_not_found_by_id() {
+        // Given
+        final UUID projectId = UUID.randomUUID();
+
+        // When
+        when(projectStoragePort.getById(projectId)).thenThrow(OnlyDustException.class);
+
+        // Then
+        assertThatThrownBy(() -> projectService.getById(projectId, null))
+                .isInstanceOf(OnlyDustException.class);
+        verifyNoInteractions(permissionService);
+    }
+
+
+    @Test
     void should_not_get_a_private_project_when_not_logged() {
         // Given
         final String slug = faker.pokemon().name();
