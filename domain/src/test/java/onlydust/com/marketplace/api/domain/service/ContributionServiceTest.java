@@ -37,7 +37,7 @@ class ContributionServiceTest {
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(true);
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
-        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        when(contributionStoragePort.findContributionById(projectId, contributionId, true)).thenReturn(expectedContribution);
         final var contribution = contributionService.getContribution(projectId, contributionId,
                 User.builder().id(userId).githubUserId(githubUserId).build());
 
@@ -58,7 +58,7 @@ class ContributionServiceTest {
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(false);
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
-        when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
+        when(contributionStoragePort.findContributionById(projectId, contributionId, true)).thenReturn(expectedContribution);
         final var contribution = contributionService.getContribution(projectId, contributionId,
                 User.builder().id(userId).githubUserId(githubUserId).build());
 
@@ -67,21 +67,24 @@ class ContributionServiceTest {
     }
 
     @Test
-    void getContribution_should_return_401_when_caller_is_not_the_contributor_nor_a_project_leader() {
+    void getContribution_should_return_contribution_without_rewards_when_caller_is_not_the_contributor_nor_a_project_leader() {
         // Given
         final var projectId = UUID.randomUUID();
         final var contributionId = faker.pokemon().name();
         final var userId = UUID.randomUUID();
         final var githubUserId = faker.number().randomNumber();
+        final var expectedContribution =
+                ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
 
         // When
         when(permissionService.isUserContributor(contributionId, githubUserId)).thenReturn(false);
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
+        when(contributionStoragePort.findContributionById(projectId, contributionId, false)).thenReturn(expectedContribution);
+        final var contribution = contributionService.getContribution(projectId, contributionId,
+                User.builder().id(userId).githubUserId(githubUserId).build());
 
-        assertThatThrownBy(() -> contributionService.getContribution(projectId, contributionId,
-                User.builder().id(userId).githubUserId(githubUserId).build()))
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User is not the contributor of this contribution, nor a project leader of this project");
+        // Then
+        assertThat(contribution).isEqualTo(expectedContribution);
     }
 
     @Test

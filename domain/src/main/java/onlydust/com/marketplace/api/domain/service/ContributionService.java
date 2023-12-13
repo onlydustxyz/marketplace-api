@@ -17,11 +17,9 @@ public class ContributionService implements ContributionFacadePort {
 
     @Override
     public ContributionDetailsView getContribution(UUID projectId, String contributionId, User caller) {
-        if (!permissionService.isUserContributor(contributionId, caller.getGithubUserId()) &&
-            !permissionService.isUserProjectLead(projectId, caller.getId()))
-            throw OnlyDustException.forbidden("User is not the contributor of this contribution, nor a project leader" +
-                                              " of this project");
-        return contributionStoragePort.findContributionById(projectId, contributionId);
+        final boolean includeRewards = permissionService.isUserContributor(contributionId, caller.getGithubUserId()) ||
+                                       permissionService.isUserProjectLead(projectId, caller.getId());
+        return contributionStoragePort.findContributionById(projectId, contributionId, includeRewards);
     }
 
     @Override

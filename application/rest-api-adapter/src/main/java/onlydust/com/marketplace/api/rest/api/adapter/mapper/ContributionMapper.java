@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionStatus;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
+import onlydust.com.marketplace.api.domain.view.ContributionView;
+import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -139,10 +142,12 @@ public interface ContributionMapper {
                 .commitsCount(contribution.getGithubCommitsCount())
                 .userCommitsCount(contribution.getGithubUserCommitsCount())
                 .links(contribution.getLinks().stream().map(ContributionMapper::mapContributionLink).toList())
-                .rewards(contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
+                .rewards(contribution.getRewards() == null ? null :
+                        contribution.getRewards().stream().map(RewardMapper::rewardToResponse).toList());
     }
 
-    static ProjectContributionPageResponse mapProjectContributionPageResponse(Integer pageIndex, Page<ContributionView> contributions) {
+    static ProjectContributionPageResponse mapProjectContributionPageResponse(Integer pageIndex,
+                                                                              Page<ContributionView> contributions) {
         return new ProjectContributionPageResponse()
                 .contributions(contributions.getContent().stream().map(ContributionMapper::mapContributionPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))

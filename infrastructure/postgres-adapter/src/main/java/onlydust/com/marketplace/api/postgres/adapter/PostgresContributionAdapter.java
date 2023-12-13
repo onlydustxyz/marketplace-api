@@ -71,14 +71,17 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
+    public ContributionDetailsView findContributionById(UUID projectId, String contributionId, boolean includeRewards) {
         final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
-                .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
+                .orElseThrow(() -> OnlyDustException.notFound("contribution not found")).toView();
+
+        if (!includeRewards) {
+            return contribution;
+        }
 
         final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
                 contributionId);
-        return contribution.toView()
-                .withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
+        return contribution.withRewards(rewards.stream().map(ContributionRewardViewEntity::toView).toList());
     }
 
     private Sort sortBy(ContributionView.Sort sort, Sort.Direction direction) {

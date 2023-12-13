@@ -400,7 +400,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
-    void should_return_403_when_not_mine() {
+    void should_return_contribution_without_rewards_when_not_mine() {
         // Given
         final String jwt = userHelper.authenticateHayden().jwt();
 
@@ -413,11 +413,15 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isForbidden();
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.type").isEqualTo("CODE_REVIEW")
+                .jsonPath("$.githubNumber").isEqualTo("14")
+                .jsonPath("$.rewards").doesNotExist();
     }
 
     @Test
-    void should_return_200_when_leader() {
+    void should_return_contribution_with_rewards_when_leader() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
 
@@ -430,6 +434,10 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful();
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.type").isEqualTo("CODE_REVIEW")
+                .jsonPath("$.githubNumber").isEqualTo("14")
+                .jsonPath("$.rewards").exists();
     }
 }
