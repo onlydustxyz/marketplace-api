@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Applicatio
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
@@ -24,9 +25,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
@@ -224,14 +227,22 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public UserRewardsPageView findRewardsForUserId(UUID userId, int pageIndex, int pageSize,
+    public UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
+                                                    int pageIndex, int pageSize,
                                                     UserRewardView.SortBy sortBy, SortDirection sortDirection) {
-        final var count = customUserRewardRepository.getCount(userId);
+
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
+        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
+        final var currencies = filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(CurrencyEnumEntity::toString).toList();
+
+        final var count = customUserRewardRepository.getCount(userId, currencies, filters.getProjectIds(), fromDate, toDate);
         final var userRewardViews = customUserRewardRepository.getViewEntities(userId,
+                        currencies, filters.getProjectIds(), fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(UserRewardMapper::mapEntityToDomain)
                 .toList();
-        final var rewardsStats = rewardStatsRepository.findByUser(userId);
+        final var rewardsStats = rewardStatsRepository.findByUser(userId, currencies, filters.getProjectIds(), fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
@@ -241,10 +252,10 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .build())
                 .rewardedAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getProcessedAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getProcessedUsdAmount()) :
-                        new Money(null, Currency.Usd, rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .pendingAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getPendingAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getPendingUsdAmount()) :
-                        new Money(null, Currency.Usd, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardsCount).reduce(0, Integer::sum))
                 .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemsCount).reduce(0, Integer::sum))
                 .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectsCount).reduce(0, Integer::sum))

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,11 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -116,13 +120,22 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize, String sort,
-                                                              String direction) {
+    public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize,
+                                                              String sort, String direction,
+                                                              List<CurrencyContract> currencies, List<UUID> projects,
+                                                              String fromDate, String toDate) {
         final var sanitizedPageSize = sanitizePageSize(pageSize);
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
         final var sortBy = getSortBy(sort);
-        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), sanitizedPageIndex,
+        final var filters = UserRewardView.Filters.builder()
+                .currencies(Optional.ofNullable(currencies).orElse(List.of()).stream().map(ProjectBudgetMapper::mapCurrency).toList())
+                .projectIds(Optional.ofNullable(projects).orElse(List.of()))
+                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
+                .to(isNull(toDate) ? null : DateMapper.parse(toDate))
+                .build();
+
+        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getId(), filters, sanitizedPageIndex,
                 sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
 
         final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page);

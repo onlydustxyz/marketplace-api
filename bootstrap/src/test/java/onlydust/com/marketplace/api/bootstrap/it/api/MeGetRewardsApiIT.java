@@ -541,4 +541,110 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.rewards[0].status").isEqualTo("MISSING_PAYOUT_INFO");
     }
+
+    @Test
+    void should_filter_by_date() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "100",
+                        "fromDate", "2023-09-20",
+                        "toDate", "2023-09-20"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                // we have at least one correct date
+                .jsonPath("$.rewards[?(@.requestedAt >= '2023-09-20')]").exists()
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-21')]").exists()
+                // we do not have any incorrect date
+                .jsonPath("$.rewards[?(@.requestedAt < '2023-09-20')]").doesNotExist()
+                .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
+                .jsonPath("$.rewardedAmount.amount").doesNotExist()
+                .jsonPath("$.rewardedAmount.currency").doesNotExist()
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.pendingAmount.amount").doesNotExist()
+                .jsonPath("$.pendingAmount.currency").doesNotExist()
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(664000)
+                .jsonPath("$.receivedRewardsCount").isEqualTo(10)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(87)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
+                ;
+    }
+
+
+    @Test
+    void should_filter_by_currency() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "100",
+                        "currencies", "ETH"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewards[?(@.amount.currency == 'ETH')]").exists()
+                .jsonPath("$.rewards[?(@.amount.currency != 'ETH')]").doesNotExist()
+                .jsonPath("$.rewardedAmount.amount").isEqualTo(500)
+                .jsonPath("$.rewardedAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(890990.00)
+                .jsonPath("$.pendingAmount.amount").isEqualTo(1000)
+                .jsonPath("$.pendingAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1781980.00)
+                .jsonPath("$.receivedRewardsCount").isEqualTo(2)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(2)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
+        ;
+    }
+
+
+    @Test
+    void should_filter_by_projects() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "100",
+                        "projects", "5aabf0f1-7495-4bff-8de2-4396837ce6b4,298a547f-ecb6-4ab2-8975-68f4e9bf7b39"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
+                .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
+                .jsonPath("$.rewardedAmount.amount").doesNotExist()
+                .jsonPath("$.rewardedAmount.currency").doesNotExist()
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(890990.00)
+                .jsonPath("$.pendingAmount.amount").doesNotExist()
+                .jsonPath("$.pendingAmount.currency").doesNotExist()
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(2446980.00)
+                .jsonPath("$.receivedRewardsCount").isEqualTo(13)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(90)
+                .jsonPath("$.rewardingProjectsCount").isEqualTo(4)
+        ;
+    }
 }

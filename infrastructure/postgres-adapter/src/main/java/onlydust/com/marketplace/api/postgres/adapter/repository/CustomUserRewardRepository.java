@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 
 import javax.persistence.EntityManager;
@@ -21,7 +22,12 @@ public class CustomUserRewardRepository {
     private static final String COUNT_USER_REWARDS = """
             select count(distinct pr.id)
             from auth_users au
-                     join payment_requests pr on pr.recipient_id = au.github_user_id and au.id = :userId
+                     join payment_requests pr on pr.recipient_id = au.github_user_id and 
+                     au.id = :userId and 
+                     (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies)) and
+                     (coalesce(:projectIds) is null or pr.project_id in (:projectIds)) and
+                     (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                     (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """;
 
     protected static final String FIND_USER_REWARDS_BY_ID = """
@@ -170,12 +176,16 @@ public class CustomUserRewardRepository {
                            end                                                                                  status
                 from auth_users au
                          join payment_requests pr
-                              on pr.recipient_id = au.github_user_id and au.id = :userId
+                              on pr.recipient_id = au.github_user_id 
                          join project_details pd on pd.project_id = pr.project_id
                          left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                          left join payments r on r.request_id = pr.id
                          left join payout_checks on payout_checks.user_id = au.id and payout_checks.id = pr.id
-                where au.id = :userId
+                where au.id = :userId and
+                     (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies)) and
+                     (coalesce(:projectIds) is null or pr.project_id in (:projectIds)) and
+                     (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                     (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             order by %order_by% offset :offset limit :limit
                      """;
 
@@ -335,17 +345,27 @@ public class CustomUserRewardRepository {
                      """;
 
 
-    public Integer getCount(UUID userId) {
+    public Integer getCount(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate, String toDate) {
         final var query = entityManager
                 .createNativeQuery(COUNT_USER_REWARDS)
-                .setParameter("userId", userId);
+                .setParameter("userId", userId)
+                .setParameter("currencies", currencies)
+                .setParameter("projectIds", projectIds)
+                .setParameter("fromDate", fromDate)
+                .setParameter("toDate", toDate)
+                ;
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<UserRewardViewEntity> getViewEntities(UUID userId, UserRewardView.SortBy sortBy,
+    public List<UserRewardViewEntity> getViewEntities(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate, String toDate,
+                                                      UserRewardView.SortBy sortBy,
                                                       SortDirection sortDirection, int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), UserRewardViewEntity.class)
                 .setParameter("userId", userId)
+                .setParameter("currencies", currencies)
+                .setParameter("projectIds", projectIds)
+                .setParameter("fromDate", fromDate)
+                .setParameter("toDate", toDate)
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
                 .getResultList();
