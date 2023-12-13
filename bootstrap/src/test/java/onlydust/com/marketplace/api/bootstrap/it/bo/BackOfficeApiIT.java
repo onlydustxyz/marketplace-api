@@ -620,7 +620,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "website": "OnlyDust.xyz",
                                 "lookingForAJob": null,
                                 "weeklyAllocatedTime": null,
-                                "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                                "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "HTML", "PLpgSQL"],
                                 "tcAcceptedAt": null,
                                 "onboardingCompletedAt": null
                               },
@@ -764,7 +764,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "https://linktr.ee/abuisset",
                               "lookingForAJob": false,
                               "weeklyAllocatedTime": "none",
-                              "languages": "[\\"TypeScript\\", \\"Rust\\", \\"Python\\", \\"Cairo\\", \\"HCL\\", \\"Nix\\", \\"PLpgSQL\\", \\"Makefile\\", \\"CSS\\", \\"JavaScript\\", \\"Shell\\", \\"Dockerfile\\", \\"Procfile\\", \\"HTML\\"]",
+                              "languages": ["TypeScript", "Rust", "Python", "Cairo", "HCL", "Nix", "PLpgSQL", "Makefile", "CSS", "JavaScript", "Shell", "Dockerfile", "Procfile", "HTML"],
                               "tcAcceptedAt": "2023-06-16 16:10:53.562624",
                               "onboardingCompletedAt": "2023-06-28T13:43:28.30742Z"
                             },
@@ -804,7 +804,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "OnlyDust.xyz",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
-                              "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                              "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "HTML", "PLpgSQL"],
                               "tcAcceptedAt": null,
                               "onboardingCompletedAt": null
                             }

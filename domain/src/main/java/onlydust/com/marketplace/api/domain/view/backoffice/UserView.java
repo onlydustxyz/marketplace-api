@@ -49,7 +49,7 @@ public class UserView {
     String website;
     Boolean lookingForAJob;
     String weeklyAllocatedTime;
-    String languages;
+    List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
 

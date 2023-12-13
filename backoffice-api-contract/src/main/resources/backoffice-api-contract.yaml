@@ -640,7 +640,9 @@ components:
         weeklyAllocatedTime:
           type: string
         languages:
-          type: string
+          type: array
+          items:
+            type: string
         tcAcceptedAt:
           type: string
         onboardingCompletedAt:

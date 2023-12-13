@@ -1,13 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -15,6 +19,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BoUserEntity {
     @Id
     UUID id;
@@ -53,7 +58,8 @@ public class BoUserEntity {
     @Column(name = "looking_for_a_job")
     Boolean lookingForAJob;
     String weeklyAllocatedTime;
-    String languages;
+    @Type(type = "jsonb")
+    List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
 
