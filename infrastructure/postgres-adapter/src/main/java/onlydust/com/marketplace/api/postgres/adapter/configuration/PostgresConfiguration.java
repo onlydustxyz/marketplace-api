@@ -56,7 +56,8 @@ public class PostgresConfiguration {
                                                          final RewardableItemRepository rewardableItemRepository,
                                                          final CustomProjectRankingRepository customProjectRankingRepository,
                                                          final BudgetStatsRepository budgetStatsRepository,
-                                                         final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository) {
+                                                         final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository,
+                                                         final NewcomerViewEntityRepository newcomerViewEntityRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -74,7 +75,8 @@ public class PostgresConfiguration {
                 rewardableItemRepository,
                 customProjectRankingRepository,
                 budgetStatsRepository,
-                churnedContributorViewEntityRepository
+                churnedContributorViewEntityRepository,
+                newcomerViewEntityRepository
         );
     }
 

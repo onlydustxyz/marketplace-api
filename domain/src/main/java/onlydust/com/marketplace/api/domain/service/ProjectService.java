@@ -392,4 +392,12 @@ public class ProjectService implements ProjectFacadePort {
         }
         return projectStoragePort.getChurnedContributors(projectId, page, pageSize);
     }
+
+    @Override
+    public Page<NewcomerView> newcomers(UUID projectId, User caller, Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+            throw OnlyDustException.forbidden("Only project leads can view project insights");
+        }
+        return projectStoragePort.getNewcomers(projectId, page, pageSize);
+    }
 }

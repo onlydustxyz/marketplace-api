@@ -23,7 +23,6 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ChurnedContributorViewEntity {
     @Id
     Long id;

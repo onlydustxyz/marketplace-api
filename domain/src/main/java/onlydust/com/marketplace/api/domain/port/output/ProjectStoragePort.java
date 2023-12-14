@@ -84,4 +84,6 @@ public interface ProjectStoragePort {
     void updateProjectsRanking();
 
     Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+
+    Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
 }

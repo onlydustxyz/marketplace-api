@@ -50,6 +50,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectRankingRepository customProjectRankingRepository;
     private final BudgetStatsRepository budgetStatsRepository;
     private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
+    private final NewcomerViewEntityRepository newcomerViewEntityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -476,6 +477,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "completed_at")));
         return Page.<ChurnedContributorView>builder()
                 .content(page.getContent().stream().map(ChurnedContributorViewEntity::toDomain).toList())
+                .totalItemNumber(page.getNumberOfElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final var page = newcomerViewEntityRepository.findAllByProjectId(
+                projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "first_contribution_created_at")));
+        return Page.<NewcomerView>builder()
+                .content(page.getContent().stream().map(NewcomerViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
