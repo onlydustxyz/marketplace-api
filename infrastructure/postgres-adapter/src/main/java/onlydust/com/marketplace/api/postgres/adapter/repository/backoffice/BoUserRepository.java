@@ -33,6 +33,7 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                                     group by user_id)
             SELECT au.id                                               AS id,
                    au.created_at                                       AS created_at,
+                   GREATEST(upay.tech_updated_at, upi.tech_updated_at, au.created_at) AS updated_at,
                    au.last_seen                                        AS last_seen_at,
                    upay.identity #>> '{Company,name}'                  AS company_name,
                    upay.identity #>> '{Company,identification_number}' AS company_num,

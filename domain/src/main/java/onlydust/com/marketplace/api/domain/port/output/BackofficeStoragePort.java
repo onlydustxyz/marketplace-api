@@ -11,7 +11,7 @@ public interface BackofficeStoragePort {
 
     Page<ProjectBudgetView> findProjectBudgetPage(int pageIndex, int pageSize, List<UUID> projectIds);
 
-    Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids);
+    Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds);
 
     Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters);
 

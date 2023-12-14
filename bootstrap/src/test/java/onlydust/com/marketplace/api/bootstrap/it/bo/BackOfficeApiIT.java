@@ -563,6 +563,39 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         }
                         
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,298a547f-ecb6-4ab2-8975-68f4e9bf7b39")))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "project_lead_invitations": [
+                            {
+                              "id": "03d6f190-f898-49fa-a1e5-e6174295d3e8",
+                              "projectId": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "githubUserId": 117665867
+                            },
+                            {
+                              "id": "16def485-d98f-4619-801a-ca147c8c64a6",
+                              "projectId": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                              "githubUserId": 595505
+                            }
+                          ]
+                        }
+                        
+                        """);
     }
 
 
@@ -577,6 +610,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.users[?(@.updatedAt empty true)]").doesNotExist()
+                .jsonPath("$.users[?(@.updatedAt empty false)]").exists()
                 .json("""
                         {
                             "totalPageNumber": 9,
@@ -609,6 +644,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "optimismAddress": null,
                                 "starknetAddress": null,
                                 "createdAt": "2023-02-01T08:56:05.771022Z",
+                                "updatedAt": "2023-02-01T08:56:05.771022Z",
                                 "lastSeenAt": "2023-02-01T08:56:06.027Z",
                                 "email": "tech@onlydust.xyz",
                                 "githubUserId": 112474158,
@@ -620,7 +656,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "website": "OnlyDust.xyz",
                                 "lookingForAJob": null,
                                 "weeklyAllocatedTime": null,
-                                "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                                "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "HTML", "PLpgSQL"],
                                 "tcAcceptedAt": null,
                                 "onboardingCompletedAt": null
                               },
@@ -764,7 +800,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "https://linktr.ee/abuisset",
                               "lookingForAJob": false,
                               "weeklyAllocatedTime": "none",
-                              "languages": "[\\"TypeScript\\", \\"Rust\\", \\"Python\\", \\"Cairo\\", \\"HCL\\", \\"Nix\\", \\"PLpgSQL\\", \\"Makefile\\", \\"CSS\\", \\"JavaScript\\", \\"Shell\\", \\"Dockerfile\\", \\"Procfile\\", \\"HTML\\"]",
+                              "languages": ["TypeScript", "Rust", "Python", "Cairo", "HCL", "Nix", "PLpgSQL", "Makefile", "CSS", "JavaScript", "Shell", "Dockerfile", "Procfile", "HTML"],
                               "tcAcceptedAt": "2023-06-16 16:10:53.562624",
                               "onboardingCompletedAt": "2023-06-28T13:43:28.30742Z"
                             },
@@ -804,7 +840,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "OnlyDust.xyz",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
-                              "languages": "[\\"TypeScript\\", \\"JavaScript\\", \\"Shell\\", \\"CSS\\", \\"HTML\\", \\"PLpgSQL\\"]",
+                              "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "HTML", "PLpgSQL"],
                               "tcAcceptedAt": null,
                               "onboardingCompletedAt": null
                             }

@@ -38,6 +38,7 @@ public class UserView {
     String starknetAddress;
     String aptosAddress;
     ZonedDateTime createdAt;
+    ZonedDateTime updatedAt;
     ZonedDateTime lastSeenAt;
     String email;
     Long githubUserId;
@@ -49,7 +50,7 @@ public class UserView {
     String website;
     Boolean lookingForAJob;
     String weeklyAllocatedTime;
-    String languages;
+    List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
 

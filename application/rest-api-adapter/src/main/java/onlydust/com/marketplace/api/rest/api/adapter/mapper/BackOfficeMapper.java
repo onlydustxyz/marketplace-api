@@ -126,6 +126,7 @@ public interface BackOfficeMapper {
                         .starknetAddress(user.getStarknetAddress())
                         .aptosAddress(user.getAptosAddress())
                         .createdAt(user.getCreatedAt())
+                        .updatedAt(user.getUpdatedAt())
                         .lastSeenAt(user.getLastSeenAt())
                         .email(user.getEmail())
                         .githubUserId(user.getGithubUserId())

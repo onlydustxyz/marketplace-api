@@ -97,9 +97,9 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids) {
+    public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds) {
         final var page = projectLeadInvitationRepository.findAllByIds(PageRequest.of(pageIndex, pageSize),
-                isNull(ids) ? List.of() : ids);
+                isNull(ids) ? List.of() : ids, isNull(projectIds) ? List.of() : projectIds);
         return Page.<ProjectLeadInvitationView>builder()
                 .content(page.getContent().stream().map(entity ->
                         ProjectLeadInvitationView.builder()
