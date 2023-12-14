@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView.Identity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentViewTest {
@@ -144,6 +145,58 @@ class PaymentViewTest {
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
+    }
+
+    @Test
+    void should_return_formatted_payout_settings() {
+        assertThat(PaymentView.builder()
+                .currency(Currency.Usd)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
+                .recipientSepaAccount(validSepaAccount)
+                .build()
+                .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban() + " / " + validSepaAccount.getBic());
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Usd)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientEthWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Eth)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientEthWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Lords)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientEthWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Op)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientOptimismWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Stark)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientStarkWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
+
+        assertThat(PaymentView.builder()
+                .currency(Currency.Apt)
+                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
+                .recipientAptosWallet("wallet")
+                .build()
+                .recipientPayoutSettings()).isEqualTo("wallet");
     }
 
 }
