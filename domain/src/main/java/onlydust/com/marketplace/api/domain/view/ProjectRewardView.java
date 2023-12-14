@@ -40,7 +40,8 @@ public class ProjectRewardView {
     @Builder
     @Data
     public static class Filters {
-        Currency currency;
+        @Builder.Default
+        List<Currency> currencies = List.of();
         @Builder.Default
         List<Long> contributors = List.of();
         Date from;

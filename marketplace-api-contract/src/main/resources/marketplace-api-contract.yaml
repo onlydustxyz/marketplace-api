@@ -1178,10 +1178,12 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
-          name: currency
+          name: currencies
           description: Currency filter
           schema:
-            $ref: '#/components/schemas/CurrencyContract'
+            type: array
+            items:
+              $ref: '#/components/schemas/CurrencyContract'
         - in: query
           name: contributors
           description: Contributor filter
