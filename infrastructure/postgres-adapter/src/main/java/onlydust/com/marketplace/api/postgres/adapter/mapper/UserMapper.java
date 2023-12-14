@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdVie
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
@@ -48,7 +49,9 @@ public interface UserMapper {
                 .build();
     }
 
-    static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate) {
+    static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate,
+                                List<ProjectLedIdViewEntity> projectLedIdViewEntities,
+                                List<ApplicationEntity> applications) {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
@@ -61,11 +64,31 @@ public interface UserMapper {
                                                      && user.getOnboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.getOnboarding())
                                          && nonNull(user.getOnboarding().getProfileWizardDisplayDate()))
+                .projectsLed(projectLedIdViewEntities.stream()
+                        .filter(projectLedIdViewEntity -> !projectLedIdViewEntity.getPending())
+                        .map(projectLedIdViewEntity -> ProjectLedView.builder()
+                                .name(projectLedIdViewEntity.getName())
+                                .logoUrl(projectLedIdViewEntity.getLogoUrl())
+                                .slug(projectLedIdViewEntity.getProjectSlug())
+                                .id(projectLedIdViewEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdViewEntity.getContributorCount())
+                                .build()).toList())
+                .pendingProjectsLed(projectLedIdViewEntities.stream()
+                        .filter(ProjectLedIdViewEntity::getPending)
+                        .map(projectLedIdViewEntity -> ProjectLedView.builder()
+                                .name(projectLedIdViewEntity.getName())
+                                .logoUrl(projectLedIdViewEntity.getLogoUrl())
+                                .slug(projectLedIdViewEntity.getProjectSlug())
+                                .id(projectLedIdViewEntity.getId().getProjectId())
+                                .contributorCount(projectLedIdViewEntity.getContributorCount())
+                                .build()).toList())
+                .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
                 .build();
     }
 
     static User mapUserToDomain(RegisteredUserViewEntity user, Date termsAndConditionsLatestVersionDate,
-                                List<ProjectLedIdViewEntity> projectLedIdViewEntities) {
+                                List<ProjectLedIdViewEntity> projectLedIdViewEntities,
+                                List<ApplicationEntity> applications) {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubId())
@@ -97,6 +120,7 @@ public interface UserMapper {
                                 .id(projectLedIdViewEntity.getId().getProjectId())
                                 .contributorCount(projectLedIdViewEntity.getContributorCount())
                                 .build()).toList())
+                .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
                 .build();
     }
 

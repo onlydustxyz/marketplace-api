@@ -23,6 +23,8 @@ public class User {
     List<ProjectLedView> projectsLed = new ArrayList<>();
     @Builder.Default
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
+    @Builder.Default
+    List<UUID> projectsAppliedTo = new ArrayList<>();
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

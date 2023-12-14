@@ -3,13 +3,15 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -63,15 +65,20 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         if (user.isPresent()) {
-            return user.map(u -> UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate()));
+            return user.map(u -> {
+                final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
+                final var applications = applicationRepository.findAllByApplicantId(u.getId());
+                return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+                        projectLedIdsByUserId, applications);
+            });
         }
         // Fallback on hasura auth user
         Optional<RegisteredUserViewEntity> hasuraUser = registeredUserRepository.findByGithubId(githubId);
         return hasuraUser.map(u -> {
-            final List<ProjectLedIdViewEntity> projectLedIdsByUserId =
-                    projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
+            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
+            final var applications = applicationRepository.findAllByApplicantId(u.getId());
             return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
-                    projectLedIdsByUserId);
+                    projectLedIdsByUserId, applications);
         });
     }
 
@@ -235,15 +242,18 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
-        final var currencies = filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(CurrencyEnumEntity::toString).toList();
+        final var currencies =
+                filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(CurrencyEnumEntity::toString).toList();
 
-        final var count = customUserRewardRepository.getCount(userId, currencies, filters.getProjectIds(), fromDate, toDate);
+        final var count = customUserRewardRepository.getCount(userId, currencies, filters.getProjectIds(), fromDate,
+                toDate);
         final var userRewardViews = customUserRewardRepository.getViewEntities(userId,
                         currencies, filters.getProjectIds(), fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(UserRewardMapper::mapEntityToDomain)
                 .toList();
-        final var rewardsStats = rewardStatsRepository.findByUser(userId, currencies, filters.getProjectIds(), fromDate, toDate);
+        final var rewardsStats = rewardStatsRepository.findByUser(userId, currencies, filters.getProjectIds(),
+                fromDate, toDate);
 
         return UserRewardsPageView.builder()
                 .rewards(Page.<UserRewardView>builder()
@@ -252,11 +262,17 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                         .build())
                 .rewardedAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getProcessedAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getProcessedUsdAmount()) :
-                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                        new Money(rewardsStats.get(0).getProcessedAmount(),
+                                rewardsStats.get(0).getCurrency().toDomain(),
+                                rewardsStats.get(0).getProcessedUsdAmount()) :
+                        new Money(null, null,
+                                rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .pendingAmount(rewardsStats.size() == 1 ?
-                        new Money(rewardsStats.get(0).getPendingAmount(), rewardsStats.get(0).getCurrency().toDomain(), rewardsStats.get(0).getPendingUsdAmount()) :
-                        new Money(null, null, rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                        new Money(rewardsStats.get(0).getPendingAmount(),
+                                rewardsStats.get(0).getCurrency().toDomain(),
+                                rewardsStats.get(0).getPendingUsdAmount()) :
+                        new Money(null, null,
+                                rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

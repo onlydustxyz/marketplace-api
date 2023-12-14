@@ -3727,6 +3727,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectLedShortResponse'
+            projectsAppliedTo:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectId'
 
     ProjectLedShortResponse:
       type: object
@@ -4341,11 +4345,11 @@ components:
     ProjectChurnedContributorsPageResponse:
       type: object
       required:
-          - contributors
-          - hasMore
-          - totalPageNumber
-          - totalItemNumber
-          - nextPageIndex
+        - contributors
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
       properties:
         contributors:
           type: array
