@@ -87,4 +87,6 @@ public interface ProjectFacadePort {
     Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page, Integer pageSize);
 
     Page<NewcomerView> newcomers(UUID projectId, User caller, Integer page, Integer pageSize);
+
+    Page<ContributorActivityView> mostActives(UUID projectId, User caller, Integer page, Integer pageSize);
 }

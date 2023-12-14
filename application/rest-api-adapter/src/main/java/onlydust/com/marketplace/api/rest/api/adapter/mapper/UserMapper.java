@@ -158,15 +158,7 @@ public interface UserMapper {
         userProfileStats.setContributionCountPerWeeks(
                 profileStats.getContributionStats()
                         .stream()
-                        .map(contributionStats -> {
-                            final UserContributionStats userContributionStats = new UserContributionStats();
-                            userContributionStats.setCodeReviewCount(contributionStats.getCodeReviewCount());
-                            userContributionStats.setIssueCount(contributionStats.getIssueCount());
-                            userContributionStats.setPullRequestCount(contributionStats.getPullRequestCount());
-                            userContributionStats.setWeek(contributionStats.getWeek());
-                            userContributionStats.setYear(contributionStats.getYear());
-                            return userContributionStats;
-                        }).toList()
+                        .map(UserMapper::mapContributionStat).toList()
         );
         return userProfileStats;
     }
@@ -253,5 +245,14 @@ public interface UserMapper {
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
         return getMeResponse;
+    }
+
+    static UserContributionStats mapContributionStat(UserProfileView.ProfileStats.ContributionStats contributionStats) {
+        return new UserContributionStats()
+                .codeReviewCount(contributionStats.getCodeReviewCount())
+                .issueCount(contributionStats.getIssueCount())
+                .pullRequestCount(contributionStats.getPullRequestCount())
+                .week(contributionStats.getWeek())
+                .year(contributionStats.getYear());
     }
 }

@@ -1821,11 +1821,13 @@ paths:
           required: true
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
           required: true
           schema:
             type: integer
+            default: 5
       responses:
         "200":
           description: 'List of project most active contributors'

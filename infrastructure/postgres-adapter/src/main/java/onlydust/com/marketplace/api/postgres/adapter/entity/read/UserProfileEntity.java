@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -101,6 +102,16 @@ public class UserProfileEntity {
         Integer week;
         @JsonProperty("year")
         Integer year;
+
+        public UserProfileView.ProfileStats.ContributionStats toDomain() {
+            return UserProfileView.ProfileStats.ContributionStats.builder()
+                    .codeReviewCount(codeReviewCount)
+                    .issueCount(issueCount)
+                    .pullRequestCount(pullRequestCount)
+                    .week(week)
+                    .year(year)
+                    .build();
+        }
     }
 
     @Data

@@ -231,15 +231,7 @@ public class CustomUserRepository {
                         .contributedProjectCount(row.getNumberOfOwnContributorOnProject())
                         .contributionCount(row.getContributionsCount())
                         .contributionStats(isNull(row.getCounts()) ? List.of() :
-                                row.getCounts().stream().map(weekCount ->
-                                                UserProfileView.ProfileStats.ContributionStats.builder()
-                                                        .codeReviewCount(weekCount.getCodeReviewCount())
-                                                        .issueCount(weekCount.getIssueCount())
-                                                        .pullRequestCount(weekCount.getPullRequestCount())
-                                                        .week(weekCount.getWeek())
-                                                        .year(weekCount.getYear())
-                                                        .build()
-                                        )
+                                row.getCounts().stream().map(UserProfileEntity.WeekCount::toDomain)
                                         .sorted(new UserProfileView.ProfileStats.ContributionStatsComparator())
                                         .collect(Collectors.toList())
                         )
