@@ -214,7 +214,7 @@ public interface UserMapper {
                 }).toList();
     }
 
-    private static UserProfileCoverColor coverToUserProfileResponse(final UserProfileCover cover) {
+    public static UserProfileCoverColor coverToUserProfileResponse(final UserProfileCover cover) {
         return isNull(cover) ? UserProfileCoverColor.BLUE :
                 switch (cover) {
                     case BLUE -> UserProfileCoverColor.BLUE;

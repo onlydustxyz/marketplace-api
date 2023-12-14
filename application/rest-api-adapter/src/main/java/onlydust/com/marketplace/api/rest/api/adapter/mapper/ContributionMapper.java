@@ -61,6 +61,21 @@ public interface ContributionMapper {
                 .rewardIds(contributionView.getRewardIds());
     }
 
+    static ProjectStaledContributionsPageItemResponse mapProjectStaledContributionsPageItemResponse(ContributionView contributionView) {
+        return new ProjectStaledContributionsPageItemResponse()
+                .id(contributionView.getId())
+                .contributor(ContributorMapper.of(contributionView.getContributor()))
+                .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
+                .type(mapContributionTypeToResponse(contributionView.getType()))
+                .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
+                .githubNumber(contributionView.getGithubNumber())
+                .githubStatus(GithubStatus.valueOf(contributionView.getGithubStatus()))
+                .githubTitle(contributionView.getGithubTitle())
+                .githubHtmlUrl(contributionView.getGithubHtmlUrl())
+                .githubBody(contributionView.getGithubBody())
+                .repo(GithubRepoMapper.mapRepoToShortResponse(contributionView.getGithubRepo()));
+    }
+
     static GithubPullRequestReviewState mapGithubPullRequestReviewState(PullRequestReviewState githubPullRequestReviewState) {
         return switch (githubPullRequestReviewState) {
             case APPROVED -> GithubPullRequestReviewState.APPROVED;
@@ -149,5 +164,21 @@ public interface ContributionMapper {
                 .totalPageNumber(contributions.getTotalPageNumber())
                 .totalItemNumber(contributions.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
+    }
+
+    static ProjectStaledContributionsPageResponse mapProjectStaledContributionsPageResponse(Integer pageIndex, Page<ContributionView> contributions) {
+        return new ProjectStaledContributionsPageResponse()
+                .contributions(contributions.getContent().stream().map(ContributionMapper::mapProjectStaledContributionsPageItemResponse).toList())
+                .hasMore(hasMore(pageIndex, contributions.getTotalPageNumber()))
+                .totalPageNumber(contributions.getTotalPageNumber())
+                .totalItemNumber(contributions.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributions.getTotalPageNumber()));
+    }
+
+    static ProjectChurnedContributorsPageItemResponseAllOfLastContribution mapChurnedContribution(ChurnedContributorView.Contribution lastContribution) {
+        return new ProjectChurnedContributorsPageItemResponseAllOfLastContribution()
+                .id(lastContribution.getId())
+                .repo(GithubRepoMapper.mapRepoToShortResponse(lastContribution.getRepo()))
+                .completedAt(lastContribution.getCompletedAt());
     }
 }

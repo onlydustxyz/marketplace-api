@@ -1776,11 +1776,13 @@ paths:
           required: true
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
           required: true
           schema:
             type: integer
+            default: 5
       responses:
         "200":
           description: 'List of project churned contributors'
@@ -1858,11 +1860,13 @@ paths:
           required: true
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
           required: true
           schema:
             type: integer
+            default: 5
       responses:
         "200":
           description: 'List of project staled contributions'
@@ -4375,8 +4379,8 @@ components:
                 completedAt:
                   type: string
                   format: date-time
-                project:
-                  $ref: '#/components/schemas/ShortProjectResponse'
+                repo:
+                  $ref: '#/components/schemas/ShortGithubRepoResponse'
 
     ProjectContributorActivityPageResponse:
       type: object

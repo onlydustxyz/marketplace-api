@@ -16,6 +16,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +31,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
-
+    private static final int  CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
@@ -47,6 +49,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final RewardableItemRepository rewardableItemRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
     private final BudgetStatsRepository budgetStatsRepository;
+    private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -464,5 +467,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void updateProjectsRanking() {
         customProjectRankingRepository.updateProjectsRanking();
+    }
+
+    @Override
+    public Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final var page = churnedContributorViewEntityRepository.findAllByProjectId(
+                projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
+                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "completed_at")));
+        return Page.<ChurnedContributorView>builder()
+                .content(page.getContent().stream().map(ChurnedContributorViewEntity::toDomain).toList())
+                .totalItemNumber(page.getNumberOfElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

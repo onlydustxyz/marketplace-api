@@ -15,10 +15,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -32,6 +31,7 @@ public class ProjectService implements ProjectFacadePort {
             "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
+    private static final int STALE_CONTRIBUTION_THRESHOLD_IN_DAYS = 10;
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
@@ -372,5 +372,24 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public void updateProjectsRanking() {
         projectStoragePort.updateProjectsRanking();
+    }
+
+    @Override
+    public Page<ContributionView> staledContributions(UUID projectId, User caller, Integer page, Integer pageSize) {
+        final var filters = ContributionView.Filters.builder()
+                .projects(List.of(projectId))
+                .statuses(List.of(ContributionStatus.IN_PROGRESS))
+                .to(Date.from(ZonedDateTime.now().minusDays(STALE_CONTRIBUTION_THRESHOLD_IN_DAYS).toInstant()))
+                .build();
+
+        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page, pageSize);
+    }
+
+    @Override
+    public Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+            throw OnlyDustException.forbidden("Only project leads can view project insights");
+        }
+        return projectStoragePort.getChurnedContributors(projectId, page, pageSize);
     }
 }
