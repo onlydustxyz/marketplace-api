@@ -594,7 +594,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             }
                           ]
                         }
-                        
                         """);
     }
 
@@ -884,7 +883,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "pullRequestsCount": 1,
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
-                               "codeReviewsCount": 0
+                               "codeReviewsCount": 0,
+                               "recipientPayoutInfoMissing": false
                              },
                              {
                                "id": "047bcb92-dfbf-45c0-970d-509781237b2e",
@@ -902,7 +902,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "pullRequestsCount": 1,
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
-                               "codeReviewsCount": 0
+                               "codeReviewsCount": 0,
+                               "recipientPayoutInfoMissing": true
                              },
                              {
                                "id": "061e2c7e-bda4-49a8-9914-2e76926f70c2",
@@ -920,7 +921,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "pullRequestsCount": 1,
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
-                               "codeReviewsCount": 0
+                               "codeReviewsCount": 0,
+                               "recipientPayoutInfoMissing": false
                              },
                              {
                                "id": "079df81a-d9f4-4e46-80cf-c17f400fe88f",
@@ -938,7 +940,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "pullRequestsCount": 1,
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
-                               "codeReviewsCount": 0
+                               "codeReviewsCount": 0,
+                               "recipientPayoutInfoMissing": true
                              },
                              {
                                "id": "07e75bb9-87fc-4a22-9bea-1232c27e56d4",
@@ -956,7 +959,8 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "pullRequestsCount": 1,
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
-                               "codeReviewsCount": 0
+                               "codeReviewsCount": 0,
+                               "recipientPayoutInfoMissing": true
                              }
                            ]
                          }

@@ -103,6 +103,10 @@ public class UserPayoutInformation {
         String city;
         String postalCode;
         String address;
+
+        public boolean valid() {
+            return nonNull(country) && nonNull(city) && nonNull(postalCode) && nonNull(address);
+        }
     }
 
     @Data
@@ -111,6 +115,10 @@ public class UserPayoutInformation {
         String name;
         String identificationNumber;
         Person owner;
+
+        public boolean valid() {
+            return nonNull(name) && nonNull(identificationNumber) && nonNull(owner) && owner.valid();
+        }
     }
 
     @Data
@@ -118,6 +126,10 @@ public class UserPayoutInformation {
     public static class Person {
         String firstName;
         String lastName;
+
+        public boolean valid() {
+            return nonNull(firstName) && nonNull(lastName);
+        }
     }
 
     @Data
@@ -125,5 +137,9 @@ public class UserPayoutInformation {
     public static class SepaAccount {
         String bic;
         String iban;
+
+        public boolean valid() {
+            return nonNull(bic) && nonNull(iban);
+        }
     }
 }

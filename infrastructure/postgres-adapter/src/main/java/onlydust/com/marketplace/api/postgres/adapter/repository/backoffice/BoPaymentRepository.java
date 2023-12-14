@@ -24,11 +24,29 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	Items.urls AS items,
             	pr.requested_at,
             	Payments.processed_at,
-            	Counters.*
+            	Counters.*,
+            	upi.identity as recipient_identity,
+            	upi.location as recipient_location,
+            	upi.usd_preferred_method as recipient_usd_preferred_method,
+            	user_wallets.wallets as recipient_wallets,
+            	ba.iban as recipient_iban,
+            	ba.bic as recipient_bic
             FROM
             	payment_requests pr
             	INNER JOIN projects_budgets pb on pb.project_id = pr.project_id
             	INNER JOIN budgets b on b.id = pb.budget_id AND b.currency = pr.currency
+            	LEFT JOIN auth_users au ON au.github_user_id = pr.recipient_id
+            	LEFT JOIN user_payout_info upi ON upi.user_id = au.id
+            	LEFT JOIN bank_accounts ba ON ba.user_id = au.id
+            	LEFT JOIN (
+            	    SELECT
+            	        user_id,
+            	        jsonb_agg(jsonb_build_object('network', network, 'type', type, 'address', address)) AS wallets
+                    FROM
+                        wallets
+                    GROUP BY 
+                        user_id
+            	) user_wallets ON user_wallets.user_id = au.id
             	LEFT JOIN (
             	    SELECT 
             	        request_id,

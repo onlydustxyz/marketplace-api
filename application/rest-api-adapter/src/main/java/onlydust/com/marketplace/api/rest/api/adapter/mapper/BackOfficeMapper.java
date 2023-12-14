@@ -158,6 +158,7 @@ public interface BackOfficeMapper {
                         .currency(mapCurrency(payment.getCurrency()))
                         .recipientId(payment.getRecipientId())
                         .requestorId(payment.getRequestorId())
+                        .recipientPayoutInfoMissing(!payment.recipientPayoutInfoValid())
                         .items(payment.getItems())
                         .requestedAt(payment.getRequestedAt())
                         .processedAt(payment.getProcessedAt())

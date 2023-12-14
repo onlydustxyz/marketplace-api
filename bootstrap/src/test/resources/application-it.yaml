@@ -30,8 +30,8 @@ application:
     indexer-sync-job-delay: 500
 
 
-logging:
-  level:
-    org:
-      hibernate:
-        type: trace
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        type: trace
