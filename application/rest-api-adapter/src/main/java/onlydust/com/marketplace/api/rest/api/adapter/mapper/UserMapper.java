@@ -251,6 +251,7 @@ public interface UserMapper {
                         .contributorCount(projectLedView.getContributorCount())
                 )
                 .toList());
+        getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
         return getMeResponse;
     }
 }
