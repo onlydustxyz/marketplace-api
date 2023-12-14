@@ -19,11 +19,12 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
+import static java.util.Objects.nonNull;
+
 @EqualsAndHashCode
 @Data
 @Entity
 @TypeDef(name = "profile_cover", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class ChurnedContributorViewEntity {
     @Id
     Long id;
@@ -49,7 +50,7 @@ public class ChurnedContributorViewEntity {
                 .htmlUrl(htmlUrl)
                 .avatarUrl(avatarUrl)
                 .isRegistered(isRegistered)
-                .cover(cover == null ? null : UserProfileCover.valueOf(cover.name()))
+                .cover(nonNull(cover) ? cover.toDomain() : null)
                 .lastContribution(ChurnedContributorView.Contribution.builder()
                         .id(lastContributionId)
                         .completedAt(lastContributionCompletedAt)

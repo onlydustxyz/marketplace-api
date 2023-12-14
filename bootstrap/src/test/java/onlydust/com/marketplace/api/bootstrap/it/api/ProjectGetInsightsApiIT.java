@@ -288,4 +288,85 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_get_project_newcomers() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_INSIGHTS_NEWCOMERS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "contributors": [
+                            {
+                              "githubUserId": 17259618,
+                              "login": "alexbeno",
+                              "htmlUrl": "https://github.com/alexbeno",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                              "isRegistered": false,
+                              "cover": "BLUE",
+                              "location": null,
+                              "bio": null,
+                              "firstContributedAt": "2023-10-19T12:13:47Z"
+                            },
+                            {
+                              "githubUserId": 143011364,
+                              "login": "pixelfact",
+                              "htmlUrl": "https://github.com/pixelfact",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                              "isRegistered": false,
+                              "cover": "BLUE",
+                              "location": null,
+                              "bio": "Frontend Dev",
+                              "firstContributedAt": "2023-09-25T15:49:00Z"
+                            },
+                            {
+                              "githubUserId": 5160414,
+                              "login": "haydencleary",
+                              "htmlUrl": "https://github.com/haydencleary",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "location": "Limoges, France",
+                              "bio": "Freelance web developer focused on Typescript and React.js",
+                              "firstContributedAt": "2023-09-18T14:41:40Z"
+                            },
+                            {
+                              "githubUserId": 31901905,
+                              "login": "kaelsky",
+                              "htmlUrl": "https://github.com/kaelsky",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "location": null,
+                              "bio": null,
+                              "firstContributedAt": "2023-09-05T09:12:08Z"
+                            },
+                            {
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "htmlUrl": "https://github.com/PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "isRegistered": true,
+                              "cover": "BLUE",
+                              "location": "Paris",
+                              "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
+                              "firstContributedAt": "2023-07-12T11:54:35Z"
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 5,
+                          "totalItemNumber": 5,
+                          "nextPageIndex": 1
+                        }
+                        """);
+    }
 }

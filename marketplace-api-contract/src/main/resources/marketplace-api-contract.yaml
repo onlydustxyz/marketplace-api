@@ -1735,11 +1735,13 @@ paths:
           required: true
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
           required: true
           schema:
             type: integer
+            default: 5
       responses:
         "200":
           description: 'List of project newcomers'
@@ -4297,13 +4299,13 @@ components:
     ProjectNewcomersPageResponse:
       type: object
       required:
-        - newcomers
+        - contributors
         - hasMore
         - totalPageNumber
         - totalItemNumber
         - nextPageIndex
       properties:
-        newcomers:
+        contributors:
           type: array
           items:
             $ref: '#/components/schemas/ProjectNewcomersPageItemResponse'
