@@ -71,4 +71,16 @@ public class PaymentView {
             case Stark -> nonNull(recipientStarkWallet);
         };
     }
+
+    public String recipientPayoutSettings() {
+        return switch (currency) {
+            case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
+                    recipientEthWallet :
+                    "%s / %s".formatted(recipientSepaAccount.getIban(), recipientSepaAccount.getBic());
+            case Eth, Lords -> recipientEthWallet;
+            case Op -> recipientOptimismWallet;
+            case Apt -> recipientAptosWallet;
+            case Stark -> recipientStarkWallet;
+        };
+    }
 }

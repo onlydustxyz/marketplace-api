@@ -701,8 +701,10 @@ components:
         recipientId:
           type: integer
           format: int64
-        recipientPayoutInfoMissing:
+        isPayable:
           type: boolean
+        payoutSettings:
+          type: string
         requestorId:
           type: string
           format: uuid
