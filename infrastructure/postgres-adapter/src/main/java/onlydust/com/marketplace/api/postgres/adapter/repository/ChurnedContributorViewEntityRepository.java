@@ -40,7 +40,7 @@ public interface ChurnedContributorViewEntityRepository extends JpaRepository<Ch
                 LEFT JOIN auth_users au ON au.github_user_id = c.contributor_id
                 LEFT JOIN user_profile_info upi ON upi.id = au.id
                 WHERE
-                    completed_at < current_date - 10 AND
+                    completed_at < current_date - :threshold AND
                     pgr.project_id = :projectId
             """,
             countQuery = """
@@ -48,8 +48,8 @@ public interface ChurnedContributorViewEntityRepository extends JpaRepository<Ch
             FROM indexer_exp.contributions c
             JOIN project_github_repos pgr ON pgr.github_repo_id = c.repo_id
             WHERE
-                completed_at < current_date - 10 AND
+                completed_at < current_date - :threshold AND
                 pgr.project_id = :projectId
             """, nativeQuery = true)
-    Page<ChurnedContributorViewEntity> findAllByProjectId(UUID projectId, Pageable pageable);
+    Page<ChurnedContributorViewEntity> findAllByProjectId(UUID projectId, Integer threshold, Pageable pageable);
 }

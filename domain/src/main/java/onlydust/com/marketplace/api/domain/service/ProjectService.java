@@ -31,6 +31,7 @@ public class ProjectService implements ProjectFacadePort {
             "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
     private static final Pattern PULL_REQUEST_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)/?");
+    private static final int STALE_CONTRIBUTION_THRESHOLD_IN_DAYS = 10;
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
@@ -378,7 +379,7 @@ public class ProjectService implements ProjectFacadePort {
         final var filters = ContributionView.Filters.builder()
                 .projects(List.of(projectId))
                 .statuses(List.of(ContributionStatus.IN_PROGRESS))
-                .to(Date.from(ZonedDateTime.now().minusDays(10).toInstant()))
+                .to(Date.from(ZonedDateTime.now().minusDays(STALE_CONTRIBUTION_THRESHOLD_IN_DAYS).toInstant()))
                 .build();
 
         return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page, pageSize);

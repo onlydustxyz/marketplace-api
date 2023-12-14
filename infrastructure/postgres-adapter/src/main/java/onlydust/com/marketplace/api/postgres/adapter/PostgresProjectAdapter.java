@@ -31,7 +31,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
-
+    private static final int  CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
@@ -472,7 +472,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var page = churnedContributorViewEntityRepository.findAllByProjectId(
-                projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "completed_at")));
+                projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
+                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "completed_at")));
         return Page.<ChurnedContributorView>builder()
                 .content(page.getContent().stream().map(ChurnedContributorViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
