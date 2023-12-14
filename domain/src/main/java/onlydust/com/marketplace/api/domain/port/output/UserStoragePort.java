@@ -23,6 +23,8 @@ public interface UserStoragePort {
 
     void createUser(User user);
 
+    void updateUserLastSeenAt(UUID userId, Date date);
+
     UserPayoutInformation getPayoutInformationById(UUID id);
 
     void updateOnboardingWizardDisplayDate(UUID userId, Date date);

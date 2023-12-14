@@ -18,7 +18,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
@@ -55,8 +55,10 @@ public class UserEntity {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     private Date createdAt;
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
+    @EqualsAndHashCode.Exclude
     private Date updatedAt;
 }
