@@ -18,9 +18,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeade
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
     private static final int  CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
+    private static final int CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS = 5;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
     private final ProjectViewRepository projectViewRepository;
@@ -51,6 +54,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final BudgetStatsRepository budgetStatsRepository;
     private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
     private final NewcomerViewEntityRepository newcomerViewEntityRepository;
+    private final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -488,6 +492,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "first_contribution_created_at")));
         return Page.<NewcomerView>builder()
                 .content(page.getContent().stream().map(NewcomerViewEntity::toDomain).toList())
+                .totalItemNumber(page.getNumberOfElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final var format = new SimpleDateFormat("yyyy-MM-dd");
+        final var fromDate = Date.from(ZonedDateTime.now().minusWeeks(CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS).toInstant());
+
+        final var page = contributorActivityViewEntityRepository.findAllByProjectId(
+                projectId, format.format(fromDate),
+                PageRequest.of(pageIndex, pageSize, JpaSort.unsafe(Sort.Direction.DESC, "COUNT(*)")));
+        return Page.<ContributorActivityView>builder()
+                .content(page.getContent().stream().map(ContributorActivityViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();

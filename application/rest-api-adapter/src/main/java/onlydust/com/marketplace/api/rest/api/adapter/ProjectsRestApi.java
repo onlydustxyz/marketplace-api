@@ -457,4 +457,26 @@ public class ProjectsRestApi implements ProjectsApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
                 : ResponseEntity.ok(response);
     }
+
+
+    @Override
+    public ResponseEntity<ProjectContributorActivityPageResponse> getProjectMostActiveContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var contributors = projectFacadePort.mostActives(
+                projectId,
+                authenticatedUser,
+                sanitizedPageIndex,
+                sanitizedPageSize);
+
+        final var response = ContributorMapper.mapProjectContributorActivityPageResponse(
+                sanitizedPageIndex,
+                contributors);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
+                : ResponseEntity.ok(response);
+    }
 }

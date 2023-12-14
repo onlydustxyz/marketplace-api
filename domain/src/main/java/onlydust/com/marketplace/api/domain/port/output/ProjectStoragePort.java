@@ -86,4 +86,6 @@ public interface ProjectStoragePort {
     Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 
     Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
+
+    Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 }

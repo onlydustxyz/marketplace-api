@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.Contributor;
-import onlydust.com.marketplace.api.domain.view.ChurnedContributorView;
-import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.domain.view.NewcomerView;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 
@@ -67,6 +67,30 @@ public interface ContributorMapper {
                 .location(contributor.getLocation())
                 .bio(contributor.getBio())
                 .firstContributedAt(contributor.getFirstContributedAt())
+                ;
+    }
+
+    static ProjectContributorActivityPageResponse mapProjectContributorActivityPageResponse(int pageIndex,
+                                                                                            Page<ContributorActivityView> contributors) {
+        return new ProjectContributorActivityPageResponse()
+                .contributors(contributors.getContent().stream().map(ContributorMapper::mapProjectContributorActivityPageItemResponse).toList())
+                .hasMore(hasMore(pageIndex, contributors.getTotalPageNumber()))
+                .totalPageNumber(contributors.getTotalPageNumber())
+                .totalItemNumber(contributors.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, contributors.getTotalPageNumber()));
+    }
+
+    static ProjectContributorActivityPageItemResponse mapProjectContributorActivityPageItemResponse(ContributorActivityView activity) {
+        return new ProjectContributorActivityPageItemResponse()
+                .githubUserId(activity.getGithubId())
+                .login(activity.getLogin())
+                .htmlUrl(activity.getHtmlUrl() == null ? null : URI.create(activity.getHtmlUrl()))
+                .avatarUrl(activity.getAvatarUrl())
+                .isRegistered(activity.getIsRegistered())
+                .completedPullRequestCount(activity.getCompletedPullRequestCount())
+                .completedIssueCount(activity.getCompletedIssueCount())
+                .completedCodeReviewCount(activity.getCompletedCodeReviewCount())
+                .contributionCountPerWeeks(activity.getContributionStats().stream().map(UserMapper::mapContributionStat).toList())
                 ;
     }
 }

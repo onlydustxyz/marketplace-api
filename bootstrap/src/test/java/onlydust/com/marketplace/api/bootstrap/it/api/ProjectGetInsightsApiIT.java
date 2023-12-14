@@ -369,4 +369,271 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+
+    @Test
+    void should_get_project_most_active_contributors() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_INSIGHTS_MOST_ACTIVE_CONTRIBUTORS.formatted(KAAPER), Map.of("pageSize", "10")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "contributors": [
+                            {
+                              "githubUserId": 43467246,
+                              "login": "AnthonyBuisset",
+                              "htmlUrl": "https://github.com/AnthonyBuisset",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 504,
+                              "completedIssueCount": 11,
+                              "completedCodeReviewCount": 388,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "htmlUrl": "https://github.com/ofux",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 248,
+                              "completedIssueCount": 2,
+                              "completedCodeReviewCount": 321,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 4435377,
+                              "login": "Bernardstanislas",
+                              "htmlUrl": "https://github.com/Bernardstanislas",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 116,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 261,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 21149076,
+                              "login": "oscarwroche",
+                              "htmlUrl": "https://github.com/oscarwroche",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 117,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 96,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 34384633,
+                              "login": "tdelabro",
+                              "htmlUrl": "https://github.com/tdelabro",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4",
+                              "isRegistered": false,
+                              "completedPullRequestCount": 107,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 39,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "htmlUrl": "https://github.com/PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 30,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 117,
+                              "contributionCountPerWeeks": [
+                                {
+                                  "year": 2023,
+                                  "week": 45,
+                                  "codeReviewCount": 6,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 2
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 46,
+                                  "codeReviewCount": 3,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 0
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 47,
+                                  "codeReviewCount": 5,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 0
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 48,
+                                  "codeReviewCount": 12,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 1
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 49,
+                                  "codeReviewCount": 1,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 0
+                                }
+                              ]
+                            },
+                            {
+                              "githubUserId": 31901905,
+                              "login": "kaelsky",
+                              "htmlUrl": "https://github.com/kaelsky",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 88,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 39,
+                              "contributionCountPerWeeks": [
+                                {
+                                  "year": 2023,
+                                  "week": 45,
+                                  "codeReviewCount": 1,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 6
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 46,
+                                  "codeReviewCount": 1,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 5
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 47,
+                                  "codeReviewCount": 10,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 7
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 48,
+                                  "codeReviewCount": 10,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 2
+                                }
+                              ]
+                            },
+                            {
+                              "githubUserId": 5160414,
+                              "login": "haydencleary",
+                              "htmlUrl": "https://github.com/haydencleary",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                              "isRegistered": true,
+                              "completedPullRequestCount": 57,
+                              "completedIssueCount": 1,
+                              "completedCodeReviewCount": 82,
+                              "contributionCountPerWeeks": [
+                                {
+                                  "year": 2023,
+                                  "week": 45,
+                                  "codeReviewCount": 9,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 6
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 46,
+                                  "codeReviewCount": 9,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 3
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 47,
+                                  "codeReviewCount": 13,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 6
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 48,
+                                  "codeReviewCount": 9,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 14
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 49,
+                                  "codeReviewCount": 1,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 0
+                                }
+                              ]
+                            },
+                            {
+                              "githubUserId": 10167015,
+                              "login": "lechinoix",
+                              "htmlUrl": "https://github.com/lechinoix",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/10167015?v=4",
+                              "isRegistered": false,
+                              "completedPullRequestCount": 25,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 11,
+                              "contributionCountPerWeeks": []
+                            },
+                            {
+                              "githubUserId": 143011364,
+                              "login": "pixelfact",
+                              "htmlUrl": "https://github.com/pixelfact",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                              "isRegistered": false,
+                              "completedPullRequestCount": 55,
+                              "completedIssueCount": 0,
+                              "completedCodeReviewCount": 47,
+                              "contributionCountPerWeeks": [
+                                {
+                                  "year": 2023,
+                                  "week": 45,
+                                  "codeReviewCount": 2,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 9
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 46,
+                                  "codeReviewCount": 3,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 7
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 47,
+                                  "codeReviewCount": 6,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 2
+                                },
+                                {
+                                  "year": 2023,
+                                  "week": 48,
+                                  "codeReviewCount": 8,
+                                  "issueCount": 0,
+                                  "pullRequestCount": 14
+                                }
+                              ]
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 10,
+                          "nextPageIndex": 1
+                        }
+                        """);
+    }
 }

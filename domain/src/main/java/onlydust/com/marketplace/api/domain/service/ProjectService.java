@@ -400,4 +400,12 @@ public class ProjectService implements ProjectFacadePort {
         }
         return projectStoragePort.getNewcomers(projectId, page, pageSize);
     }
+
+    @Override
+    public Page<ContributorActivityView> mostActives(UUID projectId, User caller, Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+            throw OnlyDustException.forbidden("Only project leads can view project insights");
+        }
+        return projectStoragePort.getMostActivesContributors(projectId, page, pageSize);
+    }
 }
