@@ -281,7 +281,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_projects_led() {
+    void should_return_projects_led_and_applications() {
         // Given
         final HasuraUserHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
         final String jwt = pierre.jwt();
@@ -291,6 +291,21 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed");
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                 projectIdWithoutRepo, pierre.user().getGithubUserId()));
+
+        final var projectAppliedTo1 = UUID.randomUUID();
+        final var projectAppliedTo2 = UUID.randomUUID();
+        applicationRepository.save(ApplicationEntity.builder()
+                .id(UUID.randomUUID())
+                .projectId(projectAppliedTo1)
+                .applicantId(pierre.user().getId())
+                .receivedAt(new Date())
+                .build());
+        applicationRepository.save(ApplicationEntity.builder()
+                .id(UUID.randomUUID())
+                .projectId(projectAppliedTo2)
+                .applicantId(pierre.user().getId())
+                .receivedAt(new Date())
+                .build());
 
         // When
         client.get()
@@ -312,7 +327,10 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
                                                                 ".com/5003677688814069549.png")
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
-                .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0);
+                .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0)
+                .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)
+                .jsonPath("$.projectsAppliedTo[0]").isEqualTo(projectAppliedTo1.toString())
+                .jsonPath("$.projectsAppliedTo[1]").isEqualTo(projectAppliedTo2.toString());
 
         // Public repo
         projectRepoRepository.save(new ProjectRepoEntity(projectIdWithoutRepo, 593218280L));
@@ -332,7 +350,10 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent" +
                                                                        ".com/cZCHED10RzuEloOXuk7A")
                 .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull")
-                .jsonPath("$.pendingProjectsLed.length()").isEqualTo(1);
+                .jsonPath("$.pendingProjectsLed.length()").isEqualTo(1)
+                .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)
+                .jsonPath("$.projectsAppliedTo[0]").isEqualTo(projectAppliedTo1.toString())
+                .jsonPath("$.projectsAppliedTo[1]").isEqualTo(projectAppliedTo2.toString());
 
 
     }
