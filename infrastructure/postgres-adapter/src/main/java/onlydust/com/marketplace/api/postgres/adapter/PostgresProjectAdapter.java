@@ -474,7 +474,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var page = churnedContributorViewEntityRepository.findAllByProjectId(
                 projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
-                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "completed_at")));
+                PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "last_contribution_completed_at")));
         return Page.<ChurnedContributorView>builder()
                 .content(page.getContent().stream().map(ChurnedContributorViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
