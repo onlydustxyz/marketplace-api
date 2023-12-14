@@ -36,7 +36,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.technologies['Rust']").isEqualTo(404344)
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("NONE")
                 .jsonPath("$.isLookingForAJob").isEqualTo(false)
-                .jsonPath("$.contacts.length()").isEqualTo(6)
+                .jsonPath("$.contacts.length()").isEqualTo(4)
                 .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("private")
                 .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].channel").isEqualTo("EMAIL")
                 .jsonPath("$.contacts[?(@.contact=='antho')].visibility").isEqualTo("public")

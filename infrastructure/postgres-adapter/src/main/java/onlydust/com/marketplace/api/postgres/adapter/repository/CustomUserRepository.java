@@ -244,23 +244,37 @@ public class CustomUserRepository {
                             case one_to_three_days -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
                             case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
                         })
-                .contacts(isNull(row.getContacts()) ? Set.of() : row.getContacts().stream().map(contact ->
-                        Contact.builder()
-                                .contact(contact.getContact())
-                                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
-                                    case email -> Contact.Channel.EMAIL;
-                                    case telegram -> Contact.Channel.TELEGRAM;
-                                    case twitter -> Contact.Channel.TWITTER;
-                                    case discord -> Contact.Channel.DISCORD;
-                                    case linkedin -> Contact.Channel.LINKEDIN;
-                                    case whatsapp -> Contact.Channel.WHATSAPP;
-                                })
-                                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ?
-                                        Contact.Visibility.PUBLIC :
-                                        Contact.Visibility.PRIVATE)
-                                .build()
-                ).collect(Collectors.toSet()))
+                .contacts(getContacts(row))
                 .build();
+    }
+
+    private Set<Contact> getContacts(UserProfileEntity row) {
+        final Set<Contact> contacts = isNull(row.getContacts()) ? new HashSet<>() :
+                row.getContacts().stream().map(contact ->
+                Contact.builder()
+                        .contact(contact.getContact())
+                        .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
+                            case email -> Contact.Channel.EMAIL;
+                            case telegram -> Contact.Channel.TELEGRAM;
+                            case twitter -> Contact.Channel.TWITTER;
+                            case discord -> Contact.Channel.DISCORD;
+                            case linkedin -> Contact.Channel.LINKEDIN;
+                            case whatsapp -> Contact.Channel.WHATSAPP;
+                        })
+                        .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
+                                Contact.Visibility.PRIVATE)
+                        .build()
+        ).collect(Collectors.toSet());
+
+        if (contacts.stream().noneMatch(contact -> contact.getChannel() == Contact.Channel.EMAIL))
+            contacts.add(Contact.builder()
+                    .contact(row.getEmail())
+                    .channel(Contact.Channel.EMAIL)
+                    .visibility(Contact.Visibility.PRIVATE)
+                    .build()
+            );
+
+        return contacts;
     }
 
     private HashMap<String, Long> getTechnologies(UserProfileEntity row) {

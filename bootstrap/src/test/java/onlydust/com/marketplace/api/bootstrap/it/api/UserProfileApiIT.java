@@ -43,18 +43,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                "cover": "BLUE",
                "contacts": [
                  {
-                   "channel": "LINKEDIN",
-                   "contact": "",
-                   "visibility": "public"
-                 },
-                 {
                    "channel": "TWITTER",
                    "contact": "https://twitter.com/abuisset",
-                   "visibility": "public"
-                 },
-                 {
-                   "channel": "WHATSAPP",
-                   "contact": "",
                    "visibility": "public"
                  },
                  {
@@ -886,18 +876,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "cover": "BLUE",
               "contacts": [
                 {
-                  "channel": "LINKEDIN",
-                  "contact": "",
-                  "visibility": "public"
-                },
-                {
                   "channel": "TWITTER",
                   "contact": "https://twitter.com/abuisset",
-                  "visibility": "public"
-                },
-                {
-                  "channel": "WHATSAPP",
-                  "contact": "",
                   "visibility": "public"
                 },
                 {
@@ -1773,5 +1753,22 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").exists()
                 .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
+    }
+
+
+    @Test
+    void should_get_email_if_user_profile_has_no_contact() {
+        // Given
+        final String jwt = userHelper.authenticateHayden().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_PROFILE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contacts[?(@.channel=='EMAIL')].contact").isEqualTo("haydenclearymusic@gmail.com");
     }
 }
