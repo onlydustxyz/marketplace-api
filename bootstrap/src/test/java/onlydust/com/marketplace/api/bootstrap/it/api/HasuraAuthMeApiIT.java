@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
@@ -16,9 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @ActiveProfiles({"hasura_auth"})
@@ -31,6 +36,8 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     AuthUserRepository authUserRepository;
     @Autowired
     OnboardingRepository onboardingRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     @Order(1)
@@ -51,6 +58,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         Long githubUserId = faker.number().randomNumber();
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
+        String email = faker.internet().emailAddress();
         UUID userId = UUID.randomUUID();
 
         final AuthUserEntity user = AuthUserEntity.builder()
@@ -58,10 +66,20 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .githubUserId(githubUserId)
                 .loginAtSignup(login)
                 .avatarUrlAtSignup(avatarUrl)
+                .email(email)
                 .isAdmin(false)
                 .createdAt(new Date())
                 .build();
         authUserRepository.save(user);
+
+        final var iamUser = userRepository.findById(userId);
+        assertThat(iamUser).isPresent();
+        assertThat(iamUser.get().getId()).isEqualTo(userId);
+        assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
+        assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
+        assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo(avatarUrl);
+        assertThat(iamUser.get().getEmail()).isEqualTo(email);
+        assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
 
         final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
                 .iss(jwtSecret.getIssuer())
@@ -97,6 +115,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         Long githubUserId = faker.number().randomNumber();
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
+        String email = faker.internet().emailAddress();
         UUID userId = UUID.randomUUID();
 
         final AuthUserEntity user = AuthUserEntity.builder()
@@ -104,10 +123,20 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .githubUserId(githubUserId)
                 .loginAtSignup(login)
                 .avatarUrlAtSignup(avatarUrl)
+                .email(email)
                 .isAdmin(false)
                 .createdAt(new Date())
                 .build();
         authUserRepository.save(user);
+
+        final var iamUser = userRepository.findById(userId);
+        assertThat(iamUser).isPresent();
+        assertThat(iamUser.get().getId()).isEqualTo(userId);
+        assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
+        assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
+        assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo(avatarUrl);
+        assertThat(iamUser.get().getEmail()).isEqualTo(email);
+        assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
                 .id(user.getId())
@@ -177,5 +206,14 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.id").isEqualTo(userId.toString());
+
+        final var iamUser = userRepository.findById(userId);
+        assertThat(iamUser).isPresent();
+        assertThat(iamUser.get().getId()).isEqualTo(userId);
+        assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
+        assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
+        assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
+        assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
+        assertThat(iamUser.get().getLastSeenAt().toInstant()).isEqualTo(LocalDateTime.parse("2023-09-27T08:52:36.037").toInstant(java.time.ZoneOffset.UTC));
     }
 }
