@@ -701,6 +701,8 @@ components:
         recipientId:
           type: integer
           format: int64
+        recipientPayoutInfoMissing:
+          type: boolean
         requestorId:
           type: string
           format: uuid
