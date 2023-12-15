@@ -81,6 +81,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .lastSeenAt(new Date())
                 .build();
 
+        userRepository.deleteAll();
         assertIsSaved(expected, userRepository);
     }
 
@@ -100,6 +101,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .termsAndConditionsAcceptanceDate(new Date())
                 .profileWizardDisplayDate(new Date())
                 .build();
+
+        userRepository.deleteAll();
 
         // When
         assertIsSaved(user, userRepository);

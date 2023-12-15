@@ -132,7 +132,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.getLogin()).isEqualTo(user.getLoginAtSignup());
         assertThat(result.getAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER);
+        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
         assertThat(result.hasSeenOnboardingWizard()).isFalse();
         assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
