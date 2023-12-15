@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -96,10 +95,11 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                      LEFT JOIN onboardings o ON au.id = o.user_id
                      LEFT JOIN repo_languages rl ON rl.contributor_id = au.github_user_id
                      LEFT JOIN user_languages ul ON ul.user_id = au.id
-                WHERE 
+                WHERE
                     COALESCE(:userIds) IS NULL OR au.id IN (:userIds)
             """,
-            countQuery = "SELECT count(*) FROM auth_users WHERE COALESCE(:userIds) IS NULL OR id IN (:userIds)", nativeQuery = true)
+            countQuery = "SELECT count(*) FROM auth_users WHERE COALESCE(:userIds) IS NULL OR id IN (:userIds)",
+            nativeQuery = true)
     @NotNull
     Page<BoUserEntity> findAll(final List<UUID> userIds, final @NotNull Pageable pageable);
 }
