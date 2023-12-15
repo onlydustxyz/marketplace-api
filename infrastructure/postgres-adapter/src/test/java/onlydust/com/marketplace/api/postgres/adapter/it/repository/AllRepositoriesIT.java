@@ -76,7 +76,9 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .email(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .lastSeenAt(new Date())
                 .build();
 
         assertIsSaved(expected, userRepository);
@@ -90,7 +92,9 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .email(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .lastSeenAt(new Date())
                 .build();
         final OnboardingEntity onboarding = OnboardingEntity.builder().id(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
@@ -374,6 +378,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .createdAt(new Date())
                 .loginAtSignup(faker.rickAndMorty().character())
                 .avatarUrlAtSignup(faker.internet().url())
+                .email(faker.internet().emailAddress())
                 .isAdmin(false)
                 .build());
         final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()

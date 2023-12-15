@@ -15,7 +15,7 @@ SELECT au.id,
        coalesce(ga.login, au.login_at_signup),
        coalesce(ga.avatar_url, au.avatar_url_at_signup),
        au.email,
-       '{USER}'::iam.user_role[],
+       CASE WHEN au.admin is true THEN '{USER, ADMIN}'::iam.user_role[] ELSE '{USER}'::iam.user_role[] END,
        au.created_at,
        au.last_seen
 FROM auth_users au
@@ -28,7 +28,7 @@ ALTER TABLE iam.users
 
 
 
--- Create a trigger to insert a row into table github_user_indexes when a row is inserted in auth.user_providers
+-- Create a trigger to insert a row into table iam.users when a row is inserted in auth_users
 CREATE OR REPLACE FUNCTION public.insert_iam_user_from_auth_users()
     RETURNS TRIGGER AS
 $$
@@ -41,7 +41,7 @@ BEGIN
            coalesce((SELECT ga.avatar_url FROM indexer_exp.github_accounts ga WHERE ga.id = NEW.github_user_id),
                     NEW.avatar_url_at_signup),
            NEW.email,
-           '{USER}'::iam.user_role[],
+           CASE WHEN NEW.admin is true THEN '{USER, ADMIN}'::iam.user_role[] ELSE '{USER}'::iam.user_role[] END,
            NEW.created_at;
     -- We do not add an ON CONFLICT clause because we want to FAIL if the user already
     -- exists in iam.users, as this should NEVER happen at this point.
@@ -58,7 +58,7 @@ EXECUTE FUNCTION public.insert_iam_user_from_auth_users();
 
 
 
--- Create a trigger to update row into table github_user_indexes when a row is updated in auth.user_providers
+-- Create a trigger to update row in table iam.users when a row is updated in auth_users
 CREATE OR REPLACE FUNCTION public.update_iam_user_from_auth_users()
     RETURNS TRIGGER AS
 $$
@@ -73,3 +73,24 @@ CREATE TRIGGER update_iam_user_from_auth_users_trigger
     ON auth_users
     FOR EACH ROW
 EXECUTE FUNCTION public.update_iam_user_from_auth_users();
+
+
+-- Create a trigger to update row in table iam.users when 'admin' column is updated in auth_users
+CREATE OR REPLACE FUNCTION public.update_iam_user_roles_from_auth_users()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE iam.users
+    SET roles = CASE
+                    WHEN NEW.admin is true THEN '{USER, ADMIN}'::iam.user_role[]
+                    ELSE '{USER}'::iam.user_role[] END
+    WHERE id = NEW.id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_iam_user_roles_from_auth_users_trigger
+    AFTER UPDATE OF admin
+    ON auth_users
+    FOR EACH ROW
+EXECUTE FUNCTION public.update_iam_user_roles_from_auth_users();

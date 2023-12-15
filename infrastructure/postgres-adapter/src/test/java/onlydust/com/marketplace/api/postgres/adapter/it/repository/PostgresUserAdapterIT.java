@@ -33,17 +33,24 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     @Autowired
     PostgresUserAdapter postgresUserAdapter;
 
-    @Test
-    void getUserByGithubId_on_hasura_user_should_map_onboarding_data() {
-        // Given
-        final AuthUserEntity user = AuthUserEntity.builder()
+
+    public static AuthUserEntity newFakeAuthUserEntity(boolean isAdmin) {
+        return AuthUserEntity.builder()
                 .id(UUID.randomUUID())
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .loginAtSignup(faker.name().name())
                 .avatarUrlAtSignup(faker.internet().avatar())
-                .isAdmin(true)
+                .email(faker.internet().emailAddress())
+                .isAdmin(isAdmin)
                 .createdAt(new Date())
+                .lastSeen(new Date())
                 .build();
+    }
+
+    @Test
+    void getUserByGithubId_on_hasura_user_should_map_onboarding_data() {
+        // Given
+        final AuthUserEntity user = newFakeAuthUserEntity(true);
         authUserRepository.save(user);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
@@ -69,14 +76,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     @Test
     void getUserByGithubId_on_hasura_user_should_map_outdated_terms_and_conditions_acceptance() {
         // Given
-        final AuthUserEntity user = AuthUserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
-                .loginAtSignup(faker.name().name())
-                .avatarUrlAtSignup(faker.internet().avatar())
-                .isAdmin(true)
-                .createdAt(new Date())
-                .build();
+        final AuthUserEntity user = newFakeAuthUserEntity(true);
         authUserRepository.save(user);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
@@ -102,14 +102,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     @Test
     void getUserByGithubId_on_hasura_user_without_onboarding_data() {
         // Given
-        final AuthUserEntity user = AuthUserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
-                .loginAtSignup(faker.name().name())
-                .avatarUrlAtSignup(faker.internet().avatar())
-                .isAdmin(true)
-                .createdAt(new Date())
-                .build();
+        final AuthUserEntity user = newFakeAuthUserEntity(true);
         authUserRepository.save(user);
 
         // When
@@ -128,14 +121,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     @Test
     void getUserByGithubId_on_hasura_user_not_admin_without_onboarding_data() {
         // Given
-        final AuthUserEntity user = AuthUserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
-                .loginAtSignup(faker.name().name())
-                .avatarUrlAtSignup(faker.internet().avatar())
-                .isAdmin(false)
-                .createdAt(new Date())
-                .build();
+        final AuthUserEntity user = newFakeAuthUserEntity(true);
         authUserRepository.save(user);
 
         // When
@@ -159,7 +145,9 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .email(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
 
@@ -191,7 +179,9 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .email(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
 
@@ -223,7 +213,9 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
+                .email(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .lastSeenAt(new Date())
                 .build();
         userRepository.save(user);
 
