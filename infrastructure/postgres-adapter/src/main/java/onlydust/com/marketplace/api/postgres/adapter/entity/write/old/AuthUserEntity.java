@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
+@Deprecated
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

@@ -37,4 +37,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000018_auth_to_iam.sql
   - include:
       file: db/changelog/changelogs/00000019_fix_update_iam_user_from_auth_users.sql
+  - include:
+      file: db/changelog/changelogs/00000020_all_queries_and_functions_use_iam_users.sql
 

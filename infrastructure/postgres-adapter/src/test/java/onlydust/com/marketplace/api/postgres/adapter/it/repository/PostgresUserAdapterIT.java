@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.RegisteredUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +25,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     UserRepository userRepository;
     @Autowired
     AuthUserRepository authUserRepository;
-    @Autowired
-    RegisteredUserRepository registeredUserRepository;
     @Autowired
     OnboardingRepository onboardingRepository;
     @Autowired

@@ -72,17 +72,17 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                 group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
                      left join (select pc_me.project_id, case count(*) when 0 then false else true end is_c
                                 from projects_contributors pc_me
-                                         left join auth_users me on me.github_user_id = pc_me.github_user_id
+                                         left join iam.users me on me.github_user_id = pc_me.github_user_id
                                 where me.id = :userId
                                 group by pc_me.project_id) is_contributor on is_contributor.project_id = p.project_id
                      left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
-                                         left join auth_users me on me.github_user_id = ppc.github_user_id
+                                         left join iam.users me on me.github_user_id = ppc.github_user_id
                                 where me.id = :userId
                                 group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
                      left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
                                 from pending_project_leader_invitations ppli
-                                         left join auth_users me on me.github_user_id = ppli.github_user_id
+                                         left join iam.users me on me.github_user_id = ppli.github_user_id
                                 where me.id = :userId
                                 group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
                      left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count

@@ -6,13 +6,12 @@ import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -87,7 +86,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
-        final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(), PageRequest.of(pageIndex, pageSize));
+        final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(),
+                PageRequest.of(pageIndex, pageSize));
         return Page.<SponsorView>builder()
                 .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -97,7 +97,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds) {
+    public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids,
+                                                                         List<UUID> projectIds) {
         final var page = projectLeadInvitationRepository.findAllByIds(PageRequest.of(pageIndex, pageSize),
                 isNull(ids) ? List.of() : ids, isNull(projectIds) ? List.of() : projectIds);
         return Page.<ProjectLeadInvitationView>builder()
@@ -115,7 +116,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     public Page<UserView> listUsers(int pageIndex, int pageSize, UserView.Filters filters) {
-        final var page = boUserRepository.findAll(filters.getUsers(), PageRequest.of(pageIndex, pageSize));
+        final var page = boUserRepository.findAll(filters.getUsers(), PageRequest.of(pageIndex, pageSize,
+                Sort.by(Sort.Direction.DESC, "created_at")));
         return Page.<UserView>builder()
                 .content(page.getContent().stream().map(BoUserEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -135,7 +137,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds, PageRequest.of(pageIndex, pageSize));
+        final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
+                PageRequest.of(pageIndex, pageSize));
         return Page.<ProjectView>builder()
                 .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())

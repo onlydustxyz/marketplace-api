@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.api.domain.view.ProjectOrganizationView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
@@ -78,7 +77,7 @@ public interface ProjectMapper {
                                 projectEntity.getIgnoreCodeReviews(),
                                 projectEntity.getIgnoreContributionsBefore()
                         ))
-                .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).collect(Collectors.toSet()))
+                .topContributors(topContributors.stream().map(UserMapper::mapToContributorLinkView).toList())
                 .contributorCount(contributorCount)
                 .leaders(leaders.stream()
                         .filter(leader -> Boolean.TRUE.equals(leader.getHasAcceptedInvitation()))

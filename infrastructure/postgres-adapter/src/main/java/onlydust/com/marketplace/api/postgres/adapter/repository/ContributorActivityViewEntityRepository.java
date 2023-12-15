@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorActivityViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.NewcomerViewEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,7 +14,7 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                    c.contributor_login                             AS login,
                    c.contributor_html_url                          AS html_url,
                    c.contributor_avatar_url                        AS avatar_url,
-                   au.id IS NOT NULL                               AS is_registered,
+                   u.id IS NOT NULL                                AS is_registered,
                    DATE_PART('isoyear', c.created_at)              AS year,
                    DATE_PART('week', c.created_at)                 AS week,
                    MAX(c.created_at)                               AS created_at,
@@ -24,14 +23,14 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                    COUNT(*) FILTER (WHERE c.type = 'CODE_REVIEW')  AS code_review_count
             FROM indexer_exp.contributions c
                  JOIN project_github_repos pgr ON pgr.github_repo_id = c.repo_id
-                 LEFT JOIN auth_users au ON au.github_user_id = c.contributor_id
+                 LEFT JOIN iam.users u ON u.github_user_id = c.contributor_id
             WHERE pgr.project_id = :projectId
               AND c.status = 'COMPLETED'
             GROUP BY c.contributor_id,
                      c.contributor_login,
                      c.contributor_html_url,
                      c.contributor_avatar_url,
-                     au.id,
+                     u.id,
                      year,
                      week
             )
@@ -55,11 +54,11 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
             GROUP BY s.id, s.login, s.html_url, s.avatar_url, s.is_registered
             """,
             countQuery = """
-                SELECT COUNT(DISTINCT c.contributor_id)
-                FROM indexer_exp.contributions c
-                JOIN project_github_repos pgr ON pgr.github_repo_id = c.repo_id
-                WHERE pgr.project_id = :projectId
-                  AND c.status = 'COMPLETED'
-            """, nativeQuery = true)
+                        SELECT COUNT(DISTINCT c.contributor_id)
+                        FROM indexer_exp.contributions c
+                        JOIN project_github_repos pgr ON pgr.github_repo_id = c.repo_id
+                        WHERE pgr.project_id = :projectId
+                          AND c.status = 'COMPLETED'
+                    """, nativeQuery = true)
     Page<ContributorActivityViewEntity> findAllByProjectId(UUID projectId, String fromDate, Pageable pageable);
 }

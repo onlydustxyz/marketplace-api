@@ -25,7 +25,7 @@ public class ProjectDetailsView {
     ProjectVisibility visibility;
     Integer contributorCount;
     @Builder.Default
-    Set<ContributorLinkView> topContributors = new HashSet<>();
+    List<ContributorLinkView> topContributors = new ArrayList<>();
     @Builder.Default
     @Setter(AccessLevel.NONE)
     Set<ProjectOrganizationView> organizations = new HashSet<>();

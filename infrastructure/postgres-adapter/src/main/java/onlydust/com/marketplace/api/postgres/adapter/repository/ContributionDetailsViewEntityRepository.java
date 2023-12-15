@@ -41,7 +41,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                    user_avatar_url(c.contributor_id, c.contributor_avatar_url) as contributor_avatar_url,
                    c.contributor_id,
                    c.contributor_html_url,
-                   au.id IS NOT NULL AS contributor_is_registered,
+                   u.id IS NOT NULL AS contributor_is_registered,
                    c.pr_review_state,
                    case
                        when c.type = 'PULL_REQUEST' then (select gpr.commit_count
@@ -58,7 +58,7 @@ public interface ContributionDetailsViewEntityRepository extends JpaRepository<C
                 INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
                 INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
                 INNER JOIN public.project_details p on p.project_id = pgr.project_id        
-                LEFT JOIN auth_users au on au.github_user_id = c.contributor_id
+                LEFT JOIN iam.users u on u.github_user_id = c.contributor_id
                 LEFT JOIN LATERAL (
                     SELECT 
                         jsonb_agg(jsonb_build_object(

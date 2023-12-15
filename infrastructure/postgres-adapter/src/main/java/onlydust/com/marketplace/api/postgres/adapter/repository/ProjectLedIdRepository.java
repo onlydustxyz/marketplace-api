@@ -27,7 +27,7 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                                                 where pgr2.project_id = pd.project_id
                                                 and gr.visibility = 'PUBLIC' ) > 0)
             union
-            (select au.id,
+            (select u.id,
                     pd.project_id,
                     pd.key as project_slug,
                     pd.name,
@@ -36,10 +36,10 @@ public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdViewEn
                      (select count(pc.github_user_id)
                       from projects_contributors pc
                       where pc.project_id = pd.project_id) contributor_count
-             from auth_users au
-                      join pending_project_leader_invitations ppli on ppli.github_user_id = au.github_user_id
+             from iam.users u
+                      join pending_project_leader_invitations ppli on ppli.github_user_id = u.github_user_id
                       join project_details pd on pd.project_id = ppli.project_id
-             where au.id = :userId and (select count(pgr2.github_repo_id)
+             where u.id = :userId and (select count(pgr2.github_repo_id)
                                            from public.project_github_repos pgr2
                                            join indexer_exp.github_repos gr on pgr2.github_repo_id = gr.id
                                                 where pgr2.project_id = pd.project_id
