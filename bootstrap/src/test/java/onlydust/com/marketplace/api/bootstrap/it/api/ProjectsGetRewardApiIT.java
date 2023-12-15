@@ -90,7 +90,15 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": null
                             },
                             "createdAt": "2023-09-19T07:38:52.590518Z",
-                            "processedAt": null
+                            "processedAt": null,
+                            "project": {
+                                "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                "slug": "qa-new-contributions",
+                                "name": "QA new contributions",
+                                "shortDescription": "QA new contributions",
+                                "logoUrl": null,
+                                "visibility": "PUBLIC"
+                            }
                         }""");
 
 

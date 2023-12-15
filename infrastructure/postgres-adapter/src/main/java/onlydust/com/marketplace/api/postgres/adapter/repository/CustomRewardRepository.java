@@ -32,8 +32,18 @@ public class CustomRewardRepository {
                        when r.id is not null then 'COMPLETE'
                        else 'PROCESSING'
                        end                                                                                  status,
-                       r.receipt
+                       r.receipt,
+                    p.project_id,
+                    p.key as project_key,
+                    p.name as project_name,
+                    p.short_description as project_short_description,
+                    p.long_description as project_long_description,
+                    p.logo_url as project_logo_url,
+                    p.telegram_link as project_telegram_link,
+                    p.hiring as project_hiring,
+                    p.visibility as project_visibility
             from payment_requests pr
+                     join project_details p on p.project_id = pr.project_id
                      left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
                      left join public.auth_users au on pr.recipient_id = au.github_user_id
                      left join auth_users au_requestor on au_requestor.id = pr.requestor_id
@@ -181,8 +191,18 @@ public class CustomRewardRepository {
                        when payout_checks.valid_company and pr.invoice_received_at is null then 'PENDING_INVOICE'
                        else 'PROCESSING'
                        end                                                                                  status,
-                       r.receipt
+                       r.receipt,
+                       p.project_id,
+                       p.key as project_key,
+                       p.name as project_name,
+                       p.short_description as project_short_description,
+                       p.long_description as project_long_description,
+                       p.logo_url as project_logo_url,
+                       p.telegram_link as project_telegram_link,
+                       p.hiring as project_hiring,
+                       p.visibility as project_visibility
             from payment_requests pr
+                     join project_details p on p.project_id = pr.project_id
                      left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
                      left join auth_users au on pr.recipient_id = au.github_user_id
                      left join auth_users au_requestor on au_requestor.id = pr.requestor_id

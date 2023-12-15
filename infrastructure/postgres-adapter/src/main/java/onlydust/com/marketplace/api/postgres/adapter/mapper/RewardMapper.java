@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
@@ -47,6 +48,17 @@ public interface RewardMapper {
                         .githubLogin(rewardViewEntityByd.getRequestorLogin())
                         .githubAvatarUrl(rewardViewEntityByd.getRequestorAvatarUrl())
                         .build())
+                .project(Project.builder()
+                        .id(rewardViewEntityByd.getProjectId())
+                        .slug(rewardViewEntityByd.getProjectKey())
+                        .name(rewardViewEntityByd.getProjectName())
+                        .shortDescription(rewardViewEntityByd.getProjectShortDescription())
+                        .longDescription(rewardViewEntityByd.getProjectLongDescription())
+                        .logoUrl(rewardViewEntityByd.getProjectLogoUrl())
+                        .moreInfoUrl(rewardViewEntityByd.getProjectTelegramLink())
+                        .hiring(rewardViewEntityByd.getProjectHiring())
+                        .visibility(rewardViewEntityByd.getProjectVisibility().toDomain())
+                        .build())
                 .build();
     }
 
@@ -81,6 +93,17 @@ public interface RewardMapper {
                         .githubAvatarUrl(rewardViewEntityByd.getRequestorAvatarUrl())
                         .build())
                 .receipt(receiptToDomain(rewardViewEntityByd.getReceipt()))
+                .project(Project.builder()
+                        .id(rewardViewEntityByd.getProjectId())
+                        .slug(rewardViewEntityByd.getProjectKey())
+                        .name(rewardViewEntityByd.getProjectName())
+                        .shortDescription(rewardViewEntityByd.getProjectShortDescription())
+                        .longDescription(rewardViewEntityByd.getProjectLongDescription())
+                        .logoUrl(rewardViewEntityByd.getProjectLogoUrl())
+                        .moreInfoUrl(rewardViewEntityByd.getProjectTelegramLink())
+                        .hiring(rewardViewEntityByd.getProjectHiring())
+                        .visibility(rewardViewEntityByd.getProjectVisibility().toDomain())
+                        .build())
                 .build();
     }
 

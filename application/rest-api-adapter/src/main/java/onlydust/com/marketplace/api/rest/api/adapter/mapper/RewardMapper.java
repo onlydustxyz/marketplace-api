@@ -78,6 +78,7 @@ public interface RewardMapper {
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 .receipt(receiptToResponse(rewardView.getReceipt()))
+                .project(ProjectMapper.mapShortProjectResponse(rewardView.getProject()))
                 ;
     }
 
