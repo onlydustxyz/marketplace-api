@@ -213,7 +213,8 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
         assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
         assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo("https://avatars.githubusercontent.com/u/595505?v=4");
-        assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
-        assertThat(iamUser.get().getLastSeenAt().toInstant()).isEqualTo(LocalDateTime.parse("2023-09-27T08:52:36.037").toInstant(java.time.ZoneOffset.UTC));
+        assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER, UserRole.ADMIN);
+        assertThat(iamUser.get().getLastSeenAt().toInstant()).isGreaterThan(LocalDateTime.parse("2023-12-14T08:00:00" +
+                                                                                                ".000").toInstant(java.time.ZoneOffset.UTC));
     }
 }

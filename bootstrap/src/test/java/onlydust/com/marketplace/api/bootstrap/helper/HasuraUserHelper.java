@@ -32,7 +32,7 @@ public class HasuraUserHelper {
                 .githubUserId(githubUserId)
                 .loginAtSignup(login)
                 .avatarUrlAtSignup(avatarUrl)
-                .isAdmin(false)
+                .email("%d@foo.org".formatted(githubUserId))
                 .createdAt(new Date())
                 .isAdmin(isAdmin)
                 .build();
