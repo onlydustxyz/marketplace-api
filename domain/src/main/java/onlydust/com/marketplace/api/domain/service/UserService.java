@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -14,6 +15,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class UserService implements UserFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
+    private final UserObserverPort userObserverPort;
     private final UserStoragePort userStoragePort;
     private final DateProvider dateProvider;
     private final ProjectStoragePort projectStoragePort;
@@ -30,6 +33,7 @@ public class UserService implements UserFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
+    @Transactional
     public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity) {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
@@ -48,6 +52,7 @@ public class UserService implements UserFacadePort {
                             .login(githubUserIdentity.getGithubLogin())
                             .build();
                     userStoragePort.createUser(user);
+                    userObserverPort.onUserSignedUp(user);
                     return user;
                 });
     }

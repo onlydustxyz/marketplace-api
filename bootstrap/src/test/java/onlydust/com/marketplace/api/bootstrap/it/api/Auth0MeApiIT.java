@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -14,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 
 import java.util.Date;
 import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     final static String JWT_TOKEN = "fake-jwt";
@@ -34,6 +39,12 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl);
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
     }
 
     @Test
@@ -48,8 +59,9 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     }
 
 
+    @SneakyThrows
     @Test
-    void should_get_current_user_given_a_valid_jwt() {
+    void should_sign_up_and_get_user_given_a_valid_jwt() {
         // Given
 
         // When
@@ -67,9 +79,36 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
+
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
+                .withHeader("Content-Type", equalTo("application/json"))
+        );
+
+
+        // When we call it again (already signed-up)
+        indexerApiWireMockServer.resetRequests();
+        
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.login").isEqualTo(login)
+                .jsonPath("$.githubUserId").isEqualTo(githubUserId)
+                .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.id").isNotEmpty();
+
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
     }
 
-//    @Test
+    //    @Test
     void should_get_current_user_with_onboarding_data() {
         // Given
         final UserEntity user = UserEntity.builder()

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationOutboxConsumer;
 import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
+import onlydust.com.marketplace.api.domain.observer.UserObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
@@ -73,12 +74,14 @@ public class DomainConfiguration {
 
     @Bean
     public UserFacadePort userFacadePort(final ProjectObserverPort projectObserverPort,
+                                         final UserObserverPort userObserverPort,
                                          final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort) {
-        return new UserService(projectObserverPort, postgresUserAdapter, dateProvider, projectStoragePort,
+        return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
+                projectStoragePort,
                 githubSearchPort,
                 imageStoragePort);
     }
@@ -151,6 +154,11 @@ public class DomainConfiguration {
     @Bean
     public ContributionObserverPort contributionObserverPort(final ContributionStoragePort contributionStoragePort) {
         return new ContributionObserver(contributionStoragePort);
+    }
+
+    @Bean
+    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox) {
+        return new UserObserver(indexerOutbox);
     }
 
 }

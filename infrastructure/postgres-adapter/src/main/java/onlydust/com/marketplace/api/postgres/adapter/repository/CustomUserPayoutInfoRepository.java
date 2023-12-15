@@ -11,12 +11,19 @@ public class CustomUserPayoutInfoRepository {
     private final EntityManager entityManager;
 
     private static final String FIND_USER_PAYOUT_INFO_VALIDATIONS = """
-            select au.id user_id,
+            WITH users AS (
+                SELECT github_user_id, id
+                FROM auth_users
+                UNION
+                SELECT github_user_id, id
+                FROM iam.users
+            )
+            select u.id user_id,
                    (select count(pr.id) > 0
                     from payment_requests pr
                              left join payments p on p.request_id = pr.id
                     where p.id is null
-                      and pr.recipient_id = au.github_user_id)                                       has_pending_payments,
+                      and pr.recipient_id = u.github_user_id)                                       has_pending_payments,
                    (upi.identity is not null and upi.identity -> 'Person' is not null and
                    upi.identity -> 'Person' -> 'lastname' != cast('null' as jsonb) and
                    upi.identity -> 'Person' -> 'firstname' != cast('null' as jsonb))            valid_person,
@@ -35,7 +42,7 @@ public class CustomUserPayoutInfoRepository {
                                       left join payments p_op on p_op.request_id = pr_op.id
                                       left join wallets w_op on w_op.user_id = upi.user_id and w_op.network = 'optimism'
                              where pr_op.currency = 'op'
-                               and pr_op.recipient_id = au.github_user_id
+                               and pr_op.recipient_id = u.github_user_id
                                and p_op is null
                              limit 1), true)                                                         valid_op_wallet,
                    coalesce((select w_stark.address is not null
@@ -43,7 +50,7 @@ public class CustomUserPayoutInfoRepository {
                                       left join payments p_stark on p_stark.request_id = pr_stark.id
                                       left join wallets w_stark on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
                              where pr_stark.currency = 'stark'
-                               and pr_stark.recipient_id = au.github_user_id
+                               and pr_stark.recipient_id = u.github_user_id
                                and p_stark is null
                              limit 1), true)                                                         valid_stark_wallet,
                    coalesce((select w_apt.address is not null
@@ -51,7 +58,7 @@ public class CustomUserPayoutInfoRepository {
                                       left join payments p_apt on p_apt.request_id = pr_apt.id
                                       left join wallets w_apt on w_apt.user_id = upi.user_id and w_apt.network = 'aptos'
                              where pr_apt.currency = 'apt'
-                               and pr_apt.recipient_id = au.github_user_id
+                               and pr_apt.recipient_id = u.github_user_id
                                and p_apt is null
                              limit 1), true)                                                         valid_apt_wallet,
                    case
@@ -60,7 +67,7 @@ public class CustomUserPayoutInfoRepository {
                             (select count(pr_usd.id) > 0
                              from payment_requests pr_usd
                                       left join payments p_usd on p_usd.request_id = pr_usd.id
-                             where pr_usd.recipient_id = au.github_user_id
+                             where pr_usd.recipient_id = u.github_user_id
                                and pr_usd.currency = 'usd'
                                and p_usd.id is null))
                            ) then (select count(*) > 0
@@ -74,7 +81,7 @@ public class CustomUserPayoutInfoRepository {
                                               left join payments p_usdc on p_usdc.request_id = pr_usdc.id
                                               left join wallets w_eth on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                      where pr_usdc.currency = 'usd'
-                                       and pr_usdc.recipient_id = au.github_user_id
+                                       and pr_usdc.recipient_id = u.github_user_id
                                        and p_usdc is null
                                      limit 1), true)
                            )
@@ -85,7 +92,7 @@ public class CustomUserPayoutInfoRepository {
                                               left join wallets w_eth
                                                         on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                      where pr_usdc.currency = 'usd'
-                                       and pr_usdc.recipient_id = au.github_user_id
+                                       and pr_usdc.recipient_id = u.github_user_id
                                        and p_usdc is null
                                      limit 1), true)
                            )
@@ -94,7 +101,7 @@ public class CustomUserPayoutInfoRepository {
                        (select count(pr_usd.id) > 0
                         from payment_requests pr_usd
                                  left join payments p_usd on p_usd.request_id = pr_usd.id
-                        where pr_usd.recipient_id = au.github_user_id
+                        where pr_usd.recipient_id = u.github_user_id
                           and pr_usd.currency = 'usd'
                           and p_usd.id is null))
                       ) then (select count(*) > 0
@@ -104,7 +111,7 @@ public class CustomUserPayoutInfoRepository {
                                         from payment_requests pr_usdc
                                                  left join payments p_usdc on p_usdc.request_id = pr_usdc.id
                                         where pr_usdc.currency = 'usd'
-                                          and pr_usdc.recipient_id = au.github_user_id
+                                          and pr_usdc.recipient_id = u.github_user_id
                                           and p_usdc is null)
                            )
                        end                                                                           valid_usdc_wallet,
@@ -113,12 +120,12 @@ public class CustomUserPayoutInfoRepository {
                                       left join payments p_eth on p_eth.request_id = pr_eth.id
                                       left join wallets w_eth on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                              where pr_eth.currency in ('eth','lords')
-                               and pr_eth.recipient_id = au.github_user_id
+                               and pr_eth.recipient_id = u.github_user_id
                                and p_eth is null
                              limit 1), true)                                                         valid_eth_wallet
-            from auth_users au
-                     left join user_payout_info upi on upi.user_id = au.id
-            where au.id = :userId""";
+            from users u
+                     left join user_payout_info upi on upi.user_id = u.id
+            where u.id = :userId""";
 
     public UserPayoutInfoValidationEntity getUserPayoutInfoValidationEntity(final UUID userId) {
         return (UserPayoutInfoValidationEntity) entityManager.createNativeQuery(FIND_USER_PAYOUT_INFO_VALIDATIONS,
