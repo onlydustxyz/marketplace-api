@@ -33,3 +33,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000016_add_tech_columns_in_user_profiles.sql
   - include:
       file: db/changelog/changelogs/00000017_remove_empty_contacts.sql
+  - include:
+      file: db/changelog/changelogs/00000018_auth_to_iam.sql
+

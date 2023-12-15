@@ -34,9 +34,9 @@ public class UserService implements UserFacadePort {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
-                    final UserPayoutInformation payoutInformationById =
-                            userStoragePort.getPayoutInformationById(user.getId());
+                    final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
+                    userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
                     return user;
                 })
                 .orElseGet(() -> {
@@ -109,7 +109,7 @@ public class UserService implements UserFacadePort {
     @Override
     public UserRewardsPageView getRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                                    int pageIndex, int pageSize,
-                                                    UserRewardView.SortBy sortBy, SortDirection sortDirection) {
+                                                   UserRewardView.SortBy sortBy, SortDirection sortDirection) {
         return userStoragePort.findRewardsForUserId(userId, filters, pageIndex, pageSize, sortBy, sortDirection);
     }
 

@@ -31,7 +31,8 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         // Given
         final UUID userId = UUID.randomUUID();
         userRepository.save(new UserEntity(userId, 1L, faker.rickAndMorty().character(),
-                faker.rickAndMorty().location(), new UserRole[]{UserRole.ADMIN}, new Date(), new Date()));
+                faker.rickAndMorty().location(), faker.internet().emailAddress(), new UserRole[]{UserRole.ADMIN},
+                new Date(), new Date(), new Date()));
         final List<MoreInfoLink> moreInfoLinks = List.of(
                 MoreInfoLink.builder()
                         .value(faker.pokemon().name())

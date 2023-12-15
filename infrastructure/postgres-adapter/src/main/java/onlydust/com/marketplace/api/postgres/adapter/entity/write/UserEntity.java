@@ -18,7 +18,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode
 @Data
 @Builder(toBuilder = true)
 @Table(name = "users", schema = "iam")
@@ -45,14 +45,20 @@ public class UserEntity {
     String githubLogin;
     @Column(name = "github_avatar_url", nullable = false)
     String githubAvatarUrl;
+    @Column(name = "email", nullable = false)
+    String email;
     @Type(type = "user_role[]")
     @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
     UserRole[] roles;
+    @Column(name = "last_seen_at", nullable = false)
+    private Date lastSeenAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
+    @EqualsAndHashCode.Exclude
     private Date createdAt;
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
+    @EqualsAndHashCode.Exclude
     private Date updatedAt;
 }

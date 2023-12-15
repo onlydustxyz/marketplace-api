@@ -9,7 +9,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfil
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -33,8 +32,6 @@ public class RegisteredUserViewEntity {
     String htmlUrl;
     @Column(name = "email")
     String email;
-    @Column(name = "last_seen")
-    LocalDateTime lastSeen;
     @Column(name = "admin")
     Boolean admin;
 

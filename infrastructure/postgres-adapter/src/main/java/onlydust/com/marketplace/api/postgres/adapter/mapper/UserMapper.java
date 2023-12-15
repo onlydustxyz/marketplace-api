@@ -130,7 +130,9 @@ public interface UserMapper {
                 .githubUserId(user.getGithubUserId())
                 .githubLogin(user.getLogin())
                 .githubAvatarUrl(user.getAvatarUrl())
+                .email("TODO") //TODO: get email from Auth0 JWT claims
                 .roles(user.getRoles() != null ? user.getRoles().toArray(UserRole[]::new) : new UserRole[0])
+                .lastSeenAt(new Date())
                 .build();
     }
 
