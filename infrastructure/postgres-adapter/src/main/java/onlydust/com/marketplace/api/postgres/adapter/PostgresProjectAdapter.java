@@ -410,13 +410,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                 budgetStats.get(0).getCurrency().toDomain(),
                                 budgetStats.get(0).getRemainingUsdAmount()) :
                         new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .spentAmount(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getSpentAmount(),
                                 budgetStats.get(0).getCurrency().toDomain(),
                                 budgetStats.get(0).getSpentUsdAmount()) :
                         new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
