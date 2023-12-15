@@ -38,7 +38,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                  "Python": 45301
                },
                "createdAt": "2022-12-12T09:51:58.48559Z",
-               "lastSeenAt": "2023-10-05T19:06:50.034Z",
                "firstContributedAt": "2022-04-13T09:00:48Z",
                "cover": "BLUE",
                "contacts": [
@@ -871,7 +870,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 "Python": 45301
               },
               "createdAt": "2022-12-12T09:51:58.48559Z",
-              "lastSeenAt": "2023-10-05T19:06:50.034Z",
               "firstContributedAt": "2022-04-13T09:00:48Z",
               "cover": "BLUE",
               "contacts": [
@@ -1698,6 +1696,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").doesNotExist()
                 .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
+                .jsonPath("$.lastSeenAt").isNotEmpty()
                 .json(GET_ANTHONY_PUBLIC_PROFILE_JSON_RESPONSE);
     }
 
@@ -1724,6 +1723,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").doesNotExist()
                 .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
+                .jsonPath("$.lastSeenAt").isNotEmpty()
                 .json(GET_ANTHONY_PUBLIC_PROFILE_JSON_RESPONSE);
     }
 
@@ -1752,6 +1752,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.projects[?(@.visibility=='PRIVATE')]").exists()
                 .jsonPath("$.stats.contributionCountVariationSinceLastWeek").isNotEmpty()
+                .jsonPath("$.lastSeenAt").isNotEmpty()
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
     }
 

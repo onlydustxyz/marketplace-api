@@ -13,7 +13,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
             with payout_checks as (
                 select pr.id,
                       pr.recipient_id,
-                      au.id                                                            user_id,
+                      u.id                                                            user_id,
                       (select count(p.id) > 0
                        from payment_requests pr2
                                 left join payments p on p.request_id = pr2.id
@@ -39,7 +39,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                                    on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                 where pr_eth.currency = 'eth'
                                   and pr_eth.id = pr.id
-                                  and pr_eth.recipient_id = au.github_user_id
+                                  and pr_eth.recipient_id = u.github_user_id
                                   and p_eth is null
                                 limit 1), true)                                        valid_eth_wallet,
                       coalesce((select w_op.address is not null
@@ -48,7 +48,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                          left join wallets w_op on w_op.user_id = upi.user_id and w_op.network = 'optimism'
                                 where pr_op.currency = 'op'
                                   and pr_op.id = pr.id
-                                  and pr_op.recipient_id = au.github_user_id
+                                  and pr_op.recipient_id = u.github_user_id
                                   and p_op is null
                                 limit 1), true)                                        valid_op_wallet,
                       coalesce((select w_stark.address is not null
@@ -58,7 +58,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                                    on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
                                 where pr_stark.currency = 'stark'
                                   and pr_stark.id = pr.id
-                                  and pr_stark.recipient_id = au.github_user_id
+                                  and pr_stark.recipient_id = u.github_user_id
                                   and p_stark is null
                                 limit 1), true)                                        valid_stark_wallet,
                       coalesce((select w_apt.address is not null
@@ -66,7 +66,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                          left join payments p_apt on p_apt.request_id = pr_apt.id
                                          left join wallets w_apt on w_apt.user_id = upi.user_id and w_apt.network = 'aptos'
                                 where pr_apt.currency = 'apt'
-                                  and pr_apt.recipient_id = au.github_user_id
+                                  and pr_apt.recipient_id = u.github_user_id
                                   and p_apt is null
                                 limit 1), true)                                        valid_apt_wallet,
                       case
@@ -75,7 +75,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                (select count(pr_usd.id) > 0
                                 from payment_requests pr_usd
                                          left join payments p_usd on p_usd.request_id = pr_usd.id
-                                where pr_usd.recipient_id = au.github_user_id
+                                where pr_usd.recipient_id = u.github_user_id
                                   and pr_usd.id = pr.id
                                   and pr_usd.currency = 'usd'
                                   and p_usd.id is null))
@@ -92,7 +92,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                                            on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                         where pr_usdc.currency = 'usd'
                                           and pr_usdc.id = pr.id
-                                          and pr_usdc.recipient_id = au.github_user_id
+                                          and pr_usdc.recipient_id = u.github_user_id
                                           and p_usdc is null
                                         limit 1), true)
                               )
@@ -105,15 +105,15 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                                            on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                         where pr_usdc.currency = 'usd'
                                           and pr_usdc.id = pr.id
-                                          and pr_usdc.recipient_id = au.github_user_id
+                                          and pr_usdc.recipient_id = u.github_user_id
                                           and p_usdc is null
                                         limit 1), true)
                               )
                           else true
                           end                                                          valid_usdc_wallet
                from payment_requests pr
-                        left join auth_users au on au.github_user_id = pr.recipient_id
-                        left join public.user_payout_info upi on au.id = upi.user_id)
+                        left join iam.users u on u.github_user_id = pr.recipient_id
+                        left join public.user_payout_info upi on u.id = upi.user_id)
             SELECT
                 pr.id,
                 pr.requested_at,
@@ -159,8 +159,8 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                 indexer_exp.contributions c
             JOIN public.work_items wi ON wi.id = COALESCE(CAST(c.pull_request_id AS TEXT), CAST(c.issue_id AS TEXT), c.code_review_id)
             JOIN payment_requests pr ON pr.id = wi.payment_id AND pr.recipient_id = c.contributor_id
-            JOIN auth_users au ON au.id = pr.requestor_id
-            JOIN indexer_exp.github_accounts requestor ON requestor.id = au.github_user_id
+            JOIN iam.users u ON u.id = pr.requestor_id
+            JOIN indexer_exp.github_accounts requestor ON requestor.id = u.github_user_id
             JOIN indexer_exp.github_accounts recipient ON recipient.id = pr.recipient_id
             LEFT JOIN payments r ON r.request_id = pr.id
             LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = pr.currency

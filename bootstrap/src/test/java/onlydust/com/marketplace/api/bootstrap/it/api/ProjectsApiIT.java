@@ -40,12 +40,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "contributorCount": 4,
               "topContributors": [
                 {
-                  "githubUserId": 117665867,
-                  "login": "gilbertVDB17",
-                  "htmlUrl": "https://github.com/gilbertVDB17",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4"
-                },
-                {
                   "githubUserId": 8642470,
                   "login": "gregcha",
                   "htmlUrl": "https://github.com/gregcha",
@@ -56,6 +50,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "login": "jb1011",
                   "htmlUrl": "https://github.com/jb1011",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
+                },
+                {
+                  "githubUserId": 74653697,
+                  "login": "antiyro",
+                  "htmlUrl": "https://github.com/antiyro",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
                 }
               ],
               "repos": [
@@ -112,8 +112,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 8642470,
                   "login": "gregcha",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "name": "Grégoire CHARLES",
                   "repos": [
                     {
@@ -161,8 +161,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 119948009,
                   "login": "KasarLabs",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
                   "htmlUrl": "https://github.com/KasarLabs",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
                   "name": "KasarLabs",
                   "repos": [
                     {
@@ -235,6 +235,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "indexingComplete": true,
               "indexedAt": "2023-12-04T14:34:49.384525Z"
             }
+                        
             """;
 
     private static final String B_CONSEIL_OVERVIEW_JSON = """
@@ -2926,10 +2927,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(10)
-    public void should_update_project_ranking(){
+    public void should_update_project_ranking() {
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_GET,Map.of("pageIndex","0","pageSize","5","sort","RANK")))
+                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "5", "sort", "RANK")))
                 // Then
                 .exchange()
                 .expectStatus()

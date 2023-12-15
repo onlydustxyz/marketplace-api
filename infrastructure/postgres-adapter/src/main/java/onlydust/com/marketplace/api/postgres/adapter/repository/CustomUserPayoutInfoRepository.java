@@ -11,13 +11,6 @@ public class CustomUserPayoutInfoRepository {
     private final EntityManager entityManager;
 
     private static final String FIND_USER_PAYOUT_INFO_VALIDATIONS = """
-            WITH users AS (
-                SELECT github_user_id, id
-                FROM auth_users
-                UNION
-                SELECT github_user_id, id
-                FROM iam.users
-            )
             select u.id user_id,
                    (select count(pr.id) > 0
                     from payment_requests pr
@@ -123,7 +116,7 @@ public class CustomUserPayoutInfoRepository {
                                and pr_eth.recipient_id = u.github_user_id
                                and p_eth is null
                              limit 1), true)                                                         valid_eth_wallet
-            from users u
+            from iam.users u
                      left join user_payout_info upi on upi.user_id = u.id
             where u.id = :userId""";
 

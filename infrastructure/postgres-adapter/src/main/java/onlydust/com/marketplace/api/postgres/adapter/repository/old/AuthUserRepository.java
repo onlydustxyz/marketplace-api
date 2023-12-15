@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 import java.util.UUID;
 
+@Deprecated(forRemoval = true)
 public interface AuthUserRepository extends JpaRepository<AuthUserEntity, UUID>,
         JpaSpecificationExecutor<AuthUserEntity> {
     Optional<AuthUserEntity> findByGithubUserId(Long githubUserId);

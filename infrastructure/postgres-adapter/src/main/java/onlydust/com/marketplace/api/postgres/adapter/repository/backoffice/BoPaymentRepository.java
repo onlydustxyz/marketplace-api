@@ -35,9 +35,9 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	payment_requests pr
             	INNER JOIN projects_budgets pb on pb.project_id = pr.project_id
             	INNER JOIN budgets b on b.id = pb.budget_id AND b.currency = pr.currency
-            	LEFT JOIN auth_users au ON au.github_user_id = pr.recipient_id
-            	LEFT JOIN user_payout_info upi ON upi.user_id = au.id
-            	LEFT JOIN bank_accounts ba ON ba.user_id = au.id
+            	LEFT JOIN iam.users u ON u.github_user_id = pr.recipient_id
+            	LEFT JOIN user_payout_info upi ON upi.user_id = u.id
+            	LEFT JOIN bank_accounts ba ON ba.user_id = u.id
             	LEFT JOIN (
             	    SELECT
             	        user_id,
@@ -46,7 +46,7 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
                         wallets
                     GROUP BY 
                         user_id
-            	) user_wallets ON user_wallets.user_id = au.id
+            	) user_wallets ON user_wallets.user_id = u.id
             	LEFT JOIN (
             	    SELECT 
             	        request_id,

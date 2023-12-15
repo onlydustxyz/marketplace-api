@@ -33,7 +33,7 @@ public class CustomUserRepository {
                                     from public.contact_informations ci
                                     where ci.user_id = u.id
                                       and ci.channel = 'email'), u.email) as email,
-                   u.last_seen,
+                   u.last_seen_at,
                    u.created_at,
                    gu.login,
                    gu.html_url,
@@ -107,7 +107,7 @@ public class CustomUserRepository {
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_ID = SELECT_USER_PROFILE + """
-            from public.auth_users u
+            from iam.users u
                      join indexer_exp.github_accounts gu on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where u.id = :userId
@@ -115,14 +115,14 @@ public class CustomUserRepository {
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_ID = SELECT_USER_PROFILE + """
             from indexer_exp.github_accounts gu
-                     left join public.auth_users u on gu.id = u.github_user_id
+                     left join iam.users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.id = :githubUserId
             """;
 
     private final static String SELECT_USER_PROFILE_WHERE_GITHUB_LOGIN = SELECT_USER_PROFILE + """
             from indexer_exp.github_accounts gu
-                     left join public.auth_users u on gu.id = u.github_user_id
+                     left join iam.users u on gu.id = u.github_user_id
                      left join public.user_profile_info upi on upi.id = u.id
             where gu.login = :githubLogin
             """;
@@ -175,7 +175,7 @@ public class CustomUserRepository {
                    where rc.contributor_id = :githubUserId and rc.completed_contribution_count > 0 and gr.visibility = 'PUBLIC')
                   UNION
                   (select distinct pd.project_id, true is_lead, pl.assigned_at, pd.name, pd.logo_url, pd.key, pd.visibility
-                   from auth_users u
+                   from iam.users u
                             join project_leads pl on pl.user_id = u.id
                             join project_details pd on pd.project_id = pl.project_id
                    where u.github_user_id = :githubUserId)) as p
@@ -194,7 +194,7 @@ public class CustomUserRepository {
                 .githubId(row.getGithubId())
                 .avatarUrl(row.getAvatarUrl())
                 .createAt(row.getCreatedAt())
-                .lastSeenAt(row.getLastSeen())
+                .lastSeenAt(row.getLastSeenAt())
                 .htmlUrl(row.getHtmlUrl())
                 .location(row.getLocation())
                 .cover(isNull(row.getCover()) ? null :
@@ -251,20 +251,20 @@ public class CustomUserRepository {
     private Set<Contact> getContacts(UserProfileEntity row) {
         final Set<Contact> contacts = isNull(row.getContacts()) ? new HashSet<>() :
                 row.getContacts().stream().map(contact ->
-                Contact.builder()
-                        .contact(contact.getContact())
-                        .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
-                            case email -> Contact.Channel.EMAIL;
-                            case telegram -> Contact.Channel.TELEGRAM;
-                            case twitter -> Contact.Channel.TWITTER;
-                            case discord -> Contact.Channel.DISCORD;
-                            case linkedin -> Contact.Channel.LINKEDIN;
-                            case whatsapp -> Contact.Channel.WHATSAPP;
-                        })
-                        .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
-                                Contact.Visibility.PRIVATE)
-                        .build()
-        ).collect(Collectors.toSet());
+                        Contact.builder()
+                                .contact(contact.getContact())
+                                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
+                                    case email -> Contact.Channel.EMAIL;
+                                    case telegram -> Contact.Channel.TELEGRAM;
+                                    case twitter -> Contact.Channel.TWITTER;
+                                    case discord -> Contact.Channel.DISCORD;
+                                    case linkedin -> Contact.Channel.LINKEDIN;
+                                    case whatsapp -> Contact.Channel.WHATSAPP;
+                                })
+                                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
+                                        Contact.Visibility.PRIVATE)
+                                .build()
+                ).collect(Collectors.toSet());
 
         if (contacts.stream().noneMatch(contact -> contact.getChannel() == Contact.Channel.EMAIL))
             contacts.add(Contact.builder()

@@ -180,7 +180,16 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .loginAtSignup(faker.pokemon().location())
                 .build();
 
+        userRepository.deleteAll();
         assertIsSaved(expected, authUserRepository);
+        
+        final var iamUsers = userRepository.findAll();
+        assertThat(iamUsers).hasSize(1);
+        assertThat(iamUsers.get(0).getId()).isEqualTo(expected.getId());
+        assertThat(iamUsers.get(0).getGithubUserId()).isEqualTo(expected.getGithubUserId());
+        assertThat(iamUsers.get(0).getGithubLogin()).isEqualTo(expected.getLoginAtSignup());
+        assertThat(iamUsers.get(0).getGithubAvatarUrl()).isEqualTo(expected.getAvatarUrlAtSignup());
+        assertThat(iamUsers.get(0).getEmail()).isEqualTo(expected.getEmail());
     }
 
     @Test

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import org.intellij.lang.annotations.Language;
 
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 public class CustomProjectRewardRepository {
@@ -29,13 +27,13 @@ public class CustomProjectRewardRepository {
                    (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
                    case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
                    case
-                       when au.id is null then 'PENDING_SIGNUP'
+                       when u.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
                        else 'PROCESSING'
                        end                                          status
             from payment_requests pr
                      join indexer_exp.github_accounts gu on gu.id = pr.recipient_id
-                     left join public.auth_users au on gu.id = au.github_user_id
+                     left join iam.users u on gu.id = u.github_user_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
             where 
@@ -69,7 +67,8 @@ public class CustomProjectRewardRepository {
         return FIND_PROJECT_REWARDS.replace("%order_by%", sort);
     }
 
-    public Integer getCount(UUID projectId, List<String> currencies, List<Long> contributorsIds, String from, String to) {
+    public Integer getCount(UUID projectId, List<String> currencies, List<Long> contributorsIds, String from,
+                            String to) {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
                 .setParameter("projectId", projectId)
@@ -80,9 +79,11 @@ public class CustomProjectRewardRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, List<String> currencies, List<Long> contributorsIds,
+    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, List<String> currencies,
+                                                         List<Long> contributorsIds,
                                                          String from, String to,
-                                                         ProjectRewardView.SortBy sortBy, final SortDirection sortDirection,
+                                                         ProjectRewardView.SortBy sortBy,
+                                                         final SortDirection sortDirection,
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)

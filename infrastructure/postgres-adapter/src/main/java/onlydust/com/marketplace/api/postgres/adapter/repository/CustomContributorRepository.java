@@ -21,13 +21,6 @@ import java.util.UUID;
 public class CustomContributorRepository {
 
     protected static final String FIND_TOP_CONTRIBUTORS_BASE_QUERY = """
-            WITH users AS (
-                SELECT github_user_id
-                FROM auth_users
-                UNION
-                SELECT github_user_id
-                FROM iam.users
-            )
             SELECT
             		ga.id AS github_user_id,
             		ga.login,
@@ -38,9 +31,9 @@ public class CustomContributorRepository {
                 indexer_exp.github_accounts ga
                 JOIN projects_contributors pc ON pc.github_user_id = ga.id
                     AND pc.project_id = :projectId
-                LEFT JOIN users u ON u.github_user_id = ga.id
+                LEFT JOIN iam.users u ON u.github_user_id = ga.id
                 ORDER BY
-                    pc.completed_contribution_count DESC
+                    pc.completed_contribution_count DESC, ga.id
                 LIMIT :limit
             """;
 
@@ -53,13 +46,6 @@ public class CustomContributorRepository {
             """;
     @Language("PostgreSQL")
     protected static final String GET_CONTRIBUTORS_FOR_PROJECT = """
-            WITH users AS (
-                SELECT github_user_id
-                FROM auth_users
-                UNION
-                SELECT github_user_id
-                FROM iam.users
-            )
             select ga.id,
                    ga.login,
                    user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
@@ -90,7 +76,7 @@ public class CustomContributorRepository {
                           coalesce(amounts.usd, 0)                   earned
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
-                     left join users u on u.github_user_id = ga.id
+                     left join iam.users u on u.github_user_id = ga.id
                      left join (select count(distinct c.id)                                          total_count,
                                        count(distinct c.id) filter ( where c.type = 'PULL_REQUEST' ) pull_request_count,
                                        count(distinct c.id) filter ( where c.type = 'CODE_REVIEW' )  code_review_count,
@@ -130,13 +116,6 @@ public class CustomContributorRepository {
 
 
     protected static final String FIND_REPOS_CONTRIBUTORS = """
-            WITH users AS (
-                SELECT github_user_id
-                FROM auth_users
-                UNION
-                SELECT github_user_id
-                FROM iam.users
-            )
             SELECT
                 ga.id as github_user_id,
                 ga.login,
@@ -144,7 +123,7 @@ public class CustomContributorRepository {
                 ga.html_url,
                 u.github_user_id IS NOT NULL as is_registered
             FROM indexer_exp.github_accounts ga
-                LEFT JOIN users u on u.github_user_id = ga.id
+                LEFT JOIN iam.users u on u.github_user_id = ga.id
             WHERE
                 EXISTS(select 1 from indexer_exp.repos_contributors rc 
                 join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'

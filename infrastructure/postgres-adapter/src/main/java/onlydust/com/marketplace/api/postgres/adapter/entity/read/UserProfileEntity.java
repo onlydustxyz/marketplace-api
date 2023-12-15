@@ -57,8 +57,8 @@ public class UserProfileEntity {
     @Type(type = "profile_cover")
     @Column(name = "cover")
     ProfileCoverEnumEntity cover;
-    @Column(name = "last_seen")
-    Date lastSeen;
+    @Column(name = "last_seen_at")
+    Date lastSeenAt;
     @Column(name = "created_at")
     Date createdAt;
     @Column(name = "leading_project_number")

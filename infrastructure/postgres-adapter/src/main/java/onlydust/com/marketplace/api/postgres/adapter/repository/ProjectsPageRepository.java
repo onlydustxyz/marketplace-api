@@ -28,12 +28,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
-                           'login', COALESCE(ga.login, u.login_at_signup),
-                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.avatar_url_at_signup)),
+                           'login', COALESCE(ga.login, u.github_login),
+                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)),
                            'url', ga.html_url
                            ))
                     from project_leads pl
-                         left join auth_users u on u.id = pl.user_id
+                         left join iam.users u on u.id = pl.user_id
                          left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                   as   project_leads,
@@ -95,12 +95,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
-                           'login', COALESCE(ga.login, u.login_at_signup),
-                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.avatar_url_at_signup)),
+                           'login', COALESCE(ga.login, u.github_login),
+                           'avatarUrl', user_avatar_url(u.github_user_id, COALESCE(ga.avatar_url, u.github_avatar_url)),
                            'url', ga.html_url
                            ))
                     from project_leads pl
-                             join auth_users u on u.id = pl.user_id
+                             join iam.users u on u.id = pl.user_id
                              left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where pl.project_id = p.project_id
                     group by pl.project_id)                     as project_leads,
@@ -140,12 +140,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
                      left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
-                                         left join auth_users me on me.github_user_id = ppc.github_user_id
+                                         left join iam.users me on me.github_user_id = ppc.github_user_id
                                 where me.id = :userId
                                 group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
                      left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
                                 from pending_project_leader_invitations ppli
-                                         left join auth_users me on me.github_user_id = ppli.github_user_id
+                                         left join iam.users me on me.github_user_id = ppli.github_user_id
                                 where me.id = :userId
                                 group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
                      left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count
@@ -240,12 +240,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 group by pl_me.project_id) is_me_lead on is_me_lead.project_id = p.project_id
                      left join (select ppc.project_id, case count(*) when 0 then false else true end is_p_c
                                 from projects_pending_contributors ppc
-                                         left join auth_users me on me.github_user_id = ppc.github_user_id
+                                         left join iam.users me on me.github_user_id = ppc.github_user_id
                                 where me.id = :userId
                                 group by ppc.project_id) is_pending_contributor on is_pending_contributor.project_id = p.project_id
                      left join (select ppli.project_id, case count(*) when 0 then false else true end is_p_pl
                                 from pending_project_leader_invitations ppli
-                                         left join auth_users me on me.github_user_id = ppli.github_user_id
+                                         left join iam.users me on me.github_user_id = ppli.github_user_id
                                 where me.id = :userId
                                 group by ppli.project_id) is_pending_pl on is_pending_pl.project_id = p.project_id
                      left join (select pl_count.project_id, count(pl_count.user_id) project_lead_count

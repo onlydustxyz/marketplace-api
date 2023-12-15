@@ -5,8 +5,8 @@ import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -21,19 +21,20 @@ public class CustomUserRewardRepository {
 
     private static final String COUNT_USER_REWARDS = """
             select count(distinct pr.id)
-            from auth_users au
-                     join payment_requests pr on pr.recipient_id = au.github_user_id and 
-                     au.id = :userId and 
+            from iam.users u
+                     join payment_requests pr on pr.recipient_id = u.github_user_id and
+                     u.id = :userId and
                      (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies)) and
                      (coalesce(:projectIds) is null or pr.project_id in (:projectIds)) and
                      (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                      (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """;
 
+    @Language("PostgreSQL")
     protected static final String FIND_USER_REWARDS_BY_ID = """
                 with payout_checks as (select pr.id,
                                               pr.recipient_id,
-                                              au.id                                                            user_id,
+                                              u.id                                                            user_id,
                                               (select count(p.id) > 0
                                                from payment_requests pr2
                                                         left join payments p on p.request_id = pr2.id
@@ -59,7 +60,7 @@ public class CustomUserRewardRepository {
                                                                            on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                         where pr_eth.currency in ('eth','lords')
                                                           and pr_eth.id = pr.id
-                                                          and pr_eth.recipient_id = au.github_user_id
+                                                          and pr_eth.recipient_id = u.github_user_id
                                                           and p_eth is null
                                                         limit 1), true)                                        valid_eth_wallet,
                                               coalesce((select w_op.address is not null
@@ -68,7 +69,7 @@ public class CustomUserRewardRepository {
                                                                  left join wallets w_op on w_op.user_id = upi.user_id and w_op.network = 'optimism'
                                                         where pr_op.currency = 'op'
                                                           and pr_op.id = pr.id
-                                                          and pr_op.recipient_id = au.github_user_id
+                                                          and pr_op.recipient_id = u.github_user_id
                                                           and p_op is null
                                                         limit 1), true)                                        valid_op_wallet,
                                               coalesce((select w_stark.address is not null
@@ -78,7 +79,7 @@ public class CustomUserRewardRepository {
                                                                            on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
                                                         where pr_stark.currency = 'stark'
                                                           and pr_stark.id = pr.id
-                                                          and pr_stark.recipient_id = au.github_user_id
+                                                          and pr_stark.recipient_id = u.github_user_id
                                                           and p_stark is null
                                                         limit 1), true)                                        valid_stark_wallet,
                                               coalesce((select w_apt.address is not null
@@ -86,7 +87,7 @@ public class CustomUserRewardRepository {
                                                                  left join payments p_apt on p_apt.request_id = pr_apt.id
                                                                  left join wallets w_apt on w_apt.user_id = upi.user_id and w_apt.network = 'aptos'
                                                         where pr_apt.currency = 'apt'
-                                                          and pr_apt.recipient_id = au.github_user_id
+                                                          and pr_apt.recipient_id = u.github_user_id
                                                           and p_apt is null
                                                         limit 1), true)                                        valid_apt_wallet,
                                               case
@@ -95,7 +96,7 @@ public class CustomUserRewardRepository {
                                                        (select count(pr_usd.id) > 0
                                                         from payment_requests pr_usd
                                                                  left join payments p_usd on p_usd.request_id = pr_usd.id
-                                                        where pr_usd.recipient_id = au.github_user_id
+                                                        where pr_usd.recipient_id = u.github_user_id
                                                           and pr_usd.id = pr.id
                                                           and pr_usd.currency = 'usd'
                                                           and p_usd.id is null))
@@ -112,7 +113,7 @@ public class CustomUserRewardRepository {
                                                                                    on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                                 where pr_usdc.currency = 'usd'
                                                                   and pr_usdc.id = pr.id
-                                                                  and pr_usdc.recipient_id = au.github_user_id
+                                                                  and pr_usdc.recipient_id = u.github_user_id
                                                                   and p_usdc is null
                                                                 limit 1), true)
                                                       )
@@ -125,15 +126,15 @@ public class CustomUserRewardRepository {
                                                                                    on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                                 where pr_usdc.currency = 'usd'
                                                                   and pr_usdc.id = pr.id
-                                                                  and pr_usdc.recipient_id = au.github_user_id
+                                                                  and pr_usdc.recipient_id = u.github_user_id
                                                                   and p_usdc is null
                                                                 limit 1), true)
                                                       )
                                                   else true
                                                   end                                                          valid_usdc_wallet
                                        from payment_requests pr
-                                                left join auth_users au on au.github_user_id = pr.recipient_id
-                                                left join public.user_payout_info upi on au.id = upi.user_id)
+                                                left join iam.users u on u.github_user_id = pr.recipient_id
+                                                left join public.user_payout_info upi on u.id = upi.user_id)
                 select pr.requested_at,
                        pd.name,
                        pd.logo_url,
@@ -174,14 +175,14 @@ public class CustomUserRewardRepository {
                            when payout_checks.valid_company and pr.invoice_received_at is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                            end                                                                                  status
-                from auth_users au
+                from iam.users u
                          join payment_requests pr
-                              on pr.recipient_id = au.github_user_id 
+                              on pr.recipient_id = u.github_user_id
                          join project_details pd on pd.project_id = pr.project_id
                          left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                          left join payments r on r.request_id = pr.id
-                         left join payout_checks on payout_checks.user_id = au.id and payout_checks.id = pr.id
-                where au.id = :userId and
+                         left join payout_checks on payout_checks.user_id = u.id and payout_checks.id = pr.id
+                where u.id = :userId and
                      (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies)) and
                      (coalesce(:projectIds) is null or pr.project_id in (:projectIds)) and
                      (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
@@ -192,7 +193,7 @@ public class CustomUserRewardRepository {
     protected static final String FIND_USER_PENDING_INVOICE_REWARDS_BY_RECIPIENT_ID = """
             with payout_checks as (select pr.id,
                                           pr.recipient_id,
-                                          au.id                                                              user_id,
+                                          u.id                                                              user_id,
                                           (select count(p.id) > 0
                                            from payment_requests pr2
                                                     left join payments p on p.request_id = pr2.id
@@ -219,7 +220,7 @@ public class CustomUserRewardRepository {
                                                                        on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                     where pr_eth.currency in ('eth','lords')
                                                       and pr_eth.id = pr.id
-                                                      and pr_eth.recipient_id = au.github_user_id
+                                                      and pr_eth.recipient_id = u.github_user_id
                                                       and p_eth is null
                                                     limit 1), true)                                          valid_eth_wallet,
                                           coalesce((select w_op.address is not null
@@ -228,7 +229,7 @@ public class CustomUserRewardRepository {
                                                              left join wallets w_op on w_op.user_id = upi.user_id and w_op.network = 'optimism'
                                                     where pr_op.currency = 'op'
                                                       and pr_op.id = pr.id
-                                                      and pr_op.recipient_id = au.github_user_id
+                                                      and pr_op.recipient_id = u.github_user_id
                                                       and p_op is null
                                                     limit 1), true)                                          valid_op_wallet,
                                           coalesce((select w_stark.address is not null
@@ -238,7 +239,7 @@ public class CustomUserRewardRepository {
                                                                        on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
                                                     where pr_stark.currency = 'stark'
                                                       and pr_stark.id = pr.id
-                                                      and pr_stark.recipient_id = au.github_user_id
+                                                      and pr_stark.recipient_id = u.github_user_id
                                                       and p_stark is null
                                                     limit 1), true)                                          valid_stark_wallet,
                                           coalesce((select w_apt.address is not null
@@ -246,7 +247,7 @@ public class CustomUserRewardRepository {
                                                              left join payments p_apt on p_apt.request_id = pr_apt.id
                                                              left join wallets w_apt on w_apt.user_id = upi.user_id and w_apt.network = 'aptos'
                                                     where pr_apt.currency = 'apt'
-                                                      and pr_apt.recipient_id = au.github_user_id
+                                                      and pr_apt.recipient_id = u.github_user_id
                                                       and p_apt is null
                                                     limit 1), true)                                          valid_apt_wallet,
                                           case
@@ -255,7 +256,7 @@ public class CustomUserRewardRepository {
                                                    (select count(pr_usd.id) > 0
                                                     from payment_requests pr_usd
                                                              left join payments p_usd on p_usd.request_id = pr_usd.id
-                                                    where pr_usd.recipient_id = au.github_user_id
+                                                    where pr_usd.recipient_id = u.github_user_id
                                                       and pr_usd.id = pr.id
                                                       and pr_usd.currency = 'usd'
                                                       and p_usd.id is null))
@@ -272,7 +273,7 @@ public class CustomUserRewardRepository {
                                                                                on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                             where pr_usdc.currency = 'usd'
                                                               and pr_usdc.id = pr.id
-                                                              and pr_usdc.recipient_id = au.github_user_id
+                                                              and pr_usdc.recipient_id = u.github_user_id
                                                               and p_usdc is null
                                                             limit 1), true)
                                                   )
@@ -285,15 +286,15 @@ public class CustomUserRewardRepository {
                                                                                on w_eth.user_id = upi.user_id and w_eth.network = 'ethereum'
                                                             where pr_usdc.currency = 'usd'
                                                               and pr_usdc.id = pr.id
-                                                              and pr_usdc.recipient_id = au.github_user_id
+                                                              and pr_usdc.recipient_id = u.github_user_id
                                                               and p_usdc is null
                                                             limit 1), true)
                                                   )
                                               else true
                                               end                                                            valid_usdc_wallet
                                    from payment_requests pr
-                                            left join auth_users au on au.github_user_id = pr.recipient_id
-                                            left join public.user_payout_info upi on au.id = upi.user_id)
+                                            left join iam.users u on u.github_user_id = pr.recipient_id
+                                            left join public.user_payout_info upi on u.id = upi.user_id)
             select distinct pr.requested_at,
                    pd.name,
                    pd.logo_url,
@@ -308,12 +309,12 @@ public class CustomUserRewardRepository {
                    case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
                    'PENDING_INVOICE'                                                                                  status
             from payment_requests pr
-                     join auth_users au
-                          on pr.recipient_id = au.github_user_id
+                     join iam.users u
+                          on pr.recipient_id = u.github_user_id
                      join project_details pd on pd.project_id = pr.project_id
                      left join crypto_usd_quotes cuq on cuq.currency = pr.currency
                      left join payments r on r.request_id = pr.id
-                     left join payout_checks on payout_checks.user_id = au.id and payout_checks.id = pr.id
+                     left join payout_checks on payout_checks.user_id = u.id and payout_checks.id = pr.id
             where pr.recipient_id = :recipientId
               and (case
                        when r.id is not null then 'COMPLETE'
@@ -345,19 +346,20 @@ public class CustomUserRewardRepository {
                      """;
 
 
-    public Integer getCount(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate, String toDate) {
+    public Integer getCount(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate,
+                            String toDate) {
         final var query = entityManager
                 .createNativeQuery(COUNT_USER_REWARDS)
                 .setParameter("userId", userId)
                 .setParameter("currencies", currencies)
                 .setParameter("projectIds", projectIds)
                 .setParameter("fromDate", fromDate)
-                .setParameter("toDate", toDate)
-                ;
+                .setParameter("toDate", toDate);
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<UserRewardViewEntity> getViewEntities(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate, String toDate,
+    public List<UserRewardViewEntity> getViewEntities(UUID userId, List<String> currencies, List<UUID> projectIds,
+                                                      String fromDate, String toDate,
                                                       UserRewardView.SortBy sortBy,
                                                       SortDirection sortDirection, int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), UserRewardViewEntity.class)
@@ -391,9 +393,9 @@ public class CustomUserRewardRepository {
                        when pr.currency = 'usd' then sum(pr.amount)
                        else (select price from crypto_usd_quotes cuq where cuq.currency = pr.currency) *
                             sum(pr.amount) end dollars_equivalent
-            from auth_users au
+            from iam.users u
                      join payment_requests pr
-                          on pr.recipient_id = au.github_user_id and au.id = :userId
+                          on pr.recipient_id = u.github_user_id and u.id = :userId
             group by pr.currency""";
 
 

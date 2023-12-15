@@ -57,7 +57,7 @@ public interface ProjectMapper {
 
     static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
         final ProjectResponse projectResponse = mapProjectDetailsMetadata(project);
-        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapGithubUser).collect(Collectors.toList()));
+        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapGithubUser).toList());
         projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
         projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream()
                 .map(ProjectMapper::mapRegisteredUser)
