@@ -4043,7 +4043,12 @@ components:
       allOf:
         - $ref: '#/components/schemas/RewardResponse'
         - type: object
+          required:
+            - project
+            - receipt
           properties:
+            project:
+              $ref: '#/components/schemas/ShortProjectResponse'
             receipt:
               $ref: '#/components/schemas/ReceiptResponse'
 

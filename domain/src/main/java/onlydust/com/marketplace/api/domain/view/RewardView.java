@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.model.Project;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,6 +23,7 @@ public class RewardView {
     Date createdAt;
     Date processedAt;
     ReceiptView receipt;
+    Project project;
 
     public enum Status {
         pendingInvoice, processing, complete, pendingSignup, missingPayoutInfo

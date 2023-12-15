@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "project_visibility", typeClass = PostgreSQLEnumType.class)
 public class RewardViewEntity {
 
     @Id
@@ -58,5 +60,15 @@ public class RewardViewEntity {
     @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
     JsonNode receipt;
 
-
+    UUID projectId;
+    String projectKey;
+    String projectName;
+    String projectShortDescription;
+    String projectLongDescription;
+    String projectLogoUrl;
+    String projectTelegramLink;
+    Boolean projectHiring;
+    @Enumerated(EnumType.STRING)
+    @Type(type = "project_visibility")
+    ProjectVisibilityEnumEntity projectVisibility;
 }
