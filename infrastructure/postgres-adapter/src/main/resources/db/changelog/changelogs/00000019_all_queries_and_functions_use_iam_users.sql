@@ -4,7 +4,8 @@ $$
 SELECT coalesce(
                (SELECT upi.avatar_url
                 FROM user_profile_info upi
-                WHERE upi.id = (SELECT u.id FROM iam.users u WHERE u.github_user_id = $1)),
+                         JOIN iam.users u ON u.id = upi.id
+                WHERE u.github_user_id = $1),
                fallback_url
        )
 $$ LANGUAGE sql STABLE;
