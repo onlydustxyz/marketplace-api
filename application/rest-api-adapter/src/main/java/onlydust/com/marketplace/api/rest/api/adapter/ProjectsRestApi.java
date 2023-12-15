@@ -350,7 +350,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectContributionPageResponse> getProjectContributions(UUID projectId,
+    public ResponseEntity<ContributionPageResponse> getProjectContributions(UUID projectId,
                                                                                    List<onlydust.com.marketplace.api.contract.model.ContributionType> types,
                                                                                    List<ContributionStatus> statuses,
                                                                                    List<Long> repositories,
@@ -384,7 +384,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 sanitizedPageIndex,
                 sanitizedPageSize);
 
-        final var contributionPageResponse = ContributionMapper.mapProjectContributionPageResponse(
+        final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
                 sanitizedPageIndex,
                 contributions);
 
@@ -394,7 +394,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectStaledContributionsPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ContributionPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex, Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -405,7 +405,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 sanitizedPageIndex,
                 sanitizedPageSize);
 
-        final var contributionPageResponse = ContributionMapper.mapProjectStaledContributionsPageResponse(
+        final var contributionPageResponse = ContributionMapper.mapContributionPageResponse(
                 sanitizedPageIndex,
                 contributions);
 
