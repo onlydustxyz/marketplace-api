@@ -458,7 +458,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserContributionPageResponse'
+                $ref: '#/components/schemas/ContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1485,7 +1485,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectContributionPageResponse'
+                $ref: '#/components/schemas/ContributionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -1879,7 +1879,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectStaledContributionsPageResponse'
+                $ref: '#/components/schemas/ContributionPageResponse'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
@@ -3514,31 +3514,7 @@ components:
         - OP
         - LORDS
 
-    UserContributionPageResponse:
-      type: object
-      required:
-        - contributions
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributionPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-
-    ProjectContributionPageResponse:
+    ContributionPageResponse:
       type: object
       required:
         - contributions
@@ -4457,75 +4433,3 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserContributionStats'
-
-    ProjectStaledContributionsPageResponse:
-      type: object
-      required:
-        - contributions
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectStaledContributionsPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-
-    ProjectStaledContributionsPageItemResponse:
-      type: object
-      required:
-        - id
-        - contributor
-        - repo
-        - type
-        - status
-        - githubNumber
-        - githubTitle
-        - githubStatus
-        - githubHtmlUrl
-        - githubStatus
-        - createdAt
-      properties:
-        id:
-          type: string
-          description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
-        contributor:
-          $ref: '#/components/schemas/ContributorResponse'
-        repo:
-          $ref: '#/components/schemas/ShortGithubRepoResponse'
-        type:
-          $ref: '#/components/schemas/ContributionType'
-        status:
-          $ref: '#/components/schemas/ContributionStatus'
-        githubNumber:
-          type: integer
-          format: int64
-          description: Github item number
-          example: 6
-        githubTitle:
-          type: string
-          description: Github item title
-        githubStatus:
-          $ref: '#/components/schemas/GithubStatus'
-        githubHtmlUrl:
-          type: string
-          format: url
-          description: The public Github URL of the contribution.
-        githubBody:
-          type: string
-          description: The body of the contribution.
-        createdAt:
-          type: string
-          format: date-time
-          description: When the contribution was created
