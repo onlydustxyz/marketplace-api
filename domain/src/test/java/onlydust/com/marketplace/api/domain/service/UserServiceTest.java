@@ -450,13 +450,14 @@ public class UserServiceTest {
     void should_fail_to_claim_project_with_project_leads() {
         // Given
         final UUID projectId = UUID.randomUUID();
+        final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId))
+        when(projectStoragePort.getById(projectId, caller))
                 .thenReturn(ProjectDetailsView.builder().leaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -471,13 +472,14 @@ public class UserServiceTest {
     void should_fail_to_claim_project_with_pending_project_leads() {
         // Given
         final UUID projectId = UUID.randomUUID();
+        final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId))
+        when(projectStoragePort.getById(projectId, caller))
                 .thenReturn(ProjectDetailsView.builder().invitedLeaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -492,13 +494,14 @@ public class UserServiceTest {
     void should_fail_to_claim_project_with_no_organizations() {
         // Given
         final UUID projectId = UUID.randomUUID();
+        final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId))
+        when(projectStoragePort.getById(projectId, caller))
                 .thenReturn(ProjectDetailsView.builder().build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, User.builder().build(), null);
+            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -517,7 +520,7 @@ public class UserServiceTest {
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getById(projectId))
+        when(projectStoragePort.getById(projectId, user))
                 .thenReturn(ProjectDetailsView.builder()
                         .organizations(Set.of(
                                 ProjectOrganizationView.builder()
@@ -579,7 +582,7 @@ public class UserServiceTest {
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getById(projectId))
+        when(projectStoragePort.getById(projectId, user))
                 .thenReturn(ProjectDetailsView.builder()
                         .organizations(Set.of(
                                 ProjectOrganizationView.builder()

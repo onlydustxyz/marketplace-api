@@ -52,7 +52,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                 , null, ProjectVisibility.PUBLIC, null,
                 ProjectRewardSettings.defaultSettings(new Date())
         );
-        final ProjectDetailsView project = postgresProjectAdapter.getBySlug(slug);
+        final ProjectDetailsView project = postgresProjectAdapter.getBySlug(slug, null);
         assertEquals(moreInfoLinks.size(), project.getMoreInfos().size());
         assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(0)));
         assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(1)));
@@ -73,7 +73,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                 moreInfoLinksUpdated,
                 null, null, null, null, null
         );
-        final ProjectDetailsView projectUpdated = postgresProjectAdapter.getBySlug(slug);
+        final ProjectDetailsView projectUpdated = postgresProjectAdapter.getBySlug(slug, null);
         assertEquals(moreInfoLinksUpdated.size(), projectUpdated.getMoreInfos().size());
         assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(0)));
         assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(1)));

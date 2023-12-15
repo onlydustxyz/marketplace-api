@@ -5,15 +5,12 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public interface ProjectStoragePort {
-    ProjectDetailsView getById(UUID projectId);
+    ProjectDetailsView getById(UUID projectId, User caller);
 
-    ProjectDetailsView getBySlug(String slug);
+    ProjectDetailsView getBySlug(String slug, User caller);
 
     Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
                                                                        UUID userId, String search,

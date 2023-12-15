@@ -40,6 +40,13 @@ public class ProjectDetailsView {
     Map<String, Long> technologies = new HashMap<>();
     Boolean hasRemainingBudget;
     ProjectRewardSettings rewardSettings;
+    Me me;
+
+    public record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor, Boolean hasApplied) {
+        public Boolean isMember() {
+            return isLeader || isInvitedAsProjectLead || isContributor;
+        }
+    }
 
     public void addOrganization(final ProjectOrganizationView organization) {
         organizations.add(organization);

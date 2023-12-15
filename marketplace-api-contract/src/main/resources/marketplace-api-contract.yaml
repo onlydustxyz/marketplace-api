@@ -2902,6 +2902,27 @@ components:
           type: string
           format: date-time
           description: When the project was indexed
+        me:
+          $ref: '#/components/schemas/ProjectMeResponse'
+
+    ProjectMeResponse:
+      type: object
+      properties:
+        isMember:
+          type: boolean
+          description: Is the user a member of the project?
+        isContributor:
+          type: boolean
+          description: Is the user a contributor of the project?
+        isProjectLead:
+          type: boolean
+          description: Is the user a project lead of the project?
+        isInvitedAsProjectLead:
+          type: boolean
+          description: Is the user invited as a project lead of the project?
+        hasApplied:
+          type: boolean
+          description: Has the user applied to the project?
 
     ShortProjectResponse:
       type: object
