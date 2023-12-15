@@ -163,7 +163,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 CurrencyContract currency, List<Long> contributors,
+                                                                 List<CurrencyContract> currencies, List<Long> contributors,
                                                                  String fromDate, String toDate,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
@@ -171,7 +171,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectRewardView.SortBy sortBy = getSortBy(sort);
         final var filters = ProjectRewardView.Filters.builder()
-                .currency(nonNull(currency) ? mapCurrency(currency) : null)
+                .currencies(Optional.ofNullable(currencies).orElse(List.of()).stream().map(ProjectBudgetMapper::mapCurrency).toList())
                 .contributors(Optional.ofNullable(contributors).orElse(List.of()))
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(fromDate) ? null : DateMapper.parse(toDate))

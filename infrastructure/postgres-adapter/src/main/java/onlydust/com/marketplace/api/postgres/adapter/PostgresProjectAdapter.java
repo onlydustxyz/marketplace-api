@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -363,22 +364,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
                                               ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
                                               int pageIndex, int pageSize) {
-        final var currency = nonNull(filters.getCurrency()) ? CurrencyEnumEntity.of(filters.getCurrency()) : null;
+        final var currencies = filters.getCurrencies().stream().map(CurrencyEnumEntity::of).map(Enum::name).toList();
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
         final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
 
-        final Integer count = customProjectRewardRepository.getCount(projectId, currency, filters.getContributors(),
+        final Integer count = customProjectRewardRepository.getCount(projectId, currencies, filters.getContributors(),
                 fromDate, toDate);
         final List<ProjectRewardView> projectRewardViews = customProjectRewardRepository.getViewEntities(projectId,
-                        currency, filters.getContributors(),
+                        currencies, filters.getContributors(),
                         fromDate, toDate,
                         sortBy, sortDirection, pageIndex, pageSize)
                 .stream().map(ProjectRewardMapper::mapEntityToDomain)
                 .toList();
 
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, nonNull(currency) ?
-                        currency.toString() : null, filters.getContributors(),
+        final var budgetStats = budgetStatsRepository.findByProject(projectId, currencies, filters.getContributors(),
                 fromDate, toDate);
 
         return ProjectRewardsPageView.builder().
@@ -387,13 +387,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .totalItemNumber(count)
                         .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
                         .build())
-                .remainingBudget(new Money(budgetStats.getRemainingAmount(),
-                        filters.getCurrency(), budgetStats.getRemainingUsdAmount()))
-                .spentAmount(new Money(budgetStats.getSpentAmount(), filters.getCurrency(),
-                        budgetStats.getSpentUsdAmount()))
-                .sentRewardsCount(budgetStats.getRewardsCount())
-                .rewardedContributionsCount(budgetStats.getRewardItemsCount())
-                .rewardedContributorsCount(budgetStats.getRewardRecipientsCount())
+                .remainingBudget(budgetStats.size() == 1 ?
+                        new Money(budgetStats.get(0).getRemainingAmount(),
+                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getRemainingUsdAmount()) :
+                        new Money(null, null,
+                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .spentAmount(budgetStats.size() == 1 ?
+                        new Money(budgetStats.get(0).getSpentAmount(),
+                                budgetStats.get(0).getCurrency().toDomain(),
+                                budgetStats.get(0).getSpentUsdAmount()) :
+                        new Money(null, null,
+                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }
 

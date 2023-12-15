@@ -40,7 +40,7 @@ public class CustomProjectRewardRepository {
                      left join payments r on r.request_id = pr.id
             where 
                 pr.project_id = :projectId and 
-                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) IN (:currencies)) and 
                 (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)) and 
                 (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
@@ -51,7 +51,7 @@ public class CustomProjectRewardRepository {
             from payment_requests pr
             where
                 pr.project_id = :projectId and 
-                (:currency is null or pr.currency = CAST(CAST(:currency AS TEXT) AS currency)) and 
+                (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) IN (:currencies)) and 
                 (coalesce(:contributorsIds) is null or pr.recipient_id in (:contributorsIds)) AND
                 (:fromDate IS NULL OR pr.requested_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR pr.requested_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
@@ -69,24 +69,24 @@ public class CustomProjectRewardRepository {
         return FIND_PROJECT_REWARDS.replace("%order_by%", sort);
     }
 
-    public Integer getCount(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds, String from, String to) {
+    public Integer getCount(UUID projectId, List<String> currencies, List<Long> contributorsIds, String from, String to) {
         final var query = entityManager
                 .createNativeQuery(COUNT_PROJECT_REWARDS)
                 .setParameter("projectId", projectId)
-                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
+                .setParameter("currencies", currencies)
                 .setParameter("contributorsIds", contributorsIds)
                 .setParameter("fromDate", from)
                 .setParameter("toDate", to);
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, CurrencyEnumEntity currency, List<Long> contributorsIds,
+    public List<ProjectRewardViewEntity> getViewEntities(UUID projectId, List<String> currencies, List<Long> contributorsIds,
                                                          String from, String to,
                                                          ProjectRewardView.SortBy sortBy, final SortDirection sortDirection,
                                                          int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection), ProjectRewardViewEntity.class)
                 .setParameter("projectId", projectId)
-                .setParameter("currency", nonNull(currency) ? currency.toString() : null)
+                .setParameter("currencies", currencies)
                 .setParameter("contributorsIds", contributorsIds)
                 .setParameter("fromDate", from)
                 .setParameter("toDate", to)
