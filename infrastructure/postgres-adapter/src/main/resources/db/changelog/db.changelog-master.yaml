@@ -35,4 +35,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000017_remove_empty_contacts.sql
   - include:
       file: db/changelog/changelogs/00000018_auth_to_iam.sql
+  - include:
+      file: db/changelog/changelogs/00000019_fix_update_iam_user_from_auth_users.sql
 
