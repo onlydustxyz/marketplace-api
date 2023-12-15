@@ -554,4 +554,28 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributorsCount").isEqualTo(0);
     }
+
+
+    @Test
+    @Order(6)
+    void should_get_projects_rewards_when_no_usd_equivalent() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        cryptoUsdQuotesRepository.deleteById(CurrencyEnumEntity.eth);
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("pageIndex", "0", "pageSize",
+                        "20", "sort", "AMOUNT", "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(4000)
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(50000);
+    }
 }

@@ -541,6 +541,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(5)
     void should_filter_by_date() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
@@ -579,6 +580,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
+    @Order(6)
     void should_filter_by_currency() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
@@ -612,6 +614,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
+    @Order(7)
     void should_filter_by_projects() {
         // Given
         final String jwt = userHelper.authenticateAnthony().jwt();
@@ -640,6 +643,32 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
+        ;
+    }
+
+
+    @Test
+    @Order(8)
+    void should_get_rewards_when_no_usd_equivalent() {
+        // Given
+        final String jwt = userHelper.authenticateAnthony().jwt();
+        cryptoUsdQuotesRepository.deleteById(CurrencyEnumEntity.eth);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(24250)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(665000)
         ;
     }
 }

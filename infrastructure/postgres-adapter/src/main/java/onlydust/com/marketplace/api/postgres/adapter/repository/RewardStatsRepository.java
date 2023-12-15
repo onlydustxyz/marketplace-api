@@ -15,9 +15,9 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
             SELECT 
                 pr.currency,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ), 0) AS processed_amount,
-                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END, 0) AS processed_usd_amount,
+                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ), 0)  * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS processed_usd_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_amount,
-                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END, 0) AS pending_usd_amount,
+                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS pending_usd_amount,
                 JSONB_AGG(pr.id) AS reward_ids,
                 COALESCE(JSONB_AGG(wi.id) FILTER (WHERE wi.id IS NOT NULL), '[]') AS reward_item_ids,
                 JSONB_AGG(pr.project_id) AS project_ids

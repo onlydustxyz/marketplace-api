@@ -277,13 +277,13 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 rewardsStats.get(0).getCurrency().toDomain(),
                                 rewardsStats.get(0).getProcessedUsdAmount()) :
                         new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                rewardsStats.stream().map(RewardStatsEntity::getProcessedUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .pendingAmount(rewardsStats.size() == 1 ?
                         new Money(rewardsStats.get(0).getPendingAmount(),
                                 rewardsStats.get(0).getCurrency().toDomain(),
                                 rewardsStats.get(0).getPendingUsdAmount()) :
                         new Money(null, null,
-                                rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                rewardsStats.stream().map(RewardStatsEntity::getPendingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
                 .receivedRewardsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
