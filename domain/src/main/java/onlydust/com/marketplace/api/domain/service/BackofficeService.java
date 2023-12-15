@@ -40,8 +40,8 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds) {
-        return backofficeStoragePort.listPayments(pageIndex, pageSize, projectIds);
+    public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
+        return backofficeStoragePort.listPayments(pageIndex, pageSize, filters);
     }
 
     @Override

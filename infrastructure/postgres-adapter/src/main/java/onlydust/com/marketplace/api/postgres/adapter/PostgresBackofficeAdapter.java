@@ -124,8 +124,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
-    public Page<PaymentView> listPayments(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = boPaymentRepository.findAll(isNull(projectIds) ? List.of() : projectIds, PageRequest.of(pageIndex, pageSize));
+    public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
+        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize));
         return Page.<PaymentView>builder()
                 .content(page.getContent().stream().map(BoPaymentEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())

@@ -84,8 +84,9 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             			payment_id
             	) Counters ON (pr.id = Counters.payment_id)
             WHERE 
-                (COALESCE(:projectIds) IS NULL OR pr.project_id in (:projectIds))
+                (COALESCE(:projectIds) IS NULL OR pr.project_id in (:projectIds)) AND
+                (COALESCE(:paymentIds) IS NULL OR pr.id in (:paymentIds))
             """, nativeQuery = true)
     @NotNull
-    Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final @NotNull Pageable pageable);
+    Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final List<UUID> paymentIds, final @NotNull Pageable pageable);
 }
