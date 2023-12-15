@@ -6,11 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectBudgetView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectLeadInvitationView;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectRepositoryView;
-import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
-import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
+import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,10 +110,15 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.ok(response);
     }
 
+
     @Override
-    public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
+    public ResponseEntity<PaymentPage> getPaymentPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds, List<UUID> paymentIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
+        final var filters = PaymentView.Filters.builder()
+                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
+                .payments(Optional.ofNullable(paymentIds).orElse(List.of()))
+                .build();
+        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
         final var response = mapPaymentPageToContract(paymentsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?

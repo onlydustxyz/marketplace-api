@@ -272,6 +272,15 @@ paths:
               type: string
               format: uuid
           style: simple
+        - in: query
+          name: paymentIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
       responses:
         "200":
           description: 'Payment page'

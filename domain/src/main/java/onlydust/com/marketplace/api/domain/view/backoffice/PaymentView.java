@@ -45,6 +45,15 @@ public class PaymentView {
     String recipientOptimismWallet;
     String recipientAptosWallet;
 
+    @Value
+    @Builder
+    public static class Filters {
+        @Builder.Default
+        List<UUID> projects = List.of();
+        @Builder.Default
+        List<UUID> payments = List.of();
+    }
+
     public record Identity(Company company, Person person) {
         public boolean valid() {
             return Optional.ofNullable(company).map(Company::valid).orElse(false) ||
