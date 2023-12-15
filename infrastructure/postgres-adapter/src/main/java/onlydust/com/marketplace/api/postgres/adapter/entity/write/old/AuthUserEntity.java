@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import java.util.Date;
 import java.util.UUID;
 
-@Deprecated(forRemoval = true)
+@Deprecated
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

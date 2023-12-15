@@ -12,7 +12,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsFor
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.old.RegisteredUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -42,7 +41,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
     private final GlobalSettingsRepository globalSettingsRepository;
-    private final RegisteredUserRepository registeredUserRepository;
     private final UserPayoutInfoRepository userPayoutInfoRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
@@ -64,17 +62,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                 globalSettingsRepository.findAll().stream().findFirst()
                         .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
-        if (user.isPresent()) {
-            return user.map(u -> {
-                final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
-                final var applications = applicationRepository.findAllByApplicantId(u.getId());
-                return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
-                        projectLedIdsByUserId, applications);
-            });
-        }
-        // Fallback on hasura auth user
-        Optional<RegisteredUserViewEntity> hasuraUser = registeredUserRepository.findByGithubId(githubId);
-        return hasuraUser.map(u -> {
+        return user.map(u -> {
             final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
             return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
