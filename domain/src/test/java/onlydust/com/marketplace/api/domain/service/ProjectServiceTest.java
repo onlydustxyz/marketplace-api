@@ -56,6 +56,7 @@ public class ProjectServiceTest {
         // Given
         final String slug = faker.pokemon().name();
         final UUID userId = UUID.randomUUID();
+        final var caller = User.builder().id(userId).build();
 
         // When
         final var expectedProject = ProjectDetailsView.builder()
@@ -63,12 +64,12 @@ public class ProjectServiceTest {
                 .slug(slug)
                 .build();
         when(permissionService.hasUserAccessToProject(slug, userId)).thenReturn(true);
-        when(projectStoragePort.getBySlug(slug))
+        when(projectStoragePort.getBySlug(slug, caller))
                 .thenReturn(expectedProject);
-        final var project = projectService.getBySlug(slug, userId);
+        final var project = projectService.getBySlug(slug, caller);
 
         // Then
-        assertEquals(project, expectedProject);
+        assertThat(project).isEqualTo(expectedProject);
     }
 
     @Test
@@ -77,7 +78,7 @@ public class ProjectServiceTest {
         final String slug = faker.pokemon().name();
 
         // When
-        when(projectStoragePort.getBySlug(slug)).thenThrow(OnlyDustException.class);
+        when(projectStoragePort.getBySlug(slug, null)).thenThrow(OnlyDustException.class);
 
         // Then
         assertThatThrownBy(() -> projectService.getBySlug(slug, null))
@@ -91,7 +92,7 @@ public class ProjectServiceTest {
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getById(projectId)).thenThrow(OnlyDustException.class);
+        when(projectStoragePort.getById(projectId, null)).thenThrow(OnlyDustException.class);
 
         // Then
         assertThatThrownBy(() -> projectService.getById(projectId, null))

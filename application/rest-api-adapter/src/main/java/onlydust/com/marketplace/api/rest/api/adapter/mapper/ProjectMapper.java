@@ -74,6 +74,13 @@ public interface ProjectMapper {
                 project.getOrganizations().stream().map(ProjectOrganizationView::getRepos).flatMap(Collection::stream).map(ProjectOrganizationRepoView::getIndexedAt).toList();
         projectResponse.setIndexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull));
         projectResponse.setIndexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null));
+        if (project.getMe() != null)
+            projectResponse.setMe(new ProjectMeResponse()
+                    .isMember(project.getMe().isMember())
+                    .isProjectLead(project.getMe().isLeader())
+                    .isInvitedAsProjectLead(project.getMe().isInvitedAsProjectLead())
+                    .isContributor(project.getMe().isContributor())
+                    .hasApplied(project.getMe().hasApplied()));
 
         //TODO: this list is kept for backwards compatibility with the old API
         final var repos = new ArrayList<GithubRepoResponse>();

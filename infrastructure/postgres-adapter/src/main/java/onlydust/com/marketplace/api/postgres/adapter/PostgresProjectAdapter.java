@@ -13,10 +13,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,21 +58,23 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
     private final NewcomerViewEntityRepository newcomerViewEntityRepository;
     private final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository;
+    private final ApplicationRepository applicationRepository;
+    private final ContributionViewEntityRepository contributionViewEntityRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public ProjectDetailsView getById(UUID projectId) {
+    public ProjectDetailsView getById(UUID projectId, User caller) {
         final var projectEntity = projectViewRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
-        return getProjectDetails(projectEntity);
+        return getProjectDetails(projectEntity, caller);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ProjectDetailsView getBySlug(String slug) {
+    public ProjectDetailsView getBySlug(String slug, User caller) {
         final var projectEntity = projectViewRepository.findByKey(slug)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project '%s' not found", slug)));
-        return getProjectDetails(projectEntity);
+        return getProjectDetails(projectEntity, caller);
     }
 
     @Override
@@ -120,7 +124,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
     }
 
-    private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView) {
+    private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView, User caller) {
         final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(),
                 TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
@@ -128,8 +132,22 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
         final Boolean hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
+        final var me = isNull(caller) ? null : new ProjectDetailsView.Me(
+                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
+                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),
+                !contributionViewEntityRepository.findContributions(caller.getGithubUserId(),
+                        List.of(caller.getGithubUserId()),
+                        List.of(projectView.getId()),
+                        List.of(),
+                        List.of(),
+                        List.of(),
+                        null,
+                        null,
+                        Pageable.ofSize(1)).isEmpty(),
+                applicationRepository.findByProjectIdAndApplicantId(projectView.getId(), caller.getId()).isPresent()
+        );
         return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders
-                , sponsors, hasRemainingBudget);
+                , sponsors, hasRemainingBudget, me);
     }
 
     @Override

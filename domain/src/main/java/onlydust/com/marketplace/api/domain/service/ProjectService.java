@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
@@ -46,25 +47,26 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
-    public ProjectDetailsView getById(UUID projectId, UUID userId) {
-        final ProjectDetailsView projectById = projectStoragePort.getById(projectId);
+    public ProjectDetailsView getById(UUID projectId, User caller) {
+        final var userId = caller == null ? null : caller.getId();
+
+        final ProjectDetailsView projectById = projectStoragePort.getById(projectId, caller);
         if (!permissionService.hasUserAccessToProject(projectId, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId,
-                    userId));
+            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
         }
         return projectById;
     }
 
     @Override
-    public ProjectDetailsView getBySlug(String slug, UUID userId) {
-        final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug);
+    public ProjectDetailsView getBySlug(String slug, User caller) {
+        final var userId = caller == null ? null : caller.getId();
+
+        final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug, caller);
         if (!permissionService.hasUserAccessToProject(slug, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
-                    userId));
+            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug, userId));
         }
         return projectBySlug;
     }
-
 
     @Override
     public Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,

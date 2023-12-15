@@ -235,7 +235,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "indexingComplete": true,
               "indexedAt": "2023-12-04T14:34:49.384525Z"
             }
-                        
             """;
 
     private static final String B_CONSEIL_OVERVIEW_JSON = """
@@ -2691,6 +2690,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(false)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
@@ -2719,6 +2723,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(false)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
@@ -2812,6 +2821,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(true)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
@@ -2823,6 +2837,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(true)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
@@ -2834,6 +2853,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
@@ -2860,6 +2884,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(true)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
@@ -2871,6 +2900,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(true)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
@@ -2882,6 +2916,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
