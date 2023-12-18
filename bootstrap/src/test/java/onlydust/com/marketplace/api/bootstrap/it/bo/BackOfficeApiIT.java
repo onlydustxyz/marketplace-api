@@ -898,7 +898,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "OnlyDust.xyz",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
-                              "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "HTML", "PLpgSQL"],
+                              "languages": ["TypeScript", "JavaScript", "Shell", "CSS", "MDX", "HTML", "PLpgSQL"],
                               "tcAcceptedAt": null,
                               "onboardingCompletedAt": null
                             }
@@ -922,7 +922,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                            "totalPageNumber": 48,
-                           "totalItemNumber": 240,
+                           "totalItemNumber": 239,
                            "hasMore": true,
                            "nextPageIndex": 1,
                            "payments": [

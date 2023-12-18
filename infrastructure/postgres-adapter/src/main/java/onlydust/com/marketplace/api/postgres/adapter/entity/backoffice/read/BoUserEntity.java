@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "usd_preferred_method", typeClass = UsdPreferredMethodEnumEntity.class)
+@TypeDef(name = "preferred_method", typeClass = PostgreSQLEnumType.class)
 public class BoUserEntity {
     @Id
     UUID id;
@@ -35,7 +36,7 @@ public class BoUserEntity {
     String city;
     String country;
     @Enumerated(EnumType.STRING)
-    @Type(type = "usd_preferred_method")
+    @Type(type = "preferred_method")
     UsdPreferredMethodEnumEntity usdPreferredMethod;
     String telegram;
     String twitter;
