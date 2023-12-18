@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
-@TypeDef(name = "currency", typeClass = CurrencyEnumEntity.class)
+@TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class BudgetStatsEntity {
     @Id
