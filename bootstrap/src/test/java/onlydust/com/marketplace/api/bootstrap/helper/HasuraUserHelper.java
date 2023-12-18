@@ -8,14 +8,12 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepo
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Profile({"hasura_auth"})
 @Component
 public class HasuraUserHelper {
 

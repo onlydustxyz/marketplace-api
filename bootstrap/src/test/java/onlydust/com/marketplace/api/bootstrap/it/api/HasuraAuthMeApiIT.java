@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -26,7 +25,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@ActiveProfiles({"hasura_auth"})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
 

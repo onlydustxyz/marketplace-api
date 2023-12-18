@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 import java.util.UUID;
 
-@ActiveProfiles({"hasura_auth"})
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 

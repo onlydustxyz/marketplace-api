@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
@@ -17,7 +16,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles({"hasura_auth"})
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApiIT {
 

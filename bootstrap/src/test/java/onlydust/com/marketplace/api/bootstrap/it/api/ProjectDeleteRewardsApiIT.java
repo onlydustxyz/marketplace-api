@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepositor
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,7 +18,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

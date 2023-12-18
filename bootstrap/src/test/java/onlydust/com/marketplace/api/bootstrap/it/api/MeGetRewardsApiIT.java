@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -28,7 +27,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     private static final String GET_MY_REWARD_AMOUNTS_JSON_RESPONSE = """
@@ -575,7 +574,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.receivedRewardsCount").isEqualTo(10)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(85)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
-                ;
+        ;
     }
 
 
@@ -632,8 +631,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
-                .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4','298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
+                .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
+                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
+                .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
+                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(750000.00)

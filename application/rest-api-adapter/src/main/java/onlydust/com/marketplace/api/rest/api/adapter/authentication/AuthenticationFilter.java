@@ -20,7 +20,8 @@ import static java.util.Objects.nonNull;
 public class AuthenticationFilter extends OncePerRequestFilter {
     public final static String BEARER_PREFIX = "Bearer ";
     public final static String IMPERSONATION_HEADER = "X-Impersonation-Claims";
-    private final JwtService jwtService;
+    private final JwtService jwtServiceAuth0;
+    private final JwtService jwtServiceHasura;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
@@ -30,9 +31,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         final String impersonationHeader = httpServletRequest.getHeader(IMPERSONATION_HEADER);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            jwtService.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader).ifPresent(authentication -> {
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            });
+            jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
+                    .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                            () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""),
+                                            impersonationHeader)
+                                    .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                                            SecurityContextHolder::clearContext));
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);

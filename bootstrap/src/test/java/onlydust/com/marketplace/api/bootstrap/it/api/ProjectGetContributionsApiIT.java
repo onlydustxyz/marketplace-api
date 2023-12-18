@@ -4,13 +4,12 @@ import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HasuraUserHelper userHelper;
@@ -98,7 +97,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "100",
                         "fromDate", "2023-02-21",
                         "toDate", "2023-02-21"
-                        )))
+                )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -110,7 +109,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 // we do not have any incorrect date
                 .jsonPath("$.contributions[?(@.createdAt < '2023-02-21')]").doesNotExist()
                 .jsonPath("$.contributions[?(@.createdAt > '2023-02-22')]").doesNotExist()
-                ;
+        ;
     }
 
 

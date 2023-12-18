@@ -8,13 +8,12 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstall
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAuthorizedRepoRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 
-@ActiveProfiles("hasura_auth")
+
 public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     private static final String ONLYDUST_ACCOUNT_JSON = """
             {
