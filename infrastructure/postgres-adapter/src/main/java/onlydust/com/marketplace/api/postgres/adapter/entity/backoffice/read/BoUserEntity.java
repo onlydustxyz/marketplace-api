@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.UsdPreferredMethodEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -20,19 +21,22 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@TypeDef(name = "usd_preferred_method", typeClass = UsdPreferredMethodEnumEntity.class)
 public class BoUserEntity {
     @Id
     UUID id;
     String companyName;
     String companyNum;
-    String companyFirstname;
-    String companyLastname;
-    String personFirstname;
-    String personLastname;
+    Boolean isCompany;
+    String firstname;
+    String lastname;
     String address;
     String postCode;
     String city;
     String country;
+    @Enumerated(EnumType.STRING)
+    @Type(type = "usd_preferred_method")
+    UsdPreferredMethodEnumEntity usdPreferredMethod;
     String telegram;
     String twitter;
     String discord;
@@ -67,12 +71,11 @@ public class BoUserEntity {
     public UserView toView() {
         return UserView.builder()
                 .id(id)
+                .isCompany(isCompany)
                 .companyName(companyName)
                 .companyNum(companyNum)
-                .companyFirstname(companyFirstname)
-                .companyLastname(companyLastname)
-                .personFirstname(personFirstname)
-                .personLastname(personLastname)
+                .firstname(firstname)
+                .lastname(lastname)
                 .address(address)
                 .postCode(postCode)
                 .city(city)
@@ -105,6 +108,7 @@ public class BoUserEntity {
                 .languages(languages)
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
+                .usdPreferredMethod(usdPreferredMethod == null ? null : usdPreferredMethod.toDomain())
                 .build();
     }
 }

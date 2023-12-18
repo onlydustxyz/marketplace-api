@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
@@ -103,16 +104,16 @@ public interface BackOfficeMapper {
         return new UserPage()
                 .users(userPage.getContent().stream().map(user -> new UserPageItemResponse()
                         .id(user.getId())
+                        .isCompany(user.getIsCompany())
                         .companyName(user.getCompanyName())
                         .companyNum(user.getCompanyNum())
-                        .companyFirstname(user.getCompanyFirstname())
-                        .companyLastname(user.getCompanyLastname())
-                        .personFirstname(user.getPersonFirstname())
-                        .personLastname(user.getPersonLastname())
+                        .firstname(user.getFirstname())
+                        .lastname(user.getLastname())
                         .address(user.getAddress())
                         .postCode(user.getPostCode())
                         .city(user.getCity())
                         .country(user.getCountry())
+                        .usdPreferredMethod(mapUsdPreferredMethod(user.getUsdPreferredMethod()))
                         .telegram(user.getTelegram())
                         .twitter(user.getTwitter())
                         .discord(user.getDiscord())
@@ -146,6 +147,13 @@ public interface BackOfficeMapper {
                 .totalItemNumber(userPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, userPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, userPage.getTotalPageNumber()));
+    }
+
+    static UserPageItemResponse.UsdPreferredMethodEnum mapUsdPreferredMethod(UserPayoutInformation.UsdPreferredMethodEnum usdPreferredMethod) {
+        return usdPreferredMethod == null ? null : switch (usdPreferredMethod) {
+            case FIAT -> UserPageItemResponse.UsdPreferredMethodEnum.BANK_TRANSFER;
+            case CRYPTO -> UserPageItemResponse.UsdPreferredMethodEnum.CRYPTO;
+        };
     }
 
     static PaymentPage mapPaymentPageToContract(final Page<PaymentView> paymentPage, int pageIndex) {

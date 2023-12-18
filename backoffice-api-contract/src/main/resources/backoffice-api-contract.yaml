@@ -586,17 +586,15 @@ components:
         id:
           type: string
           format: uuid
+        isCompany:
+          type: boolean
         companyName:
           type: string
         companyNum:
           type: string
-        companyFirstname:
+        firstname:
           type: string
-        companyLastname:
-          type: string
-        personFirstname:
-          type: string
-        personLastname:
+        lastname:
           type: string
         address:
           type: string
@@ -630,6 +628,11 @@ components:
           type: string
         starknetAddress:
           type: string
+        usdPreferredMethod:
+          type: string
+          enum:
+            - BANK_TRANSFER
+            - CRYPTO
         createdAt:
           type: string
           format: date-time
