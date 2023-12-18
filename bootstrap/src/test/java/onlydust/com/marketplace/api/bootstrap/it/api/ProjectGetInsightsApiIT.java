@@ -1,10 +1,18 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.contract.model.UserContributionStats;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import org.assertj.core.internal.IntArrays;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -383,7 +391,8 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contributors[*].contributionCountPerWeeks").isArray()
+                .jsonPath("$.contributors[?(@.contributionCountPerWeeks.length() == 10)]").exists()
+                .jsonPath("$.contributors[?(@.contributionCountPerWeeks.length() != 10)]").doesNotExist()
                 .json("""
                         {
                           "contributors": [
