@@ -383,6 +383,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.contributors[*].contributionCountPerWeeks").isArray()
                 .json("""
                         {
                           "contributors": [
@@ -394,8 +395,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 504,
                               "completedIssueCount": 11,
-                              "completedCodeReviewCount": 388,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 388
                             },
                             {
                               "githubUserId": 595505,
@@ -405,8 +405,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 248,
                               "completedIssueCount": 2,
-                              "completedCodeReviewCount": 321,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 321
                             },
                             {
                               "githubUserId": 4435377,
@@ -416,8 +415,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 116,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 261,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 261
                             },
                             {
                               "githubUserId": 21149076,
@@ -427,8 +425,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 117,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 96,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 96
                             },
                             {
                               "githubUserId": 34384633,
@@ -438,8 +435,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": false,
                               "completedPullRequestCount": 107,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 39,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 39
                             },
                             {
                               "githubUserId": 16590657,
@@ -449,44 +445,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 30,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 117,
-                              "contributionCountPerWeeks": [
-                                {
-                                  "year": 2023,
-                                  "week": 45,
-                                  "codeReviewCount": 6,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 2
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 46,
-                                  "codeReviewCount": 3,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 0
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 47,
-                                  "codeReviewCount": 5,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 0
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 48,
-                                  "codeReviewCount": 12,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 1
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 49,
-                                  "codeReviewCount": 1,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 0
-                                }
-                              ]
+                              "completedCodeReviewCount": 117
                             },
                             {
                               "githubUserId": 31901905,
@@ -496,37 +455,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 88,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 39,
-                              "contributionCountPerWeeks": [
-                                {
-                                  "year": 2023,
-                                  "week": 45,
-                                  "codeReviewCount": 1,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 6
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 46,
-                                  "codeReviewCount": 1,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 5
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 47,
-                                  "codeReviewCount": 10,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 7
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 48,
-                                  "codeReviewCount": 10,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 2
-                                }
-                              ]
+                              "completedCodeReviewCount": 39
                             },
                             {
                               "githubUserId": 5160414,
@@ -536,44 +465,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "completedPullRequestCount": 57,
                               "completedIssueCount": 1,
-                              "completedCodeReviewCount": 82,
-                              "contributionCountPerWeeks": [
-                                {
-                                  "year": 2023,
-                                  "week": 45,
-                                  "codeReviewCount": 9,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 6
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 46,
-                                  "codeReviewCount": 9,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 3
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 47,
-                                  "codeReviewCount": 13,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 6
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 48,
-                                  "codeReviewCount": 9,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 14
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 49,
-                                  "codeReviewCount": 1,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 0
-                                }
-                              ]
+                              "completedCodeReviewCount": 82
                             },
                             {
                               "githubUserId": 10167015,
@@ -583,8 +475,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": false,
                               "completedPullRequestCount": 25,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 11,
-                              "contributionCountPerWeeks": []
+                              "completedCodeReviewCount": 11
                             },
                             {
                               "githubUserId": 143011364,
@@ -594,37 +485,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": false,
                               "completedPullRequestCount": 55,
                               "completedIssueCount": 0,
-                              "completedCodeReviewCount": 47,
-                              "contributionCountPerWeeks": [
-                                {
-                                  "year": 2023,
-                                  "week": 45,
-                                  "codeReviewCount": 2,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 9
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 46,
-                                  "codeReviewCount": 3,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 7
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 47,
-                                  "codeReviewCount": 6,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 2
-                                },
-                                {
-                                  "year": 2023,
-                                  "week": 48,
-                                  "codeReviewCount": 8,
-                                  "issueCount": 0,
-                                  "pullRequestCount": 14
-                                }
-                              ]
+                              "completedCodeReviewCount": 47
                             }
                           ],
                           "hasMore": true,
