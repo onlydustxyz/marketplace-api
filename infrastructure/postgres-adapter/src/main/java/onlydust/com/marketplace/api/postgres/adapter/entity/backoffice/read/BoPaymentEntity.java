@@ -31,7 +31,7 @@ import static java.util.Objects.nonNull;
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "usd_preferred_method", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "preferred_method", typeClass = PostgreSQLEnumType.class)
 public class BoPaymentEntity {
     @Id
     UUID id;
@@ -56,7 +56,7 @@ public class BoPaymentEntity {
     @Type(type = "jsonb")
     Location recipientLocation;
     @Enumerated(EnumType.STRING)
-    @Type(type = "usd_preferred_method")
+    @Type(type = "preferred_method")
     UsdPreferredMethodEnumEntity recipientUsdPreferredMethod;
     @Type(type = "jsonb")
     List<Wallet> recipientWallets;
