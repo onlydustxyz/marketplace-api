@@ -27,9 +27,8 @@ BEGIN
                         NEW.avatar_url_at_signup),
                coalesce(NEW.email, ''),
                CASE WHEN NEW.admin is true THEN '{USER, ADMIN}'::iam.user_role[] ELSE '{USER}'::iam.user_role[] END,
-               coalesce(NEW.created_at, now());
-        -- We do not add an ON CONFLICT clause because we want to FAIL if the user already
-        -- exists in iam.users, as this should NEVER happen at this point.
+               coalesce(NEW.created_at, now())
+        ON CONFLICT (id) DO NOTHING;
     END IF;
 
     RETURN NEW;
