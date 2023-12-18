@@ -1,15 +1,20 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     ApiKeyAuthenticationService.Config config;
+    @Autowired
+    BudgetRepository budgetRepository;
 
     @Test
     void should_raise_missing_authentication_given_no_api_key_when_getting_github_repos() {
@@ -480,6 +485,52 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "initialAmountDollarsEquivalent": 1789654,
                               "spentAmountDollarsEquivalent": 0,
                               "projectId": "56504731-0398-441f-80ac-90edbd14675f"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_stark_budgets_with_no_usd_equivalent() {
+        // Given
+        {
+            final var budget = budgetRepository.findById(UUID.fromString("7dcf96a0-ea20-4f95-99f4-89cee2bf3911"))
+                    .orElseThrow();
+            budget.setCurrency(CurrencyEnumEntity.stark);
+            budgetRepository.save(budget);
+        }
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_BUDGETS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
+                        )))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "budgets": [
+                            {
+                              "id": "7dcf96a0-ea20-4f95-99f4-89cee2bf3911",
+                              "currency": "STARK",
+                              "initialAmount": 10000,
+                              "remainingAmount": 9000,
+                              "spentAmount": 1000,
+                              "remainingAmountDollarsEquivalent": null,
+                              "initialAmountDollarsEquivalent": null,
+                              "spentAmountDollarsEquivalent": null,
+                              "projectId": "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
                             }
                           ]
                         }
