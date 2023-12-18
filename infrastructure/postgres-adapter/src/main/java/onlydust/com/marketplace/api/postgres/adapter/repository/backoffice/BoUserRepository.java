@@ -19,7 +19,7 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                                                  CAST((languages -> jsonb_object_keys(languages)) AS int) AS value
                                           FROM (SELECT contributor_id, jsonb_concat_agg(languages) languages
                                                 FROM indexer_exp.contributions c
-                                                         JOIN github_repos r ON r.id = c.repo_id
+                                                         JOIN indexer_exp.github_repos r ON r.id = c.repo_id
                                                 GROUP BY contributor_id) repo_languages_stats
                                           ORDER BY value DESC) repo_languages
                                     group by contributor_id),

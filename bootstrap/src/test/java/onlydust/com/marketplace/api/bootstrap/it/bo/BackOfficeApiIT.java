@@ -661,6 +661,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Rust",
                                 "Shell",
                                 "CSS",
+                                "MDX",
                                 "HTML",
                                 "PLpgSQL",
                                 "Dockerfile"
@@ -748,7 +749,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             }
                           ]
                         }
-                                                
                         """);
 
         client.get()
