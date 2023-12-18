@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecre
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
@@ -35,28 +34,26 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @Profile("!hasura_auth")
     public JWTVerifier jwtVerifier(final Auth0Properties auth0Properties) {
         return new Auth0JwtVerifier(auth0Properties);
     }
 
     @Bean
-    @Profile("!hasura_auth")
     public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final JWTVerifier jwtVerifier,
                                       final UserFacadePort userFacadePort) {
         return new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
     }
 
     @Bean
-    @Profile("hasura_auth")
     public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret,
                                        final UserFacadePort userFacadePort) {
         return new HasuraJwtService(objectMapper, jwtSecret, userFacadePort);
     }
 
     @Bean
-    public AuthenticationFilter authenticationFilter(final JwtService jwtService) {
-        return new AuthenticationFilter(jwtService);
+    public AuthenticationFilter authenticationFilter(final JwtService jwtServiceAuth0,
+                                                     final JwtService jwtServiceHasura) {
+        return new AuthenticationFilter(jwtServiceAuth0, jwtServiceHasura);
     }
 
     @Bean
@@ -86,14 +83,12 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @Profile("hasura_auth")
     @ConfigurationProperties("application.web.hasura.secret")
     public JwtSecret jwtSecret() {
         return new JwtSecret();
     }
 
     @Bean
-    @Profile("!hasura_auth")
     @ConfigurationProperties("application.web.auth0")
     public Auth0Properties auth0Properties() {
         return new Auth0Properties();

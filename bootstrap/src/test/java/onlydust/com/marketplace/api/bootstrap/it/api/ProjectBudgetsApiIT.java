@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuo
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,7 +18,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

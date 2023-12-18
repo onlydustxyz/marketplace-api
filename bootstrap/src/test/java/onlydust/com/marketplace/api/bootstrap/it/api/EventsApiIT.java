@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredCon
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class EventsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String API_KEY = "some-api-key";

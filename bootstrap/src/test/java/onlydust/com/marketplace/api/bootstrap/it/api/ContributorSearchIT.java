@@ -5,12 +5,11 @@ import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 import java.util.UUID;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     final static String login = "antho";
     final static UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"); // kaaper

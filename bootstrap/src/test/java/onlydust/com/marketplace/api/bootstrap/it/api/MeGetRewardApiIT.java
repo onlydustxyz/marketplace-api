@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentReque
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -23,7 +22,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HasuraUserHelper userHelper;

@@ -3,13 +3,12 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class MeGetContributedReposApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     HasuraUserHelper userHelper;

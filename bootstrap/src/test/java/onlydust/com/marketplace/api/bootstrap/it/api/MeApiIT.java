@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 import java.util.UUID;
@@ -20,7 +19,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class MeApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

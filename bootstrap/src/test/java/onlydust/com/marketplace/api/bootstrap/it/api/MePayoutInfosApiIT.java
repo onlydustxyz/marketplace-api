@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
@@ -19,7 +18,7 @@ import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

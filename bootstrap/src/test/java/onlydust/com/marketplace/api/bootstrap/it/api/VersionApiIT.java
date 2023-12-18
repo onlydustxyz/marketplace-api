@@ -4,11 +4,10 @@ import onlydust.com.marketplace.api.contract.model.InlineResponse200;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class VersionApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

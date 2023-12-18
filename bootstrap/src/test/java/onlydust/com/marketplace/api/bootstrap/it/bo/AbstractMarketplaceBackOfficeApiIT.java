@@ -26,7 +26,7 @@ import java.util.Map;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-@ActiveProfiles({"it", "bo", "hasura_auth"})
+@ActiveProfiles({"it", "bo"})
 @AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers

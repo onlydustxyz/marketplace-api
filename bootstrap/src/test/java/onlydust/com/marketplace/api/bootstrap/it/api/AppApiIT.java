@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles({"hasura_auth"})
+
 public class AppApiIT extends AbstractMarketplaceApiIT {
 
 

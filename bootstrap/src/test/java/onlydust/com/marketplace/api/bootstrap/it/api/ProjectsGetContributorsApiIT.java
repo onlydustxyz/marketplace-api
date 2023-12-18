@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,7 +22,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-@ActiveProfiles({"hasura_auth"})
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
