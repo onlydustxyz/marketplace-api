@@ -1,15 +1,20 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     ApiKeyAuthenticationService.Config config;
+    @Autowired
+    BudgetRepository budgetRepository;
 
     @Test
     void should_raise_missing_authentication_given_no_api_key_when_getting_github_repos() {
@@ -487,6 +492,52 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    void should_get_stark_budgets_with_no_usd_equivalent() {
+        // Given
+        {
+            final var budget = budgetRepository.findById(UUID.fromString("7dcf96a0-ea20-4f95-99f4-89cee2bf3911"))
+                    .orElseThrow();
+            budget.setCurrency(CurrencyEnumEntity.stark);
+            budgetRepository.save(budget);
+        }
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_BUDGETS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
+                        )))
+                .header("Api-Key", config.getApiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "budgets": [
+                            {
+                              "id": "7dcf96a0-ea20-4f95-99f4-89cee2bf3911",
+                              "currency": "STARK",
+                              "initialAmount": 10000,
+                              "remainingAmount": 9000,
+                              "spentAmount": 1000,
+                              "remainingAmountDollarsEquivalent": null,
+                              "initialAmountDollarsEquivalent": null,
+                              "spentAmountDollarsEquivalent": null,
+                              "projectId": "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_project_lead_invitations() {
         // When
         client.get()
@@ -622,16 +673,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "users": [
                             {
                               "id": "eaa1ddf3-fea5-4cef-825b-336f8e775e05",
+                              "isCompany": false,
                               "companyName": null,
                               "companyNum": null,
-                              "companyFirstname": null,
-                              "companyLastname": null,
-                              "personFirstname": null,
-                              "personLastname": null,
+                              "firstname": null,
+                              "lastname": null,
                               "address": null,
                               "postCode": null,
                               "city": null,
                               "country": null,
+                              "usdPreferredMethod": null,
                               "telegram": null,
                               "twitter": "https://twitter.com/haydencleary",
                               "discord": null,
@@ -661,6 +712,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "Rust",
                                 "Shell",
                                 "CSS",
+                                "MDX",
                                 "HTML",
                                 "PLpgSQL",
                                 "Dockerfile"
@@ -670,16 +722,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "f4af340d-6923-453c-bffe-2f1ce1880ff4",
+                              "isCompany": false,
                               "companyName": null,
                               "companyNum": null,
-                              "companyFirstname": null,
-                              "companyLastname": null,
-                              "personFirstname": null,
-                              "personLastname": null,
+                              "firstname": null,
+                              "lastname": null,
                               "address": null,
                               "postCode": null,
                               "city": null,
                               "country": null,
+                              "usdPreferredMethod": null,
                               "telegram": null,
                               "twitter": null,
                               "discord": null,
@@ -709,16 +761,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "0d29b7bd-9514-4a03-ad14-99bbcbef4733",
+                              "isCompany": false,
                               "companyName": null,
                               "companyNum": null,
-                              "companyFirstname": null,
-                              "companyLastname": null,
-                              "personFirstname": null,
-                              "personLastname": null,
+                              "firstname": null,
+                              "lastname": null,
                               "address": null,
                               "postCode": null,
                               "city": null,
                               "country": null,
+                              "usdPreferredMethod": null,
                               "telegram": null,
                               "twitter": null,
                               "discord": null,
@@ -748,7 +800,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             }
                           ]
                         }
-                                                
                         """);
 
         client.get()
@@ -773,16 +824,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "users": [
                             {
                               "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                              "isCompany": false,
                               "companyName": null,
                               "companyNum": null,
-                              "companyFirstname": null,
-                              "companyLastname": null,
-                              "personFirstname": "Anthony",
-                              "personLastname": "BUISSET",
+                              "firstname": "Anthony",
+                              "lastname": "BUISSET",
                               "address": "771 chemin de la sine",
                               "postCode": "06140",
                               "city": "Vence",
                               "country": "France",
+                              "usdPreferredMethod": "CRYPTO",
                               "telegram": "https://t.me/abuisset",
                               "twitter": "https://twitter.com/abuisset",
                               "discord": "antho",
@@ -813,16 +864,16 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                             },
                             {
                               "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d",
+                              "isCompany": false,
                               "companyName": null,
                               "companyNum": null,
-                              "companyFirstname": null,
-                              "companyLastname": null,
-                              "personFirstname": null,
-                              "personLastname": null,
+                              "firstname": null,
+                              "lastname": null,
                               "address": null,
                               "postCode": null,
                               "city": null,
                               "country": null,
+                              "usdPreferredMethod": null,
                               "telegram": null,
                               "twitter": "https://twitter.com/OnlyDust_xyz",
                               "discord": null,

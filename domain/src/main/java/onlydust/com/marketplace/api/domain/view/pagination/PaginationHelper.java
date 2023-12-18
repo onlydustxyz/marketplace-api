@@ -14,7 +14,11 @@ public class PaginationHelper {
     private static final int DEFAULT_PAGE_SIZE = 50;
 
     public static int sanitizePageSize(final Integer pageSize) {
-        return isNull(pageSize) || pageSize.equals(0) ? DEFAULT_PAGE_SIZE : min(pageSize, MAXIMUM_PAGE_SIZE);
+        return sanitizePageSize(pageSize, MAXIMUM_PAGE_SIZE);
+    }
+
+    public static int sanitizePageSize(final Integer pageSize, final Integer maxPageSize) {
+        return isNull(pageSize) || pageSize.equals(0) ? DEFAULT_PAGE_SIZE : min(pageSize, maxPageSize);
     }
 
     public static int sanitizePageIndex(final Integer pageIndex) {

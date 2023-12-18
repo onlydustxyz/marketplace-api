@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.Currency;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -15,16 +16,16 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class UserView {
     UUID id;
+    Boolean isCompany;
     String companyName;
     String companyNum;
-    String companyFirstname;
-    String companyLastname;
-    String personFirstname;
-    String personLastname;
+    String firstname;
+    String lastname;
     String address;
     String postCode;
     String city;
     String country;
+    UserPayoutInformation.UsdPreferredMethodEnum usdPreferredMethod;
     String telegram;
     String twitter;
     String discord;

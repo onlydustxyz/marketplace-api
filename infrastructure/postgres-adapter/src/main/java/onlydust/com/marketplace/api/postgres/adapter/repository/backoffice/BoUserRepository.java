@@ -19,7 +19,7 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                                                  CAST((languages -> jsonb_object_keys(languages)) AS int) AS value
                                           FROM (SELECT contributor_id, jsonb_concat_agg(languages) languages
                                                 FROM indexer_exp.contributions c
-                                                         JOIN github_repos r ON r.id = c.repo_id
+                                                         JOIN indexer_exp.github_repos r ON r.id = c.repo_id
                                                 GROUP BY contributor_id) repo_languages_stats
                                           ORDER BY value DESC) repo_languages
                                     group by contributor_id),
@@ -34,16 +34,16 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                    u.created_at                                        AS created_at,
                    GREATEST(upay.tech_updated_at, upi.tech_updated_at, u.created_at) AS updated_at,
                    u.last_seen_at                                      AS last_seen_at,
+                   upay.identity #> '{Company}' IS NOT NULL            AS is_company,
                    upay.identity #>> '{Company,name}'                  AS company_name,
                    upay.identity #>> '{Company,identification_number}' AS company_num,
-                   upay.identity #>> '{Company,owner,firstname}'       AS company_firstname,
-                   upay.identity #>> '{Company,owner,lastname}'        AS company_lastname,
-                   upay.identity #>> '{Person,firstname}'              AS person_firstname,
-                   upay.identity #>> '{Person,lastname}'               AS person_lastname,
+                   COALESCE(upay.identity #>> '{Company,owner,firstname}', upay.identity #>> '{Person,firstname}') AS firstname,
+                   COALESCE(upay.identity #>> '{Company,owner,lastname}', upay.identity #>> '{Person,lastname}')   AS lastname,
                    upay.location #>> '{address}'                       AS address,
                    upay.location #>> '{post_code}'                     AS post_code,
                    upay.location #>> '{city}'                          AS city,
                    upay.location #>> '{country}'                       AS country,
+                   upay.usd_preferred_method                           AS usd_preferred_method,
                    ba.bic                                              AS bic,
                    ba.iban                                             AS iban,
                    eth_name.address                                    AS ens,

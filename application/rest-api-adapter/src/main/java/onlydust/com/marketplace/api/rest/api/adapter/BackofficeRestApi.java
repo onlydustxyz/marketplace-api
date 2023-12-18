@@ -26,11 +26,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 public class BackofficeRestApi implements BackofficeApi {
 
     private final BackofficeFacadePort backofficeFacadePort;
+    final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
     @Override
     public ResponseEntity<GithubRepositoryPage> getGithubRepositoryPage(Integer pageIndex, Integer pageSize,
                                                                         List<UUID> projectIds) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectRepositoryView> projectRepositoryViewPage =
                 backofficeFacadePort.getProjectRepositoryPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
@@ -54,7 +55,7 @@ public class BackofficeRestApi implements BackofficeApi {
                 .build();
 
         final var sponsorPage =
-                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
+                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
 
         final var response = mapSponsorPageToContract(sponsorPage, sanitizedPageIndex);
 
@@ -66,7 +67,7 @@ public class BackofficeRestApi implements BackofficeApi {
 
     @Override
     public ResponseEntity<BudgetPage> getBudgetPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectBudgetView> budgetViewPage =
                 backofficeFacadePort.getBudgetPage(sanitizedPageIndex, sanitizedPageSize, projectIds);
@@ -82,7 +83,7 @@ public class BackofficeRestApi implements BackofficeApi {
     @Override
     public ResponseEntity<ProjectLeadInvitationPage> getProjectLeadInvitationPage(Integer pageIndex, Integer pageSize
             , List<UUID> ids, List<UUID> projectIds) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
+        final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         Page<ProjectLeadInvitationView> projectLeadInvitationViewPage =
                 backofficeFacadePort.getProjectLeadInvitationPage(sanitizedPageIndex, sanitizedPageSize, ids, projectIds);
@@ -102,7 +103,7 @@ public class BackofficeRestApi implements BackofficeApi {
         final var filters = UserView.Filters.builder()
                 .users(Optional.ofNullable(userIds).orElse(List.of()))
                 .build();
-        final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
+        final var usersPage = backofficeFacadePort.listUsers(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
         final var response = mapUserPageToContract(usersPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
@@ -118,7 +119,7 @@ public class BackofficeRestApi implements BackofficeApi {
                 .projects(Optional.ofNullable(projectIds).orElse(List.of()))
                 .payments(Optional.ofNullable(paymentIds).orElse(List.of()))
                 .build();
-        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize), filters);
+        final var paymentsPage = backofficeFacadePort.listPayments(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
         final var response = mapPaymentPageToContract(paymentsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
@@ -129,7 +130,7 @@ public class BackofficeRestApi implements BackofficeApi {
     @Override
     public ResponseEntity<ProjectPage> getProjectPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var paymentsPage = backofficeFacadePort.listProjects(sanitizedPageIndex, sanitizePageSize(pageSize), projectIds);
+        final var paymentsPage = backofficeFacadePort.listProjects(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), projectIds);
         final var response = mapProjectPageToContract(paymentsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
