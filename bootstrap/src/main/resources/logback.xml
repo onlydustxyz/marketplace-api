@@ -1,6 +1,31 @@
 <configuration>
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                <maxLength>8000</maxLength>
+                <shortenedClassNameLength>40</shortenedClassNameLength>
+                <rootCauseFirst>true</rootCauseFirst>
+                <inlineHash>true</inlineHash>
+
+                <!-- generated class names -->
+                <exclude>\$\$FastClassByCGLIB\$\$</exclude>
+                <exclude>\$\$EnhancerBySpringCGLIB\$\$</exclude>
+                <exclude>^sun\.reflect\..*\.invoke</exclude>
+                <!-- JDK internals -->
+                <exclude>^com\.sun\.</exclude>
+                <exclude>^sun\.net\.</exclude>
+                <!-- dynamic invocation -->
+                <exclude>^net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+                <exclude>^org\.springframework\.cglib\.</exclude>
+                <exclude>^org\.springframework\.transaction\.</exclude>
+                <exclude>^org\.springframework\.aop\.</exclude>
+                <exclude>^org\.springframework\.beans\.</exclude>
+                <exclude>^java\.lang\.reflect\.Method\.invoke</exclude>
+            </throwableConverter>
+            <shortenedLoggerNameLength>40</shortenedLoggerNameLength>
+            <timeZone>UTC</timeZone>
+        </encoder>
     </appender>
 
     <springProfile name="local">
