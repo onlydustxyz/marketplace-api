@@ -25,6 +25,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     Long githubUserId;
     String login;
     String avatarUrl;
+    String email;
 
     @Autowired
     JWTVerifier jwtVerifier;
@@ -38,6 +39,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         githubUserId = faker.number().randomNumber();
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
+        email = faker.internet().emailAddress();
         ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
@@ -78,6 +80,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(false)
                 .jsonPath("$.id").isNotEmpty();
 
         waitAtLeastOneCycleOfOutboxEventProcessing();
@@ -88,7 +91,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When we call it again (already signed-up)
         indexerApiWireMockServer.resetRequests();
-        
+
         client.get()
                 .uri(getApiURI(ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
@@ -102,13 +105,14 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(false)
                 .jsonPath("$.id").isNotEmpty();
 
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
     }
 
-    //    @Test
+    @Test
     void should_get_current_user_with_onboarding_data() {
         // Given
         final UserEntity user = UserEntity.builder()
@@ -116,7 +120,9 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubUserId(githubUserId)
                 .githubLogin(login)
                 .githubAvatarUrl(avatarUrl)
-                .roles(new UserRole[]{UserRole.USER})
+                .email(email)
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .build();
         userRepository.save(user);
 
@@ -141,6 +147,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
     }
 }

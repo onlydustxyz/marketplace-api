@@ -103,6 +103,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.isAdmin").isEqualTo(false)
                 .jsonPath("$.id").isEqualTo(userId.toString());
     }
 
@@ -167,6 +168,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(false)
                 .jsonPath("$.id").isEqualTo(userId.toString());
     }
 
@@ -203,6 +205,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                         "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp")
                 .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(true)
                 .jsonPath("$.id").isEqualTo(userId.toString());
 
         final var iamUser = userRepository.findById(userId);
