@@ -77,7 +77,7 @@ public class BoPaymentEntity {
             public UserPayoutInformation.Company toDomain() {
                 return UserPayoutInformation.Company.builder()
                         .name(name)
-                        .owner(owner.toDomain())
+                        .owner(owner == null ? null : owner.toDomain())
                         .identificationNumber(identificationNumber)
                         .build();
             }
