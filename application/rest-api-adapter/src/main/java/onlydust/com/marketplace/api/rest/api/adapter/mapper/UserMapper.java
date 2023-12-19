@@ -244,6 +244,7 @@ public interface UserMapper {
                 )
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
+        getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
         return getMeResponse;
     }
 

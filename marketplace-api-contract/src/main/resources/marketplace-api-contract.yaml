@@ -3710,6 +3710,7 @@ components:
           required:
             - hasSeenOnboardingWizard
             - hasAcceptedLatestTermsAndConditions
+            - isAdmin
           properties:
             hasSeenOnboardingWizard:
               type: boolean
@@ -3732,6 +3733,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectId'
+            isAdmin:
+              type: boolean
+              description: True if the user is an OnlyDust admin
 
     ProjectLedShortResponse:
       type: object

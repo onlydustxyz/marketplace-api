@@ -38,4 +38,8 @@ public class User {
     public boolean hasSeenOnboardingWizard() {
         return hasSeenOnboardingWizard;
     }
+
+    public boolean hasRole(UserRole role) {
+        return roles.contains(role);
+    }
 }
