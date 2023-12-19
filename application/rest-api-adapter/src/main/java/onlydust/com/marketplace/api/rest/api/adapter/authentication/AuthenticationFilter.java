@@ -31,12 +31,18 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         final String impersonationHeader = httpServletRequest.getHeader(IMPERSONATION_HEADER);
         if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
-                    .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                            () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""),
-                                            impersonationHeader)
-                                    .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                                            SecurityContextHolder::clearContext));
+            try {
+                jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
+                        .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                                () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX,
+                                                        ""),
+                                                impersonationHeader)
+                                        .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                                                SecurityContextHolder::clearContext));
+            } catch (Exception e) {
+                LOGGER.error("Error while authenticating user", e);
+                SecurityContextHolder.clearContext();
+            }
         }
 
         filterChain.doFilter(httpServletRequest, httpServletResponse);
