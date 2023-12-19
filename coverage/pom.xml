@@ -21,29 +21,67 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>domain</artifactId>
-        </dependency>
+        <!-- Application -->
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>rest-api-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>postgres-adapter</artifactId>
+            <artifactId>cron-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <!-- Bootstrap -->
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Domain -->
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Infrastructure -->
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>aws-s3-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.onlydust.marketplace.api</groupId>
             <artifactId>github-api-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>bootstrap</artifactId>
+            <artifactId>indexer-api-client-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.onlydust.marketplace.api</groupId>
+            <artifactId>linear-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>od-rust-api-client-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>postgres-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>webhook-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
