@@ -19,6 +19,8 @@ infrastructure:
 spring:
   main:
     allow-bean-definition-overriding: true
+  liquibase:
+    enabled: true
 application:
   web:
     machine-to-machine:
