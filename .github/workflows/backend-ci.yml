@@ -40,6 +40,12 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - run: ./mvnw test -T 6
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/target/site/jacoco-aggregate/jacoco.xml
+          flags: unit_tests
 
   integration_tests:
     name: Integration tests
@@ -56,3 +62,9 @@ jobs:
           java-version: '17'
           cache: 'maven'
       - run: ./mvnw verify -T 6
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/target/site/jacoco-aggregate/jacoco.xml
+          flags: integration_tests
