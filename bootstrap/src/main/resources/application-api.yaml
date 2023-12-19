@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: marketplace-api
+  liquibase:
+    enabled: true

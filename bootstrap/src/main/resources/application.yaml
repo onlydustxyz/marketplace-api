@@ -26,10 +26,8 @@ application:
     indexer-sync-job-delay: 5000 # 5 seconds
 
 spring:
-  application:
-    name: marketplace-api
   liquibase:
-    enabled: true
+    enabled: false
   datasource:
     url: ${JDBC_DATABASE_URL}
     username: ${DATABASE_USERNAME}
