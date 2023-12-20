@@ -22,6 +22,7 @@
         <module>od-rust-api-client-adapter</module>
         <module>webhook-adapter</module>
         <module>linear-adapter</module>
+        <module>auth0-api-client-adapter</module>
     </modules>
 
     <properties>
