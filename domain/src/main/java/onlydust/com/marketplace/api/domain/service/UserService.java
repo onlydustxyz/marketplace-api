@@ -34,22 +34,30 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity) {
+    public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean createIfNotExists) {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
+                    userStoragePort.updateUserIdentity(user.getId(),
+                            githubUserIdentity.getGithubLogin(),
+                            githubUserIdentity.getGithubAvatarUrl(),
+                            githubUserIdentity.getEmail(),
+                            dateProvider.now());
                     return user;
                 })
                 .orElseGet(() -> {
+                    if (!createIfNotExists) {
+                        throw OnlyDustException.notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
+                    }
                     final var user = User.builder()
                             .id(UUID.randomUUID())
                             .roles(List.of(UserRole.USER))
                             .githubUserId(githubUserIdentity.getGithubUserId())
-                            .avatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                            .login(githubUserIdentity.getGithubLogin())
+                            .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                            .githubLogin(githubUserIdentity.getGithubLogin())
+                            .githubEmail(githubUserIdentity.getEmail())
                             .build();
                     userStoragePort.createUser(user);
                     userObserverPort.onUserSignedUp(user);
@@ -181,7 +189,7 @@ public class UserService implements UserFacadePort {
         }
         final GithubMembership githubMembership =
                 githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken,
-                        user.getLogin(), org.getLogin());
+                        user.getGithubLogin(), org.getLogin());
         if (org.getIsInstalled() && (githubMembership.equals(GithubMembership.MEMBER) || githubMembership.equals(GithubMembership.ADMIN))) {
             return false;
         }

@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -55,7 +56,7 @@ public class UserServiceTest {
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final User user =
-                User.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).login(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -71,7 +72,7 @@ public class UserServiceTest {
                                 .hasMissingOptimismWallet(false)
                                 .hasMissingBankingAccount(false)
                                 .build()).build());
-        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity);
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         assertEquals(user, userByGithubIdentity);
@@ -84,7 +85,7 @@ public class UserServiceTest {
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final User user =
-                User.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).login(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -101,7 +102,7 @@ public class UserServiceTest {
                                 .hasMissingOptimismWallet(false)
                                 .hasMissingBankingAccount(false)
                                 .build()).build());
-        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity);
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         assertEquals(user, userByGithubIdentity);
@@ -117,11 +118,26 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
-        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity);
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
 
         // Then
         assertThat(userByGithubIdentity.getId()).isNotNull();
-        assertEquals(User.builder().id(userByGithubIdentity.getId()).avatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).login(githubUserIdentity.getGithubLogin()).roles(List.of(UserRole.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
+        assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(UserRole.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
+    }
+
+    @Test
+    void should_throw_exception_when_user_with_github_id_doesnt_exist_and_create_if_not_exists_is_false() {
+        // Given
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+
+        // When
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
+
+        // Then
+        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, false))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
     }
 
 
@@ -518,7 +534,8 @@ public class UserServiceTest {
     void should_fail_to_claim_project_if_user_not_github_admin_on_every_orga() {
         // Given
         final String githubAccessToken = faker.rickAndMorty().character();
-        final User user = User.builder().githubUserId(faker.random().nextLong()).login(faker.pokemon().name()).build();
+        final User user =
+                User.builder().githubUserId(faker.random().nextLong()).githubLogin(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -554,12 +571,18 @@ public class UserServiceTest {
                                         .build()
                         ))
                         .build());
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org4")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org5")).thenReturn(GithubMembership.EXTERNAL);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org6")).thenReturn(GithubMembership.EXTERNAL);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org4")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org5")).thenReturn(GithubMembership.EXTERNAL);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org6")).thenReturn(GithubMembership.EXTERNAL);
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
@@ -580,7 +603,7 @@ public class UserServiceTest {
         final String githubAccessToken = faker.rickAndMorty().character();
         final User user = User.builder().id(UUID.randomUUID())
                 .githubUserId(faker.random().nextLong())
-                .login(faker.pokemon().name()).build();
+                .githubLogin(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
@@ -609,10 +632,14 @@ public class UserServiceTest {
                                         .build()
                         ))
                         .build());
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getLogin(), "org4")).thenReturn(GithubMembership.EXTERNAL);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+                "org4")).thenReturn(GithubMembership.EXTERNAL);
         userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
 
         // Then

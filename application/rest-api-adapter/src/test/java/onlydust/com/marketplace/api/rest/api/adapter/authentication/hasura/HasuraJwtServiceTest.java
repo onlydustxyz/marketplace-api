@@ -33,8 +33,8 @@ public class HasuraJwtServiceTest {
 
         final var user = User.builder()
                 .id(userId)
-                .login(userLogin)
-                .avatarUrl(avatarUrl)
+                .githubLogin(userLogin)
+                .githubAvatarUrl(avatarUrl)
                 .githubUserId(userGithubId)
                 .roles(isAdmin ? List.of(UserRole.ADMIN, UserRole.USER) : List.of(UserRole.USER))
                 .hasSeenOnboardingWizard(true)
@@ -46,7 +46,7 @@ public class HasuraJwtServiceTest {
                         .githubUserId(userGithubId)
                         .githubLogin(userLogin)
                         .githubAvatarUrl(avatarUrl)
-                        .build())
+                        .build(), false)
         ).thenReturn(user);
 
         return user;
@@ -69,8 +69,8 @@ public class HasuraJwtServiceTest {
                                 HasuraJwtPayload.HasuraClaims.builder()
                                         .userId(user.getId())
                                         .githubUserId(user.getGithubUserId())
-                                        .login(user.getLogin())
-                                        .avatarUrl(user.getAvatarUrl())
+                                        .login(user.getGithubLogin())
+                                        .avatarUrl(user.getGithubAvatarUrl())
                                         .allowedRoles(List.of("me", "registered_user", "public"))
                                         .build()
                         )
@@ -78,7 +78,8 @@ public class HasuraJwtServiceTest {
         final String jwtToken = JwtHelper.generateValidJwtFor(jwtSecret, hasuraJwtPayload);
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, null);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken,
+                null);
 
         // Then
         assertThat(authentication).isPresent();
@@ -95,8 +96,8 @@ public class HasuraJwtServiceTest {
         assertThat(authenticationFromJwt.isImpersonating()).isFalse();
         assertThat(authenticationFromJwt.isImpersonating()).isFalse();
         assertThat(authenticationFromJwt.getImpersonator()).isNull();
-        assertThat(((HasuraAuthentication)authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
-        assertThat(((HasuraAuthentication)authenticationFromJwt).getImpersonationHeader()).isNull();
+        assertThat(((HasuraAuthentication) authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
+        assertThat(((HasuraAuthentication) authenticationFromJwt).getImpersonationHeader()).isNull();
     }
 
 
@@ -129,7 +130,8 @@ public class HasuraJwtServiceTest {
                 faker.cat().name() + "." + faker.pokemon().name() + "." + faker.pokemon().name();
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, null);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken,
+                null);
 
         // Then
         assertThat(authentication).isNotPresent();
@@ -169,8 +171,8 @@ public class HasuraJwtServiceTest {
                                 HasuraJwtPayload.HasuraClaims.builder()
                                         .userId(user.getId())
                                         .githubUserId(user.getGithubUserId())
-                                        .login(user.getLogin())
-                                        .avatarUrl(user.getAvatarUrl())
+                                        .login(user.getGithubLogin())
+                                        .avatarUrl(user.getGithubAvatarUrl())
                                         .isAnOnlydustAdmin(true)
                                         .allowedRoles(List.of("me", "registered_user", "public"))
                                         .build()
@@ -201,11 +203,11 @@ public class HasuraJwtServiceTest {
                         .githubUserId(595505L)
                         .githubLogin("ofux")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
-                        .build())
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.fromString("50aa4318-141a-4027-8f74-c135d8d166b0"))
-                .login("ofux")
-                .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
+                .githubLogin("ofux")
+                .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
                 .roles(List.of(UserRole.USER))
                 .hasSeenOnboardingWizard(false)
@@ -213,7 +215,8 @@ public class HasuraJwtServiceTest {
                 .build());
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, impersonationHeader);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken,
+                impersonationHeader);
 
         // Then
         assertThat(authentication).isPresent();
@@ -221,11 +224,12 @@ public class HasuraJwtServiceTest {
         assertTrue(authenticationFromJwt.isAuthenticated());
         assertThat(authenticationFromJwt.getName()).isEqualTo("ofux");
         assertThat(authenticationFromJwt.getPrincipal()).isEqualTo("ofux");
-        assertThat(authenticationFromJwt.getUser().getId().toString()).isEqualTo("50aa4318-141a-4027-8f74-c135d8d166b0");
+        assertThat(authenticationFromJwt.getUser().getId().toString()).isEqualTo("50aa4318-141a-4027-8f74" +
+                                                                                 "-c135d8d166b0");
         assertThat(authenticationFromJwt.getUser().getRoles()).containsExactlyInAnyOrder(UserRole.USER);
         assertThat(authenticationFromJwt.getUser().getGithubUserId()).isEqualTo(595505L);
-        assertThat(((HasuraAuthentication)authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
-        assertThat(((HasuraAuthentication)authenticationFromJwt).getImpersonationHeader()).isEqualTo(impersonationHeader);
+        assertThat(((HasuraAuthentication) authenticationFromJwt).getJwt()).isEqualTo(jwtToken);
+        assertThat(((HasuraAuthentication) authenticationFromJwt).getImpersonationHeader()).isEqualTo(impersonationHeader);
 
         assertThat(authenticationFromJwt.isImpersonating()).isTrue();
         assertThat(authenticationFromJwt.getImpersonator()).isNotNull();
@@ -251,8 +255,8 @@ public class HasuraJwtServiceTest {
                                 HasuraJwtPayload.HasuraClaims.builder()
                                         .userId(user.getId())
                                         .githubUserId(user.getGithubUserId())
-                                        .login(user.getLogin())
-                                        .avatarUrl(user.getAvatarUrl())
+                                        .login(user.getGithubLogin())
+                                        .avatarUrl(user.getGithubAvatarUrl())
                                         .isAnOnlydustAdmin(false)
                                         .allowedRoles(List.of("me", "registered_user", "public"))
                                         .build()
@@ -283,11 +287,11 @@ public class HasuraJwtServiceTest {
                         .githubUserId(595505L)
                         .githubLogin("foo")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
-                        .build())
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.fromString("50aa4318-141a-4027-8f74-c135d8d166b0"))
-                .login("foo")
-                .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
+                .githubLogin("foo")
+                .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
                 .roles(List.of(UserRole.USER))
                 .hasSeenOnboardingWizard(true)
@@ -295,7 +299,8 @@ public class HasuraJwtServiceTest {
                 .build());
 
         // When
-        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken, impersonationHeader);
+        final Optional<OnlyDustAuthentication> authentication = hasuraJwtService.getAuthenticationFromJwt(jwtToken,
+                impersonationHeader);
 
         // Then
         assertThat(authentication).isNotPresent();

@@ -37,7 +37,7 @@ public class HasuraJwtService implements JwtService {
                 .githubUserId(githubUserId)
                 .githubLogin(claims.getLogin())
                 .githubAvatarUrl(claims.getAvatarUrl())
-                .build());
+                .build(), false);
     }
 
     public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt,
@@ -97,7 +97,7 @@ public class HasuraJwtService implements JwtService {
                 .credentials(hasuraJwtPayload)
                 .isAuthenticated(true)
                 .claims(hasuraJwtPayload.getClaims())
-                .principal(user.getLogin())
+                .principal(user.getGithubLogin())
                 .impersonating(false)
                 .jwt(jwt)
                 .build());
@@ -107,7 +107,7 @@ public class HasuraJwtService implements JwtService {
                                                                                       final String impersonationHeader, final String jwt) {
 
         if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
-            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
+            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
             return Optional.empty();
         }
         final HasuraJwtPayload.HasuraClaims claims;
@@ -128,7 +128,7 @@ public class HasuraJwtService implements JwtService {
                 .credentials(hasuraJwtPayload)
                 .isAuthenticated(true)
                 .claims(claims)
-                .principal(impersonated.getLogin())
+                .principal(impersonated.getGithubLogin())
                 .impersonating(true)
                 .impersonator(impersonator)
                 .jwt(jwt)

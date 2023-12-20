@@ -220,8 +220,8 @@ public interface UserMapper {
         final GetMeResponse getMeResponse = new GetMeResponse();
         getMeResponse.setId(authenticatedUser.getId());
         getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
-        getMeResponse.setAvatarUrl(authenticatedUser.getAvatarUrl());
-        getMeResponse.setLogin(authenticatedUser.getLogin());
+        getMeResponse.setAvatarUrl(authenticatedUser.getGithubAvatarUrl());
+        getMeResponse.setLogin(authenticatedUser.getGithubLogin());
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
         getMeResponse.setHasValidPayoutInfos(authenticatedUser.getHasValidPayoutInfos());

@@ -21,7 +21,7 @@ class TechnologiesServiceTest {
     @Test
     public void should_create_an_issue_upon_technology_suggestion() {
         final var githubUsername = faker.name().username();
-        final var requester = User.builder().login(githubUsername).build();
+        final var requester = User.builder().githubLogin(githubUsername).build();
 
         technologiesService.suggest("Rust", requester);
         verify(trackingIssuePort).createIssueForTechTeam("New technology suggestion: Rust",

@@ -76,7 +76,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
         assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
         assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo(avatarUrl);
-        assertThat(iamUser.get().getEmail()).isEqualTo(email);
+        assertThat(iamUser.get().getGithubEmail()).isEqualTo(email);
         assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
 
         final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
@@ -134,7 +134,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         assertThat(iamUser.get().getGithubUserId()).isEqualTo(githubUserId);
         assertThat(iamUser.get().getGithubLogin()).isEqualTo(login);
         assertThat(iamUser.get().getGithubAvatarUrl()).isEqualTo(avatarUrl);
-        assertThat(iamUser.get().getEmail()).isEqualTo(email);
+        assertThat(iamUser.get().getGithubEmail()).isEqualTo(email);
         assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
@@ -217,5 +217,34 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         assertThat(iamUser.get().getRoles()).containsExactly(UserRole.USER, UserRole.ADMIN);
         assertThat(iamUser.get().getLastSeenAt().toInstant()).isGreaterThan(LocalDateTime.parse("2023-12-14T08:00:00" +
                                                                                                 ".000").toInstant(java.time.ZoneOffset.UTC));
+    }
+
+    @Test
+    @Order(5)
+    void should_fail_to_get_unexisting_user() throws JsonProcessingException {
+        // Given
+        Long githubUserId = faker.number().randomNumber();
+        String login = faker.name().username();
+        String avatarUrl = faker.internet().avatar();
+        UUID userId = UUID.randomUUID();
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(userId)
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(githubUserId)
+                        .avatarUrl(avatarUrl)
+                        .login(login)
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .exchange()
+                // Then
+                .expectStatus().is4xxClientError();
     }
 }

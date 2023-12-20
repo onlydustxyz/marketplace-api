@@ -27,13 +27,14 @@ public class JwtVerifierStub implements JWTVerifier {
         return verify(jwt.getToken());
     }
 
-    public void withJwtMock(String token, Long githubUserId, String login, String avatarUrl) {
+    public void withJwtMock(String token, Long githubUserId, String login, String avatarUrl, String email) {
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
         when(decodedJWT.getSubject()).thenReturn("github|" + githubUserId);
         when(decodedJWT.getPayload()).thenReturn(Base64.getUrlEncoder().encodeToString(String.format("""
                 {
                   "nickname": "%s",
                   "picture": "%s",
+                  "email": "%s",
                   "updated_at": "2023-10-10T13:55:48.308Z",
                   "iss": "https://onlydust-hackathon.eu.auth0.com/",
                   "aud": "62GDg2a6pCjnAln1FccD55eCKLJtj4T5",
@@ -43,7 +44,7 @@ public class JwtVerifierStub implements JWTVerifier {
                   "sid": "21FFEt3yU2ESFcTtqW5xAilRFJ04auUb",
                   "nonce": "j4CwZI11uuV3tDzwq4UyDEKiWiIg-Z3fWWWUzp2UXIk"
                 }
-                """, login, avatarUrl, githubUserId).getBytes()));
+                """, login, avatarUrl, email, githubUserId).getBytes()));
 
         decodedJWTPerToken.put(token, decodedJWT);
     }

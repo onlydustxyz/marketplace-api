@@ -15,6 +15,6 @@ public class UserObserver implements UserObserverPort {
 
     @Override
     public void onUserSignedUp(User user) {
-        indexerOutbox.push(new UserSignedUp(user.getId(), user.getGithubUserId(), user.getLogin(), new Date()));
+        indexerOutbox.push(new UserSignedUp(user.getId(), user.getGithubUserId(), user.getGithubLogin(), new Date()));
     }
 }
