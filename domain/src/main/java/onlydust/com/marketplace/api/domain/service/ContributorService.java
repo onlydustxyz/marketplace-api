@@ -6,10 +6,7 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
-import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -26,6 +23,7 @@ public class ContributorService implements ContributorFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final UserStoragePort userStoragePort;
     private final ContributionStoragePort contributionStoragePort;
+    private final RewardStoragePort rewardStoragePort;
 
     @Override
     public Pair<List<Contributor>, List<Contributor>> searchContributors(final UUID projectId, final Set<Long> repoIds,
@@ -69,6 +67,11 @@ public class ContributorService implements ContributorFacadePort {
     @Override
     public List<Currency> getRewardCurrencies(Long githubUserId) {
         return userStoragePort.listRewardCurrencies(githubUserId);
+    }
+
+    @Override
+    public List<Project> rewardingProjects(Long githubUserId) {
+        return rewardStoragePort.listProjectsByRecipient(githubUserId);
     }
 
     private List<Contributor> searchInternalContributors(UUID projectId, Set<Long> repoIds, String login,

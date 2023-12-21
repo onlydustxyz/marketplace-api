@@ -90,8 +90,9 @@ public class DomainConfiguration {
     public ContributorFacadePort contributorFacadePort(final ProjectStoragePort projectStoragePort,
                                                        final GithubSearchPort githubSearchPort,
                                                        final UserStoragePort userStoragePort,
-                                                       final ContributionStoragePort contributionStoragePort) {
-        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort);
+                                                       final ContributionStoragePort contributionStoragePort,
+                                                       final RewardStoragePort rewardStoragePort) {
+        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort, rewardStoragePort);
     }
 
 
