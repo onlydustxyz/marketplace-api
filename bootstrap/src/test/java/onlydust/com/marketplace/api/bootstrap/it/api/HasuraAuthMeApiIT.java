@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraJwtHelper;
 import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtPayload;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.MethodOrderer;
@@ -53,7 +56,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_current_user_given_a_valid_jwt() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         String email = faker.internet().emailAddress();
@@ -111,7 +114,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_get_current_user_with_onboarding_data() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         String email = faker.internet().emailAddress();
@@ -223,7 +226,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_fail_to_get_unexisting_user() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         UUID userId = UUID.randomUUID();
@@ -246,5 +249,152 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus().is4xxClientError();
+    }
+
+    @SneakyThrows
+    @Test
+    void should_get_impersonated_user() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber(15, true))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final UserEntity impersonatedUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(impersonatorUser.getGithubUserId() + faker.number().numberBetween(1, 1000))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatedUser);
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(impersonatorUser.getId())
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(impersonatorUser.getGithubUserId())
+                        .avatarUrl(impersonatorUser.getGithubAvatarUrl())
+                        .login(impersonatorUser.getGithubLogin())
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"x-hasura-githubUserId\":%d}".formatted(impersonatedUser.getGithubUserId())
+                )
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.login").isEqualTo(impersonatedUser.getGithubLogin())
+                .jsonPath("$.githubUserId").isEqualTo(impersonatedUser.getGithubUserId())
+                .jsonPath("$.avatarUrl").isEqualTo(impersonatedUser.getGithubAvatarUrl())
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(false)
+                .jsonPath("$.id").isEqualTo(impersonatedUser.getId().toString());
+    }
+
+    @SneakyThrows
+    @Test
+    void should_fail_to_impersonate_non_registered_user() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber(15, true))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final long impersonatedUserId = impersonatorUser.getGithubUserId() + faker.number().numberBetween(1, 1000);
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(impersonatorUser.getId())
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(impersonatorUser.getGithubUserId())
+                        .avatarUrl(impersonatorUser.getGithubAvatarUrl())
+                        .login(impersonatorUser.getGithubLogin())
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"x-hasura-githubUserId\":%d}".formatted(impersonatedUserId)
+                )
+                .exchange()
+                // Then
+                .expectStatus().isUnauthorized();
+    }
+
+    @SneakyThrows
+    @Test
+    void should_fail_to_impersonate_user_when_not_admin() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(faker.number().randomNumber(15, true))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final UserEntity impersonatedUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(impersonatorUser.getGithubUserId() + faker.number().numberBetween(1, 1000))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatedUser);
+
+        final String jwt = HasuraJwtHelper.generateValidJwtFor(jwtSecret, HasuraJwtPayload.builder()
+                .iss(jwtSecret.getIssuer())
+                .claims(HasuraJwtPayload.HasuraClaims.builder()
+                        .userId(impersonatorUser.getId())
+                        .allowedRoles(List.of("me"))
+                        .githubUserId(impersonatorUser.getGithubUserId())
+                        .avatarUrl(impersonatorUser.getGithubAvatarUrl())
+                        .login(impersonatorUser.getGithubLogin())
+                        .build())
+                .build());
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"x-hasura-githubUserId\":%d}".formatted(impersonatedUser.getGithubUserId())
+                )
+                .exchange()
+                // Then
+                .expectStatus().isUnauthorized();
     }
 }
