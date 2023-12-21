@@ -20,15 +20,18 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsEntity, 
                 COALESCE(JSONB_AGG(DISTINCT pr.recipient_id) FILTER ( WHERE pr.recipient_id IS NOT NULL ), '[]') AS reward_recipient_ids
             FROM budgets b
                 JOIN projects_budgets pb ON pb.budget_id = b.id
-                LEFT JOIN payment_requests pr ON pr.project_id = pb.project_id AND pr.currency = b.currency
+                LEFT JOIN payment_requests pr ON 
+                    pr.project_id = pb.project_id AND 
+                    pr.currency = b.currency AND 
+                    (COALESCE(:contributorIds) IS NULL OR pr.recipient_id IN (:contributorIds)) AND
+                    (:fromDate IS NULL OR pr.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
+                    (:toDate IS NULL OR pr.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
                 LEFT JOIN work_items wi ON wi.payment_id = pr.id
                 LEFT JOIN crypto_usd_quotes cuq ON cuq.currency = b.currency
             WHERE
                 pb.project_id = :projectId AND 
-                (COALESCE(:currencies) IS NULL OR CAST(pr.currency AS TEXT) IN (:currencies)) AND
-                (COALESCE(:contributorIds) IS NULL OR pr.recipient_id IN (:contributorIds)) AND
-                (:fromDate IS NULL OR pr.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
-                (:toDate IS NULL OR pr.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+                (COALESCE(:currencies) IS NULL OR CAST(b.currency AS TEXT) IN (:currencies))
+                
             GROUP BY
                 b.currency, 
                 b.initial_amount, 
