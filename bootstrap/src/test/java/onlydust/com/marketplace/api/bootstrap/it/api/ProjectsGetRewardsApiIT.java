@@ -467,11 +467,11 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.rewardedUserLogin != 'gregcha')]").doesNotExist()
-                .jsonPath("$.remainingBudget.amount").isEqualTo(28)
-                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(42000)
-                .jsonPath("$.spentAmount.amount").isEqualTo(9)
-                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.remainingBudget.amount").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(13500)
                 .jsonPath("$.sentRewardsCount").isEqualTo(9)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(3)
@@ -506,11 +506,11 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 // we do not have any incorrect date
                 .jsonPath("$.rewards[?(@.requestedAt < '2023-09-25')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
-                .jsonPath("$.remainingBudget.amount").isEqualTo(28)
-                .jsonPath("$.remainingBudget.currency").isEqualTo("ETH")
-                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(42000)
-                .jsonPath("$.spentAmount.amount").isEqualTo(2)
-                .jsonPath("$.spentAmount.currency").isEqualTo("ETH")
+                .jsonPath("$.remainingBudget.amount").doesNotExist()
+                .jsonPath("$.remainingBudget.currency").doesNotExist()
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(80141250)
+                .jsonPath("$.spentAmount.amount").doesNotExist()
+                .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(3000)
                 .jsonPath("$.sentRewardsCount").isEqualTo(2)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(1)
@@ -533,7 +533,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "10000",
                         "fromDate", "2023-09-25",
                         "toDate", "2023-09-25",
-                        "currencies", "OP"
+                        "currencies", "STARK"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
@@ -547,6 +547,33 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.spentAmount.amount").doesNotExist()
                 .jsonPath("$.spentAmount.currency").doesNotExist()
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
+                .jsonPath("$.sentRewardsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
+                .jsonPath("$.rewardedContributorsCount").isEqualTo(0);
+
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10000",
+                        "fromDate", "2020-09-25",
+                        "toDate", "2020-09-25",
+                        "currencies", "USD"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.rewards").isEmpty()
+                .jsonPath("$.remainingBudget.amount").isEqualTo(99250)
+                .jsonPath("$.remainingBudget.currency").isEqualTo("USD")
+                .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(99250)
+                .jsonPath("$.spentAmount.amount").isEqualTo(0)
+                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.sentRewardsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
