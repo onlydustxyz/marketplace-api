@@ -65,4 +65,13 @@ public class AuthenticationService {
             throw OnlyDustException.forbidden("User must be authenticated with hasura-auth");
         }
     }
+
+    @Deprecated
+    public Optional<HasuraAuthentication> tryGetHasuraAuthentication() {
+        final Authentication authentication = authenticationContext.getAuthenticationFromContext();
+        if (authentication.isAuthenticated() && authentication instanceof HasuraAuthentication) {
+            return Optional.of((HasuraAuthentication) authentication);
+        }
+        return Optional.empty();
+    }
 }

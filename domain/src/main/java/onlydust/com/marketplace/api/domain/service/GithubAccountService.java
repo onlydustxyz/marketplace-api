@@ -25,14 +25,17 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
         return githubStoragePort.findAccountByInstallationId(installationId);
     }
 
-    public List<GithubAccount> getOrganizationsForAuthenticatedUserAndGithubPersonalToken(final String githubPersonalToken,
-                                                                                          final User authenticatedUser) {
+    @Override
+    public List<GithubAccount> getOrganizationsForAuthenticatedUser(final User authenticatedUser) {
         final List<GithubAccount> userGithubAccounts =
-                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPersonalToken))
+                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubUserId(authenticatedUser.getGithubUserId()))
                         .stream()
                         .map(githubAccount -> githubAccount.toBuilder()
-                                .isCurrentUserAdmin(githubSearchPort.getGithubUserMembershipForOrganization(githubPersonalToken
-                                        , authenticatedUser.getGithubLogin(), githubAccount.getLogin()).equals(GithubMembership.ADMIN))
+                                .isCurrentUserAdmin(githubSearchPort.getGithubUserMembershipForOrganization(
+                                        authenticatedUser.getGithubUserId(),
+                                        authenticatedUser.getGithubLogin(),
+                                        githubAccount.getLogin()
+                                ).equals(GithubMembership.ADMIN))
                                 .build()
                         )
                         .collect(Collectors.toList());

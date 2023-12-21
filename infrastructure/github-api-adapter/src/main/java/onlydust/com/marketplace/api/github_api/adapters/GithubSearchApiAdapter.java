@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.GetOrgaMembershipsResponseDTO;
@@ -24,6 +25,7 @@ import static java.util.Objects.nonNull;
 public class GithubSearchApiAdapter implements GithubSearchPort {
     private final GithubHttpClient client;
     private final GithubPaginationProperties githubPaginationProperties;
+    private final GithubAuthenticationPort githubAuthenticationPort;
 
     private static final Pattern ORG_API_URL_REGEX = Pattern.compile(
             "https://api\\.github\\.com/orgs/([^/]+)");
@@ -43,10 +45,10 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     }
 
     @Override
-    public List<GithubAccount> searchOrganizationsByGithubPersonalToken(final String githubPersonalToken) {
+    public List<GithubAccount> searchOrganizationsByGithubUserId(final Long githubUserId) {
         final int pageSize = githubPaginationProperties.getPageSize();
         Integer pageIndex = 1;
-        List<GithubAccount> githubAccountsForPageIndex = getGithubAccountsForPageIndex(githubPersonalToken, pageSize,
+        List<GithubAccount> githubAccountsForPageIndex = getGithubAccountsForPageIndex(githubUserId, pageSize,
                 pageIndex);
         if (githubAccountsForPageIndex.isEmpty()) {
             return githubAccountsForPageIndex;
@@ -58,14 +60,16 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
         final List<GithubAccount> githubAccounts = new ArrayList<>(githubAccountsForPageIndex);
         while (githubAccountsForPageIndex.size() == pageSize) {
             pageIndex += 1;
-            githubAccountsForPageIndex = getGithubAccountsForPageIndex(githubPersonalToken, pageSize, pageIndex);
+            githubAccountsForPageIndex = getGithubAccountsForPageIndex(githubUserId, pageSize, pageIndex);
             githubAccounts.addAll(githubAccountsForPageIndex);
         }
         return githubAccounts;
     }
 
-    private List<GithubAccount> getGithubAccountsForPageIndex(String githubPersonalToken, final int pageSize,
+    private List<GithubAccount> getGithubAccountsForPageIndex(final Long githubUserId, final int pageSize,
                                                               Integer pageIndex) {
+        final String githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+
         final Optional<GithubOrgaSearchResponseDTO[]> githubOrgaSearchResponseDTOS =
                 client.get(String.format("/user/orgs?per_page=%s&page=%s", pageSize, pageIndex),
                         GithubOrgaSearchResponseDTO[].class, githubPersonalToken);
@@ -90,8 +94,10 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     }
 
     @Override
-    public GithubMembership getGithubUserMembershipForOrganization(String githubPersonalToken, String userLogin,
+    public GithubMembership getGithubUserMembershipForOrganization(Long githubUserId, String userLogin,
                                                                    String organizationLogin) {
+        final String githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+
         return client.get(String.format("/orgs/%s/memberships/%s", organizationLogin, userLogin),
                         GetOrgaMembershipsResponseDTO.class, githubPersonalToken)
                 .filter(dto -> nonNull(dto.getRole()) && nonNull(dto.getState()))

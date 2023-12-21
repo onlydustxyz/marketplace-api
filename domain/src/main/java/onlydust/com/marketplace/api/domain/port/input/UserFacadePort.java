@@ -50,7 +50,7 @@ public interface UserFacadePort {
 
     List<UserRewardView> getPendingInvoiceRewardsForRecipientId(Long githubUserId);
 
-    void claimProjectForAuthenticatedUserAndGithubPersonalToken(UUID projectId, User user, String githubAccessToken);
+    void claimProjectForAuthenticatedUser(UUID projectId, User user);
 
     URL saveAvatarImage(InputStream imageInputStream);
 }

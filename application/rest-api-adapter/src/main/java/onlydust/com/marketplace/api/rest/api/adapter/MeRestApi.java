@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
@@ -17,16 +16,12 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -154,15 +149,15 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ContributionPageResponse> getMyContributions(List<ContributionType> types,
-                                                                           List<ContributionStatus> statuses,
-                                                                           List<UUID> projects,
-                                                                           List<Long> repositories,
-                                                                           String fromDate,
-                                                                           String toDate,
-                                                                           ContributionSort sort,
-                                                                           String direction,
-                                                                           Integer page,
-                                                                           Integer pageSize) {
+                                                                       List<ContributionStatus> statuses,
+                                                                       List<UUID> projects,
+                                                                       List<Long> repositories,
+                                                                       String fromDate,
+                                                                       String toDate,
+                                                                       ContributionSort sort,
+                                                                       String direction,
+                                                                       Integer page,
+                                                                       Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(page);
@@ -260,20 +255,19 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations() {
-        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
         final List<GithubAccount> githubAccounts =
-                githubOrganizationFacadePort.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(
-                        hasuraAuthentication.getClaims().getGithubAccessToken(),
-                        hasuraAuthentication.getUser());
+                githubOrganizationFacadePort.getOrganizationsForAuthenticatedUser(authenticatedUser);
         return githubAccounts.isEmpty() ? ResponseEntity.notFound().build() :
                 ResponseEntity.ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
     }
 
     @Override
     public ResponseEntity<Void> claimProject(UUID projectId) {
-        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
-        userFacadePort.claimProjectForAuthenticatedUserAndGithubPersonalToken(
-                projectId, hasuraAuthentication.getUser(), hasuraAuthentication.getClaims().getGithubAccessToken()
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.claimProjectForAuthenticatedUser(
+                projectId, authenticatedUser
         );
         return ResponseEntity.noContent().build();
     }

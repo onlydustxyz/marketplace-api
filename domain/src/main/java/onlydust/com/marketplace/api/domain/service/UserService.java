@@ -156,8 +156,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public void claimProjectForAuthenticatedUserAndGithubPersonalToken(UUID projectId, User user,
-                                                                       String githubAccessToken) {
+    public void claimProjectForAuthenticatedUser(UUID projectId, User user) {
         final ProjectDetailsView projectDetails = projectStoragePort.getById(projectId, user);
         if (!projectDetails.getLeaders().isEmpty() || !projectDetails.getInvitedLeaders().isEmpty()) {
             throw OnlyDustException.forbidden("Project must have no project (pending) leads to be claimable");
@@ -167,7 +166,7 @@ public class UserService implements UserFacadePort {
         }
 
         final boolean isNotClaimable = projectDetails.getOrganizations().stream()
-                .anyMatch(org -> cannotBeClaimedByUser(user, githubAccessToken, org));
+                .anyMatch(org -> cannotBeClaimedByUser(user, org));
         if (isNotClaimable) {
             throw OnlyDustException.forbidden("User must be github admin on every organizations not installed and at " +
                                               "least member on every organization already installed linked to the " +
@@ -183,12 +182,12 @@ public class UserService implements UserFacadePort {
         return this.imageStoragePort.storeImage(imageInputStream);
     }
 
-    private boolean cannotBeClaimedByUser(User user, String githubAccessToken, ProjectOrganizationView org) {
+    private boolean cannotBeClaimedByUser(User user, ProjectOrganizationView org) {
         if (org.getId().equals(user.getGithubUserId())) {
             return false;
         }
         final GithubMembership githubMembership =
-                githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken,
+                githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(),
                         user.getGithubLogin(), org.getLogin());
         if (org.getIsInstalled() && (githubMembership.equals(GithubMembership.MEMBER) || githubMembership.equals(GithubMembership.ADMIN))) {
             return false;
