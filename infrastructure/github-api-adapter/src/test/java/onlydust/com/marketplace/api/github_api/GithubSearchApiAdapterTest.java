@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.github_api;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
+import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.github_api.dto.GithubOrgaSearchResponseDTO;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
@@ -23,20 +24,24 @@ public class GithubSearchApiAdapterTest {
     void should_return_organization_for_user_for_one_page() {
         // Given
         final GithubHttpClient httpClient = mock(GithubHttpClient.class);
+        final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
         final GithubSearchApiAdapter githubSearchApiAdapter = new GithubSearchApiAdapter(httpClient,
-                GithubPaginationProperties.builder().pageSize(2).build());
+                GithubPaginationProperties.builder().pageSize(2).build(), githubAuthenticationPort);
+
+        final long githubUserId = faker.number().randomNumber();
         final String githubPAT = faker.rickAndMorty().character();
         final GithubOrgaSearchResponseDTO orga1 = new GithubOrgaSearchResponseDTO();
         orga1.setId(1L);
         orga1.setUrl("https://api.github.com/orgs/foo1");
 
         // When
+        when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(githubPAT);
         when(httpClient.get("/user/orgs?per_page=2&page=1", GithubOrgaSearchResponseDTO[].class, githubPAT))
                 .thenReturn(Optional.of(new GithubOrgaSearchResponseDTO[]{
                         orga1
                 }));
         final List<GithubAccount> githubAccounts =
-                githubSearchApiAdapter.searchOrganizationsByGithubPersonalToken(githubPAT);
+                githubSearchApiAdapter.searchOrganizationsByGithubUserId(githubUserId);
 
         // Then
         assertEquals(1, githubAccounts.size());
@@ -48,8 +53,11 @@ public class GithubSearchApiAdapterTest {
     void should_return_organization_for_user_for_two_pages() {
         // Given
         final GithubHttpClient httpClient = mock(GithubHttpClient.class);
+        final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
         final GithubSearchApiAdapter githubSearchApiAdapter = new GithubSearchApiAdapter(httpClient,
-                GithubPaginationProperties.builder().pageSize(2).build());
+                GithubPaginationProperties.builder().pageSize(2).build(), githubAuthenticationPort);
+
+        final long githubUserId = faker.number().randomNumber();
         final String githubPAT = faker.rickAndMorty().character();
         final GithubOrgaSearchResponseDTO orga1 = new GithubOrgaSearchResponseDTO();
         orga1.setId(1L);
@@ -63,6 +71,7 @@ public class GithubSearchApiAdapterTest {
 
 
         // When
+        when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(githubPAT);
         when(httpClient.get("/user/orgs?per_page=2&page=1", GithubOrgaSearchResponseDTO[].class, githubPAT))
                 .thenReturn(Optional.of(new GithubOrgaSearchResponseDTO[]{
                         orga1, orga2
@@ -72,7 +81,7 @@ public class GithubSearchApiAdapterTest {
                         orga3
                 }));
         final List<GithubAccount> githubAccounts =
-                githubSearchApiAdapter.searchOrganizationsByGithubPersonalToken(githubPAT);
+                githubSearchApiAdapter.searchOrganizationsByGithubUserId(githubUserId);
 
         // Then
         assertEquals(3, githubAccounts.size());

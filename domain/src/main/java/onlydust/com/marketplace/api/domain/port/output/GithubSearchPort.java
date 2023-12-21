@@ -9,7 +9,8 @@ import java.util.List;
 public interface GithubSearchPort {
     List<GithubUserIdentity> searchUsersByLogin(String login);
 
-    List<GithubAccount> searchOrganizationsByGithubPersonalToken(String githubPersonalToken);
+    List<GithubAccount> searchOrganizationsByGithubUserId(Long githubUserId);
 
-    GithubMembership getGithubUserMembershipForOrganization(String githubPersonalToken, String userLogin, String organizationLogin);
+    GithubMembership getGithubUserMembershipForOrganization(Long githubUserId, String userLogin,
+                                                            String organizationLogin);
 }

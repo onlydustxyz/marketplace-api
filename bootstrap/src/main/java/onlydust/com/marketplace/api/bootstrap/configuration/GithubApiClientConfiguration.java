@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.service.RetriedGithubInstallationFacade;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
@@ -45,8 +46,10 @@ public class GithubApiClientConfiguration {
     }
 
     @Bean
-    public GithubSearchPort githubSearchPort(final GithubHttpClient githubHttpClient) {
-        return new GithubSearchApiAdapter(githubHttpClient, GithubPaginationProperties.builder().build());
+    public GithubSearchPort githubSearchPort(final GithubHttpClient githubHttpClient,
+                                             final GithubAuthenticationPort githubAuthenticationPort) {
+        return new GithubSearchApiAdapter(githubHttpClient, GithubPaginationProperties.builder().build(),
+                githubAuthenticationPort);
     }
 
     @Bean

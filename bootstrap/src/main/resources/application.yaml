@@ -101,3 +101,10 @@ infrastructure:
   webhook:
     url: ${BACKOFFICE_WEBHOOK_URL}
     environment: ${ENV}
+  auth0:
+    api:
+      client:
+        domain-base-uri: ${AUTH0_DOMAIN_BASE_URL}
+        client-id: ${AUTH0_M2M_CLIENT_ID}
+        client-secret: ${AUTH0_M2M_CLIENT_SECRET}
+        pat-cache-ttl-in-seconds: 3600

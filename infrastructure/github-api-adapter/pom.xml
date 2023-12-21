@@ -24,6 +24,11 @@
             <artifactId>domain</artifactId>
         </dependency>
         <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>auth0-api-client-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>

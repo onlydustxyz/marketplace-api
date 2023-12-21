@@ -475,7 +475,7 @@ public class UserServiceTest {
                 .thenReturn(ProjectDetailsView.builder().leaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
+            userService.claimProjectForAuthenticatedUser(projectId, caller);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -497,7 +497,7 @@ public class UserServiceTest {
                 .thenReturn(ProjectDetailsView.builder().invitedLeaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
+            userService.claimProjectForAuthenticatedUser(projectId, caller);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -519,7 +519,7 @@ public class UserServiceTest {
                 .thenReturn(ProjectDetailsView.builder().build());
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, caller, null);
+            userService.claimProjectForAuthenticatedUser(projectId, caller);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -571,21 +571,21 @@ public class UserServiceTest {
                                         .build()
                         ))
                         .build());
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org4")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org5")).thenReturn(GithubMembership.EXTERNAL);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org6")).thenReturn(GithubMembership.EXTERNAL);
         OnlyDustException onlyDustException = null;
         try {
-            userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
+            userService.claimProjectForAuthenticatedUser(projectId, user);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -632,15 +632,15 @@ public class UserServiceTest {
                                         .build()
                         ))
                         .build());
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubAccessToken, user.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org4")).thenReturn(GithubMembership.EXTERNAL);
-        userService.claimProjectForAuthenticatedUserAndGithubPersonalToken(projectId, user, githubAccessToken);
+        userService.claimProjectForAuthenticatedUser(projectId, user);
 
         // Then
         verify(userStoragePort, times(1)).saveProjectLead(user.getId(), projectId);

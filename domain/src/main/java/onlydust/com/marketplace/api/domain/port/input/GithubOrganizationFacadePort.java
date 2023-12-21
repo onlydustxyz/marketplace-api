@@ -6,6 +6,5 @@ import onlydust.com.marketplace.api.domain.model.User;
 import java.util.List;
 
 public interface GithubOrganizationFacadePort {
-    List<GithubAccount> getOrganizationsForAuthenticatedUserAndGithubPersonalToken(String githubAccessToken,
-                                                                                   final User authenticatedUser);
+    List<GithubAccount> getOrganizationsForAuthenticatedUser(final User authenticatedUser);
 }

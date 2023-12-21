@@ -110,8 +110,8 @@ public class GithubAccountServiceTest {
     void should_return_user_organizations_given_no_installed_organizations() {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
-        final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
-        final User authenticatedUser = User.builder().githubUserId(5L).githubLogin(faker.pokemon().name()).build();
+        final var githubUserId = 5L;
+        final User authenticatedUser = User.builder().githubUserId(githubUserId).githubLogin(faker.pokemon().name()).build();
 
         // When
         final List<GithubAccount> githubAccounts = List.of(
@@ -124,18 +124,17 @@ public class GithubAccountServiceTest {
                         .login("org2")
                         .build()
         );
-        when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
+        when(githubSearchPort.searchOrganizationsByGithubUserId(githubUserId))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, authenticatedUser.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.getGithubLogin(),
                 "org1"))
                 .thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, authenticatedUser.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.getGithubLogin(),
                 "org2"))
                 .thenReturn(GithubMembership.MEMBER);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L))).thenReturn(List.of());
         final List<GithubAccount> organizationsForGithubPersonalToken =
-                githubAccountService.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(githubPAT,
-                        authenticatedUser);
+                githubAccountService.getOrganizationsForAuthenticatedUser(authenticatedUser);
 
         // Then
         assertEquals(List.of(githubAccounts.get(0).toBuilder().isCurrentUserAdmin(true).build(),
@@ -148,8 +147,8 @@ public class GithubAccountServiceTest {
     void should_return_user_organizations_given_installed_organizations() {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
-        final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
-        final User user = User.builder().githubLogin(faker.pokemon().name()).githubUserId(5L).build();
+        final var githubUserId = 5L;
+        final User user = User.builder().githubLogin(faker.pokemon().name()).githubUserId(githubUserId).build();
         // When
         final List<GithubAccount> githubAccounts = List.of(
                 GithubAccount.builder()
@@ -161,11 +160,11 @@ public class GithubAccountServiceTest {
                         .login("org2")
                         .build()
         );
-        when(githubSearchPort.searchOrganizationsByGithubPersonalToken(githubPAT))
+        when(githubSearchPort.searchOrganizationsByGithubUserId(githubUserId))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, user.getGithubLogin(), "org1"))
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.getGithubLogin(), "org1"))
                 .thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubPAT, user.getGithubLogin(), "org2"))
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.getGithubLogin(), "org2"))
                 .thenReturn(GithubMembership.EXTERNAL);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L, 5L))).thenReturn(List.of(
                 GithubAccount.builder()
@@ -182,7 +181,7 @@ public class GithubAccountServiceTest {
                         .build()
         ));
         final List<GithubAccount> organizationsForGithubPersonalToken =
-                githubAccountService.getOrganizationsForAuthenticatedUserAndGithubPersonalToken(githubPAT, user);
+                githubAccountService.getOrganizationsForAuthenticatedUser(user);
 
         // Then
         assertEquals(List.of(

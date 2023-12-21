@@ -150,6 +150,11 @@
                 <artifactId>jwks-rsa</artifactId>
                 <version>0.22.1</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>3.1.8</version>
+            </dependency>
 
             <!-- AWS Dependencies -->
             <dependency>
