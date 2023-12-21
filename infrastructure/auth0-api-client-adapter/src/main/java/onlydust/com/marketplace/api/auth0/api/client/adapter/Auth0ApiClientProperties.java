@@ -13,4 +13,5 @@ public class Auth0ApiClientProperties {
     String domainBaseUri;
     String clientId;
     String clientSecret;
+    Integer patCacheTtlInSeconds = 3600;
 }

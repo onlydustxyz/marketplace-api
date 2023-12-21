@@ -29,7 +29,8 @@ public class Auth0ApiClientConfiguration {
     }
 
     @Bean
-    public GithubAuthenticationPort githubAuthenticationPort(final Auth0ApiHttpClient auth0ApiHttpClient) {
-        return new Auth0ApiClientAdapter(auth0ApiHttpClient);
+    public GithubAuthenticationPort githubAuthenticationPort(final Auth0ApiClientProperties properties,
+                                                             final Auth0ApiHttpClient auth0ApiHttpClient) {
+        return new Auth0ApiClientAdapter(properties, auth0ApiHttpClient);
     }
 }

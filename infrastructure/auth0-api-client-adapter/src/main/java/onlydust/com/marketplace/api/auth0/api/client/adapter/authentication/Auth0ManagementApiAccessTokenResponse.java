@@ -16,7 +16,7 @@ public class Auth0ManagementApiAccessTokenResponse {
     @JsonProperty("scope")
     String scope;
     @JsonProperty("expires_in")
-    Integer expires_in;
+    Integer expiresIn;
     @JsonProperty("token_type")
     String tokenType;
 }

@@ -5,12 +5,12 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.authentication.Auth0ApiAuthenticator;
 import org.junit.jupiter.api.Test;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @EnableWireMock({
@@ -21,6 +21,7 @@ class Auth0ApiClientAdapterTest {
     @InjectWireMock("auth0")
     protected WireMockServer auth0ApiWireMockServer;
 
+    @SneakyThrows
     @Test
     void getGithubPersonalToken() {
         // Given
@@ -28,8 +29,9 @@ class Auth0ApiClientAdapterTest {
                 .clientId("some-client-id")
                 .clientSecret("some-client-secret")
                 .domainBaseUri(auth0ApiWireMockServer.baseUrl())
+                .patCacheTtlInSeconds(1)
                 .build();
-        final var auth0ApiClientAdapter = new Auth0ApiClientAdapter(new Auth0ApiHttpClient(properties,
+        final var auth0ApiClientAdapter = new Auth0ApiClientAdapter(properties, new Auth0ApiHttpClient(properties,
                 new Auth0ApiAuthenticator(properties)));
 
 
@@ -45,7 +47,7 @@ class Auth0ApiClientAdapterTest {
                         }
                         """.formatted(auth0ApiWireMockServer.baseUrl())))
                 .willReturn(responseDefinition().withStatus(200).withBody("""
-                        {"access_token":"my-management-token","scope":"read:users read:user_idp_tokens","expires_in":86400,"token_type":"Bearer"}
+                        {"access_token":"my-management-token","scope":"read:users read:user_idp_tokens","expires_in":100,"token_type":"Bearer"}
                         """)));
 
         auth0ApiWireMockServer.stubFor(WireMock.get(
@@ -117,9 +119,26 @@ class Auth0ApiClientAdapterTest {
 
 
         // When
-        final String token = auth0ApiClientAdapter.getGithubPersonalToken(595505L);
-
+        var pat = auth0ApiClientAdapter.getGithubPersonalToken(595505L);
         // Then
-        assertThat(token).isEqualTo("ofux-github-pat");
+        assertThat(pat).isEqualTo("ofux-github-pat");
+        auth0ApiWireMockServer.verify(1, getRequestedFor(urlEqualTo("/api/v2/users/github%7C595505")));
+
+
+        // When we call it again, the PAT should be cached
+        auth0ApiWireMockServer.resetRequests();
+        pat = auth0ApiClientAdapter.getGithubPersonalToken(595505L);
+        // Then
+        assertThat(pat).isEqualTo("ofux-github-pat");
+        auth0ApiWireMockServer.verify(0, getRequestedFor(urlEqualTo("/api/v2/users/github%7C595505")));
+
+
+        // When we call it after a long time, a new PAT should be fetched
+        Thread.sleep(1_100);
+        auth0ApiWireMockServer.resetRequests();
+        pat = auth0ApiClientAdapter.getGithubPersonalToken(595505L);
+        // Then
+        assertThat(pat).isEqualTo("ofux-github-pat");
+        auth0ApiWireMockServer.verify(1, getRequestedFor(urlEqualTo("/api/v2/users/github%7C595505")));
     }
 }
