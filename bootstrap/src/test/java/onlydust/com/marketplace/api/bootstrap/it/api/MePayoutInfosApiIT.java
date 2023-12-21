@@ -147,7 +147,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_update_user_payout_infos() {
+    void should_update_user_company_payout_infos() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UserPayoutInformationRequest requestBody1 = new UserPayoutInformationRequest();
@@ -162,6 +162,77 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 )
                 )
                 .isCompany(true)
+                .location(new UserPayoutInformationResponseLocation()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .country(faker.address().country())
+                        .postalCode(faker.address().zipCode())
+                )
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
+                        .aptosAddress("0x" + faker.random().hex(64))
+                        .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
+                                .bic(faker.random().hex())
+                                .iban(faker.name().bloodGroup())
+                        )
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
+                );
+        final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
+        requestBody2.company(
+                        new CompanyIdentity()
+                                .identificationNumber(faker.number().digit())
+                                .name(faker.name().name())
+                                .owner(
+                                        new PersonIdentity()
+                                                .firstname(faker.name().firstName())
+                                                .lastname(faker.name().lastName())
+                                )
+                )
+                .isCompany(true)
+                .location(new UserPayoutInformationResponseLocation()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .country(faker.address().country())
+                        .postalCode(faker.address().zipCode())
+                )
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
+                        .ethAddress("0x" + faker.random().hex(40))
+                        .optimismAddress("0x" + faker.random().hex(40))
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
+                );
+
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(requestBody1))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().equals(requestToExpectedResponse(requestBody1, true, true, true, true, true));
+
+        client.put()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(requestBody2))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().equals(requestToExpectedResponse(requestBody2, true, true, true, true, true));
+    }
+
+    @Test
+    void should_update_user_individual_payout_infos() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UserPayoutInformationRequest requestBody1 = new UserPayoutInformationRequest();
+        requestBody1.person(new PersonIdentity()
+                        .firstname(faker.name().firstName())
+                        .lastname(faker.name().lastName())
+                )
+                .isCompany(false)
                 .location(new UserPayoutInformationResponseLocation()
                         .address(faker.address().fullAddress())
                         .city(faker.address().city())
