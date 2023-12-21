@@ -3513,6 +3513,7 @@ components:
         - STARK
         - OP
         - LORDS
+        - USDC
 
     ContributionPageResponse:
       type: object

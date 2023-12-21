@@ -804,6 +804,7 @@ components:
         - STARK
         - OP
         - LORDS
+        - USDC
 
     ProjectVisibility:
       type: string

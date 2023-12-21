@@ -8,12 +8,13 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import java.util.Objects;
 
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 
 public interface ProjectRewardMapper {
 
     public static Money mapMoney(onlydust.com.marketplace.api.domain.view.Money money) {
         return new Money().amount(money.getAmount())
-                .currency(nonNull(money.getCurrency()) ? ProjectBudgetMapper.mapCurrency(money.getCurrency()) : null)
+                .currency(nonNull(money.getCurrency()) ? mapCurrency(money.getCurrency()) : null)
                 .usdEquivalent(money.getUsdEquivalent());
     }
 
@@ -55,14 +56,7 @@ public interface ProjectRewardMapper {
 
     static RewardAmountResponse mapRewardAmountToResponse(ProjectRewardView view) {
         final RewardAmountResponse amount = new RewardAmountResponse();
-        amount.setCurrency(switch (view.getAmount().getCurrency()) {
-            case Apt -> CurrencyContract.APT;
-            case Op -> CurrencyContract.OP;
-            case Eth -> CurrencyContract.ETH;
-            case Stark -> CurrencyContract.STARK;
-            case Usd -> CurrencyContract.USD;
-            case Lords -> CurrencyContract.LORDS;
-        });
+        amount.setCurrency(mapCurrency(view.getAmount().getCurrency()));
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());
         return amount;

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 
 public interface UserMapper {
 
@@ -171,14 +172,7 @@ public interface UserMapper {
             myRewardAmountResponse.setTotalAmount(totalEarnedPerCurrency.getTotalAmount());
             myRewardAmountResponse.totalDollarsEquivalent(totalEarnedPerCurrency.getTotalDollarsEquivalent());
             if (totalEarnedPerCurrency.getCurrency() != null) {
-                myRewardAmountResponse.setCurrency(switch (totalEarnedPerCurrency.getCurrency()) {
-                    case Apt -> CurrencyContract.APT;
-                    case Op -> CurrencyContract.OP;
-                    case Eth -> CurrencyContract.ETH;
-                    case Stark -> CurrencyContract.STARK;
-                    case Usd -> CurrencyContract.USD;
-                    case Lords -> CurrencyContract.LORDS;
-                });
+                myRewardAmountResponse.setCurrency(mapCurrency(totalEarnedPerCurrency.getCurrency()));
             }
             response.addDetailsItem(myRewardAmountResponse);
         }

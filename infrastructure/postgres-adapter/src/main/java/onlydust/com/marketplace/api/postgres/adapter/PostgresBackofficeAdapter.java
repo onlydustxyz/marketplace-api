@@ -62,14 +62,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                         ProjectBudgetView.builder()
                                 .projectId(entity.getId().getProjectId())
                                 .id(entity.getId().getId())
-                                .currency(switch (entity.getCurrency()) {
-                                    case eth -> Currency.Eth;
-                                    case apt -> Currency.Apt;
-                                    case stark -> Currency.Stark;
-                                    case usd -> Currency.Usd;
-                                    case op -> Currency.Op;
-                                    case lords -> Currency.Lords;
-                                })
+                                .currency(entity.getCurrency().toDomain())
                                 .initialAmount(entity.getInitialAmount())
                                 .remainingAmount(entity.getRemainingAmount())
                                 .spentAmount(entity.getSpentAmount())

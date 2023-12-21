@@ -79,6 +79,7 @@ public interface BackOfficeMapper {
             case Op -> Currency.OP;
             case Eth -> Currency.ETH;
             case Lords -> Currency.LORDS;
+            case Usdc -> Currency.USDC;
         };
     }
 
