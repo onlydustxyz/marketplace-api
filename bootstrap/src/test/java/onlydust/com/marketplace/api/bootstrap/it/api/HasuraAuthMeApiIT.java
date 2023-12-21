@@ -56,7 +56,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_current_user_given_a_valid_jwt() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         String email = faker.internet().emailAddress();
@@ -114,7 +114,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_get_current_user_with_onboarding_data() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         String email = faker.internet().emailAddress();
@@ -226,7 +226,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_fail_to_get_unexisting_user() throws JsonProcessingException {
         // Given
-        Long githubUserId = faker.number().randomNumber();
+        Long githubUserId = faker.number().randomNumber(15, true);
         String login = faker.name().username();
         String avatarUrl = faker.internet().avatar();
         UUID userId = UUID.randomUUID();
@@ -257,7 +257,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserEntity impersonatorUser = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber(15, true))
                 .githubLogin(faker.name().username())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
@@ -315,7 +315,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserEntity impersonatorUser = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber(15, true))
                 .githubLogin(faker.name().username())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
@@ -355,7 +355,7 @@ public class HasuraAuthMeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserEntity impersonatorUser = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber(15, true))
                 .githubLogin(faker.name().username())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())

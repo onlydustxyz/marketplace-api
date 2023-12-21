@@ -42,7 +42,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setup() {
-        githubUserId = faker.number().randomNumber();
+        githubUserId = faker.number().randomNumber(15, true);
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         email = faker.internet().emailAddress();
