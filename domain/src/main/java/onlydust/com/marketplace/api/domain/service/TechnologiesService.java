@@ -16,7 +16,7 @@ public class TechnologiesService implements TechnologiesPort {
     @Override
     public void suggest(String name, User requester) {
         trackingIssuePort.createIssueForTechTeam("New technology suggestion: " + name,
-                "Suggested by: " + requester.getLogin());
+                "Suggested by: " + requester.getGithubLogin());
     }
 
     @Override

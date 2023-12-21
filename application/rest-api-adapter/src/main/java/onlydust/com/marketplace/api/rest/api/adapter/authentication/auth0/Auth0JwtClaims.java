@@ -19,4 +19,6 @@ public class Auth0JwtClaims {
     String githubWithUserId;
     @JsonProperty("picture")
     String githubAvatarUrl;
+    @JsonProperty("email")
+    String email;
 }

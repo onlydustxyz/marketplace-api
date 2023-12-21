@@ -26,12 +26,14 @@ public class Auth0JwtService implements JwtService {
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
 
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt, final String impersonationHeader) {
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt,
+                                                                     final String impersonationHeader) {
         try {
             final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
-            final Auth0JwtClaims jwtClaims = objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
-                    Auth0JwtClaims.class);
-            final User user = getUserFromClaims(jwtClaims);
+            final Auth0JwtClaims jwtClaims =
+                    objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
+                            Auth0JwtClaims.class);
+            final User user = getUserFromClaims(jwtClaims, true);
 
             if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
                 return getAuthenticationFromImpersonationHeader(decodedJwt, user, impersonationHeader);
@@ -55,18 +57,21 @@ public class Auth0JwtService implements JwtService {
 
     }
 
-    private User getUserFromClaims(Auth0JwtClaims jwtClaims) {
+    private User getUserFromClaims(Auth0JwtClaims jwtClaims, boolean createIfNotExists) {
         final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
         return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
                 .githubLogin(jwtClaims.getGithubLogin())
                 .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
-                .build());
+                .email(jwtClaims.getEmail())
+                .build(), createIfNotExists);
     }
 
-    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt, User impersonator, final String impersonationHeader) {
+    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt,
+                                                                                      User impersonator,
+                                                                                      final String impersonationHeader) {
         if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
-            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getLogin());
+            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
             return Optional.empty();
         }
         final Auth0JwtClaims claims;
@@ -77,7 +82,7 @@ public class Auth0JwtService implements JwtService {
             return Optional.empty();
         }
 
-        final User impersonated = getUserFromClaims(claims);
+        final User impersonated = getUserFromClaims(claims, false);
 
         LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
 

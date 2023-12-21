@@ -77,10 +77,20 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public void updateUserLastSeenAt(UUID userId, Date date) {
+    public void updateUserIdentity(UUID userId, String githubLogin, String githubAvatarUrl, String emailFromGithub,
+                                   Date lastSeenAt) {
         userRepository.findById(userId)
                 .ifPresentOrElse(userEntity -> {
-                    userEntity.setLastSeenAt(date);
+                    if (githubLogin != null) {
+                        userEntity.setGithubLogin(githubLogin);
+                    }
+                    if (githubAvatarUrl != null) {
+                        userEntity.setGithubAvatarUrl(githubAvatarUrl);
+                    }
+                    if (emailFromGithub != null) {
+                        userEntity.setGithubEmail(emailFromGithub);
+                    }
+                    userEntity.setLastSeenAt(lastSeenAt);
                     userRepository.save(userEntity);
                 }, () -> {
                     throw OnlyDustException.notFound(format("User with id %s not found", userId));

@@ -47,7 +47,7 @@ public class CustomUserPayoutInfoRepositoryIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .email(faker.internet().emailAddress())
+                .githubEmail(faker.internet().emailAddress())
                 .lastSeenAt(new Date())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .build();

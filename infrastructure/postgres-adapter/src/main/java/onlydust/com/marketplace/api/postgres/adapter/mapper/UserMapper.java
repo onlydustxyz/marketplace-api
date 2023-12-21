@@ -54,8 +54,9 @@ public interface UserMapper {
         return User.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
-                .login(user.getGithubLogin())
-                .avatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
+                .githubLogin(user.getGithubLogin())
+                .githubEmail(user.getGithubEmail())
+                .githubAvatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
                         user.getProfile().getAvatarUrl() : user.getGithubAvatarUrl())
                 .roles(Arrays.stream(user.getRoles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
@@ -89,9 +90,9 @@ public interface UserMapper {
         return UserEntity.builder()
                 .id(user.getId())
                 .githubUserId(user.getGithubUserId())
-                .githubLogin(user.getLogin())
-                .githubAvatarUrl(user.getAvatarUrl())
-                .email("TODO") //TODO: get email from Auth0 JWT claims
+                .githubLogin(user.getGithubLogin())
+                .githubAvatarUrl(user.getGithubAvatarUrl())
+                .githubEmail(user.getGithubEmail())
                 .roles(user.getRoles() != null ? user.getRoles().toArray(UserRole[]::new) : new UserRole[0])
                 .lastSeenAt(new Date())
                 .build();

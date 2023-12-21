@@ -9,4 +9,5 @@ public class GithubUserIdentity {
     Long githubUserId;
     String githubLogin;
     String githubAvatarUrl;
+    String email;
 }

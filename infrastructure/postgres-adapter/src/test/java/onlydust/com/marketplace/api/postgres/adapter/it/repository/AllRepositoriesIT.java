@@ -76,7 +76,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .email(faker.internet().emailAddress())
+                .githubEmail(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
@@ -93,7 +93,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .email(faker.internet().emailAddress())
+                .githubEmail(faker.internet().emailAddress())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
@@ -182,14 +182,14 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         userRepository.deleteAll();
         assertIsSaved(expected, authUserRepository);
-        
+
         final var iamUsers = userRepository.findAll();
         assertThat(iamUsers).hasSize(1);
         assertThat(iamUsers.get(0).getId()).isEqualTo(expected.getId());
         assertThat(iamUsers.get(0).getGithubUserId()).isEqualTo(expected.getGithubUserId());
         assertThat(iamUsers.get(0).getGithubLogin()).isEqualTo(expected.getLoginAtSignup());
         assertThat(iamUsers.get(0).getGithubAvatarUrl()).isEqualTo(expected.getAvatarUrlAtSignup());
-        assertThat(iamUsers.get(0).getEmail()).isEqualTo(expected.getEmail());
+        assertThat(iamUsers.get(0).getGithubEmail()).isEqualTo(expected.getEmail());
     }
 
     @Test

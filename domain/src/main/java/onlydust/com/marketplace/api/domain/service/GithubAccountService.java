@@ -32,14 +32,14 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                         .stream()
                         .map(githubAccount -> githubAccount.toBuilder()
                                 .isCurrentUserAdmin(githubSearchPort.getGithubUserMembershipForOrganization(githubPersonalToken
-                                        , authenticatedUser.getLogin(), githubAccount.getLogin()).equals(GithubMembership.ADMIN))
+                                        , authenticatedUser.getGithubLogin(), githubAccount.getLogin()).equals(GithubMembership.ADMIN))
                                 .build()
                         )
                         .collect(Collectors.toList());
         userGithubAccounts.add(GithubAccount.builder()
                 .id(authenticatedUser.getGithubUserId())
-                .login(authenticatedUser.getLogin())
-                .avatarUrl(authenticatedUser.getAvatarUrl())
+                .login(authenticatedUser.getGithubLogin())
+                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
                 .isPersonal(true)
                 .isCurrentUserAdmin(true)
                 .installed(false)

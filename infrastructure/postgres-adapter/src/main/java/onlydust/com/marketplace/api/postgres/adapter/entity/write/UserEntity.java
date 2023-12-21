@@ -46,7 +46,7 @@ public class UserEntity {
     @Column(name = "github_avatar_url", nullable = false)
     String githubAvatarUrl;
     @Column(name = "email", nullable = false)
-    String email;
+    String githubEmail;
     @Type(type = "user_role[]")
     @Column(name = "roles", nullable = false, columnDefinition = "iam.user_role[]")
     UserRole[] roles;

@@ -15,8 +15,9 @@ public class User {
     @Builder.Default
     List<UserRole> roles = new ArrayList<>();
     Long githubUserId;
-    String avatarUrl;
-    String login;
+    String githubAvatarUrl;
+    String githubLogin;
+    String githubEmail;
     @Builder.Default
     Boolean hasValidPayoutInfos = true;
     @Builder.Default

@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public interface UserFacadePort {
 
-    User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity);
+    User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean createIfNotExists);
 
     UserProfileView getProfileById(UUID userId);
 
@@ -37,7 +37,7 @@ public interface UserFacadePort {
 
     UserRewardsPageView getRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                             int pageIndex, int sanitizedPageSize,
-                                             UserRewardView.SortBy sortBy, SortDirection sortDirection);
+                                            UserRewardView.SortBy sortBy, SortDirection sortDirection);
 
     UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
 

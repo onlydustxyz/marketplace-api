@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -15,10 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Date;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     final static String JWT_TOKEN = "fake-jwt";
@@ -33,6 +36,8 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     UserRepository userRepository;
     @Autowired
     OnboardingRepository onboardingRepository;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     void setup() {
@@ -40,7 +45,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         email = faker.internet().emailAddress();
-        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl);
+        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl, email);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
@@ -67,49 +72,81 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // Given
 
         // When
-        client.get()
+        var me = client.get()
                 .uri(getApiURI(ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
-                // Then
                 .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.login").isEqualTo(login)
-                .jsonPath("$.githubUserId").isEqualTo(githubUserId)
-                .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
-                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
-                .jsonPath("$.isAdmin").isEqualTo(false)
-                .jsonPath("$.id").isNotEmpty();
+                .expectBody(GetMeResponse.class)
+                .returnResult().getResponseBody();
 
+        // Then
+        assertMe(me);
+        assertUserEntity(me.getId());
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
 
-
+        // ===============================================
         // When we call it again (already signed-up)
         indexerApiWireMockServer.resetRequests();
 
-        client.get()
+        me = client.get()
                 .uri(getApiURI(ME_GET))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
                 .exchange()
-                // Then
                 .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.login").isEqualTo(login)
-                .jsonPath("$.githubUserId").isEqualTo(githubUserId)
-                .jsonPath("$.avatarUrl").isEqualTo(avatarUrl)
-                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
-                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
-                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
-                .jsonPath("$.isAdmin").isEqualTo(false)
-                .jsonPath("$.id").isNotEmpty();
+                .expectBody(GetMeResponse.class)
+                .returnResult().getResponseBody();
 
+        // Then
+        assertMe(me);
+        assertUserEntity(me.getId());
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
+
+        // ===============================================
+        // When we call it again (already signed-up) with a new email
+        indexerApiWireMockServer.resetRequests();
+        email = faker.internet().emailAddress();
+        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl, email);
+
+        me = client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .expectBody(GetMeResponse.class)
+                .returnResult().getResponseBody();
+
+        // Then
+        assertMe(me);
+        assertUserEntity(me.getId());
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
+    }
+
+    protected void assertUserEntity(UUID userId) {
+        final var userEntity = entityManagerFactory.createEntityManager().find(UserEntity.class, userId);
+        assertThat(userEntity).isNotNull();
+        assertThat(userEntity.getGithubUserId()).isEqualTo(githubUserId);
+        assertThat(userEntity.getGithubLogin()).isEqualTo(login);
+        assertThat(userEntity.getGithubAvatarUrl()).isEqualTo(avatarUrl);
+        assertThat(userEntity.getGithubEmail()).isEqualTo(email);
+        assertThat(userEntity.getRoles()).containsExactly(UserRole.USER);
+    }
+
+    private void assertMe(GetMeResponse me) {
+        assertThat(me).isNotNull();
+        assertThat(me.getLogin()).isEqualTo(login);
+        assertThat(me.getGithubUserId()).isEqualTo(githubUserId);
+        assertThat(me.getAvatarUrl()).isEqualTo(avatarUrl);
+        assertThat(me.getHasSeenOnboardingWizard()).isEqualTo(false);
+        assertThat(me.getHasAcceptedLatestTermsAndConditions()).isEqualTo(false);
+        assertThat(me.getHasValidPayoutInfos()).isEqualTo(true);
+        assertThat(me.getIsAdmin()).isEqualTo(false);
+        assertThat(me.getId()).isNotNull();
     }
 
     @Test
@@ -120,7 +157,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubUserId(githubUserId)
                 .githubLogin(login)
                 .githubAvatarUrl(avatarUrl)
-                .email(email)
+                .githubEmail(email)
                 .lastSeenAt(new Date())
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .build();

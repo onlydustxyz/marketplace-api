@@ -34,7 +34,7 @@ public class AuthenticationServiceTest {
         final User user = User.builder()
                 .githubUserId(githubUserId)
                 .id(userId)
-                .login(faker.name().username())
+                .githubLogin(faker.name().username())
                 .roles(List.of(UserRole.USER))
                 .build();
 
