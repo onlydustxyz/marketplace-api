@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +186,117 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.isAdmin").isEqualTo(true)
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").isEqualTo(user.getId().toString());
+    }
+
+    @Test
+    void should_get_impersonated_user() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(githubUserId)
+                .githubLogin(login)
+                .githubAvatarUrl(avatarUrl)
+                .githubEmail(email)
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final UserEntity impersonatedUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(githubUserId + faker.number().numberBetween(1, 1000))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatedUser);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
+                )
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.login").isEqualTo(impersonatedUser.getGithubLogin())
+                .jsonPath("$.githubUserId").isEqualTo(impersonatedUser.getGithubUserId())
+                .jsonPath("$.avatarUrl").isEqualTo(impersonatedUser.getGithubAvatarUrl())
+                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
+                .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false)
+                .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
+                .jsonPath("$.isAdmin").isEqualTo(false)
+                .jsonPath("$.id").isEqualTo(impersonatedUser.getId().toString());
+    }
+
+    @Test
+    void should_fail_to_impersonate_non_registered_user() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(githubUserId)
+                .githubLogin(login)
+                .githubAvatarUrl(avatarUrl)
+                .githubEmail(email)
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final long impersonatedUserId = githubUserId + faker.number().numberBetween(1, 1000);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"sub\":\"github|%d\"}".formatted(impersonatedUserId)
+                )
+                .exchange()
+                // Then
+                .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void should_fail_to_impersonate_user_when_not_admin() {
+        // Given
+        final UserEntity impersonatorUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(githubUserId)
+                .githubLogin(login)
+                .githubAvatarUrl(avatarUrl)
+                .githubEmail(email)
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatorUser);
+
+        final UserEntity impersonatedUser = UserEntity.builder()
+                .id(UUID.randomUUID())
+                .githubUserId(githubUserId + faker.number().numberBetween(1, 1000))
+                .githubLogin(faker.name().username())
+                .githubAvatarUrl(faker.internet().avatar())
+                .githubEmail(faker.internet().emailAddress())
+                .lastSeenAt(new Date())
+                .roles(new UserRole[]{UserRole.USER})
+                .build();
+        userRepository.save(impersonatedUser);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(AuthenticationFilter.IMPERSONATION_HEADER,
+                        "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
+                )
+                .exchange()
+                // Then
+                .expectStatus().isUnauthorized();
     }
 }
