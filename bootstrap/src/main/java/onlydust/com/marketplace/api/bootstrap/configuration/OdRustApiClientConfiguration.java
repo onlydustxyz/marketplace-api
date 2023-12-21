@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiClientAdapter;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
@@ -23,7 +23,7 @@ public class OdRustApiClientConfiguration {
     }
 
     @Bean
-    public RewardStoragePort<HasuraAuthentication> rewardStoragePort(final OdRustApiHttpClient odRustApiHttpClient) {
+    public RewardServicePort<HasuraAuthentication> rewardStoragePort(final OdRustApiHttpClient odRustApiHttpClient) {
         return new OdRustApiClientAdapter(odRustApiHttpClient);
     }
 }

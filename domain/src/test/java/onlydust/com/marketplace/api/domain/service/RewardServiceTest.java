@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
 import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import org.junit.jupiter.api.Assertions;
@@ -23,13 +23,13 @@ public class RewardServiceTest {
     @Test
     void should_request_reward_given_a_project_lead() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -41,7 +41,7 @@ public class RewardServiceTest {
         final var newRewardId = UUID.randomUUID();
 
         // When
-        when(rewardStoragePort.requestPayment(authentication, requestRewardCommand))
+        when(rewardServicePort.requestPayment(authentication, requestRewardCommand))
                 .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
@@ -63,13 +63,13 @@ public class RewardServiceTest {
     @Test
     void should_throw_a_forbidden_exception_given_not_a_project_lead() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -105,13 +105,13 @@ public class RewardServiceTest {
     @Test
     void should_throw_a_forbidden_exception_given_not_amount_equals_to_0() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -148,13 +148,13 @@ public class RewardServiceTest {
     @Test
     void should_throw_a_invalid_input_exception_when_there_is_no_budget_of_such_currency() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -189,13 +189,13 @@ public class RewardServiceTest {
     @Test
     void should_throw_a_invalid_input_exception_when_there_is_not_enough_budget_of_such_currency() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
@@ -233,13 +233,13 @@ public class RewardServiceTest {
     @Test
     void should_cancel_reward_given_a_project_lead() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();
@@ -251,19 +251,19 @@ public class RewardServiceTest {
         rewardService.cancelPayment(authentication, projectLeadId, projectId, rewardId);
 
         // Then
-        verify(rewardStoragePort).cancelPayment(authentication, rewardId);
+        verify(rewardServicePort).cancelPayment(authentication, rewardId);
     }
 
     @Test
     void should_throw_a_forbidden_exception_when_cancelling_reward_given_not_a_project_lead() {
         // Given
-        final RewardStoragePort<DummyAuthentication> rewardStoragePort = mock(RewardStoragePort.class);
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
 
         final RewardService<DummyAuthentication> rewardService =
-                new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
         final DummyAuthentication authentication = new DummyAuthentication();
         final UUID projectLeadId = UUID.randomUUID();
         final UUID projectId = UUID.randomUUID();

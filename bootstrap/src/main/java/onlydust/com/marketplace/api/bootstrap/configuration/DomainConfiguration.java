@@ -102,11 +102,11 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService<HasuraAuthentication> rewardService(final RewardStoragePort<HasuraAuthentication> rewardStoragePort,
+    public RewardService<HasuraAuthentication> rewardService(final RewardServicePort<HasuraAuthentication> rewardServicePort,
                                                              final ProjectStoragePort projectStoragePort,
                                                              final PermissionService permissionService,
                                                              final IndexerPort indexerPort) {
-        return new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+        return new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
     }
 
     @Bean
