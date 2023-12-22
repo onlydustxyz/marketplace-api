@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
 import java.util.regex.Pattern;
@@ -136,7 +137,7 @@ public class UserPayoutInformation {
     @Builder
     public static class SepaAccount {
         String bic;
-        String iban;
+        IBAN iban;
 
         public boolean valid() {
             return nonNull(bic) && nonNull(iban);

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
@@ -54,7 +55,7 @@ public interface UserPayoutInfoMapper {
             payoutSettings = payoutSettings.toBuilder()
                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                             .bic(userPayoutInfoEntity.getBankAccount().getBic())
-                            .iban(userPayoutInfoEntity.getBankAccount().getIban())
+                            .iban(IBAN.valueOf(userPayoutInfoEntity.getBankAccount().getIban()))
                             .build())
                     .build();
         }
@@ -139,8 +140,10 @@ public interface UserPayoutInfoMapper {
                 final CompanyJsonEntity companyJsonEntity = OBJECT_MAPPER.treeToValue(identity,
                         CompanyJsonEntity.class);
                 final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
-                        .lastName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getLastName() : null)
-                        .firstName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getFirstName() : null)
+                        .lastName(nonNull(companyJsonEntity.getValue().getOwner()) ?
+                                companyJsonEntity.getValue().getOwner().getLastName() : null)
+                        .firstName(nonNull(companyJsonEntity.getValue().getOwner()) ?
+                                companyJsonEntity.getValue().getOwner().getFirstName() : null)
                         .build();
                 userPayoutInformation = userPayoutInformation.toBuilder()
                         .isACompany(true)
@@ -187,7 +190,7 @@ public interface UserPayoutInfoMapper {
                 entity = entity.toBuilder()
                         .bankAccount(BankAccountEntity.builder()
                                 .bic(userPayoutInformation.getPayoutSettings().getSepaAccount().getBic())
-                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getIban())
+                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getIban().toPlainString())
                                 .userId(userId)
                                 .build())
                         .build();
