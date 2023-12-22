@@ -215,7 +215,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Given
         final BudgetEntity expected = BudgetEntity.builder()
                 .id(UUID.randomUUID())
-                .currency(CurrencyEnumEntity.stark)
+                .currency(CurrencyEnumEntity.strk)
                 .initialAmount(BigDecimal.ZERO)
                 .remainingAmount(BigDecimal.ZERO)
                 .build();

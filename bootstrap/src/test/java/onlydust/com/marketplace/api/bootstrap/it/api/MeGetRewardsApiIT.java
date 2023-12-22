@@ -52,7 +52,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "totalAmount": 9511147,
                   "totalDollarsEquivalent": null,
-                  "currency": "STARK"
+                  "currency": "STRK"
                 }
               ]
             }
@@ -136,7 +136,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "status": "MISSING_PAYOUT_INFO",
                   "amount": {
                     "total": 9511147,
-                    "currency": "STARK",
+                    "currency": "STRK",
                     "dollarsEquivalent": 0
                   },
                   "numberOfRewardedContributions": 25,
@@ -349,7 +349,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         final PaymentRequestEntity paymentRequestEntity5 = paymentRequestRepository.findById(
                         UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223"))
                 .orElseThrow();
-        paymentRequestEntity5.setCurrency(CurrencyEnumEntity.stark);
+        paymentRequestEntity5.setCurrency(CurrencyEnumEntity.strk);
         paymentRequestEntity5.setAmount(BigDecimal.valueOf(9511147));
         paymentRequestRepository.save(paymentRequestEntity5);
 

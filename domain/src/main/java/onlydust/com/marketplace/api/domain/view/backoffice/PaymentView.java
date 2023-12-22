@@ -4,13 +4,10 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.*;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,7 +74,7 @@ public class PaymentView {
             case Eth, Lords, Usdc -> nonNull(recipientEthWallet);
             case Op -> nonNull(recipientOptimismWallet);
             case Apt -> nonNull(recipientAptosWallet);
-            case Stark -> nonNull(recipientStarkWallet);
+            case Strk -> nonNull(recipientStarkWallet);
         };
     }
 
@@ -89,7 +86,7 @@ public class PaymentView {
             case Eth, Lords, Usdc -> recipientEthWallet;
             case Op -> recipientOptimismWallet;
             case Apt -> recipientAptosWallet;
-            case Stark -> recipientStarkWallet;
+            case Strk -> recipientStarkWallet;
         };
     }
 }

@@ -4,10 +4,6 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
-
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
@@ -73,7 +69,7 @@ public interface BackOfficeMapper {
 
     static Currency mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
         return switch (currency) {
-            case Stark -> Currency.STARK;
+            case Strk -> Currency.STRK;
             case Usd -> Currency.USD;
             case Apt -> Currency.APT;
             case Op -> Currency.OP;

@@ -1016,7 +1016,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       {
                         "totalAmount": 500000,
                         "totalDollarsEquivalent": 0,
-                        "currency": "STARK"
+                        "currency": "STRK"
                       },
                       {
                         "totalAmount": 20.5,
@@ -1256,7 +1256,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
         final PaymentRequestEntity reward4 = paymentRequestRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1" +
                                                                                                "-8819-520b885d9223")).orElseThrow();
-        reward4.setCurrency(CurrencyEnumEntity.stark);
+        reward4.setCurrency(CurrencyEnumEntity.strk);
         reward4.setAmount(BigDecimal.valueOf(500000));
         paymentRequestRepository.save(reward4);
         cryptoUsdQuotesRepository.deleteAll();

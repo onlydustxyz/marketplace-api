@@ -5,7 +5,7 @@ public enum Currency {
     Eth,
     Op,
     Apt,
-    Stark,
+    Strk,
     Lords,
     Usdc
 }

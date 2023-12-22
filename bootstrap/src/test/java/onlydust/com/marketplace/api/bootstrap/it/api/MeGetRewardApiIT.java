@@ -98,7 +98,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.stark);
+        paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
         paymentRequestRepository.save(paymentRequestEntity);
         final UUID paymentId = UUID.randomUUID();
         final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
@@ -123,7 +123,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STARK",
+                           "currency": "STRK",
                            "amount": 100,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -167,7 +167,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STARK",
+                           "currency": "STRK",
                            "amount": 100,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -211,7 +211,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STARK",
+                           "currency": "STRK",
                            "amount": 100,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -254,7 +254,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STARK",
+                           "currency": "STRK",
                            "amount": 100,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",
@@ -298,7 +298,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                           "currency": "STARK",
+                           "currency": "STRK",
                            "amount": 100,
                            "dollarsEquivalent": null,
                            "status": "COMPLETE",

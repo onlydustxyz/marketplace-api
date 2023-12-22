@@ -41,4 +41,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000020_all_queries_and_functions_use_iam_users.sql
   - include:
       file: db/changelog/changelogs/00000021_fix_create_iam_user_from_auth_users.sql
-
+  - include:
+      file: db/changelog/changelogs/00000022_rename_stark_to_strk.sql

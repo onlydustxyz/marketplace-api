@@ -42,7 +42,7 @@ public class CustomUserPayoutInfoRepository {
                              from payment_requests pr_stark
                                       left join payments p_stark on p_stark.request_id = pr_stark.id
                                       left join wallets w_stark on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
-                             where pr_stark.currency = 'stark'
+                             where pr_stark.currency = 'strk'
                                and pr_stark.recipient_id = u.github_user_id
                                and p_stark is null
                              limit 1), true)                                                         valid_stark_wallet,

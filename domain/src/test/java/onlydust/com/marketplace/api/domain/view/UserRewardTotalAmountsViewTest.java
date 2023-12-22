@@ -21,7 +21,7 @@ public class UserRewardTotalAmountsViewTest {
                                 getStub(20, 2000D, Currency.Eth),
                                 getStub(500, 600D, Currency.Apt),
                                 getStub(5000, 5000D, Currency.Usd),
-                                getStub(1000, null, Currency.Stark)
+                                getStub(1000, null, Currency.Strk)
                         )
                 ).build();
 

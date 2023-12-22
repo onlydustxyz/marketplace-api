@@ -71,7 +71,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .id(UUID.randomUUID())
                 .initialAmount(BigDecimal.valueOf(3000))
                 .remainingAmount(BigDecimal.valueOf(100))
-                .currency(CurrencyEnumEntity.stark)
+                .currency(CurrencyEnumEntity.strk)
                 .build());
         final BudgetEntity budget2 = budgetRepository.save(BudgetEntity.builder()
                 .id(UUID.randomUUID())
@@ -127,7 +127,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                                     "dollarsConversionRate": null
                                 },
                                 {
-                                    "currency": "STARK",
+                                    "currency": "STRK",
                                     "initialAmount": 3000,
                                     "remaining": 100,
                                     "remainingDollarsEquivalent": null,

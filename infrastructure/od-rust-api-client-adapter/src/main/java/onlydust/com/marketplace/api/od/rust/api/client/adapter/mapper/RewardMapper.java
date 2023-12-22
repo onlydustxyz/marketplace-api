@@ -13,7 +13,7 @@ public interface RewardMapper {
                     case Op -> "OP";
                     case Apt -> "APT";
                     case Usd -> "USD";
-                    case Stark -> "STARK";
+                    case Strk -> "STRK";
                     case Lords -> "LORDS";
                     case Usdc -> "USDC";
                 })

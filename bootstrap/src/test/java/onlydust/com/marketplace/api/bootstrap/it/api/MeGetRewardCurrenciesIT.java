@@ -29,7 +29,7 @@ public class MeGetRewardCurrenciesIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "currencies": ["USD","ETH","STARK"]
+                           "currencies": ["USD","ETH","STRK"]
                          }
                         """);
     }
