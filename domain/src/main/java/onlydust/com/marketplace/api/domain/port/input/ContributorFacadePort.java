@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.Contributor;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.ContributionView;
@@ -27,4 +28,6 @@ public interface ContributorFacadePort {
     List<Project> contributedProjects(Long contributorId, ContributionView.Filters filters);
 
     List<GithubRepo> contributedRepos(Long contributorId, ContributionView.Filters filters);
+
+    List<Currency> getRewardCurrencies(Long githubUserId);
 }

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
@@ -251,6 +252,13 @@ public class MeRestApi implements MeApi {
         final List<UserRewardView> rewardViews =
                 userFacadePort.getPendingInvoiceRewardsForRecipientId(authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(MyRewardMapper.listToResponse(rewardViews));
+    }
+
+    @Override
+    public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var currencies = contributorFacadePort.getRewardCurrencies(authenticatedUser.getGithubUserId());
+        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(ProjectBudgetMapper::mapCurrency).toList()));
     }
 
     @Override

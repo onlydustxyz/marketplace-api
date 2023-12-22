@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -23,6 +24,8 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -343,5 +346,12 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void saveProjectLead(UUID userId, UUID projectId) {
         projectLeadRepository.save(new ProjectLeadEntity(projectId, userId));
+    }
+
+    @Override
+    public List<Currency> listRewardCurrencies(Long githubUserId) {
+        return rewardStatsRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
+                .map(CurrencyEnumEntity::toDomain)
+                .toList();
     }
 }

@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,4 +40,13 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
             """, nativeQuery = true)
     List<RewardStatsEntity> findByUser(UUID userId, List<String> currencies, List<UUID> projectIds, String fromDate,
                                        String toDate);
+
+
+    @Query(value = """
+        SELECT DISTINCT pr.currency
+        FROM payment_requests pr
+        WHERE pr.recipient_id = :githubUserId
+        ORDER BY pr.currency
+        """, nativeQuery = true)
+    List<CurrencyEnumEntity> listRewardCurrenciesByRecipient(Long githubUserId);
 }

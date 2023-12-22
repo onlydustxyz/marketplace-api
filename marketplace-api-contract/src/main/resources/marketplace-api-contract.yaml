@@ -624,6 +624,29 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/reward-currencies:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get the list of currencies the caller received rewards in
+      operationId: getMyRewardCurrencies
+      description: |
+        Get the list of currencies the caller received rewards in
+
+      responses:
+        "200":
+          description: 'Currency list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/organizations:
     get:
       security:
@@ -2087,6 +2110,16 @@ components:
           description: The error id
           example: 4f7c660e-6cf1-4424-b240-e630c4c19069
 
+    CurrencyListResponse:
+      type: object
+      description: List of currencies
+      required:
+        - currencies
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyContract'
 
 
     # VALUE OBJECTS ==================================================================

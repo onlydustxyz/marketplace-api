@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.Contributor;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
@@ -53,4 +54,6 @@ public interface UserStoragePort {
     List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 
     void saveProjectLead(UUID userId, UUID projectId);
+
+    List<Currency> listRewardCurrencies(Long githubUserId);
 }
