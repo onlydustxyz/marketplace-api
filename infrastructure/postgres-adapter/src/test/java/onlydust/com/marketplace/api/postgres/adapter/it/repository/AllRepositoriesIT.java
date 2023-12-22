@@ -91,7 +91,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
+                .githubUserId(faker.number().randomNumber(15, true))
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
@@ -420,7 +420,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                                 .bic(faker.hacker().abbreviation())
                                 .iban(IBAN.valueOf("FR1014508000702139488771C56"))
                                 .build())
-                        .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO)
                         .build())
                 .build();
 
@@ -429,16 +428,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final UserPayoutInformation payoutInformationById = postgresUserAdapter.getPayoutInformationById(userId);
 
         // Then
-        assertEquals(userPayoutInformation.toBuilder().hasValidPerson(false).hasValidCompany(true).hasValidLocation(true)
-                        .payoutSettings(payoutInformationById.getPayoutSettings()
-                                .toBuilder()
-                                .hasMissingOptimismWallet(false)
-                                .hasMissingEthWallet(false)
-                                .hasMissingAptosWallet(false)
-                                .hasMissingBankingAccount(false)
-                                .hasMissingStarknetWallet(false)
-                                .build()).build(),
-                payoutInformationById);
+        assertEquals(userPayoutInformation, payoutInformationById);
 
         final UserPayoutInformation userPayoutInformationUpdated =
                 postgresUserAdapter.savePayoutInformationForUserId(userId, userPayoutInformation.toBuilder()

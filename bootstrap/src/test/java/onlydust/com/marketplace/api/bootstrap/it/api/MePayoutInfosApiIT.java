@@ -48,10 +48,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .missingStarknetWallet(missingStarknetWallet)
                         .optimismAddress(userPayoutInformationRequest.getPayoutSettings().getOptimismAddress())
                         .missingOptimismWallet(missingOptimismWallet)
-                        .usdPreferredMethod(switch (userPayoutInformationRequest.getPayoutSettings().getUsdPreferredMethod()) {
-                            case FIAT -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT;
-                            case CRYPTO -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO;
-                        })
                         .sepaAccount(isNull(userPayoutInformationRequest.getPayoutSettings().getSepaAccount()) ?
                                 null :
                                 new UserPayoutInformationResponsePayoutSettingsSepaAccount()
@@ -137,12 +133,11 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.country").isEqualTo("France")
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
                 .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
-                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("CRYPTO")
                 .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(true)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 
@@ -174,7 +169,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban("GB49BARC20037826686157")
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
         final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
         requestBody2.company(
@@ -197,7 +191,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .ethAddress("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
 
@@ -245,7 +238,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban("FR1014508000702139488771C56")
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
         final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
         requestBody2.company(null)
@@ -262,7 +254,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .ethAddress("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
 
@@ -359,7 +350,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban("FR1014508000702139488771C56")
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
 
         // Then
@@ -403,7 +393,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.isCompany").isEqualTo(false)
-                .jsonPath("$.hasValidContactInfo").isEqualTo(true)
+                .jsonPath("$.hasValidContactInfo").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
@@ -452,8 +442,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingUsdcWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 }
