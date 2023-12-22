@@ -11,7 +11,7 @@ public interface UserPayoutInfoMapper {
         final UserPayoutInformationResponse contract = new UserPayoutInformationResponse();
         final Boolean isACompany = view.getIsACompany();
         contract.setIsCompany(isACompany);
-        contract.setHasValidContactInfo(view.getHasValidContactInfo());
+        contract.setHasValidContactInfo(view.hasValidContactInfo());
         if (isACompany) {
             final CompanyIdentity company = new CompanyIdentity();
             company.setName(view.getCompany().getName());
@@ -21,7 +21,7 @@ public interface UserPayoutInfoMapper {
             owner.setLastname(view.getCompany().getOwner().getLastName());
             company.setOwner(owner);
             contract.setCompany(company);
-        } else if (nonNull(view.getPerson())){
+        } else if (nonNull(view.getPerson())) {
             final PersonIdentity person = new PersonIdentity();
             person.setFirstname(view.getPerson().getFirstName());
             person.setLastname(view.getPerson().getLastName());
@@ -44,34 +44,17 @@ public interface UserPayoutInfoMapper {
     }
 
     private static UserPayoutInformationResponsePayoutSettings getUserPayoutInformationContractPayoutSettings(UserPayoutInformation view) {
-        final UserPayoutInformationResponsePayoutSettings payoutSettings =
-                new UserPayoutInformationResponsePayoutSettings();
+        final var payoutSettings = new UserPayoutInformationResponsePayoutSettings();
         payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
-        payoutSettings.setMissingAptosWallet(view.getPayoutSettings().getHasMissingAptosWallet());
         payoutSettings.setEthAddress(view.getPayoutSettings().getEthAddress());
         payoutSettings.setEthName(view.getPayoutSettings().getEthName());
-        payoutSettings.setMissingEthWallet(view.getPayoutSettings().getHasMissingEthWallet());
         payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress());
-        payoutSettings.setMissingOptimismWallet(view.getPayoutSettings().getHasMissingOptimismWallet());
         payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress());
-        payoutSettings.setMissingStarknetWallet(view.getPayoutSettings().getHasMissingStarknetWallet());
-        payoutSettings.setHasValidPayoutSettings(view.getPayoutSettings().isValid());
-        payoutSettings.setMissingSepaAccount(view.getPayoutSettings().getHasMissingBankingAccount());
-        payoutSettings.setMissingUsdcWallet(view.getPayoutSettings().getHasMissingUsdcWallet());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
-            final UserPayoutInformationResponsePayoutSettingsSepaAccount sepaAccount =
-                    new UserPayoutInformationResponsePayoutSettingsSepaAccount();
+            final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
             sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
             payoutSettings.setSepaAccount(sepaAccount);
-        }
-        if (nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
-            switch (view.getPayoutSettings().getUsdPreferredMethodEnum()) {
-                case FIAT ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT);
-                case CRYPTO ->
-                        payoutSettings.setUsdPreferredMethod(UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO);
-            }
         }
         return payoutSettings;
     }
@@ -107,10 +90,6 @@ public interface UserPayoutInfoMapper {
                         .optimismAddress(contract.getPayoutSettings().getOptimismAddress())
                         .ethAddress(contract.getPayoutSettings().getEthAddress())
                         .ethName(contract.getPayoutSettings().getEthName())
-                        .usdPreferredMethodEnum(switch (contract.getPayoutSettings().getUsdPreferredMethod()) {
-                            case FIAT -> UserPayoutInformation.UsdPreferredMethodEnum.FIAT;
-                            case CRYPTO -> UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO;
-                        })
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {

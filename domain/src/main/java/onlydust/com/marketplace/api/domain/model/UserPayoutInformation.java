@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Data
 @Builder(toBuilder = true)
@@ -23,31 +25,48 @@ public class UserPayoutInformation {
     Boolean isACompany = false;
     Location location;
     PayoutSettings payoutSettings;
-    @Builder.Default
-    Boolean hasValidPerson = true;
-    @Builder.Default
-    Boolean hasValidCompany = true;
-    @Builder.Default
-    Boolean hasValidLocation = true;
-    @Builder.Default
-    Boolean hasPendingPayments = false;
 
-    public Boolean getHasValidContactInfo() {
-        if (!this.hasPendingPayments) {
-            return true;
-        }
-        return (hasValidCompany || hasValidPerson) && hasValidLocation;
+    @Builder.Default
+    List<Currency> pendingPaymentsCurrencies = new ArrayList<>();
+
+    private boolean hasPendingPayments() {
+        return !pendingPaymentsCurrencies.isEmpty();
+    }
+
+    private boolean hasValidCompany() {
+        return isACompany && nonNull(company) && company.valid();
+    }
+
+    private boolean hasValidPerson() {
+        return !isACompany && nonNull(person) && person.valid();
+    }
+
+    private boolean hasValidLocation() {
+        return nonNull(location) && location.valid();
+    }
+
+    private boolean hasValidPayoutSettings() {
+        return nonNull(payoutSettings) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
+            case Usd -> nonNull(payoutSettings.sepaAccount) && payoutSettings.sepaAccount.valid();
+            case Eth, Lords, Usdc -> isNotEmpty(payoutSettings.ethAddress) || isNotEmpty(payoutSettings.ethName);
+            case Apt -> isNotEmpty(payoutSettings.aptosAddress);
+            case Op -> isNotEmpty(payoutSettings.optimismAddress);
+            case Stark -> isNotEmpty(payoutSettings.starknetAddress);
+        });
+    }
+
+    public boolean hasValidContactInfo() {
+        return (hasValidCompany() || hasValidPerson()) && hasValidLocation();
     }
 
     public boolean isValid() {
-        if (!this.hasPendingPayments) {
+        if (!this.hasPendingPayments()) {
             return true;
         }
-        return isNull(this.payoutSettings) ? this.getHasValidContactInfo() :
-                this.getHasValidContactInfo() && this.payoutSettings.isValid();
+        return hasValidContactInfo() && hasValidPayoutSettings();
     }
 
-    public void validate() {
+    public void validateWalletAddresses() {
         if (nonNull(this.payoutSettings)) {
             if (nonNull(this.payoutSettings.aptosAddress) && !APTOS_WALLET_PATTERN.matcher(this.payoutSettings.aptosAddress).matches()) {
                 throw OnlyDustException.badRequest("Invalid Aptos address format (%s)".formatted(this.payoutSettings.aptosAddress));
@@ -71,29 +90,12 @@ public class UserPayoutInformation {
     @Data
     @Builder(toBuilder = true)
     public static class PayoutSettings {
-        UsdPreferredMethodEnum usdPreferredMethodEnum;
         String ethAddress;
         String ethName;
-        @Builder.Default
-        Boolean hasMissingEthWallet = false;
         String optimismAddress;
-        @Builder.Default
-        Boolean hasMissingOptimismWallet = false;
         String aptosAddress;
-        @Builder.Default
-        Boolean hasMissingAptosWallet = false;
         String starknetAddress;
-        @Builder.Default
-        Boolean hasMissingStarknetWallet = false;
         SepaAccount sepaAccount;
-        @Builder.Default
-        Boolean hasMissingBankingAccount = false;
-        @Builder.Default
-        Boolean hasMissingUsdcWallet = false;
-
-        public Boolean isValid() {
-            return !(hasMissingAptosWallet || hasMissingEthWallet || hasMissingStarknetWallet || hasMissingOptimismWallet || hasMissingBankingAccount || hasMissingUsdcWallet);
-        }
     }
 
     @Data

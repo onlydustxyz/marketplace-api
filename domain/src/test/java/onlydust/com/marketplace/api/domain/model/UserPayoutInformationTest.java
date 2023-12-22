@@ -15,14 +15,14 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .aptosAddress("0xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
 
         assertDoesNotThrow(() ->
                 UserPayoutInformation.builder()
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .aptosAddress("0x0000357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -32,7 +32,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .aptosAddress("0x1234567890123456789012345678901234567890")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -42,7 +42,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .ethAddress("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -52,7 +52,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .ethAddress("0x000d8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -62,7 +62,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .starknetAddress("0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -72,7 +72,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .starknetAddress("0xb112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -82,7 +82,7 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .optimismAddress("0x2C6277931328e2028C3DB10625D767de19151e92")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 
     @Test
@@ -92,6 +92,6 @@ class UserPayoutInformationTest {
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                 .optimismAddress("0x002C6277931328e2028C3DB10625D767de19151e92")
                                 .build())
-                        .build().validate());
+                        .build().validateWalletAddresses());
     }
 }

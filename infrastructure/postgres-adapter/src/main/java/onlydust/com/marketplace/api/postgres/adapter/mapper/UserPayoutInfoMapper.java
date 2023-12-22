@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayout
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.*;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -22,26 +23,15 @@ public interface UserPayoutInfoMapper {
                                                    final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity) {
         try {
             UserPayoutInformation userPayoutInformation = UserPayoutInformation.builder()
-                    .hasValidPerson(userPayoutInfoValidationEntity.getHasValidPerson())
-                    .hasValidCompany(userPayoutInfoValidationEntity.getHasValidCompany())
-                    .hasValidLocation(userPayoutInfoValidationEntity.getHasValidLocation())
-                    .hasPendingPayments(userPayoutInfoValidationEntity.getHasPendingPayments())
+                    .pendingPaymentsCurrencies(Arrays.stream(userPayoutInfoValidationEntity.getPaymentRequestsCurrencies())
+                            .map(CurrencyEnumEntity::toDomain).toList())
                     .build();
             userPayoutInformation = mapLocationToDomain(userPayoutInfoEntity, userPayoutInformation);
             userPayoutInformation = mapIdentityToDomain(userPayoutInfoEntity, userPayoutInformation);
             UserPayoutInformation.PayoutSettings payoutSettings =
                     UserPayoutInformation.PayoutSettings.builder().build();
-            payoutSettings = mapUsdPreferredToDomain(userPayoutInfoEntity, payoutSettings);
             payoutSettings = mapWalletsToDomain(userPayoutInfoEntity, payoutSettings);
             payoutSettings = mapBankingAccountToDomain(userPayoutInfoEntity, payoutSettings);
-            payoutSettings = payoutSettings.toBuilder()
-                    .hasMissingAptosWallet(!userPayoutInfoValidationEntity.getHasValidAptosWallet())
-                    .hasMissingEthWallet(!userPayoutInfoValidationEntity.getHasValidEthWallet())
-                    .hasMissingOptimismWallet(!userPayoutInfoValidationEntity.getHasValidOptimismWallet())
-                    .hasMissingStarknetWallet(!userPayoutInfoValidationEntity.getHasValidStarknetWallet())
-                    .hasMissingBankingAccount(!userPayoutInfoValidationEntity.getHasValidBakingAccount())
-                    .hasMissingUsdcWallet(!userPayoutInfoValidationEntity.getHasValidUsdcWallet())
-                    .build();
             userPayoutInformation = userPayoutInformation.toBuilder().payoutSettings(payoutSettings).build();
             return userPayoutInformation;
         } catch (JsonProcessingException e) {
@@ -56,15 +46,6 @@ public interface UserPayoutInfoMapper {
                             .bic(userPayoutInfoEntity.getBankAccount().getBic())
                             .iban(userPayoutInfoEntity.getBankAccount().getIban())
                             .build())
-                    .build();
-        }
-        return payoutSettings;
-    }
-
-    private static UserPayoutInformation.PayoutSettings mapUsdPreferredToDomain(UserPayoutInfoEntity userPayoutInfoEntity, UserPayoutInformation.PayoutSettings payoutSettings) {
-        if (nonNull(userPayoutInfoEntity.getUsdPreferredMethodEnum())) {
-            payoutSettings = payoutSettings.toBuilder()
-                    .usdPreferredMethodEnum(usdPreferredMethodToDomain(userPayoutInfoEntity.getUsdPreferredMethodEnum()))
                     .build();
         }
         return payoutSettings;
@@ -139,8 +120,10 @@ public interface UserPayoutInfoMapper {
                 final CompanyJsonEntity companyJsonEntity = OBJECT_MAPPER.treeToValue(identity,
                         CompanyJsonEntity.class);
                 final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
-                        .lastName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getLastName() : null)
-                        .firstName(nonNull(companyJsonEntity.getValue().getOwner()) ? companyJsonEntity.getValue().getOwner().getFirstName() : null)
+                        .lastName(nonNull(companyJsonEntity.getValue().getOwner()) ?
+                                companyJsonEntity.getValue().getOwner().getLastName() : null)
+                        .firstName(nonNull(companyJsonEntity.getValue().getOwner()) ?
+                                companyJsonEntity.getValue().getOwner().getFirstName() : null)
                         .build();
                 userPayoutInformation = userPayoutInformation.toBuilder()
                         .isACompany(true)
@@ -179,10 +162,6 @@ public interface UserPayoutInfoMapper {
         entity = mapIdentityToEntity(userPayoutInformation, entity);
         final UserPayoutInformation.PayoutSettings payoutSettings = userPayoutInformation.getPayoutSettings();
         if (nonNull(payoutSettings)) {
-            if (nonNull(payoutSettings.getUsdPreferredMethodEnum())) {
-                entity =
-                        entity.toBuilder().usdPreferredMethodEnum(usdPreferredMethodToEntity(payoutSettings.getUsdPreferredMethodEnum())).build();
-            }
             if (nonNull(payoutSettings.getSepaAccount())) {
                 entity = entity.toBuilder()
                         .bankAccount(BankAccountEntity.builder()
