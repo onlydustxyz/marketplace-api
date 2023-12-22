@@ -48,10 +48,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .missingStarknetWallet(missingStarknetWallet)
                         .optimismAddress(userPayoutInformationRequest.getPayoutSettings().getOptimismAddress())
                         .missingOptimismWallet(missingOptimismWallet)
-                        .usdPreferredMethod(switch (userPayoutInformationRequest.getPayoutSettings().getUsdPreferredMethod()) {
-                            case FIAT -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.FIAT;
-                            case CRYPTO -> UserPayoutInformationResponsePayoutSettings.UsdPreferredMethodEnum.CRYPTO;
-                        })
                         .sepaAccount(isNull(userPayoutInformationRequest.getPayoutSettings().getSepaAccount()) ?
                                 null :
                                 new UserPayoutInformationResponsePayoutSettingsSepaAccount()
@@ -137,7 +133,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.country").isEqualTo("France")
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
                 .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
-                .jsonPath("$.payoutSettings.usdPreferredMethod").isEqualTo("CRYPTO")
                 .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(true)
@@ -174,7 +169,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
         final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
         requestBody2.company(
@@ -197,7 +191,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .ethAddress("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
 
@@ -245,7 +238,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
         final UserPayoutInformationRequest requestBody2 = new UserPayoutInformationRequest();
         requestBody2.company(null)
@@ -262,7 +254,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
                         .ethAddress("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.CRYPTO)
                 );
 
 
@@ -323,7 +314,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
 
         // Then

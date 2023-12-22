@@ -2317,11 +2317,6 @@ components:
           properties:
             hasValidPayoutSettings:
               type: boolean
-            usdPreferredMethod:
-              type: string
-              enum:
-                - CRYPTO
-                - FIAT
             sepaAccount:
               type: object
               properties:
@@ -2385,11 +2380,6 @@ components:
         payoutSettings:
           type: object
           properties:
-            usdPreferredMethod:
-              type: string
-              enum:
-                - CRYPTO
-                - FIAT
             sepaAccount:
               type: object
               properties:
