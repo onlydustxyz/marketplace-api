@@ -137,7 +137,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(true)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 
@@ -357,7 +357,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.isCompany").isEqualTo(false)
-                .jsonPath("$.hasValidContactInfo").isEqualTo(true)
+                .jsonPath("$.hasValidContactInfo").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
@@ -406,8 +406,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingStarknetWallet").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(false)
-                .jsonPath("$.payoutSettings.missingUsdcWallet").isEqualTo(true)
+                .jsonPath("$.payoutSettings.missingSepaAccount").isEqualTo(true)
                 .jsonPath("$.payoutSettings.hasValidPayoutSettings").isEqualTo(false);
     }
 }

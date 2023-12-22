@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Data
@@ -45,7 +47,7 @@ public class UserPayoutInformation {
         return nonNull(location) && location.valid();
     }
 
-    private boolean hasValidPayoutSettings() {
+    public boolean hasValidPayoutSettings() {
         return nonNull(payoutSettings) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
             case Usd -> nonNull(payoutSettings.sepaAccount) && payoutSettings.sepaAccount.valid();
             case Eth, Lords, Usdc -> isNotEmpty(payoutSettings.ethAddress) || isNotEmpty(payoutSettings.ethName);
@@ -53,6 +55,30 @@ public class UserPayoutInformation {
             case Op -> isNotEmpty(payoutSettings.optimismAddress);
             case Stark -> isNotEmpty(payoutSettings.starknetAddress);
         });
+    }
+
+    public boolean isMissingOptimismWallet() {
+        return pendingPaymentsCurrencies.contains(Currency.Op) && isEmpty(payoutSettings.optimismAddress);
+    }
+
+    public boolean isMissingAptosWallet() {
+        return pendingPaymentsCurrencies.contains(Currency.Apt) && isEmpty(payoutSettings.aptosAddress);
+    }
+
+    public boolean isMissingStarknetWallet() {
+        return pendingPaymentsCurrencies.contains(Currency.Stark) && isEmpty(payoutSettings.starknetAddress);
+    }
+
+    public boolean isMissingEthereumWallet() {
+        return (pendingPaymentsCurrencies.contains(Currency.Eth)
+                || pendingPaymentsCurrencies.contains(Currency.Lords)
+                || pendingPaymentsCurrencies.contains(Currency.Usdc))
+               && isEmpty(payoutSettings.ethAddress)
+               && isEmpty(payoutSettings.ethName);
+    }
+
+    public boolean isMissingSepaAccount() {
+        return pendingPaymentsCurrencies.contains(Currency.Usd) && (isNull(payoutSettings.sepaAccount) || !payoutSettings.sepaAccount.valid());
     }
 
     public boolean hasValidContactInfo() {

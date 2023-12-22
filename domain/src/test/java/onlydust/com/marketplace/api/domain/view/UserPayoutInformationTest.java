@@ -65,7 +65,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Eth)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -77,7 +77,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Eth)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
     }
 
     @Test
@@ -137,6 +137,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Eth)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -148,6 +149,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Usd)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingSepaAccount()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -159,6 +161,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Stark)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingStarknetWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -170,6 +173,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Lords)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -181,6 +185,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Op)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingOptimismWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -192,6 +197,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Apt)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingAptosWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -203,6 +209,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Usdc)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
+        assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
     }
 
 
@@ -217,6 +224,13 @@ public class UserPayoutInformationTest {
                 List.of()
         );
         assertThat(userPayoutInformation.isValid()).isTrue();
+        assertThat(userPayoutInformation.hasValidContactInfo()).isFalse();
+        assertThat(userPayoutInformation.hasValidPayoutSettings()).isFalse();
+        assertThat(userPayoutInformation.isMissingEthereumWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingStarknetWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingOptimismWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingAptosWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingSepaAccount()).isFalse();
     }
 
     @Test
@@ -234,7 +248,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Usd)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -246,7 +260,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Stark)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -258,7 +272,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Eth)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -270,7 +284,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Eth)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -282,7 +296,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Lords)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -294,7 +308,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Lords)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -306,7 +320,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Usdc)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -318,7 +332,7 @@ public class UserPayoutInformationTest {
                         .build(),
                 List.of(Currency.Usdc)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 true,
@@ -338,7 +352,7 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Usd, Currency.Stark, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
         );
-        assertThat(userPayoutInformation.isValid()).isTrue();
+        assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
                 false,
@@ -358,6 +372,17 @@ public class UserPayoutInformationTest {
                 List.of(Currency.Usd, Currency.Stark, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
         );
+        assertIsFullValid(userPayoutInformation);
+    }
+
+    private static void assertIsFullValid(UserPayoutInformation userPayoutInformation) {
         assertThat(userPayoutInformation.isValid()).isTrue();
+        assertThat(userPayoutInformation.hasValidContactInfo()).isTrue();
+        assertThat(userPayoutInformation.hasValidPayoutSettings()).isTrue();
+        assertThat(userPayoutInformation.isMissingEthereumWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingStarknetWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingOptimismWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingAptosWallet()).isFalse();
+        assertThat(userPayoutInformation.isMissingSepaAccount()).isFalse();
     }
 }

@@ -45,9 +45,10 @@ public interface UserPayoutInfoMapper {
 
     private static UserPayoutInformationResponsePayoutSettings getUserPayoutInformationContractPayoutSettings(UserPayoutInformation view) {
         final var payoutSettings = new UserPayoutInformationResponsePayoutSettings();
-        payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
+        payoutSettings.setHasValidPayoutSettings(view.hasValidPayoutSettings());
         payoutSettings.setEthAddress(view.getPayoutSettings().getEthAddress());
         payoutSettings.setEthName(view.getPayoutSettings().getEthName());
+        payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress());
         payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress());
         payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
@@ -56,6 +57,12 @@ public interface UserPayoutInfoMapper {
             sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
             payoutSettings.setSepaAccount(sepaAccount);
         }
+
+        payoutSettings.missingEthWallet(view.isMissingEthereumWallet());
+        payoutSettings.missingAptosWallet(view.isMissingAptosWallet());
+        payoutSettings.missingOptimismWallet(view.isMissingOptimismWallet());
+        payoutSettings.missingStarknetWallet(view.isMissingStarknetWallet());
+        payoutSettings.missingSepaAccount(view.isMissingSepaAccount());
         return payoutSettings;
     }
 
