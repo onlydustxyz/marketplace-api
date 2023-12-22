@@ -29,5 +29,7 @@ public interface ContributorFacadePort {
 
     List<GithubRepo> contributedRepos(Long contributorId, ContributionView.Filters filters);
 
+    List<Project> rewardingProjects(Long githubUserId);
+
     List<Currency> getRewardCurrencies(Long githubUserId);
 }

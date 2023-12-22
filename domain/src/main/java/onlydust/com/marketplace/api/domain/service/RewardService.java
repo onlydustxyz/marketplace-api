@@ -6,7 +6,7 @@ import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RewardService<Authentication> implements RewardFacadePort<Authentication> {
 
-    private final RewardStoragePort<Authentication> rewardStoragePort;
+    private final RewardServicePort<Authentication> rewardServicePort;
     private final ProjectStoragePort projectStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
@@ -37,13 +37,13 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
         }
 
         indexerPort.indexUser(command.getRecipientId());
-        return rewardStoragePort.requestPayment(authentication, command);
+        return rewardServicePort.requestPayment(authentication, command);
     }
 
     @Override
     public void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            rewardStoragePort.cancelPayment(authentication, rewardId);
+            rewardServicePort.cancelPayment(authentication, rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
         }

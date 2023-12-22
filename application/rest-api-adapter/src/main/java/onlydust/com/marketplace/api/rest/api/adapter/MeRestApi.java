@@ -192,18 +192,29 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<ContributedProjectsResponse> getMyContributedProjects(List<Long> repositories) {
+    public ResponseEntity<ProjectListResponse> getMyContributedProjects(List<Long> repositories) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .build();
 
-        final var contributedProjects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId()
-                , filters);
+        final var projects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId(), filters);
 
-        return ResponseEntity.ok(new ContributedProjectsResponse()
-                .projects(contributedProjects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
+        return ResponseEntity.ok(new ProjectListResponse()
+                .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
+        );
+    }
+
+
+    @Override
+    public ResponseEntity<ProjectListResponse> getMyRewardingProjects() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        final var projects = contributorFacadePort.rewardingProjects(authenticatedUser.getGithubUserId());
+
+        return ResponseEntity.ok(new ProjectListResponse()
+                .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
         );
     }
 

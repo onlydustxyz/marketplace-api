@@ -88,6 +88,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_CONTRIBUTIONS = "/api/v1/me/contributions";
     protected static final String ME_GET_CONTRIBUTED_PROJECTS = "/api/v1/me/contributed-projects";
     protected static final String ME_GET_CONTRIBUTED_REPOS = "/api/v1/me/contributed-repos";
+    protected static final String ME_GET_REWARDING_PROJECTS = "/api/v1/me/rewarding-projects";
     protected static final String ME_GET_REWARD_TOTAL_AMOUNTS = "/api/v1/me/rewards/amounts";
     protected static final String ME_REWARDS_PENDING_INVOICE = "/api/v1/me/rewards/pending-invoice";
     protected static final String ME_REWARD = "/api/v1/me/rewards/%s";

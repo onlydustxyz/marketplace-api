@@ -1,13 +1,9 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.model.Project;
 
-import java.util.UUID;
+import java.util.List;
 
-public interface RewardStoragePort<Authentication> {
-
-    UUID requestPayment(Authentication authentication,
-                        RequestRewardCommand requestRewardCommand);
-
-    void cancelPayment(Authentication authentication, UUID rewardId);
+public interface RewardStoragePort {
+    List<Project> listProjectsByRecipient(Long githubUserId);
 }

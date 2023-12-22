@@ -90,8 +90,9 @@ public class DomainConfiguration {
     public ContributorFacadePort contributorFacadePort(final ProjectStoragePort projectStoragePort,
                                                        final GithubSearchPort githubSearchPort,
                                                        final UserStoragePort userStoragePort,
-                                                       final ContributionStoragePort contributionStoragePort) {
-        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort);
+                                                       final ContributionStoragePort contributionStoragePort,
+                                                       final RewardStoragePort rewardStoragePort) {
+        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort, rewardStoragePort);
     }
 
 
@@ -102,11 +103,11 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService<HasuraAuthentication> rewardService(final RewardStoragePort<HasuraAuthentication> rewardStoragePort,
+    public RewardService<HasuraAuthentication> rewardService(final RewardServicePort<HasuraAuthentication> rewardServicePort,
                                                              final ProjectStoragePort projectStoragePort,
                                                              final PermissionService permissionService,
                                                              final IndexerPort indexerPort) {
-        return new RewardService<>(rewardStoragePort, projectStoragePort, permissionService, indexerPort);
+        return new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
     }
 
     @Bean

@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.od.rust.api.client.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper.RewardMapper;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpMethod;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class OdRustApiClientAdapter implements RewardStoragePort<HasuraAuthentication> {
+public class OdRustApiClientAdapter implements RewardServicePort<HasuraAuthentication> {
 
     private final OdRustApiHttpClient httpClient;
 

@@ -43,4 +43,25 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
     List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
                                                            List<UUID> projectIds,
                                                            List<Long> repoIds);
+
+    @Query(value = """
+            SELECT DISTINCT
+                p.project_id as id,
+                p.key,
+                p.name,
+                p.short_description,
+                p.long_description,
+                p.logo_url,
+                p.telegram_link,
+                p.hiring,
+                p.visibility
+            FROM 
+                 project_details p
+            JOIN payment_requests pr ON pr.project_id = p.project_id
+            WHERE
+                pr.recipient_id = :contributorId
+            ORDER BY 
+                p.name 
+            """, nativeQuery = true)
+    List<ShortProjectViewEntity> listProjectsByRewardRecipient(Long contributorId);
 }

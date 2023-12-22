@@ -4,10 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.ContributorFaker;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,8 +21,9 @@ public class ContributorServiceTest {
     final GithubSearchPort githubSearchPort = mock(GithubSearchPort.class);
     final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
+    final RewardStoragePort rewardStoragePort = mock(RewardStoragePort.class);
     final ContributorService contributorService = new ContributorService(projectStoragePort, githubSearchPort,
-            userStoragePort, contributionStoragePort);
+            userStoragePort, contributionStoragePort, rewardStoragePort);
     private final ContributorFaker contributorFaker = new ContributorFaker();
     private final Faker faker = new Faker();
 
