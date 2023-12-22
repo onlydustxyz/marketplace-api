@@ -199,7 +199,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                      {
                        "totalAmount": 2000,
                        "totalDollarsEquivalent": 0,
-                       "currency": "STARK"
+                       "currency": "STRK"
                      }
                    ]
                  },
@@ -1013,7 +1013,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     {
                       "totalAmount": 2000,
                       "totalDollarsEquivalent": 0,
-                      "currency": "STARK"
+                      "currency": "STRK"
                     }
                   ]
                 },

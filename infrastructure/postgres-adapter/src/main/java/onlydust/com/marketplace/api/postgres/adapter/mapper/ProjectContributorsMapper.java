@@ -50,7 +50,7 @@ public interface ProjectContributorsMapper {
         }
         if (nonNull(contributorViewEntity.getStarkAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Stark)
+                    .currency(Currency.Strk)
                     .totalAmount(contributorViewEntity.getStarkAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getStarkDollarsEquivalentAmount()).build());
         }

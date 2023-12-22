@@ -90,7 +90,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(1))
-                .currency(CurrencyContract.STARK)
+                .currency(CurrencyContract.STRK)
                 .recipientId(11111L)
                 .items(List.of(
                         new RewardItemRequest().id("pr2")

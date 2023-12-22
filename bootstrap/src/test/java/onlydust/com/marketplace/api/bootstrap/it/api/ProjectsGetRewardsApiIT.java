@@ -533,7 +533,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "10000",
                         "fromDate", "2023-09-25",
                         "toDate", "2023-09-25",
-                        "currencies", "STARK"
+                        "currencies", "STRK"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()

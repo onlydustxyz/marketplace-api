@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.domain.view.backoffice;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView.Identity;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,7 +118,7 @@ class PaymentViewTest {
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Stark)
+                .currency(Currency.Strk)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
                 .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
@@ -185,7 +183,7 @@ class PaymentViewTest {
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Stark)
+                .currency(Currency.Strk)
                 .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientStarkWallet("wallet")
                 .build()

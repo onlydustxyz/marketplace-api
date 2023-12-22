@@ -36,7 +36,7 @@ public class RewardServiceTest {
                 RequestRewardCommand.builder()
                         .projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Stark)
+                        .currency(Currency.Strk)
                         .build();
         final var newRewardId = UUID.randomUUID();
 
@@ -48,7 +48,7 @@ public class RewardServiceTest {
         when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Stark)
+                                .currency(Currency.Strk)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -75,7 +75,7 @@ public class RewardServiceTest {
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Stark)
+                        .currency(Currency.Strk)
                         .build();
 
         // When
@@ -84,7 +84,7 @@ public class RewardServiceTest {
         when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Stark)
+                                .currency(Currency.Strk)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -117,7 +117,7 @@ public class RewardServiceTest {
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(0L))
-                        .currency(Currency.Stark)
+                        .currency(Currency.Strk)
                         .build();
 
         // When
@@ -126,7 +126,7 @@ public class RewardServiceTest {
         when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Stark)
+                                .currency(Currency.Strk)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -160,7 +160,7 @@ public class RewardServiceTest {
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Stark)
+                        .currency(Currency.Strk)
                         .build();
 
         // When
@@ -180,7 +180,7 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
+        Assertions.assertEquals(("Not enough budget of currency Strk for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
         verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
@@ -201,7 +201,7 @@ public class RewardServiceTest {
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Stark)
+                        .currency(Currency.Strk)
                         .build();
 
         // When
@@ -210,7 +210,7 @@ public class RewardServiceTest {
         when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Stark)
+                                .currency(Currency.Strk)
                                 .remaining(BigDecimal.valueOf(9L))
                                 .build()))
                         .build());
@@ -224,7 +224,7 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency Stark for project %s to request a reward with an " +
+        Assertions.assertEquals(("Not enough budget of currency Strk for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
         verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());

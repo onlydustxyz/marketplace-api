@@ -56,7 +56,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                          left join payments p_stark on p_stark.request_id = pr_stark.id
                                          left join wallets w_stark
                                                    on w_stark.user_id = upi.user_id and w_stark.network = 'starknet'
-                                where pr_stark.currency = 'stark'
+                                where pr_stark.currency = 'strk'
                                   and pr_stark.id = pr.id
                                   and pr_stark.recipient_id = u.github_user_id
                                   and p_stark is null
@@ -128,7 +128,7 @@ public interface ContributionRewardViewEntityRepository extends JpaRepository<Co
                                      not payout_checks.valid_location or
                                      (not payout_checks.valid_company and not payout_checks.valid_person) or
                                      not payout_checks.valid_eth_wallet
-                             when pr.currency = 'stark' then
+                             when pr.currency = 'strk' then
                                      not payout_checks.valid_location or
                                      (not payout_checks.valid_company and not payout_checks.valid_person) or
                                      not payout_checks.valid_stark_wallet

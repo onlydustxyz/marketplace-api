@@ -102,7 +102,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .id(UUID.randomUUID())
                                 .requestedAt(new Date())
                                 .amount(BigDecimal.ONE)
-                                .currency(CurrencyEnumEntity.stark)
+                                .currency(CurrencyEnumEntity.strk)
                                 .hoursWorked(1)
                                 .requestorId(UUID.randomUUID())
                                 .build(),

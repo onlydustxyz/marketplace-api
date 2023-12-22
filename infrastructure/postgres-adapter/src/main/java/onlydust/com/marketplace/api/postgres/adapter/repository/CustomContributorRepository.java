@@ -95,7 +95,7 @@ public class CustomContributorRepository {
                                 group by c.contributor_id) to_rewards_stats on to_rewards_stats.contributor_id = ga.id
                      left join (select sum(pr.amount) filter (where pr.currency = 'usd')   usd,
                                                 sum(pr.amount) filter (where pr.currency = 'apt')   apt,
-                                                sum(pr.amount) filter (where pr.currency = 'stark') stark,
+                                                sum(pr.amount) filter (where pr.currency = 'strk') stark,
                                                 sum(pr.amount) filter (where pr.currency = 'op')    op,
                                                 sum(pr.amount) filter (where pr.currency = 'eth')   eth,
                                                 sum(pr.amount) filter (where pr.currency = 'lords')   lords,
@@ -105,7 +105,7 @@ public class CustomContributorRepository {
                                          group by pr.recipient_id) amounts on amounts.recipient_id = ga.id
                               left join crypto_usd_quotes cuq_eth on cuq_eth.currency = 'eth'
                               left join crypto_usd_quotes cuq_apt on cuq_apt.currency = 'apt'
-                              left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'stark'
+                              left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'strk'
                               left join crypto_usd_quotes cuq_op on cuq_op.currency = 'op'
                               left join crypto_usd_quotes cuq_lords on cuq_lords.currency = 'lords'
             where pc.project_id = :projectId

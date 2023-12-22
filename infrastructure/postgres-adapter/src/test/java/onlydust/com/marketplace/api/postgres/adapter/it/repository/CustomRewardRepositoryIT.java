@@ -88,7 +88,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                             .zipCode()).country(faker.address().country()).build())
                             .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
-                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.stark));
+                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk));
 
             // When
             final RewardViewEntity userReward = customRewardRepository.findUserRewardViewEntityByd(rewardId);
@@ -131,7 +131,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
         @Order(3)
         void should_return_complete_for_an_individual() {
             // Given
-            paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STARK",
+            paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STRK",
                     JacksonUtil.toJsonNode("{}"), rewardId, new Date()));
 
             // When
@@ -260,7 +260,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
         @Order(4)
         void should_return_complete_status() {
             // Given
-            paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STARK",
+            paymentRepository.save(new PaymentEntity(UUID.randomUUID(), BigDecimal.ONE, "STRK",
                     JacksonUtil.toJsonNode("{}"), rewardId, new Date()));
 
             // When

@@ -497,7 +497,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         {
             final var budget = budgetRepository.findById(UUID.fromString("7dcf96a0-ea20-4f95-99f4-89cee2bf3911"))
                     .orElseThrow();
-            budget.setCurrency(CurrencyEnumEntity.stark);
+            budget.setCurrency(CurrencyEnumEntity.strk);
             budgetRepository.save(budget);
         }
 
@@ -523,7 +523,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "budgets": [
                             {
                               "id": "7dcf96a0-ea20-4f95-99f4-89cee2bf3911",
-                              "currency": "STARK",
+                              "currency": "STRK",
                               "initialAmount": 10000,
                               "remainingAmount": 9000,
                               "spentAmount": 1000,

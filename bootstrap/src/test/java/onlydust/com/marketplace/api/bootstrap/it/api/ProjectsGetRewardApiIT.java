@@ -103,7 +103,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
-        paymentRequestEntity.setCurrency(CurrencyEnumEntity.stark);
+        paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
         paymentRequestRepository.save(paymentRequestEntity);
         final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
         paymentRepository.save(PaymentEntity.builder()
@@ -126,7 +126,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json(String.format("""
                         {
                             "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                            "currency": "STARK",
+                            "currency": "STRK",
                             "amount": 100,
                             "dollarsEquivalent": null,
                             "status": "COMPLETE",

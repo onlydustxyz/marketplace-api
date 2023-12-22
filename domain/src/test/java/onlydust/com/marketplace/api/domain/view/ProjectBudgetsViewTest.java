@@ -50,7 +50,7 @@ public class ProjectBudgetsViewTest {
     void should_return_null_dollars_equivalent_values_given_currencies_without_dollars_equivalent() {
         // Given
         final BudgetView budget1 = budgetStub(Currency.Apt, 1000, 500, null, null);
-        final BudgetView budget2 = budgetStub(Currency.Stark, 1000, 500, null, null);
+        final BudgetView budget2 = budgetStub(Currency.Strk, 1000, 500, null, null);
         final ProjectBudgetsView projectBudgetsView = ProjectBudgetsView.builder()
                 .budgets(List.of(
                         budget1,
