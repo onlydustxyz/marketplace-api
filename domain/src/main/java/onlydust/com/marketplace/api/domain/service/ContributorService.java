@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Contributor;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
@@ -63,6 +64,11 @@ public class ContributorService implements ContributorFacadePort {
     @Override
     public List<GithubRepo> contributedRepos(Long contributorId, ContributionView.Filters filters) {
         return contributionStoragePort.listReposByContributor(contributorId, filters);
+    }
+
+    @Override
+    public List<Currency> getRewardCurrencies(Long githubUserId) {
+        return userStoragePort.listRewardCurrencies(githubUserId);
     }
 
     private List<Contributor> searchInternalContributors(UUID projectId, Set<Long> repoIds, String login,
