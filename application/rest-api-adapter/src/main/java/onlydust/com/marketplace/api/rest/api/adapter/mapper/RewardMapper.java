@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 
 public interface RewardMapper {
 
@@ -20,14 +21,7 @@ public interface RewardMapper {
         return RequestRewardCommand.builder()
                 .amount(rewardRequest.getAmount())
                 .projectId(projectId)
-                .currency(switch (rewardRequest.getCurrency()) {
-                    case OP -> Currency.Op;
-                    case APT -> Currency.Apt;
-                    case USD -> Currency.Usd;
-                    case ETH -> Currency.Eth;
-                    case STARK -> Currency.Stark;
-                    case LORDS -> Currency.Lords;
-                })
+                .currency(mapCurrency(rewardRequest.getCurrency()))
                 .recipientId(rewardRequest.getRecipientId())
                 .items(rewardRequest.getItems().stream().map(RewardMapper::rewardItemRequestToDomain).toList())
                 .build();
@@ -62,14 +56,7 @@ public interface RewardMapper {
                 .createdAt(DateMapper.toZoneDateTime(rewardView.getCreatedAt()))
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
-                .currency(switch (rewardView.getCurrency()) {
-                    case Stark -> CurrencyContract.STARK;
-                    case Apt -> CurrencyContract.APT;
-                    case Op -> CurrencyContract.OP;
-                    case Eth -> CurrencyContract.ETH;
-                    case Usd -> CurrencyContract.USD;
-                    case Lords -> CurrencyContract.LORDS;
-                })
+                .currency(mapCurrency(rewardView.getCurrency()))
                 .status(switch (rewardView.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;
                     default -> RewardStatus.PROCESSING;
@@ -98,14 +85,7 @@ public interface RewardMapper {
                 .createdAt(DateMapper.toZoneDateTime(rewardView.getCreatedAt()))
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
-                .currency(switch (rewardView.getCurrency()) {
-                    case Stark -> CurrencyContract.STARK;
-                    case Apt -> CurrencyContract.APT;
-                    case Op -> CurrencyContract.OP;
-                    case Eth -> CurrencyContract.ETH;
-                    case Usd -> CurrencyContract.USD;
-                    case Lords -> CurrencyContract.LORDS;
-                })
+                .currency(mapCurrency(rewardView.getCurrency()))
                 .status(switch (rewardView.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;
                     case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;

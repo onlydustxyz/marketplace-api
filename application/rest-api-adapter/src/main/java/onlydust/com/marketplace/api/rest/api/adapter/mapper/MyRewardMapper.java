@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
 
 public interface MyRewardMapper {
@@ -53,14 +54,7 @@ public interface MyRewardMapper {
 
     private static RewardAmountResponse mapRewardAmountToResponse(UserRewardView view) {
         final RewardAmountResponse amount = new RewardAmountResponse();
-        amount.setCurrency(switch (view.getAmount().getCurrency()) {
-            case Apt -> CurrencyContract.APT;
-            case Op -> CurrencyContract.OP;
-            case Eth -> CurrencyContract.ETH;
-            case Stark -> CurrencyContract.STARK;
-            case Usd -> CurrencyContract.USD;
-            case Lords -> CurrencyContract.LORDS;
-        });
+        amount.setCurrency(mapCurrency(view.getAmount().getCurrency()));
         amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
         amount.setTotal(view.getAmount().getTotal());
         return amount;
@@ -84,14 +78,7 @@ public interface MyRewardMapper {
         for (UserTotalRewardView userTotalReward : view.getUserTotalRewards()) {
             myRewardTotalAmountsResponse.addDetailsItem(new MyRewardAmountResponse().totalAmount(userTotalReward.getTotalAmount())
                     .totalDollarsEquivalent(userTotalReward.getTotalDollarsEquivalent())
-                    .currency(switch (userTotalReward.getCurrency()) {
-                        case Apt -> CurrencyContract.APT;
-                        case Op -> CurrencyContract.OP;
-                        case Eth -> CurrencyContract.ETH;
-                        case Usd -> CurrencyContract.USD;
-                        case Stark -> CurrencyContract.STARK;
-                        case Lords -> CurrencyContract.LORDS;
-                    }));
+                    .currency(mapCurrency (userTotalReward.getCurrency())));
         }
         return myRewardTotalAmountsResponse;
     }

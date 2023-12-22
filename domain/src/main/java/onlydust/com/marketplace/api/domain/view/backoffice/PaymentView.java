@@ -74,7 +74,7 @@ public class PaymentView {
             case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
                     nonNull(recipientEthWallet) :
                     Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
-            case Eth, Lords -> nonNull(recipientEthWallet);
+            case Eth, Lords, Usdc -> nonNull(recipientEthWallet);
             case Op -> nonNull(recipientOptimismWallet);
             case Apt -> nonNull(recipientAptosWallet);
             case Stark -> nonNull(recipientStarkWallet);
@@ -86,7 +86,7 @@ public class PaymentView {
             case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
                     recipientEthWallet :
                     "%s / %s".formatted(recipientSepaAccount.getIban(), recipientSepaAccount.getBic());
-            case Eth, Lords -> recipientEthWallet;
+            case Eth, Lords, Usdc -> recipientEthWallet;
             case Op -> recipientOptimismWallet;
             case Apt -> recipientAptosWallet;
             case Stark -> recipientStarkWallet;

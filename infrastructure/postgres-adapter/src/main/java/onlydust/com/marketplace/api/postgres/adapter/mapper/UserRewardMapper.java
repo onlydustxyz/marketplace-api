@@ -34,14 +34,7 @@ public interface UserRewardMapper {
             userRewardTotalAmountsView.addUserTotalReward(UserTotalRewardView.builder()
                     .totalAmount(entity.getTotal())
                     .totalDollarsEquivalent(entity.getDollarsEquivalent())
-                    .currency(switch (entity.getCurrency()) {
-                        case op -> Currency.Op;
-                        case apt -> Currency.Apt;
-                        case usd -> Currency.Usd;
-                        case eth -> Currency.Eth;
-                        case stark -> Currency.Stark;
-                        case lords -> Currency.Lords;
-                    })
+                    .currency(entity.getCurrency().toDomain())
                     .build());
         }
         return userRewardTotalAmountsView;

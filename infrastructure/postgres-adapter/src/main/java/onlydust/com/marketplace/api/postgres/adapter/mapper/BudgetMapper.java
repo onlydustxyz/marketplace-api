@@ -10,14 +10,7 @@ public interface BudgetMapper {
     static BudgetView entityToDomain(final BudgetViewEntity entity) {
         return BudgetView.builder()
                 .remaining(entity.getRemainingAmount())
-                .currency(switch (entity.getCurrency()) {
-                    case op -> Currency.Op;
-                    case apt -> Currency.Apt;
-                    case eth -> Currency.Eth;
-                    case usd -> Currency.Usd;
-                    case stark -> Currency.Stark;
-                    case lords -> Currency.Lords;
-                })
+                .currency(entity.getCurrency().toDomain())
                 .initialAmount(entity.getInitialAmount())
                 .remainingDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())
                 .initialDollarsEquivalent(entity.getInitialAmountDollarsEquivalent())

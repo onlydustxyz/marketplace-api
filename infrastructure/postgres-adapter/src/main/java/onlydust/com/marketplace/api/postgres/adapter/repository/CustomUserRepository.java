@@ -214,14 +214,7 @@ public class CustomUserRepository {
                                                 row.getTotalsEarned().getDetails().stream().map(detail ->
                                                         TotalEarnedPerCurrency.builder()
                                                                 .currency(isNull(detail.getCurrency()) ? null :
-                                                                        switch (detail.getCurrency()) {
-                                                                            case usd -> Currency.Usd;
-                                                                            case eth -> Currency.Eth;
-                                                                            case op -> Currency.Op;
-                                                                            case apt -> Currency.Apt;
-                                                                            case stark -> Currency.Stark;
-                                                                            case lords -> Currency.Lords;
-                                                                        })
+                                                                        detail.getCurrency().toDomain())
                                                                 .totalAmount(detail.getTotalAmount())
                                                                 .totalDollarsEquivalent(detail.getTotalDollarsEquivalent())
                                                                 .build()

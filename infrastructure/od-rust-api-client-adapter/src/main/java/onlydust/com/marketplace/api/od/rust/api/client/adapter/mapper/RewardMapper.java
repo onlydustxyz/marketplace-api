@@ -15,6 +15,7 @@ public interface RewardMapper {
                     case Usd -> "USD";
                     case Stark -> "STARK";
                     case Lords -> "LORDS";
+                    case Usdc -> "USDC";
                 })
                 .projectId(command.getProjectId())
                 .recipientId(command.getRecipientId())

@@ -29,14 +29,7 @@ public interface RewardMapper {
                 .amount(rewardViewEntityByd.getAmount())
                 .createdAt(rewardViewEntityByd.getRequestedAt())
                 .processedAt(rewardViewEntityByd.getProcessedAt())
-                .currency(switch (rewardViewEntityByd.getCurrency()) {
-                    case op -> Currency.Op;
-                    case apt -> Currency.Apt;
-                    case eth -> Currency.Eth;
-                    case usd -> Currency.Usd;
-                    case stark -> Currency.Stark;
-                    case lords -> Currency.Lords;
-                })
+                .currency(rewardViewEntityByd.getCurrency().toDomain())
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
                 .status(switch (rewardViewEntityByd.getStatus()) {
                     case "PENDING_SIGNUP" -> RewardView.Status.pendingSignup;
@@ -73,14 +66,7 @@ public interface RewardMapper {
                 .amount(rewardViewEntityByd.getAmount())
                 .createdAt(rewardViewEntityByd.getRequestedAt())
                 .processedAt(rewardViewEntityByd.getProcessedAt())
-                .currency(switch (rewardViewEntityByd.getCurrency()) {
-                    case op -> Currency.Op;
-                    case apt -> Currency.Apt;
-                    case eth -> Currency.Eth;
-                    case usd -> Currency.Usd;
-                    case stark -> Currency.Stark;
-                    case lords -> Currency.Lords;
-                })
+                .currency(rewardViewEntityByd.getCurrency().toDomain())
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
                 .status(switch (rewardViewEntityByd.getStatus()) {
                     case "PENDING_SIGNUP" -> RewardView.Status.pendingSignup;
