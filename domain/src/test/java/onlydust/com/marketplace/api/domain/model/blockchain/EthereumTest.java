@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,5 +72,29 @@ class EthereumTest {
     void should_generate_transaction_url() {
         assertThat(Ethereum.BLOCK_EXPLORER.url(Ethereum.transactionHash("0x1")).toString())
                 .isEqualTo("https://etherscan.io/tx/0x01");
+    }
+
+    @Test
+    void should_create_wallet_from_address() {
+        assertThat(Ethereum.wallet("0x00000000219ab540356cBB839Cbe05303d7705Fa").asString())
+                .isEqualTo("0x00000000219ab540356cBB839Cbe05303d7705Fa");
+
+        assertThat(Ethereum.wallet("0x00000000219ab540356cBB839Cbe05303d7705Fa").accountAddress())
+                .isEqualTo(Optional.of(Ethereum.accountAddress("0x00000000219ab540356cBB839Cbe05303d7705Fa")));
+
+        assertThat(Ethereum.wallet("0x00000000219ab540356cBB839Cbe05303d7705Fa").ens())
+                .isEmpty();
+    }
+
+    @Test
+    void should_create_wallet_from_ens() {
+        assertThat(Ethereum.wallet("vitalik.eth").asString())
+                .isEqualTo("vitalik.eth");
+
+        assertThat(Ethereum.wallet("vitalik.eth").accountAddress())
+                .isEmpty();
+
+        assertThat(Ethereum.wallet("vitalik.eth").ens())
+                .isEqualTo(Optional.of("vitalik.eth"));
     }
 }
