@@ -15,7 +15,11 @@ public interface Ethereum {
         return new AccountAddress(value);
     }
 
+    static Name name(String value) {
+        return new Name(value);
+    }
+
     static Wallet wallet(String wallet) {
-        return wallet.startsWith("0x") ? new Wallet(accountAddress(wallet)) : new Wallet(wallet);
+        return wallet.startsWith("0x") ? new Wallet(accountAddress(wallet)) : new Wallet(name(wallet));
     }
 }

@@ -95,6 +95,31 @@ class EthereumTest {
                 .isEmpty();
 
         assertThat(Ethereum.wallet("vitalik.eth").ens())
-                .isEqualTo(Optional.of("vitalik.eth"));
+                .isEqualTo(Optional.of(Ethereum.name("vitalik.eth")));
+    }
+
+    @ParameterizedTest()
+    @ValueSource(strings = {
+            "",
+            "02937",
+            "0x",
+            "0x0asdf",
+            "0x123456789012345678901234567890123456",
+            "vitalik"
+    })
+    void should_reject_invalid_ens(String value) {
+        assertThatThrownBy(() -> Ethereum.name(value))
+                .isInstanceOf(OnlyDustException.class);
+    }
+
+    @ParameterizedTest()
+    @ValueSource(strings = {
+            "vitalik.eth",
+            "abuisset87.stark.eth",
+            "madame-michu.eth",
+            "jp.morgan.eth"
+    })
+    void should_accept_valid_ens(String value) {
+        assertDoesNotThrow(() -> Ethereum.name(value));
     }
 }
