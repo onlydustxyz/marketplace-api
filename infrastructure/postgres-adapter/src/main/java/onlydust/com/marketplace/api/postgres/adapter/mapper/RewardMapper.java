@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -133,6 +132,7 @@ public interface RewardMapper {
                 .ens(cryptoReceiptJsonEntity.getRecipientEns())
                 .walletAddress(cryptoReceiptJsonEntity.getRecipientAddress())
                 .type(ReceiptView.Type.CRYPTO)
+                .blockchain(crypto.toDomain())
                 .build();
     }
 

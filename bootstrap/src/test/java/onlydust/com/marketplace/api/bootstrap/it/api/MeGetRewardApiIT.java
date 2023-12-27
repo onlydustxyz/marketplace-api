@@ -190,7 +190,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "iban": null,
                                "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea",
                                "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                               "transactionReferenceLink": "https://etherscan.io/tx/0x0000000000000000000000000000000000000000000000000000000000000000"
                              }
                          }
                          """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
@@ -234,7 +235,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "iban": null,
                                "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283eb",
                                "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001"
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                               "transactionReferenceLink": "https://aptoscan.com/version/0x0000000000000000000000000000000000000000000000000000000000000001"
                              }
                          }
                          """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
@@ -277,7 +279,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "iban": null,
                                "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ec",
                                "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002"
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000002",
+                               "transactionReferenceLink": "https://optimistic.etherscan.io/tx/0x0000000000000000000000000000000000000000000000000000000000000002"
                              }
                          }
                          """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));
@@ -321,7 +324,8 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                                "iban": null,
                                "walletAddress": "0x657dd41d9bbfe65cbe9f6224d48405b7cad283ed",
                                "ens": "ilysse.eth",
-                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003"
+                               "transactionReference": "0x0000000000000000000000000000000000000000000000000000000000000003",
+                               "transactionReferenceLink": "https://starkscan.co/tx/0x0000000000000000000000000000000000000000000000000000000000000003"
                              }
                          }
                          """, DateMapper.toZoneDateTime(processedAt).format(DateTimeFormatter.ISO_INSTANT)));

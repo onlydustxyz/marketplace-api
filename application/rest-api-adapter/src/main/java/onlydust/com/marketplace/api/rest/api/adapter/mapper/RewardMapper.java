@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.api.domain.view.ReceiptView;
@@ -100,13 +99,11 @@ public interface RewardMapper {
     static ReceiptResponse receiptToResponse(final ReceiptView receiptView) {
         return isNull(receiptView) ? null : new ReceiptResponse()
                 .ens(receiptView.getEns())
-                .type(switch (receiptView.getType()) {
-                    case FIAT -> ReceiptType.FIAT;
-                    case CRYPTO -> ReceiptType.CRYPTO;
-                })
+                .type(receiptView.getType() == ReceiptView.Type.FIAT ? ReceiptType.FIAT : ReceiptType.CRYPTO)
                 .iban(receiptView.getIban())
                 .walletAddress(receiptView.getWalletAddress())
-                .transactionReference(receiptView.getTransactionReference());
+                .transactionReference(receiptView.getTransactionReference())
+                .transactionReferenceLink(receiptView.getTransactionReferenceUrl().orElse(null));
     }
 
     static RewardItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {
