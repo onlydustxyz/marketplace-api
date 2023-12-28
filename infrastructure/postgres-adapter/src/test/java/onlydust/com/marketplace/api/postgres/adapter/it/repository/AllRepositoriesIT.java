@@ -340,7 +340,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final BankAccountEntity expected = BankAccountEntity.builder()
                 .bic(faker.pokemon().location())
                 .userId(UUID.randomUUID())
-                .iban(faker.finance().iban())
+                .iban("FR1014508000702139488771C56")
                 .build();
 
         assertIsSaved(expected, bankAccountRepository);
@@ -418,7 +418,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .optimismAddress(faker.pokemon().name())
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                 .bic(faker.hacker().abbreviation())
-                                .iban(IBAN.valueOf(faker.finance().iban()))
+                                .iban(IBAN.valueOf("FR1014508000702139488771C56"))
                                 .build())
                         .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO)
                         .build())
