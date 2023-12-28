@@ -1,13 +1,15 @@
 package onlydust.com.marketplace.api.domain.view.backoffice;
 
 import com.github.javafaker.Faker;
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView.Identity;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PaymentViewTest {
     private final Faker faker = new Faker();
@@ -17,7 +19,8 @@ class PaymentViewTest {
             Person.builder().firstName(faker.name().firstName()).lastName(faker.name().lastName()).build());
     private final Identity validCompany =
             new Identity(Company.builder().name(faker.company().name()).owner(validPerson.person()).identificationNumber(faker.idNumber().ssnValid()).build(), null);
-    private final SepaAccount validSepaAccount = SepaAccount.builder().iban(faker.finance().iban()).bic(faker.finance().bic()).build();
+    private final SepaAccount validSepaAccount =
+            SepaAccount.builder().iban(IBAN.valueOf("FR1014508000702139488771C56")).bic(faker.finance().bic()).build();
 
     @Test
     void should_consider_payout_info_invalid_when_identity_is_invalid() {
@@ -34,8 +37,10 @@ class PaymentViewTest {
         assertFalse(paymentView.recipientIdentity(new Identity(Company.builder().name(faker.company().name()).identificationNumber(faker.idNumber().ssnValid()).build(), null)).build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientIdentity(new Identity(Company.builder().name(faker.company().name()).owner(validPerson.person()).build(), null)).build().recipientPayoutInfoValid());
 
-        assertFalse(paymentView.recipientIdentity(new Identity(null, Person.builder().lastName(faker.name().lastName()).build())).build().recipientPayoutInfoValid());
-        assertFalse(paymentView.recipientIdentity(new Identity(null, Person.builder().firstName(faker.name().firstName()).build())).build().recipientPayoutInfoValid());
+        assertFalse(paymentView.recipientIdentity(new Identity(null,
+                Person.builder().lastName(faker.name().lastName()).build())).build().recipientPayoutInfoValid());
+        assertFalse(paymentView.recipientIdentity(new Identity(null,
+                Person.builder().firstName(faker.name().firstName()).build())).build().recipientPayoutInfoValid());
     }
 
     @Test
@@ -64,7 +69,8 @@ class PaymentViewTest {
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().bic(faker.finance().bic()).build()).build().recipientPayoutInfoValid());
-        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().iban(faker.finance().iban()).build()).build().recipientPayoutInfoValid());
+        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().iban(IBAN.valueOf(
+                "FR1014508000702139488771C56")).build()).build().recipientPayoutInfoValid());
     }
 
     @Test
@@ -152,7 +158,7 @@ class PaymentViewTest {
                 .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
-                .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban() + " / " + validSepaAccount.getBic());
+                .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban().toPlainString() + " / " + validSepaAccount.getBic());
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Usd)

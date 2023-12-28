@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import nl.garvelink.iban.IBAN;
+import nl.garvelink.iban.IBANException;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 
 import static java.util.Objects.nonNull;
@@ -21,7 +24,7 @@ public interface UserPayoutInfoMapper {
             owner.setLastname(view.getCompany().getOwner().getLastName());
             company.setOwner(owner);
             contract.setCompany(company);
-        } else if (nonNull(view.getPerson())){
+        } else if (nonNull(view.getPerson())) {
             final PersonIdentity person = new PersonIdentity();
             person.setFirstname(view.getPerson().getFirstName());
             person.setLastname(view.getPerson().getLastName());
@@ -62,7 +65,7 @@ public interface UserPayoutInfoMapper {
             final UserPayoutInformationResponsePayoutSettingsSepaAccount sepaAccount =
                     new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
-            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban());
+            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban().toPlainString());
             payoutSettings.setSepaAccount(sepaAccount);
         }
         if (nonNull(view.getPayoutSettings().getUsdPreferredMethodEnum())) {
@@ -114,11 +117,18 @@ public interface UserPayoutInfoMapper {
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
+            IBAN iban;
+            try {
+                iban = IBAN.valueOf(contract.getPayoutSettings().getSepaAccount().getIban());
+            } catch (final IBANException e) {
+                throw OnlyDustException.badRequest("Invalid IBAN format (%s)"
+                        .formatted(contract.getPayoutSettings().getSepaAccount().getIban()), e);
+            }
             userPayoutInformation = userPayoutInformation.toBuilder()
                     .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
                             .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                     .bic(contract.getPayoutSettings().getSepaAccount().getBic())
-                                    .iban(contract.getPayoutSettings().getSepaAccount().getIban())
+                                    .iban(iban)
                                     .build())
                             .build())
                     .build();

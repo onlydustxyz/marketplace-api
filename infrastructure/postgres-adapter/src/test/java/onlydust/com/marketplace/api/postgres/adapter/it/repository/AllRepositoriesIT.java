@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -339,7 +340,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final BankAccountEntity expected = BankAccountEntity.builder()
                 .bic(faker.pokemon().location())
                 .userId(UUID.randomUUID())
-                .iban(faker.hacker().abbreviation())
+                .iban("FR1014508000702139488771C56")
                 .build();
 
         assertIsSaved(expected, bankAccountRepository);
@@ -417,7 +418,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .optimismAddress(faker.pokemon().name())
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                 .bic(faker.hacker().abbreviation())
-                                .iban(faker.hacker().abbreviation())
+                                .iban(IBAN.valueOf("FR1014508000702139488771C56"))
                                 .build())
                         .usdPreferredMethodEnum(UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO)
                         .build())

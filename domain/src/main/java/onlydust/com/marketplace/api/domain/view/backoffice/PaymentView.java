@@ -82,7 +82,7 @@ public class PaymentView {
         return switch (currency) {
             case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
                     recipientEthWallet :
-                    "%s / %s".formatted(recipientSepaAccount.getIban(), recipientSepaAccount.getBic());
+                    "%s / %s".formatted(recipientSepaAccount.getIban().toPlainString(), recipientSepaAccount.getBic());
             case Eth, Lords, Usdc -> recipientEthWallet;
             case Op -> recipientOptimismWallet;
             case Apt -> recipientAptosWallet;

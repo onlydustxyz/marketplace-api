@@ -3,7 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -122,10 +126,11 @@ public class BoPaymentEntity {
                 .issuesCount(issuesCount)
                 .dustyIssuesCount(dustyIssuesCount)
                 .codeReviewsCount(codeReviewsCount)
-                .recipientUsdPreferredMethod(nonNull(recipientUsdPreferredMethod) ? recipientUsdPreferredMethod.toDomain() : null)
+                .recipientUsdPreferredMethod(nonNull(recipientUsdPreferredMethod) ?
+                        recipientUsdPreferredMethod.toDomain() : null)
                 .recipientIdentity(nonNull(recipientIdentity) ? recipientIdentity.toDomain() : null)
                 .recipientLocation(nonNull(recipientLocation) ? recipientLocation.toDomain() : null)
-                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(recipientIban).bic(recipientBic).build())
+                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(IBAN.valueOf(recipientIban)).bic(recipientBic).build())
                 .recipientEthWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.ethereum.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientStarkWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.starknet.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientOptimismWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.optimism.name())).findFirst().map(Wallet::address).orElse(null))

@@ -172,7 +172,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.name().bloodGroup())
+                                .iban("GB49BARC20037826686157")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
@@ -243,7 +243,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.name().bloodGroup())
+                                .iban("FR1014508000702139488771C56")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
@@ -289,6 +289,42 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_not_update_user_individual_payout_infos_with_invalid_iban() {
+        // Given
+        final String jwt = userHelper.authenticatePierre().jwt();
+        final UserPayoutInformationRequest requestBody = new UserPayoutInformationRequest();
+        requestBody.person(new PersonIdentity()
+                        .firstname(faker.name().firstName())
+                        .lastname(faker.name().lastName())
+                )
+                .isCompany(false)
+                .location(new UserPayoutInformationResponseLocation()
+                        .address(faker.address().fullAddress())
+                        .city(faker.address().city())
+                        .country(faker.address().country())
+                        .postalCode(faker.address().zipCode())
+                )
+                .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
+                        .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
+                                .bic(faker.random().hex())
+                                .iban(faker.name().bloodGroup())
+                        )
+                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
+                );
+
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PAYOUT_INFO))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(requestBody))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
+    }
+
+    @Test
     void should_update_user_payout_info_given_impersonate_user() {
         // Given
         final var githubUserId = faker.number().randomNumber();
@@ -321,7 +357,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.name().bloodGroup())
+                                .iban("FR1014508000702139488771C56")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
