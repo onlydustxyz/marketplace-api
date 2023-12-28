@@ -45,3 +45,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000022_rename_stark_to_strk.sql
   - include:
       file: db/changelog/changelogs/00000023_rename_stark_to_strk_in_events.sql
+  - include:
+      file: db/changelog/changelogs/00000024_remove_whitespaces_from_ibans.sql
