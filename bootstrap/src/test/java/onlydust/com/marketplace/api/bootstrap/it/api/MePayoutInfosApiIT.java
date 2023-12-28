@@ -172,7 +172,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.finance().iban())
+                                .iban("GB49BARC20037826686157")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
@@ -243,7 +243,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.finance().iban())
+                                .iban("FR1014508000702139488771C56")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
@@ -357,7 +357,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .aptosAddress("0x" + faker.random().hex(64))
                         .sepaAccount(new UserPayoutInformationResponsePayoutSettingsSepaAccount()
                                 .bic(faker.random().hex())
-                                .iban(faker.finance().iban())
+                                .iban("FR1014508000702139488771C56")
                         )
                         .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
