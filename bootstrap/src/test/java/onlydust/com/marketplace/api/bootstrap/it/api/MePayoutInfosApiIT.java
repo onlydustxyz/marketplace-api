@@ -300,7 +300,6 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                                 .bic(faker.random().hex())
                                 .iban(faker.name().bloodGroup())
                         )
-                        .usdPreferredMethod(UserPayoutInformationRequestPayoutSettings.UsdPreferredMethodEnum.FIAT)
                 );
 
 

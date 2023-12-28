@@ -587,7 +587,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .ethName(faker.random().hex())
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).iban(faker.random().hex()).build())
+                                            .bic(faker.random().hex()).iban(IBAN.valueOf("ES6621000418401234567891")).build())
                                     .build()).build());
             final UUID completedReward = UUID.randomUUID();
             final UUID pendingInvoiceRewardIdUsdc = UUID.randomUUID();

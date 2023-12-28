@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.view;
 
+import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import org.junit.jupiter.api.Test;
@@ -158,7 +159,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .build(),
-                List.of(Currency.Stark)
+                List.of(Currency.Strk)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingStarknetWallet()).isTrue();
@@ -242,7 +243,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban("ES6621000418401234567891")
+                                .iban(IBAN.valueOf("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .build(),
@@ -258,7 +259,7 @@ public class UserPayoutInformationTest {
                 UserPayoutInformation.PayoutSettings.builder()
                         .starknetAddress("0x1234567890123456789012345678901234567890")
                         .build(),
-                List.of(Currency.Stark)
+                List.of(Currency.Strk)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -341,7 +342,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban("ES6621000418401234567891")
+                                .iban(IBAN.valueOf("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress("0x1234567890123456789012345678901234567890")
@@ -349,7 +350,7 @@ public class UserPayoutInformationTest {
                         .optimismAddress("0x1234567890123456789012345678901234567890")
                         .ethAddress("0x1234567890123456789012345678901234567890")
                         .build(),
-                List.of(Currency.Usd, Currency.Stark, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
+                List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
         );
         assertIsFullValid(userPayoutInformation);
@@ -361,7 +362,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban("ES6621000418401234567891")
+                                .iban(IBAN.valueOf("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress("0x1234567890123456789012345678901234567890")
@@ -369,7 +370,7 @@ public class UserPayoutInformationTest {
                         .optimismAddress("0x1234567890123456789012345678901234567890")
                         .ethAddress("0x1234567890123456789012345678901234567890")
                         .build(),
-                List.of(Currency.Usd, Currency.Stark, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
+                List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
         );
         assertIsFullValid(userPayoutInformation);

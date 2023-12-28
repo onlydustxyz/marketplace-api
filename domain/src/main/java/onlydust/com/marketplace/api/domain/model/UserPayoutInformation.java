@@ -54,7 +54,7 @@ public class UserPayoutInformation {
             case Eth, Lords, Usdc -> isNotEmpty(payoutSettings.ethAddress) || isNotEmpty(payoutSettings.ethName);
             case Apt -> isNotEmpty(payoutSettings.aptosAddress);
             case Op -> isNotEmpty(payoutSettings.optimismAddress);
-            case Stark -> isNotEmpty(payoutSettings.starknetAddress);
+            case Strk -> isNotEmpty(payoutSettings.starknetAddress);
         });
     }
 
@@ -67,7 +67,7 @@ public class UserPayoutInformation {
     }
 
     public boolean isMissingStarknetWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Stark) && isEmpty(payoutSettings.starknetAddress);
+        return pendingPaymentsCurrencies.contains(Currency.Strk) && isEmpty(payoutSettings.starknetAddress);
     }
 
     public boolean isMissingEthereumWallet() {
