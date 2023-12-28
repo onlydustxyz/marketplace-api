@@ -4305,6 +4305,9 @@ components:
           type: string
         transactionReference:
           type: string
+        transactionReferenceLink:
+          type: string
+          format: uri
 
     OnContributionsChangeEvent:
       type: object
