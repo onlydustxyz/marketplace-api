@@ -2,7 +2,7 @@
 UPDATE payments
 SET currency_code = 'USDC'
 WHERE currency_code = 'USD'
-  AND receipt ? 'Ethereum';
+  AND receipt ?? 'Ethereum';
 
 -- Move all payment request currencies to USDC if
 --      payment is USDC, or
@@ -30,12 +30,12 @@ FROM events
 WHERE EXISTS(select 1
              from events e
              where e.aggregate_id = events.aggregate_id
-               and e.payload ? 'Cancelled'
+               and e.payload ?? 'Cancelled'
                and e.aggregate_name = 'PAYMENT');
 
 DELETE
 FROM events
-WHERE payload ? 'Spent'
+WHERE payload ?? 'Spent'
   and aggregate_name = 'BUDGET';
 
 
@@ -44,14 +44,14 @@ UPDATE events
 SET payload = jsonb_set(payload, '{Processed, amount, currency}', '"USDC"')
 FROM payments
 where events.aggregate_id::uuid = payments.request_id
-  AND payload ? 'Processed'
+  AND payload ?? 'Processed'
   AND currency_code = 'USDC';
 
 UPDATE events
 SET payload = jsonb_set(payload, '{Requested, amount, currency}', '"USDC"')
 FROM payment_requests
 where events.aggregate_id::uuid = payment_requests.id
-  AND payload ? 'Requested'
+  AND payload ?? 'Requested'
   AND currency = 'usdc'::currency;
 
 UPDATE events
@@ -73,7 +73,7 @@ SELECT e.timestamp + interval '1 second',
                           jsonb_build_object('id', p.project_id, 'currency', 'USD', 'budget_id', gen_random_uuid()))
 FROM (SELECT DISTINCT(project_id) as project_id FROM payment_requests WHERE currency = 'usd') p
          JOIN events e
-              ON e.aggregate_id::uuid = p.project_id AND e.aggregate_name = 'PROJECT' AND e.payload ? 'Created';
+              ON e.aggregate_id::uuid = p.project_id AND e.aggregate_name = 'PROJECT' AND e.payload ?? 'Created';
 
 
 
@@ -140,4 +140,4 @@ FROM events epr
     AND e.payload #> '{BudgetLinked, currency}' = epr.payload #> '{Requested, amount, currency}'
     AND e.aggregate_id = epr.payload #>> '{Requested, project_id}'
 WHERE epr.aggregate_name = 'PAYMENT'
-  and epr.payload ? 'Requested';
+  and epr.payload ?? 'Requested';
