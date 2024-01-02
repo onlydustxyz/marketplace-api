@@ -9,10 +9,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -66,7 +63,9 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         return user.map(u -> {
-            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId());
+            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
+                    .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
+                    .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
             return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
                     projectLedIdsByUserId, applications);
