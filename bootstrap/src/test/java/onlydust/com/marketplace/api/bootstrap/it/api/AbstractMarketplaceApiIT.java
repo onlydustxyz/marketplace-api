@@ -8,6 +8,7 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -26,9 +27,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
@@ -107,12 +110,13 @@ public class AbstractMarketplaceApiIT {
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
 
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
-                    .withDatabaseName("marketplace_db")
-                    .withUsername("test")
-                    .withPassword("test")
-                    .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
-                    .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
-                    .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+            .withDatabaseName("marketplace_db")
+            .withUsername("test")
+            .withPassword("test")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/scripts"), "/scripts")
+            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("rust-api")
@@ -140,6 +144,11 @@ public class AbstractMarketplaceApiIT {
         if (!postgresSQLContainer.isRunning()) {
             postgresSQLContainer.start();
         }
+    }
+
+    @AfterAll
+    static void afterAll() throws IOException, InterruptedException {
+        assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
     }
 
     @DynamicPropertySource
