@@ -140,14 +140,10 @@ public class AbstractMarketplaceApiIT {
     }
 
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException, InterruptedException {
         if (!postgresSQLContainer.isRunning()) {
             postgresSQLContainer.start();
         }
-    }
-
-    @AfterAll
-    static void afterAll() throws IOException, InterruptedException {
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
     }
 
