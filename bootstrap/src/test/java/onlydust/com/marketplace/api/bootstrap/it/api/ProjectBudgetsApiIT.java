@@ -115,16 +115,16 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "initialDollarsEquivalent": 370457.32,
-                            "remainingDollarsEquivalent": 304235.32,
+                            "initialDollarsEquivalent": 370557.32,
+                            "remainingDollarsEquivalent": 304275.32,
                             "budgets": [
                                 {
                                     "currency": "USDC",
                                     "initialAmount": 10000,
                                     "remaining": 4000,
-                                    "remainingDollarsEquivalent": 4000,
-                                    "initialDollarsEquivalent": 10000,
-                                    "dollarsConversionRate": null
+                                    "remainingDollarsEquivalent": 4040.0,
+                                    "initialDollarsEquivalent": 10100.0,
+                                    "dollarsConversionRate": 1.01
                                 },
                                 {
                                     "currency": "STRK",

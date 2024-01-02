@@ -609,7 +609,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.remainingBudget.currency").isEqualTo("USDC")
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(100242)
                 .jsonPath("$.spentAmount.amount").isEqualTo(0)
-                .jsonPath("$.spentAmount.currency").isEqualTo("USD")
+                .jsonPath("$.spentAmount.currency").isEqualTo("USDC")
                 .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(0)
                 .jsonPath("$.sentRewardsCount").isEqualTo(0)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(0)
