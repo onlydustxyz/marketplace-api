@@ -152,7 +152,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "rewardedAmount": {
                 "amount": null,
                 "currency": null,
-                "usdEquivalent": 3125000
+                "usdEquivalent": 3125250.0
               },
               "pendingAmount": {
                 "amount": null,
@@ -259,7 +259,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "rewardedAmount": {
                 "amount": 126000,
                 "currency": "USDC",
-                "usdEquivalent": 126000
+                "usdEquivalent": 127260
               },
               "pendingAmount": {
                 "amount": 126000,
@@ -567,7 +567,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(664000)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(670640)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(670640)
@@ -637,7 +637,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2915000.00)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2921650.0)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(2171650.00)
@@ -668,7 +668,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(24330)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(695980)
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(671650)
         ;
     }

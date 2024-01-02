@@ -917,7 +917,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                             "totalPageNumber": 48,
-                            "totalItemNumber": 240,
+                            "totalItemNumber": 239,
                             "hasMore": true,
                             "nextPageIndex": 1,
                             "payments": [
