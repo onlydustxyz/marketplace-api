@@ -3,6 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
+import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
+import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -149,7 +153,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .postalCode(faker.address()
                                             .zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .starknetAddress(faker.random().hex()).build()).build());
+                                    .starknetAddress(StarkNet.accountAddress("0x01")).build()).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             individualIgithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
                             CurrencyEnumEntity.usd),
@@ -203,7 +207,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
                             .location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .optimismAddress(faker.random().hex()).build()).build());
+                                    .optimismAddress(Optimism.accountAddress("0x01")).build()).build());
             List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(individualIserId,
                     List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount,
@@ -243,7 +247,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         void should_return_user_rewards_given_a_user_with_only_apt_wallet_and_valid_contact_info() {
             // Given
             postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(faker.random().hex()).build()).build());
+                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(Aptos.accountAddress("0x01")).build()).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities =
@@ -275,7 +279,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         void should_return_user_rewards_given_a_user_with_only_eth_wallet_and_valid_contact_info() {
             // Given
             postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethAddress(faker.random().hex()).build()).build());
+                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethWallet(Ethereum.wallet("0x01")).build()).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities =
@@ -324,7 +328,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
                                     .identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethName(faker.random().hex()).build()).build());
+                                    .ethWallet(Ethereum.wallet("vitalik.eth")).build()).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             companyGithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
                             CurrencyEnumEntity.usd),
@@ -450,10 +454,10 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                             .bic(faker.random().hex()).iban(IBAN.valueOf("FR1014508000702139488771C56"
                                             )).build())
-                                    .aptosAddress(faker.random().hex())
-                                    .starknetAddress(faker.random().hex())
-                                    .aptosAddress(faker.random().hex())
-                                    .ethAddress(faker.random().hex())
+                                    .aptosAddress(Aptos.accountAddress("0x01"))
+                                    .starknetAddress(StarkNet.accountAddress("0x02"))
+                                    .aptosAddress(Aptos.accountAddress("0x03"))
+                                    .ethWallet(Ethereum.wallet("0x04"))
                                     .build()).build());
 
             // When
@@ -585,7 +589,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .identificationNumber(faker.number().digit()).build())
                             .location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethName(faker.random().hex())
+                                    .ethWallet(Ethereum.wallet("vitalik.eth"))
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                             .bic(faker.random().hex()).iban(IBAN.valueOf("ES6621000418401234567891")).build())
                                     .build()).build());
@@ -633,7 +637,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
                                     .identificationNumber(faker.number().digit()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethName(faker.random().hex()).build()).build());
+                                    .ethWallet(Ethereum.wallet("vitalik.eth")).build()).build());
 
             // When
             final List<UserRewardViewEntity> pendingInvoicesViewEntities =

@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
+import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
@@ -114,7 +116,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                     .postalCode(faker.address()
                                             .zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .starknetAddress(faker.random().hex())
+                                    .starknetAddress(StarkNet.accountAddress("0x01"))
                                     .build())
                             .build());
 
@@ -225,7 +227,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                     .postalCode(faker.address()
                                             .zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .optimismAddress(faker.random().hex())
+                                    .optimismAddress(Optimism.accountAddress("0x01"))
                                     .build())
                             .build());
 

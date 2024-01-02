@@ -3,25 +3,17 @@ package onlydust.com.marketplace.api.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import nl.garvelink.iban.IBAN;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum.Wallet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Data
 @Builder(toBuilder = true)
 public class UserPayoutInformation {
-    private static final Pattern ETHEREUM_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{40}$");
-    private static final Pattern APTOS_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{64}$");
-    private static final Pattern OPTIMISM_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{40}$");
-    private static final Pattern STARKNET_WALLET_PATTERN = Pattern.compile("^0[xX][a-fA-F0-9]{64}$");
-
     Person person;
     Company company;
     @Builder.Default
@@ -51,31 +43,30 @@ public class UserPayoutInformation {
     public boolean hasValidPayoutSettings() {
         return nonNull(payoutSettings) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
             case Usd -> nonNull(payoutSettings.sepaAccount) && payoutSettings.sepaAccount.valid();
-            case Eth, Lords, Usdc -> isNotEmpty(payoutSettings.ethAddress) || isNotEmpty(payoutSettings.ethName);
-            case Apt -> isNotEmpty(payoutSettings.aptosAddress);
-            case Op -> isNotEmpty(payoutSettings.optimismAddress);
-            case Strk -> isNotEmpty(payoutSettings.starknetAddress);
+            case Eth, Lords, Usdc -> nonNull(payoutSettings.ethWallet);
+            case Apt -> nonNull(payoutSettings.aptosAddress);
+            case Op -> nonNull(payoutSettings.optimismAddress);
+            case Strk -> nonNull(payoutSettings.starknetAddress);
         });
     }
 
     public boolean isMissingOptimismWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Op) && isEmpty(payoutSettings.optimismAddress);
+        return pendingPaymentsCurrencies.contains(Currency.Op) && isNull(payoutSettings.optimismAddress);
     }
 
     public boolean isMissingAptosWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Apt) && isEmpty(payoutSettings.aptosAddress);
+        return pendingPaymentsCurrencies.contains(Currency.Apt) && isNull(payoutSettings.aptosAddress);
     }
 
     public boolean isMissingStarknetWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Strk) && isEmpty(payoutSettings.starknetAddress);
+        return pendingPaymentsCurrencies.contains(Currency.Strk) && isNull(payoutSettings.starknetAddress);
     }
 
     public boolean isMissingEthereumWallet() {
         return (pendingPaymentsCurrencies.contains(Currency.Eth)
                 || pendingPaymentsCurrencies.contains(Currency.Lords)
                 || pendingPaymentsCurrencies.contains(Currency.Usdc))
-               && isEmpty(payoutSettings.ethAddress)
-               && isEmpty(payoutSettings.ethName);
+               && isNull(payoutSettings.ethWallet);
     }
 
     public boolean isMissingSepaAccount() {
@@ -93,31 +84,13 @@ public class UserPayoutInformation {
         return hasValidContactInfo() && hasValidPayoutSettings();
     }
 
-    public void validateWalletAddresses() {
-        if (nonNull(this.payoutSettings)) {
-            if (nonNull(this.payoutSettings.aptosAddress) && !APTOS_WALLET_PATTERN.matcher(this.payoutSettings.aptosAddress).matches()) {
-                throw OnlyDustException.badRequest("Invalid Aptos address format (%s)".formatted(this.payoutSettings.aptosAddress));
-            }
-            if (nonNull(this.payoutSettings.starknetAddress) && !STARKNET_WALLET_PATTERN.matcher(this.payoutSettings.starknetAddress).matches()) {
-                throw OnlyDustException.badRequest("Invalid Starknet address format (%s)".formatted(this.payoutSettings.starknetAddress));
-            }
-            if (nonNull(this.payoutSettings.ethAddress) && !ETHEREUM_WALLET_PATTERN.matcher(this.payoutSettings.ethAddress).matches()) {
-                throw OnlyDustException.badRequest("Invalid Ethereum address format (%s)".formatted(this.payoutSettings.ethAddress));
-            }
-            if (nonNull(this.payoutSettings.optimismAddress) && !OPTIMISM_WALLET_PATTERN.matcher(this.payoutSettings.optimismAddress).matches()) {
-                throw OnlyDustException.badRequest("Invalid Optimism address format (%s)".formatted(this.payoutSettings.optimismAddress));
-            }
-        }
-    }
-
     @Data
     @Builder(toBuilder = true)
     public static class PayoutSettings {
-        String ethAddress;
-        String ethName;
-        String optimismAddress;
-        String aptosAddress;
-        String starknetAddress;
+        Wallet ethWallet;
+        onlydust.com.marketplace.api.domain.model.blockchain.evm.AccountAddress optimismAddress;
+        onlydust.com.marketplace.api.domain.model.blockchain.aptos.AccountAddress aptosAddress;
+        onlydust.com.marketplace.api.domain.model.blockchain.starknet.AccountAddress starknetAddress;
         SepaAccount sepaAccount;
     }
 

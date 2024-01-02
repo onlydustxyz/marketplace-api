@@ -3,6 +3,10 @@ package onlydust.com.marketplace.api.domain.view;
 import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
+import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
+import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -62,7 +66,7 @@ public class UserPayoutInformationTest {
                 true,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -74,7 +78,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -89,7 +93,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -104,7 +108,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -119,7 +123,7 @@ public class UserPayoutInformationTest {
                 true,
                 false,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -257,7 +261,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .starknetAddress("0x1234567890123456789012345678901234567890")
+                        .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Strk)
         );
@@ -269,7 +273,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -281,7 +285,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethName("vitalik.eth")
+                        .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -293,7 +297,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Lords)
         );
@@ -305,7 +309,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethName("vitalik.eth")
+                        .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Lords)
         );
@@ -317,7 +321,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Usdc)
         );
@@ -329,7 +333,7 @@ public class UserPayoutInformationTest {
                 false,
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
-                        .ethName("vitalik.eth")
+                        .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Usdc)
         );
@@ -345,10 +349,10 @@ public class UserPayoutInformationTest {
                                 .iban(IBAN.valueOf("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
-                        .starknetAddress("0x1234567890123456789012345678901234567890")
-                        .aptosAddress("0x1234567890123456789012345678901234567890")
-                        .optimismAddress("0x1234567890123456789012345678901234567890")
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .aptosAddress(Aptos.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
@@ -365,10 +369,10 @@ public class UserPayoutInformationTest {
                                 .iban(IBAN.valueOf("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
-                        .starknetAddress("0x1234567890123456789012345678901234567890")
-                        .aptosAddress("0x1234567890123456789012345678901234567890")
-                        .optimismAddress("0x1234567890123456789012345678901234567890")
-                        .ethAddress("0x1234567890123456789012345678901234567890")
+                        .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .aptosAddress(Aptos.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
+                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
                         Currency.Usdc)
