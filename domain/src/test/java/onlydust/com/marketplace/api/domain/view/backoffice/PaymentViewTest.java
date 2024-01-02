@@ -94,7 +94,7 @@ class PaymentViewTest {
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Usd)
+                .currency(Currency.Usdc)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validCompany)
                 .recipientEthWallet("vitalik.eth")
@@ -152,7 +152,7 @@ class PaymentViewTest {
                 .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban().toPlainString() + " / " + validSepaAccount.getBic());
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Usd)
+                .currency(Currency.Usdc)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
