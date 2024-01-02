@@ -60,20 +60,22 @@ public class CustomContributorRepository {
                    to_rewards_stats.issue_count issues_to_reward,
                    to_rewards_stats.code_review_count code_reviews_to_reward,
                    amounts.usd,
-                          amounts.eth,
-                          coalesce(amounts.eth * cuq_eth.price, 0)   eth_usd,
-                          amounts.stark,
-                          coalesce(amounts.stark * cuq_stark.price, 0) stark_usd,
-                          amounts.apt,
-                          coalesce(amounts.apt * cuq_apt.price, 0)   apt_usd,
-                          amounts.op,
-                          coalesce(amounts.op * cuq_op.price, 0)    op_usd,
-                          amounts.lords,
-                          coalesce(amounts.lords * cuq_lords.price, 0)    lords_usd,
-                          coalesce(amounts.eth * cuq_eth.price, 0) + coalesce(amounts.stark * cuq_stark.price, 0) +
-                          coalesce(amounts.apt * cuq_apt.price, 0) + coalesce(amounts.op * cuq_op.price, 0) +
-                          coalesce(amounts.lords * cuq_lords.price, 0) +
-                          coalesce(amounts.usd, 0)                   earned
+                   amounts.usdc,
+                   coalesce(amounts.usdc * cuq_usdc.price, 0)   usdc_usd,
+                   amounts.eth,
+                   coalesce(amounts.eth * cuq_eth.price, 0)   eth_usd,
+                   amounts.stark,
+                   coalesce(amounts.stark * cuq_stark.price, 0) stark_usd,
+                   amounts.apt,
+                   coalesce(amounts.apt * cuq_apt.price, 0)   apt_usd,
+                   amounts.op,
+                   coalesce(amounts.op * cuq_op.price, 0)    op_usd,
+                   amounts.lords,
+                   coalesce(amounts.lords * cuq_lords.price, 0)    lords_usd,
+                   coalesce(amounts.eth * cuq_eth.price, 0) + coalesce(amounts.stark * cuq_stark.price, 0) +
+                   coalesce(amounts.apt * cuq_apt.price, 0) + coalesce(amounts.op * cuq_op.price, 0) +
+                   coalesce(amounts.lords * cuq_lords.price, 0) + coalesce(amounts.usdc * cuq_usdc.price, 0) +
+                   coalesce(amounts.usd, 0)                   earned
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
                      left join iam.users u on u.github_user_id = ga.id
@@ -94,6 +96,7 @@ public class CustomContributorRepository {
                                   and ic.project_id is null
                                 group by c.contributor_id) to_rewards_stats on to_rewards_stats.contributor_id = ga.id
                      left join (select sum(pr.amount) filter (where pr.currency = 'usd')   usd,
+                                                sum(pr.amount) filter (where pr.currency = 'usdc')   usdc,
                                                 sum(pr.amount) filter (where pr.currency = 'apt')   apt,
                                                 sum(pr.amount) filter (where pr.currency = 'strk') stark,
                                                 sum(pr.amount) filter (where pr.currency = 'op')    op,
@@ -104,6 +107,7 @@ public class CustomContributorRepository {
                                          where pr.project_id = :projectId
                                          group by pr.recipient_id) amounts on amounts.recipient_id = ga.id
                               left join crypto_usd_quotes cuq_eth on cuq_eth.currency = 'eth'
+                              left join crypto_usd_quotes cuq_usdc on cuq_usdc.currency = 'usdc'
                               left join crypto_usd_quotes cuq_apt on cuq_apt.currency = 'apt'
                               left join crypto_usd_quotes cuq_stark on cuq_stark.currency = 'strk'
                               left join crypto_usd_quotes cuq_op on cuq_op.currency = 'op'

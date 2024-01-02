@@ -120,11 +120,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 6000,
+                    "totalAmount": 6060,
                     "details": [
                       {
                         "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6000,
+                        "totalDollarsEquivalent": 6060,
                         "currency": "USDC"
                       }
                     ]
@@ -425,11 +425,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                            "contributionCount": 147,
                            "rewardCount": 6,
                            "earned": {
-                             "totalAmount": 6000,
+                             "totalAmount": 6060,
                              "details": [
                                {
                                  "totalAmount": 6000,
-                                 "totalDollarsEquivalent": 6000,
+                                 "totalDollarsEquivalent": 6060,
                                  "currency": "USDC"
                                }
                              ]
@@ -826,11 +826,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       "contributionCount": 147,
                       "rewardCount": 6,
                       "earned": {
-                        "totalAmount": 6000,
+                        "totalAmount": 6060,
                         "details": [
                           {
                             "totalAmount": 6000,
-                            "totalDollarsEquivalent": 6000,
+                            "totalDollarsEquivalent": 6060,
                             "currency": "USDC"
                           }
                         ]
@@ -1006,7 +1006,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 35190.00,
+                    "totalAmount": 35210.00,
                     "details": [
                       {
                         "totalAmount": 450,
@@ -1030,7 +1030,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       },
                       {
                         "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2000,
+                        "totalDollarsEquivalent": 2020.0,
                         "currency": "USDC"
                       }
                     ]
@@ -1077,11 +1077,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 6000,
+                    "totalAmount": 6060,
                     "details": [
                       {
                         "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6000,
+                        "totalDollarsEquivalent": 6060,
                         "currency": "USDC"
                       }
                     ]

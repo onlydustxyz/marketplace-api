@@ -926,7 +926,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "budgetId": "cad5d63e-d570-497e-acef-11a57691d589",
                                "projectId": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
                                "amount": 1000,
-                               "currency": "USD",
+                               "currency": "USDC",
                                "recipientId": 8642470,
                                "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                "items": [
@@ -938,7 +938,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "issuesCount": 0,
                                "dustyIssuesCount": 0,
                                "codeReviewsCount": 0,
-                               "isPayable": true,
+                               "isPayable": false,
                                "payoutSettings": "FR7640618802650004034616528 / BOUSFRPPXXX"
                              },
                              {
@@ -946,7 +946,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "budgetId": "51c40f51-f1e4-43c1-8d2f-8de97e51dca5",
                                "projectId": "6d955622-c1ce-4227-85ea-51cb1b3207b1",
                                "amount": 500,
-                               "currency": "USD",
+                               "currency": "USDC",
                                "recipientId": 116729712,
                                "requestorId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                                "items": [
@@ -966,7 +966,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "budgetId": "cad5d63e-d570-497e-acef-11a57691d589",
                                "projectId": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
                                "amount": 1000,
-                               "currency": "USD",
+                               "currency": "USDC",
                                "recipientId": 43467246,
                                "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                "items": [
@@ -986,7 +986,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "budgetId": "915814c3-981c-4d32-a965-7a3c1dc96fbd",
                                "projectId": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
                                "amount": 438,
-                               "currency": "USD",
+                               "currency": "USDC",
                                "recipientId": 4435377,
                                "requestorId": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                "items": [
@@ -1006,7 +1006,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                "budgetId": "a419c321-469a-4464-b6e1-56e800b53952",
                                "projectId": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
                                "amount": 10,
-                               "currency": "USD",
+                               "currency": "USDC",
                                "recipientId": 30843220,
                                "requestorId": "6115f024-159a-4b1f-b713-1e2ad5c6063e",
                                "items": [
