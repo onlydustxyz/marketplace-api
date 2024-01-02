@@ -669,7 +669,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .consumeWith(System.out::println)
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(24330)
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(665000)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(671650)
         ;
     }
 }
