@@ -422,7 +422,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 11111,
                           "amount": 111.47,
-                          "currency": "USD",
+                          "currency": "USDC",
                           "reason": {
                             "workItems": [
                               {

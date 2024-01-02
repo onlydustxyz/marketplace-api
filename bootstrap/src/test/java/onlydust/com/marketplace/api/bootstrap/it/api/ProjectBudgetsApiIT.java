@@ -119,7 +119,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                             "remainingDollarsEquivalent": 304235.32,
                             "budgets": [
                                 {
-                                    "currency": "USD",
+                                    "currency": "USDC",
                                     "initialAmount": 10000,
                                     "remaining": 4000,
                                     "remainingDollarsEquivalent": 4000,

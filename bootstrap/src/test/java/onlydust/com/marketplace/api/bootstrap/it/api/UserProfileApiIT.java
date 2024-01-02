@@ -189,7 +189,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                      {
                        "totalAmount": 19500,
                        "totalDollarsEquivalent": 19500,
-                       "currency": "USD"
+                       "currency": "USDC"
                      },
                      {
                        "totalAmount": 1500,
@@ -1003,7 +1003,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                     {
                       "totalAmount": 19500,
                       "totalDollarsEquivalent": 19500,
-                      "currency": "USD"
+                      "currency": "USDC"
                     },
                     {
                       "totalAmount": 1500,
