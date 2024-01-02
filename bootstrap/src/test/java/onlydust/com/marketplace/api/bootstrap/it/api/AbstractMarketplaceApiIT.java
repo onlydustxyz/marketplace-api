@@ -56,12 +56,16 @@ public class AbstractMarketplaceApiIT {
     protected static final String USERS_SEARCH_CONTRIBUTORS = "/api/v1/users/search";
     protected static final String PROJECTS_GET_CONTRIBUTORS = "/api/v1/projects/%s/contributors";
     protected static final String PROJECTS_GET_CONTRIBUTIONS = "/api/v1/projects/%s/contributions";
-    protected static final String PROJECTS_INSIGHTS_STALED_CONTRIBUTIONS = "/api/v1/projects/%s/insights/contributions/staled";
-    protected static final String PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors/churned";
+    protected static final String PROJECTS_INSIGHTS_STALED_CONTRIBUTIONS = "/api/v1/projects/%s/insights" +
+                                                                           "/contributions/staled";
+    protected static final String PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors" +
+                                                                           "/churned";
     protected static final String PROJECTS_INSIGHTS_NEWCOMERS = "/api/v1/projects/%s/insights/contributors/newcomers";
-    protected static final String PROJECTS_INSIGHTS_MOST_ACTIVE_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors/most-actives";
+    protected static final String PROJECTS_INSIGHTS_MOST_ACTIVE_CONTRIBUTORS = "/api/v1/projects/%s/insights" +
+                                                                               "/contributors/most-actives";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String PROJECTS_REWARD = "/api/v1/projects/%s/rewards/%s";
+    protected static final String PROJECTS_REWARD_MARK_INVOICE_AS_RECEIVED = "/api/v1/projects/%s/rewards/invoices";
     protected static final String PROJECTS_GET_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
     protected static final String PROJECTS_GET_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items";
     protected static final String PROJECTS_GET_ALL_COMPLETED_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items" +

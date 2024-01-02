@@ -285,6 +285,26 @@ public class RewardServiceTest {
         Assertions.assertEquals("User must be project lead to cancel a reward", onlyDustException.getMessage());
     }
 
+    @Test
+    void should_mark_invoice_as_received() {
+        // Given
+        final RewardServicePort<DummyAuthentication> rewardServicePort = mock(RewardServicePort.class);
+        final PermissionService permissionService = mock(PermissionService.class);
+        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final IndexerPort indexerPort = mock(IndexerPort.class);
+
+        final RewardService<DummyAuthentication> rewardService =
+                new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
+        final DummyAuthentication authentication = new DummyAuthentication();
+        final var rewardIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+
+        // When
+        rewardService.markInvoiceAsReceived(authentication, rewardIds);
+
+        // Then
+        verify(rewardServicePort).markInvoiceAsReceived(authentication, rewardIds);
+    }
+
     private static class DummyAuthentication {
 
     }

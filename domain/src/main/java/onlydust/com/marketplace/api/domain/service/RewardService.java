@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -47,5 +48,10 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
         }
+    }
+
+    @Override
+    public void markInvoiceAsReceived(Authentication authentication, List<UUID> rewardIds) {
+        rewardServicePort.markInvoiceAsReceived(authentication, rewardIds);
     }
 }

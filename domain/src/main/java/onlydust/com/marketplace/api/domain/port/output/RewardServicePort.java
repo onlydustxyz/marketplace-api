@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RewardServicePort<Authentication> {
@@ -10,4 +11,6 @@ public interface RewardServicePort<Authentication> {
                         RequestRewardCommand requestRewardCommand);
 
     void cancelPayment(Authentication authentication, UUID rewardId);
+
+    void markInvoiceAsReceived(Authentication authentication, List<UUID> rewardIds);
 }
