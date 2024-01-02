@@ -4,6 +4,10 @@ import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
+import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
+import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -412,10 +416,10 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .address(faker.address().fullAddress())
                         .build())
                 .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .aptosAddress(faker.rickAndMorty().character())
-                        .starknetAddress(faker.pokemon().location())
-                        .ethName(faker.pokemon().name())
-                        .optimismAddress(faker.pokemon().name())
+                        .aptosAddress(Aptos.accountAddress("0x01"))
+                        .starknetAddress(StarkNet.accountAddress("0x02"))
+                        .ethWallet(Ethereum.wallet("0x03"))
+                        .optimismAddress(Optimism.accountAddress("0x04"))
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                 .bic(faker.hacker().abbreviation())
                                 .iban(IBAN.valueOf("FR1014508000702139488771C56"))
@@ -433,14 +437,12 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final UserPayoutInformation userPayoutInformationUpdated =
                 postgresUserAdapter.savePayoutInformationForUserId(userId, userPayoutInformation.toBuilder()
                         .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
-                                .ethAddress(null)
+                                .ethWallet(null)
                                 .aptosAddress(null)
-                                .ethName(null)
                                 .sepaAccount(null)
                                 .build()).build());
-        assertNull(userPayoutInformationUpdated.getPayoutSettings().getEthAddress());
+        assertNull(userPayoutInformationUpdated.getPayoutSettings().getEthWallet());
         assertNull(userPayoutInformationUpdated.getPayoutSettings().getAptosAddress());
-        assertNull(userPayoutInformationUpdated.getPayoutSettings().getEthName());
         assertNull(userPayoutInformationUpdated.getPayoutSettings().getSepaAccount());
     }
 }

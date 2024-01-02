@@ -93,7 +93,6 @@ public class UserService implements UserFacadePort {
 
     @Override
     public UserPayoutInformation updatePayoutInformation(UUID userId, UserPayoutInformation userPayoutInformation) {
-        userPayoutInformation.validateWalletAddresses();
         return userStoragePort.savePayoutInformationForUserId(userId, userPayoutInformation);
     }
 

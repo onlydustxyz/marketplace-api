@@ -2362,14 +2362,12 @@ components:
                   example: FR5417569000301995586997O41
             missingSepaAccount:
               type: boolean
-            ethAddress:
+            ethWallet:
               type: string
-              example: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+              description: ETH wallet address or ENS
+              example: vitalik.eth
             missingEthWallet:
               type: boolean
-            ethName:
-              type: string
-              example: vitalik.eth
             optimismAddress:
               type: string
               example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
@@ -2421,11 +2419,9 @@ components:
                 iban:
                   type: string
                   example: FR5417569000301995586997O41
-            ethAddress:
+            ethWallet:
               type: string
-              example: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
-            ethName:
-              type: string
+              description: ETH wallet address or ENS
               example: vitalik.eth
             optimismAddress:
               type: string

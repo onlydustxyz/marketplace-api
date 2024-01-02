@@ -4,6 +4,10 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
+import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
+import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
@@ -226,101 +230,16 @@ public class UserServiceTest {
         assertThat(updatedUser.getBio()).isEqualTo(userProfileView.getBio());
     }
 
-
-    @Test
-    void should_validate_user_payout_profile_before_updating_it_given_wrong_aptos_address() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(faker.rickAndMorty().character()).build()).build();
-
-        // When
-        OnlyDustException onlyDustException = null;
-        try {
-            userService.updatePayoutInformation(userId, userPayoutInformation);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        assertNotNull(onlyDustException);
-        assertEquals(400, onlyDustException.getStatus());
-        assertThat(onlyDustException.getMessage()).startsWith("Invalid Aptos address format");
-    }
-
-    @Test
-    void should_validate_user_payout_profile_before_updating_it_given_wrong_eth_address() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethAddress(faker.rickAndMorty().character()).build()).build();
-
-        // When
-        OnlyDustException onlyDustException = null;
-        try {
-            userService.updatePayoutInformation(userId, userPayoutInformation);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        assertNotNull(onlyDustException);
-        assertEquals(400, onlyDustException.getStatus());
-        assertThat(onlyDustException.getMessage()).startsWith("Invalid Ethereum address format");
-    }
-
-    @Test
-    void should_validate_user_payout_profile_before_updating_it_given_wrong_stark_address() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().starknetAddress(faker.rickAndMorty().character()).build()).build();
-
-        // When
-        OnlyDustException onlyDustException = null;
-        try {
-            userService.updatePayoutInformation(userId, userPayoutInformation);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        assertNotNull(onlyDustException);
-        assertEquals(400, onlyDustException.getStatus());
-        assertThat(onlyDustException.getMessage()).startsWith("Invalid Starknet address format");
-    }
-
-    @Test
-    void should_validate_user_payout_info_before_updating_it_given_wrong_optimism_address() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder().optimismAddress(faker.rickAndMorty().character()).build()).build();
-
-        // When
-        OnlyDustException onlyDustException = null;
-        try {
-            userService.updatePayoutInformation(userId, userPayoutInformation);
-        } catch (OnlyDustException e) {
-            onlyDustException = e;
-        }
-
-        // Then
-        assertNotNull(onlyDustException);
-        assertEquals(400, onlyDustException.getStatus());
-        assertThat(onlyDustException.getMessage()).startsWith("Invalid Optimism address format");
-    }
-
     @Test
     void should_validate_user_payout_info_and_update_it_given_valid_wallet_addresses() {
         // Given
         final UUID userId = UUID.randomUUID();
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .optimismAddress("0x2C6277931328e2028C3DB10625D767de19151e92")
-                        .starknetAddress("0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597")
-                        .ethName("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045")
-                        .aptosAddress("0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b")
+                        .optimismAddress(Optimism.accountAddress("0x2C6277931328e2028C3DB10625D767de19151e92"))
+                        .starknetAddress(StarkNet.accountAddress("0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597"))
+                        .ethWallet(Ethereum.wallet("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))
+                        .aptosAddress(Aptos.accountAddress("0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b"))
                         .build()).build();
 
         // When
