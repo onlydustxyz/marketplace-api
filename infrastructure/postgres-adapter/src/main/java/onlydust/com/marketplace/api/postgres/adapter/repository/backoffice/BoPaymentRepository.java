@@ -27,7 +27,6 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
             	Counters.*,
             	upi.identity as recipient_identity,
             	upi.location as recipient_location,
-            	upi.usd_preferred_method as recipient_usd_preferred_method,
             	user_wallets.wallets as recipient_wallets,
             	ba.iban as recipient_iban,
             	ba.bic as recipient_bic
@@ -88,5 +87,6 @@ public interface BoPaymentRepository extends JpaRepository<BoPaymentEntity, UUID
                 (COALESCE(:paymentIds) IS NULL OR pr.id in (:paymentIds))
             """, nativeQuery = true)
     @NotNull
-    Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final List<UUID> paymentIds, final @NotNull Pageable pageable);
+    Page<BoPaymentEntity> findAll(final List<UUID> projectIds, final List<UUID> paymentIds,
+                                  final @NotNull Pageable pageable);
 }

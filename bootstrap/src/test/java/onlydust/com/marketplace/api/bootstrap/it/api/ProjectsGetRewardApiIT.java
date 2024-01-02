@@ -72,9 +72,9 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                             "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
-                            "currency": "USD",
+                            "currency": "USDC",
                             "amount": 1000,
-                            "dollarsEquivalent": 1000,
+                            "dollarsEquivalent": 1010,
                             "status": "PROCESSING",
                             "from": {
                                 "githubUserId": 16590657,

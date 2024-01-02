@@ -41,6 +41,10 @@ public class ProjectContributorViewEntity {
     Integer issuesToReward;
     @Column(name = "usd")
     BigDecimal usdAmount;
+    @Column(name = "usdc")
+    BigDecimal usdcAmount;
+    @Column(name = "usdc_usd")
+    BigDecimal usdcDollarsEquivalentAmount;
     @Column(name = "eth")
     BigDecimal ethAmount;
     @Column(name = "eth_usd")

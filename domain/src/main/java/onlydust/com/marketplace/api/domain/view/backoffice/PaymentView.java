@@ -4,7 +4,10 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.*;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Company;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Location;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Person;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.SepaAccount;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -13,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
-import static onlydust.com.marketplace.api.domain.model.UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO;
 
 @Value
 @Builder
@@ -33,7 +35,6 @@ public class PaymentView {
     Integer issuesCount;
     Integer dustyIssuesCount;
     Integer codeReviewsCount;
-    UsdPreferredMethodEnum recipientUsdPreferredMethod;
     Identity recipientIdentity;
     Location recipientLocation;
     SepaAccount recipientSepaAccount;
@@ -68,9 +69,7 @@ public class PaymentView {
         }
 
         return switch (currency) {
-            case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
-                    nonNull(recipientEthWallet) :
-                    Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
+            case Usd -> Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
             case Eth, Lords, Usdc -> nonNull(recipientEthWallet);
             case Op -> nonNull(recipientOptimismWallet);
             case Apt -> nonNull(recipientAptosWallet);
@@ -80,8 +79,7 @@ public class PaymentView {
 
     public String recipientPayoutSettings() {
         return switch (currency) {
-            case Usd -> Optional.ofNullable(recipientUsdPreferredMethod).orElse(CRYPTO) == CRYPTO ?
-                    recipientEthWallet :
+            case Usd ->
                     "%s / %s".formatted(recipientSepaAccount.getIban().toPlainString(), recipientSepaAccount.getBic());
             case Eth, Lords, Usdc -> recipientEthWallet;
             case Op -> recipientOptimismWallet;

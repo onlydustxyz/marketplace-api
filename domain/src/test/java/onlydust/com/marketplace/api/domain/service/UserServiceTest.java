@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static onlydust.com.marketplace.api.domain.view.UserPayoutInformationTest.fakeValidUserPayoutInformation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,55 +61,13 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
-        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(
-                UserPayoutInformation.builder()
-                        .hasValidPerson(true)
-                        .hasValidCompany(false)
-                        .hasValidLocation(true)
-                        .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                .hasMissingAptosWallet(false)
-                                .hasMissingEthWallet(false)
-                                .hasMissingStarknetWallet(false)
-                                .hasMissingOptimismWallet(false)
-                                .hasMissingBankingAccount(false)
-                                .build()).build());
+        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
     }
-
-    @Test
-    void should_find_user_given_a_github_id_with_no_payment_requests() {
-        // Given
-        final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
-        final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
-
-        // When
-        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
-        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(
-                UserPayoutInformation.builder()
-                        .hasValidPerson(false)
-                        .hasValidCompany(false)
-                        .hasValidLocation(false)
-                        .hasPendingPayments(false)
-                        .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                .hasMissingAptosWallet(false)
-                                .hasMissingEthWallet(false)
-                                .hasMissingStarknetWallet(false)
-                                .hasMissingOptimismWallet(false)
-                                .hasMissingBankingAccount(false)
-                                .build()).build());
-        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
-
-        // Then
-        assertEquals(user, userByGithubIdentity);
-        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-    }
-
 
     @Test
     void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {

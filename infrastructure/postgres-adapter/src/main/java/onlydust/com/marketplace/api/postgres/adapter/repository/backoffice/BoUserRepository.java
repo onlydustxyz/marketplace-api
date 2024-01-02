@@ -43,7 +43,6 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                    upay.location #>> '{post_code}'                     AS post_code,
                    upay.location #>> '{city}'                          AS city,
                    upay.location #>> '{country}'                       AS country,
-                   upay.usd_preferred_method                           AS usd_preferred_method,
                    ba.bic                                              AS bic,
                    ba.iban                                             AS iban,
                    eth_name.address                                    AS ens,

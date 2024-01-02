@@ -66,6 +66,12 @@ public interface ProjectContributorsMapper {
                     .totalAmount(contributorViewEntity.getAptAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getAptDollarsEquivalentAmount()).build());
         }
+        if (nonNull(contributorViewEntity.getUsdcAmount())) {
+            totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
+                    .currency(Currency.Usdc)
+                    .totalAmount(contributorViewEntity.getUsdcAmount())
+                    .totalDollarsEquivalent(contributorViewEntity.getUsdcDollarsEquivalentAmount()).build());
+        }
         if (nonNull(contributorViewEntity.getUsdAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
                     .currency(Currency.Usd)

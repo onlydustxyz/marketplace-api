@@ -120,12 +120,12 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 6000,
+                    "totalAmount": 6060,
                     "details": [
                       {
                         "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6000,
-                        "currency": "USD"
+                        "totalDollarsEquivalent": 6060,
+                        "currency": "USDC"
                       }
                     ]
                   },
@@ -425,12 +425,12 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                            "contributionCount": 147,
                            "rewardCount": 6,
                            "earned": {
-                             "totalAmount": 6000,
+                             "totalAmount": 6060,
                              "details": [
                                {
                                  "totalAmount": 6000,
-                                 "totalDollarsEquivalent": 6000,
-                                 "currency": "USD"
+                                 "totalDollarsEquivalent": 6060,
+                                 "currency": "USDC"
                                }
                              ]
                            },
@@ -826,12 +826,12 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       "contributionCount": 147,
                       "rewardCount": 6,
                       "earned": {
-                        "totalAmount": 6000,
+                        "totalAmount": 6060,
                         "details": [
                           {
                             "totalAmount": 6000,
-                            "totalDollarsEquivalent": 6000,
-                            "currency": "USD"
+                            "totalDollarsEquivalent": 6060,
+                            "currency": "USDC"
                           }
                         ]
                       },
@@ -1006,7 +1006,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 35190.00,
+                    "totalAmount": 35210.00,
                     "details": [
                       {
                         "totalAmount": 450,
@@ -1030,8 +1030,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                       },
                       {
                         "totalAmount": 2000,
-                        "totalDollarsEquivalent": 2000,
-                        "currency": "USD"
+                        "totalDollarsEquivalent": 2020.0,
+                        "currency": "USDC"
                       }
                     ]
                   },
@@ -1077,12 +1077,12 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "contributionCount": 147,
                   "rewardCount": 6,
                   "earned": {
-                    "totalAmount": 6000,
+                    "totalAmount": 6060,
                     "details": [
                       {
                         "totalAmount": 6000,
-                        "totalDollarsEquivalent": 6000,
-                        "currency": "USD"
+                        "totalDollarsEquivalent": 6060,
+                        "currency": "USDC"
                       }
                     ]
                   },
@@ -1265,6 +1265,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.op, BigDecimal.valueOf(1.43),
                 new Date()));
         cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.apt, BigDecimal.valueOf(0.56),
+                new Date()));
+        cryptoUsdQuotesRepository.save(new CryptoUsdQuotesEntity(CurrencyEnumEntity.usdc, BigDecimal.valueOf(1.01),
                 new Date()));
 
 

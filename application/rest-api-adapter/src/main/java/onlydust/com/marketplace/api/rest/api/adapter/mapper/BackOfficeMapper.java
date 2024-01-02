@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -110,7 +109,6 @@ public interface BackOfficeMapper {
                         .postCode(user.getPostCode())
                         .city(user.getCity())
                         .country(user.getCountry())
-                        .usdPreferredMethod(mapUsdPreferredMethod(user.getUsdPreferredMethod()))
                         .telegram(user.getTelegram())
                         .twitter(user.getTwitter())
                         .discord(user.getDiscord())
@@ -144,13 +142,6 @@ public interface BackOfficeMapper {
                 .totalItemNumber(userPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, userPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, userPage.getTotalPageNumber()));
-    }
-
-    static UserPageItemResponse.UsdPreferredMethodEnum mapUsdPreferredMethod(UserPayoutInformation.UsdPreferredMethodEnum usdPreferredMethod) {
-        return usdPreferredMethod == null ? null : switch (usdPreferredMethod) {
-            case FIAT -> UserPageItemResponse.UsdPreferredMethodEnum.BANK_TRANSFER;
-            case CRYPTO -> UserPageItemResponse.UsdPreferredMethodEnum.CRYPTO;
-        };
     }
 
     static PaymentPage mapPaymentPageToContract(final Page<PaymentView> paymentPage, int pageIndex) {

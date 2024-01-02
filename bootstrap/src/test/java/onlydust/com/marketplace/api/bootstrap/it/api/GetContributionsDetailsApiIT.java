@@ -113,9 +113,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "rewards": [
                             {
                               "id": "6587511b-3791-47c6-8430-8f793606c63a",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -134,9 +134,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -155,9 +155,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "335e45a5-7f59-4519-8a12-1addc530214c",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -176,9 +176,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -197,9 +197,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "e33ea956-d2f5-496b-acf9-e2350faddb16",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -218,9 +218,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "dd7d445f-6915-4955-9bae-078173627b05",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -239,9 +239,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,
@@ -260,9 +260,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "id": "95e079c9-609c-4531-8c5c-13217306b299",
-                              "currency": "USD",
+                              "currency": "USDC",
                               "amount": 1000,
-                              "dollarsEquivalent": 1000,
+                              "dollarsEquivalent": 1010,
                               "status": "PROCESSING",
                               "from": {
                                 "githubUserId": 43467246,

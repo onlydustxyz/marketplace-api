@@ -1,4 +1,3 @@
-
 openapi: 3.0.3
 info:
   title: OnlyDust Backoffice API
@@ -150,55 +149,55 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
   /bo/v1/project-lead-invitations:
-      get:
-        security:
-          - apiKey: [ ]
-        tags:
-          - Backoffice
-        summary: Get project lead invitations page
-        operationId: getProjectLeadInvitationPage
-        description: |
-          Get project lead invitations page
-        parameters:
-          - in: query
-            name: pageIndex
-            required: true
-            schema:
-              type: integer
-          - in: query
-            name: pageSize
-            required: true
-            schema:
-              type: integer
-          - in: query
-            name: ids
-            required: false
-            schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-            style: simple
-          - in: query
-            name: projectIds
-            required: false
-            schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-            style: simple
-        responses:
-          "200":
-            description: 'Project Lead Invitation page'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ProjectLeadInvitationPage'
-          "401":
-            $ref: '#/components/responses/UnauthorizedError'
-          "500":
-            $ref: '#/components/responses/InternalServerError'
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get project lead invitations page
+      operationId: getProjectLeadInvitationPage
+      description: |
+        Get project lead invitations page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: ids
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+      responses:
+        "200":
+          description: 'Project Lead Invitation page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectLeadInvitationPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 
   /bo/v1/users:
@@ -628,11 +627,6 @@ components:
           type: string
         starknetAddress:
           type: string
-        usdPreferredMethod:
-          type: string
-          enum:
-            - BANK_TRANSFER
-            - CRYPTO
         createdAt:
           type: string
           format: date-time
@@ -792,8 +786,8 @@ components:
             type: string
             format: uuid
         createdAt:
-            type: string
-            format: date-time
+          type: string
+          format: date-time
 
     Currency:
       type: string
