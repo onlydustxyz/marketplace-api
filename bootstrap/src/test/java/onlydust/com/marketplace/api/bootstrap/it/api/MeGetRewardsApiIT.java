@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
@@ -409,8 +411,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 .address(faker.address().fullAddress())
                                 .build())
                         .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                .ethName(faker.name().name())
-                                .aptosAddress(faker.rickAndMorty().character())
+                                .ethWallet(Ethereum.wallet("vitalik.eth"))
+                                .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
                                 .build())
                         .build());
 

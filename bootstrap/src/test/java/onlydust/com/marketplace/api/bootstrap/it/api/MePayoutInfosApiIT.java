@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -41,8 +42,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .payoutSettings(new UserPayoutInformationResponsePayoutSettings()
                         .aptosAddress(userPayoutInformationRequest.getPayoutSettings().getAptosAddress())
                         .missingAptosWallet(missingAptosWallet)
-                        .ethAddress(userPayoutInformationRequest.getPayoutSettings().getEthAddress())
-                        .ethName(userPayoutInformationRequest.getPayoutSettings().getEthName())
+                        .ethWallet(userPayoutInformationRequest.getPayoutSettings().getEthWallet())
                         .missingEthWallet(missingEthWallet)
                         .starknetAddress(userPayoutInformationRequest.getPayoutSettings().getStarknetAddress())
                         .missingStarknetWallet(missingStarknetWallet)
@@ -132,7 +132,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.location.city").isEqualTo("Vence")
                 .jsonPath("$.location.country").isEqualTo("France")
                 .jsonPath("$.location.postalCode").isEqualTo("06140")
-                .jsonPath("$.payoutSettings.ethName").isEqualTo("abuisset.eth")
+                .jsonPath("$.payoutSettings.ethWallet").isEqualTo("abuisset.eth")
                 .jsonPath("$.payoutSettings.missingEthWallet").isEqualTo(false)
                 .jsonPath("$.payoutSettings.missingOptimismWallet").isEqualTo(true)
                 .jsonPath("$.payoutSettings.missingAptosWallet").isEqualTo(true)
@@ -189,7 +189,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .postalCode(faker.address().zipCode())
                 )
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
-                        .ethAddress("0x" + faker.random().hex(40))
+                        .ethWallet("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
                 );
 
@@ -252,7 +252,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                         .postalCode(faker.address().zipCode())
                 )
                 .payoutSettings(new UserPayoutInformationRequestPayoutSettings()
-                        .ethAddress("0x" + faker.random().hex(40))
+                        .ethWallet("0x" + faker.random().hex(40))
                         .optimismAddress("0x" + faker.random().hex(40))
                 );
 
