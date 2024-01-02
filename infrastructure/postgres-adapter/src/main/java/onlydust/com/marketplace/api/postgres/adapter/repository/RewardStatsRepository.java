@@ -13,8 +13,8 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
     @Query(value = """
             SELECT 
                 pr.currency,
-                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ), 0) AS processed_amount,
-                COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) >= pr.amount ), 0)  * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS processed_usd_amount,
+                COALESCE(SUM(pr.amount), 0) AS processed_amount,
+                COALESCE(SUM(pr.amount), 0)  * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS processed_usd_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS pending_usd_amount,
                 JSONB_AGG(pr.id) AS reward_ids,
