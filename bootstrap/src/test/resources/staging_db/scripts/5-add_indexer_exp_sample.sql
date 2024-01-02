@@ -25,3 +25,8 @@ SELECT gr.id,
        l.value::bigint
 FROM indexer_exp.github_repos gr
          CROSS JOIN jsonb_each(gr.languages) l;
+
+
+update indexer_exp.github_app_installations
+set suspended_at = now()
+where id = 44300050; -- PierreOucif
