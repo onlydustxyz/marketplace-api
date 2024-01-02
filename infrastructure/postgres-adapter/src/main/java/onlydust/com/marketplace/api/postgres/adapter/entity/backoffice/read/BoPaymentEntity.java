@@ -12,7 +12,6 @@ import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.UsdPreferredMethodEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -35,7 +34,6 @@ import static java.util.Objects.nonNull;
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
-@TypeDef(name = "preferred_method", typeClass = PostgreSQLEnumType.class)
 public class BoPaymentEntity {
     @Id
     UUID id;
@@ -59,9 +57,6 @@ public class BoPaymentEntity {
     Identity recipientIdentity;
     @Type(type = "jsonb")
     Location recipientLocation;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "preferred_method")
-    UsdPreferredMethodEnumEntity recipientUsdPreferredMethod;
     @Type(type = "jsonb")
     List<Wallet> recipientWallets;
     String recipientIban;
@@ -126,8 +121,6 @@ public class BoPaymentEntity {
                 .issuesCount(issuesCount)
                 .dustyIssuesCount(dustyIssuesCount)
                 .codeReviewsCount(codeReviewsCount)
-                .recipientUsdPreferredMethod(nonNull(recipientUsdPreferredMethod) ?
-                        recipientUsdPreferredMethod.toDomain() : null)
                 .recipientIdentity(nonNull(recipientIdentity) ? recipientIdentity.toDomain() : null)
                 .recipientLocation(nonNull(recipientLocation) ? recipientLocation.toDomain() : null)
                 .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(IBAN.valueOf(recipientIban)).bic(recipientBic).build())

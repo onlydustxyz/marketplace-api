@@ -110,10 +110,6 @@ public class UserPayoutInformation {
         }
     }
 
-    public enum UsdPreferredMethodEnum {
-        FIAT, CRYPTO
-    }
-
     @Data
     @Builder(toBuilder = true)
     public static class PayoutSettings {

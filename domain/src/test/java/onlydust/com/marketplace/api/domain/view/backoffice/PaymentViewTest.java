@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.domain.view.backoffice;
 import com.github.javafaker.Faker;
 import nl.garvelink.iban.IBAN;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.*;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Company;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Location;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Person;
+import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.SepaAccount;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView.Identity;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +30,6 @@ class PaymentViewTest {
         final var paymentView = PaymentView.builder()
                 .currency(Currency.Usd)
                 .recipientLocation(validLocation)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
                 .recipientSepaAccount(validSepaAccount);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
@@ -48,7 +50,6 @@ class PaymentViewTest {
         final var paymentView = PaymentView.builder()
                 .currency(Currency.Usd)
                 .recipientIdentity(validCompany)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
                 .recipientSepaAccount(validSepaAccount);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
@@ -64,8 +65,7 @@ class PaymentViewTest {
         final var paymentView = PaymentView.builder()
                 .currency(Currency.Usd)
                 .recipientLocation(validLocation)
-                .recipientIdentity(validCompany)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT);
+                .recipientIdentity(validCompany);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().bic(faker.finance().bic()).build()).build().recipientPayoutInfoValid());
@@ -78,8 +78,7 @@ class PaymentViewTest {
         final var paymentView = PaymentView.builder()
                 .currency(Currency.Usd)
                 .recipientLocation(validLocation)
-                .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO);
+                .recipientIdentity(validPerson);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
     }
@@ -90,7 +89,6 @@ class PaymentViewTest {
                 .currency(Currency.Usd)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validCompany)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
                 .recipientPayoutInfoValid());
@@ -99,7 +97,6 @@ class PaymentViewTest {
                 .currency(Currency.Usd)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validCompany)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -109,7 +106,6 @@ class PaymentViewTest {
                 .currency(Currency.Eth)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -118,7 +114,6 @@ class PaymentViewTest {
                 .currency(Currency.Op)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientOptimismWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -127,7 +122,6 @@ class PaymentViewTest {
                 .currency(Currency.Strk)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientStarkWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -136,7 +130,6 @@ class PaymentViewTest {
                 .currency(Currency.Apt)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientAptosWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -145,7 +138,6 @@ class PaymentViewTest {
                 .currency(Currency.Lords)
                 .recipientLocation(validLocation)
                 .recipientIdentity(validPerson)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -155,49 +147,42 @@ class PaymentViewTest {
     void should_return_formatted_payout_settings() {
         assertThat(PaymentView.builder()
                 .currency(Currency.Usd)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.FIAT)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
                 .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban().toPlainString() + " / " + validSepaAccount.getBic());
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Usd)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Eth)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Lords)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Op)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientOptimismWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Strk)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientStarkWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Apt)
-                .recipientUsdPreferredMethod(UsdPreferredMethodEnum.CRYPTO)
                 .recipientAptosWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");

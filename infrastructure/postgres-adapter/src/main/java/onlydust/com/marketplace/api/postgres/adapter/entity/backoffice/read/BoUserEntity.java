@@ -1,17 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.UsdPreferredMethodEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +22,6 @@ import java.util.UUID;
 @Data
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@TypeDef(name = "preferred_method", typeClass = PostgreSQLEnumType.class)
 public class BoUserEntity {
     @Id
     UUID id;
@@ -35,9 +34,6 @@ public class BoUserEntity {
     String postCode;
     String city;
     String country;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "preferred_method")
-    UsdPreferredMethodEnumEntity usdPreferredMethod;
     String telegram;
     String twitter;
     String discord;
@@ -109,7 +105,6 @@ public class BoUserEntity {
                 .languages(languages)
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
-                .usdPreferredMethod(usdPreferredMethod == null ? null : usdPreferredMethod.toDomain())
                 .build();
     }
 }

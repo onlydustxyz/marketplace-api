@@ -141,21 +141,6 @@ public interface UserPayoutInfoMapper {
         return userPayoutInformation;
     }
 
-
-    private static UserPayoutInformation.UsdPreferredMethodEnum usdPreferredMethodToDomain(final UsdPreferredMethodEnumEntity usdPreferredMethodEnumEntity) {
-        return switch (usdPreferredMethodEnumEntity) {
-            case crypto -> UserPayoutInformation.UsdPreferredMethodEnum.CRYPTO;
-            case fiat -> UserPayoutInformation.UsdPreferredMethodEnum.FIAT;
-        };
-    }
-
-    private static UsdPreferredMethodEnumEntity usdPreferredMethodToEntity(final UserPayoutInformation.UsdPreferredMethodEnum usdPreferredMethodEnum) {
-        return switch (usdPreferredMethodEnum) {
-            case FIAT -> UsdPreferredMethodEnumEntity.fiat;
-            case CRYPTO -> UsdPreferredMethodEnumEntity.crypto;
-        };
-    }
-
     static UserPayoutInfoEntity mapDomainToEntity(UUID userId, UserPayoutInformation userPayoutInformation) {
         UserPayoutInfoEntity entity = UserPayoutInfoEntity.builder()
                 .userId(userId)

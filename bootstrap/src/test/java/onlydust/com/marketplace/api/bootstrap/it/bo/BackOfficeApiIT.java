@@ -507,7 +507,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
-                        )))
+                )))
                 .header("Api-Key", config.getApiKey())
                 // Then
                 .exchange()
@@ -694,7 +694,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "aptosAddress": null,
                               "optimismAddress": null,
                               "starknetAddress": null,
-                              "usdPreferredMethod": null,
                               "createdAt": "2023-10-03T09:06:07.741395Z",
                               "email": "haydenclearymusic@gmail.com",
                               "githubUserId": 5160414,
@@ -743,7 +742,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "aptosAddress": null,
                               "optimismAddress": null,
                               "starknetAddress": null,
-                              "usdPreferredMethod": null,
                               "createdAt": "2023-09-27T12:04:06.149173Z",
                               "email": "admin@onlydust.xyz",
                               "githubUserId": 144809540,
@@ -782,7 +780,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "aptosAddress": null,
                               "optimismAddress": null,
                               "starknetAddress": null,
-                              "usdPreferredMethod": null,
                               "createdAt": "2023-09-18T15:45:50.175156Z",
                               "email": "kevin@lettria.com",
                               "githubUserId": 142427301,
@@ -833,7 +830,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "postCode": "06140",
                               "city": "Vence",
                               "country": "France",
-                              "usdPreferredMethod": "CRYPTO",
                               "telegram": "https://t.me/abuisset",
                               "twitter": "https://twitter.com/abuisset",
                               "discord": "antho",
@@ -873,7 +869,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "postCode": null,
                               "city": null,
                               "country": null,
-                              "usdPreferredMethod": null,
                               "telegram": null,
                               "twitter": "https://twitter.com/OnlyDust_xyz",
                               "discord": null,
