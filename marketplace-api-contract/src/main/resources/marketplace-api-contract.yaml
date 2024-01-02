@@ -1327,6 +1327,40 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/rewards/invoices:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Mark invoice as received
+      operationId: markInvoiceAsReceived
+      description: |
+        Mark invoice as received. The caller must be the rewards' recipient.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: 'Reward ids'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarkInvoiceAsReceivedRequest'
+      responses:
+        "204":
+          description: 'Invoice marked as received'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/{projectId}/rewards/{rewardId}:
     get:
       security:
@@ -3341,6 +3375,16 @@ components:
         repoId:
           type: integer
           format: int64
+
+    MarkInvoiceAsReceivedRequest:
+      type: object
+      required:
+        - rewardIds
+      properties:
+        rewardIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardId'
 
 
     GithubPullRequest:

@@ -3,12 +3,14 @@ package onlydust.com.marketplace.api.od.rust.api.client.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
+import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkInvoiceAsReceivedDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.http.HttpMethod;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -28,6 +30,13 @@ public class OdRustApiClientAdapter implements RewardServicePort<HasuraAuthentic
     @Override
     public void cancelPayment(HasuraAuthentication authentication, UUID rewardId) {
         httpClient.sendRequest("/api/payments/" + rewardId.toString(), HttpMethod.DELETE, null, Void.class,
+                authentication);
+    }
+
+    @Override
+    public void markInvoiceAsReceived(HasuraAuthentication authentication, List<UUID> rewardIds) {
+        httpClient.sendRequest("/api/payments/invoiceReceivedAt", HttpMethod.PUT,
+                new MarkInvoiceAsReceivedDTO(rewardIds), Void.class,
                 authentication);
     }
 }

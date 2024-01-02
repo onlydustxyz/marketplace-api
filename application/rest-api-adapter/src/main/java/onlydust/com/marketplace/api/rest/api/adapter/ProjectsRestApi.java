@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter;
 
-import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.contract.ApiUtil;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
@@ -24,14 +22,9 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -40,10 +33,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
@@ -163,7 +154,8 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 List<CurrencyContract> currencies, List<Long> contributors,
+                                                                 List<CurrencyContract> currencies,
+                                                                 List<Long> contributors,
                                                                  String fromDate, String toDate,
                                                                  String sort, String direction) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
@@ -212,6 +204,14 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
         rewardFacadePort.cancelPayment(hasuraAuthentication, authenticatedUser.getId(), projectId, rewardId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> markInvoiceAsReceived(UUID projectId,
+                                                      MarkInvoiceAsReceivedRequest markInvoiceAsReceivedRequest) {
+        rewardFacadePort.markInvoiceAsReceived(authenticationService.getHasuraAuthentication(),
+                markInvoiceAsReceivedRequest.getRewardIds());
         return ResponseEntity.noContent().build();
     }
 
@@ -351,16 +351,16 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ContributionPageResponse> getProjectContributions(UUID projectId,
-                                                                                   List<onlydust.com.marketplace.api.contract.model.ContributionType> types,
-                                                                                   List<ContributionStatus> statuses,
-                                                                                   List<Long> repositories,
-                                                                                   String fromDate,
-                                                                                   String toDate,
-                                                                                   List<Long> contributorIds,
-                                                                                   ProjectContributionSort sort,
-                                                                                   String direction,
-                                                                                   Integer pageIndex,
-                                                                                   Integer pageSize) {
+                                                                            List<onlydust.com.marketplace.api.contract.model.ContributionType> types,
+                                                                            List<ContributionStatus> statuses,
+                                                                            List<Long> repositories,
+                                                                            String fromDate,
+                                                                            String toDate,
+                                                                            List<Long> contributorIds,
+                                                                            ProjectContributionSort sort,
+                                                                            String direction,
+                                                                            Integer pageIndex,
+                                                                            Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -394,7 +394,8 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ContributionPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ContributionPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex,
+                                                                                  Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -416,7 +417,9 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectChurnedContributorsPageResponse> getProjectChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ProjectChurnedContributorsPageResponse> getProjectChurnedContributors(UUID projectId,
+                                                                                                Integer pageIndex,
+                                                                                                Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -438,7 +441,8 @@ public class ProjectsRestApi implements ProjectsApi {
 
 
     @Override
-    public ResponseEntity<ProjectNewcomersPageResponse> getProjectNewcomers(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ProjectNewcomersPageResponse> getProjectNewcomers(UUID projectId, Integer pageIndex,
+                                                                            Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -460,7 +464,9 @@ public class ProjectsRestApi implements ProjectsApi {
 
 
     @Override
-    public ResponseEntity<ProjectContributorActivityPageResponse> getProjectMostActiveContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ProjectContributorActivityPageResponse> getProjectMostActiveContributors(UUID projectId,
+                                                                                                   Integer pageIndex,
+                                                                                                   Integer pageSize) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
