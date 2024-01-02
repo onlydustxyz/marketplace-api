@@ -128,6 +128,16 @@ public class CustomUserRepository {
             """;
 
     private final static String GET_PROJECT_STATS_BY_USER = """
+            with granted_usd as (
+              select 
+                pb.project_id,
+                SUM(b.initial_amount * COALESCE(CASE WHEN b.currency = 'usd' then 1 ELSE cuq.price END, 0) -
+                     b.remaining_amount * COALESCE(CASE WHEN b.currency = 'usd' then 1 ELSE cuq.price END, 0)) total
+              from projects_budgets pb
+                join budgets b on b.id = pb.budget_id
+                left join crypto_usd_quotes cuq on cuq.currency = b.currency
+              group by pb.project_id
+            )
             select  p.project_id,
                     p.key as slug,
                     p.is_lead,
@@ -140,13 +150,7 @@ public class CustomUserRepository {
                     from projects_contributors
                     where project_id = p.project_id)     contributors_count,
                     
-                   (select distinct b.initial_amount - b.remaining_amount total_usd_granted
-                    from project_details pd
-                             left join project_leads pl on pl.project_id = pd.project_id
-                             left join projects_budgets pb on pb.project_id = pd.project_id
-                             left join budgets b on b.id = pb.budget_id
-                    where pd.project_id = p.project_id
-                      and b.currency = 'usd')            total_granted,
+                   granted_usd.total as total_granted,
                       
                    (select sum(rc.completed_contribution_count)
                     from project_github_repos pgr
@@ -179,6 +183,7 @@ public class CustomUserRepository {
                             join project_leads pl on pl.user_id = u.id
                             join project_details pd on pd.project_id = pl.project_id
                    where u.github_user_id = :githubUserId)) as p
+            left join granted_usd on granted_usd.project_id = p.project_id
             order by p.is_lead desc""";
     private final static TypeReference<HashMap<String, Long>> typeRef
             = new TypeReference<>() {
