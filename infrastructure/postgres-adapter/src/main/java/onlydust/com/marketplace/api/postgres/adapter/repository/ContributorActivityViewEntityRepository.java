@@ -20,7 +20,8 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                    MAX(c.created_at)                               AS created_at,
                    COUNT(*) FILTER (WHERE c.type = 'PULL_REQUEST') AS pull_request_count,
                    COUNT(*) FILTER (WHERE c.type = 'ISSUE')        AS issue_count,
-                   COUNT(*) FILTER (WHERE c.type = 'CODE_REVIEW')  AS code_review_count
+                   COUNT(*) FILTER (WHERE c.type = 'CODE_REVIEW')  AS code_review_count,
+                   COUNT(*)                                        AS total_count
             FROM indexer_exp.contributions c
                  JOIN project_github_repos pgr ON pgr.github_repo_id = c.repo_id
                  LEFT JOIN iam.users u ON u.github_user_id = c.contributor_id
@@ -43,6 +44,7 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                 SUM(s.pull_request_count)  AS completed_pull_request_count,
                 SUM(s.issue_count)         AS completed_issue_count,
                 SUM(s.code_review_count)   AS completed_code_review_count,
+                SUM(s.total_count)         AS completed_total_count,
                 COALESCE(jsonb_agg(JSONB_BUILD_OBJECT(
                         'year', s.year,
                         'week', s.week,

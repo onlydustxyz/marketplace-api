@@ -530,7 +530,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         final var page = contributorActivityViewEntityRepository.findAllByProjectId(
                 projectId, format.format(fromDate),
-                PageRequest.of(pageIndex, pageSize, JpaSort.unsafe(Sort.Direction.DESC, "COUNT(*)")));
+                PageRequest.of(pageIndex, pageSize, JpaSort.unsafe(Sort.Direction.DESC, "completed_total_count")));
         return Page.<ContributorActivityView>builder()
                 .content(page.getContent().stream().map(ContributorActivityViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
