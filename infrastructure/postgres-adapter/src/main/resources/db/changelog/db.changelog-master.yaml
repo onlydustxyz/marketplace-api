@@ -51,3 +51,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000025_force_usd_preferred_method_to_crypto.sql
   - include:
       file: db/changelog/changelogs/00000025_migrate_usdc.sql
+  - include:
+      file: db/changelog/changelogs/00000026_shuffle_profile_covers.sql
