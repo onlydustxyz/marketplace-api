@@ -48,4 +48,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000024_remove_whitespaces_from_ibans.sql
   - include:
+      file: db/changelog/changelogs/00000025_force_usd_preferred_method_to_crypto.sql
+  - include:
       file: db/changelog/changelogs/00000025_migrate_usdc.sql
