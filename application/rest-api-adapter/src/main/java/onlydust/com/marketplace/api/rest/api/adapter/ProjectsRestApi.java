@@ -208,14 +208,6 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> markInvoiceAsReceived(UUID projectId,
-                                                      MarkInvoiceAsReceivedRequest markInvoiceAsReceivedRequest) {
-        rewardFacadePort.markInvoiceAsReceived(authenticationService.getHasuraAuthentication(),
-                markInvoiceAsReceivedRequest.getRewardIds());
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
