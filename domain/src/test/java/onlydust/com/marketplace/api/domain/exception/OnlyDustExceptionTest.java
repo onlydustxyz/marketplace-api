@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.exception;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

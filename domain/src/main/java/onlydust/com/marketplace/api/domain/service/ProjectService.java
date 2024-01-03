@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -63,7 +61,8 @@ public class ProjectService implements ProjectFacadePort {
 
         final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug, caller);
         if (!permissionService.hasUserAccessToProject(slug, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug, userId));
+            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
+                    userId));
         }
         return projectBySlug;
     }
@@ -384,11 +383,13 @@ public class ProjectService implements ProjectFacadePort {
                 .to(Date.from(ZonedDateTime.now().minusDays(STALE_CONTRIBUTION_THRESHOLD_IN_DAYS).toInstant()))
                 .build();
 
-        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page, pageSize);
+        return contributions(projectId, caller, filters, ContributionView.Sort.CREATED_AT, SortDirection.desc, page,
+                pageSize);
     }
 
     @Override
-    public Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page, Integer pageSize) {
+    public Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page,
+                                                            Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }

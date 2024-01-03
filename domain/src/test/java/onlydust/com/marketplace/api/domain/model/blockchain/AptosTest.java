@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.domain.model.blockchain;
 
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -68,7 +68,9 @@ class AptosTest {
 
     @Test
     void should_generate_transaction_url() {
-        assertThat(Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash("0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23")).toString())
-                .isEqualTo("https://aptoscan.com/version/0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23");
+        assertThat(Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash(
+                "0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23")).toString())
+                .isEqualTo("https://aptoscan" +
+                           ".com/version/0x4906e5e67af366789ce5568c6573e256a82863b9e901bb3b51d07674bacfeb23");
     }
 }

@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.exception;
+package onlydust.com.marketplace.kernel.exception;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

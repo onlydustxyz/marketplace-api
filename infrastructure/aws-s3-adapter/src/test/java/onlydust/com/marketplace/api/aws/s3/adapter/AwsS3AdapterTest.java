@@ -5,7 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,8 @@ class AwsS3AdapterTest {
         when(amazonS3.doesBucketExistV2(eq(amazonS3Properties.getImageBucket()))).thenReturn(true);
         when(amazonS3.putObject(eq(amazonS3Properties.getImageBucket()), eq(expectedFileName), any(), any())).thenReturn(putObjectResultMock);
         when(putObjectResultMock.getContentMd5()).thenReturn(new String(Base64.getEncoder().encode(DigestUtils.md5(bytes))));
-        when(amazonS3.getUrl(eq(amazonS3Properties.getImageBucket()), eq(expectedFileName))).thenReturn(new URL("https://my-s3-bucket.com/my-file.jpeg"));
+        when(amazonS3.getUrl(eq(amazonS3Properties.getImageBucket()), eq(expectedFileName))).thenReturn(new URL(
+                "https://my-s3-bucket.com/my-file.jpeg"));
         AwsS3Adapter.storeImage(new ByteArrayInputStream(bytes));
 
         // Then

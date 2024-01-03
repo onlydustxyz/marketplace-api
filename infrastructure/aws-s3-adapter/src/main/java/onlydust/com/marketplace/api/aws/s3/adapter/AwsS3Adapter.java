@@ -6,7 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
 

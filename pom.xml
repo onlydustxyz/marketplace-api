@@ -11,6 +11,8 @@
         <module>domain</module>
         <module>coverage</module>
         <module>backoffice-api-contract</module>
+        <module>accounting-domain</module>
+        <module>kernel</module>
     </modules>
 
     <parent>

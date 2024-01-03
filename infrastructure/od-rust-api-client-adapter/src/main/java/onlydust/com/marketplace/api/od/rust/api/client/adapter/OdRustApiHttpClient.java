@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -19,7 +19,7 @@ import static java.lang.String.format;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class OdRustApiHttpClient {

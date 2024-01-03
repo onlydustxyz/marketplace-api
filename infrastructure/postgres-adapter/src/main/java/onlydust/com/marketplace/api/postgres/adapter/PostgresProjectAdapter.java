@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -36,7 +36,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper
 
 @AllArgsConstructor
 public class PostgresProjectAdapter implements ProjectStoragePort {
-    private static final int  CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
+    private static final int CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
     private static final int CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS = 5;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
     private final ProjectRepository projectRepository;
@@ -515,7 +515,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var page = newcomerViewEntityRepository.findAllByProjectId(
-                projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "first_contribution_created_at")));
+                projectId, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
+                        "first_contribution_created_at")));
         return Page.<NewcomerView>builder()
                 .content(page.getContent().stream().map(NewcomerViewEntity::toDomain).toList())
                 .totalItemNumber(page.getNumberOfElements())
@@ -524,9 +525,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex,
+                                                                    Integer pageSize) {
         final var format = new SimpleDateFormat("yyyy-MM-dd");
-        final var fromDate = Date.from(ZonedDateTime.now().minusWeeks(CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS).toInstant());
+        final var fromDate =
+                Date.from(ZonedDateTime.now().minusWeeks(CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS).toInstant());
 
         final var page = contributorActivityViewEntityRepository.findAllByProjectId(
                 projectId, format.format(fromDate),

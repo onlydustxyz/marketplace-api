@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
@@ -51,10 +52,14 @@ public interface UserPayoutInfoMapper {
     private static UserPayoutInformationResponsePayoutSettings getUserPayoutInformationContractPayoutSettings(UserPayoutInformation view) {
         final var payoutSettings = new UserPayoutInformationResponsePayoutSettings();
         payoutSettings.setHasValidPayoutSettings(view.hasValidPayoutSettings());
-        if(view.getPayoutSettings().getEthWallet() != null) payoutSettings.setEthWallet(view.getPayoutSettings().getEthWallet().asString());
-        if(view.getPayoutSettings().getAptosAddress() != null) payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().asString());
-        if(view.getPayoutSettings().getOptimismAddress() != null) payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().asString());
-        if(view.getPayoutSettings().getStarknetAddress() != null) payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().asString());
+        if (view.getPayoutSettings().getEthWallet() != null)
+            payoutSettings.setEthWallet(view.getPayoutSettings().getEthWallet().asString());
+        if (view.getPayoutSettings().getAptosAddress() != null)
+            payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().asString());
+        if (view.getPayoutSettings().getOptimismAddress() != null)
+            payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().asString());
+        if (view.getPayoutSettings().getStarknetAddress() != null)
+            payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().asString());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
@@ -96,10 +101,14 @@ public interface UserPayoutInfoMapper {
         }
         userPayoutInformation = userPayoutInformation.toBuilder()
                 .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                        .starknetAddress(contract.getPayoutSettings().getStarknetAddress() == null ? null : StarkNet.accountAddress(contract.getPayoutSettings().getStarknetAddress()))
-                        .aptosAddress(contract.getPayoutSettings().getAptosAddress() == null ? null : Aptos.accountAddress(contract.getPayoutSettings().getAptosAddress()))
-                        .optimismAddress(contract.getPayoutSettings().getOptimismAddress() == null ? null : Optimism.accountAddress(contract.getPayoutSettings().getOptimismAddress()))
-                        .ethWallet(contract.getPayoutSettings().getEthWallet() == null ? null : Ethereum.wallet(contract.getPayoutSettings().getEthWallet()))
+                        .starknetAddress(contract.getPayoutSettings().getStarknetAddress() == null ? null :
+                                StarkNet.accountAddress(contract.getPayoutSettings().getStarknetAddress()))
+                        .aptosAddress(contract.getPayoutSettings().getAptosAddress() == null ? null :
+                                Aptos.accountAddress(contract.getPayoutSettings().getAptosAddress()))
+                        .optimismAddress(contract.getPayoutSettings().getOptimismAddress() == null ? null :
+                                Optimism.accountAddress(contract.getPayoutSettings().getOptimismAddress()))
+                        .ethWallet(contract.getPayoutSettings().getEthWallet() == null ? null :
+                                Ethereum.wallet(contract.getPayoutSettings().getEthWallet()))
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {

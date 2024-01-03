@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
@@ -237,9 +237,11 @@ public class UserServiceTest {
         final UserPayoutInformation userPayoutInformation =
                 UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                         .optimismAddress(Optimism.accountAddress("0x2C6277931328e2028C3DB10625D767de19151e92"))
-                        .starknetAddress(StarkNet.accountAddress("0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597"))
+                        .starknetAddress(StarkNet.accountAddress(
+                                "0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597"))
                         .ethWallet(Ethereum.wallet("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))
-                        .aptosAddress(Aptos.accountAddress("0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b"))
+                        .aptosAddress(Aptos.accountAddress(
+                                "0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b"))
                         .build()).build();
 
         // When

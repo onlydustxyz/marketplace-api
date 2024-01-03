@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,7 +17,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor

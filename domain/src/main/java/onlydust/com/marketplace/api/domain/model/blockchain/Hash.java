@@ -3,12 +3,10 @@ package onlydust.com.marketplace.api.domain.model.blockchain;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.regex.Pattern;
 
-import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @EqualsAndHashCode
 public abstract class Hash {
@@ -32,9 +30,10 @@ public abstract class Hash {
         private final int maxByteCount;
 
         public void check(final @NonNull String hash) {
-            if(!HEX_PATTERN.matcher(hash).matches()) throw badRequest("Provided hash is not hexadecimal");
+            if (!HEX_PATTERN.matcher(hash).matches()) throw badRequest("Provided hash is not hexadecimal");
             if (hash.length() < 3) throw badRequest("Provided hash is too short");
-            if (hash.length() > maxByteCount * 2 + 2) throw badRequest("Provided hash should be less than %d bytes".formatted(maxByteCount));
+            if (hash.length() > maxByteCount * 2 + 2)
+                throw badRequest("Provided hash should be less than %d bytes".formatted(maxByteCount));
         }
 
         public String sanitize(String hash) {

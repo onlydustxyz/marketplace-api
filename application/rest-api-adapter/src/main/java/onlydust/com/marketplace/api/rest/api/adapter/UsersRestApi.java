@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.UsersApi;
 import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
 import onlydust.com.marketplace.api.contract.model.PublicUserProfileResponse;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;

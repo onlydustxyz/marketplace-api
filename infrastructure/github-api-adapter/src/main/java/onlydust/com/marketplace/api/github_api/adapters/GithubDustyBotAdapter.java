@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.port.output.DustyBotStoragePort;
 import onlydust.com.marketplace.api.domain.view.RewardableItemView;

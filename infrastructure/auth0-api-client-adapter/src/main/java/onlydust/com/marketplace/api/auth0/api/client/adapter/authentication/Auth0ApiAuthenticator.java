@@ -6,7 +6,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiClientProperties;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.springframework.http.HttpStatus;
 

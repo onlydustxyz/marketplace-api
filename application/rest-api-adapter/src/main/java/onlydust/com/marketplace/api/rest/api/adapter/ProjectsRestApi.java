@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.api.domain.model.User;
