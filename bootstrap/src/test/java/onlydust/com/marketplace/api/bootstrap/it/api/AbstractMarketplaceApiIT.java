@@ -8,12 +8,12 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,13 +21,14 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
@@ -36,7 +37,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers
 @Slf4j
-@DirtiesContext
 @Import(SwaggerConfiguration.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
@@ -106,17 +106,14 @@ public class AbstractMarketplaceApiIT {
     protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
 
-    @Container
-    static PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer<>("postgres:14.3-alpine")
-                    .withDatabaseName("marketplace_db")
-                    .withUsername("test")
-                    .withPassword("test")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
-                    .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+    static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
+            .withDatabaseName("marketplace_db")
+            .withUsername("test")
+            .withPassword("test")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("rust-api")
@@ -137,6 +134,14 @@ public class AbstractMarketplaceApiIT {
 
     protected static void waitAtLeastOneCycleOfOutboxEventProcessing() throws InterruptedException {
         Thread.sleep(1000);
+    }
+
+    @BeforeAll
+    static void beforeAll() throws IOException, InterruptedException {
+        if (!postgresSQLContainer.isRunning()) {
+            postgresSQLContainer.start();
+        }
+        assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
     }
 
     @DynamicPropertySource

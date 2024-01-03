@@ -36,7 +36,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                                                                  List<UUID> projectIds) {
         final var page =
                 githubRepositoryLinkedToProjectRepository.findAllPublicForProjectsIds(PageRequest.of(pageIndex,
-                        pageSize), isNull(projectIds) ? List.of() : projectIds);
+                        pageSize, Sort.by("owner", "name")), isNull(projectIds) ? List.of() : projectIds);
         return Page.<ProjectRepositoryView>builder()
                 .content(page.getContent().stream().map(entity ->
                         ProjectRepositoryView.builder()
@@ -55,7 +55,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Page<ProjectBudgetView> findProjectBudgetPage(int pageIndex, int pageSize, List<UUID> projectIds) {
-        final var page = projectBudgetRepository.findAllByProjectIds(PageRequest.of(pageIndex, pageSize),
+        final var page = projectBudgetRepository.findAllByProjectIds(PageRequest.of(pageIndex, pageSize, Sort.by("id")),
                 isNull(projectIds) ? List.of() : projectIds);
         return Page.<ProjectBudgetView>builder()
                 .content(page.getContent().stream().map(entity ->
@@ -80,7 +80,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
         final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(),
-                PageRequest.of(pageIndex, pageSize));
+                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<SponsorView>builder()
                 .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -92,7 +92,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Transactional(readOnly = true)
     public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids,
                                                                          List<UUID> projectIds) {
-        final var page = projectLeadInvitationRepository.findAllByIds(PageRequest.of(pageIndex, pageSize),
+        final var page = projectLeadInvitationRepository.findAllByIds(PageRequest.of(pageIndex, pageSize, Sort.by("id")),
                 isNull(ids) ? List.of() : ids, isNull(projectIds) ? List.of() : projectIds);
         return Page.<ProjectLeadInvitationView>builder()
                 .content(page.getContent().stream().map(entity ->
@@ -120,7 +120,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
-        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize));
+        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "requested_at")));
         return Page.<PaymentView>builder()
                 .content(page.getContent().stream().map(BoPaymentEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -131,7 +131,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
-                PageRequest.of(pageIndex, pageSize));
+                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
         return Page.<ProjectView>builder()
                 .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())

@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,9 +21,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
@@ -33,19 +36,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Slf4j
 @Import(SwaggerConfiguration.class)
 public class AbstractMarketplaceBackOfficeApiIT {
-
-    protected static final Faker faker = new Faker();
-
-    @Container
-    static PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer<>("postgres:14.3-alpine")
+    static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
                     .withDatabaseName("marketplace_db")
                     .withUsername("test")
                     .withPassword("test")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
-                    .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
+                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
                     .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @LocalServerPort
     int port;
@@ -59,6 +56,13 @@ public class AbstractMarketplaceBackOfficeApiIT {
         registry.add("spring.datasource.username", postgresSQLContainer::getUsername);
     }
 
+    @BeforeAll
+    static void beforeAll() throws IOException, InterruptedException {
+        if (!postgresSQLContainer.isRunning()) {
+            postgresSQLContainer.start();
+        }
+        assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
+    }
 
     protected static final String GET_GITHUB_REPOS = "/bo/v1/repositories";
     protected static final String GET_SPONSORS = "/bo/v1/sponsors";
