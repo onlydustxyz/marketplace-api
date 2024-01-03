@@ -202,13 +202,7 @@ public class CustomUserRepository {
                 .lastSeenAt(row.getLastSeenAt())
                 .htmlUrl(row.getHtmlUrl())
                 .location(row.getLocation())
-                .cover(isNull(row.getCover()) ? null :
-                        switch (row.getCover()) {
-                            case cyan -> UserProfileCover.CYAN;
-                            case magenta -> UserProfileCover.MAGENTA;
-                            case yellow -> UserProfileCover.YELLOW;
-                            case blue -> UserProfileCover.BLUE;
-                        })
+                .cover(isNull(row.getCover()) ? null : row.getCover().toDomain())
                 .website(row.getWebsite())
                 .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()

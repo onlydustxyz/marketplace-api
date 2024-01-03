@@ -1,17 +1,10 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectView;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.time.temporal.WeekFields;
-import java.util.*;
 
 @Data
 @Builder
@@ -23,6 +16,10 @@ public class ChurnedContributorView {
     Boolean isRegistered;
     UserProfileCover cover;
     Contribution lastContribution;
+
+    public UserProfileCover getCover() {
+        return cover == null ? UserProfileCover.get(githubId) : cover;
+    }
 
     @Data
     @Builder
