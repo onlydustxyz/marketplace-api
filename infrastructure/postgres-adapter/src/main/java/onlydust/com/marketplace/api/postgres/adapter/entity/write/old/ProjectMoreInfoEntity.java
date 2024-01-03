@@ -36,6 +36,7 @@ public class ProjectMoreInfoEntity {
     @Column(name = "updated_at", nullable = false)
     Instant updatedAt;
 
+    @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
         UUID projectId;
         String url;
