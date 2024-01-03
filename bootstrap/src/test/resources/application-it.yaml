@@ -30,6 +30,11 @@ application:
   cron:
     notification-job-delay: 500
     indexer-sync-job-delay: 500
+  github:
+    installation:
+      retry:
+        retry-count: 1
+        retry-interval: 0
 
 
 #logging:

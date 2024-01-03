@@ -35,6 +35,7 @@ public class ProjectLeadEntity {
 
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
         UUID projectId;
         UUID userId;

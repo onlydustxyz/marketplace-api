@@ -23,6 +23,7 @@ public class ProjectRepoEntity {
     @Column(name = "github_repo_id", nullable = false, updatable = false)
     Long repoId;
 
+    @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
         UUID projectId;
         Long repoId;
