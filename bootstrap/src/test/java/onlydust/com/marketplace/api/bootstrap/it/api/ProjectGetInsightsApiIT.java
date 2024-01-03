@@ -192,12 +192,31 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "contributors": [
                             {
+                              "githubUserId": 31901905,
+                              "login": "kaelsky",
+                              "htmlUrl": "https://github.com/kaelsky",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                              "isRegistered": true,
+                              "cover": "CYAN",
+                              "lastContribution": {
+                                "id": "48c6f61a076454ba2ce5d8c52fd21deccd50aeb7953dd22b174eb2384fdea479",
+                                "completedAt": "2023-12-04T14:12:52Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
                               "githubUserId": 143011364,
                               "login": "pixelfact",
                               "htmlUrl": "https://github.com/pixelfact",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                               "isRegistered": false,
-                              "cover": "BLUE",
+                              "cover": "MAGENTA",
                               "lastContribution": {
                                 "id": "bb134dc807abcdc8125104ea79a76b3e4a99a04eb9e734fb2f17dc26f9ac65f8",
                                 "completedAt": "2023-12-04T14:12:52Z",
@@ -219,25 +238,6 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "cover": "BLUE",
                               "lastContribution": {
                                 "id": "1e65192b16f1b8550d9f11314f25c4610b62252c40336e1d74c5792002f110af",
-                                "completedAt": "2023-12-04T14:12:52Z",
-                                "repo": {
-                                  "id": 498695724,
-                                  "owner": "onlydustxyz",
-                                  "name": "marketplace-frontend",
-                                  "description": "Contributions marketplace backend services",
-                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                                }
-                              }
-                            },
-                            {
-                              "githubUserId": 31901905,
-                              "login": "kaelsky",
-                              "htmlUrl": "https://github.com/kaelsky",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                              "isRegistered": true,
-                              "cover": "BLUE",
-                              "lastContribution": {
-                                "id": "48c6f61a076454ba2ce5d8c52fd21deccd50aeb7953dd22b174eb2384fdea479",
                                 "completedAt": "2023-12-04T14:12:52Z",
                                 "repo": {
                                   "id": 498695724,
@@ -273,7 +273,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/oscarwroche",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                               "isRegistered": true,
-                              "cover": "BLUE",
+                              "cover": "CYAN",
                               "lastContribution": {
                                 "id": "39f0ee86f57fc94477f7525ca035800e54f79c7c20c8bc2774b916bcc514d921",
                                 "completedAt": "2023-07-13T16:38:18Z",
@@ -311,68 +311,68 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "contributors": [
-                            {
-                              "githubUserId": 17259618,
-                              "login": "alexbeno",
-                              "htmlUrl": "https://github.com/alexbeno",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                              "isRegistered": false,
-                              "cover": "BLUE",
-                              "location": null,
-                              "bio": null,
-                              "firstContributedAt": "2023-10-19T12:13:47Z"
-                            },
-                            {
-                              "githubUserId": 143011364,
-                              "login": "pixelfact",
-                              "htmlUrl": "https://github.com/pixelfact",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                              "isRegistered": false,
-                              "cover": "BLUE",
-                              "location": null,
-                              "bio": "Frontend Dev",
-                              "firstContributedAt": "2023-09-25T15:49:00Z"
-                            },
-                            {
-                              "githubUserId": 5160414,
-                              "login": "haydencleary",
-                              "htmlUrl": "https://github.com/haydencleary",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                              "isRegistered": true,
-                              "cover": "BLUE",
-                              "location": "Limoges, France",
-                              "bio": "Freelance web developer focused on Typescript and React.js",
-                              "firstContributedAt": "2023-09-18T14:41:40Z"
-                            },
-                            {
-                              "githubUserId": 31901905,
-                              "login": "kaelsky",
-                              "htmlUrl": "https://github.com/kaelsky",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                              "isRegistered": true,
-                              "cover": "BLUE",
-                              "location": null,
-                              "bio": null,
-                              "firstContributedAt": "2023-09-05T09:12:08Z"
-                            },
-                            {
-                              "githubUserId": 16590657,
-                              "login": "PierreOucif",
-                              "htmlUrl": "https://github.com/PierreOucif",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                              "isRegistered": true,
-                              "cover": "BLUE",
-                              "location": "Paris",
-                              "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
-                              "firstContributedAt": "2023-07-12T11:54:35Z"
-                            }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 5,
-                          "totalItemNumber": 5,
-                          "nextPageIndex": 1
-                        }
+                           "contributors": [
+                             {
+                               "githubUserId": 17259618,
+                               "login": "alexbeno",
+                               "htmlUrl": "https://github.com/alexbeno",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                               "isRegistered": false,
+                               "cover": "BLUE",
+                               "location": null,
+                               "bio": null,
+                               "firstContributedAt": "2023-10-19T12:13:47Z"
+                             },
+                             {
+                               "githubUserId": 143011364,
+                               "login": "pixelfact",
+                               "htmlUrl": "https://github.com/pixelfact",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                               "isRegistered": false,
+                               "cover": "MAGENTA",
+                               "location": null,
+                               "bio": "Frontend Dev",
+                               "firstContributedAt": "2023-09-25T15:49:00Z"
+                             },
+                             {
+                               "githubUserId": 5160414,
+                               "login": "haydencleary",
+                               "htmlUrl": "https://github.com/haydencleary",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                               "isRegistered": true,
+                               "cover": "BLUE",
+                               "location": "Limoges, France",
+                               "bio": "Freelance web developer focused on Typescript and React.js",
+                               "firstContributedAt": "2023-09-18T14:41:40Z"
+                             },
+                             {
+                               "githubUserId": 31901905,
+                               "login": "kaelsky",
+                               "htmlUrl": "https://github.com/kaelsky",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                               "isRegistered": true,
+                               "cover": "CYAN",
+                               "location": null,
+                               "bio": null,
+                               "firstContributedAt": "2023-09-05T09:12:08Z"
+                             },
+                             {
+                               "githubUserId": 16590657,
+                               "login": "PierreOucif",
+                               "htmlUrl": "https://github.com/PierreOucif",
+                               "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                               "isRegistered": true,
+                               "cover": "CYAN",
+                               "location": "Paris",
+                               "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
+                               "firstContributedAt": "2023-07-12T11:54:35Z"
+                             }
+                           ],
+                           "hasMore": true,
+                           "totalPageNumber": 5,
+                           "totalItemNumber": 5,
+                           "nextPageIndex": 1
+                         }
                         """);
     }
 
