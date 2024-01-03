@@ -32,9 +32,12 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort
-            , final ContributorFacadePort contributorFacadePort, final GithubAccountService githubAccountService) {
-        return new MeRestApi(authenticationService, userFacadePort, contributorFacadePort, githubAccountService);
+    public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort,
+                               final RewardFacadePort<HasuraAuthentication> rewardFacadePort,
+                               final ContributorFacadePort contributorFacadePort,
+                               final GithubAccountService githubAccountService) {
+        return new MeRestApi(authenticationService, userFacadePort, rewardFacadePort, contributorFacadePort,
+                githubAccountService);
     }
 
     @Bean

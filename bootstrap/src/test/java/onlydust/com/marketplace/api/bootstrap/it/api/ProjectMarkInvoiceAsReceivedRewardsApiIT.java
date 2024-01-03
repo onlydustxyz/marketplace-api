@@ -6,8 +6,6 @@ import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -20,11 +18,8 @@ public class ProjectMarkInvoiceAsReceivedRewardsApiIT extends AbstractMarketplac
     @Test
     void should_forward_mark_invoice_as_received_to_old_api() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
-        final String jwt = pierre.jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        final var rewardId1 = UUID.randomUUID();
-        final var rewardId2 = UUID.randomUUID();
+        final HasuraUserHelper.AuthenticatedUser gregoire = hasuraUserHelper.authenticateGregoire();
+        final String jwt = gregoire.jwt();
 
         // When
         rustApiWireMockServer.stubFor(WireMock.put(
@@ -35,23 +30,18 @@ public class ProjectMarkInvoiceAsReceivedRewardsApiIT extends AbstractMarketplac
                 .withRequestBody(WireMock.equalToJson("""
                         {
                             "payments": [
-                                "%s", "%s"
+                                "64fb2732-5632-4b09-a8b1-217485648129",
+                                "fab7aaf4-9b0c-4e52-bc9b-72ce08131617",
+                                "5f9060a7-6f9e-4ef7-a1e4-1aaa4c85f03c"
                             ]
                         }
-                        """.formatted(rewardId1, rewardId2)))
+                        """))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
-        client.put()
-                .uri(getApiURI(String.format(PROJECTS_REWARD_MARK_INVOICE_AS_RECEIVED, projectId)))
+        client.post()
+                .uri(getApiURI(ME_POST_MARK_INVOICE_AS_RECEIVED))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .header("Content-Type", "application/json")
-                .bodyValue("""
-                        {
-                            "rewardIds": [
-                                "%s", "%s"
-                            ]
-                        }
-                        """.formatted(rewardId1, rewardId2))
                 // Then
                 .exchange()
                 .expectStatus()

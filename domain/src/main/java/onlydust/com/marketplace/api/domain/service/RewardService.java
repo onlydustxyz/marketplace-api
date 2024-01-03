@@ -7,9 +7,10 @@ import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
+import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -19,6 +20,7 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
     private final ProjectStoragePort projectStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
+    private final UserStoragePort userStoragePort;
 
     @Override
     public UUID requestPayment(Authentication authentication, UUID projectLeadId,
@@ -51,7 +53,9 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
     }
 
     @Override
-    public void markInvoiceAsReceived(Authentication authentication, List<UUID> rewardIds) {
+    public void markInvoiceAsReceived(Authentication authentication, Long recipientId) {
+        final var rewardIds = userStoragePort.findPendingInvoiceRewardsForRecipientId(recipientId).stream()
+                .map(UserRewardView::getId).toList();
         rewardServicePort.markInvoiceAsReceived(authentication, rewardIds);
     }
 }

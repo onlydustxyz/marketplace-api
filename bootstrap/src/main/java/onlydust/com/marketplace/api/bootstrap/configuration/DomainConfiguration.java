@@ -92,7 +92,8 @@ public class DomainConfiguration {
                                                        final UserStoragePort userStoragePort,
                                                        final ContributionStoragePort contributionStoragePort,
                                                        final RewardStoragePort rewardStoragePort) {
-        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort, rewardStoragePort);
+        return new ContributorService(projectStoragePort, githubSearchPort, userStoragePort, contributionStoragePort,
+                rewardStoragePort);
     }
 
 
@@ -106,8 +107,10 @@ public class DomainConfiguration {
     public RewardService<HasuraAuthentication> rewardService(final RewardServicePort<HasuraAuthentication> rewardServicePort,
                                                              final ProjectStoragePort projectStoragePort,
                                                              final PermissionService permissionService,
-                                                             final IndexerPort indexerPort) {
-        return new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort);
+                                                             final IndexerPort indexerPort,
+                                                             final UserStoragePort userStoragePort) {
+        return new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                userStoragePort);
     }
 
     @Bean
