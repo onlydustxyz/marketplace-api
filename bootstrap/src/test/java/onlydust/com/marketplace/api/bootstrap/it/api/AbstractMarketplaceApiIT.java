@@ -8,14 +8,12 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -23,7 +21,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
@@ -113,9 +110,9 @@ public class AbstractMarketplaceApiIT {
             .withDatabaseName("marketplace_db")
             .withUsername("test")
             .withPassword("test")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/scripts"), "/scripts")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
             .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;

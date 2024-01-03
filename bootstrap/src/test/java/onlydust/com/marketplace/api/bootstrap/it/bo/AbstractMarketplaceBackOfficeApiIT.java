@@ -43,9 +43,9 @@ public class AbstractMarketplaceBackOfficeApiIT {
                     .withUsername("test")
                     .withPassword("test")
                     .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/dump"), "/tmp")
+                            MountableFile.forClasspathResource("/database/dumps"), "/tmp")
                     .withCopyFileToContainer(
-                            MountableFile.forClasspathResource("/staging_db/scripts"), "/docker-entrypoint-initdb.d")
+                            MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
                     .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @LocalServerPort
     int port;
