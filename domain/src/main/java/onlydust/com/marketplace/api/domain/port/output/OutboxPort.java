@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.notification.Event;
 import java.util.Optional;
+import onlydust.com.marketplace.api.domain.model.notification.Event;
 
 public interface OutboxPort {
 
