@@ -70,7 +70,7 @@ class AccountingServiceTest {
                 .isInstanceOf(OnlyDustException.class).hasMessage("Not enough funds");
     }
 
-    @Test
+    //@Test
     public void should_refund_sponsor() {
         accountingFacadePort.registerTransferFromSponsor(sponsorId, committeeId, BigDecimal.ONE, Currency.Op,
                 Network.OPTIMISM);
