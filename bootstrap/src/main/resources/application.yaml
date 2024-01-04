@@ -8,8 +8,7 @@ application:
         key: ${HASURA_GRAPHQL_JWT_SECRET_KEY}
         issuer: ${HASURA_GRAPHQL_JWT_SECRET_ISSUER}
     auth0:
-      # trailing slash is important!
-      jwks-url: https://onlydust-hackathon.eu.auth0.com/
+      jwks-url: ${AUTH0_JWKS_URL}
       expires-at-leeway: 10
     machine-to-machine:
       api-key: ${INTERNAL_API_KEY}
