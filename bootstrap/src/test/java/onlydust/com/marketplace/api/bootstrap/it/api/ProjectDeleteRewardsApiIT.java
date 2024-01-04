@@ -79,7 +79,6 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.delete(
                         WireMock.urlEqualTo("/api/payments/8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -107,10 +106,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.delete(
                         WireMock.urlEqualTo("/api/payments/8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
-                .withHeader(IMPERSONATION_HEADER, equalTo(impersonatePierreHeader))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         client.delete()

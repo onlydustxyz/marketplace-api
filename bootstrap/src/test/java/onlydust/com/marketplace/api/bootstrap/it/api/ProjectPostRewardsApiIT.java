@@ -140,13 +140,13 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 16590657,
+                          "requestorId": "fc92397c-3431-4a84-8054-845376b630a0",
                           "amount": 12.95,
                           "currency": "ETH",
                           "reason": {
@@ -226,13 +226,13 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 16590657,
+                          "requestorId": "fc92397c-3431-4a84-8054-845376b630a0",
                           "amount": 12.95,
                           "currency": "ETH",
                           "reason": {
@@ -316,13 +316,13 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 16590657,
+                          "requestorId": "fc92397c-3431-4a84-8054-845376b630a0",
                           "amount": 12.95,
                           "currency": "ETH",
                           "reason": {
@@ -413,14 +413,13 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         rustApiWireMockServer.stubFor(WireMock.post(
                         WireMock.urlEqualTo("/api/payments"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
-                .withHeader(IMPERSONATION_HEADER, equalTo(impersonatePierreHeader))
                 .withRequestBody(WireMock.equalToJson("""
                         {
                           "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                           "recipientId": 11111,
+                          "requestorId": "fc92397c-3431-4a84-8054-845376b630a0",
                           "amount": 111.47,
                           "currency": "USDC",
                           "reason": {

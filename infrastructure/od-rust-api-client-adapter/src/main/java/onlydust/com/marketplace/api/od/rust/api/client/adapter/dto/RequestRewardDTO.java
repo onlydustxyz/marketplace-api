@@ -12,6 +12,7 @@ import java.util.UUID;
 public class RequestRewardDTO {
     UUID projectId;
     Long recipientId;
+    UUID requestorId;
     BigDecimal amount;
     String currency;
     ReasonDTO reason;

@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
@@ -50,7 +49,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
     private final AuthenticationService authenticationService;
-    private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
+    private final RewardFacadePort rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
 
     @Override
@@ -191,8 +190,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
-        final var rewardId = rewardFacadePort.requestPayment(hasuraAuthentication, authenticatedUser.getId(),
+        final var rewardId = rewardFacadePort.requestPayment(authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
         final var response = new CreateRewardResponse();
         response.setId(rewardId);
@@ -202,8 +200,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<Void> cancelReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final HasuraAuthentication hasuraAuthentication = authenticationService.getHasuraAuthentication();
-        rewardFacadePort.cancelPayment(hasuraAuthentication, authenticatedUser.getId(), projectId, rewardId);
+        rewardFacadePort.cancelPayment(authenticatedUser.getId(), projectId, rewardId);
         return ResponseEntity.noContent().build();
     }
 

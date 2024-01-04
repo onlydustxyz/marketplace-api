@@ -14,16 +14,16 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class RewardService<Authentication> implements RewardFacadePort<Authentication> {
+public class RewardService implements RewardFacadePort {
 
-    private final RewardServicePort<Authentication> rewardServicePort;
+    private final RewardServicePort rewardServicePort;
     private final ProjectStoragePort projectStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
     private final UserStoragePort userStoragePort;
 
     @Override
-    public UUID requestPayment(Authentication authentication, UUID projectLeadId,
+    public UUID requestPayment(UUID projectLeadId,
                                RequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId)) {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
@@ -40,22 +40,22 @@ public class RewardService<Authentication> implements RewardFacadePort<Authentic
         }
 
         indexerPort.indexUser(command.getRecipientId());
-        return rewardServicePort.requestPayment(authentication, command);
+        return rewardServicePort.requestPayment(projectLeadId, command);
     }
 
     @Override
-    public void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId) {
+    public void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            rewardServicePort.cancelPayment(authentication, rewardId);
+            rewardServicePort.cancelPayment(rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
         }
     }
 
     @Override
-    public void markInvoiceAsReceived(Authentication authentication, Long recipientId) {
+    public void markInvoiceAsReceived(Long recipientId) {
         final var rewardIds = userStoragePort.findPendingInvoiceRewardsForRecipientId(recipientId).stream()
                 .map(UserRewardView::getId).toList();
-        rewardServicePort.markInvoiceAsReceived(authentication, rewardIds);
+        rewardServicePort.markInvoiceAsReceived(rewardIds);
     }
 }
