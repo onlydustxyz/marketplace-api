@@ -247,7 +247,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .iban(IBAN.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .build(),
@@ -346,7 +346,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .iban(IBAN.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
@@ -366,7 +366,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .iban(IBAN.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))

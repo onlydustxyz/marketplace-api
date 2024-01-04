@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
@@ -59,7 +58,7 @@ public interface UserPayoutInfoMapper {
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
-            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban().toPlainString());
+            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban().asString());
             payoutSettings.setSepaAccount(sepaAccount);
         }
 
@@ -104,7 +103,7 @@ public interface UserPayoutInfoMapper {
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
-            final var iban = IBAN.valueOf(contract.getPayoutSettings().getSepaAccount().getIban());
+            final var iban = IBAN.of(contract.getPayoutSettings().getSepaAccount().getIban());
             userPayoutInformation = userPayoutInformation.toBuilder()
                     .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
                             .sepaAccount(UserPayoutInformation.SepaAccount.builder()

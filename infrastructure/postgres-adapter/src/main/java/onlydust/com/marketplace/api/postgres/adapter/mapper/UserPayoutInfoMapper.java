@@ -49,7 +49,7 @@ public interface UserPayoutInfoMapper {
             payoutSettings = payoutSettings.toBuilder()
                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                             .bic(userPayoutInfoEntity.getBankAccount().getBic())
-                            .iban(IBAN.valueOf(userPayoutInfoEntity.getBankAccount().getIban()))
+                            .iban(IBAN.of(userPayoutInfoEntity.getBankAccount().getIban()))
                             .build())
                     .build();
         }
@@ -150,7 +150,7 @@ public interface UserPayoutInfoMapper {
                 entity = entity.toBuilder()
                         .bankAccount(BankAccountEntity.builder()
                                 .bic(userPayoutInformation.getPayoutSettings().getSepaAccount().getBic())
-                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getIban().toPlainString())
+                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getIban().asString())
                                 .userId(userId)
                                 .build())
                         .build();

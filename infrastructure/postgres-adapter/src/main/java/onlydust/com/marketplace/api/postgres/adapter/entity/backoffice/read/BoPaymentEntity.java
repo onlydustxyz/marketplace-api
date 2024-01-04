@@ -123,7 +123,7 @@ public class BoPaymentEntity {
                 .codeReviewsCount(codeReviewsCount)
                 .recipientIdentity(nonNull(recipientIdentity) ? recipientIdentity.toDomain() : null)
                 .recipientLocation(nonNull(recipientLocation) ? recipientLocation.toDomain() : null)
-                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(IBAN.valueOf(recipientIban)).bic(recipientBic).build())
+                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(IBAN.of(recipientIban)).bic(recipientBic).build())
                 .recipientEthWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.ethereum.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientStarkWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.starknet.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientOptimismWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.optimism.name())).findFirst().map(Wallet::address).orElse(null))

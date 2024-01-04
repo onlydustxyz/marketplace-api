@@ -422,7 +422,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .optimismAddress(Optimism.accountAddress("0x04"))
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                 .bic(faker.hacker().abbreviation())
-                                .iban(IBAN.valueOf("FR1014508000702139488771C56"))
+                                .iban(IBAN.of("FR1014508000702139488771C56"))
                                 .build())
                         .build())
                 .build();

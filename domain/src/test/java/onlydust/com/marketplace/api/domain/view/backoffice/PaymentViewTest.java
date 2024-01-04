@@ -23,7 +23,7 @@ class PaymentViewTest {
     private final Identity validCompany =
             new Identity(Company.builder().name(faker.company().name()).owner(validPerson.person()).identificationNumber(faker.idNumber().ssnValid()).build(), null);
     private final SepaAccount validSepaAccount =
-            SepaAccount.builder().iban(IBAN.valueOf("FR1014508000702139488771C56")).bic(faker.finance().bic()).build();
+            SepaAccount.builder().iban(IBAN.of("FR1014508000702139488771C56")).bic(faker.finance().bic()).build();
 
     @Test
     void should_consider_payout_info_invalid_when_identity_is_invalid() {
@@ -69,7 +69,7 @@ class PaymentViewTest {
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().bic(faker.finance().bic()).build()).build().recipientPayoutInfoValid());
-        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().iban(IBAN.valueOf(
+        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().iban(IBAN.of(
                 "FR1014508000702139488771C56")).build()).build().recipientPayoutInfoValid());
     }
 
@@ -149,7 +149,7 @@ class PaymentViewTest {
                 .currency(Currency.Usd)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
-                .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban().toPlainString() + " / " + validSepaAccount.getBic());
+                .recipientPayoutSettings()).isEqualTo(validSepaAccount.getIban().asString() + " / " + validSepaAccount.getBic());
 
         assertThat(PaymentView.builder()
                 .currency(Currency.Usdc)
