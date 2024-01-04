@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import nl.garvelink.iban.IBAN;
-import nl.garvelink.iban.IBANException;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
@@ -60,7 +58,7 @@ public interface UserPayoutInfoMapper {
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
-            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getIban().toPlainString());
+            sepaAccount.setIban(view.getPayoutSettings().getSepaAccount().getAccountNumber().asString());
             payoutSettings.setSepaAccount(sepaAccount);
         }
 
@@ -105,18 +103,12 @@ public interface UserPayoutInfoMapper {
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
-            IBAN iban;
-            try {
-                iban = IBAN.valueOf(contract.getPayoutSettings().getSepaAccount().getIban());
-            } catch (final IBANException e) {
-                throw OnlyDustException.badRequest("Invalid IBAN format (%s)"
-                        .formatted(contract.getPayoutSettings().getSepaAccount().getIban()), e);
-            }
+            final var iban = AccountNumber.of(contract.getPayoutSettings().getSepaAccount().getIban());
             userPayoutInformation = userPayoutInformation.toBuilder()
                     .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
                             .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                     .bic(contract.getPayoutSettings().getSepaAccount().getBic())
-                                    .iban(iban)
+                                    .accountNumber(iban)
                                     .build())
                             .build())
                     .build();

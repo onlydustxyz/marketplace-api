@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
@@ -49,7 +49,7 @@ public interface UserPayoutInfoMapper {
             payoutSettings = payoutSettings.toBuilder()
                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                             .bic(userPayoutInfoEntity.getBankAccount().getBic())
-                            .iban(IBAN.valueOf(userPayoutInfoEntity.getBankAccount().getIban()))
+                            .accountNumber(AccountNumber.of(userPayoutInfoEntity.getBankAccount().getIban()))
                             .build())
                     .build();
         }
@@ -150,7 +150,7 @@ public interface UserPayoutInfoMapper {
                 entity = entity.toBuilder()
                         .bankAccount(BankAccountEntity.builder()
                                 .bic(userPayoutInformation.getPayoutSettings().getSepaAccount().getBic())
-                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getIban().toPlainString())
+                                .iban(userPayoutInformation.getPayoutSettings().getSepaAccount().getAccountNumber().asString())
                                 .userId(userId)
                                 .build())
                         .build();

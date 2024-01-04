@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
@@ -247,7 +247,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .build(),
@@ -346,7 +346,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
@@ -366,7 +366,7 @@ public class UserPayoutInformationTest {
                 true,
                 UserPayoutInformation.PayoutSettings.builder()
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                .iban(IBAN.valueOf("ES6621000418401234567891"))
+                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))

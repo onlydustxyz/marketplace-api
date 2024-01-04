@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum.Wallet;
 
 import java.util.ArrayList;
@@ -134,10 +134,10 @@ public class UserPayoutInformation {
     @Builder
     public static class SepaAccount {
         String bic;
-        IBAN iban;
+        AccountNumber accountNumber;
 
         public boolean valid() {
-            return nonNull(bic) && nonNull(iban);
+            return nonNull(bic) && nonNull(accountNumber);
         }
     }
 }
