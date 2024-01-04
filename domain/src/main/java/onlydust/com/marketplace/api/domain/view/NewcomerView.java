@@ -18,4 +18,8 @@ public class NewcomerView {
     String location;
     String bio;
     ZonedDateTime firstContributedAt;
+
+    public UserProfileCover getCover() {
+        return cover == null ? UserProfileCover.get(githubId) : cover;
+    }
 }

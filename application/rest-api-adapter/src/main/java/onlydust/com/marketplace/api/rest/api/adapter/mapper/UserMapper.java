@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.*;
@@ -25,7 +26,7 @@ public interface UserMapper {
                 .bio(userProfileRequest.getBio())
                 .website(userProfileRequest.getWebsite())
                 .location(userProfileRequest.getLocation())
-                .cover(coverToUserProfileDomain(userProfileRequest.getCover()))
+                .cover(userProfileRequest.getCover() == null ? null : coverToUserProfileDomain(userProfileRequest.getCover()))
                 .contacts(contactToDomain(userProfileRequest.getContacts()))
                 .technologies(userProfileRequest.getTechnologies())
                 .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
@@ -56,9 +57,8 @@ public interface UserMapper {
                 }).toList();
     }
 
-    static UserProfileCover coverToUserProfileDomain(UserProfileCoverColor cover) {
-        return isNull(cover) ? UserProfileCover.BLUE :
-                switch (cover) {
+    static UserProfileCover coverToUserProfileDomain(final @NonNull UserProfileCoverColor cover) {
+        return switch (cover) {
                     case BLUE -> UserProfileCover.BLUE;
                     case CYAN -> UserProfileCover.CYAN;
                     case MAGENTA -> UserProfileCover.MAGENTA;
@@ -200,9 +200,8 @@ public interface UserMapper {
                 }).toList();
     }
 
-    public static UserProfileCoverColor coverToUserProfileResponse(final UserProfileCover cover) {
-        return isNull(cover) ? UserProfileCoverColor.BLUE :
-                switch (cover) {
+    public static UserProfileCoverColor coverToUserProfileResponse(final @NonNull UserProfileCover cover) {
+        return switch (cover) {
                     case BLUE -> UserProfileCoverColor.BLUE;
                     case CYAN -> UserProfileCoverColor.CYAN;
                     case MAGENTA -> UserProfileCoverColor.MAGENTA;

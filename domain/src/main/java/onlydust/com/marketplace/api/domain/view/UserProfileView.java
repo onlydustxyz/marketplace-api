@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 import onlydust.com.marketplace.api.domain.model.Contact;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
@@ -49,6 +46,10 @@ public class UserProfileView {
             firstContributedAt = projectStats.getUserFirstContributedAt();
         }
         this.projectsStats.add(projectStats);
+    }
+
+    public UserProfileCover getCover() {
+        return cover == null ? UserProfileCover.get(githubId) : cover;
     }
 
     @Data
