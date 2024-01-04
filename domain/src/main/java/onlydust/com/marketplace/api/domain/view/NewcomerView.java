@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import java.time.ZonedDateTime;
 import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.model.UserProfileCover;
+import java.time.ZonedDateTime;
 
 @Data
 @Builder

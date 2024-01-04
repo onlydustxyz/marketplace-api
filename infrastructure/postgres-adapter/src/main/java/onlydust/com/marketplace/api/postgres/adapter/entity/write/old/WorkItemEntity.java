@@ -1,22 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import java.util.UUID;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContributionTypeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WorkItemIdEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor

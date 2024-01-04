@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
+import java.util.UUID;
 
 @Data
 @Builder
