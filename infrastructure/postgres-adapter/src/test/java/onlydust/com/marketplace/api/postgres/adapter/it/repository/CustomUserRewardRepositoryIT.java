@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.bank.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
@@ -441,7 +441,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         void should_return_user_rewards_given_a_user_with_only_banking_account_for_valid_company() {
             // Given
             postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
-                    UserPayoutInformation.builder().isACompany(true).company(UserPayoutInformation.Company.builder().name(faker.name().name()).owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().sepaAccount(UserPayoutInformation.SepaAccount.builder().bic(faker.random().hex()).iban(IBAN.of("FR1014508000702139488771C56")).build()).build()).build());
+                    UserPayoutInformation.builder().isACompany(true).company(UserPayoutInformation.Company.builder().name(faker.name().name()).owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().sepaAccount(UserPayoutInformation.SepaAccount.builder().bic(faker.random().hex()).accountNumber(AccountNumber.of("FR1014508000702139488771C56")).build()).build()).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
@@ -483,7 +483,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .identificationNumber(faker.number().digit()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).iban(IBAN.of("FR1014508000702139488771C56"
+                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of("FR1014508000702139488771C56"
                                             )).build())
                                     .aptosAddress(Aptos.accountAddress("0x01"))
                                     .starknetAddress(StarkNet.accountAddress("0x02"))
@@ -634,7 +634,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .ethWallet(Ethereum.wallet("vitalik.eth"))
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).iban(IBAN.of("ES6621000418401234567891")).build())
+                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of("ES6621000418401234567891")).build())
                                     .build()).build());
             final UUID completedReward = UUID.randomUUID();
             final UUID pendingInvoiceRewardIdUsdc = UUID.randomUUID();

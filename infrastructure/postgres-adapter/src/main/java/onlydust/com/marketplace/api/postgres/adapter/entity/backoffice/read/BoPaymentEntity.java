@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.bank.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
@@ -123,7 +123,7 @@ public class BoPaymentEntity {
                 .codeReviewsCount(codeReviewsCount)
                 .recipientIdentity(nonNull(recipientIdentity) ? recipientIdentity.toDomain() : null)
                 .recipientLocation(nonNull(recipientLocation) ? recipientLocation.toDomain() : null)
-                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().iban(IBAN.of(recipientIban)).bic(recipientBic).build())
+                .recipientSepaAccount(UserPayoutInformation.SepaAccount.builder().accountNumber(AccountNumber.of(recipientIban)).bic(recipientBic).build())
                 .recipientEthWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.ethereum.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientStarkWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.starknet.name())).findFirst().map(Wallet::address).orElse(null))
                 .recipientOptimismWallet(wallets.stream().filter(wallet -> wallet.network().equals(NetworkEnumEntity.optimism.name())).findFirst().map(Wallet::address).orElse(null))

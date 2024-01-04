@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.bank.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
@@ -422,7 +422,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .optimismAddress(Optimism.accountAddress("0x04"))
                         .sepaAccount(UserPayoutInformation.SepaAccount.builder()
                                 .bic(faker.hacker().abbreviation())
-                                .iban(IBAN.of("FR1014508000702139488771C56"))
+                                .accountNumber(AccountNumber.of("FR1014508000702139488771C56"))
                                 .build())
                         .build())
                 .build();
