@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountingStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -16,7 +15,7 @@ public class AccountingService implements AccountingFacadePort {
     private final CommitteeAccountingStoragePort committeeAccountingStoragePort;
 
     @Override
-    public void registerTransferFromSponsor(UUID sponsorId, UUID committeeId, BigDecimal amount, Currency currency,
+    public void registerTransferFromSponsor(SponsorId sponsorId, CommitteeId committeeId, BigDecimal amount, Currency currency,
                                             Network network) {
 
         final var currentBalance = committeeAccountingStoragePort.getBalance(committeeId, currency);
@@ -26,7 +25,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void allocateFundsToProject(UUID committeeId, UUID projectId, BigDecimal amount, Currency currency) {
+    public void allocateFundsToProject(CommitteeId committeeId, ProjectId projectId, BigDecimal amount, Currency currency) {
         final var balance = committeeAccountingStoragePort.getBalance(committeeId, currency);
         if (balance.isEmpty() || balance.get().compareTo(amount) < 0) {
             throw OnlyDustException.badRequest("Not enough funds");
@@ -34,7 +33,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void registerRefundToSponsor(UUID sponsorId, BigDecimal one, Currency currency) {
+    public void registerRefundToSponsor(SponsorId sponsorId, BigDecimal one, Currency currency) {
 
         throw OnlyDustException.badRequest("Not enough funds");
     }

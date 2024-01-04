@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import lombok.Getter;
+import onlydust.com.marketplace.accounting.domain.model.CommitteeId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountingStoragePort;
 
@@ -16,7 +17,7 @@ public class CommitteeAccountingStorage implements CommitteeAccountingStoragePor
     final List<CommitteeBalance> committeeBalances = new ArrayList<>();
 
     @Override
-    public Optional<BigDecimal> getBalance(UUID committeeId, Currency currency) {
+    public Optional<BigDecimal> getBalance(CommitteeId committeeId, Currency currency) {
         return committeeBalances.stream()
                 .filter(cb -> cb.committeeId.equals(committeeId) && cb.currency.equals(currency))
                 .findFirst()
@@ -24,11 +25,11 @@ public class CommitteeAccountingStorage implements CommitteeAccountingStoragePor
     }
 
     @Override
-    public void saveBalance(UUID committeeId, BigDecimal amount, Currency currency) {
+    public void saveBalance(CommitteeId committeeId, BigDecimal amount, Currency currency) {
         committeeBalances.removeIf(cb -> cb.committeeId.equals(committeeId) && cb.currency.equals(currency));
         committeeBalances.add(new CommitteeBalance(committeeId, amount, currency));
     }
 
-    record CommitteeBalance(UUID committeeId, BigDecimal amount, Currency currency) {
+    record CommitteeBalance(CommitteeId committeeId, BigDecimal amount, Currency currency) {
     }
 }

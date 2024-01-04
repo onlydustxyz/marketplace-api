@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.accounting.domain;
 
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,20 +13,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MainTest {
-
     AccountingFacadePort accountingFacadePort;
     CommitteeAccountingStorage accountingStorage;
-    UUID sponsorId;
-    UUID committeeId;
-    UUID projectId;
+    SponsorId sponsorId;
+    CommitteeId committeeId;
+    ProjectId projectId;
 
     @BeforeEach
     void setUp() {
         accountingStorage = new CommitteeAccountingStorage();
         accountingFacadePort = new AccountingService(accountingStorage);
-        sponsorId = UUID.randomUUID();
-        committeeId = UUID.randomUUID();
-        projectId = UUID.randomUUID();
+        sponsorId = SponsorId.random();
+        committeeId = CommitteeId.random();
+        projectId = ProjectId.random();
     }
 
     @Test
@@ -54,7 +52,7 @@ class MainTest {
 
     @Test
     public void should_not_spend_money_from_another_committee() {
-        final var otherCommitteeId = UUID.randomUUID();
+        final var otherCommitteeId = CommitteeId.random();
         accountingFacadePort.registerTransferFromSponsor(sponsorId, otherCommitteeId, BigDecimal.ONE, Currency.Op,
                 Network.OPTIMISM);
 
