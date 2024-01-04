@@ -1,19 +1,27 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
+import static java.util.Objects.nonNull;
+
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import java.util.Date;
+import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
-import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Map;
-
-import static java.util.Objects.nonNull;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -22,46 +30,47 @@ import static java.util.Objects.nonNull;
 @TypeDef(name = "github_repo_visibility", typeClass = PostgreSQLEnumType.class)
 @Immutable
 public class GithubRepoEntity {
-    @Id
-    @EqualsAndHashCode.Include
-    Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    GithubAccountEntity owner;
-    String name;
-    String htmlUrl;
-    Date updatedAt;
-    String Description;
-    Long starsCount;
-    Long forksCount;
-    Boolean hasIssues;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
-    Map<String, Long> languages;
+  @Id
+  @EqualsAndHashCode.Include
+  Long id;
+  @ManyToOne(fetch = FetchType.LAZY)
+  GithubAccountEntity owner;
+  String name;
+  String htmlUrl;
+  Date updatedAt;
+  String Description;
+  Long starsCount;
+  Long forksCount;
+  Boolean hasIssues;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    GithubRepoEntity parent;
+  @Type(type = "jsonb")
+  @Column(columnDefinition = "jsonb")
+  Map<String, Long> languages;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "project_github_repos",
-            schema = "public",
-            joinColumns = @JoinColumn(name = "github_repo_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id"))
-    ProjectEntity project;
-    @Enumerated(EnumType.STRING)
-    @org.hibernate.annotations.Type(type = "github_repo_visibility")
-    Visibility visibility;
+  @ManyToOne(fetch = FetchType.LAZY)
+  GithubRepoEntity parent;
 
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "id")
-    GithubRepoStatsEntity stats;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "project_github_repos",
+      schema = "public",
+      joinColumns = @JoinColumn(name = "github_repo_id"),
+      inverseJoinColumns = @JoinColumn(name = "project_id"))
+  ProjectEntity project;
+  @Enumerated(EnumType.STRING)
+  @org.hibernate.annotations.Type(type = "github_repo_visibility")
+  Visibility visibility;
 
-    public enum Visibility {
-        PUBLIC, PRIVATE
-    }
+  @OneToOne
+  @JoinColumn(name = "id", referencedColumnName = "id")
+  GithubRepoStatsEntity stats;
 
-    public Boolean isPublic() {
-        return nonNull(this.visibility) && this.visibility.equals(Visibility.PUBLIC);
-    }
+  public enum Visibility {
+    PUBLIC, PRIVATE
+  }
+
+  public Boolean isPublic() {
+    return nonNull(this.visibility) && this.visibility.equals(Visibility.PUBLIC);
+  }
 }

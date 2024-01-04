@@ -11,17 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersonJsonEntity {
-    @JsonProperty("Person")
-    Value value;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Value {
-        @JsonProperty("firstname")
-        String firstName;
-        @JsonProperty("lastname")
-        String lastName;
-    }
+  @JsonProperty("Person")
+  Value value;
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Value {
+
+    @JsonProperty("firstname")
+    String firstName;
+    @JsonProperty("lastname")
+    String lastName;
+  }
 }

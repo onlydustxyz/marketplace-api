@@ -1,20 +1,19 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetViewEntity;
 
 public interface BudgetMapper {
 
 
-    static BudgetView entityToDomain(final BudgetViewEntity entity) {
-        return BudgetView.builder()
-                .remaining(entity.getRemainingAmount())
-                .currency(entity.getCurrency().toDomain())
-                .initialAmount(entity.getInitialAmount())
-                .remainingDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())
-                .initialDollarsEquivalent(entity.getInitialAmountDollarsEquivalent())
-                .dollarsConversionRate(entity.getDollarsConversionRate())
-                .build();
-    }
+  static BudgetView entityToDomain(final BudgetViewEntity entity) {
+    return BudgetView.builder()
+        .remaining(entity.getRemainingAmount())
+        .currency(entity.getCurrency().toDomain())
+        .initialAmount(entity.getInitialAmount())
+        .remainingDollarsEquivalent(entity.getRemainingAmountDollarsEquivalent())
+        .initialDollarsEquivalent(entity.getInitialAmountDollarsEquivalent())
+        .dollarsConversionRate(entity.getDollarsConversionRate())
+        .build();
+  }
 }

@@ -13,20 +13,20 @@ import org.springframework.retry.annotation.Retryable;
 @AllArgsConstructor
 public class IndexerApiOutboxConsumer implements OutboxConsumer {
 
-    private final IndexerPort indexerPort;
+  private final IndexerPort indexerPort;
 
-    @Override
-    public void process(Event event) {
-        callIndexerApi(event);
-    }
+  @Override
+  public void process(Event event) {
+    callIndexerApi(event);
+  }
 
-    @Retryable(maxAttempts = 6, backoff = @Backoff(delay = 500, multiplier = 2))
-    private void callIndexerApi(Event event) {
-        if (event instanceof ProjectLinkedReposChanged projectLinkedReposChanged) {
-            indexerPort.onRepoLinkChanged(projectLinkedReposChanged.getLinkedRepoIds(),
-                    projectLinkedReposChanged.getUnlinkedRepoIds());
-        } else if (event instanceof UserSignedUp userSignedUp) {
-            indexerPort.indexUser(userSignedUp.getGithubUserId());
-        }
+  @Retryable(maxAttempts = 6, backoff = @Backoff(delay = 500, multiplier = 2))
+  private void callIndexerApi(Event event) {
+    if (event instanceof ProjectLinkedReposChanged projectLinkedReposChanged) {
+      indexerPort.onRepoLinkChanged(projectLinkedReposChanged.getLinkedRepoIds(),
+          projectLinkedReposChanged.getUnlinkedRepoIds());
+    } else if (event instanceof UserSignedUp userSignedUp) {
+      indexerPort.indexUser(userSignedUp.getGithubUserId());
     }
+  }
 }

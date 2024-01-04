@@ -1,59 +1,68 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserProfile;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.api.domain.view.RewardItemView;
+import onlydust.com.marketplace.api.domain.view.RewardView;
+import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.api.domain.view.UserRewardsPageView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.*;
-
 public interface UserStoragePort {
-    UserProfileView getProfileById(UUID userId);
 
-    UserProfileView getProfileById(Long githubUserId);
+  UserProfileView getProfileById(UUID userId);
 
-    UserProfileView getProfileByLogin(String githubLogin);
+  UserProfileView getProfileById(Long githubUserId);
 
-    void saveProfile(UUID userId, UserProfile userProfile);
+  UserProfileView getProfileByLogin(String githubLogin);
 
-    Optional<User> getUserByGithubId(Long githubId);
+  void saveProfile(UUID userId, UserProfile userProfile);
 
-    void createUser(User user);
+  Optional<User> getUserByGithubId(Long githubId);
 
-    void updateUserIdentity(UUID userId, String githubLogin, String githubAvatarUrl, String emailFromGithub,
-                            Date lastSeenAt);
+  void createUser(User user);
 
-    UserPayoutInformation getPayoutInformationById(UUID id);
+  void updateUserIdentity(UUID userId, String githubLogin, String githubAvatarUrl, String emailFromGithub,
+      Date lastSeenAt);
 
-    void updateOnboardingWizardDisplayDate(UUID userId, Date date);
+  UserPayoutInformation getPayoutInformationById(UUID id);
 
-    void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
+  void updateOnboardingWizardDisplayDate(UUID userId, Date date);
 
-    UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
+  void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
 
-    UUID createApplicationOnProject(UUID userId, UUID projectId);
+  UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
-    UserPayoutInformation savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation);
+  UUID createApplicationOnProject(UUID userId, UUID projectId);
 
-    UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
-                                             int pageIndex, int pageSize,
-                                             UserRewardView.SortBy sortBy, SortDirection sortDirection);
+  UserPayoutInformation savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation);
 
-    UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId);
+  UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
+      int pageIndex, int pageSize,
+      UserRewardView.SortBy sortBy, SortDirection sortDirection);
 
-    RewardView findRewardById(UUID rewardId);
+  UserRewardTotalAmountsView findRewardTotalAmountsForUserId(UUID userId);
 
-    Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
+  RewardView findRewardById(UUID rewardId);
 
-    List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
+  Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 
-    List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
+  List<UserRewardView> findPendingInvoiceRewardsForRecipientId(Long githubUserId);
 
-    void saveProjectLead(UUID userId, UUID projectId);
+  List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 
-    List<Currency> listRewardCurrencies(Long githubUserId);
+  void saveProjectLead(UUID userId, UUID projectId);
+
+  List<Currency> listRewardCurrencies(Long githubUserId);
 }

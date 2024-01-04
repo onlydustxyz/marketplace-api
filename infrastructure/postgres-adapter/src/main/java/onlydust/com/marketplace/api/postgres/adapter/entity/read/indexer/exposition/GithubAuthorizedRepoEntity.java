@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
-import lombok.*;
-import org.hibernate.annotations.Immutable;
-
+import java.io.Serializable;
 import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -17,18 +20,20 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GithubAuthorizedRepoEntity {
-    @EmbeddedId
-    @EqualsAndHashCode.Include
-    Id id;
 
-    @Embeddable
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    public static class Id implements Serializable {
-        Long repoId;
-        Long installationId;
-    }
+  @EmbeddedId
+  @EqualsAndHashCode.Include
+  Id id;
+
+  @Embeddable
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @EqualsAndHashCode
+  public static class Id implements Serializable {
+
+    Long repoId;
+    Long installationId;
+  }
 }

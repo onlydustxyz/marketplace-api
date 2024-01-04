@@ -5,5 +5,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Conta
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContactInformationRepository extends JpaRepository<ContactInformationEntity,
-        ContactInformationIdEntity> {
+    ContactInformationIdEntity> {
+
 }

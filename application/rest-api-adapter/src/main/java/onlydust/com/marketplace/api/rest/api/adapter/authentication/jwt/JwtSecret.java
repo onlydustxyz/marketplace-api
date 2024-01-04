@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtSecret {
-    String type;
-    String key;
-    String issuer;
+
+  String type;
+  String key;
+  String issuer;
 }

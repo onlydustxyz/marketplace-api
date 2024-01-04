@@ -5,12 +5,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEnt
 
 public interface SponsorMapper {
 
-    static SponsorView mapToSponsorView(SponsorEntity sponsor) {
-        return SponsorView.builder()
-                .id(sponsor.getId())
-                .name(sponsor.getName())
-                .url(sponsor.getUrl())
-                .logoUrl(sponsor.getLogoUrl())
-                .build();
-    }
+  static SponsorView mapToSponsorView(SponsorEntity sponsor) {
+    return SponsorView.builder()
+        .id(sponsor.getId())
+        .name(sponsor.getName())
+        .url(sponsor.getUrl())
+        .logoUrl(sponsor.getLogoUrl())
+        .build();
+  }
 }

@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.domain.view;
 
 public interface UserLinkView {
 
-    Long getGithubUserId();
+  Long getGithubUserId();
 
-    String getLogin();
+  String getLogin();
 
-    String getAvatarUrl();
+  String getAvatarUrl();
 
-    String getUrl();
+  String getUrl();
 }

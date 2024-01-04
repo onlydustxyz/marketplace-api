@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class WebCorsProperties {
-    private String[] hosts;
+
+  private String[] hosts;
 }

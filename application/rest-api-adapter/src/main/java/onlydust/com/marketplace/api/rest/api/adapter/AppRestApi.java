@@ -7,9 +7,9 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 public class AppRestApi {
 
-    @GetMapping("/")
-    public RedirectView redirectRootPathToHealthCheck() {
-        return new RedirectView("/actuator/health");
-    }
-    
+  @GetMapping("/")
+  public RedirectView redirectRootPathToHealthCheck() {
+    return new RedirectView("/actuator/health");
+  }
+
 }

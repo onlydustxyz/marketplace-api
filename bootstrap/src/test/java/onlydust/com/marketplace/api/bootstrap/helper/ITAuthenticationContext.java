@@ -7,11 +7,11 @@ import org.springframework.security.core.Authentication;
 
 public class ITAuthenticationContext implements AuthenticationContext {
 
-    @Setter
-    private Authentication authentication = Auth0Authentication.builder().isAuthenticated(false).build();
+  @Setter
+  private Authentication authentication = Auth0Authentication.builder().isAuthenticated(false).build();
 
-    @Override
-    public Authentication getAuthenticationFromContext() {
-        return authentication;
-    }
+  @Override
+  public Authentication getAuthenticationFromContext() {
+    return authentication;
+  }
 }

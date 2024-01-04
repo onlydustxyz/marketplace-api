@@ -8,18 +8,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MarketplaceApiWebMvcConfigurer implements WebMvcConfigurer {
 
-    private final WebSecurityConfiguration.WebCorsProperties webCorsProperties;
+  private final WebSecurityConfiguration.WebCorsProperties webCorsProperties;
 
-    @Autowired
-    public MarketplaceApiWebMvcConfigurer(WebSecurityConfiguration.WebCorsProperties webCorsProperties) {
-        this.webCorsProperties = webCorsProperties;
-    }
+  @Autowired
+  public MarketplaceApiWebMvcConfigurer(WebSecurityConfiguration.WebCorsProperties webCorsProperties) {
+    this.webCorsProperties = webCorsProperties;
+  }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
-                .allowedOrigins(this.webCorsProperties.getHosts());
-    }
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/api/**")
+        .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
+        .allowedOrigins(this.webCorsProperties.getHosts());
+  }
 }
 

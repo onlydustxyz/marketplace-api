@@ -1,47 +1,46 @@
 package onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper;
 
+import java.util.UUID;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 
-import java.util.UUID;
-
 public interface RewardMapper {
 
-    static RequestRewardDTO mapCreateRewardCommandToDTO(UUID requestorId, final RequestRewardCommand command) {
-        return RequestRewardDTO.builder()
-                .amount(command.getAmount())
-                .currency(switch (command.getCurrency()) {
-                    case Eth -> "ETH";
-                    case Op -> "OP";
-                    case Apt -> "APT";
-                    case Usd -> "USD";
-                    case Strk -> "STRK";
-                    case Lords -> "LORDS";
-                    case Usdc -> "USDC";
-                })
-                .projectId(command.getProjectId())
-                .recipientId(command.getRecipientId())
-                .requestorId(requestorId)
-                .reason(RequestRewardDTO.ReasonDTO.builder()
-                        .workItems(
-                                command.getItems().stream().map(
-                                        RewardMapper::itemToDTO
-                                ).toList()
-                        )
-                        .build())
-                .build();
-    }
+  static RequestRewardDTO mapCreateRewardCommandToDTO(UUID requestorId, final RequestRewardCommand command) {
+    return RequestRewardDTO.builder()
+        .amount(command.getAmount())
+        .currency(switch (command.getCurrency()) {
+          case Eth -> "ETH";
+          case Op -> "OP";
+          case Apt -> "APT";
+          case Usd -> "USD";
+          case Strk -> "STRK";
+          case Lords -> "LORDS";
+          case Usdc -> "USDC";
+        })
+        .projectId(command.getProjectId())
+        .recipientId(command.getRecipientId())
+        .requestorId(requestorId)
+        .reason(RequestRewardDTO.ReasonDTO.builder()
+            .workItems(
+                command.getItems().stream().map(
+                    RewardMapper::itemToDTO
+                ).toList()
+            )
+            .build())
+        .build();
+  }
 
-    private static RequestRewardDTO.ReasonDTO.WorkItemDTO itemToDTO(final RequestRewardCommand.Item item) {
-        return RequestRewardDTO.ReasonDTO.WorkItemDTO.builder()
-                .id(item.getId())
-                .number(item.getNumber())
-                .repoId(item.getRepoId())
-                .type(switch (item.getType()) {
-                    case issue -> "ISSUE";
-                    case codeReview -> "CODE_REVIEW";
-                    case pullRequest -> "PULL_REQUEST";
-                })
-                .build();
-    }
+  private static RequestRewardDTO.ReasonDTO.WorkItemDTO itemToDTO(final RequestRewardCommand.Item item) {
+    return RequestRewardDTO.ReasonDTO.WorkItemDTO.builder()
+        .id(item.getId())
+        .number(item.getNumber())
+        .repoId(item.getRepoId())
+        .type(switch (item.getType()) {
+          case issue -> "ISSUE";
+          case codeReview -> "CODE_REVIEW";
+          case pullRequest -> "PULL_REQUEST";
+        })
+        .build();
+  }
 }

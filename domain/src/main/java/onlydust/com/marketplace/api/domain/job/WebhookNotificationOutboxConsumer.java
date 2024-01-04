@@ -11,15 +11,15 @@ import org.springframework.retry.annotation.Retryable;
 @AllArgsConstructor
 public class WebhookNotificationOutboxConsumer implements OutboxConsumer {
 
-    private final WebhookPort webhookPort;
+  private final WebhookPort webhookPort;
 
-    @Override
-    public void process(Event event) {
-        sendNotification(event);
-    }
+  @Override
+  public void process(Event event) {
+    sendNotification(event);
+  }
 
-    @Retryable(maxAttempts = 6, backoff = @Backoff(delay = 500, multiplier = 2))
-    private void sendNotification(Event event) {
-        webhookPort.send(event);
-    }
+  @Retryable(maxAttempts = 6, backoff = @Backoff(delay = 500, multiplier = 2))
+  private void sendNotification(Event event) {
+    webhookPort.send(event);
+  }
 }

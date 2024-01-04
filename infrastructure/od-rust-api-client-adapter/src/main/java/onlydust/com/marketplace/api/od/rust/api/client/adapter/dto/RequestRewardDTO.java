@@ -1,34 +1,36 @@
 package onlydust.com.marketplace.api.od.rust.api.client.adapter.dto;
 
-import lombok.Builder;
-import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
 public class RequestRewardDTO {
-    UUID projectId;
-    Long recipientId;
-    UUID requestorId;
-    BigDecimal amount;
-    String currency;
-    ReasonDTO reason;
+
+  UUID projectId;
+  Long recipientId;
+  UUID requestorId;
+  BigDecimal amount;
+  String currency;
+  ReasonDTO reason;
+
+  @Data
+  @Builder
+  public static class ReasonDTO {
+
+    List<WorkItemDTO> workItems;
 
     @Data
     @Builder
-    public static class ReasonDTO {
-        List<WorkItemDTO> workItems;
+    public static class WorkItemDTO {
 
-        @Data
-        @Builder
-        public static class WorkItemDTO {
-            String id;
-            String type;
-            Long repoId;
-            Long number;
-        }
+      String id;
+      String type;
+      Long repoId;
+      Long number;
     }
+  }
 }

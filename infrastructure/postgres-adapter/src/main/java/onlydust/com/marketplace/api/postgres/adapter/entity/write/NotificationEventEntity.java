@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Table;
 
 @Entity
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import javax.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 public class NotificationEventEntity extends EventEntity {
 
-    public NotificationEventEntity(Event event) {
-        super(event);
-    }
+  public NotificationEventEntity(Event event) {
+    super(event);
+  }
 }

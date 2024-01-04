@@ -8,10 +8,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventReposit
 
 @AllArgsConstructor
 public class PostgresEventStorageAdapter implements EventStoragePort {
-    final EventRepository eventRepository;
 
-    @Override
-    public void saveEvent(OldEvent oldEvent) {
-        eventRepository.save(OldEventEntity.of(oldEvent));
-    }
+  final EventRepository eventRepository;
+
+  @Override
+  public void saveEvent(OldEvent oldEvent) {
+    eventRepository.save(OldEventEntity.of(oldEvent));
+  }
 }

@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import lombok.*;
-
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,8 +14,9 @@ import java.util.UUID;
 @Data
 @Entity
 public class ProjectLeadInvitationEntity {
-    @Id
-    UUID id;
-    UUID projectId;
-    Long githubUserId;
+
+  @Id
+  UUID id;
+  UUID projectId;
+  Long githubUserId;
 }

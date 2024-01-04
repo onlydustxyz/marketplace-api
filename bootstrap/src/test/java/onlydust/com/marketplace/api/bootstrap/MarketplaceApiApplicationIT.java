@@ -10,15 +10,15 @@ import org.springframework.context.annotation.Primary;
 @SpringBootApplication
 public class MarketplaceApiApplicationIT {
 
-    public static void main(String[] args) {
-        SpringApplication.run(MarketplaceApiApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(MarketplaceApiApplication.class, args);
+  }
 
 
-    @Bean
-    @Primary
-    public JWTVerifier jwtVerifier() {
-        return new JwtVerifierStub();
-    }
+  @Bean
+  @Primary
+  public JWTVerifier jwtVerifier() {
+    return new JwtVerifierStub();
+  }
 
 }

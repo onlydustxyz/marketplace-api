@@ -10,19 +10,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OdRustApiClientConfiguration {
 
-    @Bean
-    @ConfigurationProperties(value = "infrastructure.od.api.client")
-    public OdRustApiHttpClient.Properties odRustApiHttpClientProperties() {
-        return new OdRustApiHttpClient.Properties();
-    }
+  @Bean
+  @ConfigurationProperties(value = "infrastructure.od.api.client")
+  public OdRustApiHttpClient.Properties odRustApiHttpClientProperties() {
+    return new OdRustApiHttpClient.Properties();
+  }
 
-    @Bean
-    public OdRustApiHttpClient odRustApiHttpClient(final OdRustApiHttpClient.Properties odRustApiHttpClientProperties) {
-        return new OdRustApiHttpClient(odRustApiHttpClientProperties);
-    }
+  @Bean
+  public OdRustApiHttpClient odRustApiHttpClient(final OdRustApiHttpClient.Properties odRustApiHttpClientProperties) {
+    return new OdRustApiHttpClient(odRustApiHttpClientProperties);
+  }
 
-    @Bean
-    public RewardServicePort rewardStoragePort(final OdRustApiHttpClient odRustApiHttpClient) {
-        return new OdRustApiClientAdapter(odRustApiHttpClient);
-    }
+  @Bean
+  public RewardServicePort rewardStoragePort(final OdRustApiHttpClient odRustApiHttpClient) {
+    return new OdRustApiClientAdapter(odRustApiHttpClient);
+  }
 }

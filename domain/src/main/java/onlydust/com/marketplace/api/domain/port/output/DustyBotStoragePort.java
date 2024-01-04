@@ -5,10 +5,10 @@ import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 
 public interface DustyBotStoragePort {
 
-    RewardableItemView createIssue(final GithubRepo repo,
-                                   final String title,
-                                   final String description);
+  RewardableItemView createIssue(final GithubRepo repo,
+      final String title,
+      final String description);
 
-    RewardableItemView closeIssue(final GithubRepo repo,
-                                  final Long issueNumber);
+  RewardableItemView closeIssue(final GithubRepo repo,
+      final Long issueNumber);
 }

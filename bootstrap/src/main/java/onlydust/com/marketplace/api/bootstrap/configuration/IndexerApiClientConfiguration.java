@@ -10,19 +10,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class IndexerApiClientConfiguration {
 
-    @Bean
-    @ConfigurationProperties(value = "infrastructure.indexer.api.client")
-    public IndexerApiHttpClient.Properties indexerApiHttpClientProperties() {
-        return new IndexerApiHttpClient.Properties();
-    }
+  @Bean
+  @ConfigurationProperties(value = "infrastructure.indexer.api.client")
+  public IndexerApiHttpClient.Properties indexerApiHttpClientProperties() {
+    return new IndexerApiHttpClient.Properties();
+  }
 
-    @Bean
-    public IndexerApiHttpClient indexerApiHttpClient(final IndexerApiHttpClient.Properties indexerApiHttpClientProperties) {
-        return new IndexerApiHttpClient(indexerApiHttpClientProperties);
-    }
+  @Bean
+  public IndexerApiHttpClient indexerApiHttpClient(final IndexerApiHttpClient.Properties indexerApiHttpClientProperties) {
+    return new IndexerApiHttpClient(indexerApiHttpClientProperties);
+  }
 
-    @Bean
-    public IndexerPort indexerPort(final IndexerApiHttpClient indexerApiHttpClient) {
-        return new IndexerApiClientAdapter(indexerApiHttpClient);
-    }
+  @Bean
+  public IndexerPort indexerPort(final IndexerApiHttpClient indexerApiHttpClient) {
+    return new IndexerApiClientAdapter(indexerApiHttpClient);
+  }
 }

@@ -5,29 +5,30 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewE
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 
 public interface GithubRepoMapper {
-    static GithubRepo map(GithubRepoEntity repo) {
-        return GithubRepo.builder()
-                .id(repo.getId())
-                .owner(repo.getOwner().getLogin())
-                .name(repo.getName())
-                .htmlUrl(repo.getHtmlUrl())
-                .updatedAt(repo.getUpdatedAt())
-                .description(repo.getDescription())
-                .starsCount(repo.getStarsCount())
-                .forksCount(repo.getForksCount())
-                .build();
-    }
 
-    static GithubRepo map(GithubRepoViewEntity repo) {
-        return GithubRepo.builder()
-                .id(repo.getId())
-                .owner(repo.getOwner())
-                .name(repo.getName())
-                .htmlUrl(repo.getHtmlUrl())
-                .updatedAt(repo.getUpdatedAt())
-                .description(repo.getDescription())
-                .starsCount(repo.getStarsCount())
-                .forksCount(repo.getForksCount())
-                .build();
-    }
+  static GithubRepo map(GithubRepoEntity repo) {
+    return GithubRepo.builder()
+        .id(repo.getId())
+        .owner(repo.getOwner().getLogin())
+        .name(repo.getName())
+        .htmlUrl(repo.getHtmlUrl())
+        .updatedAt(repo.getUpdatedAt())
+        .description(repo.getDescription())
+        .starsCount(repo.getStarsCount())
+        .forksCount(repo.getForksCount())
+        .build();
+  }
+
+  static GithubRepo map(GithubRepoViewEntity repo) {
+    return GithubRepo.builder()
+        .id(repo.getId())
+        .owner(repo.getOwner())
+        .name(repo.getName())
+        .htmlUrl(repo.getHtmlUrl())
+        .updatedAt(repo.getUpdatedAt())
+        .description(repo.getDescription())
+        .starsCount(repo.getStarsCount())
+        .forksCount(repo.getForksCount())
+        .build();
+  }
 }

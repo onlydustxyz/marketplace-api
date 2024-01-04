@@ -5,4 +5,5 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WorkI
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WorkItemRepository extends JpaRepository<WorkItemEntity, WorkItemIdEntity> {
+
 }

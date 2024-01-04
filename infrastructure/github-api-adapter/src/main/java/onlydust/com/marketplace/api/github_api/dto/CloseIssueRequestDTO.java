@@ -6,6 +6,7 @@ import lombok.Data;
 @Builder
 @Data
 public class CloseIssueRequestDTO {
-    @Builder.Default
-    String state = "closed";
+
+  @Builder.Default
+  String state = "closed";
 }

@@ -12,17 +12,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CompanyJsonEntity {
 
-    @JsonProperty("Company")
-    Value value;
+  @JsonProperty("Company")
+  Value value;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Value {
-        String name;
-        @JsonProperty("identification_number")
-        String identificationNumber;
-        PersonJsonEntity.Value owner;
-    }
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Value {
+
+    String name;
+    @JsonProperty("identification_number")
+    String identificationNumber;
+    PersonJsonEntity.Value owner;
+  }
 }

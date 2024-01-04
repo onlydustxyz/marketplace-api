@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Data
 public class FiatReceiptJsonEntity {
-    @JsonProperty("recipient_iban")
-    String recipientIban;
-    @JsonProperty("transaction_reference")
-    String transactionReference;
+
+  @JsonProperty("recipient_iban")
+  String recipientIban;
+  @JsonProperty("transaction_reference")
+  String transactionReference;
 }

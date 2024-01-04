@@ -2,16 +2,28 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -25,32 +37,32 @@ import java.util.UUID;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class UserProfileInfoEntity {
 
-    @Id
-    @Column(name = "id")
-    UUID id;
-    @Column(name = "bio")
-    String bio;
-    @Column(name = "location")
-    String location;
-    @Column(name = "website")
-    String website;
-    @Column(name = "looking_for_a_job", nullable = false)
-    Boolean isLookingForAJob;
-    @Column(name = "avatar_url")
-    String avatarUrl;
-    @Column(name = "weekly_allocated_time", nullable = false)
-    @Type(type = "weekly_allocated")
-    @Enumerated(EnumType.STRING)
-    AllocatedTimeEnumEntity allocatedTime;
-    @Type(type = "profile_cover")
-    @Column(name = "cover")
-    @Enumerated(EnumType.STRING)
-    ProfileCoverEnumEntity cover;
-    @Type(type = "jsonb")
-    @Column(name = "languages", columnDefinition = "jsonb")
-    Map<String, Long> languages;
+  @Id
+  @Column(name = "id")
+  UUID id;
+  @Column(name = "bio")
+  String bio;
+  @Column(name = "location")
+  String location;
+  @Column(name = "website")
+  String website;
+  @Column(name = "looking_for_a_job", nullable = false)
+  Boolean isLookingForAJob;
+  @Column(name = "avatar_url")
+  String avatarUrl;
+  @Column(name = "weekly_allocated_time", nullable = false)
+  @Type(type = "weekly_allocated")
+  @Enumerated(EnumType.STRING)
+  AllocatedTimeEnumEntity allocatedTime;
+  @Type(type = "profile_cover")
+  @Column(name = "cover")
+  @Enumerated(EnumType.STRING)
+  ProfileCoverEnumEntity cover;
+  @Type(type = "jsonb")
+  @Column(name = "languages", columnDefinition = "jsonb")
+  Map<String, Long> languages;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
-    List<ContactInformationEntity> contactInformations;
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+  @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
+  List<ContactInformationEntity> contactInformations;
 }

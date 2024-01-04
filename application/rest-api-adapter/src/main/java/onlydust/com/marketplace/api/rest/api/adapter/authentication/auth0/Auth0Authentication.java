@@ -1,69 +1,69 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import java.util.Collection;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
-
 @Value
 @Builder
 public class Auth0Authentication implements OnlyDustAuthentication {
-    DecodedJWT credentials;
-    User user;
-    String principal;
-    Collection<? extends GrantedAuthority> authorities;
-    @Builder.Default
-    Boolean isAuthenticated = false;
 
-    User impersonator;
-    boolean impersonating;
+  DecodedJWT credentials;
+  User user;
+  String principal;
+  Collection<? extends GrantedAuthority> authorities;
+  @Builder.Default
+  Boolean isAuthenticated = false;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
+  User impersonator;
+  boolean impersonating;
 
-    @Override
-    public Object getCredentials() {
-        return this.credentials;
-    }
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return authorities;
+  }
 
-    @Override
-    public Object getDetails() {
-        return this.user;
-    }
+  @Override
+  public Object getCredentials() {
+    return this.credentials;
+  }
 
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
+  @Override
+  public Object getDetails() {
+    return this.user;
+  }
 
-    @Override
-    public boolean isAuthenticated() {
-        return this.isAuthenticated;
-    }
+  @Override
+  public Object getPrincipal() {
+    return principal;
+  }
 
-    @Override
-    public void setAuthenticated(boolean b) throws IllegalArgumentException {
+  @Override
+  public boolean isAuthenticated() {
+    return this.isAuthenticated;
+  }
 
-    }
+  @Override
+  public void setAuthenticated(boolean b) throws IllegalArgumentException {
 
-    @Override
-    public String getName() {
-        return this.principal;
-    }
+  }
 
-    @Override
-    public boolean isImpersonating() {
-        return impersonating;
-    }
+  @Override
+  public String getName() {
+    return this.principal;
+  }
 
-    @Override
-    public User getImpersonator() {
-        return impersonator;
-    }
+  @Override
+  public boolean isImpersonating() {
+    return impersonating;
+  }
+
+  @Override
+  public User getImpersonator() {
+    return impersonator;
+  }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class GithubPaginationProperties {
-    @Builder.Default
-    int pageSize = 100;
+
+  @Builder.Default
+  int pageSize = 100;
 }

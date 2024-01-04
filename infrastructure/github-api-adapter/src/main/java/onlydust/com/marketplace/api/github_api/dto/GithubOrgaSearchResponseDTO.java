@@ -8,9 +8,9 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GithubOrgaSearchResponseDTO {
 
-    String login;
-    Long id;
-    String url;
-    @JsonProperty("avatar_url")
-    String avatarUrl;
+  String login;
+  Long id;
+  String url;
+  @JsonProperty("avatar_url")
+  String avatarUrl;
 }

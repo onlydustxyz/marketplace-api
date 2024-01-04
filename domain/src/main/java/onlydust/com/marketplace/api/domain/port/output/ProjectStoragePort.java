@@ -1,88 +1,107 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.view.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import onlydust.com.marketplace.api.domain.model.ContributionStatus;
+import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.api.domain.view.ChurnedContributorView;
+import onlydust.com.marketplace.api.domain.view.ContributorActivityView;
+import onlydust.com.marketplace.api.domain.view.NewcomerView;
+import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.api.domain.view.ProjectDetailsView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.api.domain.view.ProjectRewardsPageView;
+import onlydust.com.marketplace.api.domain.view.RewardItemView;
+import onlydust.com.marketplace.api.domain.view.RewardView;
+import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.*;
-
 public interface ProjectStoragePort {
-    ProjectDetailsView getById(UUID projectId, User caller);
 
-    ProjectDetailsView getBySlug(String slug, User caller);
+  ProjectDetailsView getById(UUID projectId, User caller);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                       UUID userId, String search,
-                                                                       ProjectCardView.SortBy sort, Boolean mine,
-                                                                       Integer pageIndex, Integer pageSize);
+  ProjectDetailsView getBySlug(String slug, User caller);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                 String search, ProjectCardView.SortBy sort,
-                                                                 Integer pageIndex, Integer pageSize);
+  Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
+      UUID userId, String search,
+      ProjectCardView.SortBy sort, Boolean mine,
+      Integer pageIndex, Integer pageSize);
 
-    String createProject(UUID projectId, String name, String shortDescription, String longDescription,
-                         Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
-                         List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
-                         ProjectVisibility visibility
-            , String imageUrl, ProjectRewardSettings rewardSettings);
+  Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
+      String search, ProjectCardView.SortBy sort,
+      Integer pageIndex, Integer pageSize);
 
-    void updateProject(UUID id, String name, String shortDescription, String longDescription,
-                       Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
-                       List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
+  String createProject(UUID projectId, String name, String shortDescription, String longDescription,
+      Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
+      List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
+      ProjectVisibility visibility
+      , String imageUrl, ProjectRewardSettings rewardSettings);
 
-    Page<ProjectContributorsLinkView> findContributors(UUID projectId, String login,
-                                                       ProjectContributorsLinkView.SortBy sortBy,
-                                                       SortDirection sortDirection,
-                                                       int pageIndex, int pageSize);
+  void updateProject(UUID id, String name, String shortDescription, String longDescription,
+      Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
+      List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
+      List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
 
-    Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, String login,
-                                                                     ProjectContributorsLinkView.SortBy sortBy,
-                                                                     SortDirection sortDirection,
-                                                                     int pageIndex, int pageSize);
+  Page<ProjectContributorsLinkView> findContributors(UUID projectId, String login,
+      ProjectContributorsLinkView.SortBy sortBy,
+      SortDirection sortDirection,
+      int pageIndex, int pageSize);
 
-    List<UUID> getProjectLeadIds(UUID projectId);
+  Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, String login,
+      ProjectContributorsLinkView.SortBy sortBy,
+      SortDirection sortDirection,
+      int pageIndex, int pageSize);
 
-    Set<Long> getProjectInvitedLeadIds(UUID projectId);
+  List<UUID> getProjectLeadIds(UUID projectId);
 
-    ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
-                                       ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
-                                        int pageIndex, int pageSize);
+  Set<Long> getProjectInvitedLeadIds(UUID projectId);
 
-    ProjectBudgetsView findBudgets(UUID projectId);
+  ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
+      ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
+      int pageIndex, int pageSize);
 
-    RewardView getProjectReward(UUID rewardId);
+  ProjectBudgetsView findBudgets(UUID projectId);
 
-    Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
+  RewardView getProjectReward(UUID rewardId);
 
-    Set<Long> getProjectRepoIds(UUID projectId);
+  Page<RewardItemView> getProjectRewardItems(UUID rewardId, int pageIndex, int pageSize);
 
-    Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
-                                                                                           ContributionType contributionType,
-                                                                                           ContributionStatus contributionStatus,
-                                                                                           Long githubUserid,
-                                                                                           int pageIndex, int pageSize,
-                                                                                           String search,
-                                                                                           Boolean includeIgnoredItems);
+  Set<Long> getProjectRepoIds(UUID projectId);
 
-    String getProjectSlugById(UUID projectId);
+  Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+      ContributionType contributionType,
+      ContributionStatus contributionStatus,
+      Long githubUserid,
+      int pageIndex, int pageSize,
+      String search,
+      Boolean includeIgnoredItems);
 
-    RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
+  String getProjectSlugById(UUID projectId);
 
-    RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
+  RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
 
-    Set<Long> removeUsedRepos(Collection<Long> repoIds);
+  RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 
-    boolean hasUserAccessToProject(UUID projectId, UUID userId);
+  Set<Long> removeUsedRepos(Collection<Long> repoIds);
 
-    boolean hasUserAccessToProject(String projectSlug, UUID userId);
+  boolean hasUserAccessToProject(UUID projectId, UUID userId);
 
-    void updateProjectsRanking();
+  boolean hasUserAccessToProject(String projectSlug, UUID userId);
 
-    Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+  void updateProjectsRanking();
 
-    Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
+  Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 
-    Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+  Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
+
+  Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 }

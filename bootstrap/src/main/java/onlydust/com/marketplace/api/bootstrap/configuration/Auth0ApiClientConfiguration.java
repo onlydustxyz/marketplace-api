@@ -13,32 +13,33 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class Auth0ApiClientConfiguration {
-    @Bean
-    @ConfigurationProperties(value = "infrastructure.auth0.api.client")
-    public Auth0ApiClientProperties auth0ApiClientProperties() {
-        return new Auth0ApiClientProperties();
-    }
 
-    @Bean
-    public Auth0ApiAuthenticator auth0ApiAuthenticator(final Auth0ApiClientProperties properties) {
-        return new Auth0ApiAuthenticator(properties);
-    }
+  @Bean
+  @ConfigurationProperties(value = "infrastructure.auth0.api.client")
+  public Auth0ApiClientProperties auth0ApiClientProperties() {
+    return new Auth0ApiClientProperties();
+  }
 
-    @Bean
-    public Auth0ApiHttpClient auth0ApiHttpClient(final Auth0ApiClientProperties properties,
-                                                 final Auth0ApiAuthenticator auth0ApiAuthenticator) {
-        return new Auth0ApiHttpClient(properties, auth0ApiAuthenticator);
-    }
+  @Bean
+  public Auth0ApiAuthenticator auth0ApiAuthenticator(final Auth0ApiClientProperties properties) {
+    return new Auth0ApiAuthenticator(properties);
+  }
 
-    @Bean
-    public Auth0ApiClientAdapter auth0ApiClientAdapter(final Auth0ApiClientProperties properties,
-                                                       final Auth0ApiHttpClient auth0ApiHttpClient) {
-        return new Auth0ApiClientAdapter(properties, auth0ApiHttpClient);
-    }
+  @Bean
+  public Auth0ApiHttpClient auth0ApiHttpClient(final Auth0ApiClientProperties properties,
+      final Auth0ApiAuthenticator auth0ApiAuthenticator) {
+    return new Auth0ApiHttpClient(properties, auth0ApiAuthenticator);
+  }
 
-    @Bean
-    public GithubAuthenticationPort githubAuthenticationPort(final AuthenticationService authenticationService,
-                                                             final Auth0ApiClientAdapter auth0ApiClientAdapter) {
-        return new RetroCompatibleGithubAuthenticationAdapter(authenticationService, auth0ApiClientAdapter);
-    }
+  @Bean
+  public Auth0ApiClientAdapter auth0ApiClientAdapter(final Auth0ApiClientProperties properties,
+      final Auth0ApiHttpClient auth0ApiHttpClient) {
+    return new Auth0ApiClientAdapter(properties, auth0ApiHttpClient);
+  }
+
+  @Bean
+  public GithubAuthenticationPort githubAuthenticationPort(final AuthenticationService authenticationService,
+      final Auth0ApiClientAdapter auth0ApiClientAdapter) {
+    return new RetroCompatibleGithubAuthenticationAdapter(authenticationService, auth0ApiClientAdapter);
+  }
 }

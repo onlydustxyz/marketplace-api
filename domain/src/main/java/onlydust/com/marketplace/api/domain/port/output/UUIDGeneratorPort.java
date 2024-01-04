@@ -4,5 +4,5 @@ import java.util.UUID;
 
 public interface UUIDGeneratorPort {
 
-    UUID generate();
+  UUID generate();
 }

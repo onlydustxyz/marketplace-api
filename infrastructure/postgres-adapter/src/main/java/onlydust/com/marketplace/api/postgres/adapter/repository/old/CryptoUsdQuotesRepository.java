@@ -5,4 +5,5 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CryptoUsdQuotesRepository extends JpaRepository<CryptoUsdQuotesEntity, CurrencyEnumEntity> {
+
 }

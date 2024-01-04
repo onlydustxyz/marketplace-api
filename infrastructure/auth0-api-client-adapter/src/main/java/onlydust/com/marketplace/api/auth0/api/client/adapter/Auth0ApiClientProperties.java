@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Auth0ApiClientProperties {
-    String domainBaseUri;
-    String clientId;
-    String clientSecret;
-    Integer patCacheTtlInSeconds = 3600;
+
+  String domainBaseUri;
+  String clientId;
+  String clientSecret;
+  Integer patCacheTtlInSeconds = 3600;
 }

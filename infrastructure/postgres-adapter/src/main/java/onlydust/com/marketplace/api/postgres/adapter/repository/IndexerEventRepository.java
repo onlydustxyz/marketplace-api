@@ -6,9 +6,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEn
 
 public interface IndexerEventRepository extends OutboxRepository<IndexerEventEntity> {
 
-    @Override
-    default void saveEvent(Event event) {
-        save(new IndexerEventEntity(event));
-    }
+  @Override
+  default void saveEvent(Event event) {
+    save(new IndexerEventEntity(event));
+  }
 
 }

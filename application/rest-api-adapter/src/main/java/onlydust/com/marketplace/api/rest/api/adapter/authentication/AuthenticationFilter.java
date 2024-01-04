@@ -1,5 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
+import static java.util.Objects.nonNull;
+
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -7,45 +14,38 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static java.util.Objects.nonNull;
-
 @Slf4j
 @AllArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
-    public final static String BEARER_PREFIX = "Bearer ";
-    public final static String IMPERSONATION_HEADER = "X-Impersonation-Claims";
-    private final JwtService jwtServiceAuth0;
-    private final JwtService jwtServiceHasura;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest,
-                                    @NonNull HttpServletResponse httpServletResponse,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+  public final static String BEARER_PREFIX = "Bearer ";
+  public final static String IMPERSONATION_HEADER = "X-Impersonation-Claims";
+  private final JwtService jwtServiceAuth0;
+  private final JwtService jwtServiceHasura;
 
-        final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        final String impersonationHeader = httpServletRequest.getHeader(IMPERSONATION_HEADER);
-        if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
-            try {
-                jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
-                        .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                                () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX,
-                                                        ""),
-                                                impersonationHeader)
-                                        .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                                                SecurityContextHolder::clearContext));
-            } catch (Exception e) {
-                LOGGER.error("Error while authenticating user", e);
-                SecurityContextHolder.clearContext();
-            }
-        }
+  @Override
+  protected void doFilterInternal(HttpServletRequest httpServletRequest,
+      @NonNull HttpServletResponse httpServletResponse,
+      @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+    final String authorization = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+    final String impersonationHeader = httpServletRequest.getHeader(IMPERSONATION_HEADER);
+    if (nonNull(authorization) && authorization.startsWith(BEARER_PREFIX)) {
+      try {
+        jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
+            .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX,
+                            ""),
+                        impersonationHeader)
+                    .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
+                        SecurityContextHolder::clearContext));
+      } catch (Exception e) {
+        LOGGER.error("Error while authenticating user", e);
+        SecurityContextHolder.clearContext();
+      }
     }
+
+    filterChain.doFilter(httpServletRequest, httpServletResponse);
+  }
 
 }

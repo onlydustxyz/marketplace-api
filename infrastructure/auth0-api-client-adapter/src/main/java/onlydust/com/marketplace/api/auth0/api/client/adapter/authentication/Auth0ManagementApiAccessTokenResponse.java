@@ -11,12 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Auth0ManagementApiAccessTokenResponse {
-    @JsonProperty("access_token")
-    String accessToken;
-    @JsonProperty("scope")
-    String scope;
-    @JsonProperty("expires_in")
-    Integer expiresIn;
-    @JsonProperty("token_type")
-    String tokenType;
+
+  @JsonProperty("access_token")
+  String accessToken;
+  @JsonProperty("scope")
+  String scope;
+  @JsonProperty("expires_in")
+  Integer expiresIn;
+  @JsonProperty("token_type")
+  String tokenType;
 }

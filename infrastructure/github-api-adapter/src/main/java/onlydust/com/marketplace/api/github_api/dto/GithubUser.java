@@ -9,8 +9,9 @@ import lombok.Value;
 @NoArgsConstructor(force = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GithubUser {
-    Long id;
-    String login;
-    @JsonProperty("avatar_url")
-    String avatarUrl;
+
+  Long id;
+  String login;
+  @JsonProperty("avatar_url")
+  String avatarUrl;
 }

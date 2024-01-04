@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class LocationJsonEntity {
-    String city;
-    @JsonProperty("post_code")
-    String postCode;
-    String address;
-    String country;
+
+  String city;
+  @JsonProperty("post_code")
+  String postCode;
+  String address;
+  String country;
 }

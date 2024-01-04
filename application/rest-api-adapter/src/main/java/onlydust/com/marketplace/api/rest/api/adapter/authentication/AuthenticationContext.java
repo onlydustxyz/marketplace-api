@@ -4,5 +4,5 @@ import org.springframework.security.core.Authentication;
 
 public interface AuthenticationContext {
 
-    Authentication getAuthenticationFromContext();
+  Authentication getAuthenticationFromContext();
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class GetOrgaMembershipsResponseDTO {
-    String state;
-    String role;
+
+  String state;
+  String role;
 }

@@ -14,19 +14,19 @@ import org.springframework.context.annotation.Profile;
 @Profile("bo")
 public class BackofficeConfiguration {
 
-    @Bean
-    public BackofficeRestApi backofficeRestApi(final BackofficeFacadePort backofficeFacadePort) {
-        return new BackofficeRestApi(backofficeFacadePort);
-    }
+  @Bean
+  public BackofficeRestApi backofficeRestApi(final BackofficeFacadePort backofficeFacadePort) {
+    return new BackofficeRestApi(backofficeFacadePort);
+  }
 
-    @Bean
-    public BackofficeFacadePort backofficeFacadePort(final BackofficeStoragePort backofficeStoragePort) {
-        return new BackofficeService(backofficeStoragePort);
-    }
+  @Bean
+  public BackofficeFacadePort backofficeFacadePort(final BackofficeStoragePort backofficeStoragePort) {
+    return new BackofficeService(backofficeStoragePort);
+  }
 
-    @Bean
-    @ConfigurationProperties("application.web.back-office")
-    public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
-        return new ApiKeyAuthenticationService.Config();
-    }
+  @Bean
+  @ConfigurationProperties("application.web.back-office")
+  public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
+    return new ApiKeyAuthenticationService.Config();
+  }
 }

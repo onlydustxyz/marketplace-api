@@ -1,26 +1,25 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import static java.util.Objects.isNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import static java.util.Objects.isNull;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 public interface DateMapper {
 
-    static ZonedDateTime toZoneDateTime(final Date date) {
-        return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
-    }
+  static ZonedDateTime toZoneDateTime(final Date date) {
+    return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
+  }
 
-    static Date parse(final String date) {
-        try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        } catch (ParseException e) {
-            throw OnlyDustException.badRequest("Invalid date format", e);
-        }
+  static Date parse(final String date) {
+    try {
+      return new SimpleDateFormat("yyyy-MM-dd").parse(date);
+    } catch (ParseException e) {
+      throw OnlyDustException.badRequest("Invalid date format", e);
     }
+  }
 }

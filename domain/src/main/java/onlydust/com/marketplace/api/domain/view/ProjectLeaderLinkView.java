@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.api.domain.view;
 
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.UUID;
 
 @Data
 @Builder
 public class ProjectLeaderLinkView implements UserLinkView {
-    UUID id;
-    Long githubUserId;
-    String login;
-    String avatarUrl;
-    String url;
+
+  UUID id;
+  Long githubUserId;
+  String login;
+  String avatarUrl;
+  String url;
 }

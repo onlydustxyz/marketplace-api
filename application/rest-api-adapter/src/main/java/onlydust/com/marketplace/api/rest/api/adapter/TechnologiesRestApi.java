@@ -17,20 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Tags(@Tag(name = "Technologies"))
 @AllArgsConstructor
 public class TechnologiesRestApi implements TechnologiesApi {
-    private final TechnologiesPort technologiesPort;
-    private final AuthenticationService authenticationService;
 
-    @Override
-    public ResponseEntity<AllTechnologiesResponse> getTechnologies() {
-        final var technologies = technologiesPort.getAllUsedTechnologies();
-        return new ResponseEntity<>(new AllTechnologiesResponse().technologies(technologies), HttpStatus.OK);
-    }
+  private final TechnologiesPort technologiesPort;
+  private final AuthenticationService authenticationService;
 
-    @Override
-    public ResponseEntity<Void> suggestTechnology(SuggestTechnologyRequest request) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+  @Override
+  public ResponseEntity<AllTechnologiesResponse> getTechnologies() {
+    final var technologies = technologiesPort.getAllUsedTechnologies();
+    return new ResponseEntity<>(new AllTechnologiesResponse().technologies(technologies), HttpStatus.OK);
+  }
 
-        technologiesPort.suggest(request.getTechnology(), authenticatedUser);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
+  @Override
+  public ResponseEntity<Void> suggestTechnology(SuggestTechnologyRequest request) {
+    final User authenticatedUser = authenticationService.getAuthenticatedUser();
+
+    technologiesPort.suggest(request.getTechnology(), authenticatedUser);
+    return new ResponseEntity<>(HttpStatus.CREATED);
+  }
 }

@@ -4,4 +4,5 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldEventEn
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EventRepository extends JpaRepository<OldEventEntity, Long> {
+
 }

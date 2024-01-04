@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MoreInfoLink {
-    String url;
-    String value;
+
+  String url;
+  String value;
 }

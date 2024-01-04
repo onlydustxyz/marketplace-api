@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class EventsRestApi implements EventsApi {
 
-    private final ContributionObserverPort contributionObserverPort;
+  private final ContributionObserverPort contributionObserverPort;
 
-    @Override
-    public ResponseEntity<Void> onContributionsChange(OnContributionsChangeEvent onContributionsChangeEvent) {
-        contributionObserverPort.onContributionsChanged(onContributionsChangeEvent.getRepoIds());
-        return ResponseEntity.noContent().build();
-    }
+  @Override
+  public ResponseEntity<Void> onContributionsChange(OnContributionsChangeEvent onContributionsChangeEvent) {
+    contributionObserverPort.onContributionsChanged(onContributionsChangeEvent.getRepoIds());
+    return ResponseEntity.noContent().build();
+  }
 }

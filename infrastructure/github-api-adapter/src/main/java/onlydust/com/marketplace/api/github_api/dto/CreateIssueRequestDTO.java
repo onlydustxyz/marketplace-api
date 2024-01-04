@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class CreateIssueRequestDTO {
-    String title;
-    String body;
+
+  String title;
+  String body;
 }

@@ -8,17 +8,17 @@ import org.junit.jupiter.api.Test;
 public class CreateIssueRequestDTOTest {
 
 
-    @Test
-    void should_serialize() throws JsonProcessingException {
-        // Given
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final CloseIssueRequestDTO closeIssueRequestDTO = CloseIssueRequestDTO.builder().build();
+  @Test
+  void should_serialize() throws JsonProcessingException {
+    // Given
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final CloseIssueRequestDTO closeIssueRequestDTO = CloseIssueRequestDTO.builder().build();
 
-        // When
-        final byte[] bytes = objectMapper.writeValueAsBytes(closeIssueRequestDTO);
+    // When
+    final byte[] bytes = objectMapper.writeValueAsBytes(closeIssueRequestDTO);
 
-        // Then
-        Assertions.assertNotNull(bytes);
-        Assertions.assertTrue(bytes.length > 0);
-    }
+    // Then
+    Assertions.assertNotNull(bytes);
+    Assertions.assertTrue(bytes.length > 0);
+  }
 }

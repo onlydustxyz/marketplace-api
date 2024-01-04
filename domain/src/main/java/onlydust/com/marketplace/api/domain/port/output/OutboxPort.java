@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
 import onlydust.com.marketplace.api.domain.model.notification.Event;
-
 import java.util.Optional;
 
 public interface OutboxPort {
-    void push(Event event);
 
-    Optional<Event> peek();
+  void push(Event event);
 
-    void ack();
+  Optional<Event> peek();
 
-    void nack(String message);
+  void ack();
+
+  void nack(String message);
 }

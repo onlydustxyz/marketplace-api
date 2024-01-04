@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Auth0Properties {
-    String jwksUrl;
-    Long expiresAtLeeway;
+
+  String jwksUrl;
+  Long expiresAtLeeway;
 }

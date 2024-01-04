@@ -1,10 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import lombok.*;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
@@ -15,23 +22,24 @@ import java.util.UUID;
 @Table(name = "custom_ignored_contributions", schema = "public")
 public class CustomIgnoredContributionEntity {
 
-    @EmbeddedId
-    @EqualsAndHashCode.Include
-    Id id;
+  @EmbeddedId
+  @EqualsAndHashCode.Include
+  Id id;
 
-    @Column(name = "ignored")
-    @EqualsAndHashCode.Include
-    Boolean ignored;
+  @Column(name = "ignored")
+  @EqualsAndHashCode.Include
+  Boolean ignored;
 
-    @Builder
-    @Data
-    @Embeddable
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class Id implements Serializable {
-        @Column(name = "project_id")
-        UUID projectId;
-        @Column(name = "contribution_id")
-        String contributionId;
-    }
+  @Builder
+  @Data
+  @Embeddable
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Id implements Serializable {
+
+    @Column(name = "project_id")
+    UUID projectId;
+    @Column(name = "contribution_id")
+    String contributionId;
+  }
 }

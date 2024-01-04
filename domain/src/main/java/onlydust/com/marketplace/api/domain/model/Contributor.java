@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class Contributor {
-    GithubUserIdentity id;
-    Boolean isRegistered;
+
+  GithubUserIdentity id;
+  Boolean isRegistered;
 }

@@ -11,10 +11,10 @@ import org.springframework.security.core.GrantedAuthority;
 @AllArgsConstructor
 public class OnlyDustGrantedAuthority implements GrantedAuthority {
 
-    private final UserRole role;
+  private final UserRole role;
 
-    @Override
-    public String getAuthority() {
-        return role.name();
-    }
+  @Override
+  public String getAuthority() {
+    return role.name();
+  }
 }

@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
@@ -10,37 +12,32 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstall
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubRepoViewEntityRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Objects.isNull;
-
 @AllArgsConstructor
 public class PostgresGithubAdapter implements GithubStoragePort {
 
-    private final GithubAppInstallationRepository githubAppInstallationRepository;
-    private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
+  private final GithubAppInstallationRepository githubAppInstallationRepository;
+  private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<GithubAccount> findAccountByInstallationId(Long installationId) {
-        return githubAppInstallationRepository.findById(installationId)
-                .map(GithubAccountMapper::map);
-    }
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<GithubAccount> findAccountByInstallationId(Long installationId) {
+    return githubAppInstallationRepository.findById(installationId)
+        .map(GithubAccountMapper::map);
+  }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<GithubRepo> findRepoById(Long repoId) {
-        return githubRepoViewEntityRepository.findById(repoId)
-                .map(GithubRepoMapper::map);
-    }
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<GithubRepo> findRepoById(Long repoId) {
+    return githubRepoViewEntityRepository.findById(repoId)
+        .map(GithubRepoMapper::map);
+  }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds) {
-        return githubAppInstallationRepository.findAllByAccount_IdIn(userGithubAccountIds)
-                .stream()
-                .map(GithubAccountMapper::map)
-                .toList();
-    }
+  @Override
+  @Transactional(readOnly = true)
+  public List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds) {
+    return githubAppInstallationRepository.findAllByAccount_IdIn(userGithubAccountIds)
+        .stream()
+        .map(GithubAccountMapper::map)
+        .toList();
+  }
 }

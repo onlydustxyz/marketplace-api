@@ -4,4 +4,5 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectLeadRepository extends JpaRepository<ProjectLeadEntity, ProjectLeadEntity.PrimaryKey> {
+
 }

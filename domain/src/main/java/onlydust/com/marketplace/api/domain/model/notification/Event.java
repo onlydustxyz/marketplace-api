@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.domain.model.notification;
 
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode
 public abstract class Event implements Serializable {
+
 }

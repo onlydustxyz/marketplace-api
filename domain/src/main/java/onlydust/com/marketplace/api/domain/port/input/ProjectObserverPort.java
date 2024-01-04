@@ -4,21 +4,22 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface ProjectObserverPort {
-    void onProjectCreated(UUID projectId);
 
-    void onProjectDetailsUpdated(UUID projectId);
+  void onProjectCreated(UUID projectId);
 
-    void onLeaderAssigned(UUID projectId, UUID leaderId);
+  void onProjectDetailsUpdated(UUID projectId);
 
-    void onLeaderUnassigned(UUID projectId, UUID leaderId);
+  void onLeaderAssigned(UUID projectId, UUID leaderId);
 
-    void onLeaderInvited(UUID projectId, Long githubUserId);
+  void onLeaderUnassigned(UUID projectId, UUID leaderId);
 
-    void onLeaderInvitationCancelled(UUID projectId, Long githubUserId);
+  void onLeaderInvited(UUID projectId, Long githubUserId);
 
-    void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
+  void onLeaderInvitationCancelled(UUID projectId, Long githubUserId);
 
-    void onRewardSettingsChanged(UUID projectId);
+  void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
 
-    void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
+  void onRewardSettingsChanged(UUID projectId);
+
+  void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
 }

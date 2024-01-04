@@ -7,10 +7,11 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 @Data
 @Builder
 public class ProjectRewardsPageView {
-    Page<ProjectRewardView> rewards;
-    Money remainingBudget;
-    Money spentAmount;
-    Integer sentRewardsCount;
-    Integer rewardedContributionsCount;
-    Integer rewardedContributorsCount;
+
+  Page<ProjectRewardView> rewards;
+  Money remainingBudget;
+  Money spentAmount;
+  Integer sentRewardsCount;
+  Integer rewardedContributionsCount;
+  Integer rewardedContributorsCount;
 }

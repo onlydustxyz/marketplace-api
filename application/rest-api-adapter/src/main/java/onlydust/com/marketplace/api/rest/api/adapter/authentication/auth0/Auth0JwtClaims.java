@@ -13,12 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Auth0JwtClaims {
-    @JsonProperty("nickname")
-    String githubLogin;
-    @JsonProperty("sub")
-    String githubWithUserId;
-    @JsonProperty("picture")
-    String githubAvatarUrl;
-    @JsonProperty("email")
-    String email;
+
+  @JsonProperty("nickname")
+  String githubLogin;
+  @JsonProperty("sub")
+  String githubWithUserId;
+  @JsonProperty("picture")
+  String githubAvatarUrl;
+  @JsonProperty("email")
+  String email;
 }

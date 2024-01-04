@@ -6,9 +6,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEv
 
 public interface NotificationEventRepository extends OutboxRepository<NotificationEventEntity> {
 
-    @Override
-    default void saveEvent(Event event) {
-        save(new NotificationEventEntity(event));
-    }
+  @Override
+  default void saveEvent(Event event) {
+    save(new NotificationEventEntity(event));
+  }
 
 }

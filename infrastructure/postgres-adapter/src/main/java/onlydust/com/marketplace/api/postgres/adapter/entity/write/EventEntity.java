@@ -3,6 +3,15 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import java.io.Serializable;
+import java.time.Instant;
+import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,10 +22,6 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.time.Instant;
-
 @MappedSuperclass
 @NoArgsConstructor
 @EqualsAndHashCode
@@ -24,49 +29,50 @@ import java.time.Instant;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @TypeDef(name = "outbox_event_status", typeClass = PostgreSQLEnumType.class)
 public abstract class EventEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb", nullable = false)
-    Payload payload;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Type(type = "outbox_event_status")
-    Status status;
+  @Type(type = "jsonb")
+  @Column(columnDefinition = "jsonb", nullable = false)
+  Payload payload;
 
-    String error;
+  @Enumerated(EnumType.STRING)
+  @Type(type = "outbox_event_status")
+  Status status;
 
-    @EqualsAndHashCode.Exclude
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    Instant createdAt;
+  String error;
 
-    @EqualsAndHashCode.Exclude
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    Instant updatedAt;
+  @EqualsAndHashCode.Exclude
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false, updatable = false)
+  Instant createdAt;
 
-    public EventEntity(Event event) {
-        this.payload = new Payload(event);
-        this.status = Status.PENDING;
-    }
+  @EqualsAndHashCode.Exclude
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
+  Instant updatedAt;
 
-    public Event getEvent() {
-        return payload.getEvent();
-    }
+  public EventEntity(Event event) {
+    this.payload = new Payload(event);
+    this.status = Status.PENDING;
+  }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Payload implements Serializable {
+  public Event getEvent() {
+    return payload.getEvent();
+  }
 
-        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
-        private Event event;
-    }
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class Payload implements Serializable {
 
-    public enum Status {
-        PENDING, PROCESSED, FAILED
-    }
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
+    private Event event;
+  }
+
+  public enum Status {
+    PENDING, PROCESSED, FAILED
+  }
 }

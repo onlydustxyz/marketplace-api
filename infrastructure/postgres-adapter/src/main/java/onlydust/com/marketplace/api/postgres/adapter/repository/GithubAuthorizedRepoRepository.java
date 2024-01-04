@@ -4,4 +4,5 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GithubAuthorizedRepoRepository extends JpaRepository<GithubAuthorizedRepoEntity, GithubAuthorizedRepoEntity.Id> {
+
 }

@@ -9,25 +9,26 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class Contact {
-    Channel channel;
-    String contact;
-    Visibility visibility;
 
-    @AllArgsConstructor
-    @Getter
-    public enum Channel {
-        EMAIL,
-        TELEGRAM,
-        TWITTER,
-        DISCORD,
-        LINKEDIN,
-        WHATSAPP
-    }
+  Channel channel;
+  String contact;
+  Visibility visibility;
 
-    @AllArgsConstructor
-    @Getter
-    public enum Visibility {
-        PRIVATE, PUBLIC
-    }
+  @AllArgsConstructor
+  @Getter
+  public enum Channel {
+    EMAIL,
+    TELEGRAM,
+    TWITTER,
+    DISCORD,
+    LINKEDIN,
+    WHATSAPP
+  }
+
+  @AllArgsConstructor
+  @Getter
+  public enum Visibility {
+    PRIVATE, PUBLIC
+  }
 
 }
