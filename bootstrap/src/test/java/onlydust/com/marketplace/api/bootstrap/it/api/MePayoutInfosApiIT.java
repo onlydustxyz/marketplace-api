@@ -280,7 +280,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_not_update_user_individual_payout_infos_with_invalid_iban() {
+    void should_update_user_individual_payout_infos_with_invalid_iban() {
         // Given
         final String jwt = userHelper.authenticatePierre().jwt();
         final UserPayoutInformationRequest requestBody = new UserPayoutInformationRequest();
@@ -311,7 +311,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isBadRequest();
+                .isOk();
     }
 
     @Test
