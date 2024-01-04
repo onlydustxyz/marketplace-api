@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.auth0.api.client.adapter.deprecated;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiClientAdapter;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 

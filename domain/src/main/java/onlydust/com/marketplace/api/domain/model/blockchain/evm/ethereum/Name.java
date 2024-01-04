@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.regex.Pattern;
 
-import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @EqualsAndHashCode
 public class Name {

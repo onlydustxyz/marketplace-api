@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.auth0.api.client.adapter;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import org.springframework.http.HttpMethod;
 

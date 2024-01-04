@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.port.input.GithubInstallationFacadePort;
 
@@ -26,7 +26,8 @@ public class RetriedGithubInstallationFacade implements GithubInstallationFacade
             try {
                 Thread.sleep(config.retryInterval);
             } catch (InterruptedException e) {
-                throw OnlyDustException.internalServerError("Error while retrying to get account by installation ID", e);
+                throw OnlyDustException.internalServerError("Error while retrying to get account by installation ID",
+                        e);
             }
         }
         return Optional.empty();

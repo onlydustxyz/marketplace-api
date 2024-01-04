@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.model;
 
 import lombok.Value;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.time.ZoneId;
 import java.util.Date;

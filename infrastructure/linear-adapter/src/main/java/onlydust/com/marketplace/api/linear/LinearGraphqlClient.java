@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.linear;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,11 +28,13 @@ public class LinearGraphqlClient {
         }
     }
 
-    public <ResponseBody> Optional<ResponseBody> decodeResponse(HttpResponse<byte[]> response, Class<ResponseBody> responseClass) {
+    public <ResponseBody> Optional<ResponseBody> decodeResponse(HttpResponse<byte[]> response,
+                                                                Class<ResponseBody> responseClass) {
         return switch (response.statusCode()) {
             case 200, 201 -> Optional.of(decodeBody(response.body(), responseClass));
             case 403, 404, 422, 451 -> Optional.empty();
-            default -> throw OnlyDustException.internalServerError("Received incorrect status (" + response.statusCode() + ") when fetching Linear API");
+            default ->
+                    throw OnlyDustException.internalServerError("Received incorrect status (" + response.statusCode() + ") when fetching Linear API");
         };
     }
 
@@ -51,10 +53,12 @@ public class LinearGraphqlClient {
         }
     }
 
-    public <ResponseBody> Optional<ResponseBody> graphql(String query, Object variables, Class<ResponseBody> responseClass) {
+    public <ResponseBody> Optional<ResponseBody> graphql(String query, Object variables,
+                                                         Class<ResponseBody> responseClass) {
         try {
             final var body = Map.of("query", query, "variables", variables);
-            final var httpResponse = fetch("POST", URI.create(config.baseUri + "/graphql"), HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)));
+            final var httpResponse = fetch("POST", URI.create(config.baseUri + "/graphql"),
+                    HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)));
             return decodeResponse(httpResponse, responseClass);
         } catch (JsonProcessingException e) {
             throw OnlyDustException.internalServerError("Unable to serialize graphql request body", e);
@@ -89,18 +93,20 @@ public class LinearGraphqlClient {
             return states.get(key);
         }
 
-        public enum Keys { Engineering }
+        public enum Keys {Engineering}
     }
 
     @Data
     public static class State {
         UUID id;
-        public enum Keys { Backlog }
+
+        public enum Keys {Backlog}
     }
 
     @Data
     public static class Label {
         UUID id;
-        public enum Keys { TechStuff }
+
+        public enum Keys {TechStuff}
     }
 }

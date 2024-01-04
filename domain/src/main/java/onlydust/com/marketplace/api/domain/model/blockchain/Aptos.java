@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.domain.model.blockchain;
 
 
-import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.blockchain.aptos.*;
 
 public interface Aptos {
