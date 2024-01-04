@@ -1,7 +1,6 @@
-package onlydust.com.marketplace.api.domain.exception;
+package onlydust.com.marketplace.kernel.exception;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,11 +20,12 @@ public class OnlyDustExceptionTest {
         final String exceptionString = onlyDustException.toString();
 
         // Then
+        System.out.println(exceptionString);
         Assertions.assertTrue(exceptionString.contains(String.format("message='%s'", message)));
         Assertions.assertTrue(exceptionString.contains(String.format("status=%d", status)));
         Assertions.assertTrue(exceptionString.contains("""
                 java.io.IOException: raclette
-                	at onlydust.com.marketplace.api.domain.exception.OnlyDustExceptionTest.should_return_stack_trace_in_to_string_given_a_root_exception(OnlyDustExceptionTest.java:17)
+                	at onlydust.com.marketplace.kernel.exception.OnlyDustExceptionTest.should_return_stack_trace_in_to_string_given_a_root_exception(OnlyDustExceptionTest.java:17)
                 """));
     }
 }
