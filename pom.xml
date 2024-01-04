@@ -155,11 +155,6 @@
                 <artifactId>caffeine</artifactId>
                 <version>3.1.8</version>
             </dependency>
-            <dependency>
-                <groupId>nl.garvelink.oss</groupId>
-                <artifactId>iban</artifactId>
-                <version>1.14.0</version>
-            </dependency>
 
             <!-- AWS Dependencies -->
             <dependency>

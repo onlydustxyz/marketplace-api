@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;

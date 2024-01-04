@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum.Wallet;
 
 import java.util.ArrayList;

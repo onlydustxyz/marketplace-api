@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.domain.view.backoffice;
 
 import com.github.javafaker.Faker;
-import nl.garvelink.iban.IBAN;
+import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Company;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Location;

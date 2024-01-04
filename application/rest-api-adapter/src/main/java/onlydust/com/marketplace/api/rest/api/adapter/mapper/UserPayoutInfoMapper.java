@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import nl.garvelink.iban.IBAN;
-import nl.garvelink.iban.IBANException;
+import onlydust.com.marketplace.api.domain.model.bank.IBAN;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
@@ -105,13 +104,7 @@ public interface UserPayoutInfoMapper {
                         .build())
                 .build();
         if (nonNull(contract.getPayoutSettings().getSepaAccount())) {
-            IBAN iban;
-            try {
-                iban = IBAN.valueOf(contract.getPayoutSettings().getSepaAccount().getIban());
-            } catch (final IBANException e) {
-                throw OnlyDustException.badRequest("Invalid IBAN format (%s)"
-                        .formatted(contract.getPayoutSettings().getSepaAccount().getIban()), e);
-            }
+            final var iban = IBAN.valueOf(contract.getPayoutSettings().getSepaAccount().getIban());
             userPayoutInformation = userPayoutInformation.toBuilder()
                     .payoutSettings(userPayoutInformation.getPayoutSettings().toBuilder()
                             .sepaAccount(UserPayoutInformation.SepaAccount.builder()
