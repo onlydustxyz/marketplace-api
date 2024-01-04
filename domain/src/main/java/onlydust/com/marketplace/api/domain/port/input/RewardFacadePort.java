@@ -4,12 +4,12 @@ import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 
 import java.util.UUID;
 
-public interface RewardFacadePort<Authentication> {
+public interface RewardFacadePort {
 
-    UUID requestPayment(Authentication authentication, UUID projectLeadId,
+    UUID requestPayment(UUID projectLeadId,
                         RequestRewardCommand requestRewardCommand);
 
-    void cancelPayment(Authentication authentication, UUID projectLeadId, UUID projectId, UUID rewardId);
+    void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId);
 
-    void markInvoiceAsReceived(Authentication authentication, Long recipientId);
+    void markInvoiceAsReceived(Long recipientId);
 }

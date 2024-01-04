@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.exception.OnlyDustException;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -21,8 +20,6 @@ import static java.net.http.HttpRequest.BodyPublishers.noBody;
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.domain.exception.OnlyDustException.internalServerError;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.IMPERSONATION_HEADER;
 
 @AllArgsConstructor
 public class OdRustApiHttpClient {
@@ -30,26 +27,19 @@ public class OdRustApiHttpClient {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Properties properties;
 
-    private HttpRequest.Builder builderFromAuthorizations(final HasuraAuthentication authentication) {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
+    private HttpRequest.Builder builder() {
+        return HttpRequest.newBuilder()
                 .header("Content-Type", "application/json")
-                .header("Api-Key", properties.getApiKey())
-                .header("Authorization", BEARER_PREFIX + authentication.getJwt());
-
-        if (authentication.getImpersonationHeader() != null) {
-            builder = builder.header(IMPERSONATION_HEADER, authentication.getImpersonationHeader());
-        }
-        return builder;
+                .header("Api-Key", properties.getApiKey());
     }
 
     public <RequestBody, ResponseBody> ResponseBody sendRequest(final String path,
                                                                 final HttpMethod method,
                                                                 final RequestBody requestBody,
-                                                                final Class<ResponseBody> responseClass,
-                                                                final HasuraAuthentication authentication) {
+                                                                final Class<ResponseBody> responseClass) {
         try {
             final HttpResponse<byte[]> httpResponse = httpClient.send(
-                    builderFromAuthorizations(authentication)
+                    builder()
                             .uri(URI.create(properties.getBaseUri() + path))
                             .method(method.name(),
                                     isNull(requestBody) ? noBody() :

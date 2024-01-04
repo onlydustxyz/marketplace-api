@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -104,12 +103,12 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public RewardService<HasuraAuthentication> rewardService(final RewardServicePort<HasuraAuthentication> rewardServicePort,
-                                                             final ProjectStoragePort projectStoragePort,
-                                                             final PermissionService permissionService,
-                                                             final IndexerPort indexerPort,
-                                                             final UserStoragePort userStoragePort) {
-        return new RewardService<>(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+    public RewardService rewardService(final RewardServicePort rewardServicePort,
+                                       final ProjectStoragePort projectStoragePort,
+                                       final PermissionService permissionService,
+                                       final IndexerPort indexerPort,
+                                       final UserStoragePort userStoragePort) {
+        return new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
                 userStoragePort);
     }
 

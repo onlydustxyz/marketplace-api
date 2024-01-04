@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.domain.service.RewardService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,7 @@ public class RestApiConfiguration {
     @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
                                           final AuthenticationService authenticationService,
-                                          final RewardService<HasuraAuthentication> rewardService,
+                                          final RewardService rewardService,
                                           final ContributionFacadePort contributionFacadePort) {
         return new ProjectsRestApi(projectFacadePort, authenticationService, rewardService,
                 contributionFacadePort);
@@ -33,7 +32,7 @@ public class RestApiConfiguration {
 
     @Bean
     public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort,
-                               final RewardFacadePort<HasuraAuthentication> rewardFacadePort,
+                               final RewardFacadePort rewardFacadePort,
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService) {
         return new MeRestApi(authenticationService, userFacadePort, rewardFacadePort, contributorFacadePort,

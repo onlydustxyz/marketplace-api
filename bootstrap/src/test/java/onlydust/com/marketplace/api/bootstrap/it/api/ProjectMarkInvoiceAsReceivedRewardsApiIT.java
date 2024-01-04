@@ -24,7 +24,6 @@ public class ProjectMarkInvoiceAsReceivedRewardsApiIT extends AbstractMarketplac
         // When
         rustApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/payments/invoiceReceivedAt"))
-                .withHeader("Authorization", equalTo(BEARER_PREFIX + jwt))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-rust-api-key"))
                 .withRequestBody(WireMock.equalToJson("""

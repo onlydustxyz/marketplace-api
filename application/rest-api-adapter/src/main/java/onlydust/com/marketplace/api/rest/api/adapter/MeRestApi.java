@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -47,7 +46,7 @@ public class MeRestApi implements MeApi {
 
     private final AuthenticationService authenticationService;
     private final UserFacadePort userFacadePort;
-    private final RewardFacadePort<HasuraAuthentication> rewardFacadePort;
+    private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
 
@@ -311,8 +310,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> markInvoiceAsReceived() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        rewardFacadePort.markInvoiceAsReceived(authenticationService.getHasuraAuthentication(),
-                authenticatedUser.getGithubUserId());
+        rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
         return ResponseEntity.noContent().build();
     }
 }
