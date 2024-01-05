@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
@@ -685,13 +685,13 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     GithubAppInstallationRepository githubAppInstallationRepository;
     @Autowired
-    HasuraUserHelper hasuraUserHelper;
+    UserAuthHelper userAuthHelper;
     @Autowired
     GithubAuthorizedRepoRepository githubAuthorizedRepoRepository;
 
     @Test
     void should_get_github_account_from_installation_id() {
-        final String jwt = hasuraUserHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         client.get()
                 .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/44741576"))
                 .header("Authorization", "Bearer " + jwt)
@@ -705,7 +705,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_404_when_not_found() {
-        final String jwt = hasuraUserHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         client.get()
                 .uri(getApiURI(GITHUB_INSTALLATIONS_GET + "/0"))
                 .header("Authorization", "Bearer " + jwt)
@@ -726,7 +726,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
         githubAppInstallationEntity.setId(123456L);
         githubAppInstallationRepository.delete(githubAppInstallationEntity);
         final String githubPAT = faker.rickAndMorty().character() + faker.random().nextLong();
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre(githubPAT);
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre(githubPAT);
         final String jwt = pierre.jwt();
         githubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo("/user/orgs?per_page=100&page=1"))
                 .withHeader("Authorization", WireMock.equalTo("Bearer " + githubPAT))

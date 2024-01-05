@@ -1,25 +1,17 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
-import onlydust.com.marketplace.api.contract.model.UserContributionStats;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import org.assertj.core.internal.IntArrays;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.WeekFields;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
 
     private final static String KAAPER = "298a547f-ecb6-4ab2-8975-68f4e9bf7b39";
 

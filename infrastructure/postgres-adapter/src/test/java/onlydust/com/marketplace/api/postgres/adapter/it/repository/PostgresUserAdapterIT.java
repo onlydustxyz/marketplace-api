@@ -4,11 +4,9 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,115 +22,10 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    AuthUserRepository authUserRepository;
-    @Autowired
     OnboardingRepository onboardingRepository;
     @Autowired
     PostgresUserAdapter postgresUserAdapter;
 
-
-    public static AuthUserEntity newFakeAuthUserEntity(boolean isAdmin) {
-        return AuthUserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
-                .loginAtSignup(faker.name().name())
-                .avatarUrlAtSignup(faker.internet().avatar())
-                .email(faker.internet().emailAddress())
-                .isAdmin(isAdmin)
-                .createdAt(new Date())
-                .lastSeen(new Date())
-                .build();
-    }
-
-    @Test
-    void getUserByGithubId_on_hasura_user_should_map_onboarding_data() {
-        // Given
-        final AuthUserEntity user = newFakeAuthUserEntity(true);
-        authUserRepository.save(user);
-
-        final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(user.getId())
-                .termsAndConditionsAcceptanceDate(new Date())
-                .profileWizardDisplayDate(new Date())
-                .build();
-        onboardingRepository.save(onboarding);
-
-        // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
-
-        // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getLoginAtSignup());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
-    }
-
-    @Test
-    void getUserByGithubId_on_hasura_user_should_map_outdated_terms_and_conditions_acceptance() {
-        // Given
-        final AuthUserEntity user = newFakeAuthUserEntity(true);
-        authUserRepository.save(user);
-
-        final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(user.getId())
-                .termsAndConditionsAcceptanceDate(faker.date().birthday())
-                .profileWizardDisplayDate(new Date())
-                .build();
-        onboardingRepository.save(onboarding);
-
-        // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
-
-        // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getLoginAtSignup());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
-    }
-
-    @Test
-    void getUserByGithubId_on_hasura_user_without_onboarding_data() {
-        // Given
-        final AuthUserEntity user = newFakeAuthUserEntity(true);
-        authUserRepository.save(user);
-
-        // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
-
-        // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getLoginAtSignup());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isFalse();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
-    }
-
-    @Test
-    void getUserByGithubId_on_hasura_user_not_admin_without_onboarding_data() {
-        // Given
-        final AuthUserEntity user = newFakeAuthUserEntity(true);
-        authUserRepository.save(user);
-
-        // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
-
-        // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getLoginAtSignup());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getAvatarUrlAtSignup());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(UserRole.USER, UserRole.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isFalse();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
-    }
 
     @Test
     void getUserByGithubId_should_map_onboarding_data() {

@@ -1,17 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class MeGetRewardingProjectsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
 
     @Test
     void should_get_all_my_rewarding_projects() {

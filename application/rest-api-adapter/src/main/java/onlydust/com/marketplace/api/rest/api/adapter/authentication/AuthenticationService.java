@@ -2,9 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraAuthentication;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -52,15 +51,6 @@ public class AuthenticationService {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication.isAuthenticated() && authentication instanceof OnlyDustAuthentication) {
             return Optional.of(((OnlyDustAuthentication) authentication).getUser());
-        }
-        return Optional.empty();
-    }
-
-    @Deprecated
-    public Optional<HasuraAuthentication> tryGetHasuraAuthentication() {
-        final Authentication authentication = authenticationContext.getAuthenticationFromContext();
-        if (authentication.isAuthenticated() && authentication instanceof HasuraAuthentication) {
-            return Optional.of((HasuraAuthentication) authentication);
         }
         return Optional.empty();
     }

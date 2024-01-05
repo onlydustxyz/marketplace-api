@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -29,7 +29,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ApplicationRepository applicationRepository;
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     ProjectLeadRepository projectLeadRepository;
     @Autowired
@@ -282,7 +282,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_projects_led_and_applications() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         projectLeadRepository.save(new ProjectLeadEntity(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
                 pierre.user().getId()));
