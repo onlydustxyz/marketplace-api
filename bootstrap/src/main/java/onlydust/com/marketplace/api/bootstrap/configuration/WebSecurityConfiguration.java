@@ -10,8 +10,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiK
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.hasura.HasuraJwtService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.jwt.JwtSecret;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,15 +43,8 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public JwtService jwtServiceHasura(final ObjectMapper objectMapper, final JwtSecret jwtSecret,
-                                       final UserFacadePort userFacadePort) {
-        return new HasuraJwtService(objectMapper, jwtSecret, userFacadePort);
-    }
-
-    @Bean
-    public AuthenticationFilter authenticationFilter(final JwtService jwtServiceAuth0,
-                                                     final JwtService jwtServiceHasura) {
-        return new AuthenticationFilter(jwtServiceAuth0, jwtServiceHasura);
+    public AuthenticationFilter authenticationFilter(final JwtService jwtServiceAuth0) {
+        return new AuthenticationFilter(jwtServiceAuth0);
     }
 
     @Bean
@@ -80,12 +71,6 @@ public class WebSecurityConfiguration {
     @ConfigurationProperties("application.web.cors")
     public WebCorsProperties webCorsProperties() {
         return new WebCorsProperties();
-    }
-
-    @Bean
-    @ConfigurationProperties("application.web.hasura.secret")
-    public JwtSecret jwtSecret() {
-        return new JwtSecret();
     }
 
     @Bean

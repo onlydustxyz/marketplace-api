@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
@@ -39,8 +39,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
     @Autowired
     OnboardingRepository onboardingRepository;
-    @Autowired
-    AuthUserRepository authUserRepository;
     @Autowired
     PaymentRepository paymentRepository;
     @Autowired
@@ -167,34 +165,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, onboardingRepository);
-    }
-
-
-    @Test
-    void should_create_auth_user() {
-        // Given
-        authUserRepository.deleteAll();
-        final AuthUserEntity expected = AuthUserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber())
-                .createdAt(new Date())
-                .avatarUrlAtSignup(faker.pokemon().name())
-                .email("test@gmail.com")
-                .lastSeen(new Date())
-                .isAdmin(Boolean.FALSE)
-                .loginAtSignup(faker.pokemon().location())
-                .build();
-
-        userRepository.deleteAll();
-        assertIsSaved(expected, authUserRepository);
-
-        final var iamUsers = userRepository.findAll();
-        assertThat(iamUsers).hasSize(1);
-        assertThat(iamUsers.get(0).getId()).isEqualTo(expected.getId());
-        assertThat(iamUsers.get(0).getGithubUserId()).isEqualTo(expected.getGithubUserId());
-        assertThat(iamUsers.get(0).getGithubLogin()).isEqualTo(expected.getLoginAtSignup());
-        assertThat(iamUsers.get(0).getGithubAvatarUrl()).isEqualTo(expected.getAvatarUrlAtSignup());
-        assertThat(iamUsers.get(0).getGithubEmail()).isEqualTo(expected.getEmail());
     }
 
     @Test
@@ -389,14 +359,15 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     void should_save_and_read_and_update_user_payout_info() {
         // Given
         final UUID userId = UUID.randomUUID();
-        authUserRepository.save(AuthUserEntity.builder()
+        userRepository.save(UserEntity.builder()
                 .id(userId)
                 .githubUserId(1L)
                 .createdAt(new Date())
-                .loginAtSignup(faker.rickAndMorty().character())
-                .avatarUrlAtSignup(faker.internet().url())
-                .email(faker.internet().emailAddress())
-                .isAdmin(false)
+                .lastSeenAt(new Date())
+                .githubLogin(faker.rickAndMorty().character())
+                .githubAvatarUrl(faker.internet().url())
+                .githubEmail(faker.internet().emailAddress())
+                .roles(new UserRole[]{UserRole.USER})
                 .build());
         final UserPayoutInformation.Person person = UserPayoutInformation.Person.builder()
                 .firstName(faker.name().firstName())
