@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
@@ -2663,7 +2663,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
 
     @Test
     @Order(1)
