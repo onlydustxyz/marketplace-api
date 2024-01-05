@@ -71,7 +71,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                             "currency": "USDC",
                             "amount": 1000,
                             "dollarsEquivalent": 1010,
-                            "status": "PROCESSING",
+                            "status": "PENDING_INVOICE",
                             "from": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",

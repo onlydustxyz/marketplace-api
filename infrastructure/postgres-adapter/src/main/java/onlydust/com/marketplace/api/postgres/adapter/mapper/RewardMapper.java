@@ -68,8 +68,9 @@ public interface RewardMapper {
                 .currency(rewardViewEntityByd.getCurrency().toDomain())
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
                 .status(switch (rewardViewEntityByd.getStatus()) {
-                    case "PENDING_SIGNUP" -> RewardView.Status.pendingSignup;
                     case "COMPLETE" -> RewardView.Status.complete;
+                    case "PENDING_INVOICE" -> RewardView.Status.pendingInvoice;
+                    case "MISSING_PAYOUT_INFO" -> RewardView.Status.missingPayoutInfo;
                     default -> RewardView.Status.processing;
                 })
                 .from(GithubUserIdentity.builder()
