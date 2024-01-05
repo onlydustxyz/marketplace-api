@@ -2,11 +2,6 @@ application:
   web:
     cors:
       hosts: ${FRONTEND_CORS_HOSTS}
-    hasura:
-      secret:
-        type: ${HASURA_GRAPHQL_JWT_SECRET_TYPE}
-        key: ${HASURA_GRAPHQL_JWT_SECRET_KEY}
-        issuer: ${HASURA_GRAPHQL_JWT_SECRET_ISSUER}
     auth0:
       jwks-url: ${AUTH0_JWKS_URL}
       expires-at-leeway: 10
