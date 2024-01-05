@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -23,7 +22,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 
@@ -58,7 +57,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_user_payout_info() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser anthony = userHelper.authenticateAnthony();
+        final UserAuthHelper.AuthenticatedUser anthony = userHelper.authenticateAnthony();
         final String jwt = anthony.jwt();
         paymentRequestRepository.saveAll(
                 List.of(

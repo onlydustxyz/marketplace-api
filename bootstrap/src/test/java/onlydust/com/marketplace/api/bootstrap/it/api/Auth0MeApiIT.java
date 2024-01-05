@@ -25,11 +25,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
-    final static String JWT_TOKEN = "fake-jwt";
     Long githubUserId;
     String login;
     String avatarUrl;
     String email;
+    String token;
 
     @Autowired
     JWTVerifier jwtVerifier;
@@ -46,7 +46,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         email = faker.internet().emailAddress();
-        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl, email);
+        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
@@ -75,7 +75,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When
         var me = client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(GetMeResponse.class)
@@ -95,7 +95,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         me = client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(GetMeResponse.class)
@@ -111,11 +111,11 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When we call it again (already signed-up) with a new email
         indexerApiWireMockServer.resetRequests();
         email = faker.internet().emailAddress();
-        ((JwtVerifierStub) jwtVerifier).withJwtMock(JWT_TOKEN, githubUserId, login, avatarUrl, email);
+        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
 
         me = client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody(GetMeResponse.class)
@@ -174,7 +174,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful()
@@ -217,7 +217,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
                 )
@@ -254,7 +254,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUserId)
                 )
@@ -291,7 +291,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(ME_GET))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + JWT_TOKEN)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
                 )

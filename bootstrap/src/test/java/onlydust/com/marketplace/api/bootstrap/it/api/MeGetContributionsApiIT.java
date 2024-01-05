@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
 
     @Test
     void should_get_my_contributions() {

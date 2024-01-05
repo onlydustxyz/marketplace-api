@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.SuggestTechnologyRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    private HasuraUserHelper userHelper;
+    private UserAuthHelper userHelper;
 
 
     @Test
