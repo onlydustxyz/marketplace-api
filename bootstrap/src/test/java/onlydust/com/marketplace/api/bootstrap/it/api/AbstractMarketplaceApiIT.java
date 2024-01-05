@@ -111,8 +111,7 @@ public class AbstractMarketplaceApiIT {
             .withUsername("test")
             .withPassword("test")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint" +
-                                                                                                  "-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
             .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @InjectWireMock("github")

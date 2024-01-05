@@ -1,0 +1,25 @@
+# #################################################################################################
+# Download a dump from Heroku and save it to: bootstrap/src/test/resources/database/dumps/heroku.dump
+# Note: the DB will run on port 5434
+# #################################################################################################
+
+version: '3'
+services:
+  db:
+    image: "postgres:14.10-alpine"
+    container_name: "marketplace_db_with_heroku_dump"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=marketplace_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./bootstrap/src/test/resources/database/docker_init_with_heroku_dump:/docker-entrypoint-initdb.d
+      - ./bootstrap/src/test/resources/database/dumps:/tmp
+      - ./bootstrap/src/test/resources/database/scripts:/scripts
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "marketplace_db", "-U", "test" ]
+      interval: 2s
+      timeout: 1s
+      retries: 20
