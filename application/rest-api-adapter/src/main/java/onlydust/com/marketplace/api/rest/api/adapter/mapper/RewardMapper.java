@@ -58,14 +58,15 @@ public interface RewardMapper {
                 .currency(mapCurrency(rewardView.getCurrency()))
                 .status(switch (rewardView.getStatus()) {
                     case complete -> RewardStatus.COMPLETE;
+                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
+                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
                     default -> RewardStatus.PROCESSING;
                     case pendingSignup -> RewardStatus.PENDING_SIGNUP;
                 })
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 .receipt(receiptToResponse(rewardView.getReceipt()))
-                .project(ProjectMapper.mapShortProjectResponse(rewardView.getProject()))
-                ;
+                .project(ProjectMapper.mapShortProjectResponse(rewardView.getProject()));
     }
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
