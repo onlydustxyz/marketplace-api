@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 public class Account {
     private Amount balance;
 
-    public Account() {
-        this.balance = Amount.of(BigDecimal.ZERO);
+    public Account(Currency currency) {
+        this.balance = Amount.of(BigDecimal.ZERO, currency);
     }
 
     public Account(Amount initialBalance) {

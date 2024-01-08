@@ -13,9 +13,10 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
 
     @Override
     public void registerTransfer(SponsorId sponsorId, Amount amount) {
-        final var sponsorAccount = sponsorAccountProvider.sponsorAccount(sponsorId);
+        final var sponsorAccount = sponsorAccountProvider.sponsorAccount(sponsorId, amount.getCurrency());
         if (sponsorAccount.isEmpty()) {
-            throw OnlyDustException.notFound("Sponsor account not found");
+            throw OnlyDustException.notFound("Sponsor %s %s account not found".formatted(sponsorId,
+                    amount.getCurrency()));
         }
         sponsorAccount.get().transfer(amount);
     }
