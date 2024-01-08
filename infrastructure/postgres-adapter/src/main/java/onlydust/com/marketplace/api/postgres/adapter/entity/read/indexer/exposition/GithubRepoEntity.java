@@ -11,6 +11,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
@@ -35,9 +36,8 @@ public class GithubRepoEntity {
     Long forksCount;
     Boolean hasIssues;
 
-    @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
-    Map<String, Long> languages;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repoId")
+    List<GithubRepoLanguageEntity> languages;
 
     @ManyToOne(fetch = FetchType.LAZY)
     GithubRepoEntity parent;

@@ -13,16 +13,10 @@ import java.util.UUID;
 public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
 
     @Query(value = """
-            WITH repo_languages AS (SELECT contributor_id, jsonb_agg(KEY) AS languages
-                                    FROM (SELECT contributor_id,
-                                                 jsonb_object_keys(languages)                             AS KEY,
-                                                 CAST((languages -> jsonb_object_keys(languages)) AS int) AS value
-                                          FROM (SELECT contributor_id, jsonb_concat_agg(languages) languages
-                                                FROM indexer_exp.contributions c
-                                                         JOIN indexer_exp.github_repos r ON r.id = c.repo_id
-                                                GROUP BY contributor_id) repo_languages_stats
-                                          ORDER BY value DESC) repo_languages
-                                    group by contributor_id),
+            WITH repo_languages AS (SELECT contributor_id, jsonb_agg(DISTINCT grl.language) AS languages
+                                    FROM indexer_exp.contributions c 
+                                    JOIN indexer_exp.github_repo_languages grl ON grl.repo_id = c.repo_id
+                                    GROUP BY contributor_id),
                  user_languages AS (SELECT user_id, jsonb_agg(KEY) AS languages
                                     FROM (SELECT id                                                       as user_id,
                                                  jsonb_object_keys(languages)                             AS KEY,

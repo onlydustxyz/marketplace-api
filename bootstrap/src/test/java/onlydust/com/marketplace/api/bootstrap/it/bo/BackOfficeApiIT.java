@@ -59,45 +59,77 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 10,
-                          "totalItemNumber": 47,
+                          "totalPageNumber": 9,
+                          "totalItemNumber": 41,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "githubRepositories": [
                             {
-                              "id": 595516050,
-                              "owner": "Generative-Labs",
-                              "name": "StarkLink",
-                              "technologies": {},
-                              "projectId": "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
+                              "id": 40652912,
+                              "owner": "IonicaBizau",
+                              "name": "node-cobol",
+                              "technologies": {
+                                "COBOL": 10808,
+                                "JavaScript": 6987
+                              },
+                              "projectId": "a852e8fd-de3c-4a14-813e-4b592af40d54"
                             },
                             {
-                              "id": 595516050,
-                              "owner": "Generative-Labs",
-                              "name": "StarkLink",
-                              "technologies": {},
-                              "projectId": "98873240-31df-431a-81dc-7d6fe01143a0"
+                              "id": 659718526,
+                              "owner": "KasarLabs",
+                              "name": "deoxys-telemetry",
+                              "technologies": {
+                                "CSS": 33120,
+                                "HTML": 707,
+                                "Rust": 408641,
+                                "Shell": 732,
+                                "Dockerfile": 1982,
+                                "JavaScript": 3843,
+                                "TypeScript": 190809
+                              },
+                              "projectId": "7d04163c-4187-4313-8066-61504d34fc56"
                             },
                             {
-                              "id": 595516050,
-                              "owner": "Generative-Labs",
-                              "name": "StarkLink",
-                              "technologies": {},
-                              "projectId": "4f7bcc3e-3d3d-4a8f-8280-bb6df33382da"
+                              "id": 276180695,
+                              "owner": "MaximeBeasse",
+                              "name": "KeyDecoder",
+                              "technologies": {
+                                "C++": 2226,
+                                "Dart": 121265,
+                                "CMake": 460,
+                                "Swift": 404,
+                                "Kotlin": 1381,
+                                "Objective-C": 38
+                              },
+                              "projectId": "b0f54343-3732-4118-8054-dba40f1ffb85"
                             },
                             {
-                              "id": 595516050,
-                              "owner": "Generative-Labs",
-                              "name": "StarkLink",
-                              "technologies": {},
-                              "projectId": "f992349c-e30c-4156-8b55-0a9dbc20b873"
+                              "id": 276180695,
+                              "owner": "MaximeBeasse",
+                              "name": "KeyDecoder",
+                              "technologies": {
+                                "C++": 2226,
+                                "Dart": 121265,
+                                "CMake": 460,
+                                "Swift": 404,
+                                "Kotlin": 1381,
+                                "Objective-C": 38
+                              },
+                              "projectId": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9"
                             },
                             {
-                              "id": 595516050,
-                              "owner": "Generative-Labs",
-                              "name": "StarkLink",
-                              "technologies": {},
-                              "projectId": "f25e3389-d681-4811-b45c-3d1106d8e478"
+                              "id": 64700934,
+                              "owner": "OpenZeppelin",
+                              "name": "openzeppelin-contracts",
+                              "technologies": {
+                                "Ruby": 255376,
+                                "Shell": 8324,
+                                "Python": 6719,
+                                "Makefile": 1714,
+                                "Solidity": 837904,
+                                "JavaScript": 1027177
+                              },
+                              "projectId": "467cb27c-9726-4f94-818e-6aa49bbf5e75"
                             }
                           ]
                         }
