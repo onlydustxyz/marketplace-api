@@ -3,14 +3,16 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
@@ -33,7 +35,7 @@ public class RewardStatsEntity {
     @Type(type = "jsonb")
     Set<UUID> rewardIds;
     @Type(type = "jsonb")
-    Set<String> rewardItemIds;
+    Set<Set<String>> rewardItemIds;
     @Type(type = "jsonb")
     Set<UUID> projectIds;
 }
