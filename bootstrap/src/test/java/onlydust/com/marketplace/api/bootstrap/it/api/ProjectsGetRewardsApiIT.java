@@ -637,6 +637,6 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.remainingBudget.usdEquivalent").isEqualTo(4040)
-                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(50500);
+                .jsonPath("$.spentAmount.usdEquivalent").isEqualTo(2020);
     }
 }
