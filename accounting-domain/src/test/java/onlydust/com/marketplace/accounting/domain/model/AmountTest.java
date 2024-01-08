@@ -28,6 +28,13 @@ class AmountTest {
     }
 
     @Test
+    void negate() {
+        final var amount = Amount.of(3L, Currency.Usd);
+        final var result = amount.negate();
+        assertThat(result).isEqualTo(Amount.of(-3L, Currency.Usd));
+    }
+
+    @Test
     void isPositive() {
         assertThat(Amount.of(3L, Currency.Usd).isPositive()).isTrue();
         assertThat(Amount.of(-3L, Currency.Usd).isPositive()).isFalse();
