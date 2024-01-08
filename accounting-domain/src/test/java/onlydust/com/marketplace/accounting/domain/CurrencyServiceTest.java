@@ -2,14 +2,18 @@ package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteService;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 
@@ -25,12 +29,15 @@ public class CurrencyServiceTest {
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
-    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage);
+    final QuoteService quoteService = mock(QuoteService.class);
+    final QuoteStorage quoteStorage = mock(QuoteStorage.class);
+    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, quoteService, quoteStorage);
 
     @Test
     void should_add_erc20_support_on_ethereum() {
         // When
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(BigDecimal.valueOf(0.35));
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
         // Then
@@ -41,6 +48,9 @@ public class CurrencyServiceTest {
         assertThat(capturedCurrency.id()).isNotNull();
         assertThat(capturedCurrency.name()).isEqualTo("Lords");
         assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("LORDS"));
+
+        verify(quoteStorage, times(1))
+                .save(new Quote(capturedCurrency.id(), Currency.Code.USD, BigDecimal.valueOf(0.35)));
     }
 
     @Test

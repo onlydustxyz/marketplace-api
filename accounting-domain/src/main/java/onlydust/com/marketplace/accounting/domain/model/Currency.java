@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record Currency(Id id, String name, Code code) {
@@ -27,6 +28,7 @@ public record Currency(Id id, String name, Code code) {
     @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Code {
+        public static Code USD = Code.of("USD");
         String inner;
 
         @Override
