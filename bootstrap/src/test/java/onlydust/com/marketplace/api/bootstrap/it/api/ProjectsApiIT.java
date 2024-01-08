@@ -232,7 +232,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "ignoreContributionsBefore": null
               },
               "indexingComplete": true,
-              "indexedAt": "2023-12-04T14:34:49.384525Z"
+              "indexedAt": "2023-12-04T14:35:10.986567Z"
             }
                         
             """;

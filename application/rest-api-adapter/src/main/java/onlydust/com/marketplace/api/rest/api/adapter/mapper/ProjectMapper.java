@@ -71,7 +71,10 @@ public interface ProjectMapper {
         projectResponse.setTechnologies(project.getTechnologies());
 
         final var reposIndexedTimes =
-                project.getOrganizations().stream().map(ProjectOrganizationView::getRepos).flatMap(Collection::stream).map(ProjectOrganizationRepoView::getIndexedAt).toList();
+                project.getOrganizations().stream().map(ProjectOrganizationView::getRepos)
+                        .flatMap(Collection::stream)
+                        .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
+                        .map(ProjectOrganizationRepoView::getIndexedAt).toList();
         projectResponse.setIndexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull));
         projectResponse.setIndexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null));
         if (project.getMe() != null)
