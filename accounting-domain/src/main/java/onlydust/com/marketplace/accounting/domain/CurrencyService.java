@@ -10,16 +10,13 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 @AllArgsConstructor
 public class CurrencyService {
-    private final ERC20Provider ethereumERC20Provider;
-    private final ERC20Provider optimismERC20Provider;
+    private final ERC20ProviderFactory erc20ProviderFactory;
     private final CurrencyStorage currencyStorage;
 
     public void addERC20Support(Blockchain blockchain, ContractAddress tokenAddress) {
-        final var token = (switch (blockchain) {
-            case ETHEREUM -> ethereumERC20Provider.get(tokenAddress);
-            case OPTIMISM -> optimismERC20Provider.get(tokenAddress);
-            default -> throw OnlyDustException.badRequest("ERC20 tokens on %s are not supported".formatted(blockchain.pretty()));
-        }).orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
+        final var token = erc20ProviderFactory.get(blockchain)
+                .get(tokenAddress)
+                .orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
         currencyStorage.save(Currency.of(token));
     }

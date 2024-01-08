@@ -24,7 +24,8 @@ public class CurrencyServiceTest {
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
-    final CurrencyService currencyService = new CurrencyService(ethereumERC20Provider, optimismERC20Provider, currencyStorage);
+    final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
+    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage);
 
     @Test
     void should_add_erc20_support_on_ethereum() {
