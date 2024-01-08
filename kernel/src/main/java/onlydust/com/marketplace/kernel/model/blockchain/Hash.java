@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.model.blockchain;
+package onlydust.com.marketplace.kernel.model.blockchain;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

@@ -1,8 +1,8 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.starknet;
+package onlydust.com.marketplace.kernel.model.blockchain.aptos;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.domain.model.blockchain.Hash;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 @EqualsAndHashCode(callSuper = true)
 public class TransactionHash extends Hash {

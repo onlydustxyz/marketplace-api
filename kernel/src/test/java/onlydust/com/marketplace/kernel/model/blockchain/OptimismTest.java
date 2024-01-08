@@ -1,6 +1,7 @@
-package onlydust.com.marketplace.api.domain.model.blockchain;
+package onlydust.com.marketplace.kernel.model.blockchain;
 
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -10,17 +11,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class StarkNetTest {
+class OptimismTest {
     @ParameterizedTest()
     @ValueSource(strings = {
             "",
             "02937",
             "0x",
             "0x0asdf",
-            "0x12345678901234567890123456789012345678901234567890123456789012345"
+            "0x12345678901234567890123456789012345678901"
     })
     void should_reject_invalid_address(String value) {
-        assertThatThrownBy(() -> StarkNet.accountAddress(value))
+        assertThatThrownBy(() -> Optimism.accountAddress(value))
                 .isInstanceOf(OnlyDustException.class);
     }
 
@@ -33,14 +34,14 @@ class StarkNetTest {
             "0x40B38765696e3d5d8d9d834D8AaD4bB6e418E489"
     })
     void should_accept_valid_address(String value) {
-        assertDoesNotThrow(() -> StarkNet.accountAddress(value));
+        assertDoesNotThrow(() -> Optimism.accountAddress(value));
     }
 
     @Test
     void should_sanitize_value() {
-        assertThat(StarkNet.accountAddress("0x1").asString()).isEqualTo("0x01");
-        assertThat(StarkNet.accountAddress("0x01").asString()).isEqualTo("0x01");
-        assertThat(StarkNet.accountAddress("0x123456789").asString()).isEqualTo("0x0123456789");
+        assertThat(Optimism.accountAddress("0x1").asString()).isEqualTo("0x01");
+        assertThat(Optimism.accountAddress("0x01").asString()).isEqualTo("0x01");
+        assertThat(Optimism.accountAddress("0x123456789").asString()).isEqualTo("0x0123456789");
     }
 
     @ParameterizedTest()
@@ -52,7 +53,7 @@ class StarkNetTest {
             "0x01234567890123456789012345678901234567890123456789012345678901234"
     })
     void should_reject_invalid_hash(String value) {
-        assertThrows(OnlyDustException.class, () -> StarkNet.transactionHash(value));
+        assertThrows(OnlyDustException.class, () -> Optimism.transactionHash(value));
     }
 
     @ParameterizedTest()
@@ -64,12 +65,12 @@ class StarkNetTest {
             "0x19cf81d9b6b0277869b550072365a86b3aa8f41438c084c3d767c215b54f9e2"
     })
     void should_accept_valid_hash(String value) {
-        assertDoesNotThrow(() -> StarkNet.transactionHash(value));
+        assertDoesNotThrow(() -> Optimism.transactionHash(value));
     }
 
     @Test
     void should_generate_transaction_url() {
-        assertThat(StarkNet.BLOCK_EXPLORER.url(StarkNet.transactionHash("0x1")).toString())
-                .isEqualTo("https://starkscan.co/tx/0x01");
+        assertThat(Optimism.BLOCK_EXPLORER.url(Optimism.transactionHash("0x1")).toString())
+                .isEqualTo("https://optimistic.etherscan.io/tx/0x01");
     }
 }

@@ -1,7 +1,7 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum;
+package onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum;
 
-import onlydust.com.marketplace.api.domain.model.blockchain.BlockExplorer;
-import onlydust.com.marketplace.api.domain.model.blockchain.evm.TransactionHash;
+import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.TransactionHash;
 
 import java.net.URI;
 

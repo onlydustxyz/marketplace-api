@@ -1,7 +1,9 @@
-package onlydust.com.marketplace.api.domain.model.blockchain;
+package onlydust.com.marketplace.kernel.model.blockchain;
 
 
-import onlydust.com.marketplace.api.domain.model.blockchain.aptos.*;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptoScan;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.TransactionHash;
 
 public interface Aptos {
     BlockExplorer<TransactionHash> BLOCK_EXPLORER = new AptoScan();

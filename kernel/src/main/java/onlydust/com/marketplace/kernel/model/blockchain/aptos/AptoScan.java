@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.aptos;
+package onlydust.com.marketplace.kernel.model.blockchain.aptos;
 
-import onlydust.com.marketplace.api.domain.model.blockchain.BlockExplorer;
+import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
 
 import java.net.URI;
 

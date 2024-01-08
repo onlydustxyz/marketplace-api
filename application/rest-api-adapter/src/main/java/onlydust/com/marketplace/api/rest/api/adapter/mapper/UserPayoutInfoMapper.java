@@ -2,12 +2,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
-import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
-import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
-import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 
 import static java.util.Objects.nonNull;
 

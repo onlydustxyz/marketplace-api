@@ -1,16 +1,15 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum;
+package onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.domain.model.blockchain.evm.AccountAddress;
-import org.springframework.lang.Nullable;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress;
 
 import java.util.Optional;
 
 @EqualsAndHashCode
 public class Wallet {
-    private final @Nullable AccountAddress address;
-    private final @Nullable Name ens;
+    private final AccountAddress address;
+    private final Name ens;
 
     public Wallet(@NonNull AccountAddress address) {
         this.address = address;

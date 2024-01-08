@@ -1,8 +1,9 @@
-package onlydust.com.marketplace.api.domain.model.blockchain;
+package onlydust.com.marketplace.kernel.model.blockchain;
 
 
-import onlydust.com.marketplace.api.domain.model.blockchain.evm.*;
-import onlydust.com.marketplace.api.domain.model.blockchain.evm.optimism.*;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.TransactionHash;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.optimism.EtherScan;
 
 public interface Optimism {
     BlockExplorer<TransactionHash> BLOCK_EXPLORER = new EtherScan();

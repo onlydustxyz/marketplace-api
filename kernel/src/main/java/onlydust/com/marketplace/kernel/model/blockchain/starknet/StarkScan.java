@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.starknet;
+package onlydust.com.marketplace.kernel.model.blockchain.starknet;
 
-import onlydust.com.marketplace.api.domain.model.blockchain.BlockExplorer;
+import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
 
 import java.net.URI;
 

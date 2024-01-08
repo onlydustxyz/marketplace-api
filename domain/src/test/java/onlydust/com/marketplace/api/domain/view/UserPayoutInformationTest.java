@@ -3,10 +3,10 @@ package onlydust.com.marketplace.api.domain.view;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
-import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
-import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
-import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

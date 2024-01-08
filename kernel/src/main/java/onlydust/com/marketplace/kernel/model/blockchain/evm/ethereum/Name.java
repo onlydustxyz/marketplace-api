@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum;
+package onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum;
 
 import lombok.EqualsAndHashCode;
 
