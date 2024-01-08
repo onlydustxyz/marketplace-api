@@ -36,7 +36,7 @@ public class CurrencyServiceTest {
         final var capturedCurrency = currency.getValue();
         assertThat(capturedCurrency.id()).isNotNull();
         assertThat(capturedCurrency.name()).isEqualTo("Lords");
-        assertThat(capturedCurrency.symbol()).isEqualTo("LORDS");
+        assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("LORDS"));
     }
 
     @Test
