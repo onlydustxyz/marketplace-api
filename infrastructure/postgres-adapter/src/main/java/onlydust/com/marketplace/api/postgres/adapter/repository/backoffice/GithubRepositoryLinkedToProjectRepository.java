@@ -16,10 +16,15 @@ public interface GithubRepositoryLinkedToProjectRepository extends JpaRepository
             SELECT gr.id,
                    gr.owner_login AS owner,
                    gr.name,
-                   gr.languages   AS technologies,
+                   rl.languages   AS technologies,
                    pgr.project_id
             FROM indexer_exp.github_repos AS gr
-                     JOIN project_github_repos pgr ON pgr.github_repo_id = gr.id
+             JOIN project_github_repos pgr ON pgr.github_repo_id = gr.id
+             JOIN (
+                SELECT repo_id, jsonb_object_agg(language, line_count) AS languages
+                FROM indexer_exp.github_repo_languages
+                GROUP BY repo_id
+             ) rl ON rl.repo_id = gr.id
             WHERE gr.visibility = 'PUBLIC'
             AND (COALESCE(:projectIds) IS NULL OR pgr.project_id IN (:projectIds))
             """, nativeQuery = true)
