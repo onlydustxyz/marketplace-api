@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 @EqualsAndHashCode
 public class Amount {
     @NonNull
-    private final BigDecimal value;
+    protected final BigDecimal value;
     @NonNull
-    private final Currency currency;
+    protected final Currency currency;
 
-    private Amount(@NonNull BigDecimal value, @NonNull Currency currency) {
+    protected Amount(@NonNull BigDecimal value, @NonNull Currency currency) {
         this.value = value;
         this.currency = currency;
     }
