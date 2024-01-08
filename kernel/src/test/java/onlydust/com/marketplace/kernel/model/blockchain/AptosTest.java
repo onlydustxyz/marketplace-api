@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.kernel.model.blockchain;
 
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -39,9 +38,9 @@ class AptosTest {
 
     @Test
     void should_sanitize_value() {
-        assertThat(Aptos.accountAddress("0x1").asString()).isEqualTo("0x01");
-        assertThat(Aptos.accountAddress("0x01").asString()).isEqualTo("0x01");
-        assertThat(Aptos.accountAddress("0x123456789").asString()).isEqualTo("0x0123456789");
+        assertThat(Aptos.accountAddress("0x1").toString()).isEqualTo("0x01");
+        assertThat(Aptos.accountAddress("0x01").toString()).isEqualTo("0x01");
+        assertThat(Aptos.accountAddress("0x123456789").toString()).isEqualTo("0x0123456789");
     }
 
     @ParameterizedTest()

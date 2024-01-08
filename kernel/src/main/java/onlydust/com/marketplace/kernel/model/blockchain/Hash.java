@@ -19,7 +19,8 @@ public abstract class Hash {
         this.inner = validator.sanitize(hash);
     }
 
-    public String asString() {
+    @Override
+    public String toString() {
         return inner;
     }
 

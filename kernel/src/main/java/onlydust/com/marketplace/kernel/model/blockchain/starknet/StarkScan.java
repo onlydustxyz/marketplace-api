@@ -9,6 +9,6 @@ public class StarkScan implements BlockExplorer<TransactionHash> {
 
     @Override
     public URI url(TransactionHash transactionHash) {
-        return URI.create(BASE_URL + "/tx/" + transactionHash.asString());
+        return URI.create(BASE_URL + "/tx/" + transactionHash);
     }
 }

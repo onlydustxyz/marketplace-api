@@ -203,7 +203,7 @@ public interface UserPayoutInfoMapper {
                                            UserPayoutInfoEntity entity) {
         if (nonNull(payoutSettings.getAptosAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getAptosAddress().asString())
+                    .address(payoutSettings.getAptosAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)
@@ -213,7 +213,7 @@ public interface UserPayoutInfoMapper {
         }
         if (nonNull(payoutSettings.getOptimismAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getOptimismAddress().asString())
+                    .address(payoutSettings.getOptimismAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)
@@ -223,7 +223,7 @@ public interface UserPayoutInfoMapper {
         }
         if (nonNull(payoutSettings.getStarknetAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getStarknetAddress().asString())
+                    .address(payoutSettings.getStarknetAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)

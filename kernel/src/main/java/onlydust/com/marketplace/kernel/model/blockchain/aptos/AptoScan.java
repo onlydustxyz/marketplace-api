@@ -9,6 +9,6 @@ public class AptoScan implements BlockExplorer<TransactionHash> {
 
     @Override
     public URI url(TransactionHash version) {
-        return URI.create(BASE_URL + "/version/" + version.asString());
+        return URI.create(BASE_URL + "/version/" + version.toString());
     }
 }

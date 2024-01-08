@@ -26,7 +26,7 @@ public class Wallet {
             assert ens != null;
             return ens.asString();
         } else {
-            return address.asString();
+            return address.toString();
         }
     }
 

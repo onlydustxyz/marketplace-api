@@ -54,11 +54,11 @@ public interface UserPayoutInfoMapper {
         if (view.getPayoutSettings().getEthWallet() != null)
             payoutSettings.setEthWallet(view.getPayoutSettings().getEthWallet().asString());
         if (view.getPayoutSettings().getAptosAddress() != null)
-            payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().asString());
+            payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().toString());
         if (view.getPayoutSettings().getOptimismAddress() != null)
-            payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().asString());
+            payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().toString());
         if (view.getPayoutSettings().getStarknetAddress() != null)
-            payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().asString());
+            payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().toString());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());
