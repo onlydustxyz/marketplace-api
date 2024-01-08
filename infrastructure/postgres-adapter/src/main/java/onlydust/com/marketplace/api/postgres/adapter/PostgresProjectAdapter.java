@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -17,6 +16,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -410,15 +410,17 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                 budgetStats.get(0).getCurrency().toDomain(),
                                 budgetStats.get(0).getRemainingUsdAmount()) :
                         new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                budgetStats.stream().map(BudgetStatsEntity::getRemainingUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
+                                        BigDecimal::add)))
                 .spentAmount(budgetStats.size() == 1 ?
                         new Money(budgetStats.get(0).getSpentAmount(),
                                 budgetStats.get(0).getCurrency().toDomain(),
                                 budgetStats.get(0).getSpentUsdAmount()) :
                         new Money(null, null,
-                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add)))
+                                budgetStats.stream().map(BudgetStatsEntity::getSpentUsdAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,
+                                        BigDecimal::add)))
                 .sentRewardsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
+                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .build();
     }

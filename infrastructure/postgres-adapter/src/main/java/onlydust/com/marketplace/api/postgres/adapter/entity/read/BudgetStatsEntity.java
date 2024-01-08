@@ -9,7 +9,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
@@ -32,7 +35,7 @@ public class BudgetStatsEntity {
     @Type(type = "jsonb")
     Set<UUID> rewardIds;
     @Type(type = "jsonb")
-    Set<String> rewardItemIds;
+    Set<Set<String>> rewardItemIds;
     @Type(type = "jsonb")
     Set<Integer> rewardRecipientIds;
 }
