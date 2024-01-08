@@ -26,7 +26,7 @@ public class CurrencyService {
         final var currency = Currency.of(token);
         currencyStorage.save(currency);
 
-        final var price = quoteService.currentPrice(token, Currency.Code.USD);
-        quoteStorage.save(new Quote(currency.id(), Currency.Code.USD, price));
+        quoteService.currentPrice(token, Currency.Code.USD)
+                .ifPresent(price -> quoteStorage.save(new Quote(currency.id(), Currency.Code.USD, price)));
     }
 }

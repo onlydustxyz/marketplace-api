@@ -37,7 +37,7 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_ethereum() {
         // When
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(BigDecimal.valueOf(0.35));
+        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(BigDecimal.valueOf(0.35)));
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
         // Then
@@ -89,5 +89,24 @@ public class CurrencyServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Could not find a valid ERC20 contract at address 0x388C818CA8B9251b393131C08a736A67ccB19297 on Ethereum");
+    }
+
+    @Test
+    void should_not_store_quote_if_not_found() {
+        // When
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.empty());
+        currencyService.addERC20Support(ETHEREUM, LORDS.address());
+
+        // Then
+        ArgumentCaptor<Currency> currency = ArgumentCaptor.forClass(Currency.class);
+        verify(currencyStorage, times(1)).save(currency.capture());
+
+        final var capturedCurrency = currency.getValue();
+        assertThat(capturedCurrency.id()).isNotNull();
+        assertThat(capturedCurrency.name()).isEqualTo("Lords");
+        assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("LORDS"));
+
+        verify(quoteStorage, never()).save(any());
     }
 }
