@@ -77,6 +77,6 @@ public class CurrencyServiceTest {
         assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.ETHEREUM, invalidAddress))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Could not find a valid ERC20 contract at address 0x388C818CA8B9251b393131C08a736A67ccB19297");
+                .hasMessage("Could not find a valid ERC20 contract at address 0x388C818CA8B9251b393131C08a736A67ccB19297 on Ethereum");
     }
 }

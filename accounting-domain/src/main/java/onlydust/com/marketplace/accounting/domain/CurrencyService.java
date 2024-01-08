@@ -19,7 +19,7 @@ public class CurrencyService {
             case ETHEREUM -> ethereumERC20Provider.get(tokenAddress);
             case OPTIMISM -> optimismERC20Provider.get(tokenAddress);
             default -> throw OnlyDustException.badRequest("ERC20 tokens on %s are not supported".formatted(blockchain.pretty()));
-        }).orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s".formatted(tokenAddress)));
+        }).orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
         currencyStorage.save(Currency.of(token));
     }
