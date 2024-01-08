@@ -125,7 +125,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -154,17 +154,18 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "rewardedAmount": {
                 "amount": null,
                 "currency": null,
-                "usdEquivalent": 3125250.0
+                "usdEquivalent": 197010.00
               },
               "pendingAmount": {
                 "amount": null,
                 "currency": null,
-                "usdEquivalent": 2750250
+                "usdEquivalent": 182010.00
               },
               "receivedRewardsCount": 6,
               "rewardedContributionsCount": 26,
               "rewardingProjectsCount": 1
             }
+                        
             """;
     private static final String ME_GET_REWARDS_RESPONSE_JSON = """
             {
@@ -176,7 +177,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -190,7 +191,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -204,7 +205,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -218,7 +219,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -232,7 +233,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -246,7 +247,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 1000,
                     "currency": "USDC",
-                    "dollarsEquivalent": 1010
+                    "dollarsEquivalent": 1010.00
                   },
                   "numberOfRewardedContributions": 1,
                   "rewardedOnProjectName": "QA new contributions",
@@ -259,19 +260,20 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 6,
               "nextPageIndex": 0,
               "rewardedAmount": {
-                "amount": 126000,
+                "amount": 6000,
                 "currency": "USDC",
-                "usdEquivalent": 127260
+                "usdEquivalent": 6060.00
               },
               "pendingAmount": {
-                "amount": 126000,
+                "amount": 6000,
                 "currency": "USDC",
-                "usdEquivalent": 127260
+                "usdEquivalent": 6060.00
               },
               "receivedRewardsCount": 6,
               "rewardedContributionsCount": 26,
               "rewardingProjectsCount": 1
             }
+                        
             """;
     @Autowired
     HasuraUserHelper userHelper;
@@ -569,10 +571,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-21')]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(670640)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(9090)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(670640)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(9090)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(10)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(85)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(1)
@@ -639,10 +641,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.amount").doesNotExist()
                 .jsonPath("$.rewardedAmount.currency").doesNotExist()
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2921650.0)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(2260100)
                 .jsonPath("$.pendingAmount.amount").doesNotExist()
                 .jsonPath("$.pendingAmount.currency").doesNotExist()
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(2171650.00)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(1510100.0)
                 .jsonPath("$.receivedRewardsCount").isEqualTo(13)
                 .jsonPath("$.rewardedContributionsCount").isEqualTo(88)
                 .jsonPath("$.rewardingProjectsCount").isEqualTo(2)
@@ -670,8 +672,8 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(695980)
-                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(671650)
+                .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(19662)
+                .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(10100)
         ;
     }
 }

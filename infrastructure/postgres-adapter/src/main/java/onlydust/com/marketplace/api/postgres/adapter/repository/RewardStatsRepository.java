@@ -5,12 +5,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.UUID;
 
 public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, CurrencyEnumEntity> {
     @Query(value = """
+            WITH work_item_ids AS (SELECT wi.payment_id, JSONB_AGG(DISTINCT wi.id) as ids FROM work_items wi GROUP BY wi.payment_id)
             SELECT 
                 pr.currency,
                 COALESCE(SUM(pr.amount), 0) AS processed_amount,
@@ -18,11 +18,11 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) AS pending_amount,
                 COALESCE(SUM(pr.amount) FILTER ( WHERE COALESCE(p.total_paid, 0) < pr.amount ), 0) * CASE WHEN pr.currency = 'usd' THEN 1 ELSE cuq.price END AS pending_usd_amount,
                 JSONB_AGG(pr.id) AS reward_ids,
-                COALESCE(JSONB_AGG(wi.id) FILTER (WHERE wi.id IS NOT NULL), '[]') AS reward_item_ids,
+                COALESCE(JSONB_AGG(wii.ids) FILTER ( WHERE wii.ids IS NOT NULL ), '[]') AS reward_item_ids,
                 JSONB_AGG(pr.project_id) AS project_ids
             FROM payment_requests pr
             JOIN iam.users u on u.github_user_id = pr.recipient_id
-            LEFT JOIN work_items wi ON pr.id = wi.payment_id
+            LEFT JOIN work_item_ids wii ON wii.payment_id = pr.id
             LEFT JOIN ( 
                 SELECT p.request_id, SUM(amount) as total_paid 
                 FROM payments p 
@@ -43,10 +43,10 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsEntity, 
 
 
     @Query(value = """
-        SELECT DISTINCT pr.currency
-        FROM payment_requests pr
-        WHERE pr.recipient_id = :githubUserId
-        ORDER BY pr.currency
-        """, nativeQuery = true)
+            SELECT DISTINCT pr.currency
+            FROM payment_requests pr
+            WHERE pr.recipient_id = :githubUserId
+            ORDER BY pr.currency
+            """, nativeQuery = true)
     List<CurrencyEnumEntity> listRewardCurrenciesByRecipient(Long githubUserId);
 }
