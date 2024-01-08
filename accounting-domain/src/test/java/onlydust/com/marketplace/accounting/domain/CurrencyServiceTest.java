@@ -31,6 +31,6 @@ public class CurrencyServiceTest {
         assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.APTOS, lordsAddress))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("APTOS is not EVM compatible");
+                .hasMessage("Aptos is not EVM compatible");
     }
 }
