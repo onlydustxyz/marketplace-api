@@ -18,7 +18,8 @@ public class CurrencyService {
             throw OnlyDustException.badRequest("%s is not EVM compatible".formatted(blockchain.pretty()));
         }
 
-        final var token = erc20Provider.get(tokenAddress);
+        final var token = erc20Provider.get(tokenAddress)
+                .orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s".formatted(tokenAddress)));
         currencyStorage.save(Currency.of(token));
     }
 }

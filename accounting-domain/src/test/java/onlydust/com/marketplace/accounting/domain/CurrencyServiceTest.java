@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,7 +26,7 @@ public class CurrencyServiceTest {
     @Test
     void given_a_blockchain_evm_compatible_should_add_erc20_support() {
         // When
-        when(erc20Provider.get(LORDS.address())).thenReturn(LORDS);
+        when(erc20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         currencyService.addERC20Support(Blockchain.ETHEREUM, LORDS.address());
 
         // Then
@@ -40,13 +41,23 @@ public class CurrencyServiceTest {
 
     @Test
     void given_a_blockchain_not_evm_compatible_should_not_add_erc20_support() {
-        // Given
-        final var lordsAddress = Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0");
-
         // When
-        assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.APTOS, lordsAddress))
+        assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.APTOS, LORDS.address()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Aptos is not EVM compatible");
+    }
+
+    @Test
+    void given_a_wrong_address_should_not_add_erc20_support() {
+        // Given
+        final var invalidAddress = Ethereum.contractAddress("0x388C818CA8B9251b393131C08a736A67ccB19297");
+
+        // When
+        when(erc20Provider.get(LORDS.address())).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.ETHEREUM, invalidAddress))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Could not find a valid ERC20 contract at address 0x388C818CA8B9251b393131C08a736A67ccB19297");
     }
 }
