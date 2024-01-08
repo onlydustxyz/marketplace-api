@@ -7,5 +7,5 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import java.util.Optional;
 
 public interface SponsorAccountProvider {
-    Optional<Account> sponsorAccount(SponsorId sponsorId, Currency currency);
+    Optional<Account> get(SponsorId sponsorId, Currency currency);
 }

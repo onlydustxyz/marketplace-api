@@ -9,4 +9,6 @@ public interface SponsorAccountingFacadePort {
     void registerTransfer(SponsorId sponsorId, Amount amount);
 
     void fundCommittee(SponsorId sponsorId, CommitteeId committeeId, Amount amount);
+
+    void refundFromCommittee(CommitteeId committeeId, SponsorId sponsorId, Amount amount);
 }
