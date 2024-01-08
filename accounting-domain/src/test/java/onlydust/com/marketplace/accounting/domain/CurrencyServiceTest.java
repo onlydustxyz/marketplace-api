@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -19,14 +20,16 @@ import static org.mockito.Mockito.*;
 
 public class CurrencyServiceTest {
     private final static ERC20 LORDS = new ERC20(Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0"), "Lords", "LORDS", 18, BigInteger.TEN);
+    private final static ERC20 OPTIMISM = new ERC20(Optimism.contractAddress("0x4200000000000000000000000000000000000042"), "Optimism", "OP", 18, BigInteger.TEN);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final ERC20Provider erc20Provider = mock(ERC20Provider.class);
-    final CurrencyService currencyService = new CurrencyService(erc20Provider, currencyStorage);
+    final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
+    final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
+    final CurrencyService currencyService = new CurrencyService(ethereumERC20Provider, optimismERC20Provider, currencyStorage);
 
     @Test
-    void given_a_blockchain_evm_compatible_should_add_erc20_support() {
+    void should_add_erc20_support_on_ethereum() {
         // When
-        when(erc20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         currencyService.addERC20Support(Blockchain.ETHEREUM, LORDS.address());
 
         // Then
@@ -40,12 +43,28 @@ public class CurrencyServiceTest {
     }
 
     @Test
-    void given_a_blockchain_not_evm_compatible_should_not_add_erc20_support() {
+    void should_add_erc20_support_on_optimism() {
+        // When
+        when(optimismERC20Provider.get(OPTIMISM.address())).thenReturn(Optional.of(OPTIMISM));
+        currencyService.addERC20Support(Blockchain.OPTIMISM, OPTIMISM.address());
+
+        // Then
+        ArgumentCaptor<Currency> currency = ArgumentCaptor.forClass(Currency.class);
+        verify(currencyStorage, times(1)).save(currency.capture());
+
+        final var capturedCurrency = currency.getValue();
+        assertThat(capturedCurrency.id()).isNotNull();
+        assertThat(capturedCurrency.name()).isEqualTo("Optimism");
+        assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("OP"));
+    }
+
+    @Test
+    void should_not_add_erc20_support_on_unsupported_blockchain() {
         // When
         assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.APTOS, LORDS.address()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Aptos is not EVM compatible");
+                .hasMessage("ERC20 tokens on Aptos are not supported");
     }
 
     @Test
@@ -54,7 +73,7 @@ public class CurrencyServiceTest {
         final var invalidAddress = Ethereum.contractAddress("0x388C818CA8B9251b393131C08a736A67ccB19297");
 
         // When
-        when(erc20Provider.get(LORDS.address())).thenReturn(Optional.empty());
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> currencyService.addERC20Support(Blockchain.ETHEREUM, invalidAddress))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
