@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountingSt
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 
 @AllArgsConstructor

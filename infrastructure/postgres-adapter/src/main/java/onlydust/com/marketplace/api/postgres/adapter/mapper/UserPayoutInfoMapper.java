@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
-import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
-import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
-import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
@@ -203,7 +203,7 @@ public interface UserPayoutInfoMapper {
                                            UserPayoutInfoEntity entity) {
         if (nonNull(payoutSettings.getAptosAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getAptosAddress().asString())
+                    .address(payoutSettings.getAptosAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)
@@ -213,7 +213,7 @@ public interface UserPayoutInfoMapper {
         }
         if (nonNull(payoutSettings.getOptimismAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getOptimismAddress().asString())
+                    .address(payoutSettings.getOptimismAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)
@@ -223,7 +223,7 @@ public interface UserPayoutInfoMapper {
         }
         if (nonNull(payoutSettings.getStarknetAddress())) {
             entity.addWallets(WalletEntity.builder()
-                    .address(payoutSettings.getStarknetAddress().asString())
+                    .address(payoutSettings.getStarknetAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .id(WalletIdEntity.builder()
                             .userId(userId)
