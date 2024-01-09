@@ -15,7 +15,11 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
     public void registerTransfer(SponsorId sponsorId, Amount amount) {
         final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
         try {
-            sponsorAccount.registerExternalTransfer(amount);
+            if (amount.isPositive()) {
+                sponsorAccount.mint(PositiveAmount.of(amount));
+            } else {
+                sponsorAccount.burn(PositiveAmount.of(amount.negate()));
+            }
         } catch (OnlyDustException e) {
             throw OnlyDustException.badRequest("Cannot register transfer of %s for sponsor %s: %s"
                     .formatted(amount, sponsorId, e.getMessage()));
@@ -27,7 +31,7 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
         final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
         final var committeeAccount = getAccount(committeeId, amount.getCurrency());
         try {
-            sponsorAccount.sendAmountTo(committeeAccount, amount);
+            sponsorAccount.send(committeeAccount, amount);
         } catch (OnlyDustException e) {
             throw OnlyDustException.badRequest("Cannot transfer %s from sponsor %s to committee %s: %s"
                     .formatted(amount, sponsorId, committeeId, e.getMessage()));
@@ -39,7 +43,7 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
         final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
         final var committeeAccount = getAccount(committeeId, amount.getCurrency());
         try {
-            committeeAccount.sendRefundTo(sponsorAccount, amount);
+            committeeAccount.refund(sponsorAccount, amount);
         } catch (OnlyDustException e) {
             throw OnlyDustException.badRequest("Cannot transfer %s from committee %s to sponsor %s: %s"
                     .formatted(amount, committeeId, sponsorId, e.getMessage()));

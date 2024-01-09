@@ -151,7 +151,7 @@ public class SponsorAccountingTest {
         sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(7L, Currencies.USD));
 
         final var anotherAccount = new Account(Currencies.USD);
-        committeeAccount.sendAmountTo(anotherAccount, PositiveAmount.of(6L, Currencies.USD));
+        committeeAccount.send(anotherAccount, PositiveAmount.of(6L, Currencies.USD));
 
         assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveAmount.of(2L,
                 Currencies.USD)))

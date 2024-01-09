@@ -10,11 +10,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class AmountTest {
 
     @Test
-    void plus() {
+    void add() {
         final var amount1 = Amount.of(3L, Currencies.USD);
         final var amount2 = Amount.of(2L, Currencies.USD);
 
-        final var result = amount1.plus(amount2);
+        final var result = amount1.add(amount2);
         assertThat(result).isEqualTo(Amount.of(5L, Currencies.USD));
     }
 
@@ -23,9 +23,28 @@ class AmountTest {
         final var amount1 = Amount.of(3L, Currencies.USD);
         final var amount2 = Amount.of(2L, Currencies.ETH);
 
-        assertThatThrownBy(() -> amount1.plus(amount2))
+        assertThatThrownBy(() -> amount1.add(amount2))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot sum different currencies");
+                .hasMessage("Cannot perform arithmetic operations with different currencies");
+    }
+
+    @Test
+    void subtract() {
+        final var amount1 = Amount.of(3L, Currencies.USD);
+        final var amount2 = Amount.of(2L, Currencies.USD);
+
+        final var result = amount1.subtract(amount2);
+        assertThat(result).isEqualTo(Amount.of(1L, Currencies.USD));
+    }
+
+    @Test
+    void should_not_subtract_different_currencies() {
+        final var amount1 = Amount.of(3L, Currencies.USD);
+        final var amount2 = Amount.of(2L, Currencies.ETH);
+
+        assertThatThrownBy(() -> amount1.subtract(amount2))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot perform arithmetic operations with different currencies");
     }
 
     @Test
@@ -45,6 +64,16 @@ class AmountTest {
     void isNegative() {
         assertThat(Amount.of(3L, Currencies.USD).isNegative()).isFalse();
         assertThat(Amount.of(-3L, Currencies.USD).isNegative()).isTrue();
+    }
+
+    @Test
+    void isLowerThan() {
+        final var amount1 = Amount.of(3L, Currencies.USD);
+        final var amount2 = Amount.of(2L, Currencies.USD);
+
+        assertThat(amount1.isStrictlyLowerThan(amount2)).isFalse();
+        assertThat(amount2.isStrictlyLowerThan(amount1)).isTrue();
+        assertThat(amount1.isStrictlyLowerThan(amount1)).isFalse();
     }
 
     @Test

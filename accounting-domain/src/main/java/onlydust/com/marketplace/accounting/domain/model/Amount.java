@@ -33,11 +33,19 @@ public class Amount {
      * @return a new Amount with the sum of the current value and the given amount
      * @throws OnlyDustException if the given amount has a different currency
      */
-    public @NonNull Amount plus(@NonNull Amount amount) {
+    public @NonNull Amount add(@NonNull final Amount amount) {
         if (!currency.equals(amount.currency)) {
-            throw OnlyDustException.internalServerError("Cannot sum different currencies");
+            throw OnlyDustException.internalServerError("Cannot perform arithmetic operations with different currencies");
         }
         return new Amount(value.add(amount.value), currency);
+    }
+
+    /***
+     * @param sent the amount to be subtracted
+     * @return a new Amount with the difference of the current value and the given amount
+     */
+    public @NonNull Amount subtract(@NonNull final Amount sent) {
+        return add(sent.negate());
     }
 
     /***
@@ -61,8 +69,17 @@ public class Amount {
         return !isPositive();
     }
 
+    public boolean isStrictlyLowerThan(@NonNull Amount amount) {
+        if (!currency.equals(amount.currency)) {
+            throw OnlyDustException.internalServerError("Cannot compare different currencies");
+        }
+        return value.compareTo(amount.value) < 0;
+    }
+
     @Override
     public String toString() {
         return "%s %s".formatted(value, currency);
     }
+
+
 }
