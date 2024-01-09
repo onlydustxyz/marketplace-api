@@ -7,4 +7,6 @@ public interface Currencies {
     Currency USDC = Currency.of(ERC20Tokens.USDC);
     Currency LORDS = Currency.of(ERC20Tokens.LORDS);
     Currency STRK = new Currency("StarkNet Token", Currency.Code.of("STRK"));
+    Currency USD = new Currency("US Dollar", Currency.Code.of("USD"));
+    Currency ETH = new Currency("Ether", Currency.Code.of("ETH"));
 }

@@ -35,6 +35,9 @@ public class Currency {
     public Optional<String> description() { return Optional.ofNullable(metadata).map(Metadata::description); }
     public Optional<URI> logoUri() { return Optional.ofNullable(metadata).map(Metadata::logoUri); }
 
+    @Override
+    public String toString() { return code.toString(); }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
