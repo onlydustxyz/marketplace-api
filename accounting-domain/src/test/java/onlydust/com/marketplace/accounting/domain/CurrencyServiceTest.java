@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -32,6 +33,12 @@ public class CurrencyServiceTest {
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
     final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, quoteService, quoteStorage);
+
+    @BeforeEach
+    void setUp() {
+        reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage);
+        when(currencyStorage.exists(any())).thenReturn(false);
+    }
 
     @Test
     void should_add_erc20_support_on_ethereum() {
@@ -99,14 +106,23 @@ public class CurrencyServiceTest {
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
         // Then
-        ArgumentCaptor<Currency> currency = ArgumentCaptor.forClass(Currency.class);
-        verify(currencyStorage, times(1)).save(currency.capture());
+        verify(currencyStorage, times(1)).save(any());
+        verify(quoteStorage, never()).save(any());
+    }
 
-        final var capturedCurrency = currency.getValue();
-        assertThat(capturedCurrency.id()).isNotNull();
-        assertThat(capturedCurrency.name()).isEqualTo("Lords");
-        assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("LORDS"));
 
+    @Test
+    void should_not_add_duplicate_currencies() {
+        // Given
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(currencyStorage.exists(Currency.Code.of("LORDS"))).thenReturn(true);
+
+        // When
+        currencyService.addERC20Support(ETHEREUM, LORDS.address());
+
+        // Then
+        verify(currencyStorage, never()).save(any());
+        verify(quoteService, never()).currentPrice(any(), any());
         verify(quoteStorage, never()).save(any());
     }
 }

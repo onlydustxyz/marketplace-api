@@ -24,9 +24,11 @@ public class CurrencyService {
                 .orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
         final var currency = Currency.of(token);
-        currencyStorage.save(currency);
+        if(!currencyStorage.exists(currency.code())) {
+            currencyStorage.save(currency);
 
-        quoteService.currentPrice(token, Currency.Code.USD)
-                .ifPresent(price -> quoteStorage.save(new Quote(currency.id(), Currency.Code.USD, price)));
+            quoteService.currentPrice(token, Currency.Code.USD)
+                    .ifPresent(price -> quoteStorage.save(new Quote(currency.id(), Currency.Code.USD, price)));
+        }
     }
 }
