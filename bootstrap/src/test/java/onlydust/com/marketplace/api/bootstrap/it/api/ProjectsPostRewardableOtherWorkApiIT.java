@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -166,7 +166,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
 
                 """;
     @Autowired
-    HasuraUserHelper hasuraUserHelper;
+    UserAuthHelper userAuthHelper;
     @Autowired
     ProjectRepository projectRepository;
     @Autowired
@@ -193,9 +193,9 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     @Order(2)
     void should_be_forbidden_given_authenticated_user_not_project_lead() {
         // Given
-        hasuraUserHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
+        userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
-        final String jwt = hasuraUserHelper.authenticateUser(1L).jwt();
+        final String jwt = userAuthHelper.authenticateUser(1L).jwt();
         final UUID projectId = projectRepository.findAll().get(0).getId();
 
         // When
@@ -215,7 +215,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     @Order(3)
     void should_be_forbidden_given_authenticated_user_project_lead_on_not_linked_repo() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
@@ -233,7 +233,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     @Test
     void should_create_and_close_rewardable_issue_given_a_project_lead_and_linked_repo() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final Long repoId = 498695724L;
         final String repoName = "marketplace-frontend";

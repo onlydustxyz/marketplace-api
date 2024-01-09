@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -61,11 +61,11 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
     @Autowired
     JWTVerifier jwtVerifier;
     @Autowired
-    HasuraUserHelper hasuraUserHelper;
+    UserAuthHelper userAuthHelper;
 
     @Test
     void should_fetch_project_contributors_and_suggest_external_contributors_from_github() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -76,7 +76,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_repos_contributors_and_suggest_external_contributors_from_github() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "493591124,498695724", "login", login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -88,7 +88,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_repos_contributors_even_without_login_search() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "498695724")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -101,7 +101,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_project_contributors_even_without_login_search() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -114,7 +114,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_external_contributors_even_without_project_nor_repo() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "login", login))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -127,7 +127,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_external_contributors_when_externalSearchOnly_is_true() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login,
                         "externalSearchOnly", "true")))
@@ -176,7 +176,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_400_when_no_param_is_provided() {
-        final String jwt = hasuraUserHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)

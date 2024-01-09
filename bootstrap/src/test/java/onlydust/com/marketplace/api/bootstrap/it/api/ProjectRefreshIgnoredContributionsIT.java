@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
@@ -57,7 +57,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     // @formatter:on
 
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired

@@ -2,11 +2,12 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
 import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.AuthUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
@@ -16,7 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserPayoutInfoRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class CustomRewardRepositoryIT extends AbstractPostgresIT {
 
     @Autowired
-    AuthUserRepository authUserRepository;
+    UserRepository userRepository;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -60,9 +61,17 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
         @Order(1)
         void should_return_payout_info_missing_status_for_an_individual() {
             // Given
-            authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
-                    new Date(),
-                    faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
+            userRepository.save(
+                    UserEntity.builder()
+                            .id(userId)
+                            .githubUserId(githubUserId)
+                            .githubLogin(faker.name().username())
+                            .githubAvatarUrl(faker.internet().avatar())
+                            .githubEmail(faker.internet().emailAddress())
+                            .roles(new UserRole[]{UserRole.USER})
+                            .lastSeenAt(new Date())
+                            .build()
+            );
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)
@@ -160,9 +169,17 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
         @Order(1)
         void should_return_payout_info_missing_status() {
             // Given
-            authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
-                    new Date(),
-                    faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
+            userRepository.save(
+                    UserEntity.builder()
+                            .id(userId)
+                            .githubUserId(githubUserId)
+                            .githubLogin(faker.name().username())
+                            .githubAvatarUrl(faker.internet().avatar())
+                            .githubEmail(faker.internet().emailAddress())
+                            .roles(new UserRole[]{UserRole.USER})
+                            .lastSeenAt(new Date())
+                            .build()
+            );
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)

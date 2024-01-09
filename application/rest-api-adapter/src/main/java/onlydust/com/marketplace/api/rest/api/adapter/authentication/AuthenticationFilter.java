@@ -21,7 +21,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     public final static String BEARER_PREFIX = "Bearer ";
     public final static String IMPERSONATION_HEADER = "X-Impersonation-Claims";
     private final JwtService jwtServiceAuth0;
-    private final JwtService jwtServiceHasura;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
@@ -34,11 +33,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             try {
                 jwtServiceAuth0.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX, ""), impersonationHeader)
                         .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                                () -> jwtServiceHasura.getAuthenticationFromJwt(authorization.replace(BEARER_PREFIX,
-                                                        ""),
-                                                impersonationHeader)
-                                        .ifPresentOrElse(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication),
-                                                SecurityContextHolder::clearContext));
+                                SecurityContextHolder::clearContext);
             } catch (Exception e) {
                 LOGGER.error("Error while authenticating user", e);
                 SecurityContextHolder.clearContext();

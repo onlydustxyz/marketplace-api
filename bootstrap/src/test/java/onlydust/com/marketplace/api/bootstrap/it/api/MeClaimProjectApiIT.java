@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    HasuraUserHelper hasuraUserHelper;
+    UserAuthHelper userAuthHelper;
     @Autowired
     ProjectLeadRepository projectLeadRepository;
     @Autowired
@@ -32,7 +32,7 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
     void should_not_claim_project_given_current_user_is_external_from_one_organization() {
         // Given
         final String githubPAT = faker.rickAndMorty().character();
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre(githubPAT);
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre(githubPAT);
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         projectLeadRepository.delete(ProjectLeadEntity.builder()
                 .projectId(projectId)
@@ -70,7 +70,7 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
     void should_claim_project() {
         // Given
         final String githubPAT = faker.rickAndMorty().character();
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre(githubPAT);
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre(githubPAT);
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When

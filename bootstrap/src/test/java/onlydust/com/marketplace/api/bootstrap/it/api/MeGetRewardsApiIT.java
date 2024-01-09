@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
@@ -276,7 +276,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         
             """;
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -394,7 +394,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_get_my_rewards_with_pending_invoice() throws ParseException {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         postgresUserAdapter.savePayoutInformationForUserId(pierre.user().getId(),
                 UserPayoutInformation.builder()
