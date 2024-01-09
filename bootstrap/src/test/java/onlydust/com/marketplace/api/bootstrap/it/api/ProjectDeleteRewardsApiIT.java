@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
@@ -22,7 +22,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    public HasuraUserHelper hasuraUserHelper;
+    public UserAuthHelper userAuthHelper;
     @Autowired
     public ProjectRepository projectRepository;
 
@@ -50,9 +50,9 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_be_forbidden_given_authenticated_user_not_project_lead() throws JsonProcessingException {
         // Given
-        hasuraUserHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
+        userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
-        final String jwt = hasuraUserHelper.authenticateUser(1L).jwt();
+        final String jwt = userAuthHelper.authenticateUser(1L).jwt();
         final UUID projectId = projectRepository.findAll().get(0).getId();
         final UUID rewardId = UUID.randomUUID();
 
@@ -71,7 +71,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_request_reward_to_old_api_given_a_project_lead() throws JsonProcessingException {
         // Given
-        final HasuraUserHelper.AuthenticatedUser pierre = hasuraUserHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
@@ -95,11 +95,11 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_request_reward_to_old_api_given_a_project_lead_impersonated() throws JsonProcessingException {
         // Given
-        final String jwt = hasuraUserHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().character(),
                 faker.internet().url(), true).jwt();
-        hasuraUserHelper.authenticateUser(2L);
+        userAuthHelper.authenticateUser(2L);
         final String impersonatePierreHeader =
-                hasuraUserHelper.getImpersonationHeaderToImpersonatePierre();
+                userAuthHelper.getImpersonationHeaderToImpersonatePierre();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
 

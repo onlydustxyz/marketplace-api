@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BudgetEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectToBudgetEntity;
@@ -22,7 +22,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     ProjectToBudgetIdRepository projectToBudgetIdRepository;
     @Autowired

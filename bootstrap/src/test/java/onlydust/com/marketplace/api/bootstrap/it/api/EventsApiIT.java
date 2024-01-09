@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
@@ -50,7 +50,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
             "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
     );
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired

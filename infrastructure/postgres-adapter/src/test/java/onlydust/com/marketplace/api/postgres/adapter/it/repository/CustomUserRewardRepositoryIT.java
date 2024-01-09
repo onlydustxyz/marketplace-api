@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
 import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
@@ -11,14 +12,18 @@ import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserPayoutInfoRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.AuthUserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -39,7 +44,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
     private static Long githubUserId = faker.random().nextLong();
     private static UUID projectId = UUID.randomUUID();
     @Autowired
-    AuthUserRepository authUserRepository;
+    UserRepository userRepository;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -59,8 +64,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
     @Order(1)
     void should_return_user_rewards_given_a_user_without_payout_info_and_with_rewards() {
         // Given
-        authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(), new Date(),
-                faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
+        userRepository.save(
+                UserEntity.builder()
+                        .id(userId)
+                        .githubUserId(githubUserId)
+                        .githubLogin(faker.name().username())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubEmail(faker.internet().emailAddress())
+                        .roles(new UserRole[]{UserRole.USER})
+                        .lastSeenAt(new Date())
+                        .build()
+        );
         projectRepository.save(
                 ProjectEntity.builder()
                         .id(projectId)
@@ -145,9 +159,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(1)
         void should_return_user_rewards_given_a_user_with_only_stark_wallet_and_valid_contact_info() {
             // Given
-            authUserRepository.save(new AuthUserEntity(individualIserId, individualIgithubUserId,
-                    faker.rickAndMorty().location(), new Date(), faker.rickAndMorty().character(),
-                    faker.internet().url(), new Date(), false));
+            userRepository.save(
+                    UserEntity.builder()
+                            .id(individualIserId)
+                            .githubUserId(individualIgithubUserId)
+                            .githubLogin(faker.name().username())
+                            .githubAvatarUrl(faker.internet().avatar())
+                            .githubEmail(faker.internet().emailAddress())
+                            .roles(new UserRole[]{UserRole.USER})
+                            .lastSeenAt(new Date())
+                            .build()
+            );
             postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
                     UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder()
                                     .lastName(faker.name().lastName()).firstName(faker.name().firstName())
@@ -338,9 +360,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(1)
         void should_return_user_rewards_given_a_user_with_only_eth_wallet_for_valid_company() {
             // Given
-            authUserRepository.save(new AuthUserEntity(companyUserId, companyGithubUserId,
-                    faker.rickAndMorty().location(), new Date(), faker.rickAndMorty().character(),
-                    faker.internet().url(), new Date(), false));
+            userRepository.save(
+                    UserEntity.builder()
+                            .id(companyUserId)
+                            .githubUserId(companyGithubUserId)
+                            .githubLogin(faker.name().username())
+                            .githubAvatarUrl(faker.internet().avatar())
+                            .githubEmail(faker.internet().emailAddress())
+                            .roles(new UserRole[]{UserRole.USER})
+                            .lastSeenAt(new Date())
+                            .build()
+            );
             postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
                     UserPayoutInformation.builder().isACompany(true)
                             .company(UserPayoutInformation.Company.builder().name(faker.name().name())
@@ -483,7 +513,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                                     .identificationNumber(faker.number().digit()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of("FR1014508000702139488771C56"
+                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of(
+                                                    "FR1014508000702139488771C56"
                                             )).build())
                                     .aptosAddress(Aptos.accountAddress("0x01"))
                                     .starknetAddress(StarkNet.accountAddress("0x02"))
@@ -607,9 +638,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(1)
         void should_return_one_reward() {
             // Given
-            authUserRepository.save(new AuthUserEntity(userId, githubUserId, faker.rickAndMorty().location(),
-                    new Date(),
-                    faker.rickAndMorty().character(), faker.internet().url(), new Date(), false));
+            userRepository.save(
+                    UserEntity.builder()
+                            .id(userId)
+                            .githubUserId(githubUserId)
+                            .githubLogin(faker.name().username())
+                            .githubAvatarUrl(faker.internet().avatar())
+                            .githubEmail(faker.internet().emailAddress())
+                            .roles(new UserRole[]{UserRole.USER})
+                            .lastSeenAt(new Date())
+                            .build()
+            );
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)
@@ -634,7 +673,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
                                     .ethWallet(Ethereum.wallet("vitalik.eth"))
                                     .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of("ES6621000418401234567891")).build())
+                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of(
+                                                    "ES6621000418401234567891")).build())
                                     .build()).build());
             final UUID completedReward = UUID.randomUUID();
             final UUID pendingInvoiceRewardIdUsdc = UUID.randomUUID();
