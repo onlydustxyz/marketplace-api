@@ -75,7 +75,7 @@ public class SponsorAccountingTest {
         assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-1L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot register transfer of -1USD for sponsor %s: Insufficient funds".formatted(sponsorId));
+                .hasMessage("Cannot register transfer of -1 USD for sponsor %s: Insufficient funds".formatted(sponsorId));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SponsorAccountingTest {
         assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-1L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot register transfer of -1USD for sponsor %s: Insufficient funds".formatted(sponsorId));
+                .hasMessage("Cannot register transfer of -1 USD for sponsor %s: Insufficient funds".formatted(sponsorId));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class SponsorAccountingTest {
         sponsorAccounting.registerTransfer(sponsorId, Amount.of(3L, Currencies.USD));
         assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-2L, Currencies.ETH)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot register transfer of -2ETH for sponsor %s: Insufficient funds".formatted(sponsorId));
+                .hasMessage("Cannot register transfer of -2 ETH for sponsor %s: Insufficient funds".formatted(sponsorId));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class SponsorAccountingTest {
         assertThatThrownBy(() -> sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot transfer 2USD from sponsor %s to committee %s: Insufficient funds".formatted(sponsorId, committeeId));
+                .hasMessage("Cannot transfer 2 USD from sponsor %s to committee %s: Insufficient funds".formatted(sponsorId, committeeId));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class SponsorAccountingTest {
         assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveAmount.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage(("Cannot transfer 2USD from committee %s to sponsor %s: Cannot refund more than the amount" +
+                .hasMessage(("Cannot transfer 2 USD from committee %s to sponsor %s: Cannot refund more than the amount" +
                              " received").formatted(committeeId, sponsorId));
     }
 
@@ -169,7 +169,7 @@ public class SponsorAccountingTest {
                 PositiveAmount.of(2L,
                         Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage(("Cannot transfer 2USD from committee %s to sponsor %s: " +
+                .hasMessage(("Cannot transfer 2 USD from committee %s to sponsor %s: " +
                              "Cannot refund more than the amount received").formatted(otherCommitteeId, sponsorId));
     }
 
