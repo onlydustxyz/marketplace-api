@@ -79,7 +79,7 @@ public class PaymentView {
 
     public String recipientPayoutSettings() {
         return switch (currency) {
-            case Usd ->
+            case Usd -> recipientSepaAccount == null ? "" :
                     "%s / %s".formatted(recipientSepaAccount.getAccountNumber().asString(), recipientSepaAccount.getBic());
             case Eth, Lords, Usdc -> recipientEthWallet;
             case Op -> recipientOptimismWallet;
