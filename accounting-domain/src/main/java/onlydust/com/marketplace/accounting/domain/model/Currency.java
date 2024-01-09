@@ -9,11 +9,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Currency {
-    @NonNull Id id;
-    @NonNull String name;
-    @NonNull Code code;
-    Metadata metadata;
+    @EqualsAndHashCode.Include
+    @NonNull private final Id id;
+    @NonNull private final String name;
+    @NonNull private final Code code;
+    private final Metadata metadata;
+
+    public Currency(final @NonNull String name, final @NonNull Code code) {
+        this(Id.random(), name, code, null);
+    }
 
     public static Currency of(final @NonNull ERC20 token) {
         return new Currency(Id.random(), token.name(), Code.of(token.symbol()), null);

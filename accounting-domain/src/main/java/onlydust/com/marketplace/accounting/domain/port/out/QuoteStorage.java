@@ -5,5 +5,5 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 
 public interface QuoteStorage {
-    void save(Quote quote);
+    void save(Quote... quotes);
 }

@@ -5,8 +5,10 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 public interface QuoteService {
-    Optional<BigDecimal> currentPrice(ERC20 token, Currency.Code base);
+    Optional<Quote> currentPrice(ERC20 token, Currency.Code base);
+    List<Optional<Quote>> currentPrice(List<Currency.Id> code, Currency.Code base);
 }
