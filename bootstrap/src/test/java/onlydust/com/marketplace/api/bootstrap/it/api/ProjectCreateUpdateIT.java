@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
@@ -26,7 +26,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     private static UUID projectId;
 
     @Autowired
-    HasuraUserHelper userHelper;
+    UserAuthHelper userHelper;
 
     @Autowired
     EventRepository eventRepository;

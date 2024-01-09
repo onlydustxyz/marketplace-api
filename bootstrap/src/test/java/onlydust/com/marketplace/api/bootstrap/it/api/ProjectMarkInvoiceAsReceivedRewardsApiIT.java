@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.bootstrap.helper.HasuraUserHelper;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,12 +13,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ProjectMarkInvoiceAsReceivedRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    public HasuraUserHelper hasuraUserHelper;
+    public UserAuthHelper userAuthHelper;
 
     @Test
     void should_forward_mark_invoice_as_received_to_old_api() {
         // Given
-        final HasuraUserHelper.AuthenticatedUser gregoire = hasuraUserHelper.authenticateGregoire();
+        final UserAuthHelper.AuthenticatedUser gregoire = userAuthHelper.authenticateGregoire();
         final String jwt = gregoire.jwt();
 
         // When
