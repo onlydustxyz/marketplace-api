@@ -63,6 +63,6 @@ public class Amount {
 
     @Override
     public String toString() {
-        return "%s%s".formatted(value, currency);
+        return "%s %s".formatted(value, currency);
     }
 }

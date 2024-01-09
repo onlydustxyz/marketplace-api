@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import onlydust.com.marketplace.api.domain.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 @Data
 public class CryptoReceiptJsonEntity {
