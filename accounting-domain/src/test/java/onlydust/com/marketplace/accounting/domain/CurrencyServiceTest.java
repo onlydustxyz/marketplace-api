@@ -3,10 +3,7 @@ package onlydust.com.marketplace.accounting.domain;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
-import onlydust.com.marketplace.accounting.domain.port.out.QuoteService;
-import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
@@ -16,23 +13,25 @@ import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Optional;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.LORDS;
+import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.OP;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class CurrencyServiceTest {
-    private final static ERC20 LORDS = new ERC20(Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0"), "Lords", "LORDS", 18, BigInteger.TEN);
-    private final static ERC20 OP = new ERC20(Optimism.contractAddress("0x4200000000000000000000000000000000000042"), "Optimism", "OP", 18, BigInteger.TEN);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
+    final CurrencyMetadataService currencyMetadataService = mock(CurrencyMetadataService.class);
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
-    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, quoteService, quoteStorage);
+    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
 
     @BeforeEach
     void setUp() {
@@ -45,6 +44,7 @@ public class CurrencyServiceTest {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(BigDecimal.valueOf(0.35)));
+        when(currencyMetadataService.get(Currency.Code.of(LORDS.symbol()))).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https://realms.io"))));
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -57,6 +57,8 @@ public class CurrencyServiceTest {
         assertThat(capturedCurrency.id()).isNotNull();
         assertThat(capturedCurrency.name()).isEqualTo("Lords");
         assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("LORDS"));
+        assertThat(capturedCurrency.description()).isEqualTo(Optional.of("Realms token"));
+        assertThat(capturedCurrency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
 
         verify(quoteStorage, times(1))
                 .save(new Quote(capturedCurrency.id(), Currency.Code.USD, BigDecimal.valueOf(0.35)));
@@ -78,6 +80,8 @@ public class CurrencyServiceTest {
         assertThat(capturedCurrency.id()).isNotNull();
         assertThat(capturedCurrency.name()).isEqualTo("Optimism");
         assertThat(capturedCurrency.code()).isEqualTo(Currency.Code.of("OP"));
+        assertThat(capturedCurrency.description()).isEqualTo(Optional.empty());
+        assertThat(capturedCurrency.logoUri()).isEqualTo(Optional.empty());
     }
 
     @Test

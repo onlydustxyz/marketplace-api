@@ -4,13 +4,30 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
-import java.math.BigDecimal;
+import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
-public record Currency(Id id, String name, Code code) {
-    public static Currency of(ERC20 token) {
-        return new Currency(Id.random(), token.name(), Code.of(token.symbol()));
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Currency {
+    @NonNull Id id;
+    @NonNull String name;
+    @NonNull Code code;
+    Metadata metadata;
+
+    public static Currency of(final @NonNull ERC20 token) {
+        return new Currency(Id.random(), token.name(), Code.of(token.symbol()), null);
     }
+
+    public Currency withMetadata(final @NonNull Metadata metadata) {
+        return new Currency(id, name, code, metadata);
+    }
+
+    public Id id() { return id; }
+    public String name() { return name; }
+    public Code code() { return code; }
+    public Optional<String> description() { return Optional.ofNullable(metadata).map(Metadata::description); }
+    public Optional<URI> logoUri() { return Optional.ofNullable(metadata).map(Metadata::logoUri); }
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
@@ -35,5 +52,8 @@ public record Currency(Id id, String name, Code code) {
         public String toString() {
             return inner;
         }
+    }
+
+    public record Metadata(String description, URI logoUri) {
     }
 }

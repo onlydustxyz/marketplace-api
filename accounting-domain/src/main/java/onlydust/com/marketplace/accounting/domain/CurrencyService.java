@@ -3,10 +3,7 @@ package onlydust.com.marketplace.accounting.domain;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
-import onlydust.com.marketplace.accounting.domain.port.out.QuoteService;
-import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -15,6 +12,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 public class CurrencyService {
     private final ERC20ProviderFactory erc20ProviderFactory;
     private final CurrencyStorage currencyStorage;
+    private final CurrencyMetadataService currencyMetadataService;
     private final QuoteService quoteService;
     private final QuoteStorage quoteStorage;
 
@@ -25,7 +23,8 @@ public class CurrencyService {
 
         final var currency = Currency.of(token);
         if(!currencyStorage.exists(currency.code())) {
-            currencyStorage.save(currency);
+            final var metadata = currencyMetadataService.get(currency.code());
+            currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
             quoteService.currentPrice(token, Currency.Code.USD)
                     .ifPresent(price -> quoteStorage.save(new Quote(currency.id(), Currency.Code.USD, price)));
