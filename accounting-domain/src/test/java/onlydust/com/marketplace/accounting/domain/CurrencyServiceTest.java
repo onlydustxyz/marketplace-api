@@ -42,9 +42,11 @@ public class CurrencyServiceTest {
 
     @Test
     void should_add_erc20_support_on_ethereum() {
-        // When
+        //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(BigDecimal.valueOf(0.35)));
+
+        // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
         // Then
@@ -62,8 +64,10 @@ public class CurrencyServiceTest {
 
     @Test
     void should_add_erc20_support_on_optimism() {
-        // When
+        // Given
         when(optimismERC20Provider.get(OP.address())).thenReturn(Optional.of(OP));
+
+        // When
         currencyService.addERC20Support(OPTIMISM, OP.address());
 
         // Then
@@ -89,9 +93,9 @@ public class CurrencyServiceTest {
     void given_a_wrong_address_should_not_add_erc20_support() {
         // Given
         final var invalidAddress = Ethereum.contractAddress("0x388C818CA8B9251b393131C08a736A67ccB19297");
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.empty());
 
         // When
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> currencyService.addERC20Support(ETHEREUM, invalidAddress))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
@@ -100,16 +104,17 @@ public class CurrencyServiceTest {
 
     @Test
     void should_not_store_quote_if_not_found() {
-        // When
+        // Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.empty());
+
+        // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
         // Then
         verify(currencyStorage, times(1)).save(any());
         verify(quoteStorage, never()).save(any());
     }
-
 
     @Test
     void should_not_add_duplicate_currencies() {
