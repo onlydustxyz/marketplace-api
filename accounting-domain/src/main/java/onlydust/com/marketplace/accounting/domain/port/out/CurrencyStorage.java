@@ -1,0 +1,13 @@
+package onlydust.com.marketplace.accounting.domain.port.out;
+
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+
+import java.util.List;
+
+public interface CurrencyStorage {
+    void save(Currency currency);
+
+    Boolean exists(Currency.Code code);
+
+    List<Currency> all();
+}

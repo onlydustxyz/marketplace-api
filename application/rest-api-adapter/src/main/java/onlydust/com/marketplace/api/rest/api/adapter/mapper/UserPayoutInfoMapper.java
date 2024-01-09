@@ -2,12 +2,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.blockchain.Aptos;
-import onlydust.com.marketplace.api.domain.model.blockchain.Ethereum;
-import onlydust.com.marketplace.api.domain.model.blockchain.Optimism;
-import onlydust.com.marketplace.api.domain.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 
 import static java.util.Objects.nonNull;
 
@@ -55,11 +54,11 @@ public interface UserPayoutInfoMapper {
         if (view.getPayoutSettings().getEthWallet() != null)
             payoutSettings.setEthWallet(view.getPayoutSettings().getEthWallet().asString());
         if (view.getPayoutSettings().getAptosAddress() != null)
-            payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().asString());
+            payoutSettings.setAptosAddress(view.getPayoutSettings().getAptosAddress().toString());
         if (view.getPayoutSettings().getOptimismAddress() != null)
-            payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().asString());
+            payoutSettings.setOptimismAddress(view.getPayoutSettings().getOptimismAddress().toString());
         if (view.getPayoutSettings().getStarknetAddress() != null)
-            payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().asString());
+            payoutSettings.setStarknetAddress(view.getPayoutSettings().getStarknetAddress().toString());
         if (nonNull(view.getPayoutSettings().getSepaAccount())) {
             final var sepaAccount = new UserPayoutInformationResponsePayoutSettingsSepaAccount();
             sepaAccount.setBic(view.getPayoutSettings().getSepaAccount().getBic());

@@ -3,7 +3,8 @@ package onlydust.com.marketplace.api.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
-import onlydust.com.marketplace.api.domain.model.blockchain.evm.ethereum.Wallet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.AccountAddress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,9 +89,9 @@ public class UserPayoutInformation {
     @Builder(toBuilder = true)
     public static class PayoutSettings {
         Wallet ethWallet;
-        onlydust.com.marketplace.api.domain.model.blockchain.evm.AccountAddress optimismAddress;
-        onlydust.com.marketplace.api.domain.model.blockchain.aptos.AccountAddress aptosAddress;
-        onlydust.com.marketplace.api.domain.model.blockchain.starknet.AccountAddress starknetAddress;
+        onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress optimismAddress;
+        onlydust.com.marketplace.kernel.model.blockchain.aptos.AccountAddress aptosAddress;
+        AccountAddress starknetAddress;
         SepaAccount sepaAccount;
     }
 
