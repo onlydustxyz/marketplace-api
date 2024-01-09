@@ -132,7 +132,7 @@ public class SponsorAccountingTest {
     }
 
     @Test
-    public void should_unallocate_funds_from_a_committee() {
+    public void should_refund_sponsor_from_a_committee() {
         when(sponsorAccountProvider.get(sponsorId, Currency.Usd)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
                 Currency.Usd))));
         when(committeeAccountProvider.get(committeeId, Currency.Usd)).thenReturn(Optional.of(new Account(Currency.Usd)));
@@ -141,7 +141,7 @@ public class SponsorAccountingTest {
     }
 
     @Test
-    public void should_fail_to_unallocate_funds_from_a_committee_if_balance_is_insufficient() {
+    public void should_fail_to_refund_sponsor_from_a_committee_if_balance_is_insufficient() {
         when(sponsorAccountProvider.get(sponsorId, Currency.Usd)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
                 Currency.Usd))));
         when(committeeAccountProvider.get(committeeId, Currency.Usd)).thenReturn(Optional.of(new Account(Currency.Usd)));
@@ -154,7 +154,7 @@ public class SponsorAccountingTest {
     }
 
     @Test
-    public void should_fail_to_unallocate_funds_from_a_committee_if_amount_was_given_by_another_sponsor() {
+    public void should_fail_to_refund_sponsor_from_a_committee_if_amount_was_given_by_another_sponsor() {
         when(sponsorAccountProvider.get(sponsorId, Currency.Usd)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
                 Currency.Usd))));
         when(committeeAccountProvider.get(committeeId, Currency.Usd)).thenReturn(Optional.of(new Account(Currency.Usd)));
@@ -171,4 +171,6 @@ public class SponsorAccountingTest {
                 .hasMessage(("Cannot transfer 2USD from committee %s to sponsor %s: " +
                              "Cannot refund more than the amount received").formatted(otherCommitteeId, sponsorId));
     }
+
+
 }
