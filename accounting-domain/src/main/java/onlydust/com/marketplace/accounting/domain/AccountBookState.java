@@ -88,7 +88,11 @@ public class AccountBookState {
                 return;
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
-            removeTransaction(unspentVertex.vertex());
+            if (graph.outgoingEdgesOf(unspentVertex.vertex()).isEmpty()) {
+                removeTransaction(unspentVertex.vertex());
+            } else {
+                incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
+            }
         }
     }
 

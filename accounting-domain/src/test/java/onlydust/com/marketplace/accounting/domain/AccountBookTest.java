@@ -161,6 +161,34 @@ public class AccountBookTest {
     }
 
     @Test
+    public void should_refund_money_from_account_with_partial_spent() {
+        // Given
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        accountBook.mint(account1, PositiveAmount.of(100L));
+        accountBook.transfer(account1, account2, PositiveAmount.of(100L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(60L));
+        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(60L));
+
+        // When
+        accountBook.refund(account2, account1, PositiveAmount.of(10L));
+
+        // Then
+        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(30L));
+
+        // When
+        accountBook.refund(account2, account1, PositiveAmount.of(30L));
+
+        // Then
+        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
+    }
+
+    @Test
     public void should_not_refund_more_than_received() {
         // Given
         final var account1 = Account.Id.random();
@@ -204,6 +232,100 @@ public class AccountBookTest {
         assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
         assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
         assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(50L));
+    }
+
+    @Test
+    public void should_receive_money_from_multiple_accounts() {
+        // Given
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        accountBook.mint(account1, PositiveAmount.of(100L));
+        accountBook.mint(account2, PositiveAmount.of(100L));
+
+        // When
+        accountBook.transfer(account1, account3, PositiveAmount.of(50L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(30L));
+
+        // Then
+        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(70L));
+        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(80L));
+    }
+
+    @Test
+    public void should_transfer_to_multiple_accounts() {
+        // Given
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        accountBook.mint(account1, PositiveAmount.of(100L));
+
+        // When
+        accountBook.transfer(account1, account2, PositiveAmount.of(50L));
+        accountBook.transfer(account1, account3, PositiveAmount.of(30L));
+
+        // Then
+        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(20L));
+        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(30L));
+    }
+
+    @Test
+    public void should_handle_multiple_transfers_and_refunds_from_multiple_accounts() {
+        // Given
+        final var sponsor1 = Account.Id.random();
+        final var sponsor2 = Account.Id.random();
+        final var committee1 = Account.Id.random();
+        final var committee2 = Account.Id.random();
+        final var project1 = Account.Id.random();
+        final var project2 = Account.Id.random();
+        final var contributor = Account.Id.random();
+        accountBook.mint(sponsor1, PositiveAmount.of(100_000L));
+        accountBook.mint(sponsor2, PositiveAmount.of(100_000L));
+
+        accountBook.transfer(sponsor1, committee1, PositiveAmount.of(8_000L));
+        accountBook.transfer(sponsor1, committee2, PositiveAmount.of(1_000L));
+
+        accountBook.transfer(sponsor2, committee1, PositiveAmount.of(15_000L));
+        accountBook.transfer(sponsor2, committee2, PositiveAmount.of(500L));
+        accountBook.transfer(sponsor2, committee2, PositiveAmount.of(4_500L));
+
+        accountBook.transfer(committee1, project1, PositiveAmount.of(8_000L));
+        accountBook.transfer(committee1, project1, PositiveAmount.of(12_000L));
+        accountBook.transfer(committee1, project2, PositiveAmount.of(2_000L));
+
+        accountBook.transfer(committee2, project2, PositiveAmount.of(1_000L));
+        accountBook.transfer(committee2, project2, PositiveAmount.of(500L));
+        accountBook.transfer(committee2, project2, PositiveAmount.of(500L));
+        accountBook.transfer(committee2, project2, PositiveAmount.of(1_000L));
+
+        accountBook.transfer(project2, contributor, PositiveAmount.of(2_000L));
+        accountBook.transfer(project2, contributor, PositiveAmount.of(1_000L));
+        accountBook.transfer(project2, contributor, PositiveAmount.of(500L));
+        accountBook.transfer(project2, contributor, PositiveAmount.of(100L));
+
+        // Then
+        assertThat(accountBook.balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
+        assertThat(accountBook.balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
+        assertThat(accountBook.balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
+        assertThat(accountBook.balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_000L));
+        assertThat(accountBook.balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
+        assertThat(accountBook.balanceOf(project2)).isEqualTo(PositiveAmount.of(1_400L));
+        assertThat(accountBook.balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
+
+        // When
+        accountBook.refund(project2, committee2, PositiveAmount.of(700L));
+
+        // Then
+        assertThat(accountBook.balanceOf(project2)).isEqualTo(PositiveAmount.of(700L));
+        assertThat(accountBook.balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_700L));
+        // Check other accounts are not impacted
+        assertThat(accountBook.balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
+        assertThat(accountBook.balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
+        assertThat(accountBook.balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
+        assertThat(accountBook.balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
+        assertThat(accountBook.balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
     }
 
     @Test
