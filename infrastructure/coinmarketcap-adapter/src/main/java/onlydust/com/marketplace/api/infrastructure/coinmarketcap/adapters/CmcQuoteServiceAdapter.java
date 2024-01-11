@@ -24,7 +24,7 @@ public class CmcQuoteServiceAdapter implements QuoteService {
     private final Properties properties;
 
     @Override
-    public Optional<Quote> currentPrice(ERC20 token, Currency.Code base) {
+    public Optional<Quote> currentPrice(Currency.Id currencyId, ERC20 token, Currency.Code base) {
         final var baseId = Optional.ofNullable(properties.currencyIds.get(base))
                 .orElseThrow(() -> badRequest("Currency %s is not supported as base".formatted(base)));
 
@@ -36,12 +36,12 @@ public class CmcQuoteServiceAdapter implements QuoteService {
                         .filter(d -> token.address().equals(d.platform.tokenAddress))
                         .findFirst()
                         .map(d -> d.quote.get(baseId))
-                        .map(q -> new Quote(Currency.Id.random(), base, q.price))
+                        .map(q -> new Quote(currencyId, base, q.price))
                 );
     }
 
     @Override
-    public List<Optional<Quote>> currentPrice(List<Currency.Id> code, Currency.Code base) {
+    public List<Optional<Quote>> currentPrice(List<Currency.Id> currencies, Currency.Code base) {
         return List.of();
     }
 

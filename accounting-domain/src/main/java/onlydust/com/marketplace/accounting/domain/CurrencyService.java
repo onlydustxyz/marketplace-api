@@ -32,7 +32,7 @@ public class CurrencyService {
             final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
-            quoteService.currentPrice(token, Currency.Code.USD)
+            quoteService.currentPrice(currency.id(), token, Currency.Code.USD)
                     .ifPresent(quoteStorage::save);
         }
     }

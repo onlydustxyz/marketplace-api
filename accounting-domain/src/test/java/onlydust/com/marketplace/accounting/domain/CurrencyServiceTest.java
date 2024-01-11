@@ -43,7 +43,7 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(LORDS_USD));
+        when(quoteService.currentPrice(any(), LORDS, Currency.Code.USD)).thenReturn(Optional.of(LORDS_USD));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
                                                                                                                          "://realms.io"))));
 
@@ -110,7 +110,7 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.empty());
+        when(quoteService.currentPrice(any(), LORDS, Currency.Code.USD)).thenReturn(Optional.empty());
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -131,7 +131,7 @@ public class CurrencyServiceTest {
 
         // Then
         verify(currencyStorage, never()).save(any());
-        verify(quoteService, never()).currentPrice(any(ERC20.class), any());
+        verify(quoteService, never()).currentPrice(any(), any(ERC20.class), any());
         verify(quoteStorage, never()).save(any());
     }
 
