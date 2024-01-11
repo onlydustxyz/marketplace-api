@@ -46,7 +46,7 @@ public class AccountBookState {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
         try {
-            refundFromVertices(to, amount, unspentVertices);
+            refundFromVertices(amount, unspentVertices);
         } catch (InsufficientFundsException e) {
             throw OnlyDustException.badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
         }
@@ -74,7 +74,7 @@ public class AccountBookState {
         }
     }
 
-    private void refundFromVertices(@NonNull final Account.Id to, @NonNull final PositiveAmount amount,
+    private void refundFromVertices(@NonNull final PositiveAmount amount,
                                     @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {
