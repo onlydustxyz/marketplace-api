@@ -21,8 +21,8 @@ public class SponsorAccountingTest {
     SponsorId sponsorId;
     CommitteeId committeeId;
 
-    private static final Amount ONE_USD = Amount.of(BigDecimal.ONE, Currencies.USD);
-    private static final Amount ONE_ETH = Amount.of(BigDecimal.ONE, Currencies.ETH);
+    private static final Money ONE_USD = Money.of(BigDecimal.ONE, Currencies.USD);
+    private static final Money ONE_ETH = Money.of(BigDecimal.ONE, Currencies.ETH);
 
     @BeforeEach
     void setUp() {
@@ -57,7 +57,7 @@ public class SponsorAccountingTest {
 
     @Test
     public void should_register_transfer_to_sponsor() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(BigDecimal.ONE, Currencies.USD))));
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(BigDecimal.ONE, Currencies.USD))));
         sponsorAccounting.registerTransfer(sponsorId, ONE_USD);
     }
 
@@ -72,7 +72,7 @@ public class SponsorAccountingTest {
     @Test
     public void should_fail_to_register_transfer_to_sponsor_higher_than_what_it_sent() {
         when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-1L,
+        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Money.of(-1L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot register transfer of -1 USD for sponsor %s: Insufficient funds".formatted(sponsorId));
@@ -81,11 +81,11 @@ public class SponsorAccountingTest {
     @Test
     public void should_add_up_transfers() {
         when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(1L, Currencies.USD));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(3L, Currencies.USD));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(-2L, Currencies.USD));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(-2L, Currencies.USD));
-        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-1L,
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(1L, Currencies.USD));
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(3L, Currencies.USD));
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(-2L, Currencies.USD));
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(-2L, Currencies.USD));
+        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Money.of(-1L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot register transfer of -1 USD for sponsor %s: Insufficient funds".formatted(sponsorId));
@@ -95,27 +95,27 @@ public class SponsorAccountingTest {
     public void should_add_up_transfers_of_different_currencies_separately() {
         when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
         when(sponsorAccountProvider.get(sponsorId, Currencies.ETH)).thenReturn(Optional.of(new Account(Currencies.ETH)));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(1L, Currencies.ETH));
-        sponsorAccounting.registerTransfer(sponsorId, Amount.of(3L, Currencies.USD));
-        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Amount.of(-2L, Currencies.ETH)))
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(1L, Currencies.ETH));
+        sponsorAccounting.registerTransfer(sponsorId, Money.of(3L, Currencies.USD));
+        assertThatThrownBy(() -> sponsorAccounting.registerTransfer(sponsorId, Money.of(-2L, Currencies.ETH)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot register transfer of -2 ETH for sponsor %s: Insufficient funds".formatted(sponsorId));
     }
 
     @Test
     public void should_fund_a_committee() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(7L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(1L, Currencies.USD));
+        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(1L, Currencies.USD));
     }
 
     @Test
     public void should_fail_to_fund_an_unknown_committee() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(1L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(1L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(2L,
+        assertThatThrownBy(() -> sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Committee %s USD account not found".formatted(committeeId));
@@ -123,10 +123,10 @@ public class SponsorAccountingTest {
 
     @Test
     public void should_fail_to_fund_a_committee_if_balance_is_insufficient() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(1L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(1L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        assertThatThrownBy(() -> sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(2L,
+        assertThatThrownBy(() -> sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot transfer 2 USD from sponsor %s to committee %s: Insufficient funds".formatted(sponsorId, committeeId));
@@ -134,26 +134,26 @@ public class SponsorAccountingTest {
 
     @Test
     public void should_refund_sponsor_from_a_committee() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(7L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(1L, Currencies.USD));
-        sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveAmount.of(1L, Currencies.USD));
+        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(1L, Currencies.USD));
+        sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveMoney.of(1L, Currencies.USD));
     }
 
     @Test
     public void should_fail_to_refund_sponsor_from_a_committee_if_balance_is_insufficient() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(7L,
                 Currencies.USD))));
 
         final var committeeAccount = new Account(Currencies.USD);
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(committeeAccount));
-        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(7L, Currencies.USD));
+        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(7L, Currencies.USD));
 
         final var anotherAccount = new Account(Currencies.USD);
-        committeeAccount.send(anotherAccount, PositiveAmount.of(6L, Currencies.USD));
+        committeeAccount.send(anotherAccount, PositiveMoney.of(6L, Currencies.USD));
 
-        assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveAmount.of(2L,
+        assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveMoney.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage(("Cannot transfer 2 USD from committee %s to sponsor %s: Insufficient funds").formatted(committeeId, sponsorId));
@@ -161,11 +161,11 @@ public class SponsorAccountingTest {
 
     @Test
     public void should_fail_to_refund_sponsor_from_a_committee_if_amount_given_by_the_sponsor_is_insufficient() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(7L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(1L, Currencies.USD));
-        assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveAmount.of(2L,
+        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(1L, Currencies.USD));
+        assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(committeeId, sponsorId, PositiveMoney.of(2L,
                 Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage(("Cannot transfer 2 USD from committee %s to sponsor %s: Cannot refund more than the amount" +
@@ -174,17 +174,17 @@ public class SponsorAccountingTest {
 
     @Test
     public void should_fail_to_refund_sponsor_from_a_committee_if_amount_was_given_by_another_sponsor() {
-        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(7L,
+        when(sponsorAccountProvider.get(sponsorId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(7L,
                 Currencies.USD))));
         when(committeeAccountProvider.get(committeeId, Currencies.USD)).thenReturn(Optional.of(new Account(Currencies.USD)));
-        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveAmount.of(5L, Currencies.USD));
+        sponsorAccounting.fundCommittee(sponsorId, committeeId, PositiveMoney.of(5L, Currencies.USD));
 
         final var otherCommitteeId = CommitteeId.random();
-        when(committeeAccountProvider.get(otherCommitteeId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveAmount.of(6L, Currencies.USD))));
+        when(committeeAccountProvider.get(otherCommitteeId, Currencies.USD)).thenReturn(Optional.of(new Account(PositiveMoney.of(6L, Currencies.USD))));
 
 
         assertThatThrownBy(() -> sponsorAccounting.refundFromCommittee(otherCommitteeId, sponsorId,
-                PositiveAmount.of(2L,
+                PositiveMoney.of(2L,
                         Currencies.USD)))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage(("Cannot transfer 2 USD from committee %s to sponsor %s: " +

@@ -30,7 +30,7 @@ public class Account {
         this.currency = currency;
     }
 
-    public Account(@NonNull PositiveAmount initialBalance) {
+    public Account(@NonNull PositiveMoney initialBalance) {
         this.id = Id.random();
         this.currency = initialBalance.getCurrency();
         mint(initialBalance);
@@ -40,18 +40,18 @@ public class Account {
         return id;
     }
 
-    public void mint(@NonNull PositiveAmount amount) {
-        registerTransaction(new Transaction(NOWHERE, this.id, PositiveAmount.of(amount)));
+    public void mint(@NonNull PositiveMoney amount) {
+        registerTransaction(new Transaction(NOWHERE, this.id, PositiveMoney.of(amount)));
     }
 
-    public void burn(@NonNull PositiveAmount amount) {
+    public void burn(@NonNull PositiveMoney amount) {
         if (balance().isStrictlyLowerThan(amount)) {
             throw OnlyDustException.badRequest("Insufficient funds");
         }
         registerTransaction(new Transaction(this.id, NOWHERE, amount));
     }
 
-    public void send(@NonNull Account recipient, @NonNull PositiveAmount amount) {
+    public void send(@NonNull Account recipient, @NonNull PositiveMoney amount) {
         if (balance().isStrictlyLowerThan(amount)) {
             throw OnlyDustException.badRequest("Insufficient funds");
         }
@@ -60,37 +60,37 @@ public class Account {
         recipient.registerTransaction(transaction);
     }
 
-    public void refund(@NonNull Account recipient, @NonNull PositiveAmount amount) {
+    public void refund(@NonNull Account recipient, @NonNull PositiveMoney amount) {
         if (balanceFrom(recipient.id).isStrictlyLowerThan(amount)) {
             throw OnlyDustException.badRequest("Cannot refund more than the amount received");
         }
         send(recipient, amount);
     }
 
-    public Amount balance() {
+    public Money balance() {
         final var received = transactions.stream()
                 .filter(tx -> tx.destination().equals(this.id))
                 .map(Transaction::amount)
-                .reduce(PositiveAmount.of(BigDecimal.ZERO, currency), PositiveAmount::plus);
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
 
         final var sent = transactions.stream()
                 .filter(tx -> tx.origin().equals(this.id))
                 .map(Transaction::amount)
-                .reduce(PositiveAmount.of(BigDecimal.ZERO, currency), PositiveAmount::plus);
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
 
         return received.subtract(sent);
     }
 
-    public Amount balanceFrom(@NonNull Account.Id from) {
+    public Money balanceFrom(@NonNull Account.Id from) {
         final var received = transactions.stream()
                 .filter(tx -> tx.destination().equals(this.id) && tx.origin().equals(from))
                 .map(Transaction::amount)
-                .reduce(PositiveAmount.of(BigDecimal.ZERO, currency), PositiveAmount::plus);
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
 
         final var sent = transactions.stream()
                 .filter(tx -> tx.destination().equals(from) && tx.origin().equals(this.id))
                 .map(Transaction::amount)
-                .reduce(PositiveAmount.of(BigDecimal.ZERO, currency), PositiveAmount::plus);
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
 
         return received.subtract(sent);
     }

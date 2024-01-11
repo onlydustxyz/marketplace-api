@@ -12,22 +12,22 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
     private final CommitteeAccountProvider committeeAccountProvider;
 
     @Override
-    public void registerTransfer(SponsorId sponsorId, Amount amount) {
-        final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
+    public void registerTransfer(SponsorId sponsorId, Money money) {
+        final var sponsorAccount = getAccount(sponsorId, money.getCurrency());
         try {
-            if (amount.isPositive()) {
-                sponsorAccount.mint(PositiveAmount.of(amount));
+            if (money.isPositive()) {
+                sponsorAccount.mint(PositiveMoney.of(money));
             } else {
-                sponsorAccount.burn(PositiveAmount.of(amount.negate()));
+                sponsorAccount.burn(PositiveMoney.of(money.negate()));
             }
         } catch (OnlyDustException e) {
             throw OnlyDustException.badRequest("Cannot register transfer of %s for sponsor %s: %s"
-                    .formatted(amount, sponsorId, e.getMessage()));
+                    .formatted(money, sponsorId, e.getMessage()));
         }
     }
 
     @Override
-    public void fundCommittee(SponsorId sponsorId, CommitteeId committeeId, PositiveAmount amount) {
+    public void fundCommittee(SponsorId sponsorId, CommitteeId committeeId, PositiveMoney amount) {
         final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
         final var committeeAccount = getAccount(committeeId, amount.getCurrency());
         try {
@@ -39,7 +39,7 @@ public class SponsorAccounting implements SponsorAccountingFacadePort {
     }
 
     @Override
-    public void refundFromCommittee(CommitteeId committeeId, SponsorId sponsorId, PositiveAmount amount) {
+    public void refundFromCommittee(CommitteeId committeeId, SponsorId sponsorId, PositiveMoney amount) {
         final var sponsorAccount = getAccount(sponsorId, amount.getCurrency());
         final var committeeAccount = getAccount(committeeId, amount.getCurrency());
         try {
