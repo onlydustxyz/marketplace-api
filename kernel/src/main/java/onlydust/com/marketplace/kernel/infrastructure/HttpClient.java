@@ -54,7 +54,7 @@ public abstract class HttpClient {
                 default -> throw internalServerError(format("Unknown error (status %d) when calling %s: %s", statusCode, request, bodyString(body)));
             };
         } catch (JsonProcessingException e) {
-            throw internalServerError("Fail to serialize request", e);
+            throw internalServerError("Fail to serialize/deserialize", e);
         } catch (IOException | InterruptedException e) {
             throw internalServerError("Fail send request", e);
         }
