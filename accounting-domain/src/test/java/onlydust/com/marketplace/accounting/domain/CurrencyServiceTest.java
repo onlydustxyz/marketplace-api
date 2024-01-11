@@ -2,17 +2,14 @@ package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
-import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.stubs.Quotes;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +44,8 @@ public class CurrencyServiceTest {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(LORDS_USD));
-        when(currencyMetadataService.get(Currency.Code.of(LORDS.symbol()))).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
-                                                                                                                                                    "://realms.io"))));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
+                                                                                                                         "://realms.io"))));
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());

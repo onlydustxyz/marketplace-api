@@ -11,7 +11,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
-import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -30,7 +29,7 @@ public class CurrencyService {
 
         final var currency = Currency.of(token);
         if (!currencyStorage.exists(currency.code())) {
-            final var metadata = currencyMetadataService.get(currency.code());
+            final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
             quoteService.currentPrice(token, Currency.Code.USD)
