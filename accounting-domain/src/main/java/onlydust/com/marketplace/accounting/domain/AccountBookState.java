@@ -57,6 +57,29 @@ public class AccountBookState {
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    public @NonNull PositiveAmount refundableBalance(@NonNull Account.Id from, @NonNull Account.Id to) {
+        final var unspentVertices = unspentVerticesOf(from, to);
+        return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
+    }
+
+    public @NonNull PositiveAmount transferredAmount(@NonNull Account.Id from, @NonNull Account.Id to) {
+        return accountVertices(to).stream()
+                .filter(v -> hasParent(v, from))
+                .map(v -> incomingEdgeOf(v).getAmount())
+                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+    }
+
+    private boolean hasParent(@NonNull final Vertex vertex, @NonNull final Account.Id parent) {
+        if (vertex.equals(root)) {
+            return false;
+        }
+        final var directParent = incomingEdgeOf(vertex).getSource();
+        if (directParent.accountId().equals(parent)) {
+            return true;
+        }
+        return hasParent(directParent, parent);
+    }
+
     private void sendFromVertices(@NonNull final Account.Id to, @NonNull final PositiveAmount amount, @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {

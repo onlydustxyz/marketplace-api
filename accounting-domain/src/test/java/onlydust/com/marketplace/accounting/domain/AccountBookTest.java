@@ -345,14 +345,52 @@ public class AccountBookTest {
 
     @Test
     public void should_get_refundable_balance() {
+        // Given
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        accountBook.mint(account1, PositiveAmount.of(100L));
+        accountBook.transfer(account1, account2, PositiveAmount.of(50L));
+        accountBook.transfer(account1, account3, PositiveAmount.of(30L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(5L));
+
+        // When
+        final var refundableBalanceFromAccount2ToAccount1 = accountBook.refundableBalance(account2, account1);
+        final var refundableBalanceFromAccount3ToAccount1 = accountBook.refundableBalance(account3, account1);
+        final var refundableBalanceFromAccount3ToAccount2 = accountBook.refundableBalance(account3, account2);
+        final var refundableBalanceFromAccount1ToAccount3 = accountBook.refundableBalance(account1, account3);
+
+        // Then
+        assertThat(refundableBalanceFromAccount2ToAccount1).isEqualTo(PositiveAmount.of(45L));
+        assertThat(refundableBalanceFromAccount3ToAccount1).isEqualTo(PositiveAmount.of(30L));
+        assertThat(refundableBalanceFromAccount3ToAccount2).isEqualTo(PositiveAmount.of(5L));
+        assertThat(refundableBalanceFromAccount1ToAccount3).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
     public void should_get_the_amount_of_money_transferred_from_an_account_to_another() {
-    }
+        // Given
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        accountBook.mint(account1, PositiveAmount.of(100L));
+        accountBook.transfer(account1, account2, PositiveAmount.of(50L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(5L));
+        accountBook.refund(account2, account1, PositiveAmount.of(10L));
 
-    @Test
-    public void should_get_the_amount_of_money_indirectly_transferred_from_an_account_to_another() {
+        // When
+        final var transferredAmountFromAccount1ToAccount2 = accountBook.transferredAmount(account1, account2);
+        final var transferredAmountFromAccount1ToAccount3 = accountBook.transferredAmount(account1, account3);
+        final var transferredAmountFromAccount2ToAccount3 = accountBook.transferredAmount(account2, account3);
+        final var transferredAmountFromAccount2ToAccount1 = accountBook.transferredAmount(account2, account1);
+        final var transferredAmountFromAccount3ToAccount1 = accountBook.transferredAmount(account3, account1);
+
+        // Then
+        assertThat(transferredAmountFromAccount1ToAccount2).isEqualTo(PositiveAmount.of(40L));
+        assertThat(transferredAmountFromAccount1ToAccount3).isEqualTo(PositiveAmount.of(5L));
+        assertThat(transferredAmountFromAccount2ToAccount3).isEqualTo(PositiveAmount.of(5L));
+        assertThat(transferredAmountFromAccount2ToAccount1).isEqualTo(PositiveAmount.ZERO);
+        assertThat(transferredAmountFromAccount3ToAccount1).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test

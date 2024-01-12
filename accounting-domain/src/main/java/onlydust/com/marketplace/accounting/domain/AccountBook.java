@@ -28,4 +28,12 @@ public class AccountBook {
     public void refund(Account.Id from, Account.Id to, PositiveAmount amount) {
         state.refund(from, to, amount);
     }
+
+    public PositiveAmount refundableBalance(Account.Id from, Account.Id to) {
+        return state.refundableBalance(from, to);
+    }
+
+    public PositiveAmount transferredAmount(Account.Id from, Account.Id to) {
+        return state.transferredAmount(from, to);
+    }
 }
