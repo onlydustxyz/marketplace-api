@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ public class CurrencyServiceTest {
     final CurrencyMetadataService currencyMetadataService = mock(CurrencyMetadataService.class);
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
+    final ERC20Storage erc20Storage = mock(ERC20Storage.class);
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
@@ -38,7 +40,7 @@ public class CurrencyServiceTest {
         reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage);
         when(currencyStorage.exists(any())).thenReturn(false);
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
-        currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+        currencyService = new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
     }
 
     @Test
@@ -48,7 +50,6 @@ public class CurrencyServiceTest {
         when(quoteService.currentPrice(any(), eq(LORDS), eq(Currencies.USD.id()))).thenReturn(Optional.of(LORDS_USD));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
                                                                                                                          "://realms.io"))));
-
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
 
@@ -64,6 +65,7 @@ public class CurrencyServiceTest {
         assertThat(capturedCurrency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
 
         verify(quoteStorage, times(1)).save(LORDS_USD);
+        verify(erc20Storage, times(1)).save(Blockchain.ETHEREUM, LORDS);
     }
 
     @Test
