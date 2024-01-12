@@ -29,7 +29,7 @@ class Auth0JwtServiceTest {
                         .githubLogin("pixelfact")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                         .email("pixelfact.company@gmail.com")
-                        .build(), true)
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("pixelfact")
@@ -73,7 +73,7 @@ class Auth0JwtServiceTest {
                         .githubUserId(31901905L)
                         .githubLogin("kaelsky")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
-                        .build(), true)
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("kaelsky")
@@ -104,7 +104,7 @@ class Auth0JwtServiceTest {
                         .githubLogin("pixelfact")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                         .email("pixelfact.company@gmail.com")
-                        .build(), true)
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("pixelfact")
@@ -124,17 +124,13 @@ class Auth0JwtServiceTest {
 
         final String impersonationHeader = """
                 {
-                  "nickname": "ofux",
-                  "picture": "https://avatars.githubusercontent.com/u/595505?v=4",
                   "sub": "github|595505"
                 }
                 """;
         when(userFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(595505L)
-                        .githubLogin("ofux")
-                        .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
-                        .build(), false)
+                        .build(), true)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("ofux")
@@ -173,7 +169,7 @@ class Auth0JwtServiceTest {
                         .githubUserId(31901905L)
                         .githubLogin("kaelsky")
                         .githubAvatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
-                        .build(), true)
+                        .build(), false)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("kaelsky")
@@ -191,17 +187,13 @@ class Auth0JwtServiceTest {
 
         final String impersonationHeader = """
                 {
-                  "nickname": "ofux",
-                  "picture": "https://avatars.githubusercontent.com/u/595505?v=4",
                   "sub": "github|595505"
                 }
                 """;
         when(userFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(595505L)
-                        .githubLogin("ofux")
-                        .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
-                        .build(), false)
+                        .build(), true)
         ).thenReturn(User.builder()
                 .id(UUID.randomUUID())
                 .githubLogin("ofux")

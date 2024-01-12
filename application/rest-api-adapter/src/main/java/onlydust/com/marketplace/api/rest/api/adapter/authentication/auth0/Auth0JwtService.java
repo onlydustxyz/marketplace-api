@@ -33,7 +33,7 @@ public class Auth0JwtService implements JwtService {
             final Auth0JwtClaims jwtClaims =
                     objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
                             Auth0JwtClaims.class);
-            final User user = getUserFromClaims(jwtClaims, true);
+            final User user = getUserFromClaims(jwtClaims, false);
 
             if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
                 return getAuthenticationFromImpersonationHeader(decodedJwt, user, impersonationHeader);
@@ -57,14 +57,14 @@ public class Auth0JwtService implements JwtService {
 
     }
 
-    private User getUserFromClaims(Auth0JwtClaims jwtClaims, boolean createIfNotExists) {
+    private User getUserFromClaims(Auth0JwtClaims jwtClaims, boolean isImpersonated) {
         final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
         return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
                 .githubLogin(jwtClaims.getGithubLogin())
                 .githubAvatarUrl(jwtClaims.getGithubAvatarUrl())
                 .email(jwtClaims.getEmail())
-                .build(), createIfNotExists);
+                .build(), isImpersonated);
     }
 
     private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt,
@@ -82,7 +82,7 @@ public class Auth0JwtService implements JwtService {
             return Optional.empty();
         }
 
-        final User impersonated = getUserFromClaims(claims, false);
+        final User impersonated = getUserFromClaims(claims, true);
 
         LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
 
