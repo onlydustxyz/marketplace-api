@@ -31,19 +31,21 @@ public class CurrencyServiceTest {
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
-    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+    CurrencyService currencyService;
 
     @BeforeEach
     void setUp() {
         reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage);
         when(currencyStorage.exists(any())).thenReturn(false);
+        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
     }
 
     @Test
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(any(), LORDS, Currencies.USD.id())).thenReturn(Optional.of(LORDS_USD));
+        when(quoteService.currentPrice(any(), eq(LORDS), eq(Currencies.USD.id()))).thenReturn(Optional.of(LORDS_USD));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
                                                                                                                          "://realms.io"))));
 
@@ -110,7 +112,7 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(any(), LORDS, Currencies.USD.id())).thenReturn(Optional.empty());
+        when(quoteService.currentPrice(any(), eq(LORDS), eq(Currencies.USD.id()))).thenReturn(Optional.empty());
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
