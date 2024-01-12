@@ -3,11 +3,13 @@ package onlydust.com.marketplace.accounting.domain;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleDirectedGraph;
+import org.jgrapht.traverse.DepthFirstIterator;
 
 import java.util.*;
 
@@ -67,6 +69,45 @@ public class AccountBookState {
                 .filter(v -> hasParent(v, from))
                 .map(v -> incomingEdgeOf(v).getAmount())
                 .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+    }
+
+    public @NonNull List<Transaction> transactionsFrom(@NonNull Account.Id from) {
+        final var startVertices = accountVertices(from);
+        final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
+
+        for (Vertex startVertex : startVertices) {
+            final var iterator = new DepthFirstIterator<>(graph, startVertex);
+            while (iterator.hasNext()) {
+                final var v = iterator.next();
+                if (v.equals(startVertex)) {
+                    continue;
+                }
+                final var incomingEdge = incomingEdgeOf(v);
+                aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), v.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
+            }
+        }
+
+        return mapAggregatedAmountsToTransactions(aggregatedAmounts);
+    }
+
+    public @NonNull List<Transaction> transactionsTo(@NonNull Account.Id to) {
+        final var startVertices = accountVertices(to);
+        final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
+
+        for (Vertex startVertex : startVertices) {
+            aggregateIncomingTransactions(startVertex, aggregatedAmounts);
+        }
+
+        return mapAggregatedAmountsToTransactions(aggregatedAmounts);
+    }
+
+    private void aggregateIncomingTransactions(@NonNull final Vertex vertex, @NonNull final Map<FromTo, PositiveAmount> aggregatedAmounts) {
+        final var incomingEdge = incomingEdgeOf(vertex);
+        if (incomingEdge.getSource().equals(root)) {
+            return;
+        }
+        aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), vertex.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
+        aggregateIncomingTransactions(incomingEdge.getSource(), aggregatedAmounts);
     }
 
     private boolean hasParent(@NonNull final Vertex vertex, @NonNull final Account.Id parent) {
@@ -185,6 +226,15 @@ public class AccountBookState {
     }
 
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
+    }
+
+    private record FromTo(@NonNull Account.Id from, @NonNull Account.Id to) {
+    }
+
+    private static ArrayList<Transaction> mapAggregatedAmountsToTransactions(Map<FromTo, PositiveAmount> aggregatedAmounts) {
+        final var transactions = new ArrayList<Transaction>(aggregatedAmounts.size());
+        aggregatedAmounts.forEach((fromTo, amount) -> transactions.add(new Transaction(fromTo.from(), fromTo.to(), amount)));
+        return transactions;
     }
 
     public static class InsufficientFundsException extends Exception {

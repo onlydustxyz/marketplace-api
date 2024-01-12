@@ -3,6 +3,9 @@ package onlydust.com.marketplace.accounting.domain;
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+
+import java.util.List;
 
 public class AccountBook {
 
@@ -35,5 +38,13 @@ public class AccountBook {
 
     public PositiveAmount transferredAmount(Account.Id from, Account.Id to) {
         return state.transferredAmount(from, to);
+    }
+
+    public List<Transaction> transactionsFrom(Account.Id from) {
+        return state.transactionsFrom(from);
+    }
+
+    public List<Transaction> transactionsTo(Account.Id to) {
+        return state.transactionsTo(to);
     }
 }

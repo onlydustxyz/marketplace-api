@@ -3,9 +3,12 @@ package onlydust.com.marketplace.accounting.domain;
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -395,9 +398,79 @@ public class AccountBookTest {
 
     @Test
     public void should_get_the_list_of_accounts_that_received_money_from_me() {
+        // Given
+        final var account0 = Account.Id.random();
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        final var account4 = Account.Id.random();
+        accountBook.mint(account0, PositiveAmount.of(100L));
+        accountBook.transfer(account0, account1, PositiveAmount.of(100L));
+        accountBook.refund(account1, account0, PositiveAmount.of(1L));
+
+        accountBook.transfer(account1, account2, PositiveAmount.of(10L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(5L));
+        accountBook.refund(account3, account2, PositiveAmount.of(1L));
+        accountBook.transfer(account1, account4, PositiveAmount.of(42L));
+
+        // When
+        final List<Transaction> transactionsFromAccount1 = accountBook.transactionsFrom(account1);
+        final List<Transaction> transactionsFromAccount2 = accountBook.transactionsFrom(account2);
+        final List<Transaction> transactionsFromAccount3 = accountBook.transactionsFrom(account3);
+        final List<Transaction> transactionsFromAccount4 = accountBook.transactionsFrom(account4);
+
+        // Then
+        assertThat(transactionsFromAccount1).containsExactlyInAnyOrder(
+                new Transaction(account1, account2, PositiveAmount.of(10L)),
+                new Transaction(account2, account3, PositiveAmount.of(4L)),
+                new Transaction(account1, account4, PositiveAmount.of(42L))
+        );
+        assertThat(transactionsFromAccount2).containsExactlyInAnyOrder(
+                new Transaction(account2, account3, PositiveAmount.of(4L))
+        );
+        assertThat(transactionsFromAccount3).isEmpty();
+        assertThat(transactionsFromAccount4).isEmpty();
     }
 
     @Test
     public void should_get_the_list_of_accounts_that_sent_money_to_me() {
+        // Given
+        final var account0 = Account.Id.random();
+        final var account1 = Account.Id.random();
+        final var account2 = Account.Id.random();
+        final var account3 = Account.Id.random();
+        final var account4 = Account.Id.random();
+        accountBook.mint(account0, PositiveAmount.of(100L));
+        accountBook.transfer(account0, account1, PositiveAmount.of(100L));
+        accountBook.refund(account1, account0, PositiveAmount.of(1L));
+
+        accountBook.transfer(account1, account2, PositiveAmount.of(10L));
+        accountBook.transfer(account2, account3, PositiveAmount.of(5L));
+        accountBook.refund(account3, account2, PositiveAmount.of(1L));
+        accountBook.transfer(account1, account4, PositiveAmount.of(42L));
+
+        // When
+        final List<Transaction> transactionsToAccount1 = accountBook.transactionsTo(account1);
+        final List<Transaction> transactionsToAccount2 = accountBook.transactionsTo(account2);
+        final List<Transaction> transactionsToAccount3 = accountBook.transactionsTo(account3);
+        final List<Transaction> transactionsToAccount4 = accountBook.transactionsTo(account4);
+
+        // Then
+        assertThat(transactionsToAccount1).containsExactlyInAnyOrder(
+                new Transaction(account0, account1, PositiveAmount.of(99L))
+        );
+        assertThat(transactionsToAccount2).containsExactlyInAnyOrder(
+                new Transaction(account0, account1, PositiveAmount.of(99L)),
+                new Transaction(account1, account2, PositiveAmount.of(10L))
+        );
+        assertThat(transactionsToAccount3).containsExactlyInAnyOrder(
+                new Transaction(account0, account1, PositiveAmount.of(99L)),
+                new Transaction(account1, account2, PositiveAmount.of(10L)),
+                new Transaction(account2, account3, PositiveAmount.of(4L))
+        );
+        assertThat(transactionsToAccount4).containsExactlyInAnyOrder(
+                new Transaction(account0, account1, PositiveAmount.of(99L)),
+                new Transaction(account1, account4, PositiveAmount.of(42L))
+        );
     }
 }
