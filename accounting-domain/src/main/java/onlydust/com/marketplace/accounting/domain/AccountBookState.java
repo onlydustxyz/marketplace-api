@@ -7,13 +7,15 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.visitor.Visitable;
+import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import java.util.*;
 
-public class AccountBookState {
+public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
     public static final Account.Id ROOT = Account.Id.of(UUID.fromString("10000000-0000-0000-0000-000000000000"));
 
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
@@ -26,14 +28,17 @@ public class AccountBookState {
         accountVertices.put(ROOT, new ArrayList<>(List.of(root)));
     }
 
+    @Override
     public void mint(@NonNull final Account.Id account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
     }
 
+    @Override
     public void burn(@NonNull final Account.Id account, @NonNull final PositiveAmount amount) {
         refund(account, ROOT, amount);
     }
 
+    @Override
     public void transfer(@NonNull final Account.Id from, @NonNull final Account.Id to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
@@ -44,6 +49,7 @@ public class AccountBookState {
         }
     }
 
+    @Override
     public void refund(@NonNull final Account.Id from, @NonNull final Account.Id to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
@@ -219,6 +225,11 @@ public class AccountBookState {
         if (from.equals(to)) {
             throw OnlyDustException.badRequest("An account (%s) cannot transfer money to itself".formatted(from));
         }
+    }
+
+    @Override
+    public void accept(Visitor<AccountBookState> visitor) {
+        visitor.visit(this);
     }
 
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
