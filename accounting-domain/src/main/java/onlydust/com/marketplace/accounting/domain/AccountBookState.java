@@ -75,18 +75,7 @@ public class AccountBookState {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
-        for (Vertex startVertex : startVertices) {
-            final var iterator = new DepthFirstIterator<>(graph, startVertex);
-            while (iterator.hasNext()) {
-                final var v = iterator.next();
-                if (v.equals(startVertex)) {
-                    continue;
-                }
-                final var incomingEdge = incomingEdgeOf(v);
-                aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), v.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
-            }
-        }
-
+        startVertices.forEach(startVertex -> aggregateOutgoingTransactions(startVertex, aggregatedAmounts));
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
@@ -94,11 +83,18 @@ public class AccountBookState {
         final var startVertices = accountVertices(to);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
-        for (Vertex startVertex : startVertices) {
-            aggregateIncomingTransactions(startVertex, aggregatedAmounts);
-        }
-
+        startVertices.forEach(startVertex -> aggregateIncomingTransactions(startVertex, aggregatedAmounts));
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
+    }
+
+    private void aggregateOutgoingTransactions(Vertex startVertex, Map<FromTo, PositiveAmount> aggregatedAmounts) {
+        final var iterator = new DepthFirstIterator<>(graph, startVertex);
+        iterator.forEachRemaining(v -> {
+            if (!v.equals(startVertex)) {
+                final var incomingEdge = incomingEdgeOf(v);
+                aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), v.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
+            }
+        });
     }
 
     private void aggregateIncomingTransactions(@NonNull final Vertex vertex, @NonNull final Map<FromTo, PositiveAmount> aggregatedAmounts) {
