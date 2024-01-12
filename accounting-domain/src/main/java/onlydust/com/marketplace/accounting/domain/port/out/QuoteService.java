@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuoteService {
-    Optional<Quote> currentPrice(Currency.Id currencyId, ERC20 token, Currency.Code base);
+    Optional<Quote> currentPrice(Currency.Id currencyId, ERC20 token, Currency.Id base);
 
-    List<Optional<Quote>> currentPrice(List<Currency.Id> currencies, Currency.Code base);
+    List<Optional<Quote>> currentPrice(List<Currency.Id> currencies, Currency.Id base);
 }

@@ -14,18 +14,20 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class CmcQuoteServiceAdapter implements QuoteService {
     private final CmcClient client;
-    private final Properties properties;
+    private final Map<Currency.Id, Integer> internalIds;
 
     @Override
-    public Optional<Quote> currentPrice(Currency.Id currencyId, ERC20 token, Currency.Code base) {
-        final var baseId = Optional.ofNullable(properties.currencyIds.get(base))
+    public Optional<Quote> currentPrice(Currency.Id currencyId, ERC20 token, Currency.Id base) {
+        final var baseId = Optional.ofNullable(internalIds.get(base))
                 .orElseThrow(() -> badRequest("Currency %s is not supported as base".formatted(base)));
 
         final var typeRef = new TypeReference<CmcClient.Response<Map<String, List<Data>>>>() {
@@ -41,8 +43,23 @@ public class CmcQuoteServiceAdapter implements QuoteService {
     }
 
     @Override
-    public List<Optional<Quote>> currentPrice(List<Currency.Id> currencies, Currency.Code base) {
-        return List.of();
+    public List<Optional<Quote>> currentPrice(List<Currency.Id> currencies, Currency.Id base) {
+        final var baseId = Optional.ofNullable(internalIds.get(base)).orElseThrow(() -> badRequest("Currency %s is not supported as base".formatted(base)));
+
+        final var currencyIds = currencies.stream().map(this.internalIds::get).filter(Objects::nonNull).map(Object::toString).toArray(String[]::new);
+
+        final var typeRef = new TypeReference<CmcClient.Response<Map<String, Data>>>() {
+        };
+
+        final var response = client.get("/v2/cryptocurrency/quotes/latest?id=%s&convert_id=%d"
+                        .formatted(String.join(",", currencyIds), baseId), typeRef)
+                .orElseThrow(() -> internalServerError("Unable to fetch quotes"));
+
+        return currencies.stream()
+                .map(c -> Optional.ofNullable(response.get(internalIds.get(c).toString()))
+                        .map(d -> d.quote.get(baseId))
+                        .map(q -> new Quote(c, base, q.price)))
+                .toList();
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -54,8 +71,5 @@ public class CmcQuoteServiceAdapter implements QuoteService {
         @JsonIgnoreProperties(ignoreUnknown = true)
         private record Platform(@JsonProperty("token_address") ContractAddress tokenAddress) {
         }
-    }
-
-    public record Properties(Map<Currency.Code, Integer> currencyIds) {
     }
 }
