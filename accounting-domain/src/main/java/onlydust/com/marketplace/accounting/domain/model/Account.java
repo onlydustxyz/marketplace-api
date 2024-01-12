@@ -12,10 +12,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Getter
 public class Account {
+
+    public static final Account.Id NOWHERE = Account.Id.of(UUID.fromString("00000000-0000-0000-0000-000000000000"));
 
     @NonNull
     private final Account.Id id;
@@ -29,61 +30,75 @@ public class Account {
         this.currency = currency;
     }
 
-    public Account(@NonNull PositiveAmount initialBalance) {
+    public Account(@NonNull PositiveMoney initialBalance) {
         this.id = Id.random();
         this.currency = initialBalance.getCurrency();
-        registerTransaction(new Transaction(null, this.id, initialBalance));
+        mint(initialBalance);
     }
 
     public Id id() {
         return id;
     }
 
-    public void registerExternalTransfer(@NonNull Amount amount) {
-        if (amount.isPositive()) {
-            registerTransaction(new Transaction(null, this.id, PositiveAmount.of(amount)));
-        } else {
-            registerTransaction(new Transaction(this.id, null, PositiveAmount.of(amount.negate())));
-        }
+    public void mint(@NonNull PositiveMoney amount) {
+        registerTransaction(new Transaction(NOWHERE, this.id, PositiveMoney.of(amount)));
     }
 
-    public void sendAmountTo(@NonNull Account recipient, @NonNull PositiveAmount amount) {
+    public void burn(@NonNull PositiveMoney amount) {
+        if (balance().isStrictlyLowerThan(amount)) {
+            throw OnlyDustException.badRequest("Insufficient funds");
+        }
+        registerTransaction(new Transaction(this.id, NOWHERE, amount));
+    }
+
+    public void send(@NonNull Account recipient, @NonNull PositiveMoney amount) {
+        if (balance().isStrictlyLowerThan(amount)) {
+            throw OnlyDustException.badRequest("Insufficient funds");
+        }
         final var transaction = new Transaction(this.id, recipient.id, amount);
         this.registerTransaction(transaction);
         recipient.registerTransaction(transaction);
     }
 
-    public void sendRefundTo(@NonNull Account recipient, @NonNull PositiveAmount amount) {
-        final var transaction = new Transaction(this.id, recipient.id, amount);
-
-        final var subBalance = filteredBalanceWithMoreTransactions(recipient.id, transaction);
-        if (subBalance.isNegative()) {
+    public void refund(@NonNull Account recipient, @NonNull PositiveMoney amount) {
+        if (balanceFrom(recipient.id).isStrictlyLowerThan(amount)) {
             throw OnlyDustException.badRequest("Cannot refund more than the amount received");
         }
-
-        this.registerTransaction(transaction);
-        recipient.registerTransaction(transaction);
+        send(recipient, amount);
     }
 
-    public Amount balance() {
-        return balanceWithMoreTransactions();
+    public Money balance() {
+        final var received = transactions.stream()
+                .filter(tx -> tx.destination().equals(this.id))
+                .map(Transaction::amount)
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
+
+        final var sent = transactions.stream()
+                .filter(tx -> tx.origin().equals(this.id))
+                .map(Transaction::amount)
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
+
+        return received.subtract(sent);
     }
 
-    private Amount balanceWithMoreTransactions(Transaction... someOtherTransactions) {
-        return filteredBalanceWithMoreTransactions(null, someOtherTransactions);
-    }
+    public Money balanceFrom(@NonNull Account.Id from) {
+        final var received = transactions.stream()
+                .filter(tx -> tx.destination().equals(this.id) && tx.origin().equals(from))
+                .map(Transaction::amount)
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
 
-    private Amount filteredBalanceWithMoreTransactions(Id otherAccountId, Transaction... someOtherTransactions) {
-        return Stream.concat(transactions.stream(), Stream.of(someOtherTransactions))
-                .filter(tx -> otherAccountId == null || otherAccountId.equals(tx.origin()) || otherAccountId.equals(tx.destination()))
-                .map(tx -> this.id.equals(tx.origin()) ? tx.amount().negate() : tx.amount())
-                .reduce(Amount.of(BigDecimal.ZERO, currency), Amount::plus);
+        final var sent = transactions.stream()
+                .filter(tx -> tx.destination().equals(from) && tx.origin().equals(this.id))
+                .map(Transaction::amount)
+                .reduce(PositiveMoney.of(BigDecimal.ZERO, currency), PositiveMoney::plus);
+
+        return received.subtract(sent);
     }
 
     private void registerTransaction(@NonNull Transaction transaction) {
-        final var newBalance = balanceWithMoreTransactions(transaction);
-        if (newBalance.isNegative()) {
-            throw OnlyDustException.badRequest("Insufficient funds");
+        if (!transaction.amount().getCurrency().equals(currency)) {
+            throw OnlyDustException.badRequest("%s account cannot receive transactions in %s"
+                    .formatted(currency, transaction.amount().getCurrency()));
         }
         transactions.add(transaction);
     }
@@ -99,6 +114,6 @@ public class Account {
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }
-    
+
     }
 }

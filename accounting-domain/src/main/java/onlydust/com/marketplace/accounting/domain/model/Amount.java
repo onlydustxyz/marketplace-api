@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;
 
@@ -12,39 +11,40 @@ import java.math.BigDecimal;
 public class Amount {
     @NonNull
     protected final BigDecimal value;
-    @NonNull
-    protected final Currency currency;
 
-    protected Amount(@NonNull BigDecimal value, @NonNull Currency currency) {
+    protected Amount(@NonNull BigDecimal value) {
         this.value = value;
-        this.currency = currency;
     }
 
-    public static @NonNull Amount of(BigDecimal value, Currency currency) {
-        return new Amount(value, currency);
+    public static @NonNull Amount of(BigDecimal value) {
+        return new Amount(value);
     }
 
-    public static @NonNull Amount of(Long value, Currency currency) {
-        return new Amount(BigDecimal.valueOf(value), currency);
+    public static @NonNull Amount of(Long value) {
+        return new Amount(BigDecimal.valueOf(value));
     }
 
     /***
      * @param amount the amount to be added
-     * @return a new Amount with the sum of the current value and the given amount
-     * @throws OnlyDustException if the given amount has a different currency
+     * @return a new Amount with the sum of this amount and the given amount
      */
-    public @NonNull Amount plus(@NonNull Amount amount) {
-        if (!currency.equals(amount.currency)) {
-            throw OnlyDustException.internalServerError("Cannot sum different currencies");
-        }
-        return new Amount(value.add(amount.value), currency);
+    public @NonNull Amount add(@NonNull final Amount amount) {
+        return new Amount(value.add(amount.value));
+    }
+
+    /***
+     * @param amount the amount to be subtracted
+     * @return a new Amount with the difference of this amount and the given amount
+     */
+    public @NonNull Amount subtract(@NonNull final Amount amount) {
+        return add(amount.negate());
     }
 
     /***
      * @return a new Amount with the same value but with the opposite sign
      */
     public @NonNull Amount negate() {
-        return new Amount(value.negate(), currency);
+        return new Amount(value.negate());
     }
 
     /***
@@ -61,8 +61,34 @@ public class Amount {
         return !isPositive();
     }
 
+    /***
+     * @param amount the amount to be compared
+     * @return true if this amount is strictly lower than the given amount
+     */
+    public boolean isStrictlyLowerThan(@NonNull Amount amount) {
+        return value.compareTo(amount.value) < 0;
+    }
+
+    /***
+     * @param amount the amount to be compared
+     * @return true if this amount is lower than or equal to the given amount
+     */
+    public boolean isStrictlyGreaterThan(@NonNull Amount amount) {
+        return value.compareTo(amount.value) > 0;
+    }
+
+    /***
+     * @param amount the amount to be compared
+     * @return true if this amount is greater than or equal to the given amount
+     */
+    public boolean isGreaterThanOrEqual(@NonNull Amount amount) {
+        return value.compareTo(amount.value) >= 0;
+    }
+
     @Override
     public String toString() {
-        return "%s %s".formatted(value, currency);
+        return "%s".formatted(value);
     }
+
+
 }

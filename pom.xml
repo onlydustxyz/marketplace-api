@@ -157,6 +157,11 @@
                 <artifactId>caffeine</artifactId>
                 <version>3.1.8</version>
             </dependency>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>1.5.2</version>
+            </dependency>
 
             <!-- AWS Dependencies -->
             <dependency>

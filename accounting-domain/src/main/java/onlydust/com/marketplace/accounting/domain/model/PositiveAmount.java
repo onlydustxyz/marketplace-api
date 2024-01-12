@@ -11,34 +11,32 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 public class PositiveAmount extends Amount {
 
-    protected PositiveAmount(@NonNull BigDecimal value, @NonNull Currency currency) {
-        super(value, currency);
+    public static final PositiveAmount ZERO = PositiveAmount.of(BigDecimal.ZERO);
+
+    protected PositiveAmount(@NonNull BigDecimal value) {
+        super(value);
         if (value.compareTo(BigDecimal.ZERO) < 0) {
             throw OnlyDustException.internalServerError("Cannot create a positive amount with a negative value");
         }
     }
 
-    public static @NonNull PositiveAmount of(BigDecimal value, Currency currency) {
-        return new PositiveAmount(value, currency);
+    public static @NonNull PositiveAmount of(BigDecimal value) {
+        return new PositiveAmount(value);
     }
 
-    public static @NonNull PositiveAmount of(Long value, Currency currency) {
-        return new PositiveAmount(BigDecimal.valueOf(value), currency);
+    public static @NonNull PositiveAmount of(Long value) {
+        return new PositiveAmount(BigDecimal.valueOf(value));
     }
 
     public static @NonNull PositiveAmount of(Amount amount) {
-        return new PositiveAmount(amount.value, amount.currency);
+        return new PositiveAmount(amount.value);
     }
 
     /***
-     * @param amount the amount to be added
-     * @return a new Amount with the sum of the current value and the given amount
-     * @throws OnlyDustException if the given amount has a different currency
+     * @param amount the positive amount to be added
+     * @return a new Amount with the sum of this amount and the given amount
      */
-    public @NonNull PositiveAmount plus(@NonNull PositiveAmount amount) {
-        if (!currency.equals(amount.currency)) {
-            throw OnlyDustException.internalServerError("Cannot sum different currencies");
-        }
-        return new PositiveAmount(value.add(amount.value), currency);
+    public @NonNull PositiveAmount add(@NonNull PositiveAmount amount) {
+        return new PositiveAmount(value.add(amount.value));
     }
 }
