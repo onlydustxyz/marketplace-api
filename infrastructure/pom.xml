@@ -24,6 +24,7 @@
         <module>linear-adapter</module>
         <module>auth0-api-client-adapter</module>
         <module>infura-adapter</module>
+        <module>coinmarketcap-adapter</module>
     </modules>
 
     <properties>

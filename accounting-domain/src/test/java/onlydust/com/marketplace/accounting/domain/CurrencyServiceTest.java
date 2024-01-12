@@ -2,17 +2,14 @@ package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
-import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.stubs.Quotes;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -34,21 +31,23 @@ public class CurrencyServiceTest {
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
-    final CurrencyService currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+    CurrencyService currencyService;
 
     @BeforeEach
     void setUp() {
         reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage);
         when(currencyStorage.exists(any())).thenReturn(false);
+        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
     }
 
     @Test
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.of(LORDS_USD));
-        when(currencyMetadataService.get(Currency.Code.of(LORDS.symbol()))).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
-                                                                                                                                                    "://realms.io"))));
+        when(quoteService.currentPrice(any(), eq(LORDS), eq(Currencies.USD.id()))).thenReturn(Optional.of(LORDS_USD));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https" +
+                                                                                                                         "://realms.io"))));
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -113,7 +112,7 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(LORDS, Currency.Code.USD)).thenReturn(Optional.empty());
+        when(quoteService.currentPrice(any(), eq(LORDS), eq(Currencies.USD.id()))).thenReturn(Optional.empty());
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -134,7 +133,7 @@ public class CurrencyServiceTest {
 
         // Then
         verify(currencyStorage, never()).save(any());
-        verify(quoteService, never()).currentPrice(any(ERC20.class), any());
+        verify(quoteService, never()).currentPrice(any(), any(ERC20.class), any());
         verify(quoteStorage, never()).save(any());
     }
 
@@ -144,7 +143,7 @@ public class CurrencyServiceTest {
         final var currencies = List.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK);
 
         when(currencyStorage.all()).thenReturn(currencies);
-        when(quoteService.currentPrice(currencies.stream().map(Currency::id).toList(), Currency.Code.USD))
+        when(quoteService.currentPrice(currencies.stream().map(Currency::id).toList(), Currencies.USD.id()))
                 .thenReturn(List.of(Optional.of(USDC_USD), Optional.of(LORDS_USD), Optional.empty()));
 
         // When
