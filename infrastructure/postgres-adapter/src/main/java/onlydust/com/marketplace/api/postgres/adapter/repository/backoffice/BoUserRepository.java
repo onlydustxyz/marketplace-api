@@ -52,7 +52,7 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                    COALESCE(twitter.contact, gu.twitter)               AS twitter,
                    discord.contact                                     AS discord,
                    COALESCE(linkedin.contact, gu.linkedin)             AS linkedin,
-                   COALESCE(email.contact, u.email)                    AS email,
+                   u.email                                             AS email,
                    whatsapp.contact                                    AS whatsapp,
                    COALESCE(upi.bio, gu.bio)                           AS bio,
                    COALESCE(upi.location, gu.location)                 AS location,
@@ -82,7 +82,6 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                      LEFT JOIN contact_informations telegram ON telegram.user_id = u.id AND telegram.channel = 'telegram'
                      LEFT JOIN contact_informations twitter ON twitter.user_id = u.id AND twitter.channel = 'twitter'
                      LEFT JOIN contact_informations linkedin ON linkedin.user_id = u.id AND linkedin.channel = 'linkedin'
-                     LEFT JOIN contact_informations email ON email.user_id = u.id AND email.channel = 'email'
                      LEFT JOIN contact_informations discord ON discord.user_id = u.id AND discord.channel = 'discord'
                      LEFT JOIN contact_informations whatsapp ON whatsapp.user_id = u.id AND whatsapp.channel = 'whatsapp'
                      LEFT JOIN onboardings o ON u.id = o.user_id

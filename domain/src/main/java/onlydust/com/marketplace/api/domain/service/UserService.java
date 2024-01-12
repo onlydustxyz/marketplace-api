@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
@@ -14,6 +13,7 @@ import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import javax.transaction.Transactional;
 import java.io.InputStream;
@@ -34,21 +34,23 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean createIfNotExists) {
+    public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    userStoragePort.updateUserIdentity(user.getId(),
-                            githubUserIdentity.getGithubLogin(),
-                            githubUserIdentity.getGithubAvatarUrl(),
-                            githubUserIdentity.getEmail(),
-                            dateProvider.now());
+                    if (!readOnly) {
+                        userStoragePort.updateUserIdentity(user.getId(),
+                                githubUserIdentity.getGithubLogin(),
+                                githubUserIdentity.getGithubAvatarUrl(),
+                                githubUserIdentity.getEmail(),
+                                dateProvider.now());
+                    }
                     return user;
                 })
                 .orElseGet(() -> {
-                    if (!createIfNotExists) {
+                    if (readOnly) {
                         throw OnlyDustException.notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
                     }
                     final var user = User.builder()
