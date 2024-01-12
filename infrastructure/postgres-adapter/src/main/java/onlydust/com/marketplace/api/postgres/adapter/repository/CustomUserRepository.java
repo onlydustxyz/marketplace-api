@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.Contact;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
-import onlydust.com.marketplace.api.domain.model.UserProfileCover;
 import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
 import onlydust.com.marketplace.api.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.domain.view.UserProfileView;
@@ -21,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactChanelEnumEntity.email;
 
 @AllArgsConstructor
 @Slf4j
@@ -29,10 +28,7 @@ public class CustomUserRepository {
     private static final String SELECT_USER_PROFILE = """
             select gu.id as                                github_user_id,
                    u.id,
-                    coalesce((select ci.contact
-                                    from public.contact_informations ci
-                                    where ci.user_id = u.id
-                                      and ci.channel = 'email'), u.email) as email,
+                   u.email as email,
                    u.last_seen_at,
                    u.created_at,
                    gu.login,
@@ -241,32 +237,30 @@ public class CustomUserRepository {
     }
 
     private Set<Contact> getContacts(UserProfileEntity row) {
-        final Set<Contact> contacts = isNull(row.getContacts()) ? new HashSet<>() :
-                row.getContacts().stream().map(contact ->
-                        Contact.builder()
-                                .contact(contact.getContact())
-                                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
-                                    case email -> Contact.Channel.EMAIL;
-                                    case telegram -> Contact.Channel.TELEGRAM;
-                                    case twitter -> Contact.Channel.TWITTER;
-                                    case discord -> Contact.Channel.DISCORD;
-                                    case linkedin -> Contact.Channel.LINKEDIN;
-                                    case whatsapp -> Contact.Channel.WHATSAPP;
-                                })
-                                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
-                                        Contact.Visibility.PRIVATE)
-                                .build()
-                ).collect(Collectors.toSet());
+        final List<UserProfileEntity.Contact> contactEntities = row.getContacts() != null ? row.getContacts() : List.of();
 
-        if (contacts.stream().noneMatch(contact -> contact.getChannel() == Contact.Channel.EMAIL))
-            contacts.add(Contact.builder()
-                    .contact(row.getEmail())
-                    .channel(Contact.Channel.EMAIL)
-                    .visibility(Contact.Visibility.PRIVATE)
-                    .build()
-            );
+        final var contacts = contactEntities.stream().map(contact -> Contact.builder()
+                .contact(email.equals(contact.getChannel()) ? row.getEmail() : contact.getContact())
+                .channel(isNull(contact.getChannel()) ? null : switch (contact.getChannel()) {
+                    case email -> Contact.Channel.EMAIL;
+                    case telegram -> Contact.Channel.TELEGRAM;
+                    case twitter -> Contact.Channel.TWITTER;
+                    case discord -> Contact.Channel.DISCORD;
+                    case linkedin -> Contact.Channel.LINKEDIN;
+                    case whatsapp -> Contact.Channel.WHATSAPP;
+                })
+                .visibility(Boolean.TRUE.equals(contact.getIsPublic()) ? Contact.Visibility.PUBLIC :
+                        Contact.Visibility.PRIVATE)
+                .build()
+        ).collect(Collectors.toMap(Contact::getChannel, contact -> contact, (a, b) -> a));
 
-        return contacts;
+        contacts.putIfAbsent(Contact.Channel.EMAIL, Contact.builder()
+                .contact(row.getEmail())
+                .channel(Contact.Channel.EMAIL)
+                .visibility(Contact.Visibility.PRIVATE)
+                .build());
+
+        return new HashSet<>(contacts.values());
     }
 
     private HashMap<String, Long> getTechnologies(UserProfileEntity row) {

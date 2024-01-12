@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public interface UserFacadePort {
 
-    User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean createIfNotExists);
+    User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly);
 
     UserProfileView getProfileById(UUID userId);
 
