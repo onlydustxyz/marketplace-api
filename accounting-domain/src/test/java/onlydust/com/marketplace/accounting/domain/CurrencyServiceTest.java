@@ -5,7 +5,6 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +64,7 @@ public class CurrencyServiceTest {
         assertThat(capturedCurrency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
 
         verify(quoteStorage, times(1)).save(LORDS_USD);
-        verify(erc20Storage, times(1)).save(Blockchain.ETHEREUM, LORDS);
+        verify(erc20Storage, times(1)).save(LORDS);
     }
 
     @Test

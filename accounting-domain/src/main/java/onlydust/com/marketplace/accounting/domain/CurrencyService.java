@@ -45,7 +45,7 @@ public class CurrencyService {
                 .orElseThrow(() -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress,
                         blockchain.pretty())));
 
-        erc20Storage.save(blockchain, token);
+        erc20Storage.save(token);
 
         final var currency = Currency.of(token);
         if (!currencyStorage.exists(currency.code())) {

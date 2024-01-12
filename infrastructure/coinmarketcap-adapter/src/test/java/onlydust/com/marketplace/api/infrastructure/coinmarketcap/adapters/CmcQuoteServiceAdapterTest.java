@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Storage;
 import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 
 import java.math.BigDecimal;
@@ -35,8 +36,8 @@ class CmcQuoteServiceAdapterTest {
     private final ERC20Storage erc20Storage = mock(ERC20Storage.class);
     private final CmcQuoteServiceAdapter adapter = new CmcQuoteServiceAdapter(client, currencyStorage, erc20Storage, adapterProperties);
 
-    private final static ERC20 USDC_ERC20 = new ERC20(Ethereum.contractAddress("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), "USD Coin", "USDC", 6, BigInteger.TEN);
-    private final static ERC20 LORDS_ERC20 = new ERC20(Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0"), "Lords", "LORDS", 18, BigInteger.TEN);
+    private final static ERC20 USDC_ERC20 = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), "USD Coin", "USDC", 6, BigInteger.TEN);
+    private final static ERC20 LORDS_ERC20 = new ERC20(Blockchain.ETHEREUM, Ethereum.contractAddress("0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0"), "Lords", "LORDS", 18, BigInteger.TEN);
     private final static Currency USDC = Currency.of(USDC_ERC20);
     private final static Currency LORDS = Currency.of(LORDS_ERC20);
 
