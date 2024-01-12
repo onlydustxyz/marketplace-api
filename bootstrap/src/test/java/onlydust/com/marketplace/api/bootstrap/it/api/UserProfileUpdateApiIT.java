@@ -64,7 +64,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "cover": "YELLOW",
                             "contacts": [
                                 {
-                                    "contact": "yolo@croute.com",
+                                    "contact": "_____THIS-WONT-CHANGE-RETURNED-THE-EMAIL____@croute.com",
                                     "channel": "EMAIL",
                                     "visibility": "public"
                                 },
@@ -94,12 +94,11 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("ONE_TO_THREE_DAYS")
                 .jsonPath("$.isLookingForAJob").isEqualTo(true)
                 .jsonPath("$.contacts.length()").isEqualTo(2)
-                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')]").doesNotExist()
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("public")
+                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].channel").isEqualTo("EMAIL")
                 .jsonPath("$.contacts[?(@.contact=='antho')]").doesNotExist()
                 .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')]").doesNotExist()
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')]").doesNotExist()
-                .jsonPath("$.contacts[?(@.contact=='yolo@croute.com')].visibility").isEqualTo("public")
-                .jsonPath("$.contacts[?(@.contact=='yolo@croute.com')].channel").isEqualTo("EMAIL")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].visibility").isEqualTo("private")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM");
     }

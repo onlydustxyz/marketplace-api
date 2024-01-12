@@ -1,13 +1,8 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
-import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
@@ -16,6 +11,11 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
+import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +56,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void should_find_user_given_a_github_id() {
+    void should_find_user_given_a_github_id_and_update_it() {
         // Given
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
@@ -69,6 +69,32 @@ public class UserServiceTest {
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
+        verify(userStoragePort, times(1)).updateUserIdentity(
+                user.getId(),
+                githubUserIdentity.getGithubLogin(),
+                githubUserIdentity.getGithubAvatarUrl(),
+                githubUserIdentity.getEmail(),
+                dateProvider.now()
+        );
+        assertEquals(user, userByGithubIdentity);
+        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+    }
+
+    @Test
+    void should_find_user_given_a_github_id_but_not_update_it_when_read_only_is_true() {
+        // Given
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+        final User user =
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+
+        // When
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
+        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
+
+        // Then
+        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
     }
@@ -81,15 +107,16 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
-        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
+        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
         assertThat(userByGithubIdentity.getId()).isNotNull();
         assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(UserRole.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
     }
 
     @Test
-    void should_throw_exception_when_user_with_github_id_doesnt_exist_and_create_if_not_exists_is_false() {
+    void should_throw_exception_when_user_with_github_id_doesnt_exist_and_read_only_is_true() {
         // Given
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
@@ -98,7 +125,8 @@ public class UserServiceTest {
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
 
         // Then
-        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, false))
+        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
+        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
     }
