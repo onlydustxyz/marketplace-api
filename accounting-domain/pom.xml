@@ -24,6 +24,10 @@
             <artifactId>kernel</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

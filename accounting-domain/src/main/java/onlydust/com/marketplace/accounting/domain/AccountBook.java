@@ -1,0 +1,50 @@
+package onlydust.com.marketplace.accounting.domain;
+
+import onlydust.com.marketplace.accounting.domain.model.Account;
+import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+
+import java.util.List;
+
+public class AccountBook {
+
+    private final AccountBookState state = new AccountBookState();
+
+
+    public void mint(Account.Id account, PositiveAmount amount) {
+        state.mint(account, amount);
+    }
+
+    public void burn(Account.Id account, PositiveAmount amount) {
+        state.burn(account, amount);
+    }
+
+    public Amount balanceOf(Account.Id account) {
+        return state.balanceOf(account);
+    }
+
+    public void transfer(Account.Id from, Account.Id to, PositiveAmount amount) {
+        state.transfer(from, to, amount);
+    }
+
+    public void refund(Account.Id from, Account.Id to, PositiveAmount amount) {
+        state.refund(from, to, amount);
+    }
+
+    public PositiveAmount refundableBalance(Account.Id from, Account.Id to) {
+        return state.refundableBalance(from, to);
+    }
+
+    public PositiveAmount transferredAmount(Account.Id from, Account.Id to) {
+        return state.transferredAmount(from, to);
+    }
+
+    public List<Transaction> transactionsFrom(Account.Id from) {
+        return state.transactionsFrom(from);
+    }
+
+    public List<Transaction> transactionsTo(Account.Id to) {
+        return state.transactionsTo(to);
+    }
+}
