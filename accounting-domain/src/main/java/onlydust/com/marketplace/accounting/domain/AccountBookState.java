@@ -13,7 +13,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
 
 import java.util.*;
 
-public class AccountBookState {
+public class AccountBookState implements AccountBook {
     public static final Account.Id ROOT = Account.Id.of(UUID.fromString("10000000-0000-0000-0000-000000000000"));
 
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
@@ -26,14 +26,17 @@ public class AccountBookState {
         accountVertices.put(ROOT, new ArrayList<>(List.of(root)));
     }
 
+    @Override
     public void mint(@NonNull final Account.Id account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
     }
 
+    @Override
     public void burn(@NonNull final Account.Id account, @NonNull final PositiveAmount amount) {
         refund(account, ROOT, amount);
     }
 
+    @Override
     public void transfer(@NonNull final Account.Id from, @NonNull final Account.Id to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
@@ -44,6 +47,7 @@ public class AccountBookState {
         }
     }
 
+    @Override
     public void refund(@NonNull final Account.Id from, @NonNull final Account.Id to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);

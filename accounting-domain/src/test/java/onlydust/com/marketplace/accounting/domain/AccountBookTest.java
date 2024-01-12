@@ -15,11 +15,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class AccountBookTest {
 
-    AccountBook accountBook;
+    AccountBookAggregate accountBook;
 
     @BeforeEach
     void setUp() {
-        accountBook = new AccountBook();
+        accountBook = new AccountBookAggregate();
     }
 
     @Test
@@ -32,7 +32,7 @@ public class AccountBookTest {
         accountBook.mint(account, amount);
 
         // Then no exception is thrown
-        assertThat(accountBook.balanceOf(account)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account)).isEqualTo(amount);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class AccountBookTest {
         accountBook.burn(account, amount);
 
         // Then no exception is thrown
-        assertThat(accountBook.balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class AccountBookTest {
                 .hasMessage("Cannot refund %s from %s to %s".formatted(amount, account, AccountBookState.ROOT));
 
         // Then
-        assertThat(accountBook.balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -76,8 +76,8 @@ public class AccountBookTest {
         accountBook.transfer(sender, recipient, amount);
 
         // Then
-        assertThat(accountBook.balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(recipient)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class AccountBookTest {
                 .hasMessage("An account (%s) cannot transfer money to itself".formatted(sender));
 
         // Then
-        assertThat(accountBook.balanceOf(sender)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
     }
 
     @Test
@@ -109,8 +109,8 @@ public class AccountBookTest {
                 .hasMessage("Cannot transfer %s from %s to %s".formatted(amount, sender, recipient));
 
         // Then
-        assertThat(accountBook.balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -121,15 +121,15 @@ public class AccountBookTest {
         final var amount = PositiveAmount.of(100L);
         accountBook.mint(sender, amount);
         accountBook.transfer(sender, recipient, amount);
-        assertThat(accountBook.balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(recipient)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
 
         // When
         accountBook.refund(recipient, sender, amount);
 
         // Then
-        assertThat(accountBook.balanceOf(sender)).isEqualTo(amount);
-        assertThat(accountBook.balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -142,25 +142,25 @@ public class AccountBookTest {
         accountBook.mint(account1, amount);
         accountBook.transfer(account1, account2, amount);
         accountBook.transfer(account2, account3, amount);
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(amount);
 
         // When
         accountBook.refund(account3, account2, amount);
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
 
         // Then
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(amount);
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.ZERO);
 
         // When
         accountBook.refund(account2, account1, amount);
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(amount);
 
         // Then
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -172,23 +172,23 @@ public class AccountBookTest {
         accountBook.mint(account1, PositiveAmount.of(100L));
         accountBook.transfer(account1, account2, PositiveAmount.of(100L));
         accountBook.transfer(account2, account3, PositiveAmount.of(60L));
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(40L));
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(60L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(60L));
 
         // When
         accountBook.refund(account2, account1, PositiveAmount.of(10L));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(30L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(30L));
 
         // When
         accountBook.refund(account2, account1, PositiveAmount.of(30L));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(40L));
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
     }
 
     @Test
@@ -199,8 +199,8 @@ public class AccountBookTest {
         final var amount = PositiveAmount.of(100L);
         accountBook.mint(account1, amount);
         accountBook.transfer(account1, account2, amount);
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(amount);
 
         // When
         assertThatThrownBy(() -> accountBook.refund(account2, account1, amount.add(PositiveAmount.of(1L))))
@@ -208,8 +208,8 @@ public class AccountBookTest {
                 .hasMessage("Cannot refund %s from %s to %s".formatted(amount.add(PositiveAmount.of(1L)), account2, account1));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(amount);
     }
 
     @Test
@@ -222,9 +222,9 @@ public class AccountBookTest {
         accountBook.mint(account1, amount);
         accountBook.transfer(account1, account2, amount);
         accountBook.transfer(account2, account3, PositiveAmount.of(50L));
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(50L));
 
         // When
         assertThatThrownBy(() -> accountBook.refund(account2, account1, amount))
@@ -232,9 +232,9 @@ public class AccountBookTest {
                 .hasMessage("Cannot refund %s from %s to %s".formatted(amount, account2, account1));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(50L));
     }
 
     @Test
@@ -251,9 +251,9 @@ public class AccountBookTest {
         accountBook.transfer(account2, account3, PositiveAmount.of(30L));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(50L));
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(70L));
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(80L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(70L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(80L));
     }
 
     @Test
@@ -269,9 +269,9 @@ public class AccountBookTest {
         accountBook.transfer(account1, account3, PositiveAmount.of(30L));
 
         // Then
-        assertThat(accountBook.balanceOf(account1)).isEqualTo(PositiveAmount.of(20L));
-        assertThat(accountBook.balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
-        assertThat(accountBook.balanceOf(account3)).isEqualTo(PositiveAmount.of(30L));
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(20L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(50L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(30L));
     }
 
     @Test
@@ -309,38 +309,38 @@ public class AccountBookTest {
         accountBook.transfer(project2, contributor, PositiveAmount.of(100L));
 
         // Then
-        assertThat(accountBook.balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
-        assertThat(accountBook.balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
-        assertThat(accountBook.balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
-        assertThat(accountBook.balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_000L));
-        assertThat(accountBook.balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
-        assertThat(accountBook.balanceOf(project2)).isEqualTo(PositiveAmount.of(1_400L));
-        assertThat(accountBook.balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
+        assertThat(accountBook.state().balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
+        assertThat(accountBook.state().balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
+        assertThat(accountBook.state().balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
+        assertThat(accountBook.state().balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_000L));
+        assertThat(accountBook.state().balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
+        assertThat(accountBook.state().balanceOf(project2)).isEqualTo(PositiveAmount.of(1_400L));
+        assertThat(accountBook.state().balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
 
         // When
         accountBook.refund(project2, committee2, PositiveAmount.of(700L));
 
         // Then
-        assertThat(accountBook.balanceOf(project2)).isEqualTo(PositiveAmount.of(700L));
-        assertThat(accountBook.balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_700L));
+        assertThat(accountBook.state().balanceOf(project2)).isEqualTo(PositiveAmount.of(700L));
+        assertThat(accountBook.state().balanceOf(committee2)).isEqualTo(PositiveAmount.of(3_700L));
         // Check other accounts are not impacted
-        assertThat(accountBook.balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
-        assertThat(accountBook.balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
-        assertThat(accountBook.balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
-        assertThat(accountBook.balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
-        assertThat(accountBook.balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
+        assertThat(accountBook.state().balanceOf(sponsor1)).isEqualTo(PositiveAmount.of(91_000L));
+        assertThat(accountBook.state().balanceOf(sponsor2)).isEqualTo(PositiveAmount.of(80_000L));
+        assertThat(accountBook.state().balanceOf(committee1)).isEqualTo(PositiveAmount.of(1_000L));
+        assertThat(accountBook.state().balanceOf(project1)).isEqualTo(PositiveAmount.of(20_000L));
+        assertThat(accountBook.state().balanceOf(contributor)).isEqualTo(PositiveAmount.of(3_600L));
     }
 
     @Test
     public void should_get_account_balance() {
         // Given
-        final var accountBook = new AccountBook();
+        final var accountBook = new AccountBookAggregate();
         final var recipient = Account.Id.random();
         final var amount = PositiveAmount.of(100L);
         accountBook.mint(recipient, amount);
 
         // When
-        final Amount balance = accountBook.balanceOf(recipient);
+        final Amount balance = accountBook.state().balanceOf(recipient);
 
         // Then
         assertThat(balance).isEqualTo(amount);
@@ -358,10 +358,10 @@ public class AccountBookTest {
         accountBook.transfer(account2, account3, PositiveAmount.of(5L));
 
         // When
-        final var refundableBalanceFromAccount2ToAccount1 = accountBook.refundableBalance(account2, account1);
-        final var refundableBalanceFromAccount3ToAccount1 = accountBook.refundableBalance(account3, account1);
-        final var refundableBalanceFromAccount3ToAccount2 = accountBook.refundableBalance(account3, account2);
-        final var refundableBalanceFromAccount1ToAccount3 = accountBook.refundableBalance(account1, account3);
+        final var refundableBalanceFromAccount2ToAccount1 = accountBook.state().refundableBalance(account2, account1);
+        final var refundableBalanceFromAccount3ToAccount1 = accountBook.state().refundableBalance(account3, account1);
+        final var refundableBalanceFromAccount3ToAccount2 = accountBook.state().refundableBalance(account3, account2);
+        final var refundableBalanceFromAccount1ToAccount3 = accountBook.state().refundableBalance(account1, account3);
 
         // Then
         assertThat(refundableBalanceFromAccount2ToAccount1).isEqualTo(PositiveAmount.of(45L));
@@ -382,11 +382,11 @@ public class AccountBookTest {
         accountBook.refund(account2, account1, PositiveAmount.of(10L));
 
         // When
-        final var transferredAmountFromAccount1ToAccount2 = accountBook.transferredAmount(account1, account2);
-        final var transferredAmountFromAccount1ToAccount3 = accountBook.transferredAmount(account1, account3);
-        final var transferredAmountFromAccount2ToAccount3 = accountBook.transferredAmount(account2, account3);
-        final var transferredAmountFromAccount2ToAccount1 = accountBook.transferredAmount(account2, account1);
-        final var transferredAmountFromAccount3ToAccount1 = accountBook.transferredAmount(account3, account1);
+        final var transferredAmountFromAccount1ToAccount2 = accountBook.state().transferredAmount(account1, account2);
+        final var transferredAmountFromAccount1ToAccount3 = accountBook.state().transferredAmount(account1, account3);
+        final var transferredAmountFromAccount2ToAccount3 = accountBook.state().transferredAmount(account2, account3);
+        final var transferredAmountFromAccount2ToAccount1 = accountBook.state().transferredAmount(account2, account1);
+        final var transferredAmountFromAccount3ToAccount1 = accountBook.state().transferredAmount(account3, account1);
 
         // Then
         assertThat(transferredAmountFromAccount1ToAccount2).isEqualTo(PositiveAmount.of(40L));
@@ -414,10 +414,10 @@ public class AccountBookTest {
         accountBook.transfer(account1, account4, PositiveAmount.of(42L));
 
         // When
-        final List<Transaction> transactionsFromAccount1 = accountBook.transactionsFrom(account1);
-        final List<Transaction> transactionsFromAccount2 = accountBook.transactionsFrom(account2);
-        final List<Transaction> transactionsFromAccount3 = accountBook.transactionsFrom(account3);
-        final List<Transaction> transactionsFromAccount4 = accountBook.transactionsFrom(account4);
+        final List<Transaction> transactionsFromAccount1 = accountBook.state().transactionsFrom(account1);
+        final List<Transaction> transactionsFromAccount2 = accountBook.state().transactionsFrom(account2);
+        final List<Transaction> transactionsFromAccount3 = accountBook.state().transactionsFrom(account3);
+        final List<Transaction> transactionsFromAccount4 = accountBook.state().transactionsFrom(account4);
 
         // Then
         assertThat(transactionsFromAccount1).containsExactlyInAnyOrder(
@@ -450,10 +450,10 @@ public class AccountBookTest {
         accountBook.transfer(account1, account4, PositiveAmount.of(42L));
 
         // When
-        final List<Transaction> transactionsToAccount1 = accountBook.transactionsTo(account1);
-        final List<Transaction> transactionsToAccount2 = accountBook.transactionsTo(account2);
-        final List<Transaction> transactionsToAccount3 = accountBook.transactionsTo(account3);
-        final List<Transaction> transactionsToAccount4 = accountBook.transactionsTo(account4);
+        final List<Transaction> transactionsToAccount1 = accountBook.state().transactionsTo(account1);
+        final List<Transaction> transactionsToAccount2 = accountBook.state().transactionsTo(account2);
+        final List<Transaction> transactionsToAccount3 = accountBook.state().transactionsTo(account3);
+        final List<Transaction> transactionsToAccount4 = accountBook.state().transactionsTo(account4);
 
         // Then
         assertThat(transactionsToAccount1).containsExactlyInAnyOrder(
