@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.kernel.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -39,6 +40,21 @@ public abstract class HttpClient {
                                                                    final HttpMethod method,
                                                                    final RequestBody requestBody,
                                                                    final Class<ResponseBody> responseClass) {
+        final var body = send(path, method, requestBody);
+        return Void.class.isAssignableFrom(responseClass) ? Optional.empty() : body.map(b -> decode(b, responseClass));
+    }
+
+    public <RequestBody, ResponseBody> Optional<ResponseBody> send(final String path,
+                                                                   final HttpMethod method,
+                                                                   final RequestBody requestBody,
+                                                                   final TypeReference<ResponseBody> typeRef) {
+        final var body = send(path, method, requestBody);
+        return body.map(b -> decode(b, typeRef));
+    }
+
+    private <RequestBody> Optional<byte[]> send(final String path,
+                                                final HttpMethod method,
+                                                final RequestBody requestBody) {
         try {
             final var request = buildRequest(method, path, requestBody);
             final var httpResponse = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
@@ -50,7 +66,7 @@ public abstract class HttpClient {
                 case 401 -> throw unauthorized("Unauthorized error received from %s: %s".formatted(request, bodyString(body)));
                 case 403 -> throw forbidden("Forbidden error when calling %s: %s".formatted(request, bodyString(body)));
                 case 204, 404 -> Optional.empty();
-                case 200, 201, 202 -> Void.class.isAssignableFrom(responseClass) ? Optional.empty() : Optional.of(objectMapper.readValue(body, responseClass));
+                case 200, 201, 202 -> Optional.of(body);
                 default -> throw internalServerError(format("Unknown error (status %d) when calling %s: %s", statusCode, request, bodyString(body)));
             };
         } catch (JsonProcessingException e) {
@@ -60,6 +76,22 @@ public abstract class HttpClient {
         }
     }
 
+    private <T> T decode(byte[] content, Class<T> className) {
+        try {
+            return objectMapper.readValue(content, className);
+        } catch (IOException e) {
+            throw internalServerError("Fail to deserialize response", e);
+        }
+    }
+
+    private <T> T decode(byte[] content, TypeReference<T> typeRef) {
+        try {
+            return objectMapper.readValue(content, typeRef);
+        } catch (IOException e) {
+            throw internalServerError("Fail to deserialize response", e);
+        }
+    }
+    
     private static String bodyString(final byte[] body) {
         return body != null ? new String(body, StandardCharsets.UTF_8) : "null";
     }
