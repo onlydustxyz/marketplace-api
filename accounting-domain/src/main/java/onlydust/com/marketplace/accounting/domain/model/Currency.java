@@ -12,9 +12,12 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Currency {
     @EqualsAndHashCode.Include
-    @NonNull private final Id id;
-    @NonNull private final String name;
-    @NonNull private final Code code;
+    @NonNull
+    private final Id id;
+    @NonNull
+    private final String name;
+    @NonNull
+    private final Code code;
     private final Metadata metadata;
 
     public Currency(final @NonNull String name, final @NonNull Code code) {
@@ -22,21 +25,37 @@ public class Currency {
     }
 
     public static Currency of(final @NonNull ERC20 token) {
-        return new Currency(Id.random(), token.name(), Code.of(token.symbol()), null);
+        return new Currency(token.name(), Code.of(token.symbol()));
     }
 
     public Currency withMetadata(final @NonNull Metadata metadata) {
         return new Currency(id, name, code, metadata);
     }
 
-    public Id id() { return id; }
-    public String name() { return name; }
-    public Code code() { return code; }
-    public Optional<String> description() { return Optional.ofNullable(metadata).map(Metadata::description); }
-    public Optional<URI> logoUri() { return Optional.ofNullable(metadata).map(Metadata::logoUri); }
+    public Id id() {
+        return id;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public Code code() {
+        return code;
+    }
+
+    public Optional<String> description() {
+        return Optional.ofNullable(metadata).map(Metadata::description);
+    }
+
+    public Optional<URI> logoUri() {
+        return Optional.ofNullable(metadata).map(Metadata::logoUri);
+    }
 
     @Override
-    public String toString() { return code.toString(); }
+    public String toString() {
+        return code.toString();
+    }
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
