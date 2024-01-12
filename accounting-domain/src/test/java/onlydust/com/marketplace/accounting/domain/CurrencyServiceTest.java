@@ -140,6 +140,24 @@ public class CurrencyServiceTest {
     }
 
     @Test
+    void should_reject_duplicate_erc20() {
+        // Given
+        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(currencyStorage.exists(Currency.Code.of("LORDS"))).thenReturn(true);
+        when(erc20Storage.exists(ETHEREUM, LORDS.address())).thenReturn(true);
+
+        // When
+        assertThatThrownBy(() -> currencyService.addERC20Support(ETHEREUM, LORDS.address()))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("ERC20 token at address 0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0 on Ethereum is already supported");
+
+        // Then
+        verify(currencyStorage, never()).save(any());
+        verify(quoteService, never()).currentPrice(any(), any(ERC20.class), any());
+        verify(quoteStorage, never()).save(any());
+    }
+
+    @Test
     void should_refresh_quotes() {
         // Given
         final var currencies = List.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK);

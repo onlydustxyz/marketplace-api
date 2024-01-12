@@ -4,13 +4,12 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.util.Optional;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 public class CurrencyService {
     private final @NonNull ERC20ProviderFactory erc20ProviderFactory;
@@ -38,9 +37,12 @@ public class CurrencyService {
     }
 
     public void addERC20Support(Blockchain blockchain, ContractAddress tokenAddress) {
+        if (erc20Storage.exists(blockchain, tokenAddress))
+            throw badRequest("ERC20 token at address %s on %s is already supported".formatted(tokenAddress, blockchain.pretty()));
+
         final var token = erc20ProviderFactory.get(blockchain)
                 .get(tokenAddress)
-                .orElseThrow(() -> OnlyDustException.notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress,
+                .orElseThrow(() -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress,
                         blockchain.pretty())));
 
         erc20Storage.save(blockchain, token);
