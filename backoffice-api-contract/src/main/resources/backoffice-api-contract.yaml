@@ -334,6 +334,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+
+  /bo/v1/currencies:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Add support of a new currency
+      operationId: createCurrency
+      description: Add support of a new currency
+      requestBody:
+        description: Currency to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyRequest'
+      responses:
+        "200":
+          description: 'Currency is now supported'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     apiKey:
@@ -358,6 +391,26 @@ components:
           example:
             message: You must be authenticated to make this call
             status: 401
+            id: 4f7c660e-6cf1-4424-b240-e630c4c19069
+          schema:
+            $ref: '#/components/schemas/OnlyDustError'
+    BadRequestError:
+      description: Bad request
+      content:
+        application/json:
+          example:
+            message: The request is invalid
+            status: 404
+            id: 4f7c660e-6cf1-4424-b240-e630c4c19069
+          schema:
+            $ref: '#/components/schemas/OnlyDustError'
+    NotFoundError:
+      description: Not found
+      content:
+        application/json:
+          example:
+            message: The requested resource was not found
+            status: 404
             id: 4f7c660e-6cf1-4424-b240-e630c4c19069
           schema:
             $ref: '#/components/schemas/OnlyDustError'
@@ -823,3 +876,77 @@ components:
       enum:
         - PUBLIC
         - PRIVATE
+
+    CurrencyRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/CurrencyType'
+        standard:
+          $ref: '#/components/schemas/CurrencyStandard'
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        address:
+          $ref: '#/components/schemas/ContractAddress'
+
+    CurrencyResponse:
+      type: object
+      required:
+        - id
+        - type
+        - name
+        - code
+        - logoUrl
+        - decimals
+      properties:
+        id:
+          $ref: '#/components/schemas/CurrencyId'
+        type:
+          $ref: '#/components/schemas/CurrencyType'
+        standard:
+          $ref: '#/components/schemas/CurrencyStandard'
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        address:
+          $ref: '#/components/schemas/ContractAddress'
+        name:
+          type: string
+        code:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+        decimals:
+          type: integer
+        description:
+          type: string
+
+    CurrencyId:
+      type: string
+      format: uuid
+
+    CurrencyType:
+      type: string
+      enum:
+        - FIAT
+        - CRYPTO
+
+    CurrencyStandard:
+      type: string
+      enum:
+        - ISO4217
+        - ERC20
+
+    BlockchainContract:
+      type: string
+      enum:
+        - ETHEREUM
+        - OPTIMISM
+        - STARKNET
+        - APTOS
+
+    ContractAddress:
+      type: string
+      format: hex

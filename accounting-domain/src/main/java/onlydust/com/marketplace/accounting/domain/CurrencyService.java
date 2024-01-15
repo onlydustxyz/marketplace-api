@@ -10,7 +10,7 @@ import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
-public class CurrencyService {
+public class CurrencyService implements onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort {
     private final @NonNull ERC20ProviderFactory erc20ProviderFactory;
     private final @NonNull ERC20Storage erc20Storage;
     private final @NonNull CurrencyStorage currencyStorage;
@@ -35,7 +35,8 @@ public class CurrencyService {
                 .orElseThrow(() -> internalServerError("USD currency is not available"));
     }
 
-    public void addERC20Support(Blockchain blockchain, ContractAddress tokenAddress) {
+    @Override
+    public Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress) {
         if (erc20Storage.exists(blockchain, tokenAddress))
             throw badRequest("ERC20 token at address %s on %s is already supported".formatted(tokenAddress, blockchain.pretty()));
 
@@ -47,14 +48,18 @@ public class CurrencyService {
         erc20Storage.save(token);
 
         final var currency = Currency.of(token);
+
         if (!currencyStorage.exists(currency.code())) {
             final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
             saveUsdQuotes(List.of(currency));
         }
+
+        return currency;
     }
 
+    @Override
     public void refreshQuotes() {
         saveUsdQuotes(currencyStorage.all());
     }

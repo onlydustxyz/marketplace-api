@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +29,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 public class BackofficeRestApi implements BackofficeApi {
 
     private final BackofficeFacadePort backofficeFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
     @Override
@@ -138,4 +142,17 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<CurrencyResponse> createCurrency(CurrencyRequest request) {
+        final var currency = switch (request.getType()) {
+            case CRYPTO -> switch (request.getStandard()) {
+                case ERC20 -> currencyFacadePort.addERC20Support(mapBlockchain(request.getBlockchain()), Ethereum.contractAddress(request.getAddress()));
+                default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+            };
+
+            default -> throw OnlyDustException.badRequest("Currency type %s is not supported".formatted(request.getType()));
+        };
+
+        return ResponseEntity.ok(mapCurrencyResponse(currency));
+    }
 }
