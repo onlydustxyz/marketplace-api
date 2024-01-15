@@ -9,9 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.infrastructure.HttpClient;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
+import java.util.Map;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -27,6 +29,12 @@ public class CmcClient extends HttpClient {
     @Override
     protected URI uri(String path) {
         return URI.create(properties.baseUri + path);
+    }
+
+    public Optional<MetadataResponse> metadata(ContractAddress address) {
+        return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(address), new TypeReference<Response<Map<Integer,
+                MetadataResponse>>>() {
+        }).flatMap(d -> d.values().stream().findFirst());
     }
 
     public <T> Optional<T> get(String path, TypeReference<Response<T>> typeRef) {
@@ -49,5 +57,9 @@ public class CmcClient extends HttpClient {
         @JsonIgnoreProperties(ignoreUnknown = true)
         private record Status(@JsonProperty("error_code") Integer errorCode, @JsonProperty("error_message") String errorMessage) {
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record MetadataResponse(String description, URI logo) {
     }
 }
