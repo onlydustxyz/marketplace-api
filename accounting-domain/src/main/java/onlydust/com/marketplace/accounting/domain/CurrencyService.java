@@ -7,6 +7,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
+import java.util.List;
+
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 public class CurrencyService {
@@ -50,8 +52,8 @@ public class CurrencyService {
             final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
-            quoteService.currentPrice(currency, usd)
-                    .ifPresent(quoteStorage::save);
+            quoteService.currentPrice(List.of(currency), usd)
+                    .forEach(quoteStorage::save);
         }
     }
 

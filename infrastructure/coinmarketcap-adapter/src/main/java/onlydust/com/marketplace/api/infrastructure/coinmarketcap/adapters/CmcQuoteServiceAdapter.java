@@ -16,13 +16,6 @@ public class CmcQuoteServiceAdapter implements QuoteService {
     private final @NonNull CmcClient client;
 
     @Override
-    public Optional<Quote> currentPrice(Currency currency, Currency base) {
-        return client.quotes(List.of(currency), List.of(base)).values().stream()
-                .findFirst()
-                .map(q -> new Quote(currency.id(), base.id(), q.quote().get(client.internalId(base).orElseThrow()).price()));
-    }
-
-    @Override
     public List<Quote> currentPrice(List<Currency> currencies, Currency base) {
         final var response = client.quotes(currencies, List.of(base));
         final var baseId = client.internalId(base).orElseThrow();

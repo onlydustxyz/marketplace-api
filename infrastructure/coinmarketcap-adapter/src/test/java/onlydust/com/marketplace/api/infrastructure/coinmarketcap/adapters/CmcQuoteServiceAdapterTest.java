@@ -40,18 +40,6 @@ class CmcQuoteServiceAdapterTest {
     private final static Currency LORDS = Currency.of(LORDS_ERC20);
 
     //    @Test
-    void should_return_single_quote_from_erc20() {
-        // When
-        final var quote = adapter.currentPrice(USDC, USD).orElseThrow();
-
-        // Then
-        assertThat(quote.price()).isGreaterThan(BigDecimal.valueOf(0.95));
-        assertThat(quote.price()).isLessThan(BigDecimal.valueOf(1.05));
-        assertThat(quote.currencyId()).isEqualTo(USDC.id());
-        assertThat(quote.base()).isEqualTo(USD.id());
-    }
-
-    //    @Test
     void should_return_multiple_quotes_from_ids() {
         // When
         final var quotes = adapter.currentPrice(List.of(USDC, ETH, LORDS), USD);

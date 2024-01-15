@@ -49,8 +49,8 @@ public class CurrencyServiceTest {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https://realms.io"))));
-        when(quoteService.currentPrice(any(Currency.class), eq(Currencies.USD)))
-                .then(i -> Optional.of(new Quote(i.getArgument(0, Currency.class).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
+        when(quoteService.currentPrice(any(), eq(Currencies.USD)))
+                .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -116,7 +116,7 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(Currencies.LORDS, Currencies.USD)).thenReturn(Optional.empty());
+        when(quoteService.currentPrice(List.of(Currencies.LORDS), Currencies.USD)).thenReturn(List.of());
 
         // When
         currencyService.addERC20Support(ETHEREUM, LORDS.address());
@@ -137,7 +137,7 @@ public class CurrencyServiceTest {
 
         // Then
         verify(currencyStorage, never()).save(any());
-        verify(quoteService, never()).currentPrice(any(Currency.class), any());
+        verify(quoteService, never()).currentPrice(any(), any());
         verify(quoteStorage, never()).save(any());
     }
 
@@ -155,7 +155,7 @@ public class CurrencyServiceTest {
 
         // Then
         verify(currencyStorage, never()).save(any());
-        verify(quoteService, never()).currentPrice(any(Currency.class), any());
+        verify(quoteService, never()).currentPrice(any(), any());
         verify(quoteStorage, never()).save(any());
     }
 
