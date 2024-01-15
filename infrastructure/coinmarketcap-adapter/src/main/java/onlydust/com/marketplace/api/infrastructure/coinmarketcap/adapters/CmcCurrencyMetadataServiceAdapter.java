@@ -14,6 +14,6 @@ public class CmcCurrencyMetadataServiceAdapter implements CurrencyMetadataServic
 
     @Override
     public Optional<Currency.Metadata> get(ERC20 token) {
-        return client.metadata(token.address()).map(m -> new Currency.Metadata(m.description(), m.logo()));
+        return client.metadata(token).map(m -> new Currency.Metadata(m.description(), m.logo()));
     }
 }

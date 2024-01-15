@@ -19,17 +19,18 @@ public class Currency {
     @NonNull
     private final Code code;
     private final Metadata metadata;
+    private final ERC20 erc20;
 
     public Currency(final @NonNull String name, final @NonNull Code code) {
-        this(Id.random(), name, code, null);
+        this(Id.random(), name, code, null, null);
     }
 
     public static Currency of(final @NonNull ERC20 token) {
-        return new Currency(token.name(), Code.of(token.symbol()));
+        return new Currency(Id.random(), token.name(), Code.of(token.symbol()), null, token);
     }
 
     public Currency withMetadata(final @NonNull Metadata metadata) {
-        return new Currency(id, name, code, metadata);
+        return new Currency(id, name, code, metadata, erc20);
     }
 
     public Id id() {
@@ -50,6 +51,10 @@ public class Currency {
 
     public Optional<URI> logoUri() {
         return Optional.ofNullable(metadata).map(Metadata::logoUri);
+    }
+
+    public Optional<ERC20> erc20() {
+        return Optional.ofNullable(erc20);
     }
 
     @Override

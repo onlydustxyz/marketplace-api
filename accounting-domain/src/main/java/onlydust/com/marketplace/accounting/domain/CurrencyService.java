@@ -7,8 +7,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
-import java.util.Optional;
-
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 public class CurrencyService {
@@ -52,18 +50,14 @@ public class CurrencyService {
             final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
-            quoteService.currentPrice(currency.id(), token, usd.id())
+            quoteService.currentPrice(currency, usd)
                     .ifPresent(quoteStorage::save);
         }
     }
 
     public void refreshQuotes() {
-        final var currencies = currencyStorage.all().stream().map(Currency::id).toList();
-        final var quotes = quoteService.currentPrice(currencies, usd.id()).stream()
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toArray(Quote[]::new);
-
+        final var currencies = currencyStorage.all();
+        final var quotes = quoteService.currentPrice(currencies, usd).toArray(Quote[]::new);
         quoteStorage.save(quotes);
     }
 }
