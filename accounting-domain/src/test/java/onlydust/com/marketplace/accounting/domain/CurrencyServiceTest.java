@@ -172,6 +172,7 @@ public class CurrencyServiceTest {
         currencyService.refreshQuotes();
 
         // Then
-        verify(quoteStorage, times(1)).save(USDC_USD, LORDS_USD);
+        verify(quoteStorage, times(1)).save(USDC_USD);
+        verify(quoteStorage, times(1)).save(LORDS_USD);
     }
 }

@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -52,14 +51,15 @@ public class CurrencyService {
             final var metadata = currencyMetadataService.get(token);
             currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
 
-            quoteService.currentPrice(List.of(currency), usd)
-                    .forEach(quoteStorage::save);
+            saveUsdQuotes(List.of(currency));
         }
     }
 
     public void refreshQuotes() {
-        final var currencies = currencyStorage.all();
-        final var quotes = quoteService.currentPrice(currencies, usd).toArray(Quote[]::new);
-        quoteStorage.save(quotes);
+        saveUsdQuotes(currencyStorage.all());
+    }
+
+    private void saveUsdQuotes(List<Currency> currencies) {
+        quoteService.currentPrice(currencies, usd).forEach(quoteStorage::save);
     }
 }

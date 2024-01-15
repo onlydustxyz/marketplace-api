@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.handler.codec.http.HttpMethod;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -61,8 +59,8 @@ public class CmcClient extends HttpClient {
     }
 
     public Optional<Integer> internalId(Currency currency) {
-        return Optional.ofNullable(INTERNAL_IDS.computeIfAbsent(currency.id(),
-                id -> currency.erc20().flatMap(erc20 -> metadata(erc20).map(m -> m.id)).orElse(null)));
+        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> currency.erc20().flatMap(this::metadata).map(MetadataResponse::id).orElse(null));
+        return Optional.ofNullable(id);
     }
 
     private <T> Optional<T> get(String path, TypeReference<Response<T>> typeRef) {
@@ -74,12 +72,7 @@ public class CmcClient extends HttpClient {
                 });
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class Properties {
-        String baseUri;
-        String apiKey;
-        Map<onlydust.com.marketplace.accounting.domain.model.Currency.Id, Integer> currencyIds;
+    public record Properties(String baseUri, String apiKey, Map<Currency.Id, Integer> currencyIds) {
     }
 
     public record Response<T>(Status status, T data) {
