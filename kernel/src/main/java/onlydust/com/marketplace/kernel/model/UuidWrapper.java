@@ -16,4 +16,8 @@ public abstract class UuidWrapper {
     public String toString() {
         return uuid.toString();
     }
+
+    public UUID value() {
+        return uuid;
+    }
 }

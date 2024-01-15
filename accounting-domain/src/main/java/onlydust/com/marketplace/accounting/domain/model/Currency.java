@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Builder(toBuilder = true, access = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 public class Currency {
     @EqualsAndHashCode.Include
     @NonNull
@@ -129,7 +129,7 @@ public class Currency {
         }
     }
 
-    public record Metadata(String description, URI logoUri) {
+    public record Metadata(String description, @NonNull URI logoUri) {
     }
 
     public enum Type {FIAT, CRYPTO}
