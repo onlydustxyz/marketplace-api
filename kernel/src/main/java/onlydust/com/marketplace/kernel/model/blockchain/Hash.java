@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
-@EqualsAndHashCode
 public abstract class Hash {
     final @NonNull String inner;
 
@@ -17,6 +16,21 @@ public abstract class Hash {
         validator.check(hash);
 
         this.inner = validator.sanitize(hash);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Hash hash))
+            return false;
+
+        return inner.equalsIgnoreCase(hash.inner);
+    }
+
+    @Override
+    public int hashCode() {
+        return inner.hashCode();
     }
 
     @Override

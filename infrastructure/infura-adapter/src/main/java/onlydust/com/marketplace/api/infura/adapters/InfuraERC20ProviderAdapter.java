@@ -24,7 +24,7 @@ public class InfuraERC20ProviderAdapter extends InfuraClient implements ERC20Pro
         final var totalSupply = contract.totalSupply().sendAsync();
 
         try {
-            return Optional.of(new ERC20(address, name.get(), symbol.get(), decimals.get().intValue(), totalSupply.get()));
+            return Optional.of(new ERC20(blockchain(), address, name.get(), symbol.get(), decimals.get().intValue(), totalSupply.get()));
         } catch (ContractCallException e) {
             return Optional.empty();
         } catch (Exception e) {

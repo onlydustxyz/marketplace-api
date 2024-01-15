@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.infura;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
@@ -11,11 +12,17 @@ public class InfuraClient {
     protected final Web3j web3j;
     protected final DefaultGasProvider gasPriceProvider;
     protected final Credentials credentials;
+    private final Properties properties;
 
     public InfuraClient(Properties properties) {
         this.web3j = Web3j.build(new HttpService("%s/%s".formatted(properties.baseUri, properties.apiKey)));
         this.gasPriceProvider = new DefaultGasProvider();
         this.credentials = Credentials.create(properties.privateKey);
+        this.properties = properties;
+    }
+
+    public Blockchain blockchain() {
+        return properties.blockchain;
     }
 
     @Data
@@ -24,5 +31,6 @@ public class InfuraClient {
         String baseUri;
         String apiKey;
         String privateKey;
+        Blockchain blockchain;
     }
 }
