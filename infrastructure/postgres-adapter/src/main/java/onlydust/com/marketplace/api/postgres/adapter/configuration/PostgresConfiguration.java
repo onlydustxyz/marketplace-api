@@ -220,4 +220,19 @@ public class PostgresConfiguration {
     public TechnologyStoragePort technologyStoragePort(final TechnologyViewEntityRepository technologyViewEntityRepository) {
         return new PostgresTechnologyAdapter(technologyViewEntityRepository);
     }
+
+    @Bean
+    public PostgresQuoteAdapter postgresQuoteAdapter(final QuoteRepository quoteRepository) {
+        return new PostgresQuoteAdapter(quoteRepository);
+    }
+
+    @Bean
+    public PostgresCurrencyAdapter postgresCurrencyAdapter(final CurrencyRepository currencyRepository) {
+        return new PostgresCurrencyAdapter(currencyRepository);
+    }
+
+    @Bean
+    public PostgresERC20Adapter postgresERC20Adapter(final ERC20Repository erc20Repository) {
+        return new PostgresERC20Adapter(erc20Repository);
+    }
 }

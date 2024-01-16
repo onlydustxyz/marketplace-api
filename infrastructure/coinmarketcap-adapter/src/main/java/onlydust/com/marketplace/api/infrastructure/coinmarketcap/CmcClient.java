@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.handler.codec.http.HttpMethod;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -72,7 +75,13 @@ public class CmcClient extends HttpClient {
                 });
     }
 
-    public record Properties(String baseUri, String apiKey, Map<Currency.Id, Integer> currencyIds) {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Data
+    public static class Properties {
+        String baseUri;
+        String apiKey;
+        Map<Currency.Id, Integer> currencyIds;
     }
 
     public record Response<T>(Status status, T data) {

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.service.BackofficeService;
@@ -15,8 +16,9 @@ import org.springframework.context.annotation.Profile;
 public class BackofficeConfiguration {
 
     @Bean
-    public BackofficeRestApi backofficeRestApi(final BackofficeFacadePort backofficeFacadePort) {
-        return new BackofficeRestApi(backofficeFacadePort);
+    public BackofficeRestApi backofficeRestApi(final BackofficeFacadePort backofficeFacadePort,
+                                               final CurrencyFacadePort currencyFacadePort) {
+        return new BackofficeRestApi(backofficeFacadePort, currencyFacadePort);
     }
 
     @Bean
