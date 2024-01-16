@@ -42,8 +42,6 @@ public class Auth0JwtVerifier implements JWTVerifier {
 
         this.jwtVerifier = JWT.require(algorithm)
                 .acceptExpiresAt(conf.getExpiresAtLeeway())
-                .withClaimPresence("nickname")
-                .withClaimPresence("picture")
                 .build();
     }
 

@@ -1,0 +1,15 @@
+{
+    "request": {
+        "url": "/userinfo",
+        "method": "POST",
+        "headers": {
+            "Authorization": {
+                "contains": "Bearer token-for-pierre"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "userinfo-pierre.json"
+    }
+}
