@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.helper;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.ClaimsProvider;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class UserAuthHelper {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    JWTVerifier jwtVerifier;
+    ClaimsProvider<Auth0JwtClaims> claimsProvider;
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
 
@@ -95,7 +96,7 @@ public class UserAuthHelper {
 
     public AuthenticatedUser authenticateUser(UserEntity user, String githubPAT) {
 
-        final var token = ((JwtVerifierStub) jwtVerifier).tokenFor(user.getGithubUserId(), user.getGithubLogin(),
+        final var token = ((Auth0ClaimsProviderStub) claimsProvider).tokenFor(user.getGithubUserId(), user.getGithubLogin(),
                 user.getGithubAvatarUrl(), user.getGithubEmail());
 
         if (githubPAT != null) {

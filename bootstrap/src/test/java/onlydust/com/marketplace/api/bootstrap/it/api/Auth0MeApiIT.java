@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.bootstrap.helper.Auth0ClaimsProviderStub;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -12,6 +11,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Onboarding
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.ClaimsProvider;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     String token;
 
     @Autowired
-    JWTVerifier jwtVerifier;
+    ClaimsProvider<Auth0JwtClaims> claimsProvider;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -46,7 +47,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         email = faker.internet().emailAddress();
-        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
+        token = ((Auth0ClaimsProviderStub) claimsProvider).tokenFor(githubUserId, login, avatarUrl, email);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
@@ -111,7 +112,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When we call it again (already signed-up) with a new email
         indexerApiWireMockServer.resetRequests();
         email = faker.internet().emailAddress();
-        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
+        token = ((Auth0ClaimsProviderStub) claimsProvider).tokenFor(githubUserId, login, avatarUrl, email);
 
         me = client.get()
                 .uri(getApiURI(ME_GET))
