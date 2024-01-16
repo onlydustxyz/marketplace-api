@@ -35,7 +35,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public ClaimsProvider<Auth0JwtClaims> auth0JwtClaimsClaimsProvider(final ObjectMapper objectMapper, final Auth0Properties auth0Properties) {
-        return new Auth0ClaimsProvider(objectMapper, HttpClient.newHttpClient(), auth0Properties);
+        return new CachedClaimsProvider<>(new Auth0ClaimsProvider(objectMapper, HttpClient.newHttpClient(), auth0Properties), auth0Properties);
     }
 
     @Bean

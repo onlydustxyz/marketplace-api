@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class Auth0Properties {
     String jwksUrl;
     Long expiresAtLeeway;
+    Long accessTokenCacheTtlInSeconds;
 }
