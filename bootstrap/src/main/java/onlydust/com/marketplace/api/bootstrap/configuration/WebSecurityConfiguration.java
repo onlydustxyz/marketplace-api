@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0ClaimsProvider;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,14 +34,14 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public JWTVerifier jwtVerifier(final Auth0Properties auth0Properties) {
-        return new Auth0JwtVerifier(auth0Properties);
+    public ClaimsProvider<Auth0JwtClaims> auth0JwtClaimsClaimsProvider(final ObjectMapper objectMapper, final Auth0Properties auth0Properties) {
+        return new Auth0ClaimsProvider(objectMapper, HttpClient.newHttpClient(), auth0Properties);
     }
 
     @Bean
-    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final Auth0Properties auth0Properties,
-                                      final UserFacadePort userFacadePort) {
-        return new Auth0JwtService(objectMapper, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper,
+                                      final UserFacadePort userFacadePort, final ClaimsProvider<Auth0JwtClaims> auth0JwtClaimsClaimsProvider) {
+        return new Auth0JwtService(objectMapper, userFacadePort, auth0JwtClaimsClaimsProvider);
     }
 
     @Bean
