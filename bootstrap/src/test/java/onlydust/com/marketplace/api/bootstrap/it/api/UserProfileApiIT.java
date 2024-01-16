@@ -1663,9 +1663,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
             }
             """;
 
-    @Autowired
-    UserAuthHelper userHelper;
-
 
     @Test
     void should_return_a_not_found_error() {
@@ -1738,7 +1735,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_private_user_profile() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -1768,7 +1765,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_email_if_user_profile_has_no_contact() {
         // Given
-        final String jwt = userHelper.authenticateHayden().jwt();
+        final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
         client.get()

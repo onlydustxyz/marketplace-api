@@ -11,13 +11,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     @Test
     void should_get_my_contributions() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -175,7 +174,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_project_filter() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -199,7 +198,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_repos_filter() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -223,7 +222,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_type_filter() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -248,7 +247,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_status_filter() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -273,7 +272,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_list_rewards_associated_to_a_contribution() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -315,7 +314,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_project_repo_name() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -355,7 +354,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_github_number_title() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -395,7 +394,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_links_count() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -431,7 +430,7 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_duplicate_contributions() {
         // Given
-        final String jwt = userHelper.authenticateHayden().jwt();
+        final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
         client.get()

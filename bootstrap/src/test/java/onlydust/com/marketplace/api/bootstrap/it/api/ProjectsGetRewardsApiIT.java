@@ -213,8 +213,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                  "nextPageIndex": 0
              }""";
 
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -228,7 +227,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(0)
     void should_return_forbidden_status_when_getting_project_rewards_given_user_not_project_lead() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
         // When
@@ -245,7 +244,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_get_projects_rewards() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
@@ -297,7 +296,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_project_rewards_with_multiple_currencies() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
@@ -396,7 +395,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_projects_rewards_filtered_by_currency() {
         // Given
-        final String jwt = userHelper.authenticateGregoire().jwt();
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         final var budget = budgetRepository.findById(UUID.fromString("5cd59ea2-f67a-4723-b90f-f5fd9036d6d1"))
@@ -459,7 +458,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_get_projects_rewards_filtered_by_contributors() {
         // Given
-        final String jwt = userHelper.authenticateGregoire().jwt();
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         // When
@@ -492,7 +491,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_get_projects_rewards_filtered_by_date() {
         // Given
-        final String jwt = userHelper.authenticateGregoire().jwt();
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         // When
@@ -532,7 +531,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void should_return_empty_state_when_no_result_found() {
 
         // Given
-        final String jwt = userHelper.authenticateGregoire().jwt();
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         // When
@@ -621,7 +620,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(6)
     void should_get_projects_rewards_when_no_usd_equivalent() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         cryptoUsdQuotesRepository.deleteById(CurrencyEnumEntity.eth);

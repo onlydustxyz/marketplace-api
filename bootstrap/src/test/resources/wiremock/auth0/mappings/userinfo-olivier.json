@@ -1,15 +1,15 @@
 {
     "request": {
-        "url": "/userinfo",
-        "method": "POST",
+        "url": "/",
+        "method": "GET",
         "headers": {
             "Authorization": {
-                "contains": "Bearer token-for-pierre"
+                "contains": "Bearer token-for-github|595505"
             }
         }
     },
     "response": {
         "status": 200,
-        "bodyFileName": "userinfo-pierre.json"
+        "bodyFileName": "userinfo-olivier.json"
     }
 }

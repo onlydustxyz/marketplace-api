@@ -684,8 +684,7 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     GithubAppInstallationRepository githubAppInstallationRepository;
-    @Autowired
-    UserAuthHelper userAuthHelper;
+
     @Autowired
     GithubAuthorizedRepoRepository githubAuthorizedRepoRepository;
 

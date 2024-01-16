@@ -22,8 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired
@@ -38,7 +37,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         // When
         client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -88,7 +87,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         // When
         client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -135,7 +134,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         // When
         client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -185,7 +184,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         // When
         client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -233,7 +232,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
         // When
         client.patch()
                 .uri(getApiURI(format(PROJECTS_IGNORED_CONTRIBUTIONS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

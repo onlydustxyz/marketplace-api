@@ -46,7 +46,25 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         login = faker.name().username();
         avatarUrl = faker.internet().avatar();
         email = faker.internet().emailAddress();
-        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
+        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId);
+
+        auth0WireMockServer.stubFor(
+                get(urlPathEqualTo("/"))
+                        .withHeader("Authorization", containing("Bearer token-for-github|%d".formatted(githubUserId)))
+                        .willReturn(ok()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("""
+                                        {
+                                            "sub": "github|%d",
+                                            "nickname": "%s",
+                                            "name": "%s",
+                                            "picture": "%s",
+                                            "updated_at": "2023-12-11T12:33:51Z",
+                                            "email": "%s",
+                                            "email_verified": true
+                                        }
+                                        """.formatted(githubUserId, login, login, avatarUrl, email)
+                                )));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
@@ -111,7 +129,25 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // When we call it again (already signed-up) with a new email
         indexerApiWireMockServer.resetRequests();
         email = faker.internet().emailAddress();
-        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, login, avatarUrl, email);
+        token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId);
+
+        auth0WireMockServer.stubFor(
+                get(urlPathEqualTo("/"))
+                        .withHeader("Authorization", containing("Bearer token-for-github|%d".formatted(githubUserId)))
+                        .willReturn(ok()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("""
+                                        {
+                                            "sub": "github|%d",
+                                            "nickname": "%s",
+                                            "name": "%s",
+                                            "picture": "%s",
+                                            "updated_at": "2023-12-11T12:33:51Z",
+                                            "email": "%s",
+                                            "email_verified": true
+                                        }
+                                        """.formatted(githubUserId, login, login, avatarUrl, email)
+                                )));
 
         me = client.get()
                 .uri(getApiURI(ME_GET))

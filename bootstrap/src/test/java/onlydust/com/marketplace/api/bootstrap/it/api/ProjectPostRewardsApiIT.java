@@ -24,9 +24,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
-
-    @Autowired
-    public UserAuthHelper userAuthHelper;
     @Autowired
     public ProjectRepository projectRepository;
 

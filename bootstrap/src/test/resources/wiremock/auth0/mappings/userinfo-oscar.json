@@ -4,12 +4,12 @@
         "method": "GET",
         "headers": {
             "Authorization": {
-                "contains": "Bearer token-for-github|5160414"
+                "contains": "Bearer token-for-github|21149076"
             }
         }
     },
     "response": {
         "status": 200,
-        "bodyFileName": "userinfo-hayden.json"
+        "bodyFileName": "userinfo-oscar.json"
     }
 }

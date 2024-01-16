@@ -49,8 +49,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
             "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
             "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
     );
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired
@@ -210,7 +209,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
 
     private UUID createProject(ProjectRewardSettings rewardSettings) {
         final UUID projectId = UUID.randomUUID();
-        final UUID leadId = userHelper.authenticatePierre().user().getId();
+        final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
         postgresProjectAdapter.createProject(projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),

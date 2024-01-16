@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
@@ -8,7 +9,11 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +49,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "rust-api", property = "infrastructure.od.api.client.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url"),
-        @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri")
+        @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
+        @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -126,11 +132,22 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer webhookWireMockServer;
     @InjectWireMock("linear")
     protected WireMockServer linearWireMockServer;
+    @InjectWireMock("auth0")
+    protected WireMockServer auth0WireMockServer;
 
     @LocalServerPort
     int port;
     @Autowired
     WebTestClient client;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    JWTVerifier jwtVerifier;
+    @Autowired
+    GithubAuthenticationPort githubAuthenticationPort;
+
+    protected UserAuthHelper userAuthHelper;
+
 
     protected static void waitAtLeastOneCycleOfOutboxEventProcessing() throws InterruptedException {
         Thread.sleep(1000);
@@ -143,6 +160,12 @@ public class AbstractMarketplaceApiIT {
         }
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
     }
+
+    @BeforeEach
+    void setupUserAuthHelper() {
+        userAuthHelper = new UserAuthHelper(userRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
+    }
+
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {

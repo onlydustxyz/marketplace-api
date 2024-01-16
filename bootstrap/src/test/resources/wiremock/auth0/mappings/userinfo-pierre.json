@@ -1,15 +1,15 @@
 {
-  "request": {
-    "url": "/search/users?per_page=5&q=antho",
-    "method": "GET",
-    "headers": {
-      "Authorization": {
-        "contains": "Bearer GITHUB_PAT"
-      }
+    "request": {
+        "url": "/",
+        "method": "GET",
+        "headers": {
+            "Authorization": {
+                "contains": "Bearer token-for-github|16590657"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "userinfo-pierre.json"
     }
-  },
-  "response": {
-    "status": 200,
-    "bodyFileName": "search-antho.json"
-  }
 }

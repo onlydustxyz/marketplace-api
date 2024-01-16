@@ -28,36 +28,33 @@ public class JwtVerifierStub implements JWTVerifier {
         return verify(jwt.getToken());
     }
 
-    public String tokenFor(String githubWithUserId, String login, String avatarUrl, String email) {
+    public String tokenFor(String githubWithUserId) {
+        final String token = "token-for-%s".formatted(githubWithUserId);
+
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
         when(decodedJWT.getSubject()).thenReturn(githubWithUserId);
+        when(decodedJWT.getToken()).thenReturn(token);
         when(decodedJWT.getPayload()).thenReturn(Base64.getUrlEncoder().encodeToString(String.format("""
                 {
-                  "nickname": "%s",
-                  "picture": "%s",
-                  "email": "%s",
-                  "updated_at": "2023-10-10T13:55:48.308Z",
                   "iss": "https://onlydust-hackathon.eu.auth0.com/",
                   "aud": "62GDg2a6pCjnAln1FccD55eCKLJtj4T5",
                   "iat": 1696947933,
                   "exp": 2000000000,
                   "sub": "%s",
-                  "sid": "21FFEt3yU2ESFcTtqW5xAilRFJ04auUb",
-                  "nonce": "j4CwZI11uuV3tDzwq4UyDEKiWiIg-Z3fWWWUzp2UXIk"
+                  "azp": "gfOdiFOltYYUMYeBzNpeNAjMHmb9fWoV",
+                  "scope": "openid profile email"
                 }
-                """, login, avatarUrl, email, githubWithUserId).getBytes()));
+                """, githubWithUserId).getBytes()));
 
-        final String token = "token-for-%s".formatted(githubWithUserId);
         decodedJWTPerToken.put(token, decodedJWT);
         return token;
     }
 
-    public String tokenFor(Long githubUserId, String login, String avatarUrl, String email) {
-        return tokenFor("github|%d".formatted(githubUserId), login, avatarUrl, email);
+    public String tokenFor(Long githubUserId) {
+        return tokenFor("github|%d".formatted(githubUserId));
     }
 
     public String tokenFor(Auth0JwtClaims claims) {
-        return tokenFor(claims.getGithubWithUserId(), claims.getGithubLogin(), claims.getGithubAvatarUrl(),
-                claims.getEmail());
+        return tokenFor(claims.getGithubWithUserId());
     }
 }

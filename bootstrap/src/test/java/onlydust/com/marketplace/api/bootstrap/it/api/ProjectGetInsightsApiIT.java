@@ -10,15 +10,14 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     private final static String KAAPER = "298a547f-ecb6-4ab2-8975-68f4e9bf7b39";
 
     @Test
     void should_get_staled_contributions() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -169,7 +168,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_churned_contributors() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -290,7 +289,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_newcomers() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -372,7 +371,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_most_active_contributors() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()

@@ -1114,8 +1114,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
 
     @Autowired
-    UserAuthHelper userHelper;
-    @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
@@ -1192,7 +1190,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_find_project_contributors_as_project_lead() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
@@ -1212,7 +1210,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_find_project_contributors_as_project_lead_with_login_filter() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
@@ -1233,7 +1231,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_find_project_contributors_with_multi_currencies() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         final PaymentRequestEntity reward1 = paymentRequestRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401" +
@@ -1288,7 +1286,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_find_project_contributors_with_ignored_contributions() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
                 .id(IgnoredContributionEntity.Id.builder()
