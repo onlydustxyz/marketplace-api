@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.net.http.HttpClient;
+
 @Configuration
 public class WebSecurityConfiguration {
 
@@ -37,9 +39,9 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final JWTVerifier jwtVerifier,
+    public JwtService jwtServiceAuth0(final ObjectMapper objectMapper, final Auth0Properties auth0Properties,
                                       final UserFacadePort userFacadePort) {
-        return new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort);
+        return new Auth0JwtService(objectMapper, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
     }
 
     @Bean
