@@ -40,7 +40,7 @@ public class CurrencyService implements CurrencyFacadePort {
     }
 
     @Override
-    public Currency addNativeCryptocurrencySupport(Currency.Code code, Integer decimals) {
+    public Currency addNativeCryptocurrencySupport(final @NonNull Currency.Code code, final @NonNull Integer decimals) {
         return currencyStorage.findByCode(code)
                 .orElseGet(() -> createCurrency(code, decimals));
     }
