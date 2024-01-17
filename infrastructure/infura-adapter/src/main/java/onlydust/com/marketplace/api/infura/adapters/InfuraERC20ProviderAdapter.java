@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import org.web3j.tx.exceptions.ContractCallException;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 public class InfuraERC20ProviderAdapter extends InfuraClient implements ERC20Provider {
     public InfuraERC20ProviderAdapter(final Properties properties) {
@@ -25,9 +26,9 @@ public class InfuraERC20ProviderAdapter extends InfuraClient implements ERC20Pro
 
         try {
             return Optional.of(new ERC20(blockchain(), address, name.get(), symbol.get(), decimals.get().intValue(), totalSupply.get()));
-        } catch (ContractCallException e) {
-            return Optional.empty();
-        } catch (Exception e) {
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof ContractCallException)
+                return Optional.empty();
             throw OnlyDustException.internalServerError("Unable to fetch ERC20 name at address %s".formatted(address), e);
         }
     }

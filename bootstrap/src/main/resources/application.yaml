@@ -103,3 +103,18 @@ infrastructure:
         client-id: ${AUTH0_M2M_CLIENT_ID}
         client-secret: ${AUTH0_M2M_CLIENT_SECRET}
         pat-cache-ttl-in-seconds: 3600
+  coinmarketcap:
+    base-uri: https://pro-api.coinmarketcap.com
+    api-key: ${COINMARKETCAP_API_KEY}
+    currency-ids:
+      a03cdb25-abe9-494f-84d5-d7426a9bf4e0: 2781 # USD TODO: remove
+  ethereum:
+    base-uri: https://mainnet.infura.io/v3
+    api-key: ${INFURA_API_KEY}
+    blockchain: ethereum
+    private-key: ${ETHEREUM_PRIVATE_KEY}
+  optimism:
+    base-uri: https://optimism-mainnet.infura.io/v3
+    api-key: ${INFURA_API_KEY}
+    blockchain: optimism
+    private-key: ${ETHEREUM_PRIVATE_KEY}

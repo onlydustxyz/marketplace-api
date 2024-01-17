@@ -1,0 +1,873 @@
+{
+    "status": {
+        "timestamp": "2024-01-15T21:03:24.780Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 17,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "3408": {
+            "id": 3408,
+            "name": "USDC",
+            "symbol": "USDC",
+            "category": "token",
+            "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
+            "slug": "usd-coin",
+            "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+            "subreddit": "",
+            "tag-names": [
+                "Medium of Exchange",
+                "Stablecoin",
+                "Asset-Backed Stablecoin",
+                "Coinbase Ventures Portfolio",
+                "Hedera Hashgraph Ecosystem",
+                "Fantom Ecosystem",
+                "Arbitrum Ecosystem",
+                "Moonriver Ecosystem",
+                "BNB Chain",
+                "USD Stablecoin",
+                "Optimism Ecosystem"
+            ],
+            "tag-groups": [
+                "INDUSTRY",
+                "CATEGORY",
+                "CATEGORY",
+                "CATEGORY",
+                "PLATFORM",
+                "PLATFORM",
+                "PLATFORM",
+                "PLATFORM",
+                "PLATFORM",
+                "CATEGORY",
+                "PLATFORM"
+            ],
+            "twitter_username": "circle",
+            "is_hidden": 0,
+            "date_launched": null,
+            "contract_address": [
+                {
+                    "contract_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "platform": {
+                        "name": "Ethereum",
+                        "coin": {
+                            "id": "1027",
+                            "name": "Ethereum",
+                            "symbol": "ETH",
+                            "slug": "ethereum"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+                    "platform": {
+                        "name": "Solana",
+                        "coin": {
+                            "id": "5426",
+                            "name": "Solana",
+                            "symbol": "SOL",
+                            "slug": "solana"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "31566704",
+                    "platform": {
+                        "name": "Algorand",
+                        "coin": {
+                            "id": "4030",
+                            "name": "Algorand",
+                            "symbol": "ALGO",
+                            "slug": "algorand"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+                    "platform": {
+                        "name": "BNB Smart Chain (BEP20)",
+                        "coin": {
+                            "id": "1839",
+                            "name": "BNB",
+                            "symbol": "BNB",
+                            "slug": "bnb"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+                    "platform": {
+                        "name": "Fantom",
+                        "coin": {
+                            "id": "3513",
+                            "name": "Fantom",
+                            "symbol": "FTM",
+                            "slug": "fantom"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
+                    "platform": {
+                        "name": "Gnosis Chain",
+                        "coin": {
+                            "id": "1659",
+                            "name": "Gnosis",
+                            "symbol": "GNO",
+                            "slug": "gnosis-gno"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xcca4e6302510d555b654b3eab9c0fcb223bcfdf0",
+                    "platform": {
+                        "name": "Viction",
+                        "coin": {
+                            "id": "2570",
+                            "name": "Viction",
+                            "symbol": "VIC",
+                            "slug": "viction"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x980a5afef3d17ad98635f6c5aebcbaeded3c3430",
+                    "platform": {
+                        "name": "KCC",
+                        "coin": {
+                            "id": "2087",
+                            "name": "KuCoin Token",
+                            "symbol": "KCS",
+                            "slug": "kucoin-token"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+                    "platform": {
+                        "name": "Moonriver",
+                        "coin": {
+                            "id": "9285",
+                            "name": "Moonriver",
+                            "symbol": "MOVR",
+                            "slug": "moonriver"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+                    "platform": {
+                        "name": "Avalanche C-Chain",
+                        "coin": {
+                            "id": "5805",
+                            "name": "Avalanche",
+                            "symbol": "AVAX",
+                            "slug": "avalanche"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+                    "platform": {
+                        "name": "Arbitrum",
+                        "coin": {
+                            "id": "11841",
+                            "name": "Arbitrum",
+                            "symbol": "ARB",
+                            "slug": "arbitrum"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xe2c120f188ebd5389f71cf4d9c16d05b62a58993",
+                    "platform": {
+                        "name": "Velas",
+                        "coin": {
+                            "id": "4747",
+                            "name": "Velas",
+                            "symbol": "VLX",
+                            "slug": "velas"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xc21223249CA28397B4B6541dfFaEcC539BfF0c59",
+                    "platform": {
+                        "name": "Cronos",
+                        "coin": {
+                            "id": "3635",
+                            "name": "Cronos",
+                            "symbol": "CRO",
+                            "slug": "cronos"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x985458e523db3d53125813ed68c274899e9dfab4",
+                    "platform": {
+                        "name": "Harmony",
+                        "coin": {
+                            "id": "3945",
+                            "name": "Harmony",
+                            "symbol": "ONE",
+                            "slug": "harmony"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "secret1h6z05y90gwm4sqxzhz4pkyp36cna9xtp7q0urv",
+                    "platform": {
+                        "name": "Secret",
+                        "coin": {
+                            "id": "5604",
+                            "name": "Secret",
+                            "symbol": "SCRT",
+                            "slug": "secret"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8",
+                    "platform": {
+                        "name": "Tron20",
+                        "coin": {
+                            "id": "1958",
+                            "name": "TRON",
+                            "symbol": "TRX",
+                            "slug": "tron"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x66a2A913e447d6b4BF33EFbec43aAeF87890FBbc",
+                    "platform": {
+                        "name": "Boba Network",
+                        "coin": {
+                            "id": "14556",
+                            "name": "Boba Network",
+                            "symbol": "BOBA",
+                            "slug": "boba-network"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "USDC-c76f1f",
+                    "platform": {
+                        "name": "Elrond",
+                        "coin": {
+                            "id": "6892",
+                            "name": "MultiversX",
+                            "symbol": "EGLD",
+                            "slug": "multiversx-egld"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x0b7007c13325c48911f73a2dad5fa5dcbf808adc",
+                    "platform": {
+                        "name": "Ronin",
+                        "coin": {
+                            "id": "14101",
+                            "name": "Ronin",
+                            "symbol": "RON",
+                            "slug": "ronin"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "terra1pvel56a2hs93yd429pzv9zp5aptcjg5ulhkz7w",
+                    "platform": {
+                        "name": "Terra Classic",
+                        "coin": {
+                            "id": "4172",
+                            "name": "Terra Classic",
+                            "symbol": "LUNC",
+                            "slug": "terra-luna"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+                    "platform": {
+                        "name": "Telos",
+                        "coin": {
+                            "id": "4660",
+                            "name": "Telos",
+                            "symbol": "TLOS",
+                            "slug": "telos"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x818ec0a7fe18ff94269904fced6ae3dae6d6dc0b",
+                    "platform": {
+                        "name": "Moonbeam",
+                        "coin": {
+                            "id": "6836",
+                            "name": "Moonbeam",
+                            "symbol": "GLMR",
+                            "slug": "moonbeam"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xb12bfca5a55806aaf64e99521918a4bf0fc40802",
+                    "platform": {
+                        "name": "Aurora",
+                        "coin": {
+                            "id": "14803",
+                            "name": "Aurora",
+                            "symbol": "AURORA",
+                            "slug": "aurora-near"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xea32a96608495e54156ae48931a7c20f0dcc1a21",
+                    "platform": {
+                        "name": "Metis Andromeda",
+                        "coin": {
+                            "id": "9640",
+                            "name": "MetisDAO",
+                            "symbol": "METIS",
+                            "slug": "metisdao"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x620fd5fa44be6af63715ef4e65ddfa0387ad13f5",
+                    "platform": {
+                        "name": "Fuse",
+                        "coin": {
+                            "id": "5634",
+                            "name": "Fuse",
+                            "symbol": "FUSE",
+                            "slug": "fuse-network"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x81ECac0D6Be0550A00FF064a4f9dd2400585FE9c",
+                    "platform": {
+                        "name": "Oasis Network",
+                        "coin": {
+                            "id": "7653",
+                            "name": "Oasis Network",
+                            "symbol": "ROSE",
+                            "slug": "oasis-network"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x3ad9dfe640e1a9cc1d9b0948620820d975c3803a",
+                    "platform": {
+                        "name": "Avalanche DFK",
+                        "coin": {
+                            "id": "12319",
+                            "name": "DeFi Kingdoms",
+                            "symbol": "JEWEL",
+                            "slug": "defi-kingdoms"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
+                    "platform": {
+                        "name": "Elastos",
+                        "coin": {
+                            "id": "2492",
+                            "name": "Elastos",
+                            "symbol": "ELA",
+                            "slug": "elastos"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xc946daf81b08146b1c7a8da2a851ddf2b3eaaf85",
+                    "platform": {
+                        "name": "OKExChain",
+                        "coin": {
+                            "id": "8267",
+                            "name": "OKT Chain",
+                            "symbol": "OKT",
+                            "slug": "okt"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x3b2bf2b523f54c4e454f08aa286d03115aff326c",
+                    "platform": {
+                        "name": "IoTex",
+                        "coin": {
+                            "id": "2777",
+                            "name": "IoTeX",
+                            "symbol": "IOTX",
+                            "slug": "iotex"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xB44a9B6905aF7c801311e8F4E76932ee959c663C",
+                    "platform": {
+                        "name": "Milkomeda",
+                        "coin": {
+                            "id": "2010",
+                            "name": "Cardano",
+                            "symbol": "ADA",
+                            "slug": "cardano"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xd86e243fc0007e6226b07c9a50c9d70d78299eb5",
+                    "platform": {
+                        "name": "Meter",
+                        "coin": {
+                            "id": "5919",
+                            "name": "Meter Governance",
+                            "symbol": "MTRG",
+                            "slug": "meter-governance"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                    "platform": {
+                        "name": "Optimism",
+                        "coin": {
+                            "id": "11840",
+                            "name": "Optimism",
+                            "symbol": "OP",
+                            "slug": "optimism-ethereum"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
+                    "platform": {
+                        "name": "Near",
+                        "coin": {
+                            "id": "6535",
+                            "name": "NEAR Protocol",
+                            "symbol": "NEAR",
+                            "slug": "near-protocol"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x52a9cea01c4cbdd669883e41758b8eb8e8e2b34b",
+                    "platform": {
+                        "name": "Wanchain",
+                        "coin": {
+                            "id": "2606",
+                            "name": "Wanchain",
+                            "symbol": "WAN",
+                            "slug": "wanchain"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x6963efed0ab40f6c3d7bda44a05dcf1437c44372",
+                    "platform": {
+                        "name": "Conflux",
+                        "coin": {
+                            "id": "7334",
+                            "name": "Conflux",
+                            "symbol": "CFX",
+                            "slug": "conflux-network"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0:c37b3fafca5bf7d3704b081fde7df54f298736ee059bf6d32fac25f5e6085bf6",
+                    "platform": {
+                        "name": "Everscale",
+                        "coin": {
+                            "id": "7505",
+                            "name": "Everscale",
+                            "symbol": "EVER",
+                            "slug": "everscale"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4",
+                    "platform": {
+                        "name": "Osmosis",
+                        "coin": {
+                            "id": "12220",
+                            "name": "Osmosis",
+                            "symbol": "OSMO",
+                            "slug": "osmosis"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "6XtHjpXbs9RRJP2Sr9GUyVqzACcby9TkThHXnjVC5CDJ",
+                    "platform": {
+                        "name": "Waves",
+                        "coin": {
+                            "id": "1274",
+                            "name": "Waves",
+                            "symbol": "WAVES",
+                            "slug": "waves"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x765277EebeCA2e31912C9946eAe1021199B39C61",
+                    "platform": {
+                        "name": "Bitgert",
+                        "coin": {
+                            "id": "11079",
+                            "name": "Bitgert",
+                            "symbol": "BRISE",
+                            "slug": "bitrise-token"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xBcbd9990dcEC6a64741ea27BeC0cA8ff6B91Bc26",
+                    "platform": {
+                        "name": "Bitcoin Cash",
+                        "coin": {
+                            "id": "1831",
+                            "name": "Bitcoin Cash",
+                            "symbol": "BCH",
+                            "slug": "bitcoin-cash"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x765277eebeca2e31912c9946eae1021199b39c61",
+                    "platform": {
+                        "name": "Dogechain",
+                        "coin": {
+                            "id": "74",
+                            "name": "Dogecoin",
+                            "symbol": "DOGE",
+                            "slug": "dogecoin"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x765277eebeca2e31912c9946eae1021199b39c61",
+                    "platform": {
+                        "name": "KardiaChain",
+                        "coin": {
+                            "id": "5453",
+                            "name": "KardiaChain",
+                            "symbol": "KAI",
+                            "slug": "kardiachain"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x80b5a32E4F032B2a058b4F29EC95EEfEEB87aDcd",
+                    "platform": {
+                        "name": "Canto",
+                        "coin": {
+                            "id": "21516",
+                            "name": "CANTO",
+                            "symbol": "CANTO",
+                            "slug": "canto"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x25de68ef588cb0c2c8f3537861e828ae699cd0db",
+                    "platform": {
+                        "name": "EthereumPoW",
+                        "coin": {
+                            "id": "21296",
+                            "name": "EthereumPoW",
+                            "symbol": "ETHW",
+                            "slug": "ethereum-pow"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC",
+                    "platform": {
+                        "name": "Aptos",
+                        "coin": {
+                            "id": "21794",
+                            "name": "Aptos",
+                            "symbol": "APT",
+                            "slug": "aptos"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x4200000000000000000000000000000000000100",
+                    "platform": {
+                        "name": "Tomb Chain",
+                        "coin": {
+                            "id": "11495",
+                            "name": "Tomb",
+                            "symbol": "TOMB",
+                            "slug": "tomb"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x22e89898A04eaf43379BeB70bf4E38b1faf8A31e",
+                    "platform": {
+                        "name": "ThunderCore",
+                        "coin": {
+                            "id": "3930",
+                            "name": "ThunderCore",
+                            "symbol": "TT",
+                            "slug": "thundercore"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xe46910336479F254723710D57e7b683F3315b22B",
+                    "platform": {
+                        "name": "Evmos",
+                        "coin": {
+                            "id": "19899",
+                            "name": "Evmos",
+                            "symbol": "EVMOS",
+                            "slug": "evmos"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x2bF9b864cdc97b08B6D79ad4663e71B8aB65c45c",
+                    "platform": {
+                        "name": "Syscoin",
+                        "coin": {
+                            "id": "541",
+                            "name": "Syscoin",
+                            "symbol": "SYS",
+                            "slug": "syscoin"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xffd7510ca0a3279c7a5f50018a26c21d5bc1dbcf",
+                    "platform": {
+                        "name": "Energi",
+                        "coin": {
+                            "id": "3218",
+                            "name": "Energi",
+                            "symbol": "NRG",
+                            "slug": "energi"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x6a2d262D56735DbA19Dd70682B39F6bE9a931D98",
+                    "platform": {
+                        "name": "Astar",
+                        "coin": {
+                            "id": "12885",
+                            "name": "Astar",
+                            "symbol": "ASTR",
+                            "slug": "astar"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xe2aa35c2039bd0ff196a6ef99523cc0d3972ae3e",
+                    "platform": {
+                        "name": "SX Network",
+                        "coin": {
+                            "id": "8377",
+                            "name": "SX Network",
+                            "symbol": "SX",
+                            "slug": "sportx"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
+                    "platform": {
+                        "name": "Wemix",
+                        "coin": {
+                            "id": "7548",
+                            "name": "WEMIX",
+                            "symbol": "WEMIX",
+                            "slug": "wemix"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x3355df6d4c9c3035724fd0e3914de96a5a83aaf4",
+                    "platform": {
+                        "name": "zkSync Era",
+                        "coin": {
+                            "id": "24091",
+                            "name": "zkSync",
+                            "symbol": "TBD",
+                            "slug": "zksync"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xfa9343c3897324496a05fc75abed6bac29f8a40f",
+                    "platform": {
+                        "name": "Kava",
+                        "coin": {
+                            "id": "4846",
+                            "name": "Kava",
+                            "symbol": "KAVA",
+                            "slug": "kava"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xa8ce8aee21bc2a48a5ef670afcc9274c7bbbc035",
+                    "platform": {
+                        "name": "Polygon zkEVM",
+                        "coin": {
+                            "id": "3890",
+                            "name": "Polygon",
+                            "symbol": "MATIC",
+                            "slug": "polygon"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0.0.456858",
+                    "platform": {
+                        "name": "Hedera Hashgraph",
+                        "coin": {
+                            "id": "4642",
+                            "name": "Hedera",
+                            "symbol": "HBAR",
+                            "slug": "hedera"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x5d4b302506645c37ff133b98c4b50a5ae14841659738d6d733d59d0d217a93bf::coin::COIN",
+                    "platform": {
+                        "name": "Sui Network",
+                        "coin": {
+                            "id": "20947",
+                            "name": "Sui",
+                            "symbol": "SUI",
+                            "slug": "sui"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x15d38573d2feeb82e7ad5187ab8c1d52810b1f07",
+                    "platform": {
+                        "name": "PulseChain",
+                        "coin": {
+                            "id": "11145",
+                            "name": "Pulsechain",
+                            "symbol": "PLS",
+                            "slug": "pulsechain"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x186181e225dc1ad85a4a94164232bd261e351c33",
+                    "platform": {
+                        "name": "Godwoken",
+                        "coin": {
+                            "id": "4948",
+                            "name": "Nervos Network",
+                            "symbol": "CKB",
+                            "slug": "nervos-network"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xea6b04272f9f62f997f666f07d3a974134f7ffb9",
+                    "platform": {
+                        "name": "Neon EVM",
+                        "coin": {
+                            "id": "23015",
+                            "name": "Neon EVM",
+                            "symbol": "NEON",
+                            "slug": "neon"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
+                    "platform": {
+                        "name": "Starknet",
+                        "coin": {
+                            "id": "22691",
+                            "name": "Starknet Token",
+                            "symbol": "STRK",
+                            "slug": "starknet-token"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+                    "platform": {
+                        "name": "Polygon",
+                        "coin": {
+                            "id": "3890",
+                            "name": "Polygon",
+                            "symbol": "MATIC",
+                            "slug": "polygon"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                    "platform": {
+                        "name": "Base",
+                        "coin": {
+                            "id": "27716",
+                            "name": "Base",
+                            "symbol": "TBA",
+                            "slug": "base"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0xa4151B2B3e269645181dCcF2D426cE75fcbDeca9",
+                    "platform": {
+                        "name": "Core",
+                        "coin": {
+                            "id": "23254",
+                            "name": "Core",
+                            "symbol": "CORE",
+                            "slug": "core-dao"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x09bc4e0d864854c6afb6eb9a9cdf58ac190d0df9",
+                    "platform": {
+                        "name": "Mantle",
+                        "coin": {
+                            "id": "27075",
+                            "name": "Mantle",
+                            "symbol": "MNT",
+                            "slug": "mantle"
+                        }
+                    }
+                },
+                {
+                    "contract_address": "0x37f750b7cc259a2f741af45294f6a16572cf5cad",
+                    "platform": {
+                        "name": "Celo",
+                        "coin": {
+                            "id": "5567",
+                            "name": "Celo",
+                            "symbol": "CELO",
+                            "slug": "celo"
+                        }
+                    }
+                }
+            ],
+            "self_reported_circulating_supply": null,
+            "self_reported_tags": null,
+            "self_reported_market_cap": null,
+            "infinite_supply": false
+        }
+    }
+}

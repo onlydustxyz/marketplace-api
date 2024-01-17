@@ -57,3 +57,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000027_remove_hasura_auth.sql
   - include:
       file: db/changelog/changelogs/00000028_update_project_stats_view_with_usdc.sql
+  - include:
+      file: db/changelog/changelogs/00000029_create_new_currencies_tables.sql

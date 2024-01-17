@@ -1,0 +1,15 @@
+{
+    "request": {
+        "url": "/v2/cryptocurrency/info?aux=logo,description&address=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "method": "GET",
+        "headers": {
+            "X-CMC_PRO_API_KEY": {
+                "contains": "CMC_API_KEY"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-usdc-info.json"
+    }
+}

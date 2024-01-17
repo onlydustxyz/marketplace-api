@@ -8,8 +8,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder(toBuilder = true)
 public class Currency {
     @EqualsAndHashCode.Include
     @NonNull
@@ -18,19 +18,49 @@ public class Currency {
     private final String name;
     @NonNull
     private final Code code;
+    @NonNull
+    private final Type type;
+    private final Standard standard;
+    @NonNull
+    private Integer decimals;
     private final Metadata metadata;
     private final ERC20 erc20;
 
-    public Currency(final @NonNull String name, final @NonNull Code code) {
-        this(Id.random(), name, code, null, null);
+    public static Currency of(final @NonNull ERC20 token) {
+        return Currency.builder()
+                .id(Id.random())
+                .name(token.name())
+                .code(Code.of(token.symbol()))
+                .type(Type.CRYPTO)
+                .standard(Standard.ERC20)
+                .erc20(token)
+                .decimals(token.decimals())
+                .build();
     }
 
-    public static Currency of(final @NonNull ERC20 token) {
-        return new Currency(Id.random(), token.name(), Code.of(token.symbol()), null, token);
+    public static Currency fiat(String name, Code code, Integer decimals) {
+        return Currency.builder()
+                .id(Id.random())
+                .name(name)
+                .code(code)
+                .type(Type.FIAT)
+                .standard(Standard.ISO4217)
+                .decimals(decimals)
+                .build();
+    }
+
+    public static Currency crypto(String name, Code code, Integer decimals) {
+        return Currency.builder()
+                .id(Id.random())
+                .name(name)
+                .code(code)
+                .type(Type.CRYPTO)
+                .decimals(decimals)
+                .build();
     }
 
     public Currency withMetadata(final @NonNull Metadata metadata) {
-        return new Currency(id, name, code, metadata, erc20);
+        return toBuilder().metadata(metadata).build();
     }
 
     public Id id() {
@@ -43,6 +73,18 @@ public class Currency {
 
     public Code code() {
         return code;
+    }
+
+    public Type type() {
+        return type;
+    }
+
+    public Optional<Standard> standard() {
+        return Optional.ofNullable(standard);
+    }
+
+    public Integer decimals() {
+        return decimals;
     }
 
     public Optional<String> description() {
@@ -60,6 +102,10 @@ public class Currency {
     @Override
     public String toString() {
         return code.toString();
+    }
+
+    public Currency withERC20(ERC20 token) {
+        return toBuilder().erc20(token).build();
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -87,6 +133,10 @@ public class Currency {
         }
     }
 
-    public record Metadata(String description, URI logoUri) {
+    public record Metadata(String description, @NonNull URI logoUri) {
     }
+
+    public enum Type {FIAT, CRYPTO}
+
+    public enum Standard {ISO4217, ERC20}
 }

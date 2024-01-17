@@ -137,5 +137,4 @@ public class BackofficeRestApi implements BackofficeApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
-
 }

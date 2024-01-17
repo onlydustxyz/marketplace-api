@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
@@ -202,6 +206,53 @@ public interface BackOfficeMapper {
         return switch (visibility) {
             case PUBLIC -> ProjectVisibility.PUBLIC;
             case PRIVATE -> ProjectVisibility.PRIVATE;
+        };
+    }
+
+    static Blockchain mapBlockchain(BlockchainContract blockchain) {
+        return switch (blockchain) {
+            case ETHEREUM -> Blockchain.ETHEREUM;
+            case STARKNET -> Blockchain.STARKNET;
+            case OPTIMISM -> Blockchain.OPTIMISM;
+            case APTOS -> Blockchain.APTOS;
+        };
+    }
+
+    static BlockchainContract mapBlockchain(Blockchain blockchain) {
+        return switch (blockchain) {
+            case ETHEREUM -> BlockchainContract.ETHEREUM;
+            case STARKNET -> BlockchainContract.STARKNET;
+            case OPTIMISM -> BlockchainContract.OPTIMISM;
+            case APTOS -> BlockchainContract.APTOS;
+        };
+    }
+
+    static CurrencyResponse mapCurrencyResponse(onlydust.com.marketplace.accounting.domain.model.Currency currency) {
+        return new CurrencyResponse()
+                .id(currency.id().value())
+                .type(mapCurrencyType(currency.type()))
+                .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
+                .blockchain(currency.erc20().map(ERC20::blockchain).map(BackOfficeMapper::mapBlockchain).orElse(null))
+                .address(currency.erc20().map(ERC20::address).map(Hash::toString).orElse(null))
+                .name(currency.name())
+                .code(currency.code().toString())
+                .logoUrl(currency.logoUri().orElse(null))
+                .decimals(currency.decimals())
+                .description(currency.description().orElse(null))
+                ;
+    }
+
+    static CurrencyStandard mapCurrencyStandard(final @NonNull onlydust.com.marketplace.accounting.domain.model.Currency.Standard s) {
+        return switch (s) {
+            case ERC20 -> CurrencyStandard.ERC20;
+            case ISO4217 -> CurrencyStandard.ISO4217;
+        };
+    }
+
+    static CurrencyType mapCurrencyType(final @NonNull onlydust.com.marketplace.accounting.domain.model.Currency.Type type) {
+        return switch (type) {
+            case FIAT -> CurrencyType.FIAT;
+            case CRYPTO -> CurrencyType.CRYPTO;
         };
     }
 }

@@ -8,8 +8,6 @@ import java.util.Optional;
 public interface CurrencyStorage {
     void save(Currency currency);
 
-    Boolean exists(Currency.Code code);
-
     List<Currency> all();
 
     Optional<Currency> findByCode(Currency.Code code);
