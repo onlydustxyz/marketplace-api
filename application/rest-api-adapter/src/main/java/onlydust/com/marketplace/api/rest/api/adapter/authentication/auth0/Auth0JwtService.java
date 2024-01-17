@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,13 +12,8 @@ import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -27,26 +21,25 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Auth0JwtService implements JwtService {
     private final ObjectMapper objectMapper;
-    private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
-    private final HttpClient httpClient;
-    private final Auth0Properties properties;
+    private final Auth0UserInfoService userInfoService;
+    private final JWTVerifier jwtVerifier;
 
     @Override
-    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt,
+    public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String accessToken,
                                                                      final String impersonationHeader) {
         try {
-            final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
-            final Auth0JwtClaims jwtClaims = getUserInfo(decodedJwt.getToken());
-            final User user = getUserFromClaims(jwtClaims, false);
+            jwtVerifier.verify(accessToken);
+            final var userClaims = userInfoService.getUserInfo(accessToken);
+            final var user = getUserFromClaims(userClaims, false);
 
             if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
-                return getAuthenticationFromImpersonationHeader(decodedJwt, user, impersonationHeader);
+                return getAuthenticationFromImpersonationHeader(accessToken, user, impersonationHeader);
             }
 
             return Optional.of(Auth0Authentication.builder()
                     .authorities(user.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
-                    .credentials(decodedJwt)
+                    .credentials(accessToken)
                     .isAuthenticated(true)
                     .user(user)
                     .principal(user.getGithubUserId().toString())
@@ -61,20 +54,7 @@ public class Auth0JwtService implements JwtService {
         }
     }
 
-    private Auth0JwtClaims getUserInfo(String accessToken) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(properties.userInfoUrl))
-                .header("Authorization", "Bearer " + accessToken)
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200)
-            throw OnlyDustException.internalServerError("Unable to get user info from Auth0: [%d] %s".formatted(response.statusCode(), response.body()));
-
-        return objectMapper.readValue(response.body(), Auth0JwtClaims.class);
-    }
-
-    private User getUserFromClaims(Auth0JwtClaims jwtClaims, boolean isImpersonated) {
+    private User getUserFromClaims(final Auth0JwtClaims jwtClaims, final boolean isImpersonated) {
         final Long githubUserId = Long.valueOf(jwtClaims.getGithubWithUserId().replaceFirst("github\\|", ""));
         return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
@@ -84,8 +64,8 @@ public class Auth0JwtService implements JwtService {
                 .build(), isImpersonated);
     }
 
-    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(DecodedJWT decodedJwt,
-                                                                                      User impersonator,
+    private Optional<OnlyDustAuthentication> getAuthenticationFromImpersonationHeader(final String accessToken,
+                                                                                      final User impersonator,
                                                                                       final String impersonationHeader) {
         if (!impersonator.getRoles().contains(UserRole.ADMIN)) {
             LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
@@ -105,7 +85,7 @@ public class Auth0JwtService implements JwtService {
 
         return Optional.of(Auth0Authentication.builder()
                 .authorities(impersonated.getRoles().stream().map(OnlyDustGrantedAuthority::new).collect(Collectors.toList()))
-                .credentials(decodedJwt)
+                .credentials(accessToken)
                 .isAuthenticated(true)
                 .user(impersonated)
                 .principal(impersonated.getGithubUserId().toString())
