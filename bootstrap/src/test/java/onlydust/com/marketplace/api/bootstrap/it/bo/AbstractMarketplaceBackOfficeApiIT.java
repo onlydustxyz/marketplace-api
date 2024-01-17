@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -62,6 +63,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer ethereumWireMockServer;
     @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
+    @Autowired
+    ApiKeyAuthenticationService.Config config;
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
@@ -86,6 +89,10 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_PROJECTS = "/bo/v1/projects";
     protected static final String GET_PROJECT_LEAD_INVITATIONS = "/bo/v1/project-lead-invitations";
     protected static final String POST_CURRENCIES = "/bo/v1/currencies";
+
+    protected String apiKey() {
+        return config.getApiKey();
+    }
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()

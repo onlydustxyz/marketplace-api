@@ -340,7 +340,7 @@ paths:
       security:
         - apiKey: [ ]
       tags:
-        - Backoffice
+        - BackofficeCurrencyManagement
       summary: Add support of a new currency
       operationId: createCurrency
       description: Add support of a new currency
