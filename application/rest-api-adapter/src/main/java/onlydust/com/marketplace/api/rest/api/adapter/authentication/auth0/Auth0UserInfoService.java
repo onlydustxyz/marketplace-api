@@ -17,6 +17,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -75,7 +77,9 @@ public class Auth0UserInfoService {
         final DecodedJWT decodedJwt = jwtVerifier.verify(accessToken);
         final Auth0JwtAccessToken payload;
         try {
-            payload = objectMapper.readValue(decodedJwt.getPayload(), Auth0JwtAccessToken.class);
+            payload = objectMapper.readValue(
+                    new String(Base64.getUrlDecoder().decode(decodedJwt.getPayload()), StandardCharsets.UTF_8),
+                    Auth0JwtAccessToken.class);
         } catch (JsonProcessingException e) {
             throw OnlyDustException.unauthorized("Could not decode access-token payload", e);
         }

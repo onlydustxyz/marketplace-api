@@ -12,6 +12,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -47,11 +49,11 @@ class Auth0UserInfoServiceTest {
 
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
         when(decodedJWT.getToken()).thenReturn(accessToken);
-        when(decodedJWT.getPayload()).thenReturn("""
+        when(decodedJWT.getPayload()).thenReturn(Base64.getUrlEncoder().encodeToString("""
                 {
                   "exp": %d
                 }
-                """.formatted(System.currentTimeMillis() / 1000 + 1));
+                """.formatted(System.currentTimeMillis() / 1000 + 1).getBytes(StandardCharsets.UTF_8)));
 
         final var response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(200);
