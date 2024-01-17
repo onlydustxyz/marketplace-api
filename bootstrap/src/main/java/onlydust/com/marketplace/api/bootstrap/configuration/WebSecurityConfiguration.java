@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiK
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,11 +40,18 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
+    public Auth0UserInfoService auth0UserInfoService(final ObjectMapper objectMapper,
+                                                     final JWTVerifier jwtVerifier,
+                                                     final Auth0Properties auth0Properties) {
+        return new Auth0UserInfoService(objectMapper, HttpClient.newHttpClient(), auth0Properties, jwtVerifier);
+    }
+
+    @Bean
     public JwtService jwtServiceAuth0(final ObjectMapper objectMapper,
-                                      final JWTVerifier jwtVerifier,
                                       final UserFacadePort userFacadePort,
-                                      final Auth0Properties auth0Properties) {
-        return new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+                                      final JWTVerifier jwtVerifier,
+                                      final Auth0UserInfoService auth0UserInfoService) {
+        return new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
     }
 
     @Bean
