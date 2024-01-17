@@ -10,13 +10,11 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userHelper;
 
     @Test
     void should_update_user_profile() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // Proves that the initial user profile is different from the updated one
         client.get()

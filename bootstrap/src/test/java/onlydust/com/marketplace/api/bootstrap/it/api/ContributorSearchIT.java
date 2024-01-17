@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Map;
@@ -57,11 +54,6 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
               ]
             }
             """;
-
-    @Autowired
-    JWTVerifier jwtVerifier;
-    @Autowired
-    UserAuthHelper userAuthHelper;
 
     @Test
     void should_fetch_project_contributors_and_suggest_external_contributors_from_github() {

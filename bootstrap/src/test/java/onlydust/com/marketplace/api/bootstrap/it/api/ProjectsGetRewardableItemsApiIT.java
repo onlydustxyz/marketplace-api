@@ -20,8 +20,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userAuthHelper;
+
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired

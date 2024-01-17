@@ -24,8 +24,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -36,7 +35,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_user_not_linked_to_reward() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
@@ -53,7 +52,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_user_reward() throws ParseException {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
 
         // When
@@ -334,7 +333,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_user_not_linked_to_reward_to_get_reward_items() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 5L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 5L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
@@ -351,7 +350,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_pagination_reward_items() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
 
         // When

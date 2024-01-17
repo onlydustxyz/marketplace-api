@@ -10,13 +10,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class MeGetContributedReposApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     @Test
     void should_get_all_my_contributed_repos() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -75,7 +74,7 @@ public class MeGetContributedReposApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_contributed_repos_filtered_by_project() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()

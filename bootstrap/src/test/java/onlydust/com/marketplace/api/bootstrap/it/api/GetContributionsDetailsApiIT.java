@@ -8,13 +8,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     @Test
     void should_return_404_when_not_found() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -31,7 +30,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_pull_request_review_state() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -51,7 +50,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_contribution_details_when_found() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -289,7 +288,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_code_review_details() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -380,7 +379,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_draft_status() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -401,7 +400,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_403_when_not_mine() {
         // Given
-        final String jwt = userHelper.authenticateHayden().jwt();
+        final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
         client.get()
@@ -418,7 +417,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_200_when_leader() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()

@@ -21,8 +21,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
 
@@ -57,7 +56,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_user_payout_info() {
         // Given
-        final UserAuthHelper.AuthenticatedUser anthony = userHelper.authenticateAnthony();
+        final UserAuthHelper.AuthenticatedUser anthony = userAuthHelper.authenticateAnthony();
         final String jwt = anthony.jwt();
         paymentRequestRepository.saveAll(
                 List.of(
@@ -143,7 +142,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_user_company_payout_infos() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UserPayoutInformationRequest requestBody1 = new UserPayoutInformationRequest();
         requestBody1.company(
                         new CompanyIdentity()
@@ -218,7 +217,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_user_individual_payout_infos() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UserPayoutInformationRequest requestBody1 = new UserPayoutInformationRequest();
         requestBody1.person(new PersonIdentity()
                         .firstname(faker.name().firstName())
@@ -281,7 +280,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_user_individual_payout_infos_with_invalid_iban() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UserPayoutInformationRequest requestBody = new UserPayoutInformationRequest();
         requestBody.person(new PersonIdentity()
                         .firstname(faker.name().firstName())
@@ -317,11 +316,11 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     void should_update_user_payout_info_given_impersonate_user() {
         // Given
         final var githubUserId = faker.number().randomNumber();
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId, faker.rickAndMorty().character(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId, faker.rickAndMorty().character(),
                 faker.internet().url(), true).jwt();
-        userHelper.authenticateUser(githubUserId);
+        userAuthHelper.authenticateUser(githubUserId);
         final String impersonatePierreHeader =
-                userHelper.getImpersonationHeaderToImpersonatePierre();
+                userAuthHelper.getImpersonationHeaderToImpersonatePierre();
 
         // When
         final UserPayoutInformationRequest requestBody = new UserPayoutInformationRequest();
@@ -362,7 +361,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody().equals(requestToExpectedResponse(requestBody, true, true, true, true, true));
 
-        final String pierreJwt = userHelper.authenticatePierre().jwt();
+        final String pierreJwt = userAuthHelper.authenticatePierre().jwt();
 
         client.get()
                 .uri(getApiURI(ME_PAYOUT_INFO))
@@ -378,7 +377,7 @@ public class MePayoutInfosApiIT extends AbstractMarketplaceApiIT {
     void should_return_valid_payout_info_given_user_first_connexion() {
         // Given
         final long githubUserId = faker.number().randomNumber();
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId,
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId,
                 faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
 
         // When

@@ -1,26 +1,25 @@
 package onlydust.com.marketplace.api.bootstrap.helper;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Component
-public class UserAuthHelper {
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-    @Autowired
+@AllArgsConstructor
+public class UserAuthHelper {
     UserRepository userRepository;
-    @Autowired
     JWTVerifier jwtVerifier;
-    @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
+    WireMockServer auth0WireMockServer;
 
     @NonNull
     public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl,
@@ -37,7 +36,42 @@ public class UserAuthHelper {
                 .build();
         userRepository.save(user);
 
+        mockAuth0UserInfo(user);
+
         return authenticateUser(user);
+    }
+
+    public void mockAuth0UserInfo(UserEntity user) {
+        mockAuth0UserInfo(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(),
+                user.getGithubAvatarUrl(), user.getGithubEmail());
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login) {
+        mockAuth0UserInfo(githubUserId, login, login + "@gmail.com");
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login, String email) {
+        mockAuth0UserInfo(githubUserId, login, login, "https://avatars.githubusercontent.com/u/%d?v=4".formatted(githubUserId), email);
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login, String name, String avatarUrl, String email) {
+        auth0WireMockServer.stubFor(
+                get(urlPathEqualTo("/"))
+                        .withHeader("Authorization", containing("Bearer token-for-github|%d".formatted(githubUserId)))
+                        .willReturn(ok()
+                                .withHeader("Content-Type", "application/json")
+                                .withBody("""
+                                        {
+                                            "sub": "github|%d",
+                                            "nickname": "%s",
+                                            "name": "%s",
+                                            "picture": "%s",
+                                            "updated_at": "2023-12-11T12:33:51Z",
+                                            "email": "%s",
+                                            "email_verified": true
+                                        }
+                                        """.formatted(githubUserId, login, name, avatarUrl, email)
+                                )));
     }
 
     @NonNull
@@ -94,9 +128,7 @@ public class UserAuthHelper {
     }
 
     public AuthenticatedUser authenticateUser(UserEntity user, String githubPAT) {
-
-        final var token = ((JwtVerifierStub) jwtVerifier).tokenFor(user.getGithubUserId(), user.getGithubLogin(),
-                user.getGithubAvatarUrl(), user.getGithubEmail());
+        final var token = ((JwtVerifierStub) jwtVerifier).tokenFor(user.getGithubUserId());
 
         if (githubPAT != null) {
             ((Auth0ApiClientStub) githubAuthenticationPort).withPat(user.getGithubUserId(), githubPAT);

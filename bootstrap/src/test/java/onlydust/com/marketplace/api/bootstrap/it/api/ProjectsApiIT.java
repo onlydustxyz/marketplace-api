@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
@@ -2662,8 +2661,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     ProjectViewRepository projectViewRepository;
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     @Test
     @Order(1)
@@ -2684,7 +2682,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When user is authenticated
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2717,7 +2715,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When user is authenticated
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2762,7 +2760,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(6)
     void should_get_projects_given_authenticated_user() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -2780,7 +2778,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(7)
     void should_get_projects_given_authenticated_user_for_mine() {
         // Given
-        final var auth = userHelper.authenticatePierre();
+        final var auth = userAuthHelper.authenticatePierre();
 
         final ProjectViewEntity bretzel = projectViewRepository.findByKey("bretzel").orElseThrow();
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(),
@@ -2815,7 +2813,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When a contributor gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2831,7 +2829,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When a lead gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateUser(134486697L).jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2847,7 +2845,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When an invited lead gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2878,7 +2876,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When a contributor gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2894,7 +2892,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When a lead gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateUser(134486697L).jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2910,7 +2908,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When an invited lead gets the project
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateHayden().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
