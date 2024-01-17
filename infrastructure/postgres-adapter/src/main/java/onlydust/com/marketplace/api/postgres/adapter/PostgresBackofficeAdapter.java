@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -131,7 +130,7 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Override
     public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         final var page = boProjectRepository.findAll(isNull(projectIds) ? List.of() : projectIds,
-                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
+                PageRequest.of(pageIndex, pageSize));
         return Page.<ProjectView>builder()
                 .content(page.getContent().stream().map(BoProjectEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
