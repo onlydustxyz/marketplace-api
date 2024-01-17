@@ -5,8 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
-import java.net.URI;
-import java.net.URL;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,4 +25,11 @@ public class ProjectView {
     ProjectVisibility visibility;
     List<UUID> projectLeadIds;
     ZonedDateTime createdAt;
+    Long activeContributors;
+    Long newContributors;
+    Long uniqueRewardedContributors;
+    Long openedIssues;
+    Long contributions;
+    BigDecimal dollarsEquivalentAmountSent;
+    BigDecimal strkAmountSent;
 }
