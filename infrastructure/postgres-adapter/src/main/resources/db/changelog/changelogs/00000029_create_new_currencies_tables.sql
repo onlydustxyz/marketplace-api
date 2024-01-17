@@ -60,7 +60,3 @@ CREATE TRIGGER update_quotes_tech_updated_at
     ON quotes
     FOR EACH ROW
 EXECUTE PROCEDURE set_tech_updated_at();
-
--- TODO: remove
-INSERT INTO currencies (id, type, standard, name, code, logo_url, decimals)
-VALUES ('a03cdb25-abe9-494f-84d5-d7426a9bf4e0', 'FIAT', 'ISO4217', 'US Dollar', 'USD', 'https://s3.amazonaws.com/airswap-token-images/USD.png', 2);

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
+@AllArgsConstructor
 public class CurrencyService implements onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort {
     private final @NonNull ERC20ProviderFactory erc20ProviderFactory;
     private final @NonNull ERC20Storage erc20Storage;
@@ -18,23 +20,6 @@ public class CurrencyService implements onlydust.com.marketplace.accounting.doma
     private final @NonNull CurrencyMetadataService currencyMetadataService;
     private final @NonNull QuoteService quoteService;
     private final @NonNull QuoteStorage quoteStorage;
-    private final @NonNull Currency usd;
-
-    public CurrencyService(final @NonNull ERC20ProviderFactory erc20ProviderFactory,
-                           final @NonNull ERC20Storage erc20Storage,
-                           final @NonNull CurrencyStorage currencyStorage,
-                           final @NonNull CurrencyMetadataService currencyMetadataService,
-                           final @NonNull QuoteService quoteService,
-                           final @NonNull QuoteStorage quoteStorage) {
-        this.erc20ProviderFactory = erc20ProviderFactory;
-        this.erc20Storage = erc20Storage;
-        this.currencyStorage = currencyStorage;
-        this.currencyMetadataService = currencyMetadataService;
-        this.quoteService = quoteService;
-        this.quoteStorage = quoteStorage;
-        this.usd = currencyStorage.findByCode(Currency.Code.USD)
-                .orElseThrow(() -> internalServerError("USD currency is not available"));
-    }
 
     @Override
     public Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress) {
@@ -70,6 +55,8 @@ public class CurrencyService implements onlydust.com.marketplace.accounting.doma
     }
 
     private void saveUsdQuotes(List<Currency> currencies) {
+        final var usd = currencyStorage.findByCode(Currency.Code.USD)
+                .orElseThrow(() -> internalServerError("USD currency is not available"));
         quoteService.currentPrice(currencies, usd).forEach(quoteStorage::save);
     }
 }
