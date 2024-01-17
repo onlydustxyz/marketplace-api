@@ -68,4 +68,26 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.description").isEqualTo("USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.")
         ;
     }
+
+
+    @Test
+    void should_reject_erc20_support_from_invalid_contract() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "ETHEREUM",
+                            "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNotFound()
+        ;
+    }
 }
