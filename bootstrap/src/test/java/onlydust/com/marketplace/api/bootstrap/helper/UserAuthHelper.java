@@ -36,6 +36,25 @@ public class UserAuthHelper {
                 .build();
         userRepository.save(user);
 
+        mockAuth0UserInfo(user);
+
+        return authenticateUser(user);
+    }
+
+    public void mockAuth0UserInfo(UserEntity user) {
+        mockAuth0UserInfo(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(),
+                user.getGithubAvatarUrl(), user.getGithubEmail());
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login) {
+        mockAuth0UserInfo(githubUserId, login, login + "@gmail.com");
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login, String email) {
+        mockAuth0UserInfo(githubUserId, login, login, "https://avatars.githubusercontent.com/u/%d?v=4".formatted(githubUserId), email);
+    }
+
+    public void mockAuth0UserInfo(Long githubUserId, String login, String name, String avatarUrl, String email) {
         auth0WireMockServer.stubFor(
                 get(urlPathEqualTo("/"))
                         .withHeader("Authorization", containing("Bearer token-for-github|%d".formatted(githubUserId)))
@@ -46,16 +65,13 @@ public class UserAuthHelper {
                                             "sub": "github|%d",
                                             "nickname": "%s",
                                             "name": "%s",
-                                            "picture": "https://avatars.githubusercontent.com/u/%d?v=4",
+                                            "picture": "%s",
                                             "updated_at": "2023-12-11T12:33:51Z",
                                             "email": "%s",
                                             "email_verified": true
                                         }
-                                        """.formatted(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(), user.getGithubUserId(),
-                                        user.getGithubEmail())
+                                        """.formatted(githubUserId, login, name, avatarUrl, email)
                                 )));
-
-        return authenticateUser(user);
     }
 
     @NonNull
