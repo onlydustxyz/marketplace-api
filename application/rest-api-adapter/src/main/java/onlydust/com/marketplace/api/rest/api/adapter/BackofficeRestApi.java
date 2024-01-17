@@ -130,8 +130,8 @@ public class BackofficeRestApi implements BackofficeApi {
     @Override
     public ResponseEntity<ProjectPage> getProjectPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var paymentsPage = backofficeFacadePort.listProjects(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), projectIds);
-        final var response = mapProjectPageToContract(paymentsPage, sanitizedPageIndex);
+        final var projectsPage = backofficeFacadePort.listProjects(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), projectIds);
+        final var response = mapProjectPageToContract(projectsPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :

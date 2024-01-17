@@ -16,11 +16,6 @@ infrastructure:
     url: http://fake.test
   linear:
     api-key: "some-linear-api-key"
-spring:
-  main:
-    allow-bean-definition-overriding: true
-  liquibase:
-    enabled: true
 application:
   web:
     machine-to-machine:
@@ -35,8 +30,16 @@ application:
       retry:
         retry-count: 1
         retry-interval: 0
-
-
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  liquibase:
+    enabled: true
+#  jpa:
+#    properties:
+#      hibernate:
+#        format_sql: true
+#    show-sql: true
 #logging:
 #  level:
 #    org:

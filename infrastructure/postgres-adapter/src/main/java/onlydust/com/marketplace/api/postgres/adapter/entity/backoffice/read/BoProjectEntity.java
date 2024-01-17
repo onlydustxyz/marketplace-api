@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.domain.view.backoffice.ProjectView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -18,7 +16,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +44,13 @@ public class BoProjectEntity {
     @Type(type = "jsonb")
     List<UUID> projectLeadIds;
     ZonedDateTime createdAt;
+    Long activeContributors;
+    Long newContributors;
+    Long uniqueRewardedContributors;
+    Long openedIssues;
+    Long contributions;
+    BigDecimal dollarsEquivalentAmountSent;
+    BigDecimal strkAmountSent;
 
     public ProjectView toView() {
         return ProjectView.builder()
@@ -61,6 +65,13 @@ public class BoProjectEntity {
                 .visibility(visibility)
                 .projectLeadIds(projectLeadIds)
                 .createdAt(createdAt)
+                .activeContributors(activeContributors)
+                .newContributors(newContributors)
+                .uniqueRewardedContributors(uniqueRewardedContributors)
+                .openedIssues(openedIssues)
+                .contributions(contributions)
+                .dollarsEquivalentAmountSent(dollarsEquivalentAmountSent)
+                .strkAmountSent(strkAmountSent)
                 .build();
     }
 }
