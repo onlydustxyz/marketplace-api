@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import com.github.tomakehurst.wiremock.recording.RecordingStatus;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +137,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
                     .beanName("ethereumWireMockServer")
                     .stubLocation("ethereum")
                     .property("infrastructure.ethereum.base-uri")
+//                    .recordFrom("https://mainnet.infura.io/v3")
                     .build()
                     .register(context);
 
@@ -160,6 +162,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
         private final @NonNull String beanName;
         private final @NonNull String stubLocation;
         private final @NonNull String property;
+        private final String recordFrom;
 
         public void register(final @NonNull ConfigurableApplicationContext context) {
             final var wireMockServer = new WireMockServer(
@@ -170,6 +173,10 @@ public class AbstractMarketplaceBackOfficeApiIT {
             );
 
             wireMockServer.start();
+
+            if (recordFrom != null)
+                wireMockServer.startRecording(recordFrom);
+
             context.getBeanFactory().registerSingleton(beanName, wireMockServer);
 
             TestPropertyValues.of("%s:http://localhost:%d".formatted(property, wireMockServer.port()))
@@ -177,6 +184,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
             context.addApplicationListener(event -> {
                 if (event instanceof ContextClosedEvent) {
+                    if (wireMockServer.getRecordingStatus().getStatus() == RecordingStatus.Recording)
+                        wireMockServer.stopRecording();
                     wireMockServer.stop();
                 }
             });
