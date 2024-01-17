@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.SuggestTechnologyRequest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -12,10 +10,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 
 public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    private UserAuthHelper userHelper;
-
-
     @Test
     void should_get_all_technologies() {
 
@@ -70,7 +64,7 @@ public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_create_linear_issue_upon_new_technology_suggested() {
         // Given
-        final var requester = userHelper.authenticatePierre();
+        final var requester = userAuthHelper.authenticatePierre();
 
         linearWireMockServer.stubFor(post(urlEqualTo("/graphql"))
                 .withHeader("Authorization", equalTo("some-linear-api-key"))
@@ -133,7 +127,7 @@ public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_error_upon_linear_reject() {
         // Given
-        final var requester = userHelper.authenticatePierre();
+        final var requester = userAuthHelper.authenticatePierre();
 
         linearWireMockServer.stubFor(post(urlEqualTo("/graphql"))
                 .willReturn(jsonResponse("""

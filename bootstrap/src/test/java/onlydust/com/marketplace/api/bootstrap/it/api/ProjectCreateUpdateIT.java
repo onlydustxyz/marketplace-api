@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
@@ -25,8 +24,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     private static UUID projectId;
 
-    @Autowired
-    UserAuthHelper userHelper;
 
     @Autowired
     EventRepository eventRepository;
@@ -82,7 +79,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         final var response = client.post()
                 .uri(getApiURI(PROJECTS_POST))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -214,7 +211,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     public void accept_leader_invitation_for_next_tests() {
         client.put()
                 .uri(getApiURI(format(ME_ACCEPT_PROJECT_LEADER_INVITATION, projectId)))
-                .header("Authorization", BEARER_PREFIX + userHelper.authenticateOlivier().jwt())
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -250,7 +247,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -287,7 +284,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -385,7 +382,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -421,7 +418,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -451,7 +448,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -509,7 +506,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         final var response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -553,7 +550,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // When
         final OnlyDustError response = client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateOlivier().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -594,7 +591,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticateAnthony().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateAnthony().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -633,7 +630,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // When
         final CreateProjectResponse responseBody = client.post()
                 .uri(getApiURI(PROJECTS_POST))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

@@ -56,8 +56,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     );
     // @formatter:on
 
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     IgnoredContributionsRepository ignoredContributionsRepository;
     @Autowired
@@ -575,7 +574,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
 
     private UUID createProject() {
         final UUID projectId = UUID.randomUUID();
-        final UUID leadId = userHelper.authenticatePierre().user().getId();
+        final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
         postgresProjectAdapter.createProject(projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
@@ -587,7 +586,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     private void updateRewardSettings(UUID projectId, String rewardSettings) {
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -613,7 +612,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     private void updateLinkedRepos(UUID projectId, String repoIds) {
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

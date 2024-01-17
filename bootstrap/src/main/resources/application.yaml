@@ -4,6 +4,7 @@ application:
       hosts: ${FRONTEND_CORS_HOSTS}
     auth0:
       jwks-url: ${AUTH0_JWKS_URL}
+      user-info-url: ${AUTH0_JWKS_URL}userinfo
       expires-at-leeway: 10
     machine-to-machine:
       api-key: ${INTERNAL_API_KEY}
