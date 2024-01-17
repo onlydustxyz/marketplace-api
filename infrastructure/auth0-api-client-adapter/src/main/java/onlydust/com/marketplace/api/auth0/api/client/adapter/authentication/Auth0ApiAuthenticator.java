@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.TimeUnit;
 
 import static java.net.http.HttpRequest.BodyPublishers.ofByteArray;
 
@@ -28,21 +29,17 @@ public class Auth0ApiAuthenticator {
     private final Cache<String, Auth0ManagementApiAccessTokenResponse> accessTokenCache = Caffeine.newBuilder()
             .expireAfter(new Expiry<String, Auth0ManagementApiAccessTokenResponse>() {
                 @Override
-                public long expireAfterCreate(String key, Auth0ManagementApiAccessTokenResponse value,
-                                              long currentTime) {
-                    // seconds to nanoseconds
-                    return (long) (value.getExpiresIn() - CACHE_TTL_LEEWAY_IN_SECONDS) * 1_000_000_000L;
+                public long expireAfterCreate(String key, Auth0ManagementApiAccessTokenResponse value, long currentTime) {
+                    return TimeUnit.SECONDS.toNanos(value.getExpiresIn() - CACHE_TTL_LEEWAY_IN_SECONDS);
                 }
 
                 @Override
-                public long expireAfterUpdate(String key, Auth0ManagementApiAccessTokenResponse value,
-                                              long currentTime, @NonNegative long currentDuration) {
+                public long expireAfterUpdate(String key, Auth0ManagementApiAccessTokenResponse value, long currentTime, @NonNegative long currentDuration) {
                     return currentDuration;
                 }
 
                 @Override
-                public long expireAfterRead(String key, Auth0ManagementApiAccessTokenResponse value,
-                                            long currentTime, @NonNegative long currentDuration) {
+                public long expireAfterRead(String key, Auth0ManagementApiAccessTokenResponse value, long currentTime, @NonNegative long currentDuration) {
                     return currentDuration;
                 }
             })

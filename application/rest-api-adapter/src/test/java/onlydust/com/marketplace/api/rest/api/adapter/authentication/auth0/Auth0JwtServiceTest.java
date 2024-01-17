@@ -48,7 +48,8 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build();
         final Auth0JwtVerifier jwtVerifier = new Auth0JwtVerifier(auth0Properties);
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+        final Auth0UserInfoService auth0UserInfoService = new Auth0UserInfoService(objectMapper, HttpClient.newHttpClient(), auth0Properties, jwtVerifier);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(VALID_JWT, null).orElseThrow();
@@ -91,7 +92,8 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build();
         final Auth0JwtVerifier jwtVerifier = new Auth0JwtVerifier(auth0Properties);
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+        final Auth0UserInfoService auth0UserInfoService = new Auth0UserInfoService(objectMapper, HttpClient.newHttpClient(), auth0Properties, jwtVerifier);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
         final var authentication = auth0JwtService.getAuthenticationFromJwt(jwt, null);
 
         assertThat(authentication).isEmpty();
@@ -140,7 +142,8 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build();
         final Auth0JwtVerifier jwtVerifier = new Auth0JwtVerifier(auth0Properties);
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+        final Auth0UserInfoService auth0UserInfoService = new Auth0UserInfoService(objectMapper, HttpClient.newHttpClient(), auth0Properties, jwtVerifier);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(VALID_JWT, impersonationHeader).orElseThrow();
@@ -201,7 +204,8 @@ class Auth0JwtServiceTest {
                 .expiresAtLeeway(ONE_CENTURY)
                 .build();
         final Auth0JwtVerifier jwtVerifier = new Auth0JwtVerifier(auth0Properties);
-        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, jwtVerifier, userFacadePort, HttpClient.newHttpClient(), auth0Properties);
+        final Auth0UserInfoService auth0UserInfoService = new Auth0UserInfoService(objectMapper, HttpClient.newHttpClient(), auth0Properties, jwtVerifier);
+        final Auth0JwtService auth0JwtService = new Auth0JwtService(objectMapper, userFacadePort, auth0UserInfoService, jwtVerifier);
 
         // When
         final var authentication = auth0JwtService.getAuthenticationFromJwt(VALID_JWT, impersonationHeader);

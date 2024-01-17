@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.User;
@@ -12,7 +11,7 @@ import java.util.Collection;
 @Value
 @Builder
 public class Auth0Authentication implements OnlyDustAuthentication {
-    DecodedJWT credentials;
+    String credentials;
     User user;
     String principal;
     Collection<? extends GrantedAuthority> authorities;
