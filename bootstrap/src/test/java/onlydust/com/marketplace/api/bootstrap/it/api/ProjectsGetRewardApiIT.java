@@ -26,8 +26,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -38,7 +37,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_not_project_lead_to_get_reward() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
@@ -56,7 +55,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_reward_given_a_project_lead() throws ParseException {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
@@ -188,7 +187,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_not_project_lead_to_get_reward_items() {
         // Given
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 2L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
@@ -206,7 +205,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_pagination_reward_items_given_a_project_lead() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
@@ -313,7 +312,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_reward_items_when_they_are_not_related_to_any_contribution() {
         // Given
-        final String jwt = userHelper.authenticateGregoire().jwt();
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
         final UUID rewardId = UUID.fromString("4ccf3463-c77d-42cd-85f3-b393901a89c1");
 
@@ -362,7 +361,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_reward_items_with_null_contributionId_when_contribution_belongs_to_another_project() {
         // Given
-        final String jwt = userHelper.authenticateUser(21149076L).jwt();
+        final String jwt = userAuthHelper.authenticateUser(21149076L).jwt();
         final UUID projectId = UUID.fromString("6d955622-c1ce-4227-85ea-51cb1b3207b1");
         final UUID rewardId = UUID.fromString("f4b7c3e4-4a45-47c7-bcba-87d6d767c3de");
 

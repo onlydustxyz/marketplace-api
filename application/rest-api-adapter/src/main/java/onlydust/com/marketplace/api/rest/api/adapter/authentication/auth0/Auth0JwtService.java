@@ -13,9 +13,13 @@ import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.JwtService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.io.IOException;
-import java.util.Base64;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,14 +29,15 @@ public class Auth0JwtService implements JwtService {
     private final ObjectMapper objectMapper;
     private final JWTVerifier jwtVerifier;
     private final UserFacadePort userFacadePort;
+    private final HttpClient httpClient;
+    private final Auth0Properties properties;
 
+    @Override
     public Optional<OnlyDustAuthentication> getAuthenticationFromJwt(final String jwt,
                                                                      final String impersonationHeader) {
         try {
             final DecodedJWT decodedJwt = this.jwtVerifier.verify(jwt);
-            final Auth0JwtClaims jwtClaims =
-                    objectMapper.readValue(Base64.getUrlDecoder().decode(decodedJwt.getPayload()),
-                            Auth0JwtClaims.class);
+            final Auth0JwtClaims jwtClaims = getUserInfo(decodedJwt.getToken());
             final User user = getUserFromClaims(jwtClaims, false);
 
             if (impersonationHeader != null && !impersonationHeader.isEmpty()) {
@@ -54,7 +59,19 @@ public class Auth0JwtService implements JwtService {
             LOGGER.debug("Invalid Jwt token", e);
             return Optional.empty();
         }
+    }
 
+    private Auth0JwtClaims getUserInfo(String accessToken) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(properties.userInfoUrl))
+                .header("Authorization", "Bearer " + accessToken)
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200)
+            throw OnlyDustException.internalServerError("Unable to get user info from Auth0: [%d] %s".formatted(response.statusCode(), response.body()));
+
+        return objectMapper.readValue(response.body(), Auth0JwtClaims.class);
     }
 
     private User getUserFromClaims(Auth0JwtClaims jwtClaims, boolean isImpersonated) {

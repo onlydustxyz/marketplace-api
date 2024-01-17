@@ -8,13 +8,12 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 
 public class MeGetRewardCurrenciesIT extends AbstractMarketplaceApiIT {
-    @Autowired
-    UserAuthHelper userHelper;
+
 
     @Test
     void should_get_all_my_reward_currencies() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()

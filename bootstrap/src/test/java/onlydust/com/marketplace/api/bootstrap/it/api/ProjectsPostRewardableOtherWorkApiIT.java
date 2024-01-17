@@ -165,8 +165,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
             }
 
                 """;
-    @Autowired
-    UserAuthHelper userAuthHelper;
+
     @Autowired
     ProjectRepository projectRepository;
     @Autowired
@@ -208,7 +207,8 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         """, projectId)).header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Only project "
-                                                                                                       + "leads can " + "create " + "rewardable " + "issue on " + "their " + "projects");
+                                                                                                       + "leads can " + "create " + "rewardable " + "issue on" +
+                                                                                                       " " + "their " + "projects");
     }
 
     @Test
@@ -227,7 +227,8 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         }
                         """, projectId)).header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
-                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Rewardable " + "issue can " + "only be " + "created on " + "repos linked " + "to this " + "project");
+                .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Rewardable " + "issue can " + "only be " + "created " +
+                                                                                                       "on " + "repos linked " + "to this " + "project");
     }
 
     @Test

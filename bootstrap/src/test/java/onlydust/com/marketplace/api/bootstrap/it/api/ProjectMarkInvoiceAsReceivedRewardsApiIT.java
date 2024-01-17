@@ -4,17 +4,12 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
 public class ProjectMarkInvoiceAsReceivedRewardsApiIT extends AbstractMarketplaceApiIT {
-
-    @Autowired
-    public UserAuthHelper userAuthHelper;
-
     @Test
     void should_forward_mark_invoice_as_received_to_old_api() {
         // Given

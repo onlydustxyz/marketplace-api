@@ -275,8 +275,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
             }
                         
             """;
-    @Autowired
-    UserAuthHelper userHelper;
+
     @Autowired
     PaymentRequestRepository paymentRequestRepository;
     @Autowired
@@ -290,7 +289,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_get_my_rewards() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
 
         // When
         client.get()
@@ -308,7 +307,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     @Test
     void should_get_my_rewards_given_multi_currencies() {
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
                 .currency(CurrencyEnumEntity.eth)
                 .price(BigDecimal.valueOf(1500L))
@@ -376,7 +375,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_get_my_total_reward_amounts_given_multi_currencies() {
         // Given
-        final String jwt = userHelper.authenticatePierre().jwt();
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
 
         // When
         client.get()
@@ -394,7 +393,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_get_my_rewards_with_pending_invoice() throws ParseException {
         // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         postgresUserAdapter.savePayoutInformationForUserId(pierre.user().getId(),
                 UserPayoutInformation.builder()
@@ -525,7 +524,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void should_return_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
         // Given
         final long githubUserId = faker.number().randomNumber();
-        final String jwt = userHelper.newFakeUser(UUID.randomUUID(), githubUserId,
+        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId,
                 faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
                 new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
@@ -547,7 +546,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_filter_by_date() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -586,7 +585,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(6)
     void should_filter_by_currency() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -620,7 +619,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(7)
     void should_filter_by_projects() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
         client.get()
@@ -656,7 +655,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(8)
     void should_get_rewards_when_no_usd_equivalent() {
         // Given
-        final String jwt = userHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
         cryptoUsdQuotesRepository.deleteById(CurrencyEnumEntity.eth);
 
         // When

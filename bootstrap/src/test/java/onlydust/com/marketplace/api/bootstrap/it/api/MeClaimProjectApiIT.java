@@ -20,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userAuthHelper;
+
     @Autowired
     ProjectLeadRepository projectLeadRepository;
     @Autowired

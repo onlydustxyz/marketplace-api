@@ -19,8 +19,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceApiIT {
 
-    @Autowired
-    UserAuthHelper userAuthHelper;
+
     @Autowired
     ProjectRepository projectRepository;
     @Autowired
