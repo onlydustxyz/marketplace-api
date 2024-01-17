@@ -3043,32 +3043,31 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                               "isMissingGithubAppInstallation": null
                             },
                             {
-                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                              "slug": "bretzel",
-                              "name": "Bretzel",
-                              "shortDescription": "A project for people who love fruits",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                              "slug": "aiolia-du-lion",
+                              "name": "Aiolia du Lion",
+                              "shortDescription": "An interactive tutorial to get you up and running with Starknet",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
                               "hiring": true,
                               "visibility": "PUBLIC",
-                              "repoCount": 4,
-                              "contributorCount": 4,
+                              "repoCount": 1,
+                              "contributorCount": 3,
                               "leaders": [
                                 {
-                                  "githubUserId": 8642470,
-                                  "login": "gregcha",
-                                  "htmlUrl": "https://github.com/gregcha",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                                },
-                                {
-                                  "githubUserId": 98735421,
-                                  "login": "pacovilletard",
-                                  "htmlUrl": "https://github.com/pacovilletard",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                                  "githubUserId": 26790304,
+                                  "login": "gaetanrecly",
+                                  "htmlUrl": null,
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
+                                  "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                                 }
                               ],
                               "sponsors": [
+                                {
+                                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                                  "name": "AS Nancy Lorraine",
+                                  "url": null,
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                                },
                                 {
                                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
                                   "name": "OGC Nissa Ineos",
@@ -3080,30 +3079,27 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Coca Cola",
                                   "url": null,
                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                },
+                                {
+                                  "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                                  "name": "Coca Colax",
+                                  "url": "https://www.coca-cola-france.fr/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
                                 }
                               ],
-                              "technologies": {
-                                "TypeScript": 190809,
-                                "Dockerfile": 1982,
-                                "Shell": 732,
-                                "CSS": 423688,
-                                "Rust": 408641,
-                                "SCSS": 98360,
-                                "JavaScript": 62716,
-                                "HTML": 121874
-                              },
+                              "technologies": {},
                               "isInvitedAsProjectLead": false,
                               "isMissingGithubAppInstallation": null
                             },
                             {
-                              "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
-                              "slug": "bretzel-196",
-                              "name": "Bretzel 196",
-                              "shortDescription": "bretzel gives you wings",
-                              "logoUrl": null,
-                              "hiring": true,
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "slug": "aldbaran-du-taureau",
+                              "name": "Aldébaran du Taureau",
+                              "shortDescription": "An interactive tutorial to get you up and running with Starknet",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
+                              "hiring": false,
                               "visibility": "PUBLIC",
-                              "repoCount": 1,
+                              "repoCount": 2,
                               "contributorCount": 0,
                               "leaders": [
                                 {
@@ -3112,14 +3108,34 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "htmlUrl": "https://github.com/gregcha",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                },
+                                {
+                                  "githubUserId": 26790304,
+                                  "login": "gaetanrecly",
+                                  "htmlUrl": null,
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2890661490599004977.webp",
+                                  "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                                 }
                               ],
-                              "sponsors": [],
+                              "sponsors": [
+                                {
+                                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                                  "name": "AS Nancy Lorraine",
+                                  "url": null,
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                                },
+                                {
+                                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                                  "name": "OGC Nissa Ineos",
+                                  "url": "https://www.ogcnice.com/fr/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                }
+                              ],
                               "technologies": {
-                                "CSS": 323507,
-                                "SCSS": 102453,
-                                "JavaScript": 58624,
-                                "HTML": 169898
+                                "CSS": 114,
+                                "Makefile": 49,
+                                "JavaScript": 15570,
+                                "HTML": 235
                               },
                               "isInvitedAsProjectLead": false,
                               "isMissingGithubAppInstallation": null

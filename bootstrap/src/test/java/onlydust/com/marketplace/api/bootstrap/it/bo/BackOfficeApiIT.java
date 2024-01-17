@@ -1244,7 +1244,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
                               "hiring": true,
-                              "rank": 1044,
+                              "rank": 1701,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "f2215429-83c7-49ce-954b-66ed453c3315"
@@ -1266,7 +1266,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
                               "hiring": false,
-                              "rank": 1039,
+                              "rank": 1694,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964",
@@ -1309,7 +1309,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": null,
                               "hiring": false,
-                              "rank": 1044,
+                              "rank": 1021,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964"
@@ -1331,7 +1331,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
                               "hiring": true,
-                              "rank": 1593,
+                              "rank": 1569,
                               "visibility": "PRIVATE",
                               "projectLeads": [
                                 "83612081-949a-47c4-a467-6f28f6adad6d"
