@@ -133,7 +133,7 @@ public class Currency {
         }
     }
 
-    public record Metadata(String description, @NonNull URI logoUri) {
+    public record Metadata(String name, String description, @NonNull URI logoUri) {
     }
 
     public enum Type {FIAT, CRYPTO}

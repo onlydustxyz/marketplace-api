@@ -47,7 +47,7 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("Realms token", URI.create("https://realms.io"))));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
         when(quoteService.currentPrice(any(), eq(Currencies.USD)))
                 .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
@@ -178,5 +178,26 @@ public class CurrencyServiceTest {
         // Then
         verify(quoteStorage, times(1)).save(USDC_USD);
         verify(quoteStorage, times(1)).save(LORDS_USD);
+    }
+
+    @Test
+    void should_add_native_cryptocurrency_support() {
+        // Given
+        when(currencyMetadataService.get(Currencies.ETH.code())).thenReturn(Optional.of(new Currency.Metadata(Currencies.ETH.name(),
+                Currencies.ETH.description().orElseThrow(), Currencies.ETH.logoUri().orElseThrow())));
+
+        // When
+        final var currency = currencyService.addNativeCryptocurrencySupport(Currencies.ETH.code(), 18);
+
+        // Then
+        assertThat(currency.id()).isNotNull();
+        assertThat(currency.name()).isEqualTo(Currencies.ETH.name());
+        assertThat(currency.code()).isEqualTo(Currencies.ETH.code());
+        assertThat(currency.description()).isEqualTo(Currencies.ETH.description());
+        assertThat(currency.logoUri()).isEqualTo(Currencies.ETH.logoUri());
+        assertThat(currency.decimals()).isEqualTo(18);
+        assertThat(currency.erc20()).isEmpty();
+
+        verify(currencyStorage, times(1)).save(currency);
     }
 }
