@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
-import com.github.javafaker.Faker;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import lombok.Builder;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
@@ -8,16 +11,20 @@ import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
@@ -25,6 +32,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -35,19 +43,25 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Testcontainers
 @Slf4j
 @Import(SwaggerConfiguration.class)
+@ContextConfiguration(initializers = AbstractMarketplaceBackOfficeApiIT.WireMockInitializer.class)
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
-                    .withDatabaseName("marketplace_db")
-                    .withUsername("test")
-                    .withPassword("test")
-                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
-                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
-                    .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
-                    .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
+            .withDatabaseName("marketplace_db")
+            .withUsername("test")
+            .withPassword("test")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+            .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
     @LocalServerPort
     int port;
     @Autowired
     WebTestClient client;
+
+    @Autowired
+    protected WireMockServer ethereumWireMockServer;
+    @Autowired
+    protected WireMockServer coinmarketcapWireMockServer;
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
@@ -71,6 +85,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_PAYMENTS = "/bo/v1/payments";
     protected static final String GET_PROJECTS = "/bo/v1/projects";
     protected static final String GET_PROJECT_LEAD_INVITATIONS = "/bo/v1/project-lead-invitations";
+    protected static final String POST_CURRENCIES = "/bo/v1/currencies";
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()
@@ -105,4 +120,50 @@ public class AbstractMarketplaceBackOfficeApiIT {
                 .toUri();
     }
 
+    public static class WireMockInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(final @NonNull ConfigurableApplicationContext context) {
+            WiremockServerRegistration.builder()
+                    .beanName("ethereumWireMockServer")
+                    .stubLocation("ethereum")
+                    .property("infrastructure.ethereum.base-uri")
+                    .build()
+                    .register(context);
+
+            WiremockServerRegistration.builder()
+                    .beanName("coinmarketcapWireMockServer")
+                    .stubLocation("coinmarketcap")
+                    .property("infrastructure.coinmarketcap.base-uri")
+                    .build()
+                    .register(context);
+        }
+    }
+
+    @Builder
+    public static class WiremockServerRegistration {
+        private final @NonNull String beanName;
+        private final @NonNull String stubLocation;
+        private final @NonNull String property;
+
+        public void register(final @NonNull ConfigurableApplicationContext context) {
+            final var wireMockServer = new WireMockServer(
+                    options()
+                            .dynamicPort()
+                            .extensions(new ResponseTemplateTransformer(true))
+                            .usingFilesUnderClasspath("wiremock/" + stubLocation)
+            );
+
+            wireMockServer.start();
+            context.getBeanFactory().registerSingleton(beanName, wireMockServer);
+
+            TestPropertyValues.of("%s:http://localhost:%d".formatted(property, wireMockServer.port()))
+                    .applyTo(context);
+
+            context.addApplicationListener(event -> {
+                if (event instanceof ContextClosedEvent) {
+                    wireMockServer.stop();
+                }
+            });
+        }
+    }
 }
