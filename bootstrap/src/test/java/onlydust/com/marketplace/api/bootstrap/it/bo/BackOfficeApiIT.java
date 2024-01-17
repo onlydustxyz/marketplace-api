@@ -1253,7 +1253,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "projectLeads": [
                                 "f2215429-83c7-49ce-954b-66ed453c3315"
                               ],
-                              "createdAt": "2023-02-22T12:23:03.403816Z"
+                              "createdAt": "2023-02-22T12:23:03.403816Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             },
                             {
                               "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
@@ -1269,7 +1276,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "f2215429-83c7-49ce-954b-66ed453c3315"
                               ],
-                              "createdAt": "2023-02-22T11:26:12.845767Z"
+                              "createdAt": "2023-02-22T11:26:12.845767Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             },
                             {
                               "id": "97f6b849-1545-4064-83f1-bc5ded33a8b3",
@@ -1282,7 +1296,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "rank": 0,
                               "visibility": "PUBLIC",
                               "projectLeads": null,
-                              "createdAt": "2023-02-27T11:42:18.77154Z"
+                              "createdAt": "2023-02-27T11:42:18.77154Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             },
                             {
                               "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
@@ -1297,7 +1318,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964"
                               ],
-                              "createdAt": "2023-01-02T11:01:23.107983Z"
+                              "createdAt": "2023-01-02T11:01:23.107983Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             },
                             {
                               "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
@@ -1312,7 +1340,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "projectLeads": [
                                 "83612081-949a-47c4-a467-6f28f6adad6d"
                               ],
-                              "createdAt": "2023-05-24T09:55:04.729065Z"
+                              "createdAt": "2023-05-24T09:55:04.729065Z",
+                              "activeContributors": 2,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 408,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             }
                           ]
                         }
@@ -1347,7 +1382,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "rank": 0,
                               "visibility": "PUBLIC",
                               "projectLeads": null,
-                              "createdAt": "2023-01-10T13:37:26.545996Z"
+                              "createdAt": "2023-01-10T13:37:26.545996Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             },
                             {
                               "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
@@ -1360,7 +1402,14 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "rank": 0,
                               "visibility": "PUBLIC",
                               "projectLeads": null,
-                              "createdAt": "2023-05-17T14:19:29.07864Z"
+                              "createdAt": "2023-05-17T14:19:29.07864Z",
+                              "activeContributors": 0,
+                              "newContributors": 0,
+                              "uniqueRewardedContributors": 0,
+                              "openedIssues": 0,
+                              "contributions": 0,
+                              "dollarsEquivalentAmountSent": 0,
+                              "strkAmountSent": 0
                             }
                           ]
                         }

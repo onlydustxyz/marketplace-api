@@ -788,7 +788,25 @@ components:
         createdAt:
           type: string
           format: date-time
-
+        activeContributors:
+          type: integer
+          format: int64
+        newContributors:
+          type: integer
+          format: int64
+        uniqueRewardedContributors:
+          type: integer
+          format: int64
+        openedIssues:
+          type: integer
+          format: int64
+        contributions:
+          type: integer
+          format: int64
+        dollarsEquivalentAmountSent:
+          type: number
+        strkAmountSent:
+          type: number
     Currency:
       type: string
       enum:
