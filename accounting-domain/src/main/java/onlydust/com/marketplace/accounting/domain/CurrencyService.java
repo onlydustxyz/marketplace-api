@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -42,20 +43,24 @@ public class CurrencyService implements onlydust.com.marketplace.accounting.doma
 
         final var token = erc20ProviderFactory.get(blockchain)
                 .get(tokenAddress)
-                .orElseThrow(() -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress,
-                        blockchain.pretty())));
+                .orElseThrow(
+                        () -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
         erc20Storage.save(token);
 
-        final var currency = Currency.of(token);
+        return currencyStorage.findByCode(Currency.Code.of(token.symbol()))
+                .map(c -> c.withERC20(token))
+                .orElseGet(() -> createCurrency(token));
+    }
 
-        if (!currencyStorage.exists(currency.code())) {
-            final var metadata = currencyMetadataService.get(token);
-            currencyStorage.save(metadata.map(currency::withMetadata).orElse(currency));
+    private Currency createCurrency(ERC20 token) {
+        final var currency = currencyMetadataService.get(token)
+                .map(metadata -> Currency.of(token).withMetadata(metadata))
+                .orElse(Currency.of(token));
 
-            saveUsdQuotes(List.of(currency));
-        }
+        currencyStorage.save(currency);
 
+        saveUsdQuotes(List.of(currency));
         return currency;
     }
 

@@ -13,7 +13,7 @@
             "name": "USDC",
             "symbol": "USDC",
             "category": "token",
-            "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform. USDC has a current supply of 25,479,619,641.770477. The last known price of USDC is 1.00005222 USD and is down -0.02 over the last 24 hours. It is currently trading on 16211 active market(s) with $5,386,763,638.37 traded over the last 24 hours. More information can be found at https://www.centre.io/usdc.",
+            "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
             "slug": "usd-coin",
             "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
             "subreddit": "",

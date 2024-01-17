@@ -8,6 +8,7 @@ import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.net.URI;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -43,7 +44,7 @@ public class CurrencyEntity {
                 .standard(currency.standard().map(Standard::of).orElse(null))
                 .name(currency.name())
                 .code(currency.code().toString())
-                .logoUrl(currency.logoUri().toString())
+                .logoUrl(Objects.requireNonNull(currency.logoUri().map(Objects::toString).orElse(null)))
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
                 .build();

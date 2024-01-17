@@ -104,6 +104,10 @@ public class Currency {
         return code.toString();
     }
 
+    public Currency withERC20(ERC20 token) {
+        return toBuilder().erc20(token).build();
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

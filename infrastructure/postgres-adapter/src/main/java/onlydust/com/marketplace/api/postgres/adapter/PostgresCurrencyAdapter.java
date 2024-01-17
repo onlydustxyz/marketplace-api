@@ -19,11 +19,6 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
     }
 
     @Override
-    public Boolean exists(Currency.Code code) {
-        return repository.existsByCode(code.toString());
-    }
-
-    @Override
     public List<Currency> all() {
         return repository.findAll().stream().map(CurrencyEntity::toDomain).toList();
     }
