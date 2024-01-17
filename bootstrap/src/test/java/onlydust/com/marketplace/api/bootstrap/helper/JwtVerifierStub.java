@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0J
 
 import java.util.Base64;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +29,7 @@ public class JwtVerifierStub implements JWTVerifier {
         return verify(jwt.getToken());
     }
 
-    public String tokenFor(String githubWithUserId) {
+    public String tokenFor(String githubWithUserId, long expiresInMilliseconds) {
         final String token = "token-for-%s".formatted(githubWithUserId);
 
         final DecodedJWT decodedJWT = mock(DecodedJWT.class);
@@ -39,22 +40,28 @@ public class JwtVerifierStub implements JWTVerifier {
                   "iss": "https://onlydust-hackathon.eu.auth0.com/",
                   "aud": "62GDg2a6pCjnAln1FccD55eCKLJtj4T5",
                   "iat": 1696947933,
-                  "exp": 2000000000,
+                  "exp": %d,
                   "sub": "%s",
                   "azp": "gfOdiFOltYYUMYeBzNpeNAjMHmb9fWoV",
                   "scope": "openid profile email"
                 }
-                """, githubWithUserId).getBytes()));
+                """,
+                TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() + expiresInMilliseconds),
+                githubWithUserId).getBytes()));
 
         decodedJWTPerToken.put(token, decodedJWT);
         return token;
+    }
+
+    public String tokenFor(String githubWithUserId) {
+        return tokenFor(githubWithUserId, 10_000L);
     }
 
     public String tokenFor(Long githubUserId) {
         return tokenFor("github|%d".formatted(githubUserId));
     }
 
-    public String tokenFor(Auth0JwtClaims claims) {
-        return tokenFor(claims.getGithubWithUserId());
+    public String tokenFor(Long githubUserId, long expiresInMilliseconds) {
+        return tokenFor("github|%d".formatted(githubUserId), expiresInMilliseconds);
     }
 }
