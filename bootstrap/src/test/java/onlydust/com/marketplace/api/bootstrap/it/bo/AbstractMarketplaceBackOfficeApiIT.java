@@ -62,6 +62,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     protected WireMockServer ethereumWireMockServer;
     @Autowired
+    protected WireMockServer optimismWireMockServer;
+    @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
     @Autowired
     ApiKeyAuthenticationService.Config config;
@@ -134,6 +136,13 @@ public class AbstractMarketplaceBackOfficeApiIT {
                     .beanName("ethereumWireMockServer")
                     .stubLocation("ethereum")
                     .property("infrastructure.ethereum.base-uri")
+                    .build()
+                    .register(context);
+
+            WiremockServerRegistration.builder()
+                    .beanName("optimismWireMockServer")
+                    .stubLocation("optimism")
+                    .property("infrastructure.optimism.base-uri")
                     .build()
                     .register(context);
 

@@ -9,7 +9,6 @@
                     "method": "eth_call",
                     "params": [
                         {
-                            "from": "0x3a21b08e9acc1d60728a06e26e8e99713b2aa7de",
                             "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                             "data": "0x95d89b41"
                         },

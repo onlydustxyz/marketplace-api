@@ -36,4 +36,36 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.description").doesNotExist()
         ;
     }
+
+    @Test
+    void should_add_erc20_support_on_optimism() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "OPTIMISM",
+                            "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("CRYPTO")
+                .jsonPath("$.standard").isEqualTo("ERC20")
+                .jsonPath("$.blockchain").isEqualTo("OPTIMISM")
+                .jsonPath("$.address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+                .jsonPath("$.name").isEqualTo("USD Coin")
+                .jsonPath("$.code").isEqualTo("USDC")
+                .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
+                .jsonPath("$.decimals").isEqualTo(6)
+                .jsonPath("$.description").isEqualTo("USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.")
+        ;
+    }
 }

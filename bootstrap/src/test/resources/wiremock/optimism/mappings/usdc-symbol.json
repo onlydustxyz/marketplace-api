@@ -9,8 +9,8 @@
                     "method": "eth_call",
                     "params": [
                         {
-                            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                            "data": "0x06fdde03"
+                            "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                            "data": "0x95d89b41"
                         },
                         "latest"
                     ]
@@ -22,7 +22,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-usdc-name.json",
+        "bodyFileName": "body-usdc-symbol.json",
         "headers": {
             "Content-Type": "application/json"
         }
