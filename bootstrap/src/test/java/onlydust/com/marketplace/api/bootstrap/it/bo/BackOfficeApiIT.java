@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,9 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
-
-    @Autowired
-    ApiKeyAuthenticationService.Config config;
     @Autowired
     BudgetRepository budgetRepository;
 
@@ -51,7 +47,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_GITHUB_REPOS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -140,7 +136,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                                                                                          "-9726-4f94" +
                                                                                                          "-818e" +
                                                                                                          "-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -219,7 +215,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_SPONSORS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -292,7 +288,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "projectIds", "467cb27c-9726-4f94-818e-6aa49bbf5e75,b0f54343-3732-4118-8054-dba40f1ffb85")
                 ))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -334,7 +330,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "sponsorIds", "eb04a5de-4802-4071-be7b-9007b563d48d,2639563e-4437-4bde-a4f4-654977c0cb39")
                 ))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -377,7 +373,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -452,7 +448,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         client.get()
                 .uri(getApiURI(GET_BUDGETS, Map.of("pageIndex", "0", "pageSize", "5", "projectIds",
                         "ccf90dcf-a91b-42c6-b5ca-49d687b4401a,56504731-0398-441f-80ac-90edbd14675f")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -509,7 +505,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "projectIds", "02a533f5-6cbb-4cb6-90fe-f6bee220443c"
                 )))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -543,7 +539,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -588,7 +584,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         client.get()
                 .uri(getApiURI(GET_PROJECT_LEAD_INVITATIONS, Map.of("pageIndex", "0", "pageSize", "5", "ids",
                         "03d6f190-f898-49fa-a1e5-e6174295d3e8,16def485-d98f-4619-801a-ca147c8c64a6")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -621,7 +617,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,298a547f-ecb6-4ab2-8975-68f4e9bf7b39")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -655,7 +651,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_USERS, Map.of("pageIndex", "0", "pageSize", "3")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -807,7 +803,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "userIds", "cde93e0e-99cf-4722-8aaa-2c27b91e270d,747e663f-4e68-4b42-965b-b5aebedcd4c4"
 
                 )))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -909,7 +905,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PAYMENTS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1032,7 +1028,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "projectIds", "8156fc5f-cec5-4f70-a0de-c368772edcd4,6d955622-c1ce-4227-85ea-51cb1b3207b1"
                 )))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1160,7 +1156,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageSize", "5",
                         "paymentIds", "1325c03f-348b-48e5-80c9-a589df5fe400,150817bb-8484-4e31-a332-ac8378d0a6e2"
                 )))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1227,7 +1223,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_PROJECTS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -1248,7 +1244,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
                               "hiring": true,
-                              "rank": 1044,
+                              "rank": 1701,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "f2215429-83c7-49ce-954b-66ed453c3315"
@@ -1270,7 +1266,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
                               "hiring": false,
-                              "rank": 1039,
+                              "rank": 1694,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964",
@@ -1313,7 +1309,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": null,
                               "hiring": false,
-                              "rank": 1044,
+                              "rank": 1021,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964"
@@ -1335,7 +1331,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
                               "hiring": true,
-                              "rank": 1593,
+                              "rank": 1569,
                               "visibility": "PRIVATE",
                               "projectLeads": [
                                 "83612081-949a-47c4-a467-6f28f6adad6d"
@@ -1358,7 +1354,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "projectIds", "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54,61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17")))
-                .header("Api-Key", config.getApiKey())
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()

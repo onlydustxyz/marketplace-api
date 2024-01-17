@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.infura;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -27,6 +28,7 @@ public class InfuraClient {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Properties {
         String baseUri;
         String apiKey;

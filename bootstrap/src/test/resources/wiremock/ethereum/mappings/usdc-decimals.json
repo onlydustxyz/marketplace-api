@@ -1,0 +1,30 @@
+{
+    "request": {
+        "url": "/INFURA_API_KEY",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "eth_call",
+                    "params": [
+                        {
+                            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                            "data": "0x313ce567"
+                        },
+                        "latest"
+                    ]
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-usdc-decimals.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

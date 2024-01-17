@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcQuoteServiceAdapterTest {
     private static final Map<Currency.Id, Integer> CURRENCY_IDS = new HashMap<>();
-    private static final Currency USD = new Currency("US Dollar", Currency.Code.USD);
-    private static final Currency ETH = new Currency("Ether", Currency.Code.of("ETH"));
+    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.USD, 2);
+    private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
 
     static {
         CURRENCY_IDS.put(USD.id(), 2781);

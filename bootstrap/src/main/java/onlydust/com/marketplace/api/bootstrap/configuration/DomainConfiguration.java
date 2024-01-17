@@ -1,5 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.CurrencyService;
+import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
@@ -164,4 +169,21 @@ public class DomainConfiguration {
         return new UserObserver(indexerOutbox);
     }
 
+    @Bean
+    public CurrencyFacadePort currencyFacadePort(final @NonNull ERC20ProviderFactory erc20ProviderFactory,
+                                                 final @NonNull ERC20Storage erc20Storage,
+                                                 final @NonNull CurrencyStorage currencyStorage,
+                                                 final @NonNull CurrencyMetadataService currencyMetadataService,
+                                                 final @NonNull QuoteService quoteService,
+                                                 final @NonNull QuoteStorage quoteStorage
+    ) {
+        return new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+    }
+
+    @Bean
+    public ERC20ProviderFactory erc20ProviderFactory(final @NonNull ERC20Provider ethereumERC20Provider,
+                                                     final @NonNull ERC20Provider optimismERC20Provider
+    ) {
+        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
+    }
 }

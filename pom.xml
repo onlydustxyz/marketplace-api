@@ -42,7 +42,7 @@
         <hibernate-types.version>2.21.1</hibernate-types.version>
         <hypersistence-utils.version>3.6.0</hypersistence-utils.version>
         <javafaker.version>1.0.2</javafaker.version>
-        <wiremock-jre8.version>2.33.2</wiremock-jre8.version>
+        <wiremock-jre8.version>2.35.0</wiremock-jre8.version>
         <reactor-netty.version>1.0.21</reactor-netty.version>
         <test-container.version>1.17.3</test-container.version>
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
@@ -249,6 +249,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
             <version>6.1.1</version>
+        </dependency>
+        <!--  Needed to avoid conflict with OkHttp being used in auth0-java and okhttp3 being used by spring -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.0</version>
         </dependency>
 
         <!-- Test -->
