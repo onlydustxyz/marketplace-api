@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface CurrencyMetadataService {
     Optional<Currency.Metadata> get(ERC20 token);
+
+    Optional<Currency.Metadata> get(Currency.Code code);
 }

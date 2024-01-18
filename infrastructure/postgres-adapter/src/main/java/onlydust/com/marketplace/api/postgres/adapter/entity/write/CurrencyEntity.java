@@ -57,7 +57,7 @@ public class CurrencyEntity {
                 .standard(standard == null ? null : standard.toDomain())
                 .name(name)
                 .code(Currency.Code.of(code))
-                .metadata(new Currency.Metadata(description, URI.create(logoUrl)))
+                .metadata(new Currency.Metadata(name, description, URI.create(logoUrl)))
                 .decimals(decimals)
                 .build();
     }

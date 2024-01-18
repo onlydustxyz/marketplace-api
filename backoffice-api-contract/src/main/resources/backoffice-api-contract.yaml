@@ -890,6 +890,10 @@ components:
           $ref: '#/components/schemas/BlockchainContract'
         address:
           $ref: '#/components/schemas/ContractAddress'
+        code:
+          type: string
+        decimals:
+          type: integer
 
     CurrencyResponse:
       type: object

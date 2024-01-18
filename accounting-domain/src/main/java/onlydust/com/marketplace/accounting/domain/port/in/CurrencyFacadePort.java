@@ -8,5 +8,8 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 public interface CurrencyFacadePort {
     Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress);
 
+    Currency addNativeCryptocurrencySupport(Currency.Code code, Integer decimals);
+
     void refreshQuotes();
+
 }

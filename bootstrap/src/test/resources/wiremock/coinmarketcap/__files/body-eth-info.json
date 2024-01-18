@@ -1,0 +1,277 @@
+{
+    "status": {
+        "timestamp": "2024-01-17T17:25:17.547Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 25,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "ETH": [
+            {
+                "id": 1027,
+                "name": "Ethereum",
+                "symbol": "ETH",
+                "category": "coin",
+                "description": "Ethereum (ETH) is a cryptocurrency",
+                "slug": "ethereum",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                "subreddit": "ethereum",
+                "tag-names": [
+                    "PoS",
+                    "Smart Contracts",
+                    "Ethereum Ecosystem",
+                    "Coinbase Ventures Portfolio",
+                    "Three Arrows Capital Portfolio",
+                    "Polychain Capital Portfolio",
+                    "Binance Labs Portfolio",
+                    "Blockchain Capital Portfolio",
+                    "BoostVC Portfolio",
+                    "CMS Holdings Portfolio",
+                    "DCG Portfolio",
+                    "DragonFly Capital Portfolio",
+                    "Electric Capital Portfolio",
+                    "Fabric Ventures Portfolio",
+                    "Framework Ventures Portfolio",
+                    "Hashkey Capital Portfolio",
+                    "Kenetic Capital Portfolio",
+                    "Huobi Capital Portfolio",
+                    "Alameda Research Portfolio",
+                    "a16z Portfolio",
+                    "1Confirmation Portfolio",
+                    "Winklevoss Capital Portfolio",
+                    "USV Portfolio",
+                    "Placeholder Ventures Portfolio",
+                    "Pantera Capital Portfolio",
+                    "Multicoin Capital Portfolio",
+                    "Paradigm Portfolio",
+                    "Injective Ecosystem",
+                    "Layer 1",
+                    "FTX Bankruptcy Estate "
+                ],
+                "tag-groups": [
+                    "ALGORITHM",
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY",
+                    "CATEGORY"
+                ],
+                "twitter_username": "ethereum",
+                "is_hidden": 0,
+                "date_launched": null,
+                "contract_address": [
+                    {
+                        "contract_address": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+                        "platform": {
+                            "name": "BNB Smart Chain (BEP20)",
+                            "coin": {
+                                "id": "1839",
+                                "name": "BNB",
+                                "symbol": "BNB",
+                                "slug": "bnb"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x64ff637fb478863b7468bc97d30a5bf3a428a1fd",
+                        "platform": {
+                            "name": "HECO",
+                            "coin": {
+                                "id": "2502",
+                                "name": "Huobi Token",
+                                "symbol": "HT",
+                                "slug": "htx-token"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0xf20d962a6c8f70c731bd838a3a388d7d48fa6e15",
+                        "platform": {
+                            "name": "Avalanche C-Chain",
+                            "coin": {
+                                "id": "5805",
+                                "name": "Avalanche",
+                                "symbol": "AVAX",
+                                "slug": "avalanche"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x2eaa73bd0db20c64f53febea7b5f5e5bccc7fb8b",
+                        "platform": {
+                            "name": "Viction",
+                            "coin": {
+                                "id": "2570",
+                                "name": "Viction",
+                                "symbol": "VIC",
+                                "slug": "viction"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x0200070000000000000000000000000000000000000000000000000000000000",
+                        "platform": {
+                            "name": "Sora",
+                            "coin": {
+                                "id": "5802",
+                                "name": "SORA",
+                                "symbol": "XOR",
+                                "slug": "sora"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x1D931Bf8656d795E50eF6D639562C5bD8Ac2B78f",
+                        "platform": {
+                            "name": "RSK RBTC",
+                            "coin": {
+                                "id": "3626",
+                                "name": "Rootstock Smart Bitcoin",
+                                "symbol": "RBTC",
+                                "slug": "rsk-smart-bitcoin"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x85219708c49aa701871ad330a94ea0f41dff24ca",
+                        "platform": {
+                            "name": "Velas",
+                            "coin": {
+                                "id": "4747",
+                                "name": "Velas",
+                                "symbol": "VLX",
+                                "slug": "velas"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk",
+                        "platform": {
+                            "name": "Solana",
+                            "coin": {
+                                "id": "5426",
+                                "name": "Solana",
+                                "symbol": "SOL",
+                                "slug": "solana"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x34d21b1e550d73cee41151c77f3c73359527a396",
+                        "platform": {
+                            "name": "Klaytn",
+                            "coin": {
+                                "id": "4256",
+                                "name": "Klaytn",
+                                "symbol": "KLAY",
+                                "slug": "klaytn"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "aurora",
+                        "platform": {
+                            "name": "Near",
+                            "coin": {
+                                "id": "6535",
+                                "name": "NEAR Protocol",
+                                "symbol": "NEAR",
+                                "slug": "near-protocol"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "KT19at7rQUvyjxnZ2fBv7D9zc8rkyG7gAoU8",
+                        "platform": {
+                            "name": "Tezos",
+                            "coin": {
+                                "id": "2011",
+                                "name": "Tezos",
+                                "symbol": "XTZ",
+                                "slug": "tezos"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x34a9c05b638020a07bb153bf624c8763bf8b4a86",
+                        "platform": {
+                            "name": "EthereumPoW",
+                            "coin": {
+                                "id": "21296",
+                                "name": "EthereumPoW",
+                                "symbol": "ETHW",
+                                "slug": "ethereum-pow"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                        "platform": {
+                            "name": "Ethereum",
+                            "coin": {
+                                "id": "1027",
+                                "name": "Ethereum",
+                                "symbol": "ETH",
+                                "slug": "ethereum"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                        "platform": {
+                            "name": "Starknet",
+                            "coin": {
+                                "id": "22691",
+                                "name": "Starknet Token",
+                                "symbol": "STRK",
+                                "slug": "starknet-token"
+                            }
+                        }
+                    },
+                    {
+                        "contract_address": "ibc/EA1D43981D5C9A1C4AAEA9C23BB1D4FA126BA9BC7020A25E0AE4AA841EA25DC5",
+                        "platform": {
+                            "name": "Osmosis",
+                            "coin": {
+                                "id": "12220",
+                                "name": "Osmosis",
+                                "symbol": "OSMO",
+                                "slug": "osmosis"
+                            }
+                        }
+                    }
+                ],
+                "self_reported_circulating_supply": null,
+                "self_reported_tags": null,
+                "self_reported_market_cap": null,
+                "infinite_supply": true
+            }
+        ]
+    }
+}

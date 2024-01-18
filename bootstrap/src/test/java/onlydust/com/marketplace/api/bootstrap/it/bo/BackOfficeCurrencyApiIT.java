@@ -90,4 +90,37 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .isNotFound()
         ;
     }
+
+
+    @Test
+    void should_add_native_cryptocurrency_support() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "code": "ETH",
+                            "decimals": "18"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("CRYPTO")
+                .jsonPath("$.standard").doesNotExist()
+                .jsonPath("$.blockchain").doesNotExist()
+                .jsonPath("$.address").doesNotExist()
+                .jsonPath("$.name").isEqualTo("Ethereum")
+                .jsonPath("$.code").isEqualTo("ETH")
+                .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png")
+                .jsonPath("$.decimals").isEqualTo(18)
+                .jsonPath("$.description").isEqualTo("Ethereum (ETH) is a cryptocurrency")
+        ;
+    }
+
 }
