@@ -33,7 +33,7 @@ public class CurrencyEntity {
     private Standard standard;
     private @NonNull String name;
     private @NonNull String code;
-    private @NonNull String logoUrl;
+    private String logoUrl;
     private @NonNull Integer decimals;
     private String description;
 
@@ -44,7 +44,7 @@ public class CurrencyEntity {
                 .standard(currency.standard().map(Standard::of).orElse(null))
                 .name(currency.name())
                 .code(currency.code().toString())
-                .logoUrl(Objects.requireNonNull(currency.logoUri().map(Objects::toString).orElse(null)))
+                .logoUrl(currency.logoUri().map(Objects::toString).orElse(null))
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
                 .build();
