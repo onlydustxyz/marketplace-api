@@ -32,15 +32,20 @@ public class CmcClient extends HttpClient {
 
     public CmcClient(Properties properties) {
         this.properties = properties;
-        fiatCurrencyMap().forEach(c -> FIAT_CURRENCIES.put(c.symbol(), c));
     }
 
-    private List<MapResponse> fiatCurrencyMap() {
-        final var typeRef = new TypeReference<Response<List<MapResponse>>>() {
-        };
+    private Map<Currency.Code, MapResponse> fiatCurrencies() {
+        if (FIAT_CURRENCIES.isEmpty()) {
+            final var typeRef = new TypeReference<Response<List<MapResponse>>>() {
+            };
 
-        return get("/v1/fiat/map?limit=5000", typeRef)
-                .orElseThrow(() -> internalServerError("Unable to fetch fiat currency map"));
+            final var currencies = get("/v1/fiat/map?limit=5000", typeRef)
+                    .orElseThrow(() -> internalServerError("Unable to fetch fiat currency map"));
+
+            FIAT_CURRENCIES.putAll(currencies.stream().collect(Collectors.toMap(MapResponse::symbol, c -> c)));
+        }
+
+        return FIAT_CURRENCIES;
     }
 
     @Override
@@ -86,7 +91,7 @@ public class CmcClient extends HttpClient {
                             .map(MetadataResponse::id)
                             .orElse(null);
 
-                    case FIAT -> Optional.ofNullable(FIAT_CURRENCIES.get(currency.code())).map(MapResponse::id).orElse(null);
+                    case FIAT -> Optional.ofNullable(fiatCurrencies().get(currency.code())).map(MapResponse::id).orElse(null);
                 }
         );
 
