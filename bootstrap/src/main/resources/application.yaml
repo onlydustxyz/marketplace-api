@@ -116,3 +116,8 @@ infrastructure:
     api-key: ${INFURA_API_KEY}
     blockchain: optimism
     private-key: ${ETHEREUM_PRIVATE_KEY}
+  starknet:
+    base-uri: https://starknet-mainnet.infura.io/v3
+    api-key: ${INFURA_API_KEY}
+    blockchain: starknet
+    private-key: ${ETHEREUM_PRIVATE_KEY}
