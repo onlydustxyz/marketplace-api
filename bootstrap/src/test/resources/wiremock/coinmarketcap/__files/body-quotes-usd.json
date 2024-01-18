@@ -1,0 +1,51 @@
+{
+    "status": {
+        "timestamp": "2024-01-18T14:57:53.676Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 15,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "2781": {
+            "id": 2781,
+            "name": "United States Dollar",
+            "symbol": "USD",
+            "slug": "united-states-dollar",
+            "num_market_pairs": 0,
+            "date_added": "2013-04-28T00:00:00.000Z",
+            "tags": [],
+            "max_supply": null,
+            "circulating_supply": 0,
+            "total_supply": 0,
+            "is_active": 0,
+            "infinite_supply": false,
+            "platform": null,
+            "cmc_rank": null,
+            "is_fiat": 1,
+            "self_reported_circulating_supply": null,
+            "self_reported_market_cap": null,
+            "tvl_ratio": null,
+            "last_updated": "2024-01-18T14:56:59.000Z",
+            "quote": {
+                "2781": {
+                    "price": 1,
+                    "volume_24h": 0,
+                    "volume_change_24h": 0,
+                    "percent_change_1h": 0,
+                    "percent_change_24h": 0,
+                    "percent_change_7d": 0,
+                    "percent_change_30d": 0,
+                    "percent_change_60d": 0,
+                    "percent_change_90d": 0,
+                    "market_cap": 0,
+                    "market_cap_dominance": 0,
+                    "fully_diluted_market_cap": 0,
+                    "tvl": null,
+                    "last_updated": "2024-01-18T14:56:59.000Z"
+                }
+            }
+        }
+    }
+}

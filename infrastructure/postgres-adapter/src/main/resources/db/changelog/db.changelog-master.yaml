@@ -59,3 +59,7 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000028_update_project_stats_view_with_usdc.sql
   - include:
       file: db/changelog/changelogs/00000029_create_new_currencies_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000030_create_rfd_schema.sql
+  - include:
+      file: db/changelog/changelogs/00000031_make_currency_logo_nullable.sql

@@ -32,15 +32,17 @@ public class CurrencyServiceTest {
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
+    final IsoCurrencyService isoCurrencyService = mock(IsoCurrencyService.class);
     CurrencyService currencyService;
 
     @BeforeEach
     void setUp() {
-        reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage);
+        reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage, isoCurrencyService);
         when(erc20Storage.exists(any(), any())).thenReturn(false);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
-        currencyService = new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+        currencyService = new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
+                isoCurrencyService);
     }
 
     @Test
@@ -199,5 +201,51 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).isEmpty();
 
         verify(currencyStorage, times(1)).save(currency);
+    }
+
+    @Test
+    void should_add_iso_currency_support() {
+        // Given
+        when(isoCurrencyService.get(Currency.Code.of("EUR"))).thenReturn(Optional.of(Currency.fiat("Euro", Currency.Code.of("EUR"), 2)));
+
+        // When
+        final var currency = currencyService.addIsoCurrencySupport(Currency.Code.of("EUR"));
+
+        // Then
+        assertThat(currency.id()).isNotNull();
+        assertThat(currency.name()).isEqualTo("Euro");
+        assertThat(currency.code()).isEqualTo(Currency.Code.of("EUR"));
+        assertThat(currency.description()).isEmpty();
+        assertThat(currency.logoUri()).isEmpty();
+        assertThat(currency.decimals()).isEqualTo(2);
+        assertThat(currency.erc20()).isEmpty();
+        assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
+        assertThat(currency.standard()).contains(Currency.Standard.ISO4217);
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+
+    @Test
+    void should_return_existing_currency_upon_duplication() {
+        // Given
+        when(isoCurrencyService.get(Currency.Code.of("ZZZ"))).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> currencyService.addIsoCurrencySupport(Currency.Code.of("ZZZ")))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Could not find ISO currency ZZZ");
+    }
+
+
+    @Test
+    void should_prevent_adding_non_existing_iso_currency() {
+        // When
+        final var currency = currencyService.addIsoCurrencySupport(Currency.Code.USD);
+
+        // Then
+        assertThat(currency).isEqualTo(Currencies.USD);
+        verify(currencyStorage, never()).save(any());
+        verify(isoCurrencyService, never()).get(any());
     }
 }

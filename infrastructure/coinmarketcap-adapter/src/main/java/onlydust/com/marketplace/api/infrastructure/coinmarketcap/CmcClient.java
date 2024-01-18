@@ -23,15 +23,29 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 public class CmcClient extends HttpClient {
     private final Properties properties;
     private final static Map<Currency.Id, Integer> INTERNAL_IDS = new HashMap<>();
+    private final static Map<Currency.Code, MapResponse> FIAT_CURRENCIES = new HashMap<>();
 
     public CmcClient(Properties properties) {
         this.properties = properties;
-        INTERNAL_IDS.putAll(properties.currencyIds);
+    }
+
+    private Map<Currency.Code, MapResponse> fiatCurrencies() {
+        if (FIAT_CURRENCIES.isEmpty()) {
+            final var typeRef = new TypeReference<Response<List<MapResponse>>>() {
+            };
+
+            final var currencies = get("/v1/fiat/map?limit=5000", typeRef)
+                    .orElseThrow(() -> internalServerError("Unable to fetch fiat currency map"));
+
+            FIAT_CURRENCIES.putAll(currencies.stream().collect(Collectors.toMap(MapResponse::symbol, c -> c)));
+        }
+
+        return FIAT_CURRENCIES;
     }
 
     @Override
@@ -66,17 +80,21 @@ public class CmcClient extends HttpClient {
         };
 
         return get("/v2/cryptocurrency/quotes/latest?id=%s&convert_id=%s".formatted(fromIds, toIds), typeRef)
-                .orElseThrow(() -> badRequest("Unable to fetch quotes"));
+                .orElseThrow(() -> internalServerError("Unable to fetch quotes"));
     }
 
     public Optional<Integer> internalId(Currency currency) {
-        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> currency.erc20()
-                .flatMap(this::metadata)
-                .map(MetadataResponse::id)
-                .orElseGet(() -> metadata(currency.code())
-                        .map(MetadataResponse::id)
-                        .orElse(null)));
-        
+        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
+                    case CRYPTO -> currency.erc20()
+                            .flatMap(this::metadata)
+                            .or(() -> metadata(currency.code()))
+                            .map(MetadataResponse::id)
+                            .orElse(null);
+
+                    case FIAT -> Optional.ofNullable(fiatCurrencies().get(currency.code())).map(MapResponse::id).orElse(null);
+                }
+        );
+
         return Optional.ofNullable(id);
     }
 
@@ -95,7 +113,6 @@ public class CmcClient extends HttpClient {
     public static class Properties {
         String baseUri;
         String apiKey;
-        Map<Currency.Id, Integer> currencyIds;
     }
 
     public record Response<T>(Status status, T data) {
@@ -117,5 +134,9 @@ public class CmcClient extends HttpClient {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public record Platform(@JsonProperty("token_address") ContractAddress tokenAddress) {
         }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record MapResponse(Integer id, String name, String sign, Currency.Code symbol) {
     }
 }

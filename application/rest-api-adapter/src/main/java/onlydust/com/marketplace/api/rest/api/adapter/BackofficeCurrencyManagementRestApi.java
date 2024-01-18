@@ -6,12 +6,15 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeCurrencyManagementApi;
 import onlydust.com.backoffice.api.contract.model.CurrencyRequest;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
+import onlydust.com.backoffice.api.contract.model.CurrencyStandard;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapBlockchain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapCurrencyResponse;
@@ -32,7 +35,10 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                 default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
             };
 
-            default -> throw OnlyDustException.badRequest("Currency type %s is not supported".formatted(request.getType()));
+            case FIAT -> switch (Optional.ofNullable(request.getStandard()).orElse(CurrencyStandard.ISO4217)) {
+                case ISO4217 -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()));
+                default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+            };
         };
 
         return ResponseEntity.ok(mapCurrencyResponse(currency));

@@ -175,9 +175,11 @@ public class DomainConfiguration {
                                                  final @NonNull CurrencyStorage currencyStorage,
                                                  final @NonNull CurrencyMetadataService currencyMetadataService,
                                                  final @NonNull QuoteService quoteService,
-                                                 final @NonNull QuoteStorage quoteStorage
+                                                 final @NonNull QuoteStorage quoteStorage,
+                                                 final @NonNull IsoCurrencyService isoCurrencyService
     ) {
-        return new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage);
+        return new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
+                isoCurrencyService);
     }
 
     @Bean
