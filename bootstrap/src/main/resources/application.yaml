@@ -106,8 +106,6 @@ infrastructure:
   coinmarketcap:
     base-uri: https://pro-api.coinmarketcap.com
     api-key: ${COINMARKETCAP_API_KEY}
-    currency-ids:
-      a03cdb25-abe9-494f-84d5-d7426a9bf4e0: 2781 # USD TODO: remove
   ethereum:
     base-uri: https://mainnet.infura.io/v3
     api-key: ${INFURA_API_KEY}

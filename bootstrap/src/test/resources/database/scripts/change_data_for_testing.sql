@@ -22,6 +22,3 @@ where id = 'f0c1b882-76f2-47d0-9331-151ce1f99281'
 update payment_requests
 set currency = 'usd'
 where id = '0341317f-b831-412a-9cec-a5a16a9d749c';
-
-INSERT INTO currencies (id, type, standard, name, code, logo_url, decimals)
-VALUES ('a03cdb25-abe9-494f-84d5-d7426a9bf4e0', 'FIAT', 'ISO4217', 'US Dollar', 'USD', 'https://s3.amazonaws.com/airswap-token-images/USD.png', 2);

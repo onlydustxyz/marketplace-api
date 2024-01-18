@@ -7,15 +7,13 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 
 import java.math.BigInteger;
 import java.net.URI;
-import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcCurrencyMetadataServiceAdapterTest {
     private final CmcClient.Properties properties = new CmcClient.Properties(
             "https://pro-api.coinmarketcap.com",
-            "<API_KEY>",
-            new HashMap<>());
+            "<API_KEY>");
     private final CmcClient client = new CmcClient(properties);
     private final CmcCurrencyMetadataServiceAdapter adapter = new CmcCurrencyMetadataServiceAdapter(client);
 

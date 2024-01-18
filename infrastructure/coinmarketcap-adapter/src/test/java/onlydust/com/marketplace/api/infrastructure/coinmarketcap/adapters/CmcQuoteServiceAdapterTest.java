@@ -26,8 +26,7 @@ class CmcQuoteServiceAdapterTest {
 
     private final CmcClient.Properties properties = new CmcClient.Properties(
             "https://pro-api.coinmarketcap.com",
-            "<API_KEY>",
-            CURRENCY_IDS);
+            "<API_KEY>");
 
     private final CmcClient client = new CmcClient(properties);
     private final CmcQuoteServiceAdapter adapter = new CmcQuoteServiceAdapter(client);

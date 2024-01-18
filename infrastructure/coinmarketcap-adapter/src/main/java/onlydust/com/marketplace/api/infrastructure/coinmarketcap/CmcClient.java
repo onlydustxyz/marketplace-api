@@ -32,7 +32,6 @@ public class CmcClient extends HttpClient {
 
     public CmcClient(Properties properties) {
         this.properties = properties;
-        INTERNAL_IDS.putAll(properties.currencyIds);
         fiatCurrencyMap().forEach(c -> FIAT_CURRENCIES.put(c.symbol(), c));
     }
 
@@ -109,7 +108,6 @@ public class CmcClient extends HttpClient {
     public static class Properties {
         String baseUri;
         String apiKey;
-        Map<Currency.Id, Integer> currencyIds;
     }
 
     public record Response<T>(Status status, T data) {

@@ -1,10 +1,29 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    @BeforeEach
+    void addUsdcSupport() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "FIAT",
+                            "code": "USD"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
     @Test
     void should_add_erc20_support_on_ethereum() {
         client
@@ -90,7 +109,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .isNotFound()
         ;
     }
-
 
     @Test
     void should_add_native_cryptocurrency_support() {
