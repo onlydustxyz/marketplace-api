@@ -21,6 +21,7 @@ public class CurrencyService implements CurrencyFacadePort {
     private final @NonNull CurrencyMetadataService currencyMetadataService;
     private final @NonNull QuoteService quoteService;
     private final @NonNull QuoteStorage quoteStorage;
+    private final @NonNull IsoCurrencyService isoCurrencyService;
 
     @Override
     public Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress) {
@@ -45,11 +46,22 @@ public class CurrencyService implements CurrencyFacadePort {
                 .orElseGet(() -> createCurrency(code, decimals));
     }
 
+    @Override
+    public Currency addIsoCurrencySupport(final @NonNull Currency.Code code) {
+        return currencyStorage.findByCode(code)
+                .or(() -> isoCurrencyService.get(code).map(this::createCurrency))
+                .orElseThrow(() -> notFound("Could not find ISO currency %s".formatted(code)));
+    }
+
     private Currency createCurrency(ERC20 token) {
         final var currency = currencyMetadataService.get(token)
                 .map(metadata -> Currency.of(token).withMetadata(metadata))
                 .orElse(Currency.of(token));
 
+        return createCurrency(currency);
+    }
+
+    private Currency createCurrency(Currency currency) {
         currencyStorage.save(currency);
 
         saveUsdQuotes(List.of(currency));
