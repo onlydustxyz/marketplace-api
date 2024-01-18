@@ -63,6 +63,14 @@ public class Currency {
         return toBuilder().metadata(metadata).build();
     }
 
+    public Currency withName(final @NonNull String name) {
+        return toBuilder().name(name).build();
+    }
+
+    public Currency withDecimals(final @NonNull Integer decimals) {
+        return toBuilder().decimals(decimals).build();
+    }
+
     public Id id() {
         return id;
     }

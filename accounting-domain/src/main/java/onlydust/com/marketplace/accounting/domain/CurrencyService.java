@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
+import java.net.URI;
 import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
@@ -82,6 +83,24 @@ public class CurrencyService implements CurrencyFacadePort {
     @Override
     public void refreshQuotes() {
         saveUsdQuotes(currencyStorage.all());
+    }
+
+    @Override
+    public Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals) {
+        var currency = currencyStorage.get(id).orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
+
+        if (name != null)
+            currency = currency.withName(name);
+        if (description != null)
+            currency = currency.withMetadata(new Currency.Metadata(currency.name(), description, currency.logoUri().orElse(null)));
+        if (logoUrl != null)
+            currency = currency.withMetadata(new Currency.Metadata(currency.name(), currency.description().orElse(null), logoUrl));
+        if (decimals != null)
+            currency = currency.withDecimals(decimals);
+
+        currencyStorage.save(currency);
+
+        return currency;
     }
 
     private void saveUsdQuotes(List<Currency> currencies) {

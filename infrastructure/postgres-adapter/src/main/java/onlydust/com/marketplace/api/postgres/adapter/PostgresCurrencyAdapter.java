@@ -27,4 +27,9 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
     public Optional<Currency> findByCode(Currency.Code code) {
         return repository.findByCode(code.toString()).map(CurrencyEntity::toDomain);
     }
+
+    @Override
+    public Optional<Currency> get(Currency.Id id) {
+        return repository.findById(id.value()).map(CurrencyEntity::toDomain);
+    }
 }

@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -141,9 +143,10 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         ;
     }
 
+    @SneakyThrows
     @Test
     void should_add_iso_currency_support() {
-        client
+        final var response = client
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
                 .contentType(APPLICATION_JSON)
@@ -157,7 +160,9 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody()
+                .expectBody();
+
+        response
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("FIAT")
                 .jsonPath("$.standard").isEqualTo("ISO4217")
@@ -168,6 +173,35 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.logoUrl").doesNotExist()
                 .jsonPath("$.decimals").isEqualTo(2)
                 .jsonPath("$.description").doesNotExist()
+        ;
+
+        final var currencyId = new ObjectMapper().readTree(response.returnResult().getResponseBody()).get("id").asText();
+
+        client
+                .put()
+                .uri(getApiURI(PUT_CURRENCIES.formatted(currencyId)))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "name": "Euro2",
+                            "description": "Euro is the official currency of the European Union",
+                            "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
+                            "decimals": 3
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("FIAT")
+                .jsonPath("$.standard").isEqualTo("ISO4217")
+                .jsonPath("$.name").isEqualTo("Euro2")
+                .jsonPath("$.code").isEqualTo("EUR")
+                .jsonPath("$.logoUrl").isEqualTo("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png")
+                .jsonPath("$.decimals").isEqualTo(3)
+                .jsonPath("$.description").isEqualTo("Euro is the official currency of the European Union")
         ;
     }
 }
