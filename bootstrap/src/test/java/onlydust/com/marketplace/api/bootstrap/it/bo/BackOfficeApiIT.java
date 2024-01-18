@@ -1341,7 +1341,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "newContributors": 0,
                               "uniqueRewardedContributors": 0,
                               "openedIssues": 0,
-                              "contributions": 408,
+                              "contributions": 396,
                               "dollarsEquivalentAmountSent": 0,
                               "strkAmountSent": 0
                             }
