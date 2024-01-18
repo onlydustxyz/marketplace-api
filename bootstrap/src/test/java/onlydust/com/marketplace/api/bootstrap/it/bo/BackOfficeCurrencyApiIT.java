@@ -123,4 +123,33 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         ;
     }
 
+    @Test
+    void should_add_iso_currency_support() {
+        client
+                .post()
+                .uri(getApiURI(POST_CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Api-Key", apiKey())
+                .bodyValue("""
+                        {
+                            "type": "FIAT",
+                            "code": "EUR"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("FIAT")
+                .jsonPath("$.standard").isEqualTo("ISO4217")
+                .jsonPath("$.blockchain").doesNotExist()
+                .jsonPath("$.address").doesNotExist()
+                .jsonPath("$.name").isEqualTo("Euro")
+                .jsonPath("$.code").isEqualTo("EUR")
+                .jsonPath("$.logoUrl").doesNotExist()
+                .jsonPath("$.decimals").isEqualTo(2)
+                .jsonPath("$.description").doesNotExist()
+        ;
+    }
 }
