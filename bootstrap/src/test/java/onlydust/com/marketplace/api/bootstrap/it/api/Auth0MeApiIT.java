@@ -90,6 +90,13 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("SignedUp")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(me.getId().toString())))
+                .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo(githubUserId.toString()))));
 
         // ===============================================
         // When we call it again (already signed-up)

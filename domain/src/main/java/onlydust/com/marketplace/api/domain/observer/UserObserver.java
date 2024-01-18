@@ -12,9 +12,12 @@ import java.util.Date;
 public class UserObserver implements UserObserverPort {
 
     private final OutboxPort indexerOutbox;
+    private final OutboxPort notificationOutbox;
 
     @Override
     public void onUserSignedUp(User user) {
-        indexerOutbox.push(new UserSignedUp(user.getId(), user.getGithubUserId(), user.getGithubLogin(), new Date()));
+        final var event = new UserSignedUp(user.getId(), user.getGithubUserId(), user.getGithubLogin(), new Date());
+        indexerOutbox.push(event);
+        notificationOutbox.push(event);
     }
 }
