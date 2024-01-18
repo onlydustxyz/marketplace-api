@@ -235,4 +235,9 @@ public class PostgresConfiguration {
     public PostgresERC20Adapter postgresERC20Adapter(final ERC20Repository erc20Repository) {
         return new PostgresERC20Adapter(erc20Repository);
     }
+
+    @Bean
+    public PostgresIsoCurrencyServiceAdapter postgresIsoCurrencyServiceAdapter(final IsoCurrencyRepository isoCurrencyRepository) {
+        return new PostgresIsoCurrencyServiceAdapter(isoCurrencyRepository);
+    }
 }
