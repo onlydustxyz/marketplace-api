@@ -165,8 +165,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox) {
-        return new UserObserver(indexerOutbox);
+    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort notificationOutbox) {
+        return new UserObserver(indexerOutbox, notificationOutbox);
     }
 
     @Bean

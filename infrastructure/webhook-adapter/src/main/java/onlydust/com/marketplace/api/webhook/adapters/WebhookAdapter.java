@@ -31,6 +31,8 @@ public class WebhookAdapter implements WebhookPort {
         } else if (event instanceof ProjectLeaderInvitationCancelled projectLeaderInvitationCancelled) {
             webhookHttpClient.post(ProjectLeaderInvitationCancelledEventDTO.of(projectLeaderInvitationCancelled,
                     config.getEnvironment()));
+        } else if (event instanceof UserSignedUp userSignedUp) {
+            webhookHttpClient.post(UserSignedUpEventDTO.of(userSignedUp, config.getEnvironment()));
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }
