@@ -1,6 +1,6 @@
 {
     "request": {
-        "url": "/v2/cryptocurrency/quotes/latest?id=3408&convert_id=2781",
+        "url": "/v2/cryptocurrency/quotes/latest?id=1027&convert_id=2781",
         "method": "GET",
         "headers": {
             "X-CMC_PRO_API_KEY": {
@@ -10,6 +10,6 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-quotes.json"
+        "bodyFileName": "body-quotes-eth.json"
     }
 }

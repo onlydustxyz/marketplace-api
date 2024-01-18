@@ -51,6 +51,14 @@ public class CmcClient extends HttpClient {
         return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.address()), typeRef).flatMap(d -> d.values().stream().findFirst());
     }
 
+    public Optional<MetadataResponse> metadata(Currency.Code code) {
+        final var typeRef = new TypeReference<Response<Map<String, List<MetadataResponse>>>>() {
+        };
+        return get("/v2/cryptocurrency/info?aux=logo,description&symbol=%s".formatted(code), typeRef).flatMap(d -> d.values().stream().findFirst()
+                .flatMap(l -> l.stream().filter(m -> m.category.equals("coin")).findFirst()));
+    }
+
+
     public Map<Integer, QuoteResponse> quotes(List<Currency> from, List<Currency> to) {
         final var fromIds = from.stream().map(this::internalId).filter(Optional::isPresent).map(id -> id.get().toString()).collect(Collectors.joining(","));
         final var toIds = to.stream().map(this::internalId).filter(Optional::isPresent).map(id -> id.get().toString()).collect(Collectors.joining(","));
@@ -62,7 +70,13 @@ public class CmcClient extends HttpClient {
     }
 
     public Optional<Integer> internalId(Currency currency) {
-        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> currency.erc20().flatMap(this::metadata).map(MetadataResponse::id).orElse(null));
+        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> currency.erc20()
+                .flatMap(this::metadata)
+                .map(MetadataResponse::id)
+                .orElseGet(() -> metadata(currency.code())
+                        .map(MetadataResponse::id)
+                        .orElse(null)));
+        
         return Optional.ofNullable(id);
     }
 
@@ -91,7 +105,7 @@ public class CmcClient extends HttpClient {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record MetadataResponse(Integer id, String description, URI logo) {
+    public record MetadataResponse(Integer id, String description, URI logo, String category, String name) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
