@@ -3774,6 +3774,7 @@ components:
             - hasSeenOnboardingWizard
             - hasAcceptedLatestTermsAndConditions
             - isAdmin
+            - createdAt
           properties:
             hasSeenOnboardingWizard:
               type: boolean
@@ -3799,6 +3800,9 @@ components:
             isAdmin:
               type: boolean
               description: True if the user is an OnlyDust admin
+            createdAt:
+              type: string
+              format: date-time
 
     ProjectLedShortResponse:
       type: object

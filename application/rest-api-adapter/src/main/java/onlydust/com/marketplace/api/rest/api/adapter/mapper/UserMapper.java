@@ -200,7 +200,7 @@ public interface UserMapper {
                 }).toList();
     }
 
-    public static UserProfileCoverColor coverToUserProfileResponse(final @NonNull UserProfileCover cover) {
+    static UserProfileCoverColor coverToUserProfileResponse(final @NonNull UserProfileCover cover) {
         return switch (cover) {
                     case BLUE -> UserProfileCoverColor.BLUE;
                     case CYAN -> UserProfileCoverColor.CYAN;
@@ -238,6 +238,7 @@ public interface UserMapper {
                 .toList());
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
+        getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
         return getMeResponse;
     }
 

@@ -7,11 +7,13 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 
@@ -324,6 +326,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(4)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
                                                                 ".com/5003677688814069549.png")
+                .jsonPath("$.createdAt").isEqualTo(DateMapper.toZoneDateTime(pierre.user().getCreatedAt()).format(DateTimeFormatter.ISO_INSTANT))
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0)
                 .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)

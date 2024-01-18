@@ -165,6 +165,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_current_user_with_onboarding_data() {
         // Given
+        final Date createdAt = new Date();
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
                 .githubUserId(githubUserId)
@@ -172,6 +173,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .githubAvatarUrl(avatarUrl)
                 .githubEmail(email)
                 .lastSeenAt(new Date())
+                .createdAt(createdAt)
                 .roles(new UserRole[]{UserRole.USER, UserRole.ADMIN})
                 .build();
         userRepository.save(user);
@@ -198,6 +200,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.isAdmin").isEqualTo(true)
+                .jsonPath("$.createdAt").isNotEmpty()
                 .jsonPath("$.id").isEqualTo(user.getId().toString());
     }
 

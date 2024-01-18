@@ -22,7 +22,7 @@ public interface UserStoragePort {
 
     Optional<User> getUserByGithubId(Long githubId);
 
-    void createUser(User user);
+    User createUser(User user);
 
     void updateUserIdentity(UUID userId, String githubLogin, String githubAvatarUrl, String emailFromGithub,
                             Date lastSeenAt);

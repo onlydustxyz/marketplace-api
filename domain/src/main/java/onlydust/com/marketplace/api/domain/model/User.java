@@ -4,6 +4,7 @@ import lombok.*;
 import onlydust.com.marketplace.api.domain.view.ProjectLedView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ public class User {
     boolean hasAcceptedLatestTermsAndConditions;
     @Getter(AccessLevel.NONE)
     boolean hasSeenOnboardingWizard;
+    Date createdAt;
 
     public boolean hasAcceptedLatestTermsAndConditions() {
         return hasAcceptedLatestTermsAndConditions;
