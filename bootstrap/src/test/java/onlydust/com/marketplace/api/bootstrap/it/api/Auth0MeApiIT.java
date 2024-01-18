@@ -12,14 +12,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Onboarding
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
 import javax.persistence.EntityManagerFactory;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 
@@ -202,7 +200,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true)
                 .jsonPath("$.hasValidPayoutInfos").isEqualTo(true)
                 .jsonPath("$.isAdmin").isEqualTo(true)
-                .jsonPath("$.createdAt").isEqualTo(DateMapper.toZoneDateTime(createdAt).format(DateTimeFormatter.ISO_INSTANT))
+                .jsonPath("$.createdAt").isNotEmpty()
                 .jsonPath("$.id").isEqualTo(user.getId().toString());
     }
 

@@ -103,16 +103,26 @@ public class UserServiceTest {
     void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+        final Date createdAt = new Date();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
+        when(userStoragePort.createUser(any())).thenReturn(User.builder().createdAt(createdAt).build());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
         assertThat(userByGithubIdentity.getId()).isNotNull();
-        assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(UserRole.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
+        assertEquals(User.builder().id(userByGithubIdentity.getId())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .roles(List.of(UserRole.USER))
+                .hasAcceptedLatestTermsAndConditions(false)
+                .createdAt(createdAt)
+                .hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
     }
 
     @Test
