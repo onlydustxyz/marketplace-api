@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -30,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
 
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
@@ -65,15 +65,15 @@ public class PostgresUserAdapter implements UserStoragePort {
                     .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                     .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
-            return UserMapper.mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+            return mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
                     projectLedIdsByUserId, applications);
         });
     }
 
     @Override
     @Transactional
-    public void createUser(User user) {
-        userRepository.save(UserMapper.mapUserToEntity(user));
+    public User createUser(User user) {
+        return mapCreatedUserToDomain(userRepository.save(mapUserToEntity(user)));
     }
 
     @Override
@@ -148,7 +148,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional
     public void saveProfile(UUID userId, UserProfile userProfile) {
-        userProfileInfoRepository.save(UserMapper.mapUserProfileToEntity(userId, userProfile));
+        userProfileInfoRepository.save(mapUserProfileToEntity(userId, userProfile));
     }
 
     @Override

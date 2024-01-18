@@ -53,7 +53,7 @@ public class UserService implements UserFacadePort {
                     if (readOnly) {
                         throw OnlyDustException.notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
                     }
-                    final var user = User.builder()
+                    var user = User.builder()
                             .id(UUID.randomUUID())
                             .roles(List.of(UserRole.USER))
                             .githubUserId(githubUserIdentity.getGithubUserId())
@@ -61,7 +61,10 @@ public class UserService implements UserFacadePort {
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
                             .build();
-                    userStoragePort.createUser(user);
+                    final User createdUser = userStoragePort.createUser(user);
+                    user = user.toBuilder()
+                            .createdAt(createdUser.getCreatedAt())
+                            .build();
                     userObserverPort.onUserSignedUp(user);
                     return user;
                 });

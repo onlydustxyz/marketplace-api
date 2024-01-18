@@ -83,7 +83,20 @@ public interface UserMapper {
                                 .contributorCount(projectLedIdViewEntity.getContributorCount())
                                 .build()).toList())
                 .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
+                .createdAt(user.getCreatedAt())
                 .build();
+    }
+
+    static User mapCreatedUserToDomain(final UserEntity userEntity){
+        return User.builder()
+                .id(userEntity.getId())
+                .githubUserId(userEntity.getGithubUserId())
+                .githubLogin(userEntity.getGithubLogin())
+                .githubEmail(userEntity.getGithubEmail())
+                .roles(Arrays.stream(userEntity.getRoles()).toList())
+                .createdAt(userEntity.getCreatedAt())
+                .build();
+
     }
 
     static UserEntity mapUserToEntity(User user) {
