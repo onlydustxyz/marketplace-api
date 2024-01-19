@@ -1,6 +1,6 @@
 {
     "request": {
-        "url": "/v2/cryptocurrency/quotes/latest?id=1027,2781,2790,3408&convert_id=2781",
+        "urlPattern": "/v2/cryptocurrency/quotes/latest.*",
         "method": "GET",
         "headers": {
             "X-CMC_PRO_API_KEY": {

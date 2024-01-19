@@ -17,10 +17,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -73,7 +70,7 @@ public class CmcClient extends HttpClient {
     }
 
 
-    public Map<Integer, QuoteResponse> quotes(List<Currency> from, List<Currency> to) {
+    public Map<Integer, QuoteResponse> quotes(Set<Currency> from, Set<Currency> to) {
         final var fromIds = currencyToIdList(from);
         final var toIds = currencyToIdList(to);
         final var typeRef = new TypeReference<Response<Map<Integer, QuoteResponse>>>() {
@@ -83,7 +80,7 @@ public class CmcClient extends HttpClient {
                 .orElseThrow(() -> internalServerError("Unable to fetch quotes"));
     }
 
-    private String currencyToIdList(List<Currency> from) {
+    private String currencyToIdList(Set<Currency> from) {
         return from.stream()
                 .map(this::internalId)
                 .filter(Optional::isPresent)
@@ -92,7 +89,7 @@ public class CmcClient extends HttpClient {
                 .collect(Collectors.joining(","));
     }
 
-    public Optional<Integer> internalId(Currency currency) {
+    public synchronized Optional<Integer> internalId(Currency currency) {
         final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
                     case CRYPTO -> currency.erc20()
                             .stream().findFirst()

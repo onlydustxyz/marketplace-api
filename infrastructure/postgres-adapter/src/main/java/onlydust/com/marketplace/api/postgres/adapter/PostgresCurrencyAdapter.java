@@ -6,8 +6,9 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class PostgresCurrencyAdapter implements CurrencyStorage {
@@ -19,8 +20,8 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
     }
 
     @Override
-    public List<Currency> all() {
-        return repository.findAll().stream().map(CurrencyEntity::toDomain).toList();
+    public Set<Currency> all() {
+        return repository.findAll().stream().map(CurrencyEntity::toDomain).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override

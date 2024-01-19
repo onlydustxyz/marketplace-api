@@ -6,12 +6,14 @@ import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.QuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
 
+import java.util.Collection;
+
 @AllArgsConstructor
 public class PostgresQuoteAdapter implements QuoteStorage {
     private final QuoteRepository repository;
 
     @Override
-    public void save(Quote quote) {
-        repository.save(QuoteEntity.of(quote));
+    public void save(Collection<Quote> quotes) {
+        repository.saveAll(quotes.stream().map(QuoteEntity::of).toList());
     }
 }

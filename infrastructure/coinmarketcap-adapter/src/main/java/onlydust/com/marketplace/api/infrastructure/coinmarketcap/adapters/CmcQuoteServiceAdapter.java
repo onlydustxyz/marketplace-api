@@ -6,25 +6,39 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteService;
 import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient;
-import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient.QuoteResponse;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @AllArgsConstructor
 public class CmcQuoteServiceAdapter implements QuoteService {
     private final @NonNull CmcClient client;
 
     @Override
-    public List<Quote> currentPrice(List<Currency> currencies, Currency base) {
-        final var response = client.quotes(currencies, List.of(base));
-        final var baseId = client.internalId(base).orElseThrow();
-        return currencies.stream().map(currency -> client.internalId(currency)
-                        .flatMap(internalId -> Optional.ofNullable(response.get(internalId)))
-                        .map(QuoteResponse::quote)
-                        .map(quote -> quote.get(baseId))
-                        .map(q -> new Quote(currency.id(), base.id(), q.price()))
-                        .orElse(null))
-                .toList();
+    public List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> bases) {
+        final var response = client.quotes(currencies, bases);
+        final var quotes = new ArrayList<Quote>();
+
+        for (Currency currency : currencies) {
+            final var currencyId = client.internalId(currency);
+            if (currencyId.isEmpty()) {
+                continue;
+            }
+
+            for (Currency base : bases) {
+                final var baseId = client.internalId(base);
+                if (baseId.isEmpty()) {
+                    continue;
+                }
+
+                quotes.add(new Quote(
+                        currency.id(),
+                        base.id(),
+                        response.get(currencyId.get()).quote().get(baseId.get()).price()));
+            }
+        }
+
+        return quotes;
     }
 }

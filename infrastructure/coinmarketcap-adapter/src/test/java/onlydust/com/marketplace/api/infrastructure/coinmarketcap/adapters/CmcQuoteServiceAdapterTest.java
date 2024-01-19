@@ -8,21 +8,13 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcQuoteServiceAdapterTest {
-    private static final Map<Currency.Id, Integer> CURRENCY_IDS = new HashMap<>();
-    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.USD, 2);
+    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
     private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
-
-    static {
-        CURRENCY_IDS.put(USD.id(), 2781);
-        CURRENCY_IDS.put(ETH.id(), 1027);
-    }
 
     private final CmcClient.Properties properties = new CmcClient.Properties(
             "https://pro-api.coinmarketcap.com",
@@ -41,7 +33,7 @@ class CmcQuoteServiceAdapterTest {
     //    @Test
     void should_return_multiple_quotes_from_ids() {
         // When
-        final var quotes = adapter.currentPrice(List.of(USDC, ETH, LORDS), USD);
+        final var quotes = adapter.currentPrice(Set.of(USDC, ETH, LORDS), Set.of(USD));
 
         // Then
         assertThat(quotes).hasSize(3);
