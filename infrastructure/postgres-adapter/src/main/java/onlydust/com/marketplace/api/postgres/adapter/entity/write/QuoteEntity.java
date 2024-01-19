@@ -13,11 +13,12 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "quotes", schema = "public")
-@Builder(access = AccessLevel.PRIVATE)
+@Builder(toBuilder = true)
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @IdClass(QuoteEntity.PrimaryKey.class)
+@ToString
 public class QuoteEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -25,6 +26,7 @@ public class QuoteEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID baseId;
+    @Getter
     private @NonNull BigDecimal price;
 
     public static QuoteEntity of(Quote quote) {

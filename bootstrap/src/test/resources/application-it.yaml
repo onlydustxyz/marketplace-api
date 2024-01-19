@@ -37,6 +37,8 @@ application:
   cron:
     notification-job-delay: 500
     indexer-sync-job-delay: 500
+    refresh-currency-quotes: 500
+
   github:
     installation:
       retry:

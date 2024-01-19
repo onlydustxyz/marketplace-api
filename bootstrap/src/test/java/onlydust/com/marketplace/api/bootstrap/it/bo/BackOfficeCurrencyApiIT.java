@@ -2,12 +2,20 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    @Autowired
+    private QuoteRepository quoteRepository;
+
     @BeforeEach
     void addUsdcSupport() {
         client
@@ -234,5 +242,20 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.decimals").isEqualTo(3)
                 .jsonPath("$.description").isEqualTo("Euro is the official currency of the European Union")
         ;
+    }
+
+    @SneakyThrows
+    @Test
+    void should_refresh_currency_quotes() {
+        // Given
+        final var quotes = quoteRepository.findAll().stream().map(q -> q.toBuilder().price(BigDecimal.ZERO).build()).toList();
+        quoteRepository.saveAll(quotes);
+
+        // When
+        Thread.sleep(700);
+
+        // Then
+        final var xxx = quoteRepository.findAll();
+        assertThat(quoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
     }
 }
