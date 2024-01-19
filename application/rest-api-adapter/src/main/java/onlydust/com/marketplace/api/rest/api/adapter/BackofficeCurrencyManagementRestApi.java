@@ -4,22 +4,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeCurrencyManagementApi;
-import onlydust.com.backoffice.api.contract.model.CurrencyCreateRequest;
-import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
-import onlydust.com.backoffice.api.contract.model.CurrencyStandard;
-import onlydust.com.backoffice.api.contract.model.CurrencyUpdateRequest;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapBlockchain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapCurrencyResponse;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @RestController
 @Tags(@Tag(name = "Backoffice"))
@@ -34,12 +35,12 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                     ? currencyFacadePort.addNativeCryptocurrencySupport(Currency.Code.of(request.getCode()), request.getDecimals())
                     : switch (request.getStandard()) {
                 case ERC20 -> currencyFacadePort.addERC20Support(mapBlockchain(request.getBlockchain()), Ethereum.contractAddress(request.getAddress()));
-                default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+                default -> throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
             };
 
             case FIAT -> switch (Optional.ofNullable(request.getStandard()).orElse(CurrencyStandard.ISO4217)) {
                 case ISO4217 -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()));
-                default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+                default -> throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
             };
         };
 
@@ -57,5 +58,20 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
         );
 
         return ResponseEntity.ok(mapCurrencyResponse(currency));
+    }
+
+    @Override
+    public ResponseEntity<UploadImageResponse> uploadLogo(Resource image) {
+        InputStream imageInputStream;
+        try {
+            imageInputStream = image.getInputStream();
+        } catch (IOException e) {
+            throw badRequest("Error while reading image data", e);
+        }
+
+        final URL imageUrl = currencyFacadePort.uploadLogo(imageInputStream);
+        final var response = new UploadImageResponse().url(imageUrl.toString());
+
+        return ResponseEntity.ok(response);
     }
 }

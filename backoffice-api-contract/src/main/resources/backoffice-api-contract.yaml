@@ -405,6 +405,44 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/currencies/logos:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeCurrencyManagement
+      summary: Upload a currency logo
+      operationId: uploadLogo
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     apiKey:
@@ -977,6 +1015,16 @@ components:
           type: integer
         description:
           type: string
+
+    UploadImageResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          description: The direct URL to the uploaded image
+      example:
+        url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
 
     CurrencyId:
       type: string

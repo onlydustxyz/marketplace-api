@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.port.output;
+package onlydust.com.marketplace.kernel.port.output;
 
 import java.io.InputStream;
 import java.net.URL;

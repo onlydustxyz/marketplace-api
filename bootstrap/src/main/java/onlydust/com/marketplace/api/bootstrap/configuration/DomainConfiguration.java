@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -176,10 +177,10 @@ public class DomainConfiguration {
                                                  final @NonNull CurrencyMetadataService currencyMetadataService,
                                                  final @NonNull QuoteService quoteService,
                                                  final @NonNull QuoteStorage quoteStorage,
-                                                 final @NonNull IsoCurrencyService isoCurrencyService
-    ) {
+                                                 final @NonNull IsoCurrencyService isoCurrencyService,
+                                                 final @NonNull ImageStoragePort imageStoragePort) {
         return new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
-                isoCurrencyService);
+                isoCurrencyService, imageStoragePort);
     }
 
     @Bean
