@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
@@ -232,14 +231,23 @@ public interface BackOfficeMapper {
                 .id(currency.id().value())
                 .type(mapCurrencyType(currency.type()))
                 .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
-                .blockchain(currency.erc20().map(ERC20::blockchain).map(BackOfficeMapper::mapBlockchain).orElse(null))
-                .address(currency.erc20().map(ERC20::address).map(Hash::toString).orElse(null))
                 .name(currency.name())
                 .code(currency.code().toString())
                 .logoUrl(currency.logoUri().orElse(null))
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
+                .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
                 ;
+    }
+
+    @NonNull
+    private static Token mapToken(ERC20 token) {
+        return new Token()
+                .blockchain(mapBlockchain(token.getBlockchain()))
+                .address(token.getAddress().toString())
+                .name(token.getName())
+                .symbol(token.getSymbol())
+                .decimals(token.getDecimals());
     }
 
     static CurrencyStandard mapCurrencyStandard(final @NonNull onlydust.com.marketplace.accounting.domain.model.Currency.Standard s) {

@@ -63,3 +63,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000030_create_rfd_schema.sql
   - include:
       file: db/changelog/changelogs/00000031_make_currency_logo_nullable.sql
+  - include:
+      file: db/changelog/changelogs/00000032_add_currency_id_in_erc20.sql

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -30,58 +29,49 @@ public class CurrencyService implements CurrencyFacadePort {
 
     @Override
     public Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress) {
-        if (erc20Storage.exists(blockchain, tokenAddress))
-            throw badRequest("ERC20 token at address %s on %s is already supported".formatted(tokenAddress, blockchain.pretty()));
-
         final var token = erc20ProviderFactory.get(blockchain)
                 .get(tokenAddress)
                 .orElseThrow(
                         () -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
-        erc20Storage.save(token);
-
-        return currencyStorage.findByCode(Currency.Code.of(token.symbol()))
+        final var currency = currencyStorage.findByCode(Currency.Code.of(token.symbol()))
                 .map(c -> c.withERC20(token))
-                .orElseGet(() -> createCurrency(token));
+                .orElseGet(() -> currencyMetadataService.get(token)
+                        .map(metadata -> Currency.of(token).withMetadata(metadata))
+                        .orElse(Currency.of(token)));
+
+        saveCurrency(currency);
+        return currency;
     }
 
     @Override
     public Currency addNativeCryptocurrencySupport(final @NonNull Currency.Code code, final @NonNull Integer decimals) {
-        return currencyStorage.findByCode(code)
-                .orElseGet(() -> createCurrency(code, decimals));
+        if (currencyStorage.exists(code)) {
+            throw badRequest("Currency %s already exists".formatted(code));
+        }
+
+        final var metadata = currencyMetadataService.get(code)
+                .orElseThrow(() -> notFound("Could not find metadata for crypto currency %s".formatted(code)));
+
+        final var currency = Currency.crypto(metadata.name(), code, decimals).withMetadata(metadata);
+
+        saveCurrency(currency);
+        return currency;
     }
 
     @Override
     public Currency addIsoCurrencySupport(final @NonNull Currency.Code code) {
-        return currencyStorage.findByCode(code)
-                .or(() -> isoCurrencyService.get(code).map(this::createCurrency))
+        final var currency = currencyStorage.findByCode(code)
+                .or(() -> isoCurrencyService.get(code))
                 .orElseThrow(() -> notFound("Could not find ISO currency %s".formatted(code)));
-    }
 
-    private Currency createCurrency(ERC20 token) {
-        final var currency = currencyMetadataService.get(token)
-                .map(metadata -> Currency.of(token).withMetadata(metadata))
-                .orElse(Currency.of(token));
-
-        return createCurrency(currency);
-    }
-
-    private Currency createCurrency(Currency currency) {
-        currencyStorage.save(currency);
-
-        saveUsdQuotes(List.of(currency));
+        saveCurrency(currency);
         return currency;
     }
 
-    private Currency createCurrency(Currency.Code code, Integer decimals) {
-        final var currency = currencyMetadataService.get(code)
-                .map(metadata -> Currency.crypto(metadata.name(), code, decimals).withMetadata(metadata))
-                .orElseThrow(() -> notFound("Could not find metadata for crypto currency %s".formatted(code)));
-
+    private void saveCurrency(Currency currency) {
         currencyStorage.save(currency);
-
         saveUsdQuotes(List.of(currency));
-        return currency;
     }
 
     @Override

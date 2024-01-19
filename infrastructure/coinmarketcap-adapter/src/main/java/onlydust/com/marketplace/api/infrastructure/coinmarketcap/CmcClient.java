@@ -62,7 +62,7 @@ public class CmcClient extends HttpClient {
     public Optional<MetadataResponse> metadata(ERC20 erc20) {
         final var typeRef = new TypeReference<Response<Map<Integer, MetadataResponse>>>() {
         };
-        return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.address()), typeRef).flatMap(d -> d.values().stream().findFirst());
+        return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.getAddress()), typeRef).flatMap(d -> d.values().stream().findFirst());
     }
 
     public Optional<MetadataResponse> metadata(Currency.Code code) {
@@ -86,6 +86,7 @@ public class CmcClient extends HttpClient {
     public Optional<Integer> internalId(Currency currency) {
         final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
                     case CRYPTO -> currency.erc20()
+                            .stream().findFirst()
                             .flatMap(this::metadata)
                             .or(() -> metadata(currency.code()))
                             .map(MetadataResponse::id)

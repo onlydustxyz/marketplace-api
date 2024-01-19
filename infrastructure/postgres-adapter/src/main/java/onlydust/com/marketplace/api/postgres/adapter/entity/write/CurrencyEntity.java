@@ -9,7 +9,9 @@ import org.hibernate.annotations.TypeDefs;
 import javax.persistence.*;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "currencies", schema = "public")
@@ -37,6 +39,9 @@ public class CurrencyEntity {
     private @NonNull Integer decimals;
     private String description;
 
+    @OneToMany(mappedBy = "currencyId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ERC20Entity> erc20;
+
     public static CurrencyEntity of(Currency currency) {
         return CurrencyEntity.builder()
                 .id(currency.id().value())
@@ -47,6 +52,7 @@ public class CurrencyEntity {
                 .logoUrl(currency.logoUri().map(Objects::toString).orElse(null))
                 .decimals(currency.decimals())
                 .description(currency.description().orElse(null))
+                .erc20(currency.erc20().stream().map(erc20 -> ERC20Entity.of(currency.id(), erc20)).collect(Collectors.toUnmodifiableSet()))
                 .build();
     }
 
@@ -59,6 +65,7 @@ public class CurrencyEntity {
                 .code(Currency.Code.of(code))
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
                 .decimals(decimals)
+                .erc20(erc20.stream().map(ERC20Entity::toDomain).collect(Collectors.toUnmodifiableSet()))
                 .build();
     }
 
