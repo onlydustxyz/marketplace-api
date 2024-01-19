@@ -1,16 +1,21 @@
 package onlydust.com.marketplace.accounting.domain;
 
+import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,16 +40,18 @@ public class CurrencyServiceTest {
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
     final IsoCurrencyService isoCurrencyService = mock(IsoCurrencyService.class);
     CurrencyService currencyService;
+    private final Faker faker = new Faker();
+    private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
 
     @BeforeEach
     void setUp() {
         reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
-                isoCurrencyService);
+                isoCurrencyService, imageStoragePort);
         when(erc20Storage.exists(any(), any())).thenReturn(false);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
         currencyService = new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
-                isoCurrencyService);
+                isoCurrencyService, imageStoragePort);
     }
 
     @Test
@@ -407,5 +414,20 @@ public class CurrencyServiceTest {
         assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
+    }
+
+    @SneakyThrows
+    @Test
+    void should_upload_currency_logo() {
+        // Given
+        final InputStream imageInputStream = mock(InputStream.class);
+        final String imageUrl = faker.internet().image();
+
+        // When
+        when(imageStoragePort.storeImage(imageInputStream)).thenReturn(new URL(imageUrl));
+        final URL url = currencyService.uploadLogo(imageInputStream);
+
+        // Then
+        assertThat(url.toString()).isEqualTo(imageUrl);
     }
 }

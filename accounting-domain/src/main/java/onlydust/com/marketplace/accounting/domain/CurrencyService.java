@@ -8,8 +8,11 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
@@ -23,6 +26,7 @@ public class CurrencyService implements CurrencyFacadePort {
     private final @NonNull QuoteService quoteService;
     private final @NonNull QuoteStorage quoteStorage;
     private final @NonNull IsoCurrencyService isoCurrencyService;
+    private final @NonNull ImageStoragePort imageStoragePort;
 
     @Override
     public Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress) {
@@ -101,6 +105,11 @@ public class CurrencyService implements CurrencyFacadePort {
         currencyStorage.save(currency);
 
         return currency;
+    }
+
+    @Override
+    public URL uploadLogo(InputStream imageInputStream) {
+        return imageStoragePort.storeImage(imageInputStream);
     }
 
     private void saveUsdQuotes(List<Currency> currencies) {
