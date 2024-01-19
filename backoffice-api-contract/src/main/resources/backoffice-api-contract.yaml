@@ -367,6 +367,30 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeCurrencyManagement
+      summary: List all supported currencies
+      operationId: listCurrencies
+      description: List all supported currencies
+      responses:
+        "200":
+          description: 'List of all supported currencies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyListResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/currencies/{currencyId}:
     put:
       security:
@@ -984,6 +1008,14 @@ components:
         description:
           type: string
 
+    CurrencyListResponse:
+      type: object
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyResponse'
+
     CurrencyResponse:
       type: object
       required:
@@ -1021,8 +1053,6 @@ components:
       properties:
         blockchain:
           $ref: '#/components/schemas/BlockchainContract'
-        standard:
-          $ref: '#/components/schemas/CurrencyStandard'
         address:
           $ref: '#/components/schemas/ContractAddress'
         decimals:
