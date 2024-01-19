@@ -9,11 +9,13 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 public class ERC20ProviderFactory {
     private final ERC20Provider ethereumProvider;
     private final ERC20Provider optimismProvider;
+    private final ERC20Provider starknetProvider;
 
     public ERC20Provider get(Blockchain blockchain) {
         return switch (blockchain) {
             case ETHEREUM -> ethereumProvider;
             case OPTIMISM -> optimismProvider;
+            case STARKNET -> starknetProvider;
             default -> throw OnlyDustException.badRequest("ERC20 tokens on %s are not supported".formatted(blockchain.pretty()));
         };
     }

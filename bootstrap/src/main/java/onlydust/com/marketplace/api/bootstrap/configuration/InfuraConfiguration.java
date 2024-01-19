@@ -29,4 +29,16 @@ public class InfuraConfiguration {
     public InfuraERC20ProviderAdapter optimismERC20Provider(final InfuraClient.Properties optimismProperties) {
         return new InfuraERC20ProviderAdapter(optimismProperties);
     }
+
+    @Bean
+    @ConfigurationProperties("infrastructure.starknet")
+    public InfuraClient.Properties starknetProperties() {
+        return new InfuraClient.Properties();
+    }
+
+    @Bean
+    public InfuraERC20ProviderAdapter starknetERC20Provider(final InfuraClient.Properties starknetProperties) {
+        return new InfuraERC20ProviderAdapter(starknetProperties);
+    }
+
 }

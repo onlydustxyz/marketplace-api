@@ -184,8 +184,9 @@ public class DomainConfiguration {
 
     @Bean
     public ERC20ProviderFactory erc20ProviderFactory(final @NonNull ERC20Provider ethereumERC20Provider,
-                                                     final @NonNull ERC20Provider optimismERC20Provider
+                                                     final @NonNull ERC20Provider optimismERC20Provider,
+                                                     final @NonNull ERC20Provider starknetERC20Provider
     ) {
-        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
+        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
     }
 }

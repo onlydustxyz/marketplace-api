@@ -28,8 +28,9 @@ public class CurrencyServiceTest {
     final CurrencyMetadataService currencyMetadataService = mock(CurrencyMetadataService.class);
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
+    final ERC20Provider starknetERC20Provider = mock(ERC20Provider.class);
     final ERC20Storage erc20Storage = mock(ERC20Storage.class);
-    final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider);
+    final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
     final IsoCurrencyService isoCurrencyService = mock(IsoCurrencyService.class);
@@ -37,7 +38,8 @@ public class CurrencyServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, quoteService, quoteStorage, isoCurrencyService);
+        reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
+                isoCurrencyService);
         when(erc20Storage.exists(any(), any())).thenReturn(false);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
@@ -85,6 +87,31 @@ public class CurrencyServiceTest {
         assertThat(currency.code()).isEqualTo(Currency.Code.of("OP"));
         assertThat(currency.description()).isEqualTo(Optional.empty());
         assertThat(currency.logoUri()).isEqualTo(Optional.empty());
+    }
+
+
+    @Test
+    void should_add_erc20_support_on_starknet() {
+        //Given
+        when(starknetERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
+        when(quoteService.currentPrice(any(), eq(Currencies.USD)))
+                .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
+
+        // When
+        final var currency = currencyService.addERC20Support(STARKNET, LORDS.address());
+
+        // Then
+        verify(currencyStorage, times(1)).save(currency);
+
+        assertThat(currency.id()).isNotNull();
+        assertThat(currency.name()).isEqualTo("Lords");
+        assertThat(currency.code()).isEqualTo(Currency.Code.of("LORDS"));
+        assertThat(currency.description()).isEqualTo(Optional.of("Realms token"));
+        assertThat(currency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
+
+        verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
+        verify(erc20Storage, times(1)).save(LORDS);
     }
 
     @Test
