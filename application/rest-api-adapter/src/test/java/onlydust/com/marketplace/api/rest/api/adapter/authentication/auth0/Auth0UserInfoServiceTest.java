@@ -53,7 +53,7 @@ class Auth0UserInfoServiceTest {
                 {
                   "exp": %d
                 }
-                """.formatted(System.currentTimeMillis() / 1000 + 1).getBytes(StandardCharsets.UTF_8)));
+                """.formatted(System.currentTimeMillis() / 1000 + 2).getBytes(StandardCharsets.UTF_8)));
 
         final var response = mock(HttpResponse.class);
         when(response.statusCode()).thenReturn(200);
@@ -95,7 +95,7 @@ class Auth0UserInfoServiceTest {
         // And when we call it again after some time, the user info should not be cached anymore
         Mockito.reset(httpClient);
         when(httpClient.send(request, HttpResponse.BodyHandlers.ofString())).thenReturn(response);
-        Thread.sleep(1_100);
+        Thread.sleep(2_100);
         claims = auth0UserInfoService.getUserInfo(accessToken);
         assertThat(claims.getGithubWithUserId()).isEqualTo("github|595505");
         assertThat(claims.getGithubLogin()).isEqualTo("ofux");

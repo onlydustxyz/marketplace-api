@@ -1266,7 +1266,6 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "moreInfoLinks": null,
                               "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
                               "hiring": false,
-                              "rank": 1694,
                               "visibility": "PUBLIC",
                               "projectLeads": [
                                 "45e98bf6-25c2-4edf-94da-e340daba8964",
