@@ -74,13 +74,22 @@ public class CmcClient extends HttpClient {
 
 
     public Map<Integer, QuoteResponse> quotes(List<Currency> from, List<Currency> to) {
-        final var fromIds = from.stream().map(this::internalId).filter(Optional::isPresent).map(id -> id.get().toString()).collect(Collectors.joining(","));
-        final var toIds = to.stream().map(this::internalId).filter(Optional::isPresent).map(id -> id.get().toString()).collect(Collectors.joining(","));
+        final var fromIds = currencyToIdList(from);
+        final var toIds = currencyToIdList(to);
         final var typeRef = new TypeReference<Response<Map<Integer, QuoteResponse>>>() {
         };
 
         return get("/v2/cryptocurrency/quotes/latest?id=%s&convert_id=%s".formatted(fromIds, toIds), typeRef)
                 .orElseThrow(() -> internalServerError("Unable to fetch quotes"));
+    }
+
+    private String currencyToIdList(List<Currency> from) {
+        return from.stream()
+                .map(this::internalId)
+                .filter(Optional::isPresent)
+                .map(id -> id.get().toString())
+                .sorted()
+                .collect(Collectors.joining(","));
     }
 
     public Optional<Integer> internalId(Currency currency) {
