@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 
 import java.io.InputStream;
@@ -22,8 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.*;
-import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.LORDS_USD;
-import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.USDC_USD;
+import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.*;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,12 +54,13 @@ public class CurrencyServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
-        when(quoteService.currentPrice(any(), eq(Set.of(Currencies.USD))))
+        when(quoteService.currentPrice(anySet(), anySet()))
                 .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
 
         // When
@@ -76,14 +77,22 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.erc20()).contains(LORDS);
 
-        verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
+        final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
+        verify(quoteStorage, times(1)).save(quotes.capture());
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)),
+                new Quote(currency.id(), currency.id(), BigDecimal.ONE)
+        );
     }
 
     @SuppressWarnings("unchecked")
     private static List<Quote> createQuotesFromInvocation(InvocationOnMock i, BigDecimal price) {
         final Set<Currency> currencies = i.getArgument(0, Set.class);
         final Set<Currency> bases = i.getArgument(1, Set.class);
-        return currencies.stream().flatMap(currency -> bases.stream().map(base -> new Quote(currency.id(), base.id(), price))).toList();
+        return currencies.stream().flatMap(
+                currency -> bases.stream().map(
+                        base -> new Quote(currency.id(), base.id(), currency.equals(base) ? BigDecimal.ONE : price)
+                )).toList();
     }
 
     @Test
@@ -113,7 +122,7 @@ public class CurrencyServiceTest {
         when(starknetERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
-        when(quoteService.currentPrice(any(), eq(Set.of(Currencies.USD))))
+        when(quoteService.currentPrice(anySet(), anySet()))
                 .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
 
         // When
@@ -130,7 +139,10 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.erc20()).contains(LORDS);
 
-        verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
+        verify(quoteStorage, times(1)).save(List.of(
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)),
+                new Quote(currency.id(), currency.id(), BigDecimal.ONE)
+        ));
     }
 
     @Test
@@ -160,7 +172,7 @@ public class CurrencyServiceTest {
         // Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
-        when(quoteService.currentPrice(Set.of(Currencies.LORDS), Set.of(Currencies.USD))).thenReturn(List.of());
+        when(quoteService.currentPrice(anySet(), anySet())).thenReturn(List.of());
 
         // When
         final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
@@ -179,12 +191,14 @@ public class CurrencyServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void should_allow_multiple_tokens_on_same_currencies() {
         // Given
         when(optimismERC20Provider.get(OP_USDC.getAddress())).thenReturn(Optional.of(OP_USDC));
         when(currencyStorage.findByCode(Currency.Code.of("USDC"))).thenReturn(Optional.of(Currencies.USDC));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
-        when(quoteService.currentPrice(Set.of(Currencies.USDC), Set.of(Currencies.USD))).thenReturn(List.of(USDC_USD));
+        when(quoteService.currentPrice(anySet(), anySet()))
+                .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
 
         // When
         final var currency = currencyService.addERC20Support(OPTIMISM, OP_USDC.getAddress());
@@ -193,7 +207,9 @@ public class CurrencyServiceTest {
         assertThat(currency).isEqualTo(Currencies.USDC);
         assertThat(currency.erc20()).containsExactlyInAnyOrder(ETH_USDC, OP_USDC);
         verify(currencyStorage, times(1)).save(currency);
-        verify(quoteStorage, times(1)).save(USDC_USD);
+        final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
+        verify(quoteStorage, times(1)).save(quotes.capture());
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(USDC_USDC, USDC_USD);
     }
 
     @Test
@@ -226,8 +242,7 @@ public class CurrencyServiceTest {
         currencyService.refreshQuotes();
 
         // Then
-        verify(quoteStorage, times(1)).save(USDC_USD);
-        verify(quoteStorage, times(1)).save(LORDS_USD);
+        verify(quoteStorage, times(1)).save(List.of(USDC_USD, LORDS_USD));
     }
 
     @Test

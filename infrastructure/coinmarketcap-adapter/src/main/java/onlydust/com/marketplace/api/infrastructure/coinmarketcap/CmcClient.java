@@ -89,7 +89,7 @@ public class CmcClient extends HttpClient {
                 .collect(Collectors.joining(","));
     }
 
-    public Optional<Integer> internalId(Currency currency) {
+    public synchronized Optional<Integer> internalId(Currency currency) {
         final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
                     case CRYPTO -> currency.erc20()
                             .stream().findFirst()
