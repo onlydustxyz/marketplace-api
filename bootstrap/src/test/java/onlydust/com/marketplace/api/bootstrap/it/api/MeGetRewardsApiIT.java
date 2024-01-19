@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
@@ -13,6 +11,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Curre
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -272,8 +272,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
               "receivedRewardsCount": 6,
               "rewardedContributionsCount": 26,
               "rewardingProjectsCount": 1
-            }
-                        
+            }            
             """;
 
     @Autowired
@@ -670,7 +669,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewardedAmount.usdEquivalent").isEqualTo(19662)
                 .jsonPath("$.pendingAmount.usdEquivalent").isEqualTo(10100)
         ;

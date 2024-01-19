@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserRewardsPageView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import java.util.List;
@@ -34,30 +33,28 @@ public interface MyRewardMapper {
     }
 
     static MyRewardPageItemResponse mapMyRewardViewToResponse(final UserRewardView view) {
-        final MyRewardPageItemResponse myRewardPageItemResponse = new MyRewardPageItemResponse();
-        myRewardPageItemResponse.setId(view.getId());
-        myRewardPageItemResponse.setProjectId(view.getProjectId());
-        myRewardPageItemResponse.setNumberOfRewardedContributions(view.getNumberOfRewardedContributions());
-        myRewardPageItemResponse.setRewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl());
-        myRewardPageItemResponse.setRewardedOnProjectName(view.getRewardedOnProjectName());
-        final RewardAmountResponse amount = mapRewardAmountToResponse(view);
-        myRewardPageItemResponse.setAmount(amount);
-        myRewardPageItemResponse.setStatus(switch (view.getStatus()) {
-            case complete -> RewardStatus.COMPLETE;
-            case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-            case processing -> RewardStatus.PROCESSING;
-            case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
-        });
-        myRewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
-        return myRewardPageItemResponse;
+        return new MyRewardPageItemResponse()
+                .id(view.getId())
+                .projectId(view.getProjectId())
+                .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
+                .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
+                .rewardedOnProjectName(view.getRewardedOnProjectName())
+                .amount(mapRewardAmountToResponse(view))
+                .status(switch (view.getStatus()) {
+                    case complete -> RewardStatus.COMPLETE;
+                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
+                    case processing -> RewardStatus.PROCESSING;
+                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
+                })
+                .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
+                ;
     }
 
     private static RewardAmountResponse mapRewardAmountToResponse(UserRewardView view) {
-        final RewardAmountResponse amount = new RewardAmountResponse();
-        amount.setCurrency(mapCurrency(view.getAmount().getCurrency()));
-        amount.setDollarsEquivalent(view.getAmount().getDollarsEquivalent());
-        amount.setTotal(view.getAmount().getTotal());
-        return amount;
+        return new RewardAmountResponse()
+                .currency(mapCurrency(view.getAmount().getCurrency()))
+                .dollarsEquivalent(view.getAmount().getDollarsEquivalent())
+                .total(view.getAmount().getTotal());
     }
 
 
@@ -78,7 +75,7 @@ public interface MyRewardMapper {
         for (UserTotalRewardView userTotalReward : view.getUserTotalRewards()) {
             myRewardTotalAmountsResponse.addDetailsItem(new MyRewardAmountResponse().totalAmount(userTotalReward.getTotalAmount())
                     .totalDollarsEquivalent(userTotalReward.getTotalDollarsEquivalent())
-                    .currency(mapCurrency (userTotalReward.getCurrency())));
+                    .currency(mapCurrency(userTotalReward.getCurrency())));
         }
         return myRewardTotalAmountsResponse;
     }

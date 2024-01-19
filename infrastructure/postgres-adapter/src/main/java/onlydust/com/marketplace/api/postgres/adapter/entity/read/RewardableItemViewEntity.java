@@ -52,6 +52,11 @@ public class RewardableItemViewEntity {
     Integer commentsCount;
     @Column(name = "ignored")
     Boolean ignored;
+    String githubBody;
+    Long githubAuthorId;
+    String githubAuthorLogin;
+    String githubAuthorHtmlUrl;
+    String githubAuthorAvatarUrl;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW

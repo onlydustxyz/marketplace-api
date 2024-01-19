@@ -126,7 +126,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
               "closed_at": "2023-08-08T06:13:08Z",
               "author_association": "MEMBER",
               "active_lock_reason": null,
-              "body": null,
+              "body": "This a body",
               "closed_by": {
                 "login": "PierreOucif",
                 "id": 16590657,
@@ -282,22 +282,29 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                 .expectBody()
                 .json("""
                         {
-                          "number": 25,
-                          "id": "1840630179",
-                          "contributionId": null,
-                          "title": "%s",
-                          "createdAt": "2023-08-08T06:11:35Z",
-                          "completedAt": "2023-08-08T06:13:08Z",
-                          "repoName": "marketplace-frontend",
-                          "repoId": 498695724,
-                          "type": "ISSUE",
-                          "commitsCount": null,
-                          "userCommitsCount": null,
-                          "commentsCount": 0,
-                          "status": "CLOSED",
-                          "ignored": false,
-                          "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25"
-                        }
+                           "number": 25,
+                           "id": "1840630179",
+                           "contributionId": null,
+                           "title": "%s",
+                           "createdAt": "2023-08-08T06:11:35Z",
+                           "completedAt": "2023-08-08T06:13:08Z",
+                           "githubBody": "This a body",
+                           "author": {
+                             "githubUserId": 16590657,
+                             "login": "PierreOucif",
+                             "htmlUrl": "https://github.com/PierreOucif",
+                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                           },
+                           "repoName": "marketplace-frontend",
+                           "repoId": 498695724,
+                           "type": "ISSUE",
+                           "commitsCount": null,
+                           "userCommitsCount": null,
+                           "commentsCount": 0,
+                           "status": "CLOSED",
+                           "ignored": false,
+                           "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25"
+                         }
                         """.formatted(title));
     }
 }

@@ -60,7 +60,9 @@ public interface RewardableItemMapper {
                 .repoId(view.getRepoId())
                 .htmlUrl(view.getGithubUrl())
                 .title(view.getTitle())
-                .ignored(Boolean.TRUE.equals(view.getIgnored()));
+                .ignored(Boolean.TRUE.equals(view.getIgnored()))
+                .githubBody(view.getGithubBody())
+                .author(ProjectMapper.mapGithubUser(view.getGithubAuthor()));
     }
 
     static AllRewardableItemsResponse listToResponse(List<RewardableItemView> rewardableItems) {

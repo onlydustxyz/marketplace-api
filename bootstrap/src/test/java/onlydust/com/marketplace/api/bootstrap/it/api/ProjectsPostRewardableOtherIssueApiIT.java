@@ -89,6 +89,13 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "title": "feature: soluce command in the CLI",
                           "createdAt": "2022-05-10T19:49:36Z",
                           "completedAt": "2022-05-12T14:10:19Z",
+                          "githubBody": "using this command (on a specific exercise or while in `watch mode`) will patch the exercise file with it's solution\\r\\nsteps:\\r\\n- `git restore -s origin/main <path to exercise file>` (in order to get rid of any user modification and avoid conflicts)\\r\\n- `patch <path to exercise file> <path to corresponding patch file>`",
+                          "author": {
+                            "githubUserId": 34384633,
+                            "login": "tdelabro",
+                            "htmlUrl": "https://github.com/tdelabro",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
+                          },
                           "repoName": "starklings",
                           "repoId": 480776993,
                           "type": "ISSUE",
@@ -98,8 +105,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                           "status": "COMPLETED",
                           "ignored": false,
                           "htmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
-                        }
-                                                
+                        }                        
                         """);
     }
 }

@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.Project;
@@ -12,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntit
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity.Crypto;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatReceiptJsonEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper.OBJECT_MAPPER;
@@ -162,6 +162,7 @@ public interface RewardMapper {
                 .repoName(rewardItemViewEntity.getRepoName())
                 .authorLogin(rewardItemViewEntity.getAuthorLogin())
                 .status(githubStatusToDomain(rewardItemViewEntity.getStatus()))
+                .githubBody(rewardItemViewEntity.getGithubBody())
                 .build();
     }
 
