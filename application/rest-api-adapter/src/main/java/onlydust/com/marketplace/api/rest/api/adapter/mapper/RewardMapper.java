@@ -108,15 +108,13 @@ public interface RewardMapper {
     }
 
     static RewardItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {
-        final RewardItemsPageResponse rewardItemsPageResponse = new RewardItemsPageResponse();
-        rewardItemsPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
-        rewardItemsPageResponse.setTotalPageNumber(page.getTotalPageNumber());
-        rewardItemsPageResponse.setTotalItemNumber(page.getTotalItemNumber());
-        rewardItemsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
-        page.getContent().stream()
-                .map(RewardMapper::itemToResponse)
-                .forEach(rewardItemsPageResponse::addRewardItemsItem);
-        return rewardItemsPageResponse;
+        return new RewardItemsPageResponse()
+                .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()))
+                .rewardItems(page.getContent().stream().map(RewardMapper::itemToResponse).toList())
+                ;
     }
 
     private static RewardItemResponse itemToResponse(final RewardItemView view) {
@@ -153,6 +151,7 @@ public interface RewardMapper {
                 .githubAuthorId(view.getGithubAuthorId())
                 .authorAvatarUrl(view.getAuthorAvatarUrl())
                 .authorGithubUrl(view.getAuthorGithubUrl())
-                .authorLogin(view.getAuthorLogin());
+                .authorLogin(view.getAuthorLogin())
+                .githubBody(view.getGithubBody());
     }
 }

@@ -4196,7 +4196,10 @@ components:
           type: string
         authorGithubUrl:
           type: string
-
+        githubBody:
+          type: string
+          description: The body of the contribution.
+    
     RewardableItemsPageResponse:
       type: object
       required:

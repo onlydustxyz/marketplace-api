@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -140,7 +140,8 @@ public class CustomRewardRepository {
                                                gpr.author_login                             author_login,
                                                user_avatar_url(gpr.author_id, gpr.author_avatar_url) author_avatar_url,
                                                gpr.author_html_url                          author_github_url,
-                                               gpr.commit_count                             commits_count
+                                               gpr.commit_count                             commits_count,
+                                               gpr.body                                     github_body
                                         from indexer_exp.github_pull_requests gpr),
                  get_issue as           (select gi.number,
                                               gi.id,
@@ -154,7 +155,8 @@ public class CustomRewardRepository {
                                               gi.author_login      author_login,
                                               user_avatar_url(gi.author_id, gi.author_avatar_url) author_avatar_url,
                                               gi.author_html_url   author_github_url,
-                                              gi.comments_count
+                                              gi.comments_count,
+                                              gi.body                                     github_body
                                        from indexer_exp.github_issues gi),
                  get_code_review as    (select gprr.number,
                                               gprr.id,
@@ -168,7 +170,8 @@ public class CustomRewardRepository {
                                               gprr.author_id             author_id,
                                               gprr.author_login          author_login,
                                               user_avatar_url(gprr.author_id, gprr.author_avatar_url)     author_avatar_url,
-                                              gprr.author_html_url       author_github_url
+                                              gprr.author_html_url       author_github_url,
+                                              gprr.body                  github_body
                                        from indexer_exp.github_code_reviews gprr)
             select distinct wi.type,
                             coalesce(cast(pull_request.id as text), cast(issue.id as text), cast(code_review.id as text))             reward_id,
@@ -186,6 +189,7 @@ public class CustomRewardRepository {
                                             coalesce(pull_request.author_avatar_url, issue.author_avatar_url, code_review.author_avatar_url))       author_avatar_url,
                             coalesce(pull_request.html_url, issue.html_url, code_review.html_url)             html_url,
                             coalesce(pull_request.author_github_url, issue.author_github_url, code_review.author_github_url) author_github_url,
+                            coalesce(pull_request.github_body, issue.github_body, code_review.github_body) github_body,
                             pull_request.commits_count,
                             (select gprcc.commit_count
                              from indexer_exp.github_pull_request_commit_counts gprcc

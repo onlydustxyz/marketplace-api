@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -239,7 +238,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 16590657,
                               "authorLogin": "PierreOucif",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "githubBody": null
                             },
                             {
                               "number": 1225,
@@ -258,7 +258,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 16590657,
                               "authorLogin": "PierreOucif",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "githubBody": null
                             }
                           ],
                           "hasMore": true,
@@ -266,8 +267,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 25,
                           "nextPageIndex": 1
                         }
-                                                
                         """);
+
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_REWARD_ITEMS, projectId, rewardId), Map.of("pageSize", "2",
                         "pageIndex", "12")))
@@ -297,15 +298,15 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 43467246,
                               "authorLogin": "AnthonyBuisset",
                               "authorAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                              "authorGithubUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                              "authorGithubUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                              "githubBody": "IT test structure\\nDocker container support\\nFirst API integration test: create project"
                             }
                           ],
                           "hasMore": false,
                           "totalPageNumber": 13,
                           "totalItemNumber": 25,
                           "nextPageIndex": 12
-                        }
-                                            
+                        }                                            
                         """);
     }
 
@@ -346,7 +347,8 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 8495664,
                               "authorLogin": "doomed-theory",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/8495664?v=4"
+                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
+                              "githubBody": "Grammar"
                             }
                           ],
                           "hasMore": false,
@@ -354,7 +356,6 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 1,
                           "nextPageIndex": 0
                         }
-                                                
                         """);
     }
 

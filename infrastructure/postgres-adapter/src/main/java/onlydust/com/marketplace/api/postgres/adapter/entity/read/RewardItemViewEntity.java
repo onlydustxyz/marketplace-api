@@ -55,6 +55,8 @@ public class RewardItemViewEntity {
     Integer commentsCount;
     @Column(name = "recipient_id")
     Long recipientId;
+    @Column(name = "github_body")
+    String githubBody;
 
     public enum ContributionType {
         ISSUE, PULL_REQUEST, CODE_REVIEW
