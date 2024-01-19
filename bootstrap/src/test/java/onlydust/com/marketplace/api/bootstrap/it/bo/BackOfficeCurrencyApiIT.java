@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -11,11 +14,13 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private QuoteRepository quoteRepository;
 
     @Test
+    @Order(1)
     void should_add_erc20_support_on_ethereum() {
         client
                 .post()
@@ -47,6 +52,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     }
 
     @Test
+    @Order(2)
     void should_add_erc20_support_on_optimism() {
         client
                 .post()
@@ -79,6 +85,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
 
     @Test
+    @Order(3)
     void should_reject_erc20_support_from_invalid_contract() {
         client
                 .post()
@@ -101,6 +108,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
 
     @Test
+    @Order(4)
     void should_add_erc20_support_on_starknet() {
         client
                 .post()
@@ -133,6 +141,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
 
     @Test
+    @Order(5)
     void should_add_native_cryptocurrency_support() {
         client
                 .post()
@@ -165,6 +174,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @SneakyThrows
     @Test
+    @Order(6)
     void should_add_iso_currency_support() {
         final var response = client
                 .post()
@@ -227,6 +237,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @SneakyThrows
     @Test
+    @Order(90)
     void should_refresh_currency_quotes() {
         // Given
         final var quotes = quoteRepository.findAll().stream().map(q -> q.toBuilder().price(BigDecimal.ZERO).build()).toList();
@@ -236,7 +247,79 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         Thread.sleep(700);
 
         // Then
-        final var xxx = quoteRepository.findAll();
         assertThat(quoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
+    }
+
+    @Test
+    @Order(91)
+    void should_list_all_supported_currencies() {
+        client
+                .get()
+                .uri(getApiURI(GET_CURRENCIES))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.currencies[*].id").isNotEmpty()
+                .json("""
+                        {
+                           "currencies": [
+                             {
+                               "type": "CRYPTO",
+                               "standard": null,
+                               "tokens": [],
+                               "name": "Ethereum",
+                               "code": "ETH",
+                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                               "decimals": 18,
+                               "description": "Ethereum (ETH) is a cryptocurrency"
+                             },
+                             {
+                               "type": "FIAT",
+                               "standard": "ISO4217",
+                               "tokens": [],
+                               "name": "Euro2",
+                               "code": "EUR",
+                               "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
+                               "decimals": 3,
+                               "description": "Euro is the official currency of the European Union"
+                             },
+                             {
+                               "type": "CRYPTO",
+                               "standard": "ERC20",
+                               "tokens": [
+                                 {
+                                   "blockchain": "ETHEREUM",
+                                   "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                   "decimals": 6,
+                                   "symbol": "USDC",
+                                   "name": "USD Coin"
+                                 },
+                                 {
+                                   "blockchain": "OPTIMISM",
+                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                   "decimals": 6,
+                                   "symbol": "USDC",
+                                   "name": "USD Coin"
+                                 },
+                                 {
+                                   "blockchain": "STARKNET",
+                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                   "decimals": 6,
+                                   "symbol": "USDC",
+                                   "name": "USD Coin"
+                                 }
+                               ],
+                               "name": "USD Coin",
+                               "code": "USDC",
+                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                               "decimals": 6,
+                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
+                             }
+                           ]
+                         }
+                        """)
+        ;
     }
 }

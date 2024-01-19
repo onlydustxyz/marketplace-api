@@ -7,6 +7,7 @@ import onlydust.com.backoffice.api.contract.BackofficeCurrencyManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -73,5 +74,12 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
         final var response = new UploadImageResponse().url(imageUrl.toString());
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CurrencyListResponse> listCurrencies() {
+        final var currencies = currencyFacadePort.listCurrencies();
+
+        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream().map(BackOfficeMapper::mapCurrencyResponse).toList()));
     }
 }

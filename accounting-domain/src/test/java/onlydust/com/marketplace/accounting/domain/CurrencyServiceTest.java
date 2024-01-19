@@ -139,10 +139,13 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.erc20()).contains(LORDS);
 
-        verify(quoteStorage, times(1)).save(List.of(
+        final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
+        verify(quoteStorage, times(1)).save(quotes.capture());
+
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(
                 new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)),
                 new Quote(currency.id(), currency.id(), BigDecimal.ONE)
-        ));
+        );
     }
 
     @Test

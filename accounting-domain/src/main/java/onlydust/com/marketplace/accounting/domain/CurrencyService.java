@@ -12,6 +12,8 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,6 +105,11 @@ public class CurrencyService implements CurrencyFacadePort {
     @Override
     public URL uploadLogo(InputStream imageInputStream) {
         return imageStoragePort.storeImage(imageInputStream);
+    }
+
+    @Override
+    public Collection<Currency> listCurrencies() {
+        return currencyStorage.all().stream().sorted(Comparator.comparing(c -> c.code().toString())).toList();
     }
 
     private void saveQuotes(Set<Currency> currencies) {
