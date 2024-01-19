@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,24 +14,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private QuoteRepository quoteRepository;
-
-    @BeforeEach
-    void addUsdcSupport() {
-        client
-                .post()
-                .uri(getApiURI(POST_CURRENCIES))
-                .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
-                .bodyValue("""
-                        {
-                            "type": "FIAT",
-                            "code": "USD"
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .isOk();
-    }
 
     @Test
     void should_add_erc20_support_on_ethereum() {
