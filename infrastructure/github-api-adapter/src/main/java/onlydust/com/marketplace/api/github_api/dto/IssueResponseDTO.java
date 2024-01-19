@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
+import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.api.domain.view.RewardItemStatus;
 import onlydust.com.marketplace.api.domain.view.RewardableItemView;
 
@@ -30,6 +31,8 @@ public class IssueResponseDTO {
     StateReason stateReason;
     @JsonProperty("html_url")
     String htmlUrl;
+    String body;
+    UserResponseDTO user;
 
     public RewardableItemView toView(final String repoName, final Long repoId) {
         assert this.id != null;
@@ -46,6 +49,13 @@ public class IssueResponseDTO {
                 .githubUrl(this.htmlUrl)
                 .title(this.title)
                 .ignored(false)
+                .githubBody(this.body)
+                .githubAuthor(ContributorLinkView.builder()
+                        .githubUserId(this.user.id)
+                        .login(this.user.login)
+                        .url(this.user.htmlUrl)
+                        .avatarUrl(this.user.avatarUrl)
+                        .build())
                 .build();
     }
 
@@ -63,5 +73,9 @@ public class IssueResponseDTO {
 
     enum StateReason {
         completed, not_planned, reopened
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record UserResponseDTO(Long id, String login, @JsonProperty("html_url") String htmlUrl, @JsonProperty("avatar_url") String avatarUrl) {
     }
 }

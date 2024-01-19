@@ -25,4 +25,6 @@ public class RewardableItemView {
     String githubUrl;
     String title;
     Boolean ignored;
+    String githubBody;
+    UserLinkView githubAuthor;
 }

@@ -4273,6 +4273,11 @@ components:
         completedAt:
           type: string
           format: date-time
+        githubBody:
+          type: string
+          description: The body of the contribution.
+        author:
+          $ref: '#/components/schemas/GithubUserResponse'
         repoName:
           type: string
         repoId:

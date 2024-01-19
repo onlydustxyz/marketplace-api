@@ -28,7 +28,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                     from indexer_exp.github_pull_request_commit_counts gprcc
                     where gprcc.pull_request_id = pull_request.id and gprcc.author_id = :githubUserId)      user_commits_count,
                    c.github_comments_count                                                                  comments_count,
-                   ic.contribution_id is not null                                                           ignored
+                   ic.contribution_id is not null                                                           ignored,
+                   c.github_body,
+                   c.github_author_id,
+                   c.github_author_login,
+                   c.github_author_html_url,
+                   c.github_author_avatar_url
             from public.project_github_repos pgr
                      JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
                      join indexer_exp.contributions c on c.repo_id = gr.id
@@ -112,8 +117,13 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                       gi.comments_count,
                                       gi.repo_name,
                                       gi.repo_id,
-                                      gi.repo_owner_login  repo_owner
-                               from indexer_exp.github_issues gi)
+                                      gi.repo_owner_login  repo_owner,
+                                      gi.body              github_body,
+                                      gi.author_id         github_author_id,
+                                      gi.author_login      github_author_login,
+                                      gi.author_html_url   github_author_html_url,
+                                      gi.author_avatar_url github_author_avatar_url
+                                  from indexer_exp.github_issues gi)
             select issue.id,
                    NULL as contribution_id,
                    'ISSUE' as type,
@@ -131,7 +141,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    NULL as                    user_commits_count,
                    issue.comments_count,
                    NULL as                    cr_outcome,
-                   FALSE as                   ignored
+                   FALSE as                   ignored,
+                   issue.github_body,
+                   issue.github_author_id,
+                   issue.github_author_login,
+                   issue.github_author_html_url,
+                   issue.github_author_avatar_url
             from get_issue issue
             where issue.repo_owner = :repoOwner
                 and issue.repo_name = :repoName
@@ -150,7 +165,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                                    gpr.commit_count     commits_count,
                                    gpr.repo_name,
                                    gpr.repo_id,
-                                   gpr.repo_owner_login  repo_owner
+                                   gpr.repo_owner_login  repo_owner,
+                                   gpr.body              github_body,
+                                   gpr.author_id         github_author_id,
+                                   gpr.author_login      github_author_login,
+                                   gpr.author_html_url   github_author_html_url,
+                                   gpr.author_avatar_url github_author_avatar_url
                             from indexer_exp.github_pull_requests gpr)
             select pr.id,
                    NULL as contribution_id,
@@ -169,7 +189,12 @@ public interface RewardableItemRepository extends JpaRepository<RewardableItemVi
                    NULL as                  user_commits_count,
                    NULL as                  comments_count,
                    NULL as                  cr_outcome,
-                   FALSE as                 ignored
+                   FALSE as                 ignored,
+                   pr.github_body,
+                   pr.github_author_id,
+                   pr.github_author_login,
+                   pr.github_author_html_url,
+                   pr.github_author_avatar_url
             from get_pr pr
             where pr.repo_owner = :repoOwner
                 and pr.repo_name = :repoName

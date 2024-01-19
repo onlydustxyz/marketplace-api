@@ -89,6 +89,13 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                           "title": "Fix typo in example code",
                           "createdAt": "2020-02-27T21:03:44Z",
                           "completedAt": "2020-02-27T21:29:57Z",
+                          "githubBody": "Hi, I noticed a small typo while checking out the README \\uD83D\\uDE42 ",
+                          "author": {
+                            "githubUserId": 7748404,
+                            "login": "kvrhdn",
+                            "htmlUrl": "https://github.com/kvrhdn",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/7748404?v=4"
+                          },
                           "repoName": "tracing",
                           "repoId": 165289175,
                           "type": "PULL_REQUEST",
@@ -99,7 +106,6 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                           "ignored": false,
                           "htmlUrl": "https://github.com/tokio-rs/tracing/pull/608"
                         }
-                                            
                         """);
     }
 }
