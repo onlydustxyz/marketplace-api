@@ -12,7 +12,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.List;
+import java.util.Set;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -71,7 +71,7 @@ public class CurrencyService implements CurrencyFacadePort {
 
     private void saveCurrency(Currency currency) {
         currencyStorage.save(currency);
-        saveQuotes(List.of(currency));
+        saveQuotes(Set.of(currency));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class CurrencyService implements CurrencyFacadePort {
         return imageStoragePort.storeImage(imageInputStream);
     }
 
-    private void saveQuotes(List<Currency> currencies) {
+    private void saveQuotes(Set<Currency> currencies) {
         final var bases = currencyStorage.all();
         quoteService.currentPrice(currencies, bases).forEach(quoteStorage::save);
     }

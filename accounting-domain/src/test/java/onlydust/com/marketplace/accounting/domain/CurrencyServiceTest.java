@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.LORDS_USD;
@@ -56,9 +58,9 @@ public class CurrencyServiceTest {
         //Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
-        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
-        when(quoteService.currentPrice(any(), eq(List.of(Currencies.USD))))
-                .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
+        when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
+        when(quoteService.currentPrice(any(), eq(Set.of(Currencies.USD))))
+                .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
 
         // When
         final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
@@ -75,6 +77,13 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).contains(LORDS);
 
         verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Quote> createQuotesFromInvocation(InvocationOnMock i, BigDecimal price) {
+        final Set<Currency> currencies = i.getArgument(0, Set.class);
+        final Set<Currency> bases = i.getArgument(1, Set.class);
+        return currencies.stream().flatMap(currency -> bases.stream().map(base -> new Quote(currency.id(), base.id(), price))).toList();
     }
 
     @Test
@@ -103,9 +112,9 @@ public class CurrencyServiceTest {
         //Given
         when(starknetERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
-        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
-        when(quoteService.currentPrice(any(), eq(List.of(Currencies.USD))))
-                .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
+        when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
+        when(quoteService.currentPrice(any(), eq(Set.of(Currencies.USD))))
+                .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
 
         // When
         final var currency = currencyService.addERC20Support(STARKNET, LORDS.getAddress());
@@ -150,8 +159,8 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
-        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
-        when(quoteService.currentPrice(List.of(Currencies.LORDS), List.of(Currencies.USD))).thenReturn(List.of());
+        when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
+        when(quoteService.currentPrice(Set.of(Currencies.LORDS), Set.of(Currencies.USD))).thenReturn(List.of());
 
         // When
         final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
@@ -174,8 +183,8 @@ public class CurrencyServiceTest {
         // Given
         when(optimismERC20Provider.get(OP_USDC.getAddress())).thenReturn(Optional.of(OP_USDC));
         when(currencyStorage.findByCode(Currency.Code.of("USDC"))).thenReturn(Optional.of(Currencies.USDC));
-        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
-        when(quoteService.currentPrice(List.of(Currencies.USDC), List.of(Currencies.USD))).thenReturn(List.of(USDC_USD));
+        when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
+        when(quoteService.currentPrice(Set.of(Currencies.USDC), Set.of(Currencies.USD))).thenReturn(List.of(USDC_USD));
 
         // When
         final var currency = currencyService.addERC20Support(OPTIMISM, OP_USDC.getAddress());
@@ -207,7 +216,7 @@ public class CurrencyServiceTest {
     @Test
     void should_refresh_quotes() {
         // Given
-        final var currencies = List.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK, Currencies.USD);
+        final var currencies = Set.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK, Currencies.USD);
 
         when(currencyStorage.all()).thenReturn(currencies);
         when(quoteService.currentPrice(currencies, currencies))

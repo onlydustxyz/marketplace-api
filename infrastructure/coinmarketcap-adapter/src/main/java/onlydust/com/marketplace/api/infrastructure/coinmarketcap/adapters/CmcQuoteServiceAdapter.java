@@ -9,13 +9,14 @@ import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 public class CmcQuoteServiceAdapter implements QuoteService {
     private final @NonNull CmcClient client;
 
     @Override
-    public List<Quote> currentPrice(List<Currency> currencies, List<Currency> bases) {
+    public List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> bases) {
         final var response = client.quotes(currencies, bases);
         final var quotes = new ArrayList<Quote>();
 
