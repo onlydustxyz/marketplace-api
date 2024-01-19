@@ -280,7 +280,6 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                            "number": 25,
