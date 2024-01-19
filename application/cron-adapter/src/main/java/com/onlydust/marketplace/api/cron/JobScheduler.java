@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @AllArgsConstructor
-@Profile("api")
+@Profile("jobs")
 public class JobScheduler {
     private final OutboxConsumerJob notificationOutboxJob;
     private final OutboxConsumerJob indexerOutboxJob;
