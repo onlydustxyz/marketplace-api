@@ -13,7 +13,7 @@ public class PostgresQuoteAdapter implements QuoteStorage {
     private final QuoteRepository repository;
 
     @Override
-    public void save(Collection<Quote> quote) {
-        repository.saveAll(quote.stream().map(QuoteEntity::of).toList());
+    public void save(Collection<Quote> quotes) {
+        repository.saveAll(quotes.stream().map(QuoteEntity::of).toList());
     }
 }

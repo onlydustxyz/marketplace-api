@@ -5,5 +5,5 @@ import onlydust.com.marketplace.accounting.domain.model.Quote;
 import java.util.Collection;
 
 public interface QuoteStorage {
-    void save(Collection<Quote> quote);
+    void save(Collection<Quote> quotes);
 }
