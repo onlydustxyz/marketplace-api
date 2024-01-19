@@ -2,12 +2,20 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    @Autowired
+    private QuoteRepository quoteRepository;
+
     @BeforeEach
     void addUsdcSupport() {
         client
@@ -48,8 +56,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.standard").isEqualTo("ERC20")
-                .jsonPath("$.blockchain").isEqualTo("ETHEREUM")
-                .jsonPath("$.address").isEqualTo("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
+                .jsonPath("$.tokens[?(@.blockchain=='ETHEREUM')].address").isEqualTo("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
                 .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
@@ -80,8 +87,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.standard").isEqualTo("ERC20")
-                .jsonPath("$.blockchain").isEqualTo("OPTIMISM")
-                .jsonPath("$.address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+                .jsonPath("$.tokens[?(@.blockchain=='OPTIMISM')].address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
                 .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
@@ -135,8 +141,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.standard").isEqualTo("ERC20")
-                .jsonPath("$.blockchain").isEqualTo("STARKNET")
-                .jsonPath("$.address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
+                .jsonPath("$.tokens[?(@.blockchain=='STARKNET')].address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
                 .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
@@ -237,5 +242,20 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.decimals").isEqualTo(3)
                 .jsonPath("$.description").isEqualTo("Euro is the official currency of the European Union")
         ;
+    }
+
+    @SneakyThrows
+    @Test
+    void should_refresh_currency_quotes() {
+        // Given
+        final var quotes = quoteRepository.findAll().stream().map(q -> q.toBuilder().price(BigDecimal.ZERO).build()).toList();
+        quoteRepository.saveAll(quotes);
+
+        // When
+        Thread.sleep(700);
+
+        // Then
+        final var xxx = quoteRepository.findAll();
+        assertThat(quoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
     }
 }

@@ -19,6 +19,7 @@ application:
     notification-job-delay: 60000 # 1 minute
     update-projects-ranking: 7200000 # 2 hours
     indexer-sync-job-delay: 5000 # 5 seconds
+    refresh-currency-quotes: 7200000 # 2 hours
 
 spring:
   liquibase:

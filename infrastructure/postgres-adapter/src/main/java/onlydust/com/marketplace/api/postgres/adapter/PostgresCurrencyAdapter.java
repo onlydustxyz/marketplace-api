@@ -32,4 +32,9 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
     public Optional<Currency> get(Currency.Id id) {
         return repository.findById(id.value()).map(CurrencyEntity::toDomain);
     }
+
+    @Override
+    public Boolean exists(Currency.Code code) {
+        return repository.existsByCode(code.toString());
+    }
 }

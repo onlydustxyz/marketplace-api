@@ -13,4 +13,6 @@ public interface CurrencyStorage {
     Optional<Currency> findByCode(Currency.Code code);
 
     Optional<Currency> get(Currency.Id id);
+
+    Boolean exists(Currency.Code code);
 }

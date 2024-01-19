@@ -2,6 +2,7 @@ package com.onlydust.marketplace.api.cron;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import org.springframework.context.annotation.Profile;
@@ -11,11 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @AllArgsConstructor
-@Profile("api")
+@Profile("jobs")
 public class JobScheduler {
     private final OutboxConsumerJob notificationOutboxJob;
     private final OutboxConsumerJob indexerOutboxJob;
     private final ProjectFacadePort projectFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
 
     @Scheduled(fixedDelayString = "${application.cron.notification-job-delay}")
     public void processPendingNotifications() {
@@ -33,5 +35,11 @@ public class JobScheduler {
     public void updateProjectRanking() {
         LOGGER.info("Updating projects ranking");
         projectFacadePort.updateProjectsRanking();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.refresh-currency-quotes}")
+    public void refreshCurrencyQuotes() {
+        LOGGER.info("Refreshing currency quotes");
+        currencyFacadePort.refreshQuotes();
     }
 }

@@ -5,8 +5,12 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder(toBuilder = true)
@@ -24,17 +28,18 @@ public class Currency {
     @NonNull
     private Integer decimals;
     private final Metadata metadata;
-    private final ERC20 erc20;
+    @Builder.Default
+    private final Set<ERC20> erc20 = Set.of();
 
     public static Currency of(final @NonNull ERC20 token) {
         return Currency.builder()
                 .id(Id.random())
-                .name(token.name())
-                .code(Code.of(token.symbol()))
+                .name(token.getName())
+                .code(Code.of(token.getSymbol()))
                 .type(Type.CRYPTO)
                 .standard(Standard.ERC20)
-                .erc20(token)
-                .decimals(token.decimals())
+                .erc20(Set.of(token))
+                .decimals(token.getDecimals())
                 .build();
     }
 
@@ -103,8 +108,8 @@ public class Currency {
         return Optional.ofNullable(metadata).map(Metadata::logoUri);
     }
 
-    public Optional<ERC20> erc20() {
-        return Optional.ofNullable(erc20);
+    public Set<ERC20> erc20() {
+        return erc20;
     }
 
     @Override
@@ -113,7 +118,10 @@ public class Currency {
     }
 
     public Currency withERC20(ERC20 token) {
-        return toBuilder().erc20(token).build();
+        final var erc20 = new HashSet<>(this.erc20);
+        if (!erc20.add(token))
+            throw badRequest("ERC20 token at address %s on %s is already supported".formatted(token.getAddress(), token.getBlockchain().pretty()));
+        return toBuilder().erc20(erc20).build();
     }
 
     @NoArgsConstructor(staticName = "random")

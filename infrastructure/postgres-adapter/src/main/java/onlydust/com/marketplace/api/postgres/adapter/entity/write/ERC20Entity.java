@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -13,6 +14,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.UUID;
 
 @Entity
 @Table(name = "erc20", schema = "public")
@@ -31,19 +33,21 @@ public class ERC20Entity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull String address;
+    private @NonNull UUID currencyId;
     private @NonNull String name;
     private @NonNull String symbol;
     private @NonNull Integer decimals;
     private @NonNull BigInteger totalSupply;
 
-    public static ERC20Entity of(ERC20 erc20) {
+    public static ERC20Entity of(Currency.Id currencyId, ERC20 erc20) {
         return ERC20Entity.builder()
-                .blockchain(NetworkEnumEntity.of(erc20.blockchain()))
-                .address(erc20.address().toString())
-                .name(erc20.name())
-                .symbol(erc20.symbol())
-                .decimals(erc20.decimals())
-                .totalSupply(erc20.totalSupply())
+                .currencyId(currencyId.value())
+                .blockchain(NetworkEnumEntity.of(erc20.getBlockchain()))
+                .address(erc20.getAddress().toString())
+                .name(erc20.getName())
+                .symbol(erc20.getSymbol())
+                .decimals(erc20.getDecimals())
+                .totalSupply(erc20.getTotalSupply())
                 .build();
     }
 

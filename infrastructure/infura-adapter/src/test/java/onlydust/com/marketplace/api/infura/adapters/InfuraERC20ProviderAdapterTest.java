@@ -18,10 +18,10 @@ class InfuraERC20ProviderAdapterTest {
     //    @Test
     void should_get_erc20_info_from_smart_contract() {
         final var token = adapter.get(USDC).orElseThrow();
-        assertThat(token.address()).isEqualTo(USDC);
-        assertThat(token.name()).isEqualTo("USD Coin");
-        assertThat(token.symbol()).isEqualTo("USDC");
-        assertThat(token.decimals()).isEqualTo(6);
-        assertThat(token.totalSupply()).isEqualTo(new BigInteger("22548692993579353"));
+        assertThat(token.getAddress()).isEqualTo(USDC);
+        assertThat(token.getName()).isEqualTo("USD Coin");
+        assertThat(token.getSymbol()).isEqualTo("USDC");
+        assertThat(token.getDecimals()).isEqualTo(6);
+        assertThat(token.getTotalSupply()).isEqualTo(new BigInteger("22548692993579353"));
     }
 }

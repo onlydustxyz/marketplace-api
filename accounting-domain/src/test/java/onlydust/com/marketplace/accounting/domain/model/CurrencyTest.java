@@ -37,7 +37,7 @@ class CurrencyTest {
 
     @Test
     void should_create_currency_from_erc20() {
-        final var currency = Currency.of(ERC20Tokens.USDC);
+        final var currency = Currency.of(ERC20Tokens.ETH_USDC);
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("USD Coin");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("USDC"));
@@ -46,6 +46,6 @@ class CurrencyTest {
         assertThat(currency.decimals()).isEqualTo(6);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
-        assertThat(currency.erc20()).contains(ERC20Tokens.USDC);
+        assertThat(currency.erc20()).contains(ERC20Tokens.ETH_USDC);
     }
 }

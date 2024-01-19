@@ -1,0 +1,15 @@
+{
+    "request": {
+        "url": "/v2/cryptocurrency/quotes/latest?id=1027,2781,2790,3408&convert_id=2781",
+        "method": "GET",
+        "headers": {
+            "X-CMC_PRO_API_KEY": {
+                "contains": "CMC_API_KEY"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-quotes-all.json"
+    }
+}

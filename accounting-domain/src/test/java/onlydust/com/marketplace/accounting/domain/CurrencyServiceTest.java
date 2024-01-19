@@ -19,8 +19,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.LORDS;
-import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.OP;
+import static onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.LORDS_USD;
 import static onlydust.com.marketplace.accounting.domain.stubs.Quotes.USDC_USD;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.*;
@@ -34,7 +33,6 @@ public class CurrencyServiceTest {
     final ERC20Provider ethereumERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider starknetERC20Provider = mock(ERC20Provider.class);
-    final ERC20Storage erc20Storage = mock(ERC20Storage.class);
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
@@ -45,25 +43,24 @@ public class CurrencyServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(currencyStorage, erc20Storage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
+        reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
-        when(erc20Storage.exists(any(), any())).thenReturn(false);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
         when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
-        currencyService = new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
+        currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
     }
 
     @Test
     void should_add_erc20_support_on_ethereum() {
         //Given
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
         when(quoteService.currentPrice(any(), eq(Currencies.USD)))
                 .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
         // When
-        final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.address());
+        final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
 
         // Then
         verify(currencyStorage, times(1)).save(currency);
@@ -73,18 +70,19 @@ public class CurrencyServiceTest {
         assertThat(currency.code()).isEqualTo(Currency.Code.of("LORDS"));
         assertThat(currency.description()).isEqualTo(Optional.of("Realms token"));
         assertThat(currency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
+        assertThat(currency.decimals()).isEqualTo(18);
+        assertThat(currency.erc20()).contains(LORDS);
 
         verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
-        verify(erc20Storage, times(1)).save(LORDS);
     }
 
     @Test
     void should_add_erc20_support_on_optimism() {
         // Given
-        when(optimismERC20Provider.get(OP.address())).thenReturn(Optional.of(OP));
+        when(optimismERC20Provider.get(OP.getAddress())).thenReturn(Optional.of(OP));
 
         // When
-        final var currency = currencyService.addERC20Support(OPTIMISM, OP.address());
+        final var currency = currencyService.addERC20Support(OPTIMISM, OP.getAddress());
 
         // Then
         verify(currencyStorage, times(1)).save(currency);
@@ -94,19 +92,21 @@ public class CurrencyServiceTest {
         assertThat(currency.code()).isEqualTo(Currency.Code.of("OP"));
         assertThat(currency.description()).isEqualTo(Optional.empty());
         assertThat(currency.logoUri()).isEqualTo(Optional.empty());
+        assertThat(currency.decimals()).isEqualTo(18);
+        assertThat(currency.erc20()).contains(OP);
     }
 
 
     @Test
     void should_add_erc20_support_on_starknet() {
         //Given
-        when(starknetERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(starknetERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
         when(quoteService.currentPrice(any(), eq(Currencies.USD)))
                 .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
         // When
-        final var currency = currencyService.addERC20Support(STARKNET, LORDS.address());
+        final var currency = currencyService.addERC20Support(STARKNET, LORDS.getAddress());
 
         // Then
         verify(currencyStorage, times(1)).save(currency);
@@ -116,15 +116,16 @@ public class CurrencyServiceTest {
         assertThat(currency.code()).isEqualTo(Currency.Code.of("LORDS"));
         assertThat(currency.description()).isEqualTo(Optional.of("Realms token"));
         assertThat(currency.logoUri()).isEqualTo(Optional.of(URI.create("https://realms.io")));
+        assertThat(currency.decimals()).isEqualTo(18);
+        assertThat(currency.erc20()).contains(LORDS);
 
         verify(quoteStorage, times(1)).save(new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)));
-        verify(erc20Storage, times(1)).save(LORDS);
     }
 
     @Test
     void should_not_add_erc20_support_on_unsupported_blockchain() {
         // When
-        assertThatThrownBy(() -> currencyService.addERC20Support(APTOS, LORDS.address()))
+        assertThatThrownBy(() -> currencyService.addERC20Support(APTOS, LORDS.getAddress()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("ERC20 tokens on Aptos are not supported");
@@ -134,7 +135,7 @@ public class CurrencyServiceTest {
     void given_a_wrong_address_should_not_add_erc20_support() {
         // Given
         final var invalidAddress = Ethereum.contractAddress("0x388C818CA8B9251b393131C08a736A67ccB19297");
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.empty());
+        when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> currencyService.addERC20Support(ETHEREUM, invalidAddress))
@@ -146,11 +147,11 @@ public class CurrencyServiceTest {
     @Test
     void should_not_store_quote_if_not_found() {
         // Given
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(quoteService.currentPrice(List.of(Currencies.LORDS), Currencies.USD)).thenReturn(List.of());
 
         // When
-        final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.address());
+        final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
 
         // Then
         assertThat(currency.id()).isNotNull();
@@ -166,30 +167,30 @@ public class CurrencyServiceTest {
     }
 
     @Test
-    void should_not_add_duplicate_currencies() {
+    void should_allow_multiple_tokens_on_same_currencies() {
         // Given
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
-        when(currencyStorage.findByCode(Currency.Code.of("LORDS"))).thenReturn(Optional.of(Currencies.LORDS));
+        when(optimismERC20Provider.get(OP_USDC.getAddress())).thenReturn(Optional.of(OP_USDC));
+        when(currencyStorage.findByCode(Currency.Code.of("USDC"))).thenReturn(Optional.of(Currencies.USDC));
+        when(quoteService.currentPrice(List.of(Currencies.USDC), Currencies.USD)).thenReturn(List.of(USDC_USD));
 
         // When
-        final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.address());
+        final var currency = currencyService.addERC20Support(OPTIMISM, OP_USDC.getAddress());
 
         // Then
-        assertThat(currency).isEqualTo(Currencies.LORDS);
-        verify(currencyStorage, never()).save(any());
-        verify(quoteService, never()).currentPrice(any(), any());
-        verify(quoteStorage, never()).save(any());
+        assertThat(currency).isEqualTo(Currencies.USDC);
+        assertThat(currency.erc20()).containsExactlyInAnyOrder(ETH_USDC, OP_USDC);
+        verify(currencyStorage, times(1)).save(currency);
+        verify(quoteStorage, times(1)).save(USDC_USD);
     }
 
     @Test
     void should_reject_duplicate_erc20() {
         // Given
-        when(ethereumERC20Provider.get(LORDS.address())).thenReturn(Optional.of(LORDS));
+        when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyStorage.findByCode(Currency.Code.of("LORDS"))).thenReturn(Optional.of(Currencies.LORDS));
-        when(erc20Storage.exists(ETHEREUM, LORDS.address())).thenReturn(true);
 
         // When
-        assertThatThrownBy(() -> currencyService.addERC20Support(ETHEREUM, LORDS.address()))
+        assertThatThrownBy(() -> currencyService.addERC20Support(ETHEREUM, LORDS.getAddress()))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("ERC20 token at address 0x686f2404e77Ab0d9070a46cdfb0B7feCDD2318b0 on Ethereum is already supported");
 
@@ -261,7 +262,7 @@ public class CurrencyServiceTest {
 
 
     @Test
-    void should_return_existing_currency_upon_duplication() {
+    void should_prevent_adding_non_existing_iso_currency() {
         // Given
         when(isoCurrencyService.get(Currency.Code.of("ZZZ"))).thenReturn(Optional.empty());
 
@@ -273,14 +274,12 @@ public class CurrencyServiceTest {
 
 
     @Test
-    void should_prevent_adding_non_existing_iso_currency() {
+    void should_return_existing_currency_upon_duplication() {
         // When
         final var currency = currencyService.addIsoCurrencySupport(Currency.Code.USD);
 
         // Then
         assertThat(currency).isEqualTo(Currencies.USD);
-        verify(currencyStorage, never()).save(any());
-        verify(isoCurrencyService, never()).get(any());
     }
 
     @Test

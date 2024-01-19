@@ -1000,10 +1000,10 @@ components:
           $ref: '#/components/schemas/CurrencyType'
         standard:
           $ref: '#/components/schemas/CurrencyStandard'
-        blockchain:
-          $ref: '#/components/schemas/BlockchainContract'
-        address:
-          $ref: '#/components/schemas/ContractAddress'
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/Token'
         name:
           type: string
         code:
@@ -1014,6 +1014,22 @@ components:
         decimals:
           type: integer
         description:
+          type: string
+
+    Token:
+      type: object
+      properties:
+        blockchain:
+          $ref: '#/components/schemas/BlockchainContract'
+        standard:
+          $ref: '#/components/schemas/CurrencyStandard'
+        address:
+          $ref: '#/components/schemas/ContractAddress'
+        decimals:
+          type: integer
+        symbol:
+          type: string
+        name:
           type: string
 
     UploadImageResponse:
