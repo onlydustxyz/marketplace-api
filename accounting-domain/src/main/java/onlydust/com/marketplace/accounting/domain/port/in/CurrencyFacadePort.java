@@ -5,6 +5,8 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
+import java.net.URI;
+
 public interface CurrencyFacadePort {
     Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull ContractAddress tokenAddress);
 
@@ -14,4 +16,5 @@ public interface CurrencyFacadePort {
 
     void refreshQuotes();
 
+    Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals);
 }

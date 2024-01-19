@@ -248,4 +248,137 @@ public class CurrencyServiceTest {
         verify(currencyStorage, never()).save(any());
         verify(isoCurrencyService, never()).get(any());
     }
+
+    @Test
+    void should_allow_to_update_a_currency() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", URI.create("https://usd.io"), 3);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo("United States Dollar");
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).contains("US currency");
+        assertThat(currency.logoUri()).contains(URI.create("https://usd.io"));
+        assertThat(currency.decimals()).isEqualTo(3);
+        assertThat(currency.erc20()).isEmpty();
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+    @Test
+    void should_prevent_updating_non_existing_currency() {
+        // Given
+        final var currencyId = Currency.Id.random();
+        when(currencyStorage.get(any())).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> currencyService.updateCurrency(currencyId, "Some name", "Some descritpion", URI.create("https://usd.io"), 3))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency %s not found".formatted(currencyId));
+
+        verify(currencyStorage, never()).save(any());
+    }
+
+    @Test
+    void should_allow_partial_update_of_name() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", null, null, null);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo("United States Dollar");
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).isEqualTo(initialCurrency.description());
+        assertThat(currency.logoUri()).isEqualTo(initialCurrency.logoUri());
+        assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+
+    @Test
+    void should_allow_partial_update_of_description() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, "US currency", null, null);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo(initialCurrency.name());
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).contains("US currency");
+        assertThat(currency.logoUri()).isEqualTo(initialCurrency.logoUri());
+        assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+
+    @Test
+    void should_allow_partial_update_of_logo_url() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, URI.create("https://usd.io"), null);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo(initialCurrency.name());
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).isEqualTo(initialCurrency.description());
+        assertThat(currency.logoUri()).contains(URI.create("https://usd.io"));
+        assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+
+    @Test
+    void should_allow_partial_update_of_decimals() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, 3);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo(initialCurrency.name());
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).isEqualTo(initialCurrency.description());
+        assertThat(currency.logoUri()).isEqualTo(initialCurrency.logoUri());
+        assertThat(currency.decimals()).isEqualTo(3);
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
 }

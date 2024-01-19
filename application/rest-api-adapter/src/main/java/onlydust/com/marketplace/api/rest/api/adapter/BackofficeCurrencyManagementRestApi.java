@@ -4,9 +4,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeCurrencyManagementApi;
-import onlydust.com.backoffice.api.contract.model.CurrencyRequest;
+import onlydust.com.backoffice.api.contract.model.CurrencyCreateRequest;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyStandard;
+import onlydust.com.backoffice.api.contract.model.CurrencyUpdateRequest;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapBlockchain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapCurrencyResponse;
@@ -26,7 +28,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
     private final CurrencyFacadePort currencyFacadePort;
 
     @Override
-    public ResponseEntity<CurrencyResponse> createCurrency(CurrencyRequest request) {
+    public ResponseEntity<CurrencyResponse> createCurrency(CurrencyCreateRequest request) {
         final var currency = switch (request.getType()) {
             case CRYPTO -> request.getStandard() == null
                     ? currencyFacadePort.addNativeCryptocurrencySupport(Currency.Code.of(request.getCode()), request.getDecimals())
@@ -40,6 +42,19 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                 default -> throw OnlyDustException.badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
             };
         };
+
+        return ResponseEntity.ok(mapCurrencyResponse(currency));
+    }
+
+    @Override
+    public ResponseEntity<CurrencyResponse> updateCurrency(UUID id, CurrencyUpdateRequest request) {
+        final var currency = currencyFacadePort.updateCurrency(
+                Currency.Id.of(id),
+                request.getName(),
+                request.getDescription(),
+                request.getLogoUrl(),
+                request.getDecimals()
+        );
 
         return ResponseEntity.ok(mapCurrencyResponse(currency));
     }

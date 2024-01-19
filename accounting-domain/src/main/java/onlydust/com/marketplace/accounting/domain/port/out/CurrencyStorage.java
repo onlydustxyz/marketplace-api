@@ -11,4 +11,6 @@ public interface CurrencyStorage {
     List<Currency> all();
 
     Optional<Currency> findByCode(Currency.Code code);
+
+    Optional<Currency> get(Currency.Id id);
 }

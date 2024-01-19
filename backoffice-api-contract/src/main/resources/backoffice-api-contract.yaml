@@ -350,10 +350,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CurrencyRequest'
+              $ref: '#/components/schemas/CurrencyCreateRequest'
       responses:
         "200":
           description: 'Currency is now supported'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyResponse'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/currencies/{currencyId}:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeCurrencyManagement
+      summary: Modify currency data
+      operationId: updateCurrency
+      description: Modify currency data
+      parameters:
+        - in: path
+          name: currencyId
+          required: true
+          schema:
+            $ref: '#/components/schemas/CurrencyId'
+      requestBody:
+        description: Currency data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyUpdateRequest'
+      responses:
+        "200":
+          description: 'Currency has been updated'
           content:
             application/json:
               schema:
@@ -877,7 +915,7 @@ components:
         - PUBLIC
         - PRIVATE
 
-    CurrencyRequest:
+    CurrencyCreateRequest:
       type: object
       required:
         - type
@@ -894,6 +932,19 @@ components:
           type: string
         decimals:
           type: integer
+
+    CurrencyUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+        decimals:
+          type: integer
+        description:
+          type: string
 
     CurrencyResponse:
       type: object
