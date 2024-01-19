@@ -19,7 +19,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 @AllArgsConstructor
 public class CurrencyService implements CurrencyFacadePort {
     private final @NonNull ERC20ProviderFactory erc20ProviderFactory;
-    private final @NonNull ERC20Storage erc20Storage;
     private final @NonNull CurrencyStorage currencyStorage;
     private final @NonNull CurrencyMetadataService currencyMetadataService;
     private final @NonNull QuoteService quoteService;
@@ -34,7 +33,7 @@ public class CurrencyService implements CurrencyFacadePort {
                 .orElseThrow(
                         () -> notFound("Could not find a valid ERC20 contract at address %s on %s".formatted(tokenAddress, blockchain.pretty())));
 
-        final var currency = currencyStorage.findByCode(Currency.Code.of(token.symbol()))
+        final var currency = currencyStorage.findByCode(Currency.Code.of(token.getSymbol()))
                 .map(c -> c.withERC20(token))
                 .orElseGet(() -> currencyMetadataService.get(token)
                         .map(metadata -> Currency.of(token).withMetadata(metadata))

@@ -172,14 +172,13 @@ public class DomainConfiguration {
 
     @Bean
     public CurrencyFacadePort currencyFacadePort(final @NonNull ERC20ProviderFactory erc20ProviderFactory,
-                                                 final @NonNull ERC20Storage erc20Storage,
                                                  final @NonNull CurrencyStorage currencyStorage,
                                                  final @NonNull CurrencyMetadataService currencyMetadataService,
                                                  final @NonNull QuoteService quoteService,
                                                  final @NonNull QuoteStorage quoteStorage,
                                                  final @NonNull IsoCurrencyService isoCurrencyService,
                                                  final @NonNull ImageStoragePort imageStoragePort) {
-        return new CurrencyService(erc20ProviderFactory, erc20Storage, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
+        return new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
     }
 
