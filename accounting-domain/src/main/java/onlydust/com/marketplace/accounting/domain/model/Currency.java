@@ -140,7 +140,6 @@ public class Currency {
     @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Code {
-        public static Code USD = Code.of("USD");
         String inner;
 
         @Override

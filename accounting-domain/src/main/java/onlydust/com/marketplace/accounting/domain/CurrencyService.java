@@ -14,7 +14,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class CurrencyService implements CurrencyFacadePort {
@@ -70,12 +71,12 @@ public class CurrencyService implements CurrencyFacadePort {
 
     private void saveCurrency(Currency currency) {
         currencyStorage.save(currency);
-        saveUsdQuotes(List.of(currency));
+        saveQuotes(List.of(currency));
     }
 
     @Override
     public void refreshQuotes() {
-        saveUsdQuotes(currencyStorage.all());
+        saveQuotes(currencyStorage.all());
     }
 
     @Override
@@ -101,9 +102,8 @@ public class CurrencyService implements CurrencyFacadePort {
         return imageStoragePort.storeImage(imageInputStream);
     }
 
-    private void saveUsdQuotes(List<Currency> currencies) {
-        final var usd = currencyStorage.findByCode(Currency.Code.USD)
-                .orElseThrow(() -> internalServerError("USD currency is not available"));
-        quoteService.currentPrice(currencies, usd).forEach(quoteStorage::save);
+    private void saveQuotes(List<Currency> currencies) {
+        final var bases = currencyStorage.all();
+        quoteService.currentPrice(currencies, bases).forEach(quoteStorage::save);
     }
 }

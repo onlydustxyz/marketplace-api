@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcQuoteServiceAdapterTest {
     private static final Map<Currency.Id, Integer> CURRENCY_IDS = new HashMap<>();
-    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.USD, 2);
+    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
     private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
 
     static {
@@ -41,7 +41,7 @@ class CmcQuoteServiceAdapterTest {
     //    @Test
     void should_return_multiple_quotes_from_ids() {
         // When
-        final var quotes = adapter.currentPrice(List.of(USDC, ETH, LORDS), USD);
+        final var quotes = adapter.currentPrice(List.of(USDC, ETH, LORDS), List.of(USD));
 
         // Then
         assertThat(quotes).hasSize(3);

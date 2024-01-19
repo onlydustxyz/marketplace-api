@@ -46,7 +46,7 @@ public class CurrencyServiceTest {
         reset(currencyStorage, ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
         when(currencyStorage.findByCode(any())).thenReturn(Optional.empty());
-        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        when(currencyStorage.findByCode(Currencies.USD.code())).thenReturn(Optional.of(Currencies.USD));
         currencyService = new CurrencyService(erc20ProviderFactory, currencyStorage, currencyMetadataService, quoteService, quoteStorage,
                 isoCurrencyService, imageStoragePort);
     }
@@ -56,7 +56,8 @@ public class CurrencyServiceTest {
         //Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
-        when(quoteService.currentPrice(any(), eq(Currencies.USD)))
+        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
+        when(quoteService.currentPrice(any(), eq(List.of(Currencies.USD))))
                 .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
         // When
@@ -102,7 +103,8 @@ public class CurrencyServiceTest {
         //Given
         when(starknetERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
         when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
-        when(quoteService.currentPrice(any(), eq(Currencies.USD)))
+        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
+        when(quoteService.currentPrice(any(), eq(List.of(Currencies.USD))))
                 .then(i -> List.of(new Quote(((Currency) i.getArgument(0, List.class).get(0)).id(), Currencies.USD.id(), BigDecimal.valueOf(0.35))));
 
         // When
@@ -148,7 +150,8 @@ public class CurrencyServiceTest {
     void should_not_store_quote_if_not_found() {
         // Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
-        when(quoteService.currentPrice(List.of(Currencies.LORDS), Currencies.USD)).thenReturn(List.of());
+        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
+        when(quoteService.currentPrice(List.of(Currencies.LORDS), List.of(Currencies.USD))).thenReturn(List.of());
 
         // When
         final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
@@ -171,7 +174,8 @@ public class CurrencyServiceTest {
         // Given
         when(optimismERC20Provider.get(OP_USDC.getAddress())).thenReturn(Optional.of(OP_USDC));
         when(currencyStorage.findByCode(Currency.Code.of("USDC"))).thenReturn(Optional.of(Currencies.USDC));
-        when(quoteService.currentPrice(List.of(Currencies.USDC), Currencies.USD)).thenReturn(List.of(USDC_USD));
+        when(currencyStorage.all()).thenReturn(List.of(Currencies.USD));
+        when(quoteService.currentPrice(List.of(Currencies.USDC), List.of(Currencies.USD))).thenReturn(List.of(USDC_USD));
 
         // When
         final var currency = currencyService.addERC20Support(OPTIMISM, OP_USDC.getAddress());
@@ -203,10 +207,10 @@ public class CurrencyServiceTest {
     @Test
     void should_refresh_quotes() {
         // Given
-        final var currencies = List.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK);
+        final var currencies = List.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK, Currencies.USD);
 
         when(currencyStorage.all()).thenReturn(currencies);
-        when(quoteService.currentPrice(currencies, Currencies.USD))
+        when(quoteService.currentPrice(currencies, currencies))
                 .thenReturn(List.of(USDC_USD, LORDS_USD));
 
         // When
@@ -276,7 +280,7 @@ public class CurrencyServiceTest {
     @Test
     void should_return_existing_currency_upon_duplication() {
         // When
-        final var currency = currencyService.addIsoCurrencySupport(Currency.Code.USD);
+        final var currency = currencyService.addIsoCurrencySupport(Currencies.USD.code());
 
         // Then
         assertThat(currency).isEqualTo(Currencies.USD);
