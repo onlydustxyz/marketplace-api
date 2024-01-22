@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -24,12 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort {
@@ -93,7 +96,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     userEntity.setLastSeenAt(lastSeenAt);
                     userRepository.save(userEntity);
                 }, () -> {
-                    throw OnlyDustException.notFound(format("User with id %s not found", userId));
+                    throw notFound(format("User with id %s not found", userId));
                 });
     }
 
@@ -102,7 +105,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UserProfileView getProfileById(UUID userId) {
         return customUserRepository.findProfileById(userId)
                 .map(this::addProjectsStats)
-                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", userId)));
+                .orElseThrow(() -> notFound(format("User profile %s not found", userId)));
     }
 
     @Override
@@ -110,7 +113,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UserProfileView getProfileById(Long githubUserId) {
         return customUserRepository.findProfileById(githubUserId)
                 .map(this::addProjectsStats)
-                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %d not found", githubUserId)));
+                .orElseThrow(() -> notFound(format("User profile %d not found", githubUserId)));
     }
 
     @Override
@@ -118,7 +121,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UserProfileView getProfileByLogin(String githubLogin) {
         return customUserRepository.findProfileByLogin(githubLogin)
                 .map(this::addProjectsStats)
-                .orElseThrow(() -> OnlyDustException.notFound(format("User profile %s not found", githubLogin)));
+                .orElseThrow(() -> notFound(format("User profile %s not found", githubLogin)));
     }
 
     private UserProfileView addProjectsStats(UserProfileView userProfileView) {
@@ -197,11 +200,11 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project leader invitation not found for project" +
-                                                                     " %s and user %d", projectId, githubUserId)));
+                .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
+                                                   " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("User with githubId %d not found", githubUserId)));
+                .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
 
         projectLeaderInvitationRepository.delete(invitation);
         projectLeadRepository.save(new ProjectLeadEntity(projectId, user.getId()));
@@ -213,7 +216,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID createApplicationOnProject(UUID userId, UUID projectId) {
         final var applicationId = UUID.randomUUID();
         projectIdRepository.findById(projectId)
-                .orElseThrow(() -> OnlyDustException.notFound(format("Project with id %s not found", projectId)));
+                .orElseThrow(() -> notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
                             throw OnlyDustException.badRequest(format("Application already exists for project %s " +
@@ -352,5 +355,24 @@ public class PostgresUserAdapter implements UserStoragePort {
         return rewardStatsRepository.listRewardCurrenciesByRecipient(githubUserId).stream()
                 .map(CurrencyEnumEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public List<User> getUsersLastSeenSince(ZonedDateTime since) {
+        return userRepository.findAllByLastSeenAtAfter(Date.from(since.toInstant()))
+                .stream()
+                .map(UserMapper::mapCreatedUserToDomain)
+                .toList();
+    }
+
+    @Override
+    public void saveUsers(List<User> users) {
+        users.forEach(u -> userRepository.findByGithubUserId(u.getGithubUserId())
+                .map(userEntity -> userEntity.toBuilder()
+                        .githubLogin(u.getGithubLogin())
+                        .githubAvatarUrl(u.getGithubAvatarUrl())
+                        .githubEmail(u.getGithubEmail())
+                        .build())
+                .ifPresent(userRepository::save));
     }
 }

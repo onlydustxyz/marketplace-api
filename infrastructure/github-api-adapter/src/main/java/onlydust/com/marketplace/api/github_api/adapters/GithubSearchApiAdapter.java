@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
@@ -9,9 +8,11 @@ import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.GetOrgaMembershipsResponseDTO;
+import onlydust.com.marketplace.api.github_api.dto.GetUserEmailsResponseDTO;
 import onlydust.com.marketplace.api.github_api.dto.GithubOrgaSearchResponseDTO;
 import onlydust.com.marketplace.api.github_api.dto.GithubUserSearchResponse;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,5 +112,18 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
                     return GithubMembership.EXTERNAL;
                 })
                 .orElse(GithubMembership.EXTERNAL);
+    }
+
+    @Override
+    public Optional<GithubUserIdentity> getUserProfile(Long githubUserId) {
+        final var githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+
+        return client.get("/user", GithubUserIdentity.class, githubPersonalToken)
+                .flatMap(userProfile -> client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
+                        .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
+                        .map(primaryEmail -> userProfile.toBuilder()
+                                .email(primaryEmail.email())
+                                .build())
+                );
     }
 }

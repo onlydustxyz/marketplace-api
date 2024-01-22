@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
@@ -18,10 +19,13 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Slf4j
 public class UserService implements UserFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
@@ -94,6 +98,30 @@ public class UserService implements UserFacadePort {
     @Override
     public UserPayoutInformation getPayoutInformationForUserId(UUID userId) {
         return userStoragePort.getPayoutInformationById(userId);
+    }
+
+    @Override
+    public void refreshActiveUserProfiles(ZonedDateTime since) {
+        final var activeUsers = userStoragePort.getUsersLastSeenSince(since);
+
+        final var userProfiles = activeUsers.stream()
+                .map(User::getGithubUserId)
+                .map(githubSearchPort::getUserProfile)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(githubUserProfile -> User.builder()
+                        .githubUserId(githubUserProfile.getGithubUserId())
+                        .githubLogin(githubUserProfile.getGithubLogin())
+                        .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
+                        .githubEmail(githubUserProfile.getEmail())
+                        .build())
+                .toList();
+
+        if (userProfiles.size() < activeUsers.size()) {
+            LOGGER.warn("Only {} user profiles found for {} active users", userProfiles.size(), activeUsers.size());
+        }
+
+        userStoragePort.saveUsers(userProfiles);
     }
 
     @Override
