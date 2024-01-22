@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -43,5 +42,27 @@ public class SponsorAccountingServiceTest {
 
         // Then
         assertThat(account.balance()).isEqualTo(Money.of(10L, currency));
+    }
+
+    /*
+     * Given a sponsor with an account
+     * When I transfer money to OnlyDust
+     * Then The transfer is registered on my account
+     */
+    @Test
+    void should_register_transfer() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currency = Currencies.USD;
+        final var account = new Account(PositiveMoney.of(100L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+
+        // When
+        sponsorAccountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
+
+        // Then
+        assertThat(account.balance()).isEqualTo(Money.of(110L, currency));
     }
 }
