@@ -228,4 +228,32 @@ public class SponsorAccountingServiceTest {
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
     }
+
+    /*
+     * Given a sponsor that has allocated money to a committee
+     * When I refund money from the committee
+     * Then The refund is registered on my account
+     */
+    @Test
+    void should_register_refund_from_committee() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(PositiveMoney.of(200L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+
+        // When
+        sponsorAccountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+        sponsorAccountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(5L), currency.id());
+
+        // Then
+        assertThat(sponsorAccount.balance()).isEqualTo(Money.of(95L, currency));
+        assertThat(committeeAccount.balance()).isEqualTo(Money.of(205L, currency));
+        assertThat(committeeAccount.balanceFrom(sponsorAccount.getId())).isEqualTo(Money.of(5L, currency));
+    }
 }
