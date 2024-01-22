@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveMoney;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @AllArgsConstructor
 public class SponsorAccountingService {
@@ -18,5 +19,12 @@ public class SponsorAccountingService {
         final var account = sponsorAccountProvider.get(sponsorId, currency)
                 .orElseGet(() -> sponsorAccountProvider.create(sponsorId, currency));
         account.mint(PositiveMoney.of(PositiveMoney.of(amount, currency)));
+    }
+
+    public void refundTo(SponsorId sponsorId, PositiveAmount amount, Currency.Id id) {
+        final var currency = currencyStorage.get(id).orElseThrow();
+        final var account = sponsorAccountProvider.get(sponsorId, currency)
+                .orElseThrow(() -> OnlyDustException.notFound("No account found for sponsor %s in currency %s".formatted(sponsorId, currency)));
+        account.burn(PositiveMoney.of(PositiveMoney.of(amount, currency)));
     }
 }

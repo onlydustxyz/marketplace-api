@@ -65,4 +65,26 @@ public class SponsorAccountingServiceTest {
         // Then
         assertThat(account.balance()).isEqualTo(Money.of(110L, currency));
     }
+
+    /*
+     * Given a sponsor with an account
+     * When I refund money from OnlyDust
+     * Then The refund is registered on my account
+     */
+    @Test
+    void should_register_refund() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currency = Currencies.USD;
+        final var account = new Account(PositiveMoney.of(100L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+
+        // When
+        sponsorAccountingService.refundTo(sponsorId, PositiveAmount.of(10L), currency.id());
+
+        // Then
+        assertThat(account.balance()).isEqualTo(Money.of(90L, currency));
+    }
 }
