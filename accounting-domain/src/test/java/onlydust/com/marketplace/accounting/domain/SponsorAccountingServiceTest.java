@@ -207,4 +207,25 @@ public class SponsorAccountingServiceTest {
         assertThat(committeeAccount.balance()).isEqualTo(Money.of(10L, currency));
         assertThat(committeeAccount.balanceFrom(sponsorAccount.getId())).isEqualTo(Money.of(10L, currency));
     }
+
+    /*
+     * Given a sponsor with an account
+     * When I allocate money to a committee in an unknown currency
+     * Then The allocation is rejected
+     */
+    @Test
+    void should_reject_allocation_when_unknown_currency() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var committeeId = CommitteeId.random();
+        final var currencyId = Currency.Id.random();
+
+        when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currencyId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency %s not found".formatted(currencyId));
+    }
 }
