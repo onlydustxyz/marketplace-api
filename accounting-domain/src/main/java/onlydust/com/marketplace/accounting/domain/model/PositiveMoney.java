@@ -18,6 +18,10 @@ public class PositiveMoney extends Money {
         }
     }
 
+    public static @NonNull PositiveMoney of(PositiveAmount amount, Currency currency) {
+        return new PositiveMoney(amount.value, currency);
+    }
+
     public static @NonNull PositiveMoney of(BigDecimal value, Currency currency) {
         return new PositiveMoney(value, currency);
     }

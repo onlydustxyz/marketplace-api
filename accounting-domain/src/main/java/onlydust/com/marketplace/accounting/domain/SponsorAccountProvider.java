@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface SponsorAccountProvider {
     Optional<Account> get(SponsorId sponsorId, Currency currency);
+
+    Account create(SponsorId sponsorId, Currency currency);
 }
