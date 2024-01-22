@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountProvider;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -16,11 +15,13 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class AccountingServiceTest {
-    final SponsorAccountProvider sponsorAccountProvider = mock(SponsorAccountProvider.class);
-    final CommitteeAccountProvider committeeAccountProvider = mock(CommitteeAccountProvider.class);
+    final AccountProvider<SponsorId> sponsorAccountProvider = mock(AccountProvider.class);
+    final AccountProvider<CommitteeId> committeeAccountProvider = mock(AccountProvider.class);
+    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(sponsorAccountProvider, committeeAccountProvider, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountProviderProxy, currencyStorage);
 
     @BeforeEach
     void setUp() {
@@ -133,7 +134,7 @@ public class AccountingServiceTest {
         assertThatThrownBy(() -> accountingService.refundTo(sponsorId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for sponsor %s in currency %s".formatted(sponsorId, currency));
+                .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
     }
 
     /*
@@ -197,7 +198,7 @@ public class AccountingServiceTest {
         when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
 
         // When
-        accountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+        accountingService.send(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
         assertThat(sponsorAccount.balance()).isEqualTo(Money.of(90L, currency));
@@ -225,7 +226,7 @@ public class AccountingServiceTest {
         when(committeeAccountProvider.create(committeeId, currency)).thenReturn(committeeAccount);
 
         // When
-        accountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+        accountingService.send(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
         assertThat(sponsorAccount.balance()).isEqualTo(Money.of(90L, currency));
@@ -248,7 +249,7 @@ public class AccountingServiceTest {
         when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currencyId))
+        assertThatThrownBy(() -> accountingService.send(sponsorId, committeeId, PositiveAmount.of(10L), currencyId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
@@ -273,8 +274,8 @@ public class AccountingServiceTest {
         when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
 
         // When
-        accountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
-        accountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(5L), currency.id());
+        accountingService.send(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+        accountingService.refund(sponsorId, committeeId, PositiveAmount.of(5L), currency.id());
 
         // Then
         assertThat(sponsorAccount.balance()).isEqualTo(Money.of(95L, currency));
@@ -297,7 +298,7 @@ public class AccountingServiceTest {
         when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currencyId))
+        assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currencyId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
@@ -319,10 +320,10 @@ public class AccountingServiceTest {
         when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+        assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for sponsor %s in currency %s".formatted(sponsorId, currency));
+                .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
     }
 
     /*
@@ -343,10 +344,10 @@ public class AccountingServiceTest {
         when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+        assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for committee %s in currency %s".formatted(committeeId, currency));
+                .hasMessage("No account found for owner %s in currency %s".formatted(committeeId, currency));
     }
 
     /*
@@ -368,7 +369,7 @@ public class AccountingServiceTest {
         when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
 
         // When
-        assertThatThrownBy(() -> accountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+        assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot refund more than the amount received");
