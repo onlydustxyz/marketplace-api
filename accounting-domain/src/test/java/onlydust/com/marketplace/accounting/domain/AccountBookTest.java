@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.accounting.domain;
 
-import onlydust.com.marketplace.accounting.domain.AccountBookAggregate.MintEvent;
-import onlydust.com.marketplace.accounting.domain.AccountBookAggregate.RefundEvent;
-import onlydust.com.marketplace.accounting.domain.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;

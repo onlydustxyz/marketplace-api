@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.accounting.domain;
+package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;

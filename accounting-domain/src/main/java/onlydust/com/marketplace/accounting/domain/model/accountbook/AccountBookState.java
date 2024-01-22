@@ -1,9 +1,8 @@
-package onlydust.com.marketplace.accounting.domain;
+package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Account;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
