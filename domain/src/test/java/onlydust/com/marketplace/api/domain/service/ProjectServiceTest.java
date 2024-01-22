@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.*;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -393,6 +395,28 @@ public class ProjectServiceTest {
         assertEquals("Only project leads can read budgets on their projects", onlyDustException.getMessage());
     }
 
+    @Test
+    void should_return_only_positive_budgets() {
+        // Given
+        final UUID projectId = UUID.randomUUID();
+        final UUID projectLeadId = UUID.randomUUID();
+
+        // When
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        when(projectStoragePort.findBudgets(projectId))
+                .thenReturn(ProjectBudgetsView.builder().budgets(
+                        List.of(
+                                BudgetView.builder().currency(Currency.Usd).remaining(BigDecimal.ONE).build(),
+                                BudgetView.builder().currency(Currency.Op).remaining(BigDecimal.ZERO).build()
+                        )
+                ).build());
+        final ProjectBudgetsView budgets = projectService.getBudgets(projectId, projectLeadId);
+
+        // Then
+        assertEquals(1, budgets.getBudgets().size());
+        assertEquals(Currency.Usd, budgets.getBudgets().get(0).getCurrency());
+        assertEquals(BigDecimal.ONE, budgets.getBudgets().get(0).getRemaining());
+    }
 
     @Test
     void should_check_project_lead_permissions_when_getting_project_reward_by_id_given_a_valid_project_lead() {
