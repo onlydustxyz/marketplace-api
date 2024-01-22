@@ -68,6 +68,27 @@ public class SponsorAccountingServiceTest {
         assertThat(account.balance()).isEqualTo(Money.of(110L, currency));
     }
 
+
+    /*
+     * Given a sponsor with an account
+     * When I transfer money to OnlyDust in an unknown currency
+     * Then The transfer is rejected
+     */
+    @Test
+    void should_reject_transfer_when_unknown_currency() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currencyId = Currency.Id.random();
+
+        when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currencyId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency %s not found".formatted(currencyId));
+    }
+
     /*
      * Given a sponsor with an account
      * When I refund money from OnlyDust
@@ -109,5 +130,25 @@ public class SponsorAccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for sponsor %s in currency %s".formatted(sponsorId, currency));
+    }
+
+    /*
+     * Given a sponsor with an account
+     * When I refund money from OnlyDust in an unknown currency
+     * Then The refund is rejected
+     */
+    @Test
+    void should_reject_refund_when_unknown_currency() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currencyId = Currency.Id.random();
+
+        when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.refundTo(sponsorId, PositiveAmount.of(10L), currencyId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency %s not found".formatted(currencyId));
     }
 }
