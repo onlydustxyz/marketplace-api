@@ -277,4 +277,50 @@ public class SponsorAccountingServiceTest {
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
     }
+
+    /*
+     * Given a sponsor with no account
+     * When I refund money from a committee
+     * Then The refund is rejected
+     */
+    @Test
+    void should_reject_unallocation_when_no_sponsor_account_found() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var committeeId = CommitteeId.random();
+        final var currency = Currencies.USD;
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("No account found for sponsor %s in currency %s".formatted(sponsorId, currency));
+    }
+
+    /*
+     * Given a sponsor with an account
+     * When I refund money from a committee with no account
+     * Then The refund is rejected
+     */
+    @Test
+    void should_reject_unallocation_when_no_committee_account_found() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var committeeId = CommitteeId.random();
+        final var currency = Currencies.USD;
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("No account found for committee %s in currency %s".formatted(committeeId, currency));
+    }
 }
