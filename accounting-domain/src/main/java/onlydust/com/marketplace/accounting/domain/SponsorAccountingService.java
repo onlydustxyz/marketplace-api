@@ -2,7 +2,9 @@ package onlydust.com.marketplace.accounting.domain;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountProvider;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @AllArgsConstructor
