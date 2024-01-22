@@ -323,4 +323,29 @@ public class SponsorAccountingServiceTest {
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for committee %s in currency %s".formatted(committeeId, currency));
     }
+
+    /*
+     * Given a sponsor with an account
+     * When I refund money from a committee
+     * Then The refund is rejected if the sponsor has not allocated enough money
+     */
+    @Test
+    void should_reject_unallocation_when_not_enough_allocated() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(PositiveMoney.of(200L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.unallocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot refund more than the amount received");
+    }
 }
