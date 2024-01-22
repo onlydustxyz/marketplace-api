@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface GithubSearchPort {
     List<GithubUserIdentity> searchUsersByLogin(String login);
@@ -14,5 +15,5 @@ public interface GithubSearchPort {
     GithubMembership getGithubUserMembershipForOrganization(Long githubUserId, String userLogin,
                                                             String organizationLogin);
 
-    GithubUserIdentity getUserProfile(Long githubUserId);
+    Optional<GithubUserIdentity> getUserProfile(Long githubUserId);
 }

@@ -115,21 +115,15 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     }
 
     @Override
-    public GithubUserIdentity getUserProfile(Long githubUserId) {
+    public Optional<GithubUserIdentity> getUserProfile(Long githubUserId) {
         final var githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
-        final var userProfile = client.get("/user", GithubUserIdentity.class, githubPersonalToken)
-                .orElseThrow(() -> OnlyDustException.internalServerError("Github user profile could not be retrieved"));
-        final var githubUserEmails = client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
-                .orElseThrow(() -> OnlyDustException.internalServerError("Github user emails could not be retrieved"));
-        final var primaryEmail = Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary)
-                .findFirst()
-                .orElseThrow(() -> OnlyDustException.internalServerError("Github user primary email could not be retrieved"));
 
-        return userProfile.toBuilder()
-                .githubUserId(userProfile.getGithubUserId())
-                .githubLogin(userProfile.getGithubLogin())
-                .githubAvatarUrl(userProfile.getGithubAvatarUrl())
-                .email(primaryEmail.email())
-                .build();
+        return client.get("/user", GithubUserIdentity.class, githubPersonalToken)
+                .flatMap(userProfile -> client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
+                        .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
+                        .map(primaryEmail -> userProfile.toBuilder()
+                                .email(primaryEmail.email())
+                                .build())
+                );
     }
 }

@@ -590,20 +590,18 @@ public class UserServiceTest {
         );
         final var githubUserIdentities = List.of(
                 GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
-                GithubUserIdentity.builder().githubUserId(users.get(1).getGithubUserId()).email(faker.internet().emailAddress()).build(),
                 GithubUserIdentity.builder().githubUserId(users.get(2).getGithubUserId()).email(faker.internet().emailAddress()).build()
         );
         final var updatedUserProfiles = List.of(
                 User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).githubEmail(githubUserIdentities.get(0).getEmail()).build(),
-                User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build(),
-                User.builder().githubUserId(githubUserIdentities.get(2).getGithubUserId()).githubEmail(githubUserIdentities.get(2).getEmail()).build()
+                User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build()
         );
 
         when(userStoragePort.getUsersLastSeenSince(since)).thenReturn(users);
 
-        when(githubSearchPort.getUserProfile(users.get(0).getGithubUserId())).thenReturn(githubUserIdentities.get(0));
-        when(githubSearchPort.getUserProfile(users.get(1).getGithubUserId())).thenReturn(githubUserIdentities.get(1));
-        when(githubSearchPort.getUserProfile(users.get(2).getGithubUserId())).thenReturn(githubUserIdentities.get(2));
+        when(githubSearchPort.getUserProfile(users.get(0).getGithubUserId())).thenReturn(Optional.of(githubUserIdentities.get(0)));
+        when(githubSearchPort.getUserProfile(users.get(1).getGithubUserId())).thenReturn(Optional.empty());
+        when(githubSearchPort.getUserProfile(users.get(2).getGithubUserId())).thenReturn(Optional.of(githubUserIdentities.get(1)));
 
         // When
         userService.refreshActiveUserProfiles(since);

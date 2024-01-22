@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -102,6 +103,8 @@ public class UserService implements UserFacadePort {
         final var users = userStoragePort.getUsersLastSeenSince(since).stream()
                 .map(User::getGithubUserId)
                 .map(githubSearchPort::getUserProfile)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(githubUserProfile -> User.builder()
                         .githubUserId(githubUserProfile.getGithubUserId())
                         .githubLogin(githubUserProfile.getGithubLogin())
