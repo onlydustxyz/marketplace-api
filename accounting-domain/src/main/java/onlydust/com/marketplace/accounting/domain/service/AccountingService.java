@@ -8,7 +8,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountProvide
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @AllArgsConstructor
-public class SponsorAccountingService {
+public class AccountingService {
 
     private final SponsorAccountProvider sponsorAccountProvider;
     private final CommitteeAccountProvider committeeAccountProvider;
