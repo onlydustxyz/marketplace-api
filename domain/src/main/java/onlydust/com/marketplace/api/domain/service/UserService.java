@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Slf4j
 public class UserService implements UserFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
@@ -100,7 +102,9 @@ public class UserService implements UserFacadePort {
 
     @Override
     public void refreshActiveUserProfiles(ZonedDateTime since) {
-        final var users = userStoragePort.getUsersLastSeenSince(since).stream()
+        final var activeUsers = userStoragePort.getUsersLastSeenSince(since);
+
+        final var userProfiles = activeUsers.stream()
                 .map(User::getGithubUserId)
                 .map(githubSearchPort::getUserProfile)
                 .filter(Optional::isPresent)
@@ -112,7 +116,12 @@ public class UserService implements UserFacadePort {
                         .githubEmail(githubUserProfile.getEmail())
                         .build())
                 .toList();
-        userStoragePort.saveUsers(users);
+
+        if (userProfiles.size() < activeUsers.size()) {
+            LOGGER.warn("Only {} user profiles found for {} active users", userProfiles.size(), activeUsers.size());
+        }
+
+        userStoragePort.saveUsers(userProfiles);
     }
 
     @Override
