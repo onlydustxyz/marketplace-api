@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.accounting.domain;
+package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;

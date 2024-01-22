@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.out.CommitteeAccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountProvider;
+import onlydust.com.marketplace.accounting.domain.service.SponsorAccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;

@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;

@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.CurrencyService;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
