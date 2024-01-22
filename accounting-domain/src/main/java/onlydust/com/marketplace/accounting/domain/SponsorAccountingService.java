@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 public class SponsorAccountingService {
 
     private final SponsorAccountProvider sponsorAccountProvider;
+    private final CommitteeAccountProvider committeeAccountProvider;
     private final CurrencyStorage currencyStorage;
 
     public void receiveFrom(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
@@ -35,8 +36,21 @@ public class SponsorAccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("No account found for sponsor %s in currency %s".formatted(sponsorId, currency)));
     }
 
+    private Account getOrCreateAccount(CommitteeId committeeId, Currency currency) {
+        return committeeAccountProvider.get(committeeId, currency)
+                .orElseGet(() -> committeeAccountProvider.create(committeeId, currency));
+    }
+
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
                 .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
+    }
+
+    public void allocate(SponsorId sponsorId, CommitteeId committeeId, PositiveAmount amount, Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var sponsorAccount = getAccount(sponsorId, currency);
+        final var committeeAccount = getOrCreateAccount(committeeId, currency);
+
+        sponsorAccount.send(committeeAccount, PositiveMoney.of(amount, currency));
     }
 }

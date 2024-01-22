@@ -15,12 +15,13 @@ import static org.mockito.Mockito.*;
 
 public class SponsorAccountingServiceTest {
     final SponsorAccountProvider sponsorAccountProvider = mock(SponsorAccountProvider.class);
+    final CommitteeAccountProvider committeeAccountProvider = mock(CommitteeAccountProvider.class);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final SponsorAccountingService sponsorAccountingService = new SponsorAccountingService(sponsorAccountProvider, currencyStorage);
+    final SponsorAccountingService sponsorAccountingService = new SponsorAccountingService(sponsorAccountProvider, committeeAccountProvider, currencyStorage);
 
     @BeforeEach
     void setUp() {
-        reset(sponsorAccountProvider, currencyStorage);
+        reset(sponsorAccountProvider, committeeAccountProvider, currencyStorage);
     }
 
     /*
@@ -150,5 +151,32 @@ public class SponsorAccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
+    }
+
+    /*
+     * Given a sponsor with an account
+     * When I allocate money to a committee
+     * Then The transfer is registered from my account to the committee account
+     */
+    @Test
+    void should_register_allocation_to_committee() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(PositiveMoney.of(200L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+
+        // When
+        sponsorAccountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+
+        // Then
+        assertThat(sponsorAccount.balance()).isEqualTo(Money.of(90L, currency));
+        assertThat(committeeAccount.balance()).isEqualTo(Money.of(210L, currency));
+        assertThat(committeeAccount.balanceFrom(sponsorAccount.getId())).isEqualTo(Money.of(10L, currency));
     }
 }

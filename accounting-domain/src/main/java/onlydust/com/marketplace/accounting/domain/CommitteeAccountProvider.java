@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface CommitteeAccountProvider {
     Optional<Account> get(CommitteeId committeeId, Currency currency);
+
+    Account create(CommitteeId committeeId, Currency currency);
 }
