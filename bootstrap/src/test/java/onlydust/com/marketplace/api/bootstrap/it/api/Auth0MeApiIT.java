@@ -55,6 +55,11 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-user-changed"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(WireMock.noContent()));
     }
 
     @Test
@@ -90,6 +95,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
+        indexerApiWireMockServer.verify(0, postRequestedFor(anyUrl()));
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("User")))
@@ -115,6 +121,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertUserEntity(me.getId());
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
+        indexerApiWireMockServer.verify(0, postRequestedFor(anyUrl()));
 
         // ===============================================
         // When we call it again (already signed-up) with a new email
@@ -138,6 +145,8 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertUserEntity(me.getId());
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
+        indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-user-changed"))
+                .withRequestBody(matchingJsonPath("$.userIds[0]", equalTo(githubUserId.toString()))));
     }
 
     protected void assertUserEntity(UUID userId) {

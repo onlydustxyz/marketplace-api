@@ -60,9 +60,22 @@ public class UserServiceTest {
     void should_find_user_given_a_github_id_and_update_it() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
-        final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                GithubUserIdentity.builder()
+                        .githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubLogin(faker.hacker().verb())
+                        .email(faker.internet().emailAddress())
+                        .build();
+
+        final User user = User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .githubEmail(githubUserIdentity.getEmail())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
+                .build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));

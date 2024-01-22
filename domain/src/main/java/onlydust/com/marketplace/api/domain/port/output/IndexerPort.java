@@ -13,4 +13,6 @@ public interface IndexerPort {
     void indexIssue(String repoOwner, String repoName, Long issueNumber);
 
     void onRepoLinkChanged(Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
+
+    void onUserChanged(Long githubUserId);
 }
