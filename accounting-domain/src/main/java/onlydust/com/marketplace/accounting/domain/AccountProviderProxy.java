@@ -13,6 +13,8 @@ public class AccountProviderProxy implements AccountProvider<Object> {
     private final AccountProvider<SponsorId> sponsorAccountProvider;
     private final AccountProvider<CommitteeId> committeeAccountProvider;
     private final AccountProvider<ProjectId> projectAccountProvider;
+    private final AccountProvider<ContributorId> contributorAccountProvider;
+
 
     @Override
     public Optional<Account> get(Object ownerId, Currency currency) {
@@ -22,6 +24,8 @@ public class AccountProviderProxy implements AccountProvider<Object> {
             return committeeAccountProvider.get(committeeId, currency);
         } else if (ownerId instanceof ProjectId projectId) {
             return projectAccountProvider.get(projectId, currency);
+        } else if (ownerId instanceof ContributorId contributorId) {
+            return contributorAccountProvider.get(contributorId, currency);
         } else {
             throw badRequest("Unknown owner type: " + ownerId.getClass());
         }
@@ -35,6 +39,8 @@ public class AccountProviderProxy implements AccountProvider<Object> {
             return committeeAccountProvider.create(committeeId, currency);
         } else if (ownerId instanceof ProjectId projectId) {
             return projectAccountProvider.create(projectId, currency);
+        } else if (ownerId instanceof ContributorId contributorId) {
+            return contributorAccountProvider.create(contributorId, currency);
         } else {
             throw badRequest("Unknown owner type: " + ownerId.getClass());
         }

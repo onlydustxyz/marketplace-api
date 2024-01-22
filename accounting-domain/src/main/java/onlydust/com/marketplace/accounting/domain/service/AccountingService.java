@@ -33,7 +33,7 @@ public class AccountingService {
         sponsorAccount.send(committeeAccount, PositiveMoney.of(amount, currency));
     }
 
-    public void refund(SponsorId from, CommitteeId to, PositiveAmount amount, Currency.Id currencyId) {
+    public <F, T> void refund(F from, T to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var sponsorAccount = getAccount(from, currency);
         final var committeeAccount = getAccount(to, currency);

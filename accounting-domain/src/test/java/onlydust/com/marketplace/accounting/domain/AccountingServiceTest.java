@@ -20,13 +20,15 @@ public class AccountingServiceTest {
     final AccountProvider<SponsorId> sponsorAccountProvider = mock(AccountProvider.class);
     final AccountProvider<CommitteeId> committeeAccountProvider = mock(AccountProvider.class);
     final AccountProvider<ProjectId> projectAccountProvider = mock(AccountProvider.class);
-    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider);
+    final AccountProvider<ContributorId> contributorAccountProvider = mock(AccountProvider.class);
+    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider,
+            contributorAccountProvider);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountProviderProxy, currencyStorage);
 
     @BeforeEach
     void setUp() {
-        reset(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider, currencyStorage);
+        reset(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider, contributorAccountProvider, currencyStorage);
     }
 
     /*
@@ -401,5 +403,75 @@ public class AccountingServiceTest {
         assertThat(committeeAccount.balance()).isEqualTo(Money.of(90L, currency));
         assertThat(projectAccount.balance()).isEqualTo(Money.of(10L, currency));
         assertThat(projectAccount.balanceFrom(committeeAccount.getId())).isEqualTo(Money.of(10L, currency));
+    }
+
+    /*
+     * Given a sponsor, a committee, 2 projects and 2 contributors
+     * When
+     *    - the sponsor funds project 1 via the committee
+     *    - project 1 rewards the 2 contributors
+     *    - the committee re-allocate unspent funds from project 1 to project 2
+     *    - the committee refunds the remaining unspent funds to the sponsor
+     *    - the sponsor funds project 2 directly
+     *    - project 2 rewards contributor 2
+     * Then All is well :-)
+     */
+    @Test
+    void should_do_everything() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(currency);
+        final var projectId1 = ProjectId.random();
+        final var projectAccount1 = new Account(currency);
+        final var projectId2 = ProjectId.random();
+        final var projectAccount2 = new Account(currency);
+        final var contributorId1 = ContributorId.random();
+        final var contributorAccount1 = new Account(currency);
+        final var contributorId2 = ContributorId.random();
+        final var contributorAccount2 = new Account(currency);
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+        when(projectAccountProvider.get(projectId1, currency)).thenReturn(Optional.of(projectAccount1));
+        when(projectAccountProvider.get(projectId2, currency)).thenReturn(Optional.of(projectAccount2));
+        when(contributorAccountProvider.get(contributorId1, currency)).thenReturn(Optional.of(contributorAccount1));
+        when(contributorAccountProvider.get(contributorId2, currency)).thenReturn(Optional.of(contributorAccount2));
+
+        // When
+        accountingService.send(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
+        accountingService.send(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
+
+        accountingService.send(projectId1, contributorId1, PositiveAmount.of(10L), currency.id());
+        accountingService.send(projectId1, contributorId2, PositiveAmount.of(20L), currency.id());
+
+        accountingService.refund(committeeId, projectId1, PositiveAmount.of(10L), currency.id());
+        accountingService.send(committeeId, projectId2, PositiveAmount.of(20L), currency.id());
+
+        accountingService.refund(sponsorId, committeeId, PositiveAmount.of(20L), currency.id());
+
+        accountingService.send(sponsorId, projectId2, PositiveAmount.of(35L), currency.id());
+
+        accountingService.send(projectId2, contributorId2, PositiveAmount.of(25L), currency.id());
+
+        // Then
+        assertThat(sponsorAccount.balance()).isEqualTo(Money.of(15L, currency));
+        assertThat(committeeAccount.balance()).isEqualTo(Money.of(0L, currency));
+        assertThat(projectAccount1.balance()).isEqualTo(Money.of(0L, currency));
+        assertThat(projectAccount2.balance()).isEqualTo(Money.of(30L, currency));
+
+        assertThat(contributorAccount1.balance()).isEqualTo(Money.of(10L, currency));
+        assertThat(contributorAccount1.balanceFrom(projectAccount1.id())).isEqualTo(Money.of(10L, currency));
+//        assertThat(contributorAccount1.balanceFrom(sponsorAccount.id())).isEqualTo(Money.of(10L, currency));
+//        assertThat(contributorAccount1.balanceFrom(committeeAccount.id())).isEqualTo(Money.of(10L, currency));
+
+        assertThat(contributorAccount2.balance()).isEqualTo(Money.of(45L, currency));
+        assertThat(contributorAccount2.balanceFrom(projectAccount1.id())).isEqualTo(Money.of(20L, currency));
+        assertThat(contributorAccount2.balanceFrom(projectAccount2.id())).isEqualTo(Money.of(25L, currency));
+//        assertThat(contributorAccount2.balanceFrom(sponsorAccount.id())).isEqualTo(Money.of(45L, currency));
+//        assertThat(contributorAccount2.balanceFrom(committeeAccount.id())).isEqualTo(Money.of(20L, currency));
     }
 }
