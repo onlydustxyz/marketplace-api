@@ -179,4 +179,32 @@ public class SponsorAccountingServiceTest {
         assertThat(committeeAccount.balance()).isEqualTo(Money.of(210L, currency));
         assertThat(committeeAccount.balanceFrom(sponsorAccount.getId())).isEqualTo(Money.of(10L, currency));
     }
+
+    /*
+     * Given a sponsor with an account
+     * When I allocate money to a committee with no account
+     * Then An account is created for the committee and the transfer is registered from my account to the committee account
+     */
+    @Test
+    void should_create_account_and_register_allocation_to_committee() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorAccount = new Account(PositiveMoney.of(100L, currency));
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(currency);
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.empty());
+        when(committeeAccountProvider.create(committeeId, currency)).thenReturn(committeeAccount);
+
+        // When
+        sponsorAccountingService.allocate(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+
+        // Then
+        assertThat(sponsorAccount.balance()).isEqualTo(Money.of(90L, currency));
+        assertThat(committeeAccount.balance()).isEqualTo(Money.of(10L, currency));
+        assertThat(committeeAccount.balanceFrom(sponsorAccount.getId())).isEqualTo(Money.of(10L, currency));
+    }
 }
