@@ -25,10 +25,10 @@ public class AccountingService {
         account.burn(PositiveMoney.of(PositiveMoney.of(amount, currency)));
     }
 
-    public void send(SponsorId sponsorId, CommitteeId committeeId, PositiveAmount amount, Currency.Id currencyId) {
+    public <F, T> void send(F from, T to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var sponsorAccount = getAccount(sponsorId, currency);
-        final var committeeAccount = getOrCreateAccount(committeeId, currency);
+        final var sponsorAccount = getAccount(from, currency);
+        final var committeeAccount = getOrCreateAccount(to, currency);
 
         sponsorAccount.send(committeeAccount, PositiveMoney.of(amount, currency));
     }

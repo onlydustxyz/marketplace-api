@@ -19,13 +19,14 @@ import static org.mockito.Mockito.*;
 public class AccountingServiceTest {
     final AccountProvider<SponsorId> sponsorAccountProvider = mock(AccountProvider.class);
     final AccountProvider<CommitteeId> committeeAccountProvider = mock(AccountProvider.class);
-    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider);
+    final AccountProvider<ProjectId> projectAccountProvider = mock(AccountProvider.class);
+    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountProviderProxy, currencyStorage);
 
     @BeforeEach
     void setUp() {
-        reset(sponsorAccountProvider, committeeAccountProvider, currencyStorage);
+        reset(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider, currencyStorage);
     }
 
     /*
@@ -373,5 +374,32 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot refund more than the amount received");
+    }
+
+    /*
+     * Given a committee with an account and a project with an account
+     * When I fund a project
+     * Then The transfer is registered on the project account
+     */
+    @Test
+    void should_register_funding() {
+        // Given
+        final var currency = Currencies.USD;
+        final var committeeId = CommitteeId.random();
+        final var committeeAccount = new Account(PositiveMoney.of(100L, currency));
+        final var projectId = ProjectId.random();
+        final var projectAccount = new Account(currency);
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+        when(projectAccountProvider.get(projectId, currency)).thenReturn(Optional.of(projectAccount));
+
+        // When
+        accountingService.send(committeeId, projectId, PositiveAmount.of(10L), currency.id());
+
+        // Then
+        assertThat(committeeAccount.balance()).isEqualTo(Money.of(90L, currency));
+        assertThat(projectAccount.balance()).isEqualTo(Money.of(10L, currency));
+        assertThat(projectAccount.balanceFrom(committeeAccount.getId())).isEqualTo(Money.of(10L, currency));
     }
 }
