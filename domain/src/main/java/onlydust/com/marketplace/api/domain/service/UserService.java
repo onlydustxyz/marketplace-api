@@ -50,6 +50,12 @@ public class UserService implements UserFacadePort {
                                 githubUserIdentity.getGithubAvatarUrl(),
                                 githubUserIdentity.getEmail(),
                                 dateProvider.now());
+
+                        if (!user.getGithubAvatarUrl().equals(githubUserIdentity.getGithubAvatarUrl()) ||
+                            !user.getGithubLogin().equals(githubUserIdentity.getGithubLogin()) ||
+                            !user.getGithubEmail().equals(githubUserIdentity.getEmail())) {
+                            userObserverPort.onUserProfileChanged(user);
+                        }
                     }
                     return user;
                 })

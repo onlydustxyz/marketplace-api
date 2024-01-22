@@ -4,4 +4,6 @@ import onlydust.com.marketplace.api.domain.model.User;
 
 public interface UserObserverPort {
     void onUserSignedUp(User user);
+
+    void onUserProfileChanged(User user);
 }

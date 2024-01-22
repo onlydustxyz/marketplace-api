@@ -39,6 +39,14 @@ public class IndexerApiClientAdapter implements IndexerPort {
         httpClient.send("/api/v1/events/on-repo-link-changed", HttpMethod.POST, new RepoLinkChangedEvent(linkedRepoIds, unlinkedRepoIds), Void.class);
     }
 
+    @Override
+    public void onUserChanged(Long githubUserId) {
+        httpClient.send("/api/v1/events/on-user-changed", HttpMethod.POST, new UserChangedEvent(Set.of(githubUserId)), Void.class);
+    }
+
     private record RepoLinkChangedEvent(Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+    }
+
+    private record UserChangedEvent(Set<Long> userIds) {
     }
 }
