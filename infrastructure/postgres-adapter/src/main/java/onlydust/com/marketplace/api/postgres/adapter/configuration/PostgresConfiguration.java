@@ -60,7 +60,8 @@ public class PostgresConfiguration {
                                                          final NewcomerViewEntityRepository newcomerViewEntityRepository,
                                                          final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                          final ApplicationRepository applicationRepository,
-                                                         final ContributionViewEntityRepository contributionViewEntityRepository) {
+                                                         final ContributionViewEntityRepository contributionViewEntityRepository,
+                                                         final HiddenContributorRepository hiddenContributorRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -82,7 +83,8 @@ public class PostgresConfiguration {
                 newcomerViewEntityRepository,
                 contributorActivityViewEntityRepository,
                 applicationRepository,
-                contributionViewEntityRepository
+                contributionViewEntityRepository,
+                hiddenContributorRepository
         );
     }
 

@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
@@ -60,6 +61,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository;
     private final ApplicationRepository applicationRepository;
     private final ContributionViewEntityRepository contributionViewEntityRepository;
+    private final HiddenContributorRepository hiddenContributorRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -330,7 +332,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                               int pageIndex, int pageSize) {
         final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, login, sortBy, sortDirection,
+                customContributorRepository.getProjectContributorViewEntity(projectId, login, null, true, sortBy, sortDirection,
                                 pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
                         .toList();
@@ -343,13 +345,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, String login,
+    public Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
                                                                             ProjectContributorsLinkView.SortBy sortBy,
                                                                             SortDirection sortDirection,
                                                                             int pageIndex, int pageSize) {
         final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
         final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, login, sortBy, sortDirection,
+                customContributorRepository.getProjectContributorViewEntity(projectId, login, projectLeadId, showHidden, sortBy, sortDirection,
                                 pageIndex, pageSize)
                         .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)
                         .toList();
@@ -541,5 +543,23 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .totalItemNumber(page.getNumberOfElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+        hiddenContributorRepository.save(new HiddenContributorEntity(HiddenContributorEntity.Id.builder()
+                .projectId(projectId)
+                .projectLeadId(projectLeadId)
+                .contributorGithubUserId(contributorGithubUserId)
+                .build()));
+    }
+
+    @Override
+    public void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+        hiddenContributorRepository.deleteById(HiddenContributorEntity.Id.builder()
+                .projectId(projectId)
+                .projectLeadId(projectLeadId)
+                .contributorGithubUserId(contributorGithubUserId)
+                .build());
     }
 }

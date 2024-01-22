@@ -27,6 +27,7 @@ public class ProjectContributorViewEntity {
     Integer contributionCount;
     @Column(name = "is_registered")
     boolean isRegistered;
+    boolean isHidden;
     @Column(name = "earned")
     BigDecimal earned;
     @Column(name = "reward_count")

@@ -5,7 +5,10 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public interface ProjectStoragePort {
     ProjectDetailsView getById(UUID projectId, User caller);
@@ -37,7 +40,7 @@ public interface ProjectStoragePort {
                                                        SortDirection sortDirection,
                                                        int pageIndex, int pageSize);
 
-    Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, String login,
+    Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
                                                                      ProjectContributorsLinkView.SortBy sortBy,
                                                                      SortDirection sortDirection,
                                                                      int pageIndex, int pageSize);
@@ -48,7 +51,7 @@ public interface ProjectStoragePort {
 
     ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
                                        ProjectRewardView.SortBy sortBy, SortDirection sortDirection,
-                                        int pageIndex, int pageSize);
+                                       int pageIndex, int pageSize);
 
     ProjectBudgetsView findBudgets(UUID projectId);
 
@@ -85,4 +88,8 @@ public interface ProjectStoragePort {
     Page<NewcomerView> getNewcomers(UUID projectId, Integer pageIndex, Integer pageSize);
 
     Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+
+    void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+
+    void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 }

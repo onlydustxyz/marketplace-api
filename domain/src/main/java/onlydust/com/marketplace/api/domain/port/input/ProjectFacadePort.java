@@ -39,7 +39,7 @@ public interface ProjectFacadePort {
                                                       Integer pageSize);
 
     Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
-                                                                      UUID projectLeadId,
+                                                                      UUID projectLeadId, Boolean showHidden,
                                                                       ProjectContributorsLinkView.SortBy sortBy,
                                                                       SortDirection sortDirection,
                                                                       Integer pageIndex,
@@ -89,4 +89,8 @@ public interface ProjectFacadePort {
     Page<NewcomerView> newcomers(UUID projectId, User caller, Integer page, Integer pageSize);
 
     Page<ContributorActivityView> mostActives(UUID projectId, User caller, Integer page, Integer pageSize);
+
+    void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+
+    void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 }

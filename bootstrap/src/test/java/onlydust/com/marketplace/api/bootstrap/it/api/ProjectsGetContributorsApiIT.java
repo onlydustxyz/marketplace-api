@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -1204,6 +1203,69 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PROJECT_LEAD);
+    }
+
+
+    @Test
+    @Order(5)
+    void should_hide_and_show_project_contributors_as_project_lead() {
+        // Given
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var veryDustyBot = 129528947L;
+
+        // When
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_HIDE_CONTRIBUTOR, projectId, veryDustyBot)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributors[?(@.githubUserId == 129528947)]").doesNotExist()
+        ;
+
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT", "showHidden", "true")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributors[?(@.githubUserId == 129528947 && @.hidden == true)]").exists()
+                .jsonPath("$.contributors[?(@.githubUserId == 129528947 && @.hidden == false)]").doesNotExist()
+                .jsonPath("$.contributors[?(@.githubUserId != 129528947 && @.hidden == true)]").doesNotExist()
+                .jsonPath("$.contributors[?(@.githubUserId != 129528947 && @.hidden == false)]").exists()
+        ;
+
+
+        // When
+        client.delete()
+                .uri(getApiURI(String.format(PROJECTS_HIDE_CONTRIBUTOR, projectId, veryDustyBot)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", "CONTRIBUTION_COUNT")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributors[?(@.githubUserId == 129528947)].hidden").isEqualTo(false)
+        ;
     }
 
     @Test
