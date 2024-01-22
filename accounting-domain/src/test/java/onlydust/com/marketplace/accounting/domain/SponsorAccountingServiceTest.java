@@ -3,12 +3,14 @@ package onlydust.com.marketplace.accounting.domain;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class SponsorAccountingServiceTest {
@@ -86,5 +88,26 @@ public class SponsorAccountingServiceTest {
 
         // Then
         assertThat(account.balance()).isEqualTo(Money.of(90L, currency));
+    }
+
+    /*
+     * Given a sponsor with no account
+     * When I refund money from OnlyDust
+     * Then The refund is rejected
+     */
+    @Test
+    void should_reject_refund_when_no_account_found() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currency = Currencies.USD;
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.refundTo(sponsorId, PositiveAmount.of(10L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("No account found for sponsor %s in currency %s".formatted(sponsorId, currency));
     }
 }
