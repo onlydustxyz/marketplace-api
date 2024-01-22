@@ -19,11 +19,11 @@ public class ProjectContributorsLinkView implements UserLinkView {
     Integer issuesToRewardCount;
     Integer codeReviewToRewardCount;
     Boolean isRegistered;
+    Boolean isHidden;
 
     public enum SortBy {
         contributionCount, earned, login, rewardCount, toRewardCount
     }
-
 
 
 }

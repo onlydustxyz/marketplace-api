@@ -274,13 +274,13 @@ public class ProjectServiceTest {
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-        projectService.getContributorsForProjectLeadId(projectId, null, projectLeadId, sortBy, sortDirection, pageIndex,
+        projectService.getContributorsForProjectLeadId(projectId, null, projectLeadId, false, sortBy, sortDirection, pageIndex,
                 pageSize);
 
         // Then
         verify(projectStoragePort, times(1)).findContributors(projectId, null, sortBy, sortDirection, pageIndex,
                 pageSize);
-        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, null, sortBy, sortDirection,
+        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, projectLeadId, null, false, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 
@@ -298,14 +298,14 @@ public class ProjectServiceTest {
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
                 .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getContributorsForProjectLeadId(projectId, login, projectLeadId, sortBy, sortDirection,
+        projectService.getContributorsForProjectLeadId(projectId, login, projectLeadId, true, sortBy, sortDirection,
                 pageIndex,
                 pageSize);
 
         // Then
         verify(projectStoragePort, times(0)).findContributors(projectId, login, sortBy, sortDirection, pageIndex,
                 pageSize);
-        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, login, sortBy, sortDirection,
+        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, projectLeadId, login, true, sortBy, sortDirection,
                 pageIndex, pageSize);
     }
 
@@ -846,5 +846,65 @@ public class ProjectServiceTest {
 
         // Then
         assertEquals(expectedContributions, contributions);
+    }
+
+    @Test
+    void should_hide_contributors() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributorId = faker.number().randomNumber();
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+
+        // When
+        projectService.hideContributorForProjectLead(projectId, projectLeadId, contributorId);
+
+        // Then
+        verify(projectStoragePort, times(1)).hideContributorForProjectLead(projectId, projectLeadId, contributorId);
+    }
+
+    @Test
+    void should_show_contributors() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributorId = faker.number().randomNumber();
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+
+        // When
+        projectService.showContributorForProjectLead(projectId, projectLeadId, contributorId);
+
+        // Then
+        verify(projectStoragePort, times(1)).showContributorForProjectLead(projectId, projectLeadId, contributorId);
+    }
+
+    @Test
+    void should_prevent_non_project_leads_from_hiding_contributors() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributorId = faker.number().randomNumber();
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> projectService.hideContributorForProjectLead(projectId, projectLeadId, contributorId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only project leads can hide contributors on their projects");
+    }
+
+    @Test
+    void should_prevent_non_project_leads_from_showing_contributors() {
+        // Given
+        final var projectId = UUID.randomUUID();
+        final var projectLeadId = UUID.randomUUID();
+        final var contributorId = faker.number().randomNumber();
+        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> projectService.showContributorForProjectLead(projectId, projectLeadId, contributorId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Only project leads can show contributors on their projects");
     }
 }

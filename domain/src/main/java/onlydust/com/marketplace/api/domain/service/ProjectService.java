@@ -220,13 +220,13 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<ProjectContributorsLinkView> getContributorsForProjectLeadId(UUID projectId, String login,
-                                                                             UUID projectLeadId,
+                                                                             UUID projectLeadId, Boolean showHidden,
                                                                              ProjectContributorsLinkView.SortBy sortBy,
                                                                              SortDirection sortDirection,
                                                                              Integer pageIndex,
                                                                              Integer pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findContributorsForProjectLead(projectId, login, sortBy, sortDirection, pageIndex,
+            return projectStoragePort.findContributorsForProjectLead(projectId, projectLeadId, login, showHidden, sortBy, sortDirection, pageIndex,
                     pageSize);
         } else {
             return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
@@ -411,5 +411,23 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
         return projectStoragePort.getMostActivesContributors(projectId, page, pageSize);
+    }
+
+    @Override
+    public void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            projectStoragePort.hideContributorForProjectLead(projectId, projectLeadId, contributorGithubUserId);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can hide contributors on their projects");
+        }
+    }
+
+    @Override
+    public void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
+            projectStoragePort.showContributorForProjectLead(projectId, projectLeadId, contributorGithubUserId);
+        } else {
+            throw OnlyDustException.forbidden("Only project leads can show contributors on their projects");
+        }
     }
 }

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.api.domain.model.User;
@@ -18,6 +17,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -131,13 +131,14 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                            Integer pageSize,
                                                                            String login,
                                                                            String sort,
-                                                                           String direction) {
+                                                                           String direction,
+                                                                           Boolean showHidden) {
 
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
         final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
                 authenticationService.tryGetAuthenticatedUser()
-                        .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, login, user.getId(),
+                        .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, login, user.getId(), showHidden,
                                 sortBy, SortDirectionMapper.requestToDomain(direction),
                                 pageIndex, sanitizedPageSize))
                         .orElseGet(() -> projectFacadePort.getContributors(projectId, login,
@@ -473,5 +474,19 @@ public class ProjectsRestApi implements ProjectsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
                 : ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> hideContributor(UUID projectId, Long githubUserId) {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        projectFacadePort.hideContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> showContributor(UUID projectId, Long githubUserId) {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
+        return ResponseEntity.noContent().build();
     }
 }

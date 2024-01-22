@@ -23,6 +23,7 @@ public interface ProjectContributorsMapper {
                 .contributionCount(contributorViewEntity.getContributionCount())
                 .githubUserId(contributorViewEntity.getGithubUserId())
                 .isRegistered(contributorViewEntity.isRegistered())
+                .isHidden(contributorViewEntity.isHidden())
                 .build();
     }
 
@@ -35,6 +36,7 @@ public interface ProjectContributorsMapper {
                 .contributionCount(contributorViewEntity.getContributionCount())
                 .githubUserId(contributorViewEntity.getGithubUserId())
                 .isRegistered(contributorViewEntity.isRegistered())
+                .isHidden(false)
                 .build();
     }
 

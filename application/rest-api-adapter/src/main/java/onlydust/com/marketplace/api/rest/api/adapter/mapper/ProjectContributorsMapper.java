@@ -47,6 +47,7 @@ public interface ProjectContributorsMapper {
         response.setIssueToReward(projectContributorsLinkView.getIssuesToRewardCount());
         response.setIsRegistered(isNull(projectContributorsLinkView.getIsRegistered()) ? false :
                 projectContributorsLinkView.getIsRegistered());
+        response.setHidden(projectContributorsLinkView.getIsHidden());
         return response;
     }
 }

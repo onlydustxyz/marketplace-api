@@ -75,10 +75,15 @@ public class CustomContributorRepository {
                    coalesce(amounts.eth * cuq_eth.price, 0) + coalesce(amounts.stark * cuq_stark.price, 0) +
                    coalesce(amounts.apt * cuq_apt.price, 0) + coalesce(amounts.op * cuq_op.price, 0) +
                    coalesce(amounts.lords * cuq_lords.price, 0) + coalesce(amounts.usdc * cuq_usdc.price, 0) +
-                   coalesce(amounts.usd, 0)                   earned
+                   coalesce(amounts.usd, 0)                   earned,
+                   hc.contributor_github_user_id is not null is_hidden
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
                      left join iam.users u on u.github_user_id = ga.id
+                     left join hidden_contributors hc on 
+                            hc.contributor_github_user_id = pc.github_user_id and 
+                            hc.project_id = :projectId and 
+                            hc.project_lead_id = CAST(CAST(:projectLeadId AS TEXT) AS UUID)
                      left join (select count(distinct c.id)                                          total_count,
                                        count(distinct c.id) filter ( where c.type = 'PULL_REQUEST' ) pull_request_count,
                                        count(distinct c.id) filter ( where c.type = 'CODE_REVIEW' )  code_review_count,
@@ -114,6 +119,7 @@ public class CustomContributorRepository {
                               left join crypto_usd_quotes cuq_lords on cuq_lords.currency = 'lords'
             where pc.project_id = :projectId
               and ga.login ilike '%' || :login || '%'
+              and (hc.contributor_github_user_id is null or :showHidden)
             order by %order_by%
             offset :offset limit :limit
             """;
@@ -174,13 +180,15 @@ public class CustomContributorRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId, String login,
+    public List<ProjectContributorViewEntity> getProjectContributorViewEntity(final UUID projectId, String login, final UUID projectLeadId, Boolean showHidden,
                                                                               ProjectContributorsLinkView.SortBy sortBy,
                                                                               SortDirection sortDirection,
                                                                               int pageIndex, int pageSize) {
         return entityManager.createNativeQuery(buildQuery(sortBy, sortDirection),
                         ProjectContributorViewEntity.class)
                 .setParameter("projectId", projectId)
+                .setParameter("projectLeadId", projectLeadId)
+                .setParameter("showHidden", showHidden)
                 .setParameter("login", login != null ? login : "")
                 .setParameter("offset", PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex))
                 .setParameter("limit", PaginationMapper.getPostgresLimitFromPagination(pageSize, pageIndex))
