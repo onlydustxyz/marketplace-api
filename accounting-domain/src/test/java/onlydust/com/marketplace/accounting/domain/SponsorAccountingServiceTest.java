@@ -155,6 +155,28 @@ public class SponsorAccountingServiceTest {
 
     /*
      * Given a sponsor with an account
+     * When I refund money from OnlyDust of more than I sent
+     * Then The refund is rejected
+     */
+    @Test
+    void should_reject_refund_when_not_enough_received() {
+        // Given
+        final var sponsorId = SponsorId.random();
+        final var currency = Currencies.USD;
+        final var account = new Account(PositiveMoney.of(100L, currency));
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+
+        // When
+        assertThatThrownBy(() -> sponsorAccountingService.refundTo(sponsorId, PositiveAmount.of(110L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Insufficient funds");
+    }
+
+    /*
+     * Given a sponsor with an account
      * When I allocate money to a committee
      * Then The transfer is registered from my account to the committee account
      */
