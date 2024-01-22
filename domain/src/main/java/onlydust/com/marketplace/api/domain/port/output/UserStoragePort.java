@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 
 public interface UserStoragePort {
@@ -56,4 +54,8 @@ public interface UserStoragePort {
     void saveProjectLead(UUID userId, UUID projectId);
 
     List<Currency> listRewardCurrencies(Long githubUserId);
+
+    List<User> getUsersLastSeenSince(ZonedDateTime since);
+
+    void saveUsers(List<User> users);
 }

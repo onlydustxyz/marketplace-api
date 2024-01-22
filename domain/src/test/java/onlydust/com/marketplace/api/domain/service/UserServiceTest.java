@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static onlydust.com.marketplace.api.domain.view.UserPayoutInformationTest.fakeValidUserPayoutInformation;
@@ -576,5 +577,38 @@ public class UserServiceTest {
 
         // Then
         assertThat(url.toString()).isEqualTo(imageUrl);
+    }
+
+    @Test
+    void should_refresh_active_user_profiles() {
+        // Given
+        final var since = ZonedDateTime.now().minusDays(30);
+        final var users = List.of(
+                User.builder().githubUserId(faker.number().randomNumber()).build(),
+                User.builder().githubUserId(faker.number().randomNumber()).build(),
+                User.builder().githubUserId(faker.number().randomNumber()).build()
+        );
+        final var githubUserIdentities = List.of(
+                GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
+                GithubUserIdentity.builder().githubUserId(users.get(1).getGithubUserId()).email(faker.internet().emailAddress()).build(),
+                GithubUserIdentity.builder().githubUserId(users.get(2).getGithubUserId()).email(faker.internet().emailAddress()).build()
+        );
+        final var updatedUserProfiles = List.of(
+                User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).githubEmail(githubUserIdentities.get(0).getEmail()).build(),
+                User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build(),
+                User.builder().githubUserId(githubUserIdentities.get(2).getGithubUserId()).githubEmail(githubUserIdentities.get(2).getEmail()).build()
+        );
+
+        when(userStoragePort.getUsersLastSeenSince(since)).thenReturn(users);
+
+        when(githubSearchPort.getUserProfile(users.get(0).getGithubUserId())).thenReturn(githubUserIdentities.get(0));
+        when(githubSearchPort.getUserProfile(users.get(1).getGithubUserId())).thenReturn(githubUserIdentities.get(1));
+        when(githubSearchPort.getUserProfile(users.get(2).getGithubUserId())).thenReturn(githubUserIdentities.get(2));
+
+        // When
+        userService.refreshActiveUserProfiles(since);
+
+        // Then
+        verify(userStoragePort, times(1)).saveUsers(updatedUserProfiles);
     }
 }

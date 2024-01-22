@@ -13,4 +13,6 @@ public interface GithubSearchPort {
 
     GithubMembership getGithubUserMembershipForOrganization(Long githubUserId, String userLogin,
                                                             String organizationLogin);
+
+    GithubUserIdentity getUserProfile(Long githubUserId);
 }

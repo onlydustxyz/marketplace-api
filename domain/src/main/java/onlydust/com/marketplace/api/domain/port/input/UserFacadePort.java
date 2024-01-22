@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +27,8 @@ public interface UserFacadePort {
     UserProfileView updateProfile(UUID userId, UserProfile userProfile);
 
     UserPayoutInformation getPayoutInformationForUserId(UUID id);
+
+    void refreshActiveUserProfiles(ZonedDateTime since);
 
     void markUserAsOnboarded(UUID userId);
 

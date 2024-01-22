@@ -18,6 +18,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,6 +95,21 @@ public class UserService implements UserFacadePort {
     @Override
     public UserPayoutInformation getPayoutInformationForUserId(UUID userId) {
         return userStoragePort.getPayoutInformationById(userId);
+    }
+
+    @Override
+    public void refreshActiveUserProfiles(ZonedDateTime since) {
+        final var users = userStoragePort.getUsersLastSeenSince(since).stream()
+                .map(User::getGithubUserId)
+                .map(githubSearchPort::getUserProfile)
+                .map(githubUserProfile -> User.builder()
+                        .githubUserId(githubUserProfile.getGithubUserId())
+                        .githubLogin(githubUserProfile.getGithubLogin())
+                        .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
+                        .githubEmail(githubUserProfile.getEmail())
+                        .build())
+                .toList();
+        userStoragePort.saveUsers(users);
     }
 
     @Override
