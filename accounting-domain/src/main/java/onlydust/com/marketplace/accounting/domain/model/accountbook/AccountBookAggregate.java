@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Account;
+import onlydust.com.marketplace.accounting.domain.model.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 
 import java.util.ArrayList;
@@ -25,23 +25,27 @@ public class AccountBookAggregate implements AccountBook {
         return fromEvents(List.of(events));
     }
 
+    public static AccountBookAggregate empty() {
+        return fromEvents();
+    }
+
     @Override
-    public void mint(Account.Id account, PositiveAmount amount) {
+    public void mint(AccountId account, PositiveAmount amount) {
         emit(new MintEvent(account, amount));
     }
 
     @Override
-    public void burn(Account.Id account, PositiveAmount amount) {
+    public void burn(AccountId account, PositiveAmount amount) {
         emit(new BurnEvent(account, amount));
     }
 
     @Override
-    public void transfer(Account.Id from, Account.Id to, PositiveAmount amount) {
+    public void transfer(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new TransferEvent(from, to, amount));
     }
 
     @Override
-    public void refund(Account.Id from, Account.Id to, PositiveAmount amount) {
+    public void refund(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new RefundEvent(from, to, amount));
     }
 
@@ -58,28 +62,28 @@ public class AccountBookAggregate implements AccountBook {
         state.accept(event);
     }
 
-    public record MintEvent(Account.Id account, PositiveAmount amount) implements AccountBookEvent {
+    public record MintEvent(AccountId account, PositiveAmount amount) implements AccountBookEvent {
         @Override
         public void visit(AccountBookState state) {
             state.mint(account, amount);
         }
     }
 
-    public record BurnEvent(Account.Id account, PositiveAmount amount) implements AccountBookEvent {
+    public record BurnEvent(AccountId account, PositiveAmount amount) implements AccountBookEvent {
         @Override
         public void visit(AccountBookState state) {
             state.burn(account, amount);
         }
     }
 
-    public record TransferEvent(Account.Id from, Account.Id to, PositiveAmount amount) implements AccountBookEvent {
+    public record TransferEvent(AccountId from, AccountId to, PositiveAmount amount) implements AccountBookEvent {
         @Override
         public void visit(AccountBookState state) {
             state.transfer(from, to, amount);
         }
     }
 
-    public record RefundEvent(Account.Id from, Account.Id to, PositiveAmount amount) implements AccountBookEvent {
+    public record RefundEvent(AccountId from, AccountId to, PositiveAmount amount) implements AccountBookEvent {
         @Override
         public void visit(AccountBookState state) {
             state.refund(from, to, amount);
