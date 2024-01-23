@@ -25,6 +25,10 @@ public class AccountBookAggregate implements AccountBook {
         return fromEvents(List.of(events));
     }
 
+    public static AccountBookAggregate empty() {
+        return fromEvents();
+    }
+
     @Override
     public void mint(Account.Id account, PositiveAmount amount) {
         emit(new MintEvent(account, amount));

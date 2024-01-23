@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import java.util.Optional;
 
 public interface AccountProvider<ID> {
-    Optional<Account> get(ID ownerId, Currency currency);
+    Optional<Account.Id> get(ID ownerId, Currency currency);
 
-    Account create(ID ownerId, Currency currency);
+    Account.Id create(ID ownerId, Currency currency);
 }
