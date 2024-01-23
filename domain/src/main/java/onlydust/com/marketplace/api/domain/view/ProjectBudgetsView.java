@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
-@Data
+
 @Builder
 public class ProjectBudgetsView {
     List<BudgetView> budgets;
@@ -36,4 +36,9 @@ public class ProjectBudgetsView {
         return remainingDollarsEquivalent;
     }
 
+    public List<BudgetView> getBudgets() {
+        return this.budgets.stream()
+                .filter(budgetView -> budgetView.getRemaining().compareTo(BigDecimal.ZERO) > 0)
+                .collect(Collectors.toList());
+    }
 }
