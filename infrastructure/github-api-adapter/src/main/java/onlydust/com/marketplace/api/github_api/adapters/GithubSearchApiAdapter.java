@@ -7,10 +7,7 @@ import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
-import onlydust.com.marketplace.api.github_api.dto.GetOrgaMembershipsResponseDTO;
-import onlydust.com.marketplace.api.github_api.dto.GetUserEmailsResponseDTO;
-import onlydust.com.marketplace.api.github_api.dto.GithubOrgaSearchResponseDTO;
-import onlydust.com.marketplace.api.github_api.dto.GithubUserSearchResponse;
+import onlydust.com.marketplace.api.github_api.dto.*;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -118,10 +115,13 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
     public Optional<GithubUserIdentity> getUserProfile(Long githubUserId) {
         final var githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        return client.get("/user", GithubUserIdentity.class, githubPersonalToken)
+        return client.get("/user", GithubUser.class, githubPersonalToken)
                 .flatMap(userProfile -> client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
                         .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
-                        .map(primaryEmail -> userProfile.toBuilder()
+                        .map(primaryEmail -> GithubUserIdentity.builder()
+                                .githubUserId(userProfile.getId())
+                                .githubLogin(userProfile.getLogin())
+                                .githubAvatarUrl(userProfile.getAvatarUrl())
                                 .email(primaryEmail.email())
                                 .build())
                 );
