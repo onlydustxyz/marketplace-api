@@ -59,11 +59,11 @@ public interface UserMapper {
 
     static UserProfileCover coverToUserProfileDomain(final @NonNull UserProfileCoverColor cover) {
         return switch (cover) {
-                    case BLUE -> UserProfileCover.BLUE;
-                    case CYAN -> UserProfileCover.CYAN;
-                    case MAGENTA -> UserProfileCover.MAGENTA;
-                    case YELLOW -> UserProfileCover.YELLOW;
-                };
+            case BLUE -> UserProfileCover.BLUE;
+            case CYAN -> UserProfileCover.CYAN;
+            case MAGENTA -> UserProfileCover.MAGENTA;
+            case YELLOW -> UserProfileCover.YELLOW;
+        };
     }
 
 
@@ -202,11 +202,11 @@ public interface UserMapper {
 
     static UserProfileCoverColor coverToUserProfileResponse(final @NonNull UserProfileCover cover) {
         return switch (cover) {
-                    case BLUE -> UserProfileCoverColor.BLUE;
-                    case CYAN -> UserProfileCoverColor.CYAN;
-                    case MAGENTA -> UserProfileCoverColor.MAGENTA;
-                    case YELLOW -> UserProfileCoverColor.YELLOW;
-                };
+            case BLUE -> UserProfileCoverColor.BLUE;
+            case CYAN -> UserProfileCoverColor.CYAN;
+            case MAGENTA -> UserProfileCoverColor.MAGENTA;
+            case YELLOW -> UserProfileCoverColor.YELLOW;
+        };
     }
 
     static GetMeResponse userToGetMeResponse(final User authenticatedUser) {
@@ -239,6 +239,7 @@ public interface UserMapper {
         getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
         getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
+        getMeResponse.setEmail(authenticatedUser.getGithubEmail());
         return getMeResponse;
     }
 

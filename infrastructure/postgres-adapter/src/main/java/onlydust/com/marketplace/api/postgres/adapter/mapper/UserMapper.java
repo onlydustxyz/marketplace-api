@@ -87,7 +87,7 @@ public interface UserMapper {
                 .build();
     }
 
-    static User mapCreatedUserToDomain(final UserEntity userEntity){
+    static User mapCreatedUserToDomain(final UserEntity userEntity) {
         return User.builder()
                 .id(userEntity.getId())
                 .githubUserId(userEntity.getGithubUserId())
