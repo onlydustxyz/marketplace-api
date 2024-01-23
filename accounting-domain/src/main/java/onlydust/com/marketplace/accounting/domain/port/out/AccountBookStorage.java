@@ -5,4 +5,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 
 public interface AccountBookStorage {
     AccountBook get(Currency currency);
+
+    void save(AccountBook accountBook);
 }
