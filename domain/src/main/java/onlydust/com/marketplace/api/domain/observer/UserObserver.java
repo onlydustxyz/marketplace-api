@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.domain.observer;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.notification.UserProfileChanged;
 import onlydust.com.marketplace.api.domain.model.notification.UserSignedUp;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
@@ -20,11 +19,5 @@ public class UserObserver implements UserObserverPort {
         final var event = new UserSignedUp(user.getId(), user.getGithubUserId(), user.getGithubLogin(), new Date());
         indexerOutbox.push(event);
         notificationOutbox.push(event);
-    }
-
-    @Override
-    public void onUserProfileChanged(User user) {
-        final var event = new UserProfileChanged(user.getGithubUserId());
-        indexerOutbox.push(event);
     }
 }
