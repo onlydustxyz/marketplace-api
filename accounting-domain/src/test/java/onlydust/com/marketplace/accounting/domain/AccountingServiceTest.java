@@ -515,13 +515,13 @@ public class AccountingServiceTest {
 
         assertThat(accountBook.state().balanceOf(contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
         assertThat(accountBook.state().transferredAmount(projectAccount1, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
-//        assertThat(contributorAccount1.balanceFrom(sponsorAccount.id())).isEqualTo(PositiveAmount.of(10L));
-//        assertThat(contributorAccount1.balanceFrom(committeeAccount.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
 
         assertThat(accountBook.state().balanceOf(contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
         assertThat(accountBook.state().transferredAmount(projectAccount1, contributorAccount2)).isEqualTo(PositiveAmount.of(20L));
         assertThat(accountBook.state().transferredAmount(projectAccount2, contributorAccount2)).isEqualTo(PositiveAmount.of(25L));
-//        assertThat(contributorAccount2.balanceFrom(sponsorAccount.id())).isEqualTo(PositiveAmount.of(45L));
-//        assertThat(contributorAccount2.balanceFrom(committeeAccount.id())).isEqualTo(PositiveAmount.of(20L));
+        assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
+        assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(40L));
     }
 }
