@@ -22,6 +22,7 @@ public class AccountingService {
         final var account = getOrCreateAccount(sponsorId, currency);
 
         accountBook.mint(account, amount);
+        accountBookStorage.save(accountBook);
     }
 
     public void refundTo(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
@@ -30,6 +31,7 @@ public class AccountingService {
         final var account = getAccount(sponsorId, currency);
 
         accountBook.burn(account, amount);
+        accountBookStorage.save(accountBook);
     }
 
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -39,6 +41,7 @@ public class AccountingService {
         final var toAccount = getOrCreateAccount(to, currency);
 
         accountBook.transfer(fromAccount, toAccount, amount);
+        accountBookStorage.save(accountBook);
     }
 
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -48,6 +51,7 @@ public class AccountingService {
         final var toAccount = getAccount(to, currency);
 
         accountBook.refund(fromAccount, toAccount, amount);
+        accountBookStorage.save(accountBook);
     }
 
     private Currency getCurrency(Currency.Id id) {

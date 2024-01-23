@@ -58,6 +58,8 @@ public class AccountingServiceTest {
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(10L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
     /*
@@ -84,6 +86,8 @@ public class AccountingServiceTest {
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(110L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
 
@@ -105,6 +109,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -131,6 +137,8 @@ public class AccountingServiceTest {
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(90L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
     /*
@@ -153,6 +161,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -173,6 +183,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -198,6 +210,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessageContaining("Cannot refund");
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -230,6 +244,8 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(90L));
         assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(210L));
         assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(10L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
     /*
@@ -262,6 +278,8 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(90L));
         assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(10L));
         assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(10L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
     /*
@@ -283,6 +301,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -316,6 +336,8 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(95L));
         assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(205L));
         assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(5L));
+
+        verify(accountBookStorage, times(2)).save(accountBook);
     }
 
     /*
@@ -337,6 +359,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -360,6 +384,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -387,6 +413,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for owner %s in currency %s".formatted(committeeId, currency));
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -416,6 +444,8 @@ public class AccountingServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessageContaining("Cannot refund");
+
+        verify(accountBookStorage, never()).save(any());
     }
 
     /*
@@ -449,6 +479,8 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(90L));
         assertThat(accountBook.state().balanceOf(projectAccount)).isEqualTo(PositiveAmount.of(10L));
         assertThat(accountBook.state().transferredAmount(committeeAccount, projectAccount)).isEqualTo(PositiveAmount.of(10L));
+
+        verify(accountBookStorage).save(accountBook);
     }
 
     /*
@@ -523,5 +555,7 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().transferredAmount(projectAccount2, contributorAccount2)).isEqualTo(PositiveAmount.of(25L));
         assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
         assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(40L));
+
+        verify(accountBookStorage, times(9)).save(accountBook);
     }
 }
