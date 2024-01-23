@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.ContributorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkViewPage;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
 import static java.util.Objects.isNull;
@@ -21,7 +21,7 @@ public interface ProjectContributorsMapper {
         return sortBy;
     }
 
-    static ContributorsPageResponse mapProjectContributorsLinkViewPageToResponse(final Page<ProjectContributorsLinkView> page,
+    static ContributorsPageResponse mapProjectContributorsLinkViewPageToResponse(final ProjectContributorsLinkViewPage page,
                                                                                  final int pageIndex) {
         final ContributorsPageResponse contributorPageResponse = new ContributorsPageResponse();
         contributorPageResponse.setTotalPageNumber(page.getTotalPageNumber());
@@ -30,6 +30,7 @@ public interface ProjectContributorsMapper {
                 .map(ProjectContributorsMapper::mapProjectContributorsLinkViewToResponse).toList());
         contributorPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
         contributorPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+        contributorPageResponse.setHasHiddenContributors(page.hasHiddenContributors());
         return contributorPageResponse;
     }
 

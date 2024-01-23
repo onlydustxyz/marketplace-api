@@ -1230,6 +1230,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.hasHiddenContributors").isEqualTo(true)
                 .jsonPath("$.contributors[?(@.githubUserId == 129528947)]").doesNotExist()
         ;
 
@@ -1241,6 +1242,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.hasHiddenContributors").isEqualTo(true)
                 .jsonPath("$.contributors[?(@.githubUserId == 129528947 && @.hidden == true)]").exists()
                 .jsonPath("$.contributors[?(@.githubUserId == 129528947 && @.hidden == false)]").doesNotExist()
                 .jsonPath("$.contributors[?(@.githubUserId != 129528947 && @.hidden == true)]").doesNotExist()
@@ -1264,6 +1266,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.hasHiddenContributors").isEqualTo(false)
                 .jsonPath("$.contributors[?(@.githubUserId == 129528947)].hidden").isEqualTo(false)
         ;
     }
