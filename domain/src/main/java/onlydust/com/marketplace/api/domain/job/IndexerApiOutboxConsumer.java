@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.model.notification.ProjectLinkedReposChanged;
-import onlydust.com.marketplace.api.domain.model.notification.UserProfileChanged;
 import onlydust.com.marketplace.api.domain.model.notification.UserSignedUp;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import org.springframework.retry.annotation.Backoff;
@@ -28,8 +27,6 @@ public class IndexerApiOutboxConsumer implements OutboxConsumer {
                     projectLinkedReposChanged.getUnlinkedRepoIds());
         } else if (event instanceof UserSignedUp userSignedUp) {
             indexerPort.indexUser(userSignedUp.getGithubUserId());
-        } else if (event instanceof UserProfileChanged userProfileChanged) {
-            indexerPort.onUserChanged(userProfileChanged.getGithubUserId());
         }
     }
 }
