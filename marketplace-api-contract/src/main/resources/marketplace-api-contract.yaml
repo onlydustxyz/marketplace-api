@@ -3866,6 +3866,10 @@ components:
             createdAt:
               type: string
               format: date-time
+            email:
+              type: string
+              format: email
+              description: User email
 
     ProjectLedShortResponse:
       type: object

@@ -119,11 +119,10 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // ===============================================
         // When we call it again (already signed-up) with a new email
         indexerApiWireMockServer.resetRequests();
-        email = faker.internet().emailAddress();
         Thread.sleep(600); // make sure user claims won't be in cache anymore
         token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId);
 
-        userAuthHelper.mockAuth0UserInfo(githubUserId, login, login, avatarUrl, email);
+        userAuthHelper.mockAuth0UserInfo(githubUserId, login, login, avatarUrl, faker.internet().emailAddress());
 
         me = client.get()
                 .uri(getApiURI(ME_GET))
@@ -154,6 +153,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(me.getLogin()).isEqualTo(login);
         assertThat(me.getGithubUserId()).isEqualTo(githubUserId);
         assertThat(me.getAvatarUrl()).isEqualTo(avatarUrl);
+        assertThat(me.getEmail()).isEqualTo(email);
         assertThat(me.getHasSeenOnboardingWizard()).isEqualTo(false);
         assertThat(me.getHasAcceptedLatestTermsAndConditions()).isEqualTo(false);
         assertThat(me.getHasValidPayoutInfos()).isEqualTo(true);
