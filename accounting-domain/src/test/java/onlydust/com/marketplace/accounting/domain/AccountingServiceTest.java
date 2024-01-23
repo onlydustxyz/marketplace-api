@@ -45,7 +45,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = Account.Id.random();
+        final var account = AccountId.random();
         final var accountBook = AccountBookAggregate.empty();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -72,7 +72,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = Account.Id.random();
+        final var account = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account, PositiveAmount.of(100L))
         );
@@ -123,7 +123,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = Account.Id.random();
+        final var account = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account, PositiveAmount.of(100L))
         );
@@ -197,7 +197,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = Account.Id.random();
+        final var account = AccountId.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
@@ -224,9 +224,9 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sponsorAccount, PositiveAmount.of(100L)),
                 new MintEvent(committeeAccount, PositiveAmount.of(200L))
@@ -258,9 +258,9 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sponsorAccount, PositiveAmount.of(100L))
         );
@@ -315,9 +315,9 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sponsorAccount, PositiveAmount.of(100L)),
                 new MintEvent(committeeAccount, PositiveAmount.of(200L))
@@ -399,7 +399,7 @@ public class AccountingServiceTest {
         final var sponsorId = SponsorId.random();
         final var committeeId = CommitteeId.random();
         final var currency = Currencies.USD;
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
@@ -427,9 +427,9 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
@@ -458,9 +458,9 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
         final var projectId = ProjectId.random();
-        final var projectAccount = Account.Id.random();
+        final var projectAccount = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(committeeAccount, PositiveAmount.of(100L))
         );
@@ -499,17 +499,17 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = Account.Id.random();
+        final var sponsorAccount = AccountId.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = Account.Id.random();
+        final var committeeAccount = AccountId.random();
         final var projectId1 = ProjectId.random();
-        final var projectAccount1 = Account.Id.random();
+        final var projectAccount1 = AccountId.random();
         final var projectId2 = ProjectId.random();
-        final var projectAccount2 = Account.Id.random();
+        final var projectAccount2 = AccountId.random();
         final var contributorId1 = ContributorId.random();
-        final var contributorAccount1 = Account.Id.random();
+        final var contributorAccount1 = AccountId.random();
         final var contributorId2 = ContributorId.random();
-        final var contributorAccount2 = Account.Id.random();
+        final var contributorAccount2 = AccountId.random();
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sponsorAccount, PositiveAmount.of(100L))
         );

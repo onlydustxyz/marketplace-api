@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Account;
+import onlydust.com.marketplace.accounting.domain.model.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -59,12 +59,12 @@ public class AccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
     }
 
-    private <OwnerId> Account.Id getOrCreateAccount(OwnerId ownerId, Currency currency) {
+    private <OwnerId> AccountId getOrCreateAccount(OwnerId ownerId, Currency currency) {
         return accountProvider.get(ownerId, currency)
                 .orElseGet(() -> accountProvider.create(ownerId, currency));
     }
 
-    private <OwnerId> Account.Id getAccount(OwnerId ownerId, Currency currency) {
+    private <OwnerId> AccountId getAccount(OwnerId ownerId, Currency currency) {
         return accountProvider.get(ownerId, currency)
                 .orElseThrow(() -> OnlyDustException.notFound("No account found for owner %s in currency %s".formatted(ownerId, currency)));
     }

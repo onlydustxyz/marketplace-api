@@ -17,7 +17,7 @@ public class AccountProviderProxy implements AccountProvider<Object> {
 
 
     @Override
-    public Optional<Account.Id> get(Object ownerId, Currency currency) {
+    public Optional<AccountId> get(Object ownerId, Currency currency) {
         if (ownerId instanceof SponsorId sponsorId) {
             return sponsorAccountProvider.get(sponsorId, currency);
         } else if (ownerId instanceof CommitteeId committeeId) {
@@ -32,7 +32,7 @@ public class AccountProviderProxy implements AccountProvider<Object> {
     }
 
     @Override
-    public Account.Id create(Object ownerId, Currency currency) {
+    public AccountId create(Object ownerId, Currency currency) {
         if (ownerId instanceof SponsorId sponsorId) {
             return sponsorAccountProvider.create(sponsorId, currency);
         } else if (ownerId instanceof CommitteeId committeeId) {
