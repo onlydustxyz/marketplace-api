@@ -25,20 +25,20 @@ public class AccountingService {
         account.burn(PositiveMoney.of(PositiveMoney.of(amount, currency)));
     }
 
-    public void send(SponsorId sponsorId, CommitteeId committeeId, PositiveAmount amount, Currency.Id currencyId) {
+    public <From, To> void send(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var sponsorAccount = getAccount(sponsorId, currency);
-        final var committeeAccount = getOrCreateAccount(committeeId, currency);
+        final var fromAccount = getAccount(from, currency);
+        final var toAccount = getOrCreateAccount(to, currency);
 
-        sponsorAccount.send(committeeAccount, PositiveMoney.of(amount, currency));
+        fromAccount.send(toAccount, PositiveMoney.of(amount, currency));
     }
 
-    public void refund(SponsorId from, CommitteeId to, PositiveAmount amount, Currency.Id currencyId) {
+    public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var sponsorAccount = getAccount(from, currency);
-        final var committeeAccount = getAccount(to, currency);
+        final var fromAccount = getAccount(from, currency);
+        final var toAccount = getAccount(to, currency);
 
-        committeeAccount.refund(sponsorAccount, PositiveMoney.of(amount, currency));
+        toAccount.refund(fromAccount, PositiveMoney.of(amount, currency));
     }
 
     private Currency getCurrency(Currency.Id id) {
@@ -46,13 +46,13 @@ public class AccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
     }
 
-    private <T> Account getOrCreateAccount(T ownerId, Currency currency) {
+    private <OwnerId> Account getOrCreateAccount(OwnerId ownerId, Currency currency) {
         return accountProvider.get(ownerId, currency)
                 .orElseGet(() -> accountProvider.create(ownerId, currency));
     }
 
-    private <T> Account getAccount(T sponsorId, Currency currency) {
-        return accountProvider.get(sponsorId, currency)
-                .orElseThrow(() -> OnlyDustException.notFound("No account found for owner %s in currency %s".formatted(sponsorId, currency)));
+    private <OwnerId> Account getAccount(OwnerId ownerId, Currency currency) {
+        return accountProvider.get(ownerId, currency)
+                .orElseThrow(() -> OnlyDustException.notFound("No account found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 }
