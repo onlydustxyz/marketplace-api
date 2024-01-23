@@ -136,7 +136,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
-        final Page<ProjectContributorsLinkView> projectContributorsLinkViewPage =
+        final var projectContributorsLinkViewPage =
                 authenticationService.tryGetAuthenticatedUser()
                         .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, login, user.getId(), showHidden,
                                 sortBy, SortDirectionMapper.requestToDomain(direction),

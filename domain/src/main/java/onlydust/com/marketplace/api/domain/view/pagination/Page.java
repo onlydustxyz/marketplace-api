@@ -1,17 +1,20 @@
 package onlydust.com.marketplace.api.domain.view.pagination;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-@Value
-@Builder
+@Getter
+@SuperBuilder
 public class Page<T> {
-
-    List<T> content;
-    int totalPageNumber;
-    int totalItemNumber;
+    private final List<T> content;
+    private final int totalPageNumber;
+    private final int totalItemNumber;
     @Builder.Default
-    Map<String, Set<Object>> filters = new HashMap<>();
+    private final Map<String, Set<Object>> filters = new HashMap<>();
 }

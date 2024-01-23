@@ -2760,6 +2760,7 @@ components:
         - totalItemNumber
         - nextPageIndex
         - hasMore
+        - hasHiddenContributors
       properties:
         totalPageNumber:
           type: integer
@@ -2770,6 +2771,9 @@ components:
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
           type: integer
+        hasHiddenContributors:
+          description: Whether there are hidden contributors in the project for the current user
+          type: boolean
         contributors:
           type: array
           items:

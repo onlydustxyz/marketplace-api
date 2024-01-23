@@ -35,15 +35,15 @@ public interface ProjectStoragePort {
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                        List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
 
-    Page<ProjectContributorsLinkView> findContributors(UUID projectId, String login,
-                                                       ProjectContributorsLinkView.SortBy sortBy,
-                                                       SortDirection sortDirection,
-                                                       int pageIndex, int pageSize);
+    ProjectContributorsLinkViewPage findContributors(UUID projectId, String login,
+                                                     ProjectContributorsLinkView.SortBy sortBy,
+                                                     SortDirection sortDirection,
+                                                     int pageIndex, int pageSize);
 
-    Page<ProjectContributorsLinkView> findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
-                                                                     ProjectContributorsLinkView.SortBy sortBy,
-                                                                     SortDirection sortDirection,
-                                                                     int pageIndex, int pageSize);
+    ProjectContributorsLinkViewPage findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
+                                                                   ProjectContributorsLinkView.SortBy sortBy,
+                                                                   SortDirection sortDirection,
+                                                                   int pageIndex, int pageSize);
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
