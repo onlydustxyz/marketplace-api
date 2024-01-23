@@ -17,15 +17,11 @@ public class RewardView {
     Currency currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
-    Status status;
+    UserRewardStatus status;
     GithubUserIdentity from;
     GithubUserIdentity to;
     Date createdAt;
     Date processedAt;
     ReceiptView receipt;
     Project project;
-
-    public enum Status {
-        pendingInvoice, processing, complete, pendingSignup, missingPayoutInfo
-    }
 }

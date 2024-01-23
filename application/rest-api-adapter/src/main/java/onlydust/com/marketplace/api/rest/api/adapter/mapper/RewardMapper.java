@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.api.domain.view.ContributionRewardView;
-import onlydust.com.marketplace.api.domain.view.ReceiptView;
-import onlydust.com.marketplace.api.domain.view.RewardItemView;
-import onlydust.com.marketplace.api.domain.view.RewardView;
+import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 
@@ -56,17 +54,22 @@ public interface RewardMapper {
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
                 .currency(mapCurrency(rewardView.getCurrency()))
-                .status(switch (rewardView.getStatus()) {
-                    case complete -> RewardStatus.COMPLETE;
-                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
-                    default -> RewardStatus.PROCESSING;
-                    case pendingSignup -> RewardStatus.PENDING_SIGNUP;
-                })
+                .status(mapRewardStatus(rewardView.getStatus()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 .receipt(receiptToResponse(rewardView.getReceipt()))
                 .project(ProjectMapper.mapShortProjectResponse(rewardView.getProject()));
+    }
+
+    @NonNull
+    private static RewardStatus mapRewardStatus(UserRewardStatus rewardView) {
+        return switch (rewardView) {
+            case complete -> RewardStatus.COMPLETE;
+            case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
+            case pendingInvoice -> RewardStatus.PENDING_INVOICE;
+            case processing -> RewardStatus.PROCESSING;
+            case locked -> RewardStatus.LOCKED;
+        };
     }
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
@@ -86,12 +89,7 @@ public interface RewardMapper {
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
                 .currency(mapCurrency(rewardView.getCurrency()))
-                .status(switch (rewardView.getStatus()) {
-                    case complete -> RewardStatus.COMPLETE;
-                    case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
-                    case pendingInvoice -> RewardStatus.PENDING_INVOICE;
-                    case processing -> RewardStatus.PROCESSING;
-                })
+                .status(mapRewardStatus(rewardView.getStatus()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 ;

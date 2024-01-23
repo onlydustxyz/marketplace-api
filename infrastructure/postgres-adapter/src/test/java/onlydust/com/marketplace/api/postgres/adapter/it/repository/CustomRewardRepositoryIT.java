@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
 import onlydust.com.marketplace.api.domain.model.UserRole;
-import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
-import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -21,6 +19,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -99,7 +98,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                             .zipCode()).country(faker.address().country()).build())
                             .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
-                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.strk));
+                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
 
             // When
             final RewardViewEntity userReward = customRewardRepository.findUserRewardViewEntityByd(rewardId);
@@ -125,7 +124,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                     .postalCode(faker.address()
                                             .zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .starknetAddress(StarkNet.accountAddress("0x01"))
+                                    .ethWallet(Ethereum.wallet("0x01"))
                                     .build())
                             .build());
 
@@ -212,7 +211,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                             .zipCode()).country(faker.address().country()).build())
                             .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
-                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.op));
+                    new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
 
             // When
             final RewardViewEntity userReward = customRewardRepository.findUserRewardViewEntityByd(rewardId);
@@ -244,7 +243,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                                     .postalCode(faker.address()
                                             .zipCode()).country(faker.address().country()).build())
                             .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .optimismAddress(Optimism.accountAddress("0x01"))
+                                    .ethWallet(Ethereum.wallet("0x01"))
                                     .build())
                             .build());
 

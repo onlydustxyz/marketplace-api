@@ -49,8 +49,10 @@ public interface ProjectRewardMapper {
             case complete -> RewardStatus.COMPLETE;
             case pendingSignup -> RewardStatus.PENDING_SIGNUP;
             case processing -> RewardStatus.PROCESSING;
+            case locked -> RewardStatus.LOCKED;
         });
         rewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
+        rewardPageItemResponse.setUnlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()));
         return rewardPageItemResponse;
     }
 

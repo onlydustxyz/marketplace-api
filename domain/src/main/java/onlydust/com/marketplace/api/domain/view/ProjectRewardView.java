@@ -20,6 +20,9 @@ public class ProjectRewardView {
     RewardStatusView status;
     RewardAmountView amount;
 
+    public Date getUnlockDate() {
+        return null;
+    }
 
     @Data
     @Builder
@@ -30,7 +33,7 @@ public class ProjectRewardView {
     }
 
     public enum RewardStatusView {
-        pendingSignup, processing, complete
+        pendingSignup, processing, complete, locked
     }
 
     public enum SortBy {

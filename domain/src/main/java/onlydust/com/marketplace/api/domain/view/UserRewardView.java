@@ -18,9 +18,12 @@ public class UserRewardView {
     Date requestedAt;
     String rewardedOnProjectName;
     String rewardedOnProjectLogoUrl;
-    RewardStatusView status;
+    UserRewardStatus status;
     RewardAmountView amount;
 
+    public Date getUnlockDate() {
+        return null;
+    }
 
     @Data
     @Builder
@@ -28,10 +31,6 @@ public class UserRewardView {
         BigDecimal total;
         Currency currency;
         BigDecimal dollarsEquivalent;
-    }
-
-    public enum RewardStatusView {
-        pendingInvoice, processing, complete, missingPayoutInfo
     }
 
     public enum SortBy {
