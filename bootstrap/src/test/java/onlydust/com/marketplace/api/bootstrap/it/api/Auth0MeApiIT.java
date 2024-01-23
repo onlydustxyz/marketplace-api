@@ -135,7 +135,6 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertMe(me);
-        assertUserEntity(me.getId());
         waitAtLeastOneCycleOfOutboxEventProcessing();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
     }

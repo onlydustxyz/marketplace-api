@@ -70,7 +70,7 @@ public class UserServiceTest {
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, times(1)).updateUserIdentity(
+        verify(userStoragePort, never()).updateUserIdentity(
                 user.getId(),
                 githubUserIdentity.getGithubLogin(),
                 githubUserIdentity.getGithubAvatarUrl(),

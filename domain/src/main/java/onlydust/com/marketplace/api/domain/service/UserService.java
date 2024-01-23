@@ -44,13 +44,6 @@ public class UserService implements UserFacadePort {
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    if (!readOnly) {
-                        userStoragePort.updateUserIdentity(user.getId(),
-                                githubUserIdentity.getGithubLogin(),
-                                githubUserIdentity.getGithubAvatarUrl(),
-                                githubUserIdentity.getEmail(),
-                                dateProvider.now());
-                    }
                     return user;
                 })
                 .orElseGet(() -> {
