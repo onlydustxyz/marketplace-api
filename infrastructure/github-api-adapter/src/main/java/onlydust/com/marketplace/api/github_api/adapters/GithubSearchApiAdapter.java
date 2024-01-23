@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.GithubMembership;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
+@Slf4j
 public class GithubSearchApiAdapter implements GithubSearchPort {
     private final GithubHttpClient client;
     private final GithubPaginationProperties githubPaginationProperties;
@@ -113,17 +115,22 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
 
     @Override
     public Optional<GithubUserIdentity> getUserProfile(Long githubUserId) {
-        final var githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+        try {
+            final var githubPersonalToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        return client.get("/user", GithubUser.class, githubPersonalToken)
-                .flatMap(userProfile -> client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
-                        .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
-                        .map(primaryEmail -> GithubUserIdentity.builder()
-                                .githubUserId(userProfile.getId())
-                                .githubLogin(userProfile.getLogin())
-                                .githubAvatarUrl(userProfile.getAvatarUrl())
-                                .email(primaryEmail.email())
-                                .build())
-                );
+            return client.get("/user", GithubUser.class, githubPersonalToken)
+                    .flatMap(userProfile -> client.get("/user/emails", GetUserEmailsResponseDTO[].class, githubPersonalToken)
+                            .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
+                            .map(primaryEmail -> GithubUserIdentity.builder()
+                                    .githubUserId(userProfile.getId())
+                                    .githubLogin(userProfile.getLogin())
+                                    .githubAvatarUrl(userProfile.getAvatarUrl())
+                                    .email(primaryEmail.email())
+                                    .build())
+                    );
+        } catch (Exception e) {
+            LOGGER.warn("Could not retrieve user profile for github user id {}", githubUserId, e);
+            return Optional.empty();
+        }
     }
 }
