@@ -29,7 +29,8 @@ public class CustomProjectRewardRepository {
                    case
                        when u.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
-                       when pr.currency in ('op', 'strk') THEN 'LOCKED'
+                       when pr.currency = 'strk' THEN 'LOCKED'
+                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                        else 'PROCESSING'
                        end                                          status
             from payment_requests pr

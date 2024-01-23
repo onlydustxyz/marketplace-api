@@ -89,7 +89,8 @@ public class CustomRewardRepository {
                    case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
                    case
                        when r.id is not null then 'COMPLETE'
-                       when pr.currency in ('op','strk') THEN 'LOCKED'
+                       when pr.currency = 'strk' THEN 'LOCKED'
+                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                        when not payout_checks.valid_location or
                             (not payout_checks.valid_company and not payout_checks.valid_person) or
                             (case

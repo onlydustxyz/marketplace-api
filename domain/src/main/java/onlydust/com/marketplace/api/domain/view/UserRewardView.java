@@ -22,7 +22,7 @@ public class UserRewardView {
     RewardAmountView amount;
 
     public Date getUnlockDate() {
-        return null;
+        return amount.currency.unlockDate();
     }
 
     @Data

@@ -21,7 +21,7 @@ public class ProjectRewardView {
     RewardAmountView amount;
 
     public Date getUnlockDate() {
-        return null;
+        return amount.currency.unlockDate();
     }
 
     @Data
