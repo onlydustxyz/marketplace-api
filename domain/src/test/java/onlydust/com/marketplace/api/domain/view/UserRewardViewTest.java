@@ -18,12 +18,22 @@ class UserRewardViewTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Currency.class, names = {"Strk", "Op"})
+    @EnumSource(value = Currency.class, names = {"Strk"})
     void should_return_no_unlock_date_for_indefinitely_locked_tokens(Currency currency) {
         // Given
         final var view = UserRewardView.builder().amount(UserRewardView.RewardAmountView.builder().currency(currency).build()).build();
 
         // Then
         assertThat(view.getUnlockDate()).isNull();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = Currency.class, names = {"Op"})
+    void should_return_unlock_date_for_locked_tokens(Currency currency) {
+        // Given
+        final var view = UserRewardView.builder().amount(UserRewardView.RewardAmountView.builder().currency(currency).build()).build();
+
+        // Then
+        assertThat(view.getUnlockDate()).isEqualTo("2024-08-23T00:00:00.000");
     }
 }

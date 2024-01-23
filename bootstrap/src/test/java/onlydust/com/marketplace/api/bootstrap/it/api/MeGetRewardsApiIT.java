@@ -131,7 +131,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:39:54.45638Z",
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
                   "status": "LOCKED",
-                  "unlockDate": null,
+                  "unlockDate": "2024-08-23T00:00:00Z",
                   "amount": {
                     "total": 30,
                     "currency": "OP",
