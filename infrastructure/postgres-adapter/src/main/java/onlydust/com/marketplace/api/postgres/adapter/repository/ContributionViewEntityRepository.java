@@ -16,6 +16,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 c.id,
                 c.created_at,
                 c.completed_at,
+                coalesce(c.completed_at, c.created_at) as last_updated_at,
                 c.type,
                 c.status,
                 c.contributor_id,
@@ -151,8 +152,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND
                 (COALESCE(:types) IS NULL OR CAST(c.type AS TEXT) IN (:types)) AND
                 (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
-                (:fromDate IS NULL OR c.created_at >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
-                (:toDate IS NULL OR c.created_at < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
+                (:fromDate IS NULL OR coalesce(c.completed_at, c.created_at) >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
+                (:toDate IS NULL OR coalesce(c.completed_at, c.created_at) < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
     Page<ContributionViewEntity> findContributions(Long contributorId,
                                                    List<Long> contributorIds,

@@ -30,7 +30,7 @@ public interface ContributionMapper {
 
 
     static ContributionPageResponse mapContributionPageResponse(Integer pageIndex,
-                                                                        Page<ContributionView> contributions) {
+                                                                Page<ContributionView> contributions) {
 
         return new ContributionPageResponse()
                 .contributions(contributions.getContent().stream().map(ContributionMapper::mapContributionPageItemResponse).toList())
@@ -45,6 +45,7 @@ public interface ContributionMapper {
                 .id(contributionView.getId())
                 .contributor(ContributorMapper.of(contributionView.getContributor()))
                 .createdAt(DateMapper.toZoneDateTime(contributionView.getCreatedAt()))
+                .lastUpdatedAt(DateMapper.toZoneDateTime(contributionView.getLastUpdatedAt()))
                 .completedAt(DateMapper.toZoneDateTime(contributionView.getCompletedAt()))
                 .type(mapContributionTypeToResponse(contributionView.getType()))
                 .status(ContributionMapper.mapContributionStatusToResponse(contributionView.getStatus()))
@@ -101,7 +102,7 @@ public interface ContributionMapper {
 
     static ContributionView.Sort mapSort(ContributionSort sort) {
         return switch (sort) {
-            case CREATED_AT -> ContributionView.Sort.CREATED_AT;
+            case LAST_UPDATED_AT -> ContributionView.Sort.LAST_UPDATED_AT;
             case PROJECT_REPO_NAME -> ContributionView.Sort.PROJECT_REPO_NAME;
             case GITHUB_NUMBER_TITLE -> ContributionView.Sort.GITHUB_NUMBER_TITLE;
             case LINKS_COUNT -> ContributionView.Sort.LINKS_COUNT;
@@ -110,7 +111,7 @@ public interface ContributionMapper {
 
     static ContributionView.Sort mapSort(ProjectContributionSort sort) {
         return switch (sort) {
-            case CREATED_AT -> ContributionView.Sort.CREATED_AT;
+            case LAST_UPDATED_AT -> ContributionView.Sort.LAST_UPDATED_AT;
             case GITHUB_NUMBER_TITLE -> ContributionView.Sort.GITHUB_NUMBER_TITLE;
             case LINKS_COUNT -> ContributionView.Sort.LINKS_COUNT;
             case REPO_NAME -> ContributionView.Sort.PROJECT_REPO_NAME;
