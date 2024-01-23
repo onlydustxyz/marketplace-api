@@ -67,6 +67,7 @@ public class CustomUserRewardRepository {
                        
                        case
                            when r.id is not null then 'COMPLETE'
+                           when pr.currency in ('op','strk') THEN 'LOCKED'
                            when not payout_checks.valid_location or
                                 (not payout_checks.valid_company and not payout_checks.valid_person) or
                                 (case
@@ -138,6 +139,7 @@ public class CustomUserRewardRepository {
             where pr.recipient_id = :recipientId
                     and (case
                            when r.id is not null then 'COMPLETE'
+                           when pr.currency in ('op','strk') THEN 'LOCKED'
                            when not payout_checks.valid_location or
                                 (not payout_checks.valid_company and not payout_checks.valid_person) or
                                 (case

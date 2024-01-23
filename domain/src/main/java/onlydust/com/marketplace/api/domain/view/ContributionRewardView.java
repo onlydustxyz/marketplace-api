@@ -16,7 +16,7 @@ public class ContributionRewardView {
     Currency currency;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
-    UserRewardView.RewardStatusView status;
+    UserRewardStatus status;
     GithubUserIdentity from;
     GithubUserIdentity to;
     Date createdAt;

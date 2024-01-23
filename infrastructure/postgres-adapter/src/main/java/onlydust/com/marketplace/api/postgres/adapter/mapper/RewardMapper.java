@@ -30,11 +30,7 @@ public interface RewardMapper {
                 .processedAt(rewardViewEntityByd.getProcessedAt())
                 .currency(rewardViewEntityByd.getCurrency().toDomain())
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
-                .status(switch (rewardViewEntityByd.getStatus()) {
-                    case "PENDING_SIGNUP" -> RewardView.Status.pendingSignup;
-                    case "COMPLETE" -> RewardView.Status.complete;
-                    default -> RewardView.Status.processing;
-                })
+                .status(mapStatusForUser(rewardViewEntityByd.getStatus()))
                 .from(GithubUserIdentity.builder()
                         .githubUserId(rewardViewEntityByd.getRequestorId())
                         .githubLogin(rewardViewEntityByd.getRequestorLogin())
@@ -67,12 +63,7 @@ public interface RewardMapper {
                 .processedAt(rewardViewEntityByd.getProcessedAt())
                 .currency(rewardViewEntityByd.getCurrency().toDomain())
                 .dollarsEquivalent(rewardViewEntityByd.getDollarsEquivalent())
-                .status(switch (rewardViewEntityByd.getStatus()) {
-                    case "COMPLETE" -> RewardView.Status.complete;
-                    case "PENDING_INVOICE" -> RewardView.Status.pendingInvoice;
-                    case "MISSING_PAYOUT_INFO" -> RewardView.Status.missingPayoutInfo;
-                    default -> RewardView.Status.processing;
-                })
+                .status(mapStatusForUser(rewardViewEntityByd.getStatus()))
                 .from(GithubUserIdentity.builder()
                         .githubUserId(rewardViewEntityByd.getRequestorId())
                         .githubLogin(rewardViewEntityByd.getRequestorLogin())
@@ -182,12 +173,13 @@ public interface RewardMapper {
         };
     }
 
-    static UserRewardView.RewardStatusView mapStatusForUser(String status) {
+    static UserRewardStatus mapStatusForUser(String status) {
         return switch (status) {
-            case "PENDING_INVOICE" -> UserRewardView.RewardStatusView.pendingInvoice;
-            case "COMPLETE" -> UserRewardView.RewardStatusView.complete;
-            case "MISSING_PAYOUT_INFO" -> UserRewardView.RewardStatusView.missingPayoutInfo;
-            default -> UserRewardView.RewardStatusView.processing;
+            case "PENDING_INVOICE" -> UserRewardStatus.pendingInvoice;
+            case "COMPLETE" -> UserRewardStatus.complete;
+            case "MISSING_PAYOUT_INFO" -> UserRewardStatus.missingPayoutInfo;
+            case "LOCKED" -> UserRewardStatus.locked;
+            default -> UserRewardStatus.processing;
         };
     }
 
@@ -195,6 +187,7 @@ public interface RewardMapper {
         return switch (status) {
             case "PENDING_SIGNUP" -> ProjectRewardView.RewardStatusView.pendingSignup;
             case "COMPLETE" -> ProjectRewardView.RewardStatusView.complete;
+            case "LOCKED" -> ProjectRewardView.RewardStatusView.locked;
             default -> ProjectRewardView.RewardStatusView.processing;
         };
     }

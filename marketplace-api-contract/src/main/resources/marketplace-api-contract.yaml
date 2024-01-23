@@ -3298,6 +3298,10 @@ components:
           example: 2023-07-21T12:45:04.750174
         status:
           $ref: '#/components/schemas/RewardStatus'
+        unlockDate:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
         amount:
           $ref: '#/components/schemas/RewardAmountResponse'
         numberOfRewardedContributions:
@@ -3332,6 +3336,10 @@ components:
           format: uuid
         status:
           $ref: '#/components/schemas/RewardStatus'
+        unlockDate:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
         amount:
           $ref: '#/components/schemas/RewardAmountResponse'
         numberOfRewardedContributions:
@@ -3358,6 +3366,7 @@ components:
         - MISSING_PAYOUT_INFO
         - PROCESSING
         - COMPLETE
+        - LOCKED
     RewardAmountResponse:
       type: object
       required:
