@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 public class JobScheduler {
     private final OutboxConsumerJob notificationOutboxJob;
     private final OutboxConsumerJob indexerOutboxJob;
+    private final OutboxConsumerJob trackingOutboxJob;
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
@@ -35,6 +36,12 @@ public class JobScheduler {
     public void processPendingIndexerApiCalls() {
         LOGGER.info("Performing pending indexer API calls");
         indexerOutboxJob.run();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.tracking-job-delay}")
+    public void processPendingTrackingEvents() {
+        LOGGER.info("Sending pending tracking events");
+        trackingOutboxJob.run();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.update-projects-ranking}")
@@ -63,5 +70,6 @@ public class JobScheduler {
         Long refreshCurrencyQuotes;
         Long refreshActiveUserProfiles;
         Long activeUserProfilesRefreshPeriodInDays;
+        Long trackingJobDelay;
     }
 }

@@ -67,3 +67,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000032_add_currency_id_in_erc20.sql
   - include:
       file: db/changelog/changelogs/00000033_create_hidden_contributors_table.sql
+  - include:
+      file: db/changelog/changelogs/00000034_create_tracking_outbox_table.sql

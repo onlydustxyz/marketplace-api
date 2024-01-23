@@ -50,7 +50,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "webhook", property = "infrastructure.webhook.url"),
         @ConfigureWireMock(name = "linear", property = "infrastructure.linear.base-uri"),
-        @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url")
+        @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
+        @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -135,6 +136,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer linearWireMockServer;
     @InjectWireMock("auth0")
     protected WireMockServer auth0WireMockServer;
+    @InjectWireMock(("posthog"))
+    protected WireMockServer posthogWireMockServer;
 
     @LocalServerPort
     int port;

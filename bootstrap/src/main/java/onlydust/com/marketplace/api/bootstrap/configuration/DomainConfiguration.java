@@ -137,8 +137,19 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public OutboxConsumer webhookNotificationOutboxConsumer(final WebhookPort webhookPort) {
-        return new WebhookNotificationOutboxConsumer(webhookPort);
+    public OutboxConsumerJob trackingOutboxJob(final OutboxPort trackingOutbox,
+                                               final OutboxConsumer webhookTrackingOutboxConsumer) {
+        return new OutboxConsumerJob(trackingOutbox, webhookTrackingOutboxConsumer);
+    }
+
+    @Bean
+    public OutboxConsumer webhookNotificationOutboxConsumer(final WebhookPort webhookNotificationPort) {
+        return new WebhookNotificationOutboxConsumer(webhookNotificationPort);
+    }
+
+    @Bean
+    public OutboxConsumer webhookTrackingOutboxConsumer(final WebhookPort webhookTrackingPort) {
+        return new WebhookNotificationOutboxConsumer(webhookTrackingPort);
     }
 
     @Bean
@@ -166,8 +177,8 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort notificationOutbox) {
-        return new UserObserver(indexerOutbox, notificationOutbox);
+    public UserObserverPort userObserverPort(final OutboxPort indexerOutbox, final OutboxPort notificationOutbox, final OutboxPort trackingOutbox) {
+        return new UserObserver(indexerOutbox, notificationOutbox, trackingOutbox);
     }
 
     @Bean

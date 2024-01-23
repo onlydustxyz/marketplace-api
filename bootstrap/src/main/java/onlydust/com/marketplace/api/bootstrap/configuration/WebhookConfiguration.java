@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.port.output.WebhookPort;
 import onlydust.com.marketplace.api.webhook.Config;
-import onlydust.com.marketplace.api.webhook.WebhookHttpClient;
-import onlydust.com.marketplace.api.webhook.adapters.WebhookAdapter;
+import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
+import onlydust.com.marketplace.api.webhook.adapters.MakeWebhookAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +21,15 @@ public class WebhookConfiguration {
     }
 
     @Bean
-    public WebhookHttpClient webhookHttpClient(final ObjectMapper objectMapper,
-                                               final HttpClient httpClient,
-                                               final Config webhookHttpClientProperties) {
-        return new WebhookHttpClient(objectMapper, httpClient, webhookHttpClientProperties);
+    public MakeWebhookHttpClient webhookHttpClient(final ObjectMapper objectMapper,
+                                                   final HttpClient httpClient,
+                                                   final Config webhookHttpClientProperties) {
+        return new MakeWebhookHttpClient(objectMapper, httpClient, webhookHttpClientProperties);
     }
 
     @Bean
-    public WebhookPort webhookPort(final WebhookHttpClient webhookHttpClient,
+    public WebhookPort webhookNotificationPort(final MakeWebhookHttpClient makeWebhookHttpClient,
                                    final Config webhookHttpClientProperties) {
-        return new WebhookAdapter(webhookHttpClient, webhookHttpClientProperties);
+        return new MakeWebhookAdapter(makeWebhookHttpClient, webhookHttpClientProperties);
     }
 }
