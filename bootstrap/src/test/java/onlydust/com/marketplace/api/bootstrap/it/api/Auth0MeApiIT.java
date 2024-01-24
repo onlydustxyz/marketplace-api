@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     OnboardingRepository onboardingRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    PosthogProperties posthogProperties;
 
     @BeforeEach
     void setup() {
@@ -97,6 +100,12 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
                 .withRequestBody(matchingJsonPath("$.payload.user_id", equalTo(me.getId().toString())))
                 .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo(githubUserId.toString()))));
+        posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
+                .withRequestBody(matchingJsonPath("$.event", equalTo("user_signed_up")))
+                .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(me.getId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent()))));
 
         // ===============================================
         // When we call it again (already signed-up)

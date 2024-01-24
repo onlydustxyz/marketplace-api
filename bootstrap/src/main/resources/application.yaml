@@ -22,6 +22,7 @@ application:
     refresh-currency-quotes: 7200000 # 2 hours
     active-user-profiles-refresh-period-in-days: 30
     refresh-active-user-profiles: 86400000 # 1 day
+    tracking-job-delay: 60000 # 1 minute
 
 spring:
   liquibase:
@@ -124,3 +125,7 @@ infrastructure:
     api-key: ${INFURA_API_KEY}
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
+  posthog:
+    base-uri: https://eu.posthog.com
+    api-key: ${POSTHOG_API_KEY}
+    user-agent: ${POSTHOG_USER_AGENT}

@@ -16,7 +16,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 
 @Slf4j
 @AllArgsConstructor
-public class WebhookHttpClient {
+public class MakeWebhookHttpClient {
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
     private final Config config;

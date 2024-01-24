@@ -14,6 +14,10 @@ infrastructure:
   webhook:
     environment: "local-it"
     url: http://fake.test
+  posthog:
+    api-key: fake-ph-api-key
+    base-uri: http://ph.fake
+    user-agent: od-it
   linear:
     api-key: "some-linear-api-key"
   ethereum:
@@ -38,6 +42,7 @@ application:
     notification-job-delay: 500
     indexer-sync-job-delay: 500
     refresh-currency-quotes: 500
+    tracking-job-delay: 500
 
   github:
     installation:

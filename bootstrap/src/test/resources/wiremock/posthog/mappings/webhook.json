@@ -1,0 +1,9 @@
+{
+    "request": {
+        "url": "/capture/",
+        "method": "POST"
+    },
+    "response": {
+        "status": 200
+    }
+}
