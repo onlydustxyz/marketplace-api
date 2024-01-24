@@ -13,7 +13,6 @@
         <module>backoffice-api-contract</module>
         <module>accounting-domain</module>
         <module>kernel</module>
-        <module>infrastructure/posthog-api-client-adapter</module>
     </modules>
 
     <parent>
