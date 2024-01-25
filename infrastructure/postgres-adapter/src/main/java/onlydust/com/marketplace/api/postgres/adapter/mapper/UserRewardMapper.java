@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
@@ -23,6 +22,7 @@ public interface UserRewardMapper {
                 .numberOfRewardedContributions(entity.getContributionCount())
                 .id(entity.getId())
                 .requestedAt(entity.getRequestedAt())
+                .processedAt(entity.getProcessedAt())
                 .projectId(entity.getProjectId())
                 .status(RewardMapper.mapStatusForUser(entity.getStatus()))
                 .build();

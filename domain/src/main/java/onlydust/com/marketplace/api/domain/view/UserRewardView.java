@@ -16,6 +16,7 @@ public class UserRewardView {
     UUID projectId;
     Integer numberOfRewardedContributions;
     Date requestedAt;
+    Date processedAt;
     String rewardedOnProjectName;
     String rewardedOnProjectLogoUrl;
     UserRewardStatus status;

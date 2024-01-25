@@ -3335,6 +3335,10 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
+        processedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
         projectId:
           type: string
           format: uuid

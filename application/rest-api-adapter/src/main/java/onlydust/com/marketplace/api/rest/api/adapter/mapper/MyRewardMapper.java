@@ -48,6 +48,7 @@ public interface MyRewardMapper {
                     case locked -> RewardStatus.LOCKED;
                 })
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
+                .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))
                 .unlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()))
                 ;
     }
