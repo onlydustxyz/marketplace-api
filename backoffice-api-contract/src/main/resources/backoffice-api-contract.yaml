@@ -14,13 +14,149 @@ servers:
     description: Production
 
 paths:
+  # BackofficeAccountingManagement ===============================================================
+  /bo/v1/sponsors/{sponsorId}/transactions:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Register a credit or debit transaction on the given sponsor's account
+      operationId: registerTransactionForSponsor
+      description: |
+        Register a credit or debit transaction on the given sponsor's account
+        This increases/decreases the available budget to actually pay contributors.
+        For credits, the funds will only be available after the optional lockedUntil date.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Transaction to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        "201":
+          description: 'The transaction has been registered'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/sponsors/{sponsorId}/funds:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Increase the sponsor's funds
+      operationId: fundsSponsor
+      description: |
+        Increase the sponsor's funds. 
+        This enable internal transactions between sponsors, projects and contributors.
+        The funds will only be available to pay contributors once the incoming transaction has been registered, 
+        i.e. money actually received on OnlyDust account.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Transaction to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        "201":
+          description: 'The transaction has been registered'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/projects/{projectId}/allocations:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Allocate a budget to a project
+      operationId: allocateBudgetToProject
+      description: Allocate a budget to a project
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: Budget to allocate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetAllocationRequest'
+      responses:
+        "201":
+          description: 'The budget has been allocated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/projects/{projectId}/refunds:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Refund a sponsor
+      operationId: refundSponsorFromProject
+      description: Refund a sponsor
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: Budget to refund
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetAllocationRequest'
+      responses:
+        "200":
+          description: 'The sponsor has been refunded'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
     get:
       security:
         - apiKey: [ ]
       tags:
-        - Backoffice
+        - BackofficeSponsorManagement
       summary: Get sponsor page
       operationId: getSponsorPage
       description: |
@@ -66,6 +202,96 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeSponsorManagement
+      summary: Add a new sponsor
+      operationId: createSponsor
+      description: |
+        Add a new sponsor
+      requestBody:
+        description: Sponsor to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SponsorRequest'
+      responses:
+        "201":
+          description: 'Sponsor is created'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsors/{sponsorId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeSponsorManagement
+      summary: Get sponsor data
+      operationId: getSponsor
+      description: |
+        Get sponsor data
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      responses:
+        "200":
+          description: 'Sponsor data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorPageItemResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeSponsorManagement
+      summary: Modify sponsor data
+      operationId: updateSponsor
+      description: Modify sponsor data
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Sponsor data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SponsorRequest'
+      responses:
+        "200":
+          description: 'Sponsor has been updated'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  # Backoffice ===============================================================
   /bo/v1/repositories:
     get:
       security:
@@ -334,6 +560,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  # BackofficeCurrencyManagement ===============================================================
 
   /bo/v1/currencies:
     post:
@@ -601,6 +828,98 @@ components:
           items:
             type: string
             format: uuid
+
+    SponsorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        logoUrl:
+          type: string
+          format: uri
+
+    TransactionRequest:
+      type: object
+      required:
+        - type
+        - amount
+        - currencyId
+        - receipt
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        lockedUntil:
+          type: string
+          format: date-time
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
+    TransactionResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/TransactionId'
+
+    TransactionType:
+      type: string
+      enum:
+        - CREDIT
+        - DEBIT
+
+    TransactionId:
+      type: string
+      format: uuid
+
+    TransactionReceipt:
+      type: object
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        reference:
+          type: string
+        thirdPartyName:
+          type: string
+          description: Name of the third party for which the transaction has been made
+        thirdPartyAccountNumber:
+          type: string
+          description: IBAN, account number, ENS or wallet address
+
+    TransactionNetwork:
+      type: string
+      enum:
+        - SWIFT
+        - SEPA
+        - ETHEREUM
+        - OPTIMISM
+        - STARKNET
+        - APTOS
+
+    ProjectId:
+      type: string
+      format: uuid
+
+    BudgetAllocationRequest:
+      type: object
+      required:
+        - sponsorId
+        - amount
+        - currencyId
+      properties:
+        sponsorId:
+          $ref: '#/components/schemas/SponsorId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
 
     Technologies:
       type: object
@@ -1071,6 +1390,10 @@ components:
           description: The direct URL to the uploaded image
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+
+    SponsorId:
+      type: string
+      format: uuid
 
     CurrencyId:
       type: string
