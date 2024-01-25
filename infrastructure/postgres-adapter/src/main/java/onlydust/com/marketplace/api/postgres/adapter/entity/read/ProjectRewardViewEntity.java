@@ -25,6 +25,8 @@ public class ProjectRewardViewEntity {
     UUID id;
     @Column(name = "requested_at")
     Date requestedAt;
+    @Column(name = "processed_at")
+    Date processedAt;
     @Column(name = "login")
     String login;
     @Column(name = "avatar_url")

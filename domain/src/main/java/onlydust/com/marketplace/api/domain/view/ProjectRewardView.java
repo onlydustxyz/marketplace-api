@@ -15,6 +15,7 @@ public class ProjectRewardView {
     UUID id;
     Integer numberOfRewardedContributions;
     Date requestedAt;
+    Date processedAt;
     String rewardedUserLogin;
     String rewardedUserAvatar;
     RewardStatusView status;

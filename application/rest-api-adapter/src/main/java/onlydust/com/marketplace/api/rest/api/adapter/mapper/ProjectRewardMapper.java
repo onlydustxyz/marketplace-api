@@ -52,6 +52,7 @@ public interface ProjectRewardMapper {
             case locked -> RewardStatus.LOCKED;
         });
         rewardPageItemResponse.setRequestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()));
+        rewardPageItemResponse.setProcessedAt(DateMapper.toZoneDateTime(view.getProcessedAt()));
         rewardPageItemResponse.setUnlockDate(DateMapper.toZoneDateTime(view.getUnlockDate()));
         return rewardPageItemResponse;
     }
