@@ -28,7 +28,7 @@ public class CustomUserRewardRepositoryTest {
         assertEquals(FIND_USER_REWARDS_BY_ID.replace("%order_by%", "contribution_count asc, requested_at desc"),
                 buildQuery(UserRewardView.SortBy.contribution,
                         SortDirection.asc));
-        assertEquals(FIND_USER_REWARDS_BY_ID.replace("%order_by%", "dollars_equivalent asc, requested_at desc"),
+        assertEquals(FIND_USER_REWARDS_BY_ID.replace("%order_by%", "dollars_equivalent asc nulls last, requested_at desc"),
                 buildQuery(UserRewardView.SortBy.amount,
                         SortDirection.asc));
         assertEquals(FIND_USER_REWARDS_BY_ID.replace("%order_by%", "status asc, requested_at desc"),

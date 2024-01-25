@@ -135,7 +135,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 30,
                     "currency": "OP",
-                    "dollarsEquivalent": 0
+                    "dollarsEquivalent": null
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",
@@ -150,7 +150,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "amount": {
                     "total": 9511147,
                     "currency": "STRK",
-                    "dollarsEquivalent": 0
+                    "dollarsEquivalent": null
                   },
                   "numberOfRewardedContributions": 25,
                   "rewardedOnProjectName": "QA new contributions",

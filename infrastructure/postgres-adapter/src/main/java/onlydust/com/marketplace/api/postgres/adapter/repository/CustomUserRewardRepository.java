@@ -63,7 +63,7 @@ public class CustomUserRewardRepository {
                        pr.currency,
                        pr.invoice_received_at,
                        (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
-                       case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
+                       case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
                        
                        case
                            when r.id is not null then 'COMPLETE'
@@ -187,7 +187,7 @@ public class CustomUserRewardRepository {
     protected static String buildQuery(UserRewardView.SortBy sortBy, final SortDirection sortDirection) {
         sortBy = isNull(sortBy) ? UserRewardView.SortBy.requestedAt : sortBy;
         final String sort = switch (sortBy) {
-            case amount -> "dollars_equivalent " + sortDirection.name() + ", requested_at desc";
+            case amount -> "dollars_equivalent " + sortDirection.name() + " nulls last, requested_at desc";
             case contribution -> "contribution_count " + sortDirection.name() + ", requested_at desc";
             case status -> "status " + sortDirection.name() + ", requested_at desc";
             default -> "requested_at " + sortDirection.name();
