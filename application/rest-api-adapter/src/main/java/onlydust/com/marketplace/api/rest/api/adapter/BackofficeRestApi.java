@@ -45,27 +45,6 @@ public class BackofficeRestApi implements BackofficeApi {
     }
 
     @Override
-    public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize,
-                                                      List<UUID> projectIds, List<UUID> sponsorIds) {
-        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-
-        final var filters = SponsorView.Filters.builder()
-                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
-                .sponsors(Optional.ofNullable(sponsorIds).orElse(List.of()))
-                .build();
-
-        final var sponsorPage =
-                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
-
-        final var response = mapSponsorPageToContract(sponsorPage, sanitizedPageIndex);
-
-        return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ResponseEntity.ok(response);
-    }
-
-
-    @Override
     public ResponseEntity<BudgetPage> getBudgetPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds) {
         final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
