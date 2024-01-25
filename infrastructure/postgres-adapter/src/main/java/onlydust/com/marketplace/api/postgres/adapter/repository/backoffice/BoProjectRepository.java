@@ -74,7 +74,7 @@ public interface BoProjectRepository extends JpaRepository<BoProjectEntity, UUID
                                 WHERE c.created_at > CURRENT_DATE - INTERVAL '3 months'
                                 GROUP BY pc.project_id) tc ON p.project_id = tc.project_id
                      LEFT JOIN (SELECT pr.project_id,
-                                       SUM(pr.amount * COALESCE(cuq.price, 0)) AS total_dollars_sent
+                                       SUM(pr.amount * COALESCE(cuq.price, 1)) AS total_dollars_sent
                                 FROM payment_requests pr
                                          LEFT JOIN crypto_usd_quotes cuq ON pr.currency = cuq.currency
                                 WHERE pr.requested_at > CURRENT_DATE - INTERVAL '3 months'
