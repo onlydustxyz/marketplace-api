@@ -25,7 +25,7 @@ public class CustomProjectRewardRepository {
                    pr.amount,
                    pr.currency,
                    (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
-                   case when pr.currency = 'usd' then pr.amount else coalesce(cuq.price, 0) * pr.amount end dollars_equivalent,
+                   case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
                    case
                        when u.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
