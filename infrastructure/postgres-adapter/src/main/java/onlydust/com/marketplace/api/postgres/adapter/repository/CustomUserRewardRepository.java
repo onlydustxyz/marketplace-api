@@ -55,6 +55,7 @@ public class CustomUserRewardRepository {
                                                            group by w.user_id) wallets on wallets.user_id = u.id
                                                 left join bank_accounts ba on ba.user_id = u.id)
                 select pr.requested_at,
+                       r.processed_at,
                        pd.name,
                        pd.logo_url,
                        pd.project_id,
@@ -120,6 +121,7 @@ public class CustomUserRewardRepository {
                                                            group by w.user_id) wallets on wallets.user_id = u.id
                                                 left join bank_accounts ba on ba.user_id = u.id)
             select distinct pr.requested_at,
+                   r.processed_at,
                    pd.name,
                    pd.logo_url,
                    pd.project_id,

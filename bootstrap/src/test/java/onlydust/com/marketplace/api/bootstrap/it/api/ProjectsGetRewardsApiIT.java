@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -31,187 +30,253 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_1 = """
             {
-                "rewards": [
-                    {
-                        "requestedAt": "2023-09-19T07:40:26.971981Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 25,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
-                    },
-                    {
-                        "requestedAt": "2023-09-20T08:46:52.77875Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 1,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-                    }
-                ],
-                "hasMore": false,
-                "totalPageNumber": 2,
-                "totalItemNumber": 6,
-                "nextPageIndex": 1
-            }""";
+              "rewards": [
+                {
+                  "requestedAt": "2023-09-19T07:40:26.971981Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                },
+                {
+                  "requestedAt": "2023-09-20T08:46:52.77875Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 1,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                }
+              ],
+              "remainingBudget": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 360436.00
+              },
+              "spentAmount": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 6060.00
+              },
+              "sentRewardsCount": 6,
+              "rewardedContributionsCount": 26,
+              "rewardedContributorsCount": 1,
+              "hasMore": false,
+              "totalPageNumber": 2,
+              "totalItemNumber": 6,
+              "nextPageIndex": 1
+            }
+            """;
     private static final String GET_PROJECT_REWARDS_JSON_RESPONSE_PAGE_0 = """
             {
-                "rewards": [
-                    {
-                        "requestedAt": "2023-09-19T07:38:22.018458Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 25,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                    },
-                    {
-                        "requestedAt": "2023-09-19T07:38:52.590518Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 25,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-                    },
-                    {
-                        "requestedAt": "2023-09-19T07:39:23.730967Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 25,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
-                    },
-                    {
-                        "requestedAt": "2023-09-19T07:39:54.45638Z",
-                        "status": "PROCESSING",
-                        "amount": {
-                            "total": 1000,
-                            "currency": "USDC",
-                            "dollarsEquivalent": 1010
-                        },
-                        "numberOfRewardedContributions": 25,
-                        "rewardedUserLogin": "PierreOucif",
-                        "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                        "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
-                    }
-                ],
-                "hasMore": true,
-                "totalPageNumber": 2,
-                "totalItemNumber": 6,
-                "nextPageIndex": 1
-            }""";
+              "rewards": [
+                {
+                  "requestedAt": "2023-09-19T07:38:22.018458Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:38:52.590518Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:39:23.730967Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:39:54.45638Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                }
+              ],
+              "remainingBudget": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 360436.00
+              },
+              "spentAmount": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 6060.00
+              },
+              "sentRewardsCount": 6,
+              "rewardedContributionsCount": 26,
+              "rewardedContributorsCount": 1,
+              "hasMore": true,
+              "totalPageNumber": 2,
+              "totalItemNumber": 6,
+              "nextPageIndex": 1
+            }
+            """;
     private static final String GET_PROJECT_REWARDS_JSON_RESPONSE = """
             {
-                 "rewards": [
-                     {
-                         "requestedAt": "2023-09-20T08:46:52.77875Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 1,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
-                     },
-                     {
-                         "requestedAt": "2023-09-19T07:40:26.971981Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 25,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
-                     },
-                     {
-                         "requestedAt": "2023-09-19T07:39:54.45638Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 25,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
-                     },
-                     {
-                         "requestedAt": "2023-09-19T07:39:23.730967Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 25,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
-                     },
-                     {
-                         "requestedAt": "2023-09-19T07:38:52.590518Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 25,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
-                     },
-                     {
-                         "requestedAt": "2023-09-19T07:38:22.018458Z",
-                         "status": "PROCESSING",
-                         "amount": {
-                             "total": 1000,
-                             "currency": "USDC",
-                             "dollarsEquivalent": 1010
-                         },
-                         "numberOfRewardedContributions": 25,
-                         "rewardedUserLogin": "PierreOucif",
-                         "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                         "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
-                     }
-                 ],
-                 "hasMore": false,
-                 "totalPageNumber": 1,
-                 "totalItemNumber": 6,
-                 "nextPageIndex": 0
-             }""";
+              "rewards": [
+                {
+                  "requestedAt": "2023-09-20T08:46:52.77875Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 1,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "e1498a17-5090-4071-a88a-6f0b0c337c3a"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:40:26.971981Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "40fda3c6-2a3f-4cdd-ba12-0499dd232d53"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:39:54.45638Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:39:23.730967Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "5b96ca1e-4ad2-41c1-8819-520b885d9223"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:38:52.590518Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "85f8358c-5339-42ac-a577-16d7760d1e28"
+                },
+                {
+                  "requestedAt": "2023-09-19T07:38:22.018458Z",
+                  "processedAt": null,
+                  "status": "PROCESSING",
+                  "unlockDate": null,
+                  "amount": {
+                    "total": 1000,
+                    "currency": "USDC",
+                    "dollarsEquivalent": 1010.00
+                  },
+                  "numberOfRewardedContributions": 25,
+                  "rewardedUserLogin": "PierreOucif",
+                  "rewardedUserAvatar": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0"
+                }
+              ],
+              "remainingBudget": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 360436.00
+              },
+              "spentAmount": {
+                "amount": null,
+                "currency": null,
+                "usdEquivalent": 6060.00
+              },
+              "sentRewardsCount": 6,
+              "rewardedContributionsCount": 26,
+              "rewardedContributorsCount": 1,
+              "hasMore": false,
+              "totalPageNumber": 1,
+              "totalItemNumber": 6,
+              "nextPageIndex": 0
+            }
+            """;
 
 
     @Autowired

@@ -55,6 +55,7 @@ public interface RewardMapper {
                 .amount(rewardView.getAmount())
                 .currency(mapCurrency(rewardView.getCurrency()))
                 .status(mapRewardStatus(rewardView.getStatus()))
+                .unlockDate(DateMapper.toZoneDateTime(rewardView.getUnlockDate()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 .receipt(receiptToResponse(rewardView.getReceipt()))

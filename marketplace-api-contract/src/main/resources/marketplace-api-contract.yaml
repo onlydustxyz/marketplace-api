@@ -3300,6 +3300,10 @@ components:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
+        processedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
         status:
           $ref: '#/components/schemas/RewardStatus'
         unlockDate:
@@ -3332,6 +3336,10 @@ components:
         - projectId
       properties:
         requestedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
+        processedAt:
           type: string
           format: date-time
           example: 2023-07-21T12:45:04.750174
@@ -3571,18 +3579,18 @@ components:
 
     ContributionSort:
       type: string
-      default: CREATED_AT
+      default: LAST_UPDATED_AT
       enum:
-        - CREATED_AT
+        - LAST_UPDATED_AT
         - PROJECT_REPO_NAME
         - GITHUB_NUMBER_TITLE
         - LINKS_COUNT
 
     ProjectContributionSort:
       type: string
-      default: CREATED_AT
+      default: LAST_UPDATED_AT
       enum:
-        - CREATED_AT
+        - LAST_UPDATED_AT
         - REPO_NAME
         - CONTRIBUTOR_LOGIN
         - GITHUB_NUMBER_TITLE
@@ -3704,6 +3712,7 @@ components:
           required:
             - id
             - createdAt
+            - lastUpdatedAt
             - status
             - rewardIds
             - project
@@ -3721,6 +3730,10 @@ components:
               type: string
               format: date-time
               description: When the contribution was completed
+            lastUpdatedAt:
+              type: string
+              format: date-time
+              description: When the contribution was last updated
             status:
               $ref: '#/components/schemas/ContributionStatus'
             githubPullRequestReviewState:
@@ -4178,6 +4191,9 @@ components:
           type: number
         status:
           $ref: '#/components/schemas/RewardStatus'
+        unlockDate:
+          type: string
+          format: date-time
         from:
           $ref: '#/components/schemas/ContributorResponse'
         to:

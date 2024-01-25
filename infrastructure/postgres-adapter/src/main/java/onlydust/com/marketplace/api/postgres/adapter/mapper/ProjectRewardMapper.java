@@ -17,6 +17,7 @@ public interface ProjectRewardMapper {
                 .numberOfRewardedContributions(entity.getContributionCount())
                 .id(entity.getId())
                 .requestedAt(entity.getRequestedAt())
+                .processedAt(entity.getProcessedAt())
                 .status(RewardMapper.mapStatusForProject(entity.getStatus()))
                 .build();
     }

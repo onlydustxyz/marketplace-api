@@ -65,34 +65,39 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
-                            "currency": "USDC",
-                            "amount": 1000,
-                            "dollarsEquivalent": 1010,
-                            "status": "PENDING_INVOICE",
-                            "from": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "to": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": null
-                            },
-                            "createdAt": "2023-09-19T07:38:22.018458Z",
-                            "processedAt": null,
-                            "project": {
-                                "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                "slug": "qa-new-contributions",
-                                "name": "QA new contributions",
-                                "shortDescription": "QA new contributions",
-                                "logoUrl": null,
-                                "visibility": "PUBLIC"
-                            }
-                        }""");
+                          "id": "2ac80cc6-7e83-4eef-bc0c-932b58f683c0",
+                          "currency": "USDC",
+                          "amount": 1000,
+                          "dollarsEquivalent": 1010.00,
+                          "status": "PENDING_INVOICE",
+                          "unlockDate": null,
+                          "from": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "htmlUrl": null,
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": null
+                          },
+                          "to": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "htmlUrl": null,
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": null
+                          },
+                          "createdAt": "2023-09-19T07:38:22.018458Z",
+                          "processedAt": null,
+                          "project": {
+                            "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                            "slug": "qa-new-contributions",
+                            "name": "QA new contributions",
+                            "shortDescription": "QA new contributions",
+                            "logoUrl": null,
+                            "visibility": "PUBLIC"
+                          },
+                          "receipt": null
+                        }
+                        """);
 
         final PaymentRequestEntity paymentRequestEntity = paymentRequestRepository.findById(rewardId).orElseThrow();
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));

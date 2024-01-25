@@ -32,6 +32,7 @@ public class ContributionViewEntity {
     String id;
 
     Date createdAt;
+    Date lastUpdatedAt;
     Date completedAt;
     @Enumerated(EnumType.STRING)
     @org.hibernate.annotations.Type(type = "contribution_type")
@@ -106,6 +107,7 @@ public class ContributionViewEntity {
         return ContributionView.builder()
                 .id(id)
                 .createdAt(createdAt)
+                .lastUpdatedAt(lastUpdatedAt)
                 .completedAt(completedAt)
                 .type(type.toView())
                 .status(status.toView())

@@ -8,11 +8,8 @@ import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubRepo;
 import onlydust.com.marketplace.api.domain.model.Project;
 
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Value
@@ -21,6 +18,7 @@ import java.util.UUID;
 public class ContributionView {
     String id;
     Date createdAt;
+    Date lastUpdatedAt;
     Date completedAt;
     ContributionType type;
     ContributionStatus status;
@@ -38,7 +36,7 @@ public class ContributionView {
     PullRequestReviewState prReviewState;
 
     public enum Sort {
-        CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE, CONTRIBUTOR_LOGIN, LINKS_COUNT
+        CREATED_AT, PROJECT_REPO_NAME, GITHUB_NUMBER_TITLE, CONTRIBUTOR_LOGIN, LINKS_COUNT, LAST_UPDATED_AT
     }
 
     @Value

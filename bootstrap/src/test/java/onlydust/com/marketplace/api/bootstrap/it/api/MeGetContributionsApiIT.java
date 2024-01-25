@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
@@ -27,62 +25,12 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "contributions": [
                             {
                               "type": "PULL_REQUEST",
-                              "contributor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "htmlUrl": "https://github.com/AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "repo": {
-                                "id": 480776993,
-                                "owner": "onlydustxyz",
-                                "name": "starklings",
-                                "description": null,
-                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
-                              },
-                              "githubAuthor": {
-                                "githubUserId": 595505,
-                                "login": "ofux",
-                                "htmlUrl": "https://github.com/ofux",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                              },
-                              "githubNumber": 1,
-                              "githubStatus": "DRAFT",
-                              "githubTitle": "feat: add common model",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
-                              "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
-                              "githubCodeReviewOutcome": null,
-                              "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
-                              "createdAt": "2022-04-12T11:59:17Z",
-                              "completedAt": "2022-04-13T09:00:49Z",
-                              "status": "COMPLETED",
-                              "project": {
-                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                "slug": "zama",
-                                "name": "Zama",
-                                "shortDescription": "A super description for Zama",
-                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
-                              },
-                              "links": [],
-                              "githubPullRequestReviewState": "PENDING_REVIEWER",
-                              "rewardIds": []
-                            },
-                            {
-                              "type": "PULL_REQUEST",
-                              "contributor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "htmlUrl": "https://github.com/AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -105,7 +53,10 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
                               "createdAt": "2022-04-12T16:56:44Z",
                               "completedAt": "2022-04-13T09:00:48Z",
+                              "lastUpdatedAt": "2022-04-13T09:00:48Z",
                               "status": "COMPLETED",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
                               "project": {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
@@ -114,12 +65,6 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
                                 "visibility": "PUBLIC"
                               },
-                              "links": [],
-                              "githubPullRequestReviewState": "PENDING_REVIEWER",
-                              "rewardIds": []
-                            },
-                            {
-                              "type": "PULL_REQUEST",
                               "contributor": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
@@ -127,6 +72,55 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
+                              "links": []
+                            },
+                            {
+                              "type": "PULL_REQUEST",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "htmlUrl": "https://github.com/ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                              },
+                              "githubNumber": 1,
+                              "githubStatus": "DRAFT",
+                              "githubTitle": "feat: add common model",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
+                              "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                              "githubCodeReviewOutcome": null,
+                              "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
+                              "createdAt": "2022-04-12T11:59:17Z",
+                              "completedAt": "2022-04-13T09:00:49Z",
+                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                "slug": "zama",
+                                "name": "Zama",
+                                "shortDescription": "A super description for Zama",
+                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                "visibility": "PUBLIC"
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "htmlUrl": "https://github.com/AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "links": []
+                            },
+                            {
+                              "type": "PULL_REQUEST",
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -149,7 +143,10 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
                               "createdAt": "2022-04-13T15:42:14Z",
                               "completedAt": "2022-04-13T16:01:10Z",
+                              "lastUpdatedAt": "2022-04-13T16:01:10Z",
                               "status": "COMPLETED",
+                              "githubPullRequestReviewState": "APPROVED",
+                              "rewardIds": [],
                               "project": {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
@@ -158,9 +155,14 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
                                 "visibility": "PUBLIC"
                               },
-                              "links": [],
-                              "githubPullRequestReviewState": "APPROVED",
-                              "rewardIds": []
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "htmlUrl": "https://github.com/AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "links": []
                             }
                           ],
                           "hasMore": true,
@@ -306,7 +308,6 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-
                         """)
         ;
     }
@@ -348,6 +349,42 @@ public class MeGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.contributions[0].project.name").isEqualTo("kaaper")
                 .jsonPath("$.contributions[0].repo.name").isEqualTo("marketplace-frontend")
+        ;
+    }
+
+    @Test
+    void should_order_by_last_update_date() {
+        // Given
+        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "LAST_UPDATED_AT"
+                        )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].lastUpdatedAt").isEqualTo("2022-04-13T09:00:48Z")
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_CONTRIBUTIONS,
+                        Map.of("pageSize", "1",
+                                "sort", "LAST_UPDATED_AT",
+                                "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .jsonPath("$.contributions[0].lastUpdatedAt").isEqualTo("2023-11-29T16:13:31Z")
         ;
     }
 

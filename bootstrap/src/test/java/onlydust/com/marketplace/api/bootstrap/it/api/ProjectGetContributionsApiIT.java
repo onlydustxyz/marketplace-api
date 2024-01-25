@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
@@ -64,6 +62,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "id": "f78954de50fec850fa0726247457c790387a866872c00653339f09ca2f32690f",
                               "createdAt": "2022-05-18T09:40:28Z",
                               "completedAt": "2022-05-18T09:40:33Z",
+                              "lastUpdatedAt": "2022-05-18T09:40:33Z",
                               "status": "COMPLETED",
                               "githubPullRequestReviewState": "PENDING_REVIEWER",
                               "rewardIds": [],
@@ -103,11 +102,11 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().isOk() // Make sure we get all results
                 .expectBody()
                 // we have at least one correct date
-                .jsonPath("$.contributions[?(@.createdAt >= '2023-02-21')]").exists()
-                .jsonPath("$.contributions[?(@.createdAt < '2023-02-22')]").exists()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt >= '2023-02-21')]").exists()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2023-02-22')]").exists()
                 // we do not have any incorrect date
-                .jsonPath("$.contributions[?(@.createdAt < '2023-02-21')]").doesNotExist()
-                .jsonPath("$.contributions[?(@.createdAt > '2023-02-22')]").doesNotExist()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2023-02-21')]").doesNotExist()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt > '2023-02-22')]").doesNotExist()
         ;
     }
 

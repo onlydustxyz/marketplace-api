@@ -19,6 +19,7 @@ public class CustomProjectRewardRepository {
     @Language("PostgreSQL")
     protected static final String FIND_PROJECT_REWARDS = """
                 select pr.requested_at,
+                   r.processed_at,
                    gu.login,
                    user_avatar_url(gu.id, gu.avatar_url) as avatar_url,
                    pr.id,
