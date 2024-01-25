@@ -4191,6 +4191,9 @@ components:
           type: number
         status:
           $ref: '#/components/schemas/RewardStatus'
+        unlockDate:
+          type: string
+          format: date-time
         from:
           $ref: '#/components/schemas/ContributorResponse'
         to:

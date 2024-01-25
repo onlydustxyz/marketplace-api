@@ -24,4 +24,8 @@ public class RewardView {
     Date processedAt;
     ReceiptView receipt;
     Project project;
+
+    public Date getUnlockDate() {
+        return currency.unlockDate();
+    }
 }
