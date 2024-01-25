@@ -24,7 +24,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @RestController
-@Tags(@Tag(name = "Backoffice"))
+@Tags(@Tag(name = "BackofficeCurrencyManagement"))
 @AllArgsConstructor
 public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyManagementApi {
     private final CurrencyFacadePort currencyFacadePort;
