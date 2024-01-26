@@ -60,9 +60,22 @@ public class UserServiceTest {
     void should_find_user_given_a_github_id_and_update_it() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
-        final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                GithubUserIdentity.builder()
+                        .githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubLogin(faker.hacker().verb())
+                        .email(faker.internet().emailAddress())
+                        .build();
+
+        final User user = User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .githubEmail(githubUserIdentity.getEmail())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
+                .build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -70,13 +83,7 @@ public class UserServiceTest {
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, never()).updateUserIdentity(
-                user.getId(),
-                githubUserIdentity.getGithubLogin(),
-                githubUserIdentity.getGithubAvatarUrl(),
-                githubUserIdentity.getEmail(),
-                dateProvider.now()
-        );
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
     }
@@ -95,7 +102,7 @@ public class UserServiceTest {
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
 
         // Then
-        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
     }
@@ -114,7 +121,7 @@ public class UserServiceTest {
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertThat(userByGithubIdentity.getId()).isNotNull();
         assertEquals(User.builder().id(userByGithubIdentity.getId())
                 .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
@@ -136,7 +143,7 @@ public class UserServiceTest {
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
 
         // Then
-        verify(userStoragePort, never()).updateUserIdentity(any(), any(), any(), any(), any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User %d not found".formatted(githubUserIdentity.getGithubUserId()));

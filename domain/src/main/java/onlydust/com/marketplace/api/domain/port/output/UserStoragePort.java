@@ -22,8 +22,7 @@ public interface UserStoragePort {
 
     User createUser(User user);
 
-    void updateUserIdentity(UUID userId, String githubLogin, String githubAvatarUrl, String emailFromGithub,
-                            Date lastSeenAt);
+    void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
 
     UserPayoutInformation getPayoutInformationById(UUID id);
 
