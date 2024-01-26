@@ -461,5 +461,32 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
         }
+
+        /*
+         * Given a sponsor, a project and a contributor
+         * When
+         *    - the sponsor funds its account partially
+         *    - project 1 rewards the contributor several times
+         * Then, the contributor cannot withdraw his money beyond funding
+         */
+        @Test
+        void should_reject_withdraw_more_than_funded() {
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id(), new TransactionReceipt());
+
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(80L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(80L), currency.id());
+
+            accountingService.sendTo(contributorId2, PositiveAmount.of(40L), currency.id(), new TransactionReceipt());
+
+            assertThatThrownBy(() -> accountingService.sendTo(contributorId2, PositiveAmount.of(40L), currency.id(), new TransactionReceipt()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Not enough fund");
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(20L));
+            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+        }
     }
 }

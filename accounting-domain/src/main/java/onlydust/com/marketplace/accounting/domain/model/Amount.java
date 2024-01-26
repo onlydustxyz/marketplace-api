@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 @Getter
 @EqualsAndHashCode
 public class Amount {
+    public static final Amount ZERO = Amount.of(BigDecimal.ZERO);
+
     @NonNull
     protected final BigDecimal value;
 

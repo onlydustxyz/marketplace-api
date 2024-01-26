@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.util.ArrayList;
@@ -23,13 +24,20 @@ public class Ledger {
     }
 
     public PositiveAmount balance() {
-        return transactions.stream()
+        return PositiveAmount.of(transactions.stream()
                 .map(Transaction::amount)
-                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+                .reduce(Amount.ZERO, Amount::add));
     }
 
     public void credit(PositiveAmount amount, TransactionReceipt transactionReceipt) {
         transactions.add(new Transaction(amount, transactionReceipt));
+    }
+
+    public void debit(PositiveAmount amount, TransactionReceipt receipt) {
+        if (balance().isStrictlyLowerThan(amount))
+            throw OnlyDustException.badRequest("Not enough fund on ledger %s".formatted(id));
+
+        transactions.add(new Transaction(amount.negate(), receipt));
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -45,6 +53,6 @@ public class Ledger {
         }
     }
 
-    private record Transaction(PositiveAmount amount, TransactionReceipt transactionReceipt) {
+    private record Transaction(Amount amount, TransactionReceipt transactionReceipt) {
     }
 }

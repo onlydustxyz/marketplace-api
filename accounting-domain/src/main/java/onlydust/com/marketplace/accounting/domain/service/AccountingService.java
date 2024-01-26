@@ -40,10 +40,8 @@ public class AccountingService {
 
     public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId, TransactionReceipt receipt) {
         sendTo(to, amount, currencyId).forEach(transaction -> {
-            final var funderLedger = ledgerStorage.get(transaction.from()).orElseThrow();
-            if (funderLedger.balance().isStrictlyLowerThan(amount)) {
-                throw OnlyDustException.badRequest("Not enough funds");
-            }
+            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
+            ledger.debit(transaction.amount(), receipt);
         });
     }
 
