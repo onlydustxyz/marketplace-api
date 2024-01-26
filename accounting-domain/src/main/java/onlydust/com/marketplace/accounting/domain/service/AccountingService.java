@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.TransactionReceipt;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -42,18 +39,12 @@ public class AccountingService {
     }
 
     public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId, TransactionReceipt receipt) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = accountBookStorage.get(currency);
-
-        final var transactions = sendTo(to, amount, currencyId);
-        transactions.forEach(transaction -> {
+        sendTo(to, amount, currencyId).forEach(transaction -> {
             final var funderLedger = ledgerStorage.get(transaction.from()).orElseThrow();
             if (funderLedger.balance().isStrictlyLowerThan(amount)) {
                 throw OnlyDustException.badRequest("Not enough funds");
             }
         });
-
-        accountBookStorage.save(accountBook);
     }
 
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -89,5 +80,13 @@ public class AccountingService {
     private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
                 .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
+    }
+
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id id, TransactionReceipt transactionReceipt) {
+        final var currency = getCurrency(id);
+        final var ledger = getOrCreateLedger(sponsorId, currency);
+
+        ledger.credit(amount, transactionReceipt);
+        ledgerStorage.save(ledger);
     }
 }

@@ -33,7 +33,7 @@ public class AccountingServiceTest {
     final LedgerStorageStub ledgerStorage = new LedgerStorageStub();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountBookStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
-    
+
     @Nested
     class GivenAnUnknownCurrency {
         final Currency.Id currencyId = Currency.Id.random();
@@ -395,6 +395,7 @@ public class AccountingServiceTest {
         @Test
         void should_do_everything() {
             // When
+            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id(), new TransactionReceipt());
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
             accountingService.transfer(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
 
@@ -410,7 +411,7 @@ public class AccountingServiceTest {
 
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(25L), currency.id());
 
-            accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id());
+            accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id(), new TransactionReceipt());
 
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();

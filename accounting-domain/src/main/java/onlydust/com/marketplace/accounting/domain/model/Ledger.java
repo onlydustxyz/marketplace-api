@@ -6,10 +6,13 @@ import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Ledger {
     final @NonNull Id id;
+    final @NonNull List<Transaction> transactions = new ArrayList<>();
 
     public Ledger() {
         this.id = Id.random();
@@ -20,7 +23,13 @@ public class Ledger {
     }
 
     public PositiveAmount balance() {
-        return PositiveAmount.ZERO;
+        return transactions.stream()
+                .map(Transaction::amount)
+                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+    }
+
+    public void credit(PositiveAmount amount, TransactionReceipt transactionReceipt) {
+        transactions.add(new Transaction(amount, transactionReceipt));
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -34,5 +43,8 @@ public class Ledger {
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }
+    }
+
+    private record Transaction(PositiveAmount amount, TransactionReceipt transactionReceipt) {
     }
 }

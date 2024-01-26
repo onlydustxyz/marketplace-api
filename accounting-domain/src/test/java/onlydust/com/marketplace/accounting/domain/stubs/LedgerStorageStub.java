@@ -3,19 +3,20 @@ package onlydust.com.marketplace.accounting.domain.stubs;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class LedgerStorageStub implements LedgerStorage {
-    private final List<Ledger> ledgers = new ArrayList<>();
+    private final Map<Ledger.Id, Ledger> ledgers = new HashMap<>();
 
+    @Override
     public void save(Ledger ledger) {
-        ledgers.add(ledger);
+        ledgers.put(ledger.id(), ledger);
     }
 
     @Override
     public Optional<Ledger> get(Ledger.Id id) {
-        return ledgers.stream().filter(l -> l.id().equals(id)).findFirst();
+        return Optional.ofNullable(ledgers.get(id));
     }
 }
