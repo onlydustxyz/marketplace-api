@@ -30,13 +30,13 @@ public class AccountingService {
     }
 
     public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
-        sendTo(to, amount, currencyId).forEach(transaction -> {
+        burn(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
             ledger.debit(transaction.amount());
         });
     }
 
-    public <From> void receiveFrom(From from, PositiveAmount amount, Currency.Id currencyId) {
+    public <From> void mint(From from, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getOrCreateLedger(from, currency);
@@ -45,7 +45,7 @@ public class AccountingService {
         accountBookStorage.save(accountBook);
     }
 
-    public <To> Collection<Transaction> sendTo(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> Collection<Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getLedger(to, currency);

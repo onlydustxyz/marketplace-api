@@ -53,7 +53,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_transfer() {
             // When
-            assertThatThrownBy(() -> accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.mint(sponsorId, PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
@@ -69,7 +69,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund() {
             // When
-            assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
@@ -132,7 +132,7 @@ public class AccountingServiceTest {
         @Test
         void should_create_ledger_and_register_transfer() {
             // When
-            accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
+            accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
             final var sponsorLedger = sponsorLedgerProvider.get(sponsorId, currency).orElseThrow();
@@ -149,7 +149,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund_when_no_account_found() {
             // When
-            assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id()))
+            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
@@ -216,7 +216,7 @@ public class AccountingServiceTest {
         @Test
         void should_register_transfer() {
             // When
-            accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
+            accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(110L));
@@ -233,7 +233,7 @@ public class AccountingServiceTest {
         @Test
         void should_register_refund() {
             // When
-            accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id());
+            accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
@@ -249,7 +249,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund_when_not_enough_received() {
             // When
-            assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(110L), currency.id()))
+            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(110L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot burn");
