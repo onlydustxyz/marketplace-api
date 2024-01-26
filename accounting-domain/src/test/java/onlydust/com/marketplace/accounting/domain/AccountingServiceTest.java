@@ -419,7 +419,7 @@ public class AccountingServiceTest {
 
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(15L));
             assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(200L));
-            assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.of(0L));
+            assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.of(30L));
 
             assertThat(accountBook.state().balanceOf(contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
@@ -427,13 +427,39 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
             assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
 
-            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.of(0L));
+            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().transferredAmount(projectLedger1.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(20L));
             assertThat(accountBook.state().transferredAmount(projectLedger2.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(25L));
             assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(45L));
             assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(40L));
 
             verify(accountBookStorage, times(10)).save(accountBook);
+        }
+
+
+        /*
+         * Given a sponsor, a project and a contributor
+         * When
+         *    - the sponsor funds its account in multiple times
+         *    - project 1 rewards the contributor with the full amount
+         * Then, the contributor can withdraw his money
+         */
+        @Test
+        void should_allow_multiple_times_funding() {
+            // When
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), new TransactionReceipt());
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), new TransactionReceipt());
+            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id(), new TransactionReceipt());
+
+            accountingService.sendTo(contributorId2, PositiveAmount.of(100L), currency.id(), new TransactionReceipt());
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
         }
     }
 }
