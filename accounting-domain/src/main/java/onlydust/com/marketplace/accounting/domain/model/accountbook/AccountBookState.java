@@ -34,7 +34,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
     @Override
     public void burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
-        refund(account, ROOT, amount);
+        transfer(account, ROOT, amount);
     }
 
     @Override

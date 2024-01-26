@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -16,19 +15,19 @@ public class AccountingService {
     private final AccountProvider<Object> accountProvider;
     private final CurrencyStorage currencyStorage;
 
-    public void receiveFrom(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
+    public <From> void receiveFrom(From from, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var account = getOrCreateAccount(sponsorId, currency);
+        final var account = getOrCreateAccount(from, currency);
 
         accountBook.mint(account, amount);
         accountBookStorage.save(accountBook);
     }
 
-    public void refundTo(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var account = getAccount(sponsorId, currency);
+        final var account = getAccount(to, currency);
 
         accountBook.burn(account, amount);
         accountBookStorage.save(accountBook);

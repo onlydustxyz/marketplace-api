@@ -133,7 +133,7 @@ public class AccountingServiceTest {
         when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
 
         // When
-        accountingService.refundTo(sponsorId, PositiveAmount.of(10L), currency.id());
+        accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(90L));
@@ -157,7 +157,7 @@ public class AccountingServiceTest {
         when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.refundTo(sponsorId, PositiveAmount.of(10L), currency.id()))
+        assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
@@ -179,7 +179,7 @@ public class AccountingServiceTest {
         when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> accountingService.refundTo(sponsorId, PositiveAmount.of(10L), currencyId))
+        assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currencyId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
@@ -206,10 +206,10 @@ public class AccountingServiceTest {
         when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
 
         // When
-        assertThatThrownBy(() -> accountingService.refundTo(sponsorId, PositiveAmount.of(110L), currency.id()))
+        assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(110L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessageContaining("Cannot refund");
+                .hasMessageContaining("Cannot transfer");
 
         verify(accountBookStorage, never()).save(any());
     }
@@ -492,6 +492,7 @@ public class AccountingServiceTest {
      *    - the committee refunds the remaining unspent funds to the sponsor
      *    - the sponsor funds project 2 directly
      *    - project 2 rewards contributor 2
+     *    - contributor 2 withdraws his money
      * Then All is well :-)
      */
     @Test
@@ -539,6 +540,8 @@ public class AccountingServiceTest {
 
         accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(25L), currency.id());
 
+        accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id());
+
         // Then
         assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(15L));
         assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(0L));
@@ -550,12 +553,12 @@ public class AccountingServiceTest {
         assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
         assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
 
-        assertThat(accountBook.state().balanceOf(contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
+        assertThat(accountBook.state().balanceOf(contributorAccount2)).isEqualTo(PositiveAmount.of(0L));
         assertThat(accountBook.state().transferredAmount(projectAccount1, contributorAccount2)).isEqualTo(PositiveAmount.of(20L));
         assertThat(accountBook.state().transferredAmount(projectAccount2, contributorAccount2)).isEqualTo(PositiveAmount.of(25L));
         assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
         assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(40L));
 
-        verify(accountBookStorage, times(9)).save(accountBook);
+        verify(accountBookStorage, times(10)).save(accountBook);
     }
 }
