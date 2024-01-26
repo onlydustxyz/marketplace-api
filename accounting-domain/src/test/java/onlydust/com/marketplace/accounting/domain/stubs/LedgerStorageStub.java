@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.stubs;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 
@@ -9,16 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 
 public class LedgerStorageStub implements LedgerStorage {
-    private final Map<Ledger.Id, Ledger> ledgers = new HashMap<>();
+    private final Map<Currency, Ledger> ledgers = new HashMap<>();
 
     @SneakyThrows
     @Override
-    public void save(Ledger ledger) {
-        ledgers.put(ledger.id(), Ledger.of(ledger));
+    public void save(Currency currency, Ledger ledger) {
+        ledgers.put(currency, Ledger.of(ledger));
     }
 
     @Override
-    public Optional<Ledger> get(Ledger.Id id) {
-        return Optional.ofNullable(ledgers.get(id)).map(Ledger::of);
+    public Optional<Ledger> get(Currency currency) {
+        return Optional.ofNullable(ledgers.get(currency));
     }
 }

@@ -196,10 +196,10 @@ public class AccountingServiceTest {
             committeeLedgerProvider.save(committeeId, currency, committeeLedger);
             projectLedgerProvider.save(projectId2, currency, projectLedger2);
             contributorLedgerProvider.save(contributorId2, currency, contributorLedger2);
-            ledgerStorage.save(sponsorLedger);
-            ledgerStorage.save(committeeLedger);
-            ledgerStorage.save(projectLedger2);
-            ledgerStorage.save(contributorLedger2);
+            ledgerStorage.save(currency, sponsorLedger);
+            ledgerStorage.save(currency, committeeLedger);
+            ledgerStorage.save(currency, projectLedger2);
+            ledgerStorage.save(currency, contributorLedger2);
 
             accountBook = AccountBookAggregate.fromEvents(
                     new MintEvent(sponsorLedger.id(), PositiveAmount.of(300L)),
@@ -395,7 +395,7 @@ public class AccountingServiceTest {
         @Test
         void should_do_everything() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id());
+            accountingService.fund(PositiveAmount.of(300L), currency.id());
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
             accountingService.transfer(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
 
@@ -450,9 +450,9 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
-            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id());
+            accountingService.fund(PositiveAmount.of(30L), currency.id());
+            accountingService.fund(PositiveAmount.of(30L), currency.id());
+            accountingService.fund(PositiveAmount.of(40L), currency.id());
 
             accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
 
@@ -472,7 +472,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_withdraw_more_than_funded() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id());
+            accountingService.fund(PositiveAmount.of(50L), currency.id());
 
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(80L), currency.id());
