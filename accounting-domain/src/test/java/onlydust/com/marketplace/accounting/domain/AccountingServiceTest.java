@@ -519,7 +519,7 @@ public class AccountingServiceTest {
         accountingService.transfer(sponsorId, projectId, PositiveAmount.of(10L), currency.id());
         accountingService.transfer(projectId, contributorId, PositiveAmount.of(10L), currency.id());
 
-        assertThatThrownBy(() -> accountingService.sendTo(contributorId, PositiveAmount.of(10L), currency.id()))
+        assertThatThrownBy(() -> accountingService.sendTo(contributorId, PositiveAmount.of(10L), currency.id(), new TransactionReceipt()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessageContaining("Not enough fund");

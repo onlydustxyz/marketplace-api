@@ -4,11 +4,15 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.TransactionReceipt;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+
+import java.util.Collection;
 
 @AllArgsConstructor
 public class AccountingService {
@@ -26,12 +30,22 @@ public class AccountingService {
         accountBookStorage.save(accountBook);
     }
 
-    public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> Collection<Transaction> sendTo(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getLedger(to, currency);
 
         final var transactions = accountBook.burn(ledger.id(), amount);
+
+        accountBookStorage.save(accountBook);
+        return transactions;
+    }
+
+    public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId, TransactionReceipt receipt) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = accountBookStorage.get(currency);
+
+        final var transactions = sendTo(to, amount, currencyId);
         transactions.forEach(transaction -> {
             final var funderLedger = ledgerStorage.get(transaction.from()).orElseThrow();
             if (funderLedger.balance().isStrictlyLowerThan(amount)) {
