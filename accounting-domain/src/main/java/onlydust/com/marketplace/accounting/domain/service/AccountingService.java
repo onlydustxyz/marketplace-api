@@ -21,6 +21,21 @@ public class AccountingService {
     private final LedgerStorage ledgerStorage;
     private final CurrencyStorage currencyStorage;
 
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id id) {
+        final var currency = getCurrency(id);
+        final var ledger = getOrCreateLedger(sponsorId, currency);
+
+        ledger.credit(amount);
+        ledgerStorage.save(ledger);
+    }
+
+    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
+        sendTo(to, amount, currencyId).forEach(transaction -> {
+            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
+            ledger.debit(transaction.amount());
+        });
+    }
+
     public <From> void receiveFrom(From from, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
@@ -39,13 +54,6 @@ public class AccountingService {
 
         accountBookStorage.save(accountBook);
         return transactions;
-    }
-
-    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
-        sendTo(to, amount, currencyId).forEach(transaction -> {
-            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount());
-        });
     }
 
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -88,13 +96,5 @@ public class AccountingService {
     private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
                 .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
-    }
-
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id id) {
-        final var currency = getCurrency(id);
-        final var ledger = getOrCreateLedger(sponsorId, currency);
-
-        ledger.credit(amount);
-        ledgerStorage.save(ledger);
     }
 }
