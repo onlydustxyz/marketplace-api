@@ -4,8 +4,8 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -21,78 +21,78 @@ import static org.mockito.Mockito.*;
 @SuppressWarnings("unchecked")
 public class AccountingServiceTest {
     final AccountBookStorage accountBookStorage = mock(AccountBookStorage.class);
-    final AccountProvider<SponsorId> sponsorAccountProvider = mock(AccountProvider.class);
-    final AccountProvider<CommitteeId> committeeAccountProvider = mock(AccountProvider.class);
-    final AccountProvider<ProjectId> projectAccountProvider = mock(AccountProvider.class);
-    final AccountProvider<ContributorId> contributorAccountProvider = mock(AccountProvider.class);
-    final AccountProviderProxy accountProviderProxy = new AccountProviderProxy(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider,
-            contributorAccountProvider);
+    final LedgerProvider<SponsorId> sponsorLedgerProvider = mock(LedgerProvider.class);
+    final LedgerProvider<CommitteeId> committeeLedgerProvider = mock(LedgerProvider.class);
+    final LedgerProvider<ProjectId> projectLedgerProvider = mock(LedgerProvider.class);
+    final LedgerProvider<ContributorId> contributorLedgerProvider = mock(LedgerProvider.class);
+    final LedgerProviderProxy ledgerProviderProxy = new LedgerProviderProxy(
+            sponsorLedgerProvider, committeeLedgerProvider, projectLedgerProvider, contributorLedgerProvider);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(accountBookStorage, accountProviderProxy, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountBookStorage, ledgerProviderProxy, currencyStorage);
 
     @BeforeEach
     void setUp() {
-        reset(sponsorAccountProvider, committeeAccountProvider, projectAccountProvider, contributorAccountProvider, currencyStorage, accountBookStorage);
+        reset(sponsorLedgerProvider, committeeLedgerProvider, projectLedgerProvider, contributorLedgerProvider, currencyStorage, accountBookStorage);
     }
 
     /*
      * Given a newly created sponsor
      * When I transfer money to OnlyDust
-     * Then A new account is created for me and the transfer is registered on it
+     * Then A new ledger is created for me and the transfer is registered on it
      */
     @Test
     void should_create_account_and_register_transfer() {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = AccountId.random();
+        final var ledger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.empty();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
-        when(sponsorAccountProvider.create(sponsorId, currency)).thenReturn(account);
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
+        when(sponsorLedgerProvider.create(sponsorId, currency)).thenReturn(ledger);
 
         // When
         accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I transfer money to OnlyDust
-     * Then The transfer is registered on my account
+     * Then The transfer is registered on my ledger
      */
     @Test
     void should_register_transfer() {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = AccountId.random();
+        final var ledger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(account, PositiveAmount.of(100L))
+                new MintEvent(ledger, PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(ledger));
 
         // When
         accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(110L));
+        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(110L));
 
         verify(accountBookStorage).save(accountBook);
     }
 
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I transfer money to OnlyDust in an unknown currency
      * Then The transfer is rejected
      */
@@ -114,35 +114,35 @@ public class AccountingServiceTest {
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I refund money from OnlyDust
-     * Then The refund is registered on my account
+     * Then The refund is registered on my ledger
      */
     @Test
     void should_register_refund() {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = AccountId.random();
+        final var ledger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(account, PositiveAmount.of(100L))
+                new MintEvent(ledger, PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(ledger));
 
         // When
         accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(90L));
 
         verify(accountBookStorage).save(accountBook);
     }
 
     /*
-     * Given a sponsor with no account
+     * Given a sponsor with no ledger
      * When I refund money from OnlyDust
      * Then The refund is rejected
      */
@@ -154,19 +154,19 @@ public class AccountingServiceTest {
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.empty());
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
+                .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
 
         verify(accountBookStorage, never()).save(any());
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I refund money from OnlyDust in an unknown currency
      * Then The refund is rejected
      */
@@ -188,7 +188,7 @@ public class AccountingServiceTest {
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I refund money from OnlyDust of more than I sent
      * Then The refund is rejected
      */
@@ -197,13 +197,13 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var account = AccountId.random();
+        final var ledger = Ledger.Id.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(account, PositiveAmount.of(100L))
+                new MintEvent(ledger, PositiveAmount.of(100L))
         ));
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(account));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(ledger));
 
         // When
         assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(110L), currency.id()))
@@ -215,75 +215,75 @@ public class AccountingServiceTest {
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I allocate money to a committee
-     * Then The transfer is registered from my account to the committee account
+     * Then The transfer is registered from my ledger to the committee ledger
      */
     @Test
     void should_register_allocation_to_committee() {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L)),
-                new MintEvent(committeeAccount, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger, PositiveAmount.of(200L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
 
         // When
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(210L));
-        assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(210L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
 
     /*
-     * Given a sponsor with an account
-     * When I allocate money to a committee with no account
-     * Then An account is created for the committee and the transfer is registered from my account to the committee account
+     * Given a sponsor with a ledger
+     * When I allocate money to a committee with no ledger
+     * Then a ledger is created for the committee and the transfer is registered from my ledger to the committee ledger
      */
     @Test
     void should_create_account_and_register_allocation_to_committee() {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.empty());
-        when(committeeAccountProvider.create(committeeId, currency)).thenReturn(committeeAccount);
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.empty());
+        when(committeeLedgerProvider.create(committeeId, currency)).thenReturn(committeeLedger);
 
         // When
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I allocate money to a committee in an unknown currency
      * Then The allocation is rejected
      */
@@ -308,34 +308,34 @@ public class AccountingServiceTest {
     /*
      * Given a sponsor that has allocated money to a committee
      * When I refund money from the committee
-     * Then The refund is registered on my account
+     * Then The refund is registered on my ledger
      */
     @Test
     void should_register_refund_from_committee() {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L)),
-                new MintEvent(committeeAccount, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger, PositiveAmount.of(200L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
 
         // When
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
         accountingService.refund(committeeId, sponsorId, PositiveAmount.of(5L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(95L));
-        assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(205L));
-        assertThat(accountBook.state().transferredAmount(sponsorAccount, committeeAccount)).isEqualTo(PositiveAmount.of(5L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(95L));
+        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(205L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(5L));
 
         verify(accountBookStorage, times(2)).save(accountBook);
     }
@@ -364,7 +364,7 @@ public class AccountingServiceTest {
     }
 
     /*
-     * Given a sponsor with no account
+     * Given a sponsor with no ledger
      * When I refund money from a committee
      * Then The refund is rejected
      */
@@ -377,20 +377,20 @@ public class AccountingServiceTest {
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.empty());
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for owner %s in currency %s".formatted(sponsorId, currency));
+                .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
 
         verify(accountBookStorage, never()).save(any());
     }
 
     /*
-     * Given a sponsor with an account
-     * When I refund money from a committee with no account
+     * Given a sponsor with a ledger
+     * When I refund money from a committee with no ledger
      * Then The refund is rejected
      */
     @Test
@@ -399,26 +399,26 @@ public class AccountingServiceTest {
         final var sponsorId = SponsorId.random();
         final var committeeId = CommitteeId.random();
         final var currency = Currencies.USD;
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
         ));
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.empty());
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("No account found for owner %s in currency %s".formatted(committeeId, currency));
+                .hasMessage("No ledger found for owner %s in currency %s".formatted(committeeId, currency));
 
         verify(accountBookStorage, never()).save(any());
     }
 
     /*
-     * Given a sponsor with an account
+     * Given a sponsor with a ledger
      * When I refund money from a committee
      * Then The refund is rejected if the sponsor has not allocated enough money
      */
@@ -427,17 +427,17 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L)),
-                new MintEvent(committeeAccount, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger, PositiveAmount.of(200L))
         ));
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
 
         // When
         assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
@@ -449,36 +449,36 @@ public class AccountingServiceTest {
     }
 
     /*
-     * Given a committee with an account and a project with an account
+     * Given a committee with a ledger and a project with a ledger
      * When I fund a project
-     * Then The transfer is registered on the project account
+     * Then The transfer is registered on the project ledger
      */
     @Test
     void should_register_funding() {
         // Given
         final var currency = Currencies.USD;
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
         final var projectId = ProjectId.random();
-        final var projectAccount = AccountId.random();
+        final var projectLedger = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(committeeAccount, PositiveAmount.of(100L))
+                new MintEvent(committeeLedger, PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
-        when(projectAccountProvider.get(projectId, currency)).thenReturn(Optional.of(projectAccount));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
+        when(projectLedgerProvider.get(projectId, currency)).thenReturn(Optional.of(projectLedger));
 
         // When
         accountingService.transfer(committeeId, projectId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(projectAccount)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(committeeAccount, projectAccount)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(projectLedger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger, projectLedger)).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -500,29 +500,29 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorAccount = AccountId.random();
+        final var sponsorLedger = Ledger.Id.random();
         final var committeeId = CommitteeId.random();
-        final var committeeAccount = AccountId.random();
+        final var committeeLedger = Ledger.Id.random();
         final var projectId1 = ProjectId.random();
-        final var projectAccount1 = AccountId.random();
+        final var projectLedger1 = Ledger.Id.random();
         final var projectId2 = ProjectId.random();
-        final var projectAccount2 = AccountId.random();
+        final var projectLedger2 = Ledger.Id.random();
         final var contributorId1 = ContributorId.random();
-        final var contributorAccount1 = AccountId.random();
+        final var contributorLedger1 = Ledger.Id.random();
         final var contributorId2 = ContributorId.random();
-        final var contributorAccount2 = AccountId.random();
+        final var contributorLedger2 = Ledger.Id.random();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorAccount, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
-        when(sponsorAccountProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorAccount));
-        when(committeeAccountProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeAccount));
-        when(projectAccountProvider.get(projectId1, currency)).thenReturn(Optional.of(projectAccount1));
-        when(projectAccountProvider.get(projectId2, currency)).thenReturn(Optional.of(projectAccount2));
-        when(contributorAccountProvider.get(contributorId1, currency)).thenReturn(Optional.of(contributorAccount1));
-        when(contributorAccountProvider.get(contributorId2, currency)).thenReturn(Optional.of(contributorAccount2));
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
+        when(projectLedgerProvider.get(projectId1, currency)).thenReturn(Optional.of(projectLedger1));
+        when(projectLedgerProvider.get(projectId2, currency)).thenReturn(Optional.of(projectLedger2));
+        when(contributorLedgerProvider.get(contributorId1, currency)).thenReturn(Optional.of(contributorLedger1));
+        when(contributorLedgerProvider.get(contributorId2, currency)).thenReturn(Optional.of(contributorLedger2));
 
         // When
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
@@ -543,21 +543,21 @@ public class AccountingServiceTest {
         accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorAccount)).isEqualTo(PositiveAmount.of(15L));
-        assertThat(accountBook.state().balanceOf(committeeAccount)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().balanceOf(projectAccount1)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().balanceOf(projectAccount2)).isEqualTo(PositiveAmount.of(30L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(15L));
+        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().balanceOf(projectLedger1)).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().balanceOf(projectLedger2)).isEqualTo(PositiveAmount.of(30L));
 
-        assertThat(accountBook.state().balanceOf(contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(projectAccount1, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(projectLedger1, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
 
-        assertThat(accountBook.state().balanceOf(contributorAccount2)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().transferredAmount(projectAccount1, contributorAccount2)).isEqualTo(PositiveAmount.of(20L));
-        assertThat(accountBook.state().transferredAmount(projectAccount2, contributorAccount2)).isEqualTo(PositiveAmount.of(25L));
-        assertThat(accountBook.state().transferredAmount(sponsorAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(45L));
-        assertThat(accountBook.state().transferredAmount(committeeAccount, contributorAccount2)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.state().balanceOf(contributorLedger2)).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().transferredAmount(projectLedger1, contributorLedger2)).isEqualTo(PositiveAmount.of(20L));
+        assertThat(accountBook.state().transferredAmount(projectLedger2, contributorLedger2)).isEqualTo(PositiveAmount.of(25L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger, contributorLedger2)).isEqualTo(PositiveAmount.of(45L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger, contributorLedger2)).isEqualTo(PositiveAmount.of(40L));
 
         verify(accountBookStorage, times(10)).save(accountBook);
     }

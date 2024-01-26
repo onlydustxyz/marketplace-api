@@ -1,55 +1,55 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @AllArgsConstructor
 public class AccountingService {
     private final AccountBookStorage accountBookStorage;
-    private final AccountProvider<Object> accountProvider;
+    private final LedgerProvider<Object> ledgerProvider;
     private final CurrencyStorage currencyStorage;
 
     public <From> void receiveFrom(From from, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var account = getOrCreateAccount(from, currency);
+        final var ledger = getOrCreateLedger(from, currency);
 
-        accountBook.mint(account, amount);
+        accountBook.mint(ledger, amount);
         accountBookStorage.save(accountBook);
     }
 
     public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var account = getAccount(to, currency);
+        final var ledger = getLedger(to, currency);
 
-        accountBook.burn(account, amount);
+        accountBook.burn(ledger, amount);
         accountBookStorage.save(accountBook);
     }
 
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var fromAccount = getAccount(from, currency);
-        final var toAccount = getOrCreateAccount(to, currency);
+        final var fromLedger = getLedger(from, currency);
+        final var toLedger = getOrCreateLedger(to, currency);
 
-        accountBook.transfer(fromAccount, toAccount, amount);
+        accountBook.transfer(fromLedger, toLedger, amount);
         accountBookStorage.save(accountBook);
     }
 
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = accountBookStorage.get(currency);
-        final var fromAccount = getAccount(from, currency);
-        final var toAccount = getAccount(to, currency);
+        final var fromLedger = getLedger(from, currency);
+        final var toLedger = getLedger(to, currency);
 
-        accountBook.refund(fromAccount, toAccount, amount);
+        accountBook.refund(fromLedger, toLedger, amount);
         accountBookStorage.save(accountBook);
     }
 
@@ -58,13 +58,13 @@ public class AccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
     }
 
-    private <OwnerId> AccountId getOrCreateAccount(OwnerId ownerId, Currency currency) {
-        return accountProvider.get(ownerId, currency)
-                .orElseGet(() -> accountProvider.create(ownerId, currency));
+    private <OwnerId> Ledger.Id getOrCreateLedger(OwnerId ownerId, Currency currency) {
+        return ledgerProvider.get(ownerId, currency)
+                .orElseGet(() -> ledgerProvider.create(ownerId, currency));
     }
 
-    private <OwnerId> AccountId getAccount(OwnerId ownerId, Currency currency) {
-        return accountProvider.get(ownerId, currency)
+    private <OwnerId> Ledger.Id getLedger(OwnerId ownerId, Currency currency) {
+        return ledgerProvider.get(ownerId, currency)
                 .orElseThrow(() -> OnlyDustException.notFound("No account found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 }
