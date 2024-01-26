@@ -35,8 +35,8 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public void burn(Ledger.Id account, PositiveAmount amount) {
-        emit(new BurnEvent(account, amount));
+    public Collection<Transaction> burn(Ledger.Id account, PositiveAmount amount) {
+        return emit(new BurnEvent(account, amount));
     }
 
     @Override
@@ -49,11 +49,6 @@ public class AccountBookAggregate implements AccountBook {
         emit(new RefundEvent(from, to, amount));
     }
 
-    @Override
-    public Collection<Ledger.Id> funders(Ledger.Id id) {
-        return state.funders(id);
-    }
-
     public AccountBookState state() {
         return state;
     }
@@ -62,36 +57,39 @@ public class AccountBookAggregate implements AccountBook {
         return pendingEvents;
     }
 
-    private void emit(AccountBookEvent event) {
+    private <R> R emit(AccountBookEvent event) {
         pendingEvents.add(event);
-        state.accept(event);
+        return state.accept(event);
     }
 
     public record MintEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent {
         @Override
-        public void visit(AccountBookState state) {
+        public Void visit(AccountBookState state) {
             state.mint(account, amount);
+            return Void.TYPE.cast(null);
         }
     }
 
     public record BurnEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent {
         @Override
-        public void visit(AccountBookState state) {
-            state.burn(account, amount);
+        public Collection<Transaction> visit(AccountBookState state) {
+            return state.burn(account, amount);
         }
     }
 
     public record TransferEvent(Ledger.Id from, Ledger.Id to, PositiveAmount amount) implements AccountBookEvent {
         @Override
-        public void visit(AccountBookState state) {
+        public Void visit(AccountBookState state) {
             state.transfer(from, to, amount);
+            return Void.TYPE.cast(null);
         }
     }
 
     public record RefundEvent(Ledger.Id from, Ledger.Id to, PositiveAmount amount) implements AccountBookEvent {
         @Override
-        public void visit(AccountBookState state) {
+        public Void visit(AccountBookState state) {
             state.refund(from, to, amount);
+            return Void.TYPE.cast(null);
         }
     }
 }

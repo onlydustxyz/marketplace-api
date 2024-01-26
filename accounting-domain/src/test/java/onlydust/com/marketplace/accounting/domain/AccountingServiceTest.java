@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
+import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -27,8 +28,9 @@ public class AccountingServiceTest {
     final LedgerProvider<ContributorId> contributorLedgerProvider = mock(LedgerProvider.class);
     final LedgerProviderProxy ledgerProviderProxy = new LedgerProviderProxy(
             sponsorLedgerProvider, committeeLedgerProvider, projectLedgerProvider, contributorLedgerProvider);
+    final LedgerStorage ledgerStorage = mock(LedgerStorage.class);
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(accountBookStorage, ledgerProviderProxy, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountBookStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
 
     @BeforeEach
     void setUp() {
@@ -131,6 +133,7 @@ public class AccountingServiceTest {
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(accountBook);
         when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(ledger));
+        when(ledgerStorage.get(ledger.id())).thenReturn(Optional.of(ledger));
 
         // When
         accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id());
@@ -209,7 +212,7 @@ public class AccountingServiceTest {
         assertThatThrownBy(() -> accountingService.sendTo(sponsorId, PositiveAmount.of(110L), currency.id()))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessageContaining("Cannot transfer");
+                .hasMessageContaining("Cannot burn");
 
         verify(accountBookStorage, never()).save(any());
     }
@@ -508,6 +511,9 @@ public class AccountingServiceTest {
         when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
         when(projectLedgerProvider.get(projectId, currency)).thenReturn(Optional.of(projectLedger));
         when(contributorLedgerProvider.get(contributorId, currency)).thenReturn(Optional.of(contributorLedger));
+        when(ledgerStorage.get(sponsorLedger.id())).thenReturn(Optional.of(sponsorLedger));
+        when(ledgerStorage.get(projectLedger.id())).thenReturn(Optional.of(projectLedger));
+        when(ledgerStorage.get(contributorLedger.id())).thenReturn(Optional.of(contributorLedger));
 
         // When
         accountingService.transfer(sponsorId, projectId, PositiveAmount.of(10L), currency.id());
@@ -559,6 +565,12 @@ public class AccountingServiceTest {
         when(projectLedgerProvider.get(projectId2, currency)).thenReturn(Optional.of(projectLedger2));
         when(contributorLedgerProvider.get(contributorId1, currency)).thenReturn(Optional.of(contributorLedger1));
         when(contributorLedgerProvider.get(contributorId2, currency)).thenReturn(Optional.of(contributorLedger2));
+        when(ledgerStorage.get(sponsorLedger.id())).thenReturn(Optional.of(sponsorLedger));
+        when(ledgerStorage.get(committeeLedger.id())).thenReturn(Optional.of(committeeLedger));
+        when(ledgerStorage.get(projectLedger1.id())).thenReturn(Optional.of(projectLedger1));
+        when(ledgerStorage.get(projectLedger2.id())).thenReturn(Optional.of(projectLedger2));
+        when(ledgerStorage.get(contributorLedger1.id())).thenReturn(Optional.of(contributorLedger1));
+        when(ledgerStorage.get(contributorLedger2.id())).thenReturn(Optional.of(contributorLedger2));
 
         // When
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
