@@ -20,6 +20,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class MeApiIT extends AbstractMarketplaceApiIT {
@@ -355,7 +356,27 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)
                 .jsonPath("$.projectsAppliedTo[0]").isEqualTo(projectAppliedTo1.toString())
                 .jsonPath("$.projectsAppliedTo[1]").isEqualTo(projectAppliedTo2.toString());
+    }
 
+    @Test
+    void should_update_last_seen_at() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final var before = new Date();
 
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        final var after = new Date();
+
+        // Then
+        final var user = userRepository.findByGithubUserId(pierre.user().getGithubUserId()).orElseThrow();
+        assertThat(user.getLastSeenAt()).isAfter(before);
+        assertThat(user.getLastSeenAt()).isBefore(after);
     }
 }
