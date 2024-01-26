@@ -374,7 +374,7 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, contributorId1, PositiveAmount.of(10L), currency.id());
 
-            assertThatThrownBy(() -> accountingService.sendTo(contributorId1, PositiveAmount.of(10L), currency.id(), new TransactionReceipt()))
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId1, PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -395,7 +395,7 @@ public class AccountingServiceTest {
         @Test
         void should_do_everything() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id(), new TransactionReceipt());
+            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id());
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
             accountingService.transfer(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
 
@@ -411,7 +411,7 @@ public class AccountingServiceTest {
 
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(25L), currency.id());
 
-            accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id(), new TransactionReceipt());
+            accountingService.withdraw(contributorId2, PositiveAmount.of(45L), currency.id());
 
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
@@ -450,11 +450,11 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), new TransactionReceipt());
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), new TransactionReceipt());
-            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id(), new TransactionReceipt());
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
+            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id());
 
-            accountingService.sendTo(contributorId2, PositiveAmount.of(100L), currency.id(), new TransactionReceipt());
+            accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
 
             // Then
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
@@ -472,14 +472,14 @@ public class AccountingServiceTest {
         @Test
         void should_reject_withdraw_more_than_funded() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id(), new TransactionReceipt());
+            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id());
 
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(80L), currency.id());
 
-            accountingService.sendTo(contributorId2, PositiveAmount.of(40L), currency.id(), new TransactionReceipt());
+            accountingService.withdraw(contributorId2, PositiveAmount.of(40L), currency.id());
 
-            assertThatThrownBy(() -> accountingService.sendTo(contributorId2, PositiveAmount.of(40L), currency.id(), new TransactionReceipt()))
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(40L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");

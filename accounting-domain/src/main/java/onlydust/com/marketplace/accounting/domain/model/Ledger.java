@@ -29,15 +29,15 @@ public class Ledger {
                 .reduce(Amount.ZERO, Amount::add));
     }
 
-    public void credit(PositiveAmount amount, TransactionReceipt transactionReceipt) {
-        transactions.add(new Transaction(amount, transactionReceipt));
+    public void credit(PositiveAmount amount) {
+        transactions.add(new Transaction(amount));
     }
 
-    public void debit(PositiveAmount amount, TransactionReceipt receipt) {
+    public void debit(PositiveAmount amount) {
         if (balance().isStrictlyLowerThan(amount))
             throw OnlyDustException.badRequest("Not enough fund on ledger %s".formatted(id));
 
-        transactions.add(new Transaction(amount.negate(), receipt));
+        transactions.add(new Transaction(amount.negate()));
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -53,6 +53,6 @@ public class Ledger {
         }
     }
 
-    private record Transaction(Amount amount, TransactionReceipt transactionReceipt) {
+    private record Transaction(Amount amount) {
     }
 }

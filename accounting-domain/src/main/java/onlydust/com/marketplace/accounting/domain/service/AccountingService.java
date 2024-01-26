@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Ledger;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -38,10 +41,10 @@ public class AccountingService {
         return transactions;
     }
 
-    public <To> void sendTo(To to, PositiveAmount amount, Currency.Id currencyId, TransactionReceipt receipt) {
+    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
         sendTo(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount(), receipt);
+            ledger.debit(transaction.amount());
         });
     }
 
@@ -80,11 +83,11 @@ public class AccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id id, TransactionReceipt transactionReceipt) {
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id id) {
         final var currency = getCurrency(id);
         final var ledger = getOrCreateLedger(sponsorId, currency);
 
-        ledger.credit(amount, transactionReceipt);
+        ledger.credit(amount);
         ledgerStorage.save(ledger);
     }
 }
