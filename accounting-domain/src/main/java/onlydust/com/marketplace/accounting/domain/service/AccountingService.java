@@ -33,6 +33,7 @@ public class AccountingService {
         burn(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
             ledger.debit(transaction.amount());
+            ledgerStorage.save(ledger);
         });
     }
 

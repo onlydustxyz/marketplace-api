@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -11,12 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@AllArgsConstructor
 public class Ledger {
     final @NonNull Id id;
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
     public Ledger() {
         this.id = Id.random();
+    }
+
+    public static Ledger of(Ledger other) {
+        final var ledger = new Ledger(other.id);
+        ledger.transactions.addAll(other.transactions);
+        return ledger;
     }
 
     public Id id() {
