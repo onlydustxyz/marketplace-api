@@ -28,8 +28,10 @@ public class CustomRewardRepository {
                    (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
                    case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
                    case
-                       when u.id is null then 'PENDING_SIGNUP'
                        when r.id is not null then 'COMPLETE'
+                       when pr.currency = 'strk' THEN 'LOCKED'
+                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                       when u.id is null then 'PENDING_SIGNUP'
                        else 'PROCESSING'
                        end                                                                                  status,
                        r.receipt,
