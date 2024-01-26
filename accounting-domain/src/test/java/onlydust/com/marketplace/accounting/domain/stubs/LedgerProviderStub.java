@@ -18,10 +18,8 @@ public class LedgerProviderStub<T> implements LedgerProvider<T> {
     }
 
     @Override
-    public Ledger create(T ownerId, Currency currency) {
-        final var ledger = new Ledger();
+    public void save(T ownerId, Currency currency, Ledger ledger) {
         if (ledgers.put(Tuple.tuple(ownerId, currency), ledger) != null)
             throw new IllegalStateException("Ledger already exists");
-        return ledger;
     }
 }

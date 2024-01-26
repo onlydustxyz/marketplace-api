@@ -75,7 +75,14 @@ public class AccountingService {
 
     private <OwnerId> Ledger getOrCreateLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
-                .orElseGet(() -> ledgerProvider.create(ownerId, currency));
+                .orElseGet(() -> createLedger(ownerId, currency));
+    }
+
+    private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency) {
+        final var ledger = new Ledger();
+        ledgerProvider.save(ownerId, currency, ledger);
+        ledgerStorage.save(ledger);
+        return ledger;
     }
 
     private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {

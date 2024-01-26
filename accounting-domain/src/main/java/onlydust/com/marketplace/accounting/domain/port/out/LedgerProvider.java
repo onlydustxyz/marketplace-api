@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface LedgerProvider<ID> {
     Optional<Ledger> get(ID ownerId, Currency currency);
 
-    Ledger create(ID ownerId, Currency currency);
+    void save(ID ownerId, Currency currency, Ledger ledger);
 }

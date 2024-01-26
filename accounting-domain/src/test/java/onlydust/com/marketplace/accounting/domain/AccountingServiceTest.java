@@ -177,25 +177,25 @@ public class AccountingServiceTest {
     @Nested
     class GivenASponsorsWithALedger {
         final SponsorId sponsorId = SponsorId.random();
-        Ledger sponsorLedger = new Ledger();
+        final Ledger sponsorLedger = new Ledger();
         final CommitteeId committeeId = CommitteeId.random();
-        Ledger committeeLedger = new Ledger();
+        final Ledger committeeLedger = new Ledger();
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
-        Ledger projectLedger2 = new Ledger();
+        final Ledger projectLedger2 = new Ledger();
         final ContributorId contributorId1 = ContributorId.random();
         final ContributorId contributorId2 = ContributorId.random();
-        Ledger contributorLedger2 = new Ledger();
+        final Ledger contributorLedger2 = new Ledger();
         final Currency currency = Currencies.USD;
         AccountBookAggregate accountBook;
 
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorLedger = sponsorLedgerProvider.create(sponsorId, currency);
-            committeeLedger = committeeLedgerProvider.create(committeeId, currency);
-            projectLedger2 = projectLedgerProvider.create(projectId2, currency);
-            contributorLedger2 = contributorLedgerProvider.create(contributorId2, currency);
+            sponsorLedgerProvider.save(sponsorId, currency, sponsorLedger);
+            committeeLedgerProvider.save(committeeId, currency, committeeLedger);
+            projectLedgerProvider.save(projectId2, currency, projectLedger2);
+            contributorLedgerProvider.save(contributorId2, currency, contributorLedger2);
             ledgerStorage.save(sponsorLedger);
             ledgerStorage.save(committeeLedger);
             ledgerStorage.save(projectLedger2);

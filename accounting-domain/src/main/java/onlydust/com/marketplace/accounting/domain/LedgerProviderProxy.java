@@ -32,15 +32,15 @@ public class LedgerProviderProxy implements LedgerProvider<Object> {
     }
 
     @Override
-    public Ledger create(Object ownerId, Currency currency) {
+    public void save(Object ownerId, Currency currency, Ledger ledger) {
         if (ownerId instanceof SponsorId sponsorId) {
-            return sponsorLedgerProvider.create(sponsorId, currency);
+            sponsorLedgerProvider.save(sponsorId, currency, ledger);
         } else if (ownerId instanceof CommitteeId committeeId) {
-            return committeeLedgerProvider.create(committeeId, currency);
+            committeeLedgerProvider.save(committeeId, currency, ledger);
         } else if (ownerId instanceof ProjectId projectId) {
-            return projectLedgerProvider.create(projectId, currency);
+            projectLedgerProvider.save(projectId, currency, ledger);
         } else if (ownerId instanceof ContributorId contributorId) {
-            return contributorLedgerProvider.create(contributorId, currency);
+            contributorLedgerProvider.save(contributorId, currency, ledger);
         } else {
             throw badRequest("Unknown owner type: " + ownerId.getClass());
         }
