@@ -20,7 +20,7 @@ public class AccountingService {
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getOrCreateLedger(from, currency);
 
-        accountBook.mint(ledger, amount);
+        accountBook.mint(ledger.id(), amount);
         accountBookStorage.save(accountBook);
     }
 
@@ -29,7 +29,7 @@ public class AccountingService {
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getLedger(to, currency);
 
-        accountBook.burn(ledger, amount);
+        accountBook.burn(ledger.id(), amount);
         accountBookStorage.save(accountBook);
     }
 
@@ -39,7 +39,7 @@ public class AccountingService {
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getOrCreateLedger(to, currency);
 
-        accountBook.transfer(fromLedger, toLedger, amount);
+        accountBook.transfer(fromLedger.id(), toLedger.id(), amount);
         accountBookStorage.save(accountBook);
     }
 
@@ -49,7 +49,7 @@ public class AccountingService {
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getLedger(to, currency);
 
-        accountBook.refund(fromLedger, toLedger, amount);
+        accountBook.refund(fromLedger.id(), toLedger.id(), amount);
         accountBookStorage.save(accountBook);
     }
 
@@ -58,13 +58,13 @@ public class AccountingService {
                 .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
     }
 
-    private <OwnerId> Ledger.Id getOrCreateLedger(OwnerId ownerId, Currency currency) {
+    private <OwnerId> Ledger getOrCreateLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
                 .orElseGet(() -> ledgerProvider.create(ownerId, currency));
     }
 
-    private <OwnerId> Ledger.Id getLedger(OwnerId ownerId, Currency currency) {
+    private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
-                .orElseThrow(() -> OnlyDustException.notFound("No account found for owner %s in currency %s".formatted(ownerId, currency)));
+                .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 }

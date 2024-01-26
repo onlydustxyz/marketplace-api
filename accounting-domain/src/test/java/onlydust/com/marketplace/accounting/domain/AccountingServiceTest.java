@@ -45,7 +45,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var ledger = Ledger.Id.random();
+        final var ledger = new Ledger();
         final var accountBook = AccountBookAggregate.empty();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -57,7 +57,7 @@ public class AccountingServiceTest {
         accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(ledger.id())).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -72,9 +72,9 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var ledger = Ledger.Id.random();
+        final var ledger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(ledger, PositiveAmount.of(100L))
+                new MintEvent(ledger.id(), PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -85,7 +85,7 @@ public class AccountingServiceTest {
         accountingService.receiveFrom(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(110L));
+        assertThat(accountBook.state().balanceOf(ledger.id())).isEqualTo(PositiveAmount.of(110L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -123,9 +123,9 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var ledger = Ledger.Id.random();
+        final var ledger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(ledger, PositiveAmount.of(100L))
+                new MintEvent(ledger.id(), PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -136,7 +136,7 @@ public class AccountingServiceTest {
         accountingService.sendTo(sponsorId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(ledger)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(ledger.id())).isEqualTo(PositiveAmount.of(90L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -197,11 +197,11 @@ public class AccountingServiceTest {
         // Given
         final var sponsorId = SponsorId.random();
         final var currency = Currencies.USD;
-        final var ledger = Ledger.Id.random();
+        final var ledger = new Ledger();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(ledger, PositiveAmount.of(100L))
+                new MintEvent(ledger.id(), PositiveAmount.of(100L))
         ));
         when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(ledger));
 
@@ -224,12 +224,12 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
-                new MintEvent(committeeLedger, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger.id(), PositiveAmount.of(200L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -241,9 +241,9 @@ public class AccountingServiceTest {
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(210L));
-        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(210L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), committeeLedger.id())).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -258,11 +258,11 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -275,9 +275,9 @@ public class AccountingServiceTest {
         accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), committeeLedger.id())).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -315,12 +315,12 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
-                new MintEvent(committeeLedger, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger.id(), PositiveAmount.of(200L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -333,9 +333,9 @@ public class AccountingServiceTest {
         accountingService.refund(committeeId, sponsorId, PositiveAmount.of(5L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(95L));
-        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(205L));
-        assertThat(accountBook.state().transferredAmount(sponsorLedger, committeeLedger)).isEqualTo(PositiveAmount.of(5L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(95L));
+        assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(205L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), committeeLedger.id())).isEqualTo(PositiveAmount.of(5L));
 
         verify(accountBookStorage, times(2)).save(accountBook);
     }
@@ -399,11 +399,11 @@ public class AccountingServiceTest {
         final var sponsorId = SponsorId.random();
         final var committeeId = CommitteeId.random();
         final var currency = Currencies.USD;
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L))
         ));
         when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
         when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.empty());
@@ -427,14 +427,14 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
         when(accountBookStorage.get(currency)).thenReturn(AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L)),
-                new MintEvent(committeeLedger, PositiveAmount.of(200L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L)),
+                new MintEvent(committeeLedger.id(), PositiveAmount.of(200L))
         ));
         when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
         when(committeeLedgerProvider.get(committeeId, currency)).thenReturn(Optional.of(committeeLedger));
@@ -458,11 +458,11 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
         final var projectId = ProjectId.random();
-        final var projectLedger = Ledger.Id.random();
+        final var projectLedger = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(committeeLedger, PositiveAmount.of(100L))
+                new MintEvent(committeeLedger.id(), PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -476,9 +476,9 @@ public class AccountingServiceTest {
         accountingService.transfer(committeeId, projectId, PositiveAmount.of(10L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(90L));
-        assertThat(accountBook.state().balanceOf(projectLedger)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(committeeLedger, projectLedger)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger.id(), projectLedger.id())).isEqualTo(PositiveAmount.of(10L));
 
         verify(accountBookStorage).save(accountBook);
     }
@@ -500,19 +500,19 @@ public class AccountingServiceTest {
         // Given
         final var currency = Currencies.USD;
         final var sponsorId = SponsorId.random();
-        final var sponsorLedger = Ledger.Id.random();
+        final var sponsorLedger = new Ledger();
         final var committeeId = CommitteeId.random();
-        final var committeeLedger = Ledger.Id.random();
+        final var committeeLedger = new Ledger();
         final var projectId1 = ProjectId.random();
-        final var projectLedger1 = Ledger.Id.random();
+        final var projectLedger1 = new Ledger();
         final var projectId2 = ProjectId.random();
-        final var projectLedger2 = Ledger.Id.random();
+        final var projectLedger2 = new Ledger();
         final var contributorId1 = ContributorId.random();
-        final var contributorLedger1 = Ledger.Id.random();
+        final var contributorLedger1 = new Ledger();
         final var contributorId2 = ContributorId.random();
-        final var contributorLedger2 = Ledger.Id.random();
+        final var contributorLedger2 = new Ledger();
         final var accountBook = AccountBookAggregate.fromEvents(
-                new MintEvent(sponsorLedger, PositiveAmount.of(100L))
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L))
         );
 
         when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
@@ -543,21 +543,21 @@ public class AccountingServiceTest {
         accountingService.sendTo(contributorId2, PositiveAmount.of(45L), currency.id());
 
         // Then
-        assertThat(accountBook.state().balanceOf(sponsorLedger)).isEqualTo(PositiveAmount.of(15L));
-        assertThat(accountBook.state().balanceOf(committeeLedger)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().balanceOf(projectLedger1)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().balanceOf(projectLedger2)).isEqualTo(PositiveAmount.of(30L));
+        assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(15L));
+        assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.of(30L));
 
-        assertThat(accountBook.state().balanceOf(contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(projectLedger1, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(sponsorLedger, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
-        assertThat(accountBook.state().transferredAmount(committeeLedger, contributorLedger1)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(projectLedger1.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
 
-        assertThat(accountBook.state().balanceOf(contributorLedger2)).isEqualTo(PositiveAmount.of(0L));
-        assertThat(accountBook.state().transferredAmount(projectLedger1, contributorLedger2)).isEqualTo(PositiveAmount.of(20L));
-        assertThat(accountBook.state().transferredAmount(projectLedger2, contributorLedger2)).isEqualTo(PositiveAmount.of(25L));
-        assertThat(accountBook.state().transferredAmount(sponsorLedger, contributorLedger2)).isEqualTo(PositiveAmount.of(45L));
-        assertThat(accountBook.state().transferredAmount(committeeLedger, contributorLedger2)).isEqualTo(PositiveAmount.of(40L));
+        assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.of(0L));
+        assertThat(accountBook.state().transferredAmount(projectLedger1.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(20L));
+        assertThat(accountBook.state().transferredAmount(projectLedger2.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(25L));
+        assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(45L));
+        assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(40L));
 
         verify(accountBookStorage, times(10)).save(accountBook);
     }

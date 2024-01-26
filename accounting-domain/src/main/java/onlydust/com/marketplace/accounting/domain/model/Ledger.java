@@ -9,6 +9,16 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import java.util.UUID;
 
 public class Ledger {
+    final @NonNull Id id;
+
+    public Ledger() {
+        this.id = Id.random();
+    }
+
+    public Id id() {
+        return this.id;
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

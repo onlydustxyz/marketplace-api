@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import java.util.Optional;
 
 public interface LedgerProvider<ID> {
-    Optional<Ledger.Id> get(ID ownerId, Currency currency);
+    Optional<Ledger> get(ID ownerId, Currency currency);
 
-    Ledger.Id create(ID ownerId, Currency currency);
+    Ledger create(ID ownerId, Currency currency);
 }

@@ -17,7 +17,7 @@ public class LedgerProviderProxy implements LedgerProvider<Object> {
 
 
     @Override
-    public Optional<Ledger.Id> get(Object ownerId, Currency currency) {
+    public Optional<Ledger> get(Object ownerId, Currency currency) {
         if (ownerId instanceof SponsorId sponsorId) {
             return sponsorLedgerProvider.get(sponsorId, currency);
         } else if (ownerId instanceof CommitteeId committeeId) {
@@ -32,7 +32,7 @@ public class LedgerProviderProxy implements LedgerProvider<Object> {
     }
 
     @Override
-    public Ledger.Id create(Object ownerId, Currency currency) {
+    public Ledger create(Object ownerId, Currency currency) {
         if (ownerId instanceof SponsorId sponsorId) {
             return sponsorLedgerProvider.create(sponsorId, currency);
         } else if (ownerId instanceof CommitteeId committeeId) {
