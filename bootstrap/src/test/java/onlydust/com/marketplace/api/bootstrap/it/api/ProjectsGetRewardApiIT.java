@@ -108,6 +108,39 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         paymentRequestEntity.setAmount(BigDecimal.valueOf(100));
         paymentRequestEntity.setCurrency(CurrencyEnumEntity.strk);
         paymentRequestRepository.save(paymentRequestEntity);
+
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARD, projectId, rewardId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                            "id": "85f8358c-5339-42ac-a577-16d7760d1e28",
+                            "currency": "STRK",
+                            "amount": 100,
+                            "dollarsEquivalent": null,
+                            "status": "LOCKED",
+                            "from": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": null
+                            },
+                            "to": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": null
+                            },
+                            "createdAt": "2023-09-19T07:38:52.590518Z",
+                            "processedAt": null
+                        }
+                        """);
+
         final Date processedAt = new SimpleDateFormat("yyyy-MM-dd").parse("2023-09-20");
         paymentRepository.save(PaymentEntity.builder()
                 .id(UUID.randomUUID())
