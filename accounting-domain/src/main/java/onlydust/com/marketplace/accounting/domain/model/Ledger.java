@@ -19,6 +19,10 @@ public class Ledger {
         return this.id;
     }
 
+    public PositiveAmount balance() {
+        return PositiveAmount.ZERO;
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

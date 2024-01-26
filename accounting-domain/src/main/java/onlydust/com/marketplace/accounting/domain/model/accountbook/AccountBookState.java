@@ -59,6 +59,13 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }
     }
 
+    @Override
+    public Collection<Ledger.Id> funders(Ledger.Id id) {
+        return graph.incomingEdgesOf(accountVertices(id).get(0)).stream()
+                .map(e -> e.getSource().accountId())
+                .toList();
+    }
+
     public @NonNull PositiveAmount balanceOf(@NonNull final Ledger.Id account) {
         final var unspentVertices = unspentVerticesOf(account);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);

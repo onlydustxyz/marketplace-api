@@ -29,6 +29,12 @@ public class AccountingService {
         final var accountBook = accountBookStorage.get(currency);
         final var ledger = getLedger(to, currency);
 
+        final var funderLedgerId = accountBook.funders(ledger.id()).stream().findFirst().orElseThrow();
+        final var funderLedger = ledgerProvider.get(funderLedgerId, currency).orElseThrow();
+        if (funderLedger.balance().isStrictlyLowerThan(amount)) {
+            throw OnlyDustException.badRequest("Not enough funds");
+        }
+
         accountBook.burn(ledger.id(), amount);
         accountBookStorage.save(accountBook);
     }

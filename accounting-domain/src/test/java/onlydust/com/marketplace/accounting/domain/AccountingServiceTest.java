@@ -484,6 +484,42 @@ public class AccountingServiceTest {
     }
 
     /*
+     * Given a sponsor, a project and a contributor with a ledger
+     * When the contributor is rewarded by the project but the sponsor is not funded (no real money received)
+     * Then The contributor cannot withdraw his money
+     */
+    @Test
+    void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
+        // Given
+        final var currency = Currencies.USD;
+        final var sponsorId = SponsorId.random();
+        final var sponsorLedger = new Ledger();
+        final var projectId = ProjectId.random();
+        final var projectLedger = new Ledger();
+        final var contributorId = ContributorId.random();
+        final var contributorLedger = new Ledger();
+
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sponsorLedger.id(), PositiveAmount.of(100L))
+        );
+
+        when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
+        when(accountBookStorage.get(currency)).thenReturn(accountBook);
+        when(sponsorLedgerProvider.get(sponsorId, currency)).thenReturn(Optional.of(sponsorLedger));
+        when(projectLedgerProvider.get(projectId, currency)).thenReturn(Optional.of(projectLedger));
+        when(contributorLedgerProvider.get(contributorId, currency)).thenReturn(Optional.of(contributorLedger));
+
+        // When
+        accountingService.transfer(sponsorId, projectId, PositiveAmount.of(10L), currency.id());
+        accountingService.transfer(projectId, contributorId, PositiveAmount.of(10L), currency.id());
+
+        assertThatThrownBy(() -> accountingService.sendTo(contributorId, PositiveAmount.of(10L), currency.id()))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessageContaining("Not enough fund");
+    }
+
+    /*
      * Given a sponsor, a committee, 2 projects and 2 contributors
      * When
      *    - the sponsor funds project 1 via the committee

@@ -49,6 +49,11 @@ public class AccountBookAggregate implements AccountBook {
         emit(new RefundEvent(from, to, amount));
     }
 
+    @Override
+    public Collection<Ledger.Id> funders(Ledger.Id id) {
+        return state.funders(id);
+    }
+
     public AccountBookState state() {
         return state;
     }
