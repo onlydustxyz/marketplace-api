@@ -2,8 +2,9 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
@@ -14,7 +15,7 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class AccountingService {
-    private final AccountBookStorage accountBookStorage;
+    private final AccountBookEventStorage accountBookEventStorage;
     private final LedgerProvider<Object> ledgerProvider;
     private final LedgerStorage ledgerStorage;
     private final CurrencyStorage currencyStorage;
@@ -41,42 +42,46 @@ public class AccountingService {
 
     public <From> void mint(From from, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var accountBook = accountBookStorage.get(currency);
+        final var accountBook = getAccountBook(currency);
         final var ledger = getOrCreateLedger(from, currency);
 
         accountBook.mint(ledger.id(), amount);
-        accountBookStorage.save(accountBook);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+    }
+
+    private AccountBookAggregate getAccountBook(Currency currency) {
+        return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
     }
 
     public <To> Collection<Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var accountBook = accountBookStorage.get(currency);
+        final var accountBook = getAccountBook(currency);
         final var ledger = getLedger(to, currency);
 
         final var transactions = accountBook.burn(ledger.id(), amount);
 
-        accountBookStorage.save(accountBook);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
         return transactions;
     }
 
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var accountBook = accountBookStorage.get(currency);
+        final var accountBook = getAccountBook(currency);
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getOrCreateLedger(to, currency);
 
         accountBook.transfer(fromLedger.id(), toLedger.id(), amount);
-        accountBookStorage.save(accountBook);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var accountBook = accountBookStorage.get(currency);
+        final var accountBook = getAccountBook(currency);
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getLedger(to, currency);
 
         accountBook.refund(fromLedger.id(), toLedger.id(), amount);
-        accountBookStorage.save(accountBook);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     private Currency getCurrency(Currency.Id id) {
