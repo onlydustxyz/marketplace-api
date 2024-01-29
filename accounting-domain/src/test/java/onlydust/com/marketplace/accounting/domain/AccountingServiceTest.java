@@ -578,5 +578,33 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.of(100L));
         }
+
+
+        /*
+         * Given sponsor 1 that funded its account with locked tokens and sponsor 2 that funded its account with unlocked tokens
+         * When A contributor is rewarded by the project
+         * Then The contributor cannot withdraw his money
+         */
+        @Test
+        void should_spend_first_fundings_even_if_locked() {
+            // Given
+            accountBook = AccountBookAggregate.fromEvents(
+                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
+                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(100L))
+            );
+
+            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+
+            // When
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend locked tokens");
+        }
     }
 }
