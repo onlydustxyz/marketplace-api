@@ -501,6 +501,29 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot spend locked tokens");
         }
+
+
+        /*
+         * Given 1 sponsor that funded its account with locked tokens
+         * When A contributor is rewarded by the project after the unlock date
+         * Then The contributor can withdraw his money
+         */
+        @Test
+        void should_withdraw_unlocked_rewards() {
+            // Given
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().minusDays(1));
+            accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(contributorLedger2.balance()).isEqualTo(PositiveAmount.ZERO);
+        }
     }
 
     @Nested
