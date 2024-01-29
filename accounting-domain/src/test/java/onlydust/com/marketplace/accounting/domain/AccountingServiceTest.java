@@ -191,10 +191,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            ledgerStorage.save(sponsorLedger);
-            ledgerStorage.save(committeeLedger);
-            ledgerStorage.save(projectLedger2);
-            ledgerStorage.save(contributorLedger2);
+            ledgerStorage.save(sponsorLedger, committeeLedger, projectLedger2, contributorLedger2);
 
             accountBook = AccountBookAggregate.fromEvents(
                     new MintEvent(sponsorLedger.id(), PositiveAmount.of(300L)),
@@ -501,10 +498,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            ledgerStorage.save(sponsorLedger1);
-            ledgerStorage.save(sponsorLedger2);
-            ledgerStorage.save(projectLedger);
-            ledgerStorage.save(contributorLedger);
+            ledgerStorage.save(sponsorLedger1, sponsorLedger2, projectLedger, contributorLedger);
         }
 
         /*

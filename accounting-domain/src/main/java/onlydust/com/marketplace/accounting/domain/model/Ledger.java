@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Ledger {
+    @EqualsAndHashCode.Include
     final @NonNull Id id;
     final @NonNull Object ownerId;
     final @NonNull Currency currency;

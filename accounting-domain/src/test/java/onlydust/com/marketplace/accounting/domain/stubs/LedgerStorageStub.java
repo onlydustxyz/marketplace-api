@@ -15,9 +15,9 @@ public class LedgerStorageStub<OwnerId> implements LedgerStorage, LedgerProvider
 
     @SneakyThrows
     @Override
-    public void save(Ledger ledger) {
-        ledgers.removeIf(l -> l.id().equals(ledger.id()));
-        ledgers.add(Ledger.of(ledger));
+    public void save(Ledger... ledgers) {
+        LedgerStorageStub.ledgers.removeAll(List.of(ledgers));
+        LedgerStorageStub.ledgers.addAll(List.of(ledgers));
     }
 
     @Override

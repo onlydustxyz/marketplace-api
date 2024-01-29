@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface LedgerStorage {
     Optional<Ledger> get(Ledger.Id id);
 
-    void save(Ledger ledger);
+    void save(Ledger... ledgers);
 }
