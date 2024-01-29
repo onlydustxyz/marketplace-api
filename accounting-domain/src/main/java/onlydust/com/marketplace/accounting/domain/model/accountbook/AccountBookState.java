@@ -33,11 +33,11 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void burn(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
+    public Collection<Transaction> burn(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(account, ROOT);
         final var unspentVertices = unspentVerticesOf(account);
         try {
-            sendFromVertices(ROOT, amount, unspentVertices);
+            return sendFromVertices(ROOT, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
             throw OnlyDustException.badRequest("Cannot burn %s from %s".formatted(amount, account), e);
         }
@@ -128,22 +128,25 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return hasParent(directParent, parent);
     }
 
-    private void sendFromVertices(@NonNull final Ledger.Id to, @NonNull final PositiveAmount amount,
-                                  @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
+    private Collection<Transaction> sendFromVertices(@NonNull final Ledger.Id to, @NonNull final PositiveAmount amount,
+                                                     @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {
             throw new InsufficientFundsException("Insufficient funds: %s < %s".formatted(unspentTotal, amount));
         }
 
+        final var transactions = new ArrayList<Transaction>(unspentVertices.size());
         var remainingAmount = amount;
         for (VertexWithBalance unspentVertex : unspentVertices) {
             if (unspentVertex.balance().isGreaterThanOrEqual(remainingAmount)) {
-                createTransaction(unspentVertex.vertex(), to, remainingAmount);
+                transactions.add(createTransaction(unspentVertex.vertex(), to, remainingAmount));
                 break;
             }
-            createTransaction(unspentVertex.vertex(), to, unspentVertex.balance());
+            transactions.add(createTransaction(unspentVertex.vertex(), to, unspentVertex.balance()));
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
         }
+
+        return transactions;
     }
 
     private void refundFromVertices(@NonNull final PositiveAmount amount,
@@ -205,7 +208,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return List.of();
     }
 
-    private void createTransaction(@NonNull final Vertex from, @NonNull final Ledger.Id to, @NonNull final PositiveAmount amount) {
+    private Transaction createTransaction(@NonNull final Vertex from, @NonNull final Ledger.Id to, @NonNull final PositiveAmount amount) {
         final var toVertex = new Vertex(UUID.randomUUID(), to);
         graph.addVertex(toVertex);
         if (accountVertices.containsKey(to)) {
@@ -216,6 +219,21 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
         final var transaction = new Edge(amount, graph.outgoingEdgesOf(from).size());
         graph.addEdge(from, toVertex, transaction);
+
+        return new Transaction(source(from).accountId(), to, amount);
+    }
+
+    private Vertex source(@NonNull final Vertex vertex) {
+        if (vertex.equals(root)) {
+            return root;
+        }
+
+        final var parent = incomingEdgeOf(vertex).getSource();
+        if (parent.equals(root)) {
+            return vertex;
+        }
+
+        return source(parent);
     }
 
     private void removeTransaction(@NonNull final Vertex vertex) {

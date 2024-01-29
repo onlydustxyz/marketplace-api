@@ -35,8 +35,8 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public void burn(Ledger.Id account, PositiveAmount amount) {
-        emit(new BurnEvent(account, amount));
+    public Collection<Transaction> burn(Ledger.Id account, PositiveAmount amount) {
+        return emit(new BurnEvent(account, amount));
     }
 
     @Override
@@ -57,9 +57,9 @@ public class AccountBookAggregate implements AccountBook {
         return pendingEvents;
     }
 
-    private void emit(AccountBookEvent event) {
+    private <R> R emit(AccountBookEvent<R> event) {
         pendingEvents.add(event);
-        state.accept(event);
+        return state.accept(event);
     }
 
     public record MintEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent<Void> {
@@ -70,11 +70,10 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
-    public record BurnEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record BurnEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent<Collection<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.burn(account, amount);
-            return null;
+        public Collection<Transaction> visit(AccountBookState state) {
+            return state.burn(account, amount);
         }
     }
 
