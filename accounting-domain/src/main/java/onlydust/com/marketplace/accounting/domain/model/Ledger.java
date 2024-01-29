@@ -15,20 +15,32 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Ledger {
     final @NonNull Id id;
+    final @NonNull Object ownerId;
+    final @NonNull Currency currency;
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
-    public Ledger() {
+    public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
         this.id = Id.random();
+        this.ownerId = ownerId;
+        this.currency = currency;
     }
 
     public static Ledger of(Ledger other) {
-        final var ledger = new Ledger(other.id);
+        final var ledger = new Ledger(other.id, other.ownerId, other.currency);
         ledger.transactions.addAll(other.transactions);
         return ledger;
     }
 
     public Id id() {
         return this.id;
+    }
+
+    public Object ownerId() {
+        return this.ownerId;
+    }
+
+    public Currency currency() {
+        return this.currency;
     }
 
     public PositiveAmount balance() {
