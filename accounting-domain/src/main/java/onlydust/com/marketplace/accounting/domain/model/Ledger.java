@@ -47,13 +47,10 @@ public class Ledger {
         return this.currency;
     }
 
-    public PositiveAmount balance(final @NonNull Network network) {
+    public PositiveAmount unlockedBalance(final @NonNull Network network) {
         return PositiveAmount.of(transactions.stream()
                 .filter(transaction -> transaction.network.equals(network))
-                .peek(transaction -> {
-                    if (transaction.lockedUntil != null && transaction.lockedUntil.isAfter(ZonedDateTime.now()))
-                        throw badRequest("Cannot spend locked tokens on ledger %s (unlock date: %s)".formatted(id, transaction.lockedUntil));
-                })
+                .takeWhile(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
     }
@@ -63,7 +60,7 @@ public class Ledger {
     }
 
     public void debit(PositiveAmount amount, Network network) {
-        if (balance(network).isStrictlyLowerThan(amount))
+        if (unlockedBalance(network).isStrictlyLowerThan(amount))
             throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
 
         transactions.add(new Transaction(amount.negate(), network, null));
