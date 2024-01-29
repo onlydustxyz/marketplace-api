@@ -113,7 +113,7 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenASponsorWithNoLedger {
-        final Currency currency = Currencies.USD;
+        final Currency currency = Currencies.USDC;
         final SponsorId sponsorId = SponsorId.random();
         final ProjectId projectId = ProjectId.random();
         final AccountBookAggregate accountBook = AccountBookAggregate.empty();
@@ -176,7 +176,8 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenASponsorsWithALedger {
-        final Currency currency = Currencies.USD;
+        final Currency currency = Currencies.USDC;
+        final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
         final Ledger sponsorLedger = new Ledger(sponsorId, currency);
         final CommitteeId committeeId = CommitteeId.random();
@@ -388,7 +389,7 @@ public class AccountingServiceTest {
         @Test
         void should_do_everything() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id());
+            accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id(), network);
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
             accountingService.transfer(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
 
@@ -443,9 +444,9 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
-            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id());
-            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id());
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), network);
+            accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), network);
+            accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id(), network);
 
             accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
 
@@ -465,7 +466,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_withdraw_more_than_funded() {
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id());
+            accountingService.fund(sponsorId, PositiveAmount.of(50L), currency.id(), network);
 
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(80L), currency.id());
@@ -494,7 +495,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
 
             assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id()))
                     // Then
@@ -515,7 +516,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().minusDays(1));
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().minusDays(1));
             accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
 
             // Then
@@ -528,7 +529,8 @@ public class AccountingServiceTest {
 
     @Nested
     class Given2SponsorsWithLedgers {
-        final Currency currency = Currencies.USD;
+        final Currency currency = Currencies.USDC;
+        final Network network = Network.ETHEREUM;
         final SponsorId sponsorId1 = SponsorId.random();
         final Ledger sponsorLedger1 = new Ledger(sponsorId1, currency);
         final SponsorId sponsorId2 = SponsorId.random();
@@ -563,7 +565,7 @@ public class AccountingServiceTest {
             when(accountBookStorage.get(currency)).thenReturn(accountBook);
 
             // When
-            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
             assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id()))
                     // Then
@@ -591,7 +593,7 @@ public class AccountingServiceTest {
             when(accountBookStorage.get(currency)).thenReturn(accountBook);
 
             // When
-            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
             accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id());
 
@@ -620,8 +622,8 @@ public class AccountingServiceTest {
             );
 
             when(accountBookStorage.get(currency)).thenReturn(accountBook);
-            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
-            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
             // When
             assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id()))
