@@ -526,5 +526,36 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
         }
+
+
+        /*
+         * Given 2 sponsors with ledgers that both rewarded a contributor
+         * When Only sponsor 1 funds its account
+         * Then The contributor can only withdraw the amount funded by sponsor 1
+         */
+        @Test
+        void should_allow_contributor_to_withdraw_only_what_is_funded() {
+            // Given
+            accountBook = AccountBookAggregate.fromEvents(
+                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
+                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(200L))
+            );
+
+            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+
+            // When
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+
+            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id());
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger1.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.of(100L));
+        }
     }
 }
