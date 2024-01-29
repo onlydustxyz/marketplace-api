@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
@@ -58,7 +57,7 @@ public class AccountBookTest {
         // When
         assertThatThrownBy(() -> accountBook.burn(account, amount))
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot refund %s from %s to %s".formatted(amount, account, AccountBookState.ROOT));
+                .hasMessage("Cannot burn %s from %s".formatted(amount, account));
 
         // Then
         assertThat(accountBook.state().balanceOf(account)).isEqualTo(PositiveAmount.ZERO);
