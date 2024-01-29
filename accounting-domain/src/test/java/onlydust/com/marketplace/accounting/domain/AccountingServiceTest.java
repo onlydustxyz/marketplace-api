@@ -651,5 +651,40 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot spend locked tokens");
         }
+
+        /*
+         * Given sponsor 1 that funded its account on Ethereum and sponsor 2 that funded its account on Optimism
+         * When A contributor is rewarded by the project
+         * Then The contributor can withdraw his money on both networks
+         */
+        @Test
+        void should_withdraw_on_both_networks() {
+            // Given
+            accountBook = AccountBookAggregate.fromEvents(
+                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
+                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(200L))
+            );
+
+            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
+            accountingService.fund(sponsorId2, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
+            assertThat(ledgerStorage.get(sponsorLedger1.id()).orElseThrow().balance(Network.ETHEREUM)).isEqualTo(PositiveAmount.of(100L));
+            assertThat(ledgerStorage.get(sponsorLedger2.id()).orElseThrow().balance(Network.OPTIMISM)).isEqualTo(PositiveAmount.of(100L));
+
+            // When
+            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
+            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger1.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger1.id()).orElseThrow().balance(Network.ETHEREUM)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger2.id()).orElseThrow().balance(Network.OPTIMISM)).isEqualTo(PositiveAmount.ZERO);
+        }
     }
 }
