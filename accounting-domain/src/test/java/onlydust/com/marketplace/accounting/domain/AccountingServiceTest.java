@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -480,6 +481,49 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(20L));
             assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
         }
+
+        /*
+         * Given 1 sponsor that funded its account with locked tokens
+         * When A contributor is rewarded by the project
+         * Then The contributor cannot withdraw his money
+         */
+        @Test
+        void should_not_withdraw_locked_rewards() {
+            // Given
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
+
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend locked tokens");
+        }
+
+
+        /*
+         * Given 1 sponsor that funded its account with locked tokens
+         * When A contributor is rewarded by the project after the unlock date
+         * Then The contributor can withdraw his money
+         */
+        @Test
+        void should_withdraw_unlocked_rewards() {
+            // Given
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().minusDays(1));
+            accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // Then
+            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(contributorLedger2.balance()).isEqualTo(PositiveAmount.ZERO);
+        }
     }
 
     @Nested
@@ -556,6 +600,34 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.of(100L));
+        }
+
+
+        /*
+         * Given sponsor 1 that funded its account with locked tokens and sponsor 2 that funded its account with unlocked tokens
+         * When A contributor is rewarded by the project
+         * Then The contributor cannot withdraw his money
+         */
+        @Test
+        void should_spend_first_fundings_even_if_locked() {
+            // Given
+            accountBook = AccountBookAggregate.fromEvents(
+                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
+                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(100L))
+            );
+
+            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
+            accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id());
+
+            // When
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend locked tokens");
         }
     }
 }

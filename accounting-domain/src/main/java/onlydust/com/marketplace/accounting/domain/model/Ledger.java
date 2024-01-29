@@ -5,12 +5,14 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -47,19 +49,23 @@ public class Ledger {
 
     public PositiveAmount balance() {
         return PositiveAmount.of(transactions.stream()
+                .peek(transaction -> {
+                    if (transaction.lockedUntil != null && transaction.lockedUntil.isAfter(ZonedDateTime.now()))
+                        throw badRequest("Cannot spend locked tokens on ledger %s (unlock date: %s)".formatted(id, transaction.lockedUntil));
+                })
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
     }
 
-    public void credit(PositiveAmount amount) {
-        transactions.add(new Transaction(amount));
+    public void credit(PositiveAmount amount, ZonedDateTime lockedUntil) {
+        transactions.add(new Transaction(amount, lockedUntil));
     }
 
     public void debit(PositiveAmount amount) {
         if (balance().isStrictlyLowerThan(amount))
-            throw OnlyDustException.badRequest("Not enough fund on ledger %s".formatted(id));
+            throw badRequest("Not enough fund on ledger %s".formatted(id));
 
-        transactions.add(new Transaction(amount.negate()));
+        transactions.add(new Transaction(amount.negate(), null));
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -75,6 +81,6 @@ public class Ledger {
         }
     }
 
-    private record Transaction(Amount amount) {
+    private record Transaction(Amount amount, ZonedDateTime lockedUntil) {
     }
 }
