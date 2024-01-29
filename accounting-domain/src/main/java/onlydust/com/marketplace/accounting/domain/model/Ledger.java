@@ -47,8 +47,9 @@ public class Ledger {
         return this.currency;
     }
 
-    public PositiveAmount balance() {
+    public PositiveAmount balance(final @NonNull Network network) {
         return PositiveAmount.of(transactions.stream()
+                .filter(transaction -> transaction.network.equals(network))
                 .peek(transaction -> {
                     if (transaction.lockedUntil != null && transaction.lockedUntil.isAfter(ZonedDateTime.now()))
                         throw badRequest("Cannot spend locked tokens on ledger %s (unlock date: %s)".formatted(id, transaction.lockedUntil));
@@ -57,15 +58,15 @@ public class Ledger {
                 .reduce(Amount.ZERO, Amount::add));
     }
 
-    public void credit(PositiveAmount amount, ZonedDateTime lockedUntil) {
-        transactions.add(new Transaction(amount, lockedUntil));
+    public void credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
+        transactions.add(new Transaction(amount, network, lockedUntil));
     }
 
-    public void debit(PositiveAmount amount) {
-        if (balance().isStrictlyLowerThan(amount))
-            throw badRequest("Not enough fund on ledger %s".formatted(id));
+    public void debit(PositiveAmount amount, Network network) {
+        if (balance(network).isStrictlyLowerThan(amount))
+            throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
 
-        transactions.add(new Transaction(amount.negate(), null));
+        transactions.add(new Transaction(amount.negate(), network, null));
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -81,6 +82,6 @@ public class Ledger {
         }
     }
 
-    private record Transaction(Amount amount, ZonedDateTime lockedUntil) {
+    private record Transaction(@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
     }
 }

@@ -27,14 +27,14 @@ public class AccountingService {
         final var currency = getCurrency(currencyId);
         final var ledger = getOrCreateLedger(sponsorId, currency);
 
-        ledger.credit(amount, lockedUntil);
+        ledger.credit(amount, network, lockedUntil);
         ledgerStorage.save(ledger);
     }
 
     public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId, Network network) {
         burn(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount());
+            ledger.debit(transaction.amount(), network);
             ledgerStorage.save(ledger);
         });
     }

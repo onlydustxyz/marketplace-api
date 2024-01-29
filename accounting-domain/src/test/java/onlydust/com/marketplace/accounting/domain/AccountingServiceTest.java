@@ -523,7 +523,27 @@ public class AccountingServiceTest {
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(contributorLedger2.balance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(contributorLedger2.balance(network)).isEqualTo(PositiveAmount.ZERO);
+        }
+
+
+        /*
+         * Given a sponsor that funded its account on Ethereum
+         * When A contributor is rewarded by the project
+         * Then The contributor cannot withdraw his money on Optimism
+         */
+        @Test
+        void should_withdraw_on_correct_network() {
+            // Given
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // When
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Not enough fund on ledger %s on network OPTIMISM".formatted(sponsorLedger.id()));
         }
     }
 
