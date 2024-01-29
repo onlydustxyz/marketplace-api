@@ -31,7 +31,7 @@ public class AccountingService {
         ledgerStorage.save(ledger);
     }
 
-    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId, Network network) {
         burn(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
             ledger.debit(transaction.amount());
