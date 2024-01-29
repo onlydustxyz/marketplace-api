@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -22,22 +19,22 @@ public class AccountingService {
     private final LedgerStorage ledgerStorage;
     private final CurrencyStorage currencyStorage;
 
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
-        fund(sponsorId, amount, currencyId, null);
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
+        fund(sponsorId, amount, currencyId, network, null);
     }
 
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, ZonedDateTime lockedUntil) {
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var ledger = getOrCreateLedger(sponsorId, currency);
 
-        ledger.credit(amount, lockedUntil);
+        ledger.credit(amount, network, lockedUntil);
         ledgerStorage.save(ledger);
     }
 
-    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId, Network network) {
         burn(to, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount());
+            ledger.debit(transaction.amount(), network);
             ledgerStorage.save(ledger);
         });
     }
