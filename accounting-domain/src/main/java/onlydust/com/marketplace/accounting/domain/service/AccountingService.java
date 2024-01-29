@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @AllArgsConstructor
@@ -22,10 +23,14 @@ public class AccountingService {
     private final CurrencyStorage currencyStorage;
 
     public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
+        fund(sponsorId, amount, currencyId, null);
+    }
+
+    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var ledger = getOrCreateLedger(sponsorId, currency);
 
-        ledger.credit(amount);
+        ledger.credit(amount, lockedUntil);
         ledgerStorage.save(ledger);
     }
 

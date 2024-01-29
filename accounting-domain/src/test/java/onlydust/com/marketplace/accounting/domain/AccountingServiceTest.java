@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -479,6 +480,26 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(20L));
             assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+        }
+
+        /*
+         * Given 1 sponsor that funded its account with locked tokens
+         * When A contributor is rewarded by the project
+         * Then The contributor cannot withdraw his money
+         */
+        @Test
+        void should_not_withdraw_locked_rewards() {
+            // Given
+            accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
+
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), ZonedDateTime.now().plusDays(1));
+
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend locked tokens");
         }
     }
 
