@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.model;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.List;
 import java.util.UUID;
 
 @Value
@@ -17,4 +18,9 @@ public class Project {
     String moreInfoUrl;
     Boolean hiring;
     ProjectVisibility visibility;
+    List<Tag> tags;
+
+    public enum Tag {
+        BEGINNERS_WELCOME,STRONG_EXPERTISE,LIKELY_TO_SEND_REWARDS,FAST_PACED
+    }
 }

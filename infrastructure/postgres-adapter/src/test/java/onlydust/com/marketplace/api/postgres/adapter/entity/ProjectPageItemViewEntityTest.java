@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemViewEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,48 @@ public class ProjectPageItemViewEntityTest {
 
             // Then
             assertEquals("$[*] ? (@.id == \"" + sponsorId1 + "\" || @.id == \"" + sponsorId2 + "\")", sponsorsJsonPath);
+        }
+
+
+    }
+
+    @Nested
+    public class ShouldReturnTagsJsonPath {
+
+        @Test
+        void given_no_tags() {
+            // Given
+            final List<Project.Tag> tags = null;
+
+            // When
+            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+
+            // Then
+            assertNull(tagsJsonPath);
+        }
+
+        @Test
+        void given_one_tag() {
+            // Given
+            final List<Project.Tag> tags = List.of(Project.Tag.BEGINNERS_WELCOME);
+
+            // When
+            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+
+            // Then
+            assertEquals("$[*] ? (@.name == \"BEGINNERS_WELCOME\")", tagsJsonPath);
+        }
+
+        @Test
+        void given_two_tags() {
+            // Given
+            final List<Project.Tag> tags = List.of(Project.Tag.BEGINNERS_WELCOME, Project.Tag.STRONG_EXPERTISE);
+
+            // When
+            final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+
+            // Then
+            assertEquals("$[*] ? (@.name == \"BEGINNERS_WELCOME\" || @.name == \"STRONG_EXPERTISE\")", tagsJsonPath);
         }
 
 

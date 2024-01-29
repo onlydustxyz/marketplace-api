@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -48,6 +50,8 @@ public class ProjectPageItemViewEntity {
     List<ProjectLead> projectLeads;
     @Type(type = "jsonb")
     List<Map<String, Long>> technologies;
+    @Type(type = "jsonb")
+    List<Tag> tags;
 
     public static String getSponsorsJsonPath(List<UUID> sponsorIds) {
         if (isNull(sponsorIds) || sponsorIds.isEmpty()) {
@@ -61,6 +65,13 @@ public class ProjectPageItemViewEntity {
             return null;
         }
         return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
+    }
+
+    public static String getTagsJsonPath(List<Project.Tag> tags) {
+        if (isNull(tags) || tags.isEmpty()) {
+            return null;
+        }
+        return "$[*] ? (" + String.join(" || ", tags.stream().map(Enum::name).map(s -> "@.name == \"" + s + "\"").toList()) + ")";
     }
 
     public ProjectCardView toView(UUID userId) {
@@ -102,6 +113,15 @@ public class ProjectPageItemViewEntity {
                 view.setIsMissingGithubAppInstallation(this.isMissingGithubAppInstallation);
             }
         }
+        if (nonNull(this.tags)) {
+            this.tags.forEach(tag -> view.addTag(switch (tag.name) {
+                case "BEGINNERS_WELCOME" -> Project.Tag.BEGINNERS_WELCOME;
+                case "STRONG_EXPERTISE" -> Project.Tag.STRONG_EXPERTISE;
+                case "LIKELY_TO_SEND_REWARDS" -> Project.Tag.LIKELY_TO_SEND_REWARDS;
+                case "FAST_PACED" -> Project.Tag.FAST_PACED;
+                default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
+            }));
+        }
         return view;
     }
 
@@ -131,6 +151,12 @@ public class ProjectPageItemViewEntity {
         String logoUrl;
         @JsonProperty("id")
         UUID id;
+        @JsonProperty("name")
+        String name;
+    }
+
+    @EqualsAndHashCode
+    public static class Tag {
         @JsonProperty("name")
         String name;
     }

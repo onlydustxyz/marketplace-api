@@ -90,6 +90,13 @@ public interface ProjectMapper {
                 .sponsors(sponsors.stream().map(SponsorMapper::mapToSponsorView).collect(Collectors.toSet()))
                 .hasRemainingBudget(hasRemainingBudget)
                 .me(me)
+                .tags(projectEntity.getTags().stream()
+                        .map(projectTagEntity -> switch (projectTagEntity.getId().getTag()) {
+                            case STRONG_EXPERTISE -> Project.Tag.STRONG_EXPERTISE;
+                            case FAST_PACED -> Project.Tag.FAST_PACED;
+                            case LIKELY_TO_SEND_REWARDS -> Project.Tag.LIKELY_TO_SEND_REWARDS;
+                            case BEGINNERS_WELCOME -> Project.Tag.BEGINNERS_WELCOME;
+                        }).collect(Collectors.toSet()))
                 .build();
 
         for (ProjectOrganizationView organization : organizations) {

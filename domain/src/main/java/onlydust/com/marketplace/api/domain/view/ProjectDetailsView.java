@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
@@ -41,6 +42,8 @@ public class ProjectDetailsView {
     Boolean hasRemainingBudget;
     ProjectRewardSettings rewardSettings;
     Me me;
+    @Builder.Default
+    Set<Project.Tag> tags = new HashSet<>();
 
     public record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor, Boolean hasApplied) {
         public Boolean isMember() {

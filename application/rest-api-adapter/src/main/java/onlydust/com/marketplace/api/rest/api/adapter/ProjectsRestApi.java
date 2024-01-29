@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.CreateAndCloseIssueCommand;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
@@ -69,19 +70,18 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex, final Integer pageSize,
-                                                           final String sort, final List<String> technologies,
-                                                           final List<UUID> sponsorId, final Boolean mine,
-                                                           final String search) {
+    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies, List<UUID> sponsorId,
+                                                           List<ProjectTag> tags, Boolean mine, String search) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final Optional<User> optionalUser = authenticationService.tryGetAuthenticatedUser();
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
+        final List<Project.Tag> projectTags = mapTagsParameter(tags);
         final Page<ProjectCardView> projectCardViewPage =
-                optionalUser.map(user -> projectFacadePort.getByTechnologiesSponsorsUserIdSearchSortBy(technologies,
+                optionalUser.map(user -> projectFacadePort.getByTagsTechnologiesSponsorsUserIdSearchSortBy(projectTags, technologies,
                                 sponsorId, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
                                 sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getByTechnologiesSponsorsSearchSortBy(technologies,
+                        .orElseGet(() -> projectFacadePort.getByTagsTechnologiesSponsorsSearchSortBy(projectTags, technologies,
                                 sponsorId, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }

@@ -63,6 +63,7 @@ public interface ProjectMapper {
                 .map(ProjectMapper::mapRegisteredUser)
                 .sorted(Comparator.comparing(RegisteredUserResponse::getGithubUserId))
                 .collect(Collectors.toList()));
+        projectResponse.setTags(project.getTags().stream().map(ProjectMapper::mapTag).toList());
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
@@ -211,7 +212,17 @@ public interface ProjectMapper {
         project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
         project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
         project.setIsMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
+        project.setTags(projectCardView.getTags().stream().map(ProjectMapper::mapTag).toList());
         return project;
+    }
+
+    private static ProjectTag mapTag(final Project.Tag tag) {
+        return switch (tag) {
+            case BEGINNERS_WELCOME -> ProjectTag.BEGINNERS_WELCOME;
+            case STRONG_EXPERTISE -> ProjectTag.STRONG_EXPERTISE;
+            case FAST_PACED -> ProjectTag.FAST_PACED;
+            case LIKELY_TO_SEND_REWARDS -> ProjectTag.LIKELY_TO_SEND_REWARDS;
+        };
     }
 
     private static SponsorResponse mapSponsor(final SponsorView sponsor) {
@@ -295,6 +306,21 @@ public interface ProjectMapper {
             }
         }
         return null;
+    }
+
+    static List<Project.Tag> mapTagsParameter(final List<ProjectTag> projectTags) {
+        return isNull(projectTags) ? null : projectTags.stream()
+                .map(ProjectMapper::mapTagParameter)
+                .toList();
+    }
+
+    private static Project.Tag mapTagParameter(final ProjectTag projectTag) {
+        return switch (projectTag) {
+            case BEGINNERS_WELCOME -> Project.Tag.BEGINNERS_WELCOME;
+            case LIKELY_TO_SEND_REWARDS -> Project.Tag.LIKELY_TO_SEND_REWARDS;
+            case STRONG_EXPERTISE -> Project.Tag.STRONG_EXPERTISE;
+            case FAST_PACED -> Project.Tag.FAST_PACED;
+        };
     }
 
     static ShortProjectResponse mapShortProjectResponse(Project project) {

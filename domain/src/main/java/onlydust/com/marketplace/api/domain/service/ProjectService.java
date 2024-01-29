@@ -69,19 +69,18 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
-                                                                             List<UUID> sponsorIds, String search,
-                                                                             ProjectCardView.SortBy sort, UUID userId
+    public Page<ProjectCardView> getByTagsTechnologiesSponsorsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
+                                                                                 List<UUID> sponsorIds, String search,
+                                                                                 ProjectCardView.SortBy sort, UUID userId
             , Boolean mine, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTechnologiesSponsorsUserIdSearchSortBy(technologies, sponsorIds, userId, search,
+        return projectStoragePort.findByTagsTechnologiesSponsorsUserIdSearchSortBy(tags, technologies, sponsorIds, userId, search,
                 sort, mine, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                       String search, ProjectCardView.SortBy sort,
-                                                                       Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTechnologiesSponsorsSearchSortBy(technologies, sponsorIds, search, sort,
+    public Page<ProjectCardView> getByTagsTechnologiesSponsorsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+                                                                           String search, ProjectCardView.SortBy sort, Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findByTagsTechnologiesSponsorsSearchSortBy(tags, technologies, sponsorIds, search, sort,
                 pageIndex, pageSize);
     }
 
