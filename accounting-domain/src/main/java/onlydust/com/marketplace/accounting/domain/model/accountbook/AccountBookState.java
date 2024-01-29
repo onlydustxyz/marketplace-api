@@ -234,8 +234,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void accept(Visitor<AccountBookState> visitor) {
-        visitor.visit(this);
+    public <R> R accept(Visitor<AccountBookState, R> visitor) {
+        return visitor.visit(this);
     }
 
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
