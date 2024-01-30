@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -16,22 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @Value
 @Table(name = "sponsor_ledgers", schema = "sandbox")
-@IdClass(SponsorLedgerEntity.PrimaryKey.class)
 public class SponsorLedgerEntity {
     @Id
     @NonNull UUID ledgerId;
 
-    @Id
+    @OneToOne
+    @JoinColumn(insertable = false, updatable = false, name = "ledger_id")
+    @NonNull LedgerEntity ledger;
+
     @NonNull UUID sponsorId;
 
-    public static SponsorLedgerEntity of(Ledger.Id ledgerId, SponsorId sponsorId) {
-        return new SponsorLedgerEntity(ledgerId.value(), sponsorId.value());
-    }
-
-    @EqualsAndHashCode
-    @ToString
-    public static class PrimaryKey implements Serializable {
-        private UUID ledgerId;
-        private UUID sponsorId;
+    public static SponsorLedgerEntity of(LedgerEntity ledger, SponsorId sponsorId) {
+        return new SponsorLedgerEntity(ledger.id, ledger, sponsorId.value());
     }
 }

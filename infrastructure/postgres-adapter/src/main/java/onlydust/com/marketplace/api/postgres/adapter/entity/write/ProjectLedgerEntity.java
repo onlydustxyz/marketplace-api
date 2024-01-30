@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -16,21 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @Value
 @Table(name = "project_ledgers", schema = "sandbox")
-@IdClass(ProjectLedgerEntity.PrimaryKey.class)
 public class ProjectLedgerEntity {
     @Id
     @NonNull UUID ledgerId;
 
-    @Id
+    @OneToOne
+    @JoinColumn(insertable = false, updatable = false, name = "ledger_id")
+    @NonNull LedgerEntity ledger;
+
     @NonNull UUID projectId;
 
-    public static ProjectLedgerEntity of(Ledger.Id ledgerId, ProjectId projectId) {
-        return new ProjectLedgerEntity(ledgerId.value(), projectId.value());
-    }
-
-    @EqualsAndHashCode
-    public static class PrimaryKey implements Serializable {
-        private UUID ledgerId;
-        private UUID projectId;
+    public static ProjectLedgerEntity of(LedgerEntity ledger, ProjectId projectId) {
+        return new ProjectLedgerEntity(ledger.id, ledger, projectId.value());
     }
 }

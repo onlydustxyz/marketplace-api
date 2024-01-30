@@ -24,17 +24,14 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     @Autowired
     private ProjectIdRepository projectIdRepository;
 
-    final Currency currency = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
-    final SponsorEntity sponsor = new SponsorEntity(SponsorId.random().value(), "sponsor", "", "");
-    final ProjectIdEntity project = new ProjectIdEntity(ProjectId.random().value());
+    static final Currency currency = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
     final Faker faker = new Faker();
     final ContributorId contributorId = ContributorId.of(faker.number().randomNumber());
 
     @BeforeEach
     void setUp() {
-        postgresCurrencyAdapter.save(currency);
-        sponsorRepository.save(sponsor);
-        projectIdRepository.save(project);
+        if (!postgresCurrencyAdapter.exists(currency.code()))
+            postgresCurrencyAdapter.save(currency);
     }
 
     @Test
@@ -45,6 +42,8 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     @Test
     void should_return_sponsor_ledger_when_found() {
         // Given
+        final SponsorEntity sponsor = new SponsorEntity(SponsorId.random().value(), "sponsor", "", "");
+        sponsorRepository.save(sponsor);
         final var ledger = new Ledger(SponsorId.of(sponsor.getId()), currency);
 
         // When
@@ -62,6 +61,8 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     @Test
     void should_return_project_ledger_when_found() {
         // Given
+        final ProjectIdEntity project = new ProjectIdEntity(ProjectId.random().value());
+        projectIdRepository.save(project);
         final var ledger = new Ledger(ProjectId.of(project.getId()), currency);
 
         // When
@@ -88,7 +89,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
         final var savedLedger = adapter.get(ledger.id());
         assertThat(savedLedger).isPresent();
         assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-        assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId);
+        assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId.value());
         assertThat(savedLedger.get().currency()).isEqualTo(currency);
     }
 }

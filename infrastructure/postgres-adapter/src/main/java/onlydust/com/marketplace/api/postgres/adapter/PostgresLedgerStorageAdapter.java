@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.LedgerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.LedgerRepository;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ public class PostgresLedgerStorageAdapter implements LedgerStorage {
     private final LedgerRepository ledgerRepository;
 
     @Override
-    @Transactional
     public Optional<Ledger> get(Ledger.Id id) {
         return ledgerRepository.findById(id.value()).map(LedgerEntity::toLedger);
     }
