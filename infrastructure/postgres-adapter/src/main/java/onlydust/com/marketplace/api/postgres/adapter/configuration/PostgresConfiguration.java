@@ -253,4 +253,9 @@ public class PostgresConfiguration {
     public PostgresLedgerStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository) {
         return new PostgresLedgerStorageAdapter(ledgerRepository);
     }
+
+    @Bean
+    public PostgresSponsorLedgerProviderAdapter postgresSponsorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresSponsorLedgerProviderAdapter(ledgerRepository);
+    }
 }

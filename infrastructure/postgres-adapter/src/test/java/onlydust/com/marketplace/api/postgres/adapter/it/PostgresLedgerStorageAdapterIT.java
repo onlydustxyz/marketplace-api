@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresCurrencyAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresLedgerStorageAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresSponsorLedgerProviderAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
@@ -23,6 +24,8 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     private SponsorRepository sponsorRepository;
     @Autowired
     private ProjectIdRepository projectIdRepository;
+    @Autowired
+    private PostgresSponsorLedgerProviderAdapter sponsorLedgerProvider;
 
     static final Currency currency = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
     final Faker faker = new Faker();
@@ -50,11 +53,21 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
         adapter.save(ledger);
 
         // Then
-        final var savedLedger = adapter.get(ledger.id());
-        assertThat(savedLedger).isPresent();
-        assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-        assertThat(savedLedger.get().ownerId()).isEqualTo(sponsor.getId());
-        assertThat(savedLedger.get().currency()).isEqualTo(currency);
+        {
+            final var savedLedger = adapter.get(ledger.id());
+            assertThat(savedLedger).isPresent();
+            assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsor.getId());
+            assertThat(savedLedger.get().currency()).isEqualTo(currency);
+        }
+
+        {
+            final var savedLedger = sponsorLedgerProvider.get(SponsorId.of(sponsor.getId()), currency);
+            assertThat(savedLedger).isPresent();
+            assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsor.getId());
+            assertThat(savedLedger.get().currency()).isEqualTo(currency);
+        }
     }
 
 
