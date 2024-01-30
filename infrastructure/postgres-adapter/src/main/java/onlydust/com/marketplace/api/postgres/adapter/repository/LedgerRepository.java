@@ -7,5 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface LedgerRepository extends JpaRepository<LedgerEntity, UUID> {
-    Optional<LedgerEntity> findBySponsorSponsorIdAndCurrencyId(UUID ownerId, UUID currency);
+    Optional<LedgerEntity> findBySponsorSponsorIdAndCurrencyId(UUID sponsorId, UUID currency);
+
+    Optional<LedgerEntity> findByContributorGithubUserIdAndCurrencyId(Long githubUserId, UUID currency);
+
+    Optional<LedgerEntity> findByProjectProjectIdAndCurrencyId(UUID projectId, UUID currency);
 }

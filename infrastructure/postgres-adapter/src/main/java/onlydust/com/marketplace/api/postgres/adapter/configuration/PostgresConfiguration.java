@@ -258,4 +258,14 @@ public class PostgresConfiguration {
     public PostgresSponsorLedgerProviderAdapter postgresSponsorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
         return new PostgresSponsorLedgerProviderAdapter(ledgerRepository);
     }
+
+    @Bean
+    public PostgresContributorLedgerProviderAdapter postgresContributorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresContributorLedgerProviderAdapter(ledgerRepository);
+    }
+
+    @Bean
+    public PostgresProjectLedgerProviderAdapter postgresProjectLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresProjectLedgerProviderAdapter(ledgerRepository);
+    }
 }
