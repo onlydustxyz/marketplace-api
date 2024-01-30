@@ -20,7 +20,7 @@ import java.util.UUID;
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 @Value
 @Builder(access = AccessLevel.PRIVATE)
-@Table(name = "ledger_transactions", schema = "sandbox")
+@Table(name = "ledger_transactions", schema = "accounting")
 public class LedgerTransactionEntity {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)

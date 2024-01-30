@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Table(name = "account_books_events", schema = "sandbox")
+@Table(name = "account_books_events", schema = "accounting")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)

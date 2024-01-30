@@ -71,4 +71,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000034_create_tracking_outbox_table.sql
   - include:
       file: db/changelog/changelogs/00000035_create_project_tags_table.sql
-      file: db/changelog/changelogs/00000035_create_sandbox_schema.sql
+  - include:
+      file: db/changelog/changelogs/00000037_create_accounting_schema.sql

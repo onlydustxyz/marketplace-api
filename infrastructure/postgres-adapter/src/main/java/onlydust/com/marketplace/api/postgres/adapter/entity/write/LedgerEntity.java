@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Data
-@Table(name = "ledgers", schema = "sandbox")
+@Table(name = "ledgers", schema = "accounting")
 @Builder(access = AccessLevel.PRIVATE)
 public class LedgerEntity {
     @Id

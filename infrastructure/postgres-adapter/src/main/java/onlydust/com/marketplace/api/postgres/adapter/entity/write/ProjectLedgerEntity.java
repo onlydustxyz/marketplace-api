@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Value
-@Table(name = "project_ledgers", schema = "sandbox")
+@Table(name = "project_ledgers", schema = "accounting")
 public class ProjectLedgerEntity {
     @Id
     @NonNull UUID ledgerId;
