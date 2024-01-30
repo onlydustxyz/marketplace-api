@@ -938,6 +938,13 @@ paths:
               type: string
               format: uuid
         - in: query
+          name: tags
+          description: Filter on project tags
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectTag'
+        - in: query
           name: mine
           description: Filter mine projects
           schema:
@@ -2931,6 +2938,10 @@ components:
           default: false
         isMissingGithubAppInstallation:
           type: boolean
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectTag'
 
     ProjectResponse:
       type: object
@@ -3034,6 +3045,10 @@ components:
           description: When the project was indexed
         me:
           $ref: '#/components/schemas/ProjectMeResponse'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectTag'
 
     ProjectMeResponse:
       type: object
@@ -4611,3 +4626,11 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserContributionStats'
+
+    ProjectTag:
+      type: string
+      enum:
+        - BEGINNERS_WELCOME
+        - STRONG_EXPERTISE
+        - LIKELY_TO_SEND_REWARDS
+        - FAST_PACED

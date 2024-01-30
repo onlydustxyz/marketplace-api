@@ -154,18 +154,20 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies,
-                                                                              List<UUID> sponsorIds, UUID userId,
-                                                                              String search,
-                                                                              ProjectCardView.SortBy sort,
-                                                                              Boolean mine, Integer pageIndex,
-                                                                              Integer pageSize) {
+    public Page<ProjectCardView> findByTagsTechnologiesSponsorsUserIdSearchSortBy(List<Project.Tag> tags,
+                                                                                  List<String> technologies,
+                                                                                  List<UUID> sponsorIds, UUID userId,
+                                                                                  String search,
+                                                                                  ProjectCardView.SortBy sort,
+                                                                                  Boolean mine, Integer pageIndex,
+                                                                                  Integer pageSize) {
         final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
         final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
-        final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, technologiesJsonPath,
+        final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
+        final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath, technologiesJsonPath,
                 sponsorsJsonPath, search);
         final List<ProjectPageItemViewEntity> projectsForUserId =
-                projectsPageRepository.findProjectsForUserId(userId, mine,
+                projectsPageRepository.findProjectsForUserId(userId, mine, tagsJsonPath,
                         technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
@@ -182,19 +184,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies,
-                                                                        List<UUID> sponsorIds, String search,
-                                                                        ProjectCardView.SortBy sort,
-                                                                        Integer pageIndex, Integer pageSize) {
+    public Page<ProjectCardView> findByTagsTechnologiesSponsorsSearchSortBy(List<Project.Tag> tags,
+                                                                            List<String> technologies,
+                                                                            List<UUID> sponsorIds, String search,
+                                                                            ProjectCardView.SortBy sort,
+                                                                            Integer pageIndex, Integer pageSize) {
 
         final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
         final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
+        final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
         final List<ProjectPageItemViewEntity> projectsForAnonymousUser =
-                projectsPageRepository.findProjectsForAnonymousUser(technologiesJsonPath, sponsorsJsonPath, search,
+                projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, sponsorsJsonPath, search,
                         isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
-        final Long count = projectsPageRepository.countProjectsForAnonymousUser(technologiesJsonPath,
+        final Long count = projectsPageRepository.countProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath,
                 sponsorsJsonPath, search);
         final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
                 projectsPageFiltersRepository.findFiltersForAnonymousUser(technologiesJsonPath, sponsorsJsonPath,

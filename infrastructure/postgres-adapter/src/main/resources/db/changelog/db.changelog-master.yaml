@@ -69,3 +69,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000033_create_hidden_contributors_table.sql
   - include:
       file: db/changelog/changelogs/00000034_create_tracking_outbox_table.sql
+  - include:
+      file: db/changelog/changelogs/00000035_create_project_tags_table.sql

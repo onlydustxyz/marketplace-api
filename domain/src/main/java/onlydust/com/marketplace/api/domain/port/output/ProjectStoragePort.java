@@ -15,14 +15,14 @@ public interface ProjectStoragePort {
 
     ProjectDetailsView getBySlug(String slug, User caller);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                       UUID userId, String search,
-                                                                       ProjectCardView.SortBy sort, Boolean mine,
-                                                                       Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> findByTagsTechnologiesSponsorsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+                                                                           UUID userId, String search,
+                                                                           ProjectCardView.SortBy sort, Boolean mine,
+                                                                           Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> findByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                 String search, ProjectCardView.SortBy sort,
-                                                                 Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> findByTagsTechnologiesSponsorsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+                                                                     String search, ProjectCardView.SortBy sort,
+                                                                     Integer pageIndex, Integer pageSize);
 
     String createProject(UUID projectId, String name, String shortDescription, String longDescription,
                          Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,

@@ -16,14 +16,14 @@ public interface ProjectFacadePort {
 
     ProjectDetailsView getBySlug(String slug, User caller);
 
-    Page<ProjectCardView> getByTechnologiesSponsorsUserIdSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                      String search, ProjectCardView.SortBy sort,
-                                                                      UUID userId, Boolean mine,
-                                                                      Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> getByTagsTechnologiesSponsorsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+                                                                          String search, ProjectCardView.SortBy sort,
+                                                                          UUID userId, Boolean mine,
+                                                                          Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> getByTechnologiesSponsorsSearchSortBy(List<String> technologies, List<UUID> sponsorIds,
-                                                                String search, ProjectCardView.SortBy sort,
-                                                                Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> getByTagsTechnologiesSponsorsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+                                                                    String search, ProjectCardView.SortBy sort,
+                                                                    Integer pageIndex, Integer pageSize);
 
 
     Pair<UUID, String> createProject(CreateProjectCommand createProjectCommand);

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
 import java.util.*;
@@ -30,6 +31,8 @@ public class ProjectCardView {
     Boolean isInvitedAsProjectLead = false;
     @Builder.Default
     Boolean isMissingGithubAppInstallation = null;
+    @Builder.Default
+    Set<Project.Tag> tags = new HashSet<>();
 
     public void addProjectLeader(final ProjectLeaderLinkView leader) {
         this.getLeaders().add(leader);
@@ -49,6 +52,10 @@ public class ProjectCardView {
                 }
             });
         }
+    }
+
+    public void addTag(final Project.Tag tag){
+        this.getTags().add(tag);
     }
 
     public enum SortBy {

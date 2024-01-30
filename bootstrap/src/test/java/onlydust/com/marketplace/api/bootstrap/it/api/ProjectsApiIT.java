@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectTagRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import org.junit.jupiter.api.MethodOrderer;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -234,6 +237,241 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "indexedAt": "2023-12-04T14:35:10.986567Z"
             }
                         
+            """;
+    private static final String BRETZEL_OVERVIEW_WITH_TAGS_JSON = """
+            {
+              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+              "slug": "bretzel",
+              "name": "Bretzel",
+              "createdAt": "2023-02-21T09:15:09.603Z",
+              "shortDescription": "A project for people who love fruits",
+              "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
+              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+              "moreInfos": [
+                {
+                  "url": "https://bretzel.club/",
+                  "value": null
+                }
+              ],
+              "hiring": true,
+              "visibility": "PUBLIC",
+              "contributorCount": 4,
+              "topContributors": [
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+                },
+                {
+                  "githubUserId": 52197971,
+                  "login": "jb1011",
+                  "htmlUrl": "https://github.com/jb1011",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
+                },
+                {
+                  "githubUserId": 74653697,
+                  "login": "antiyro",
+                  "htmlUrl": "https://github.com/antiyro",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
+                }
+              ],
+              "repos": [
+                {
+                  "id": 380954304,
+                  "owner": "gregcha",
+                  "name": "bretzel-app",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 452047076,
+                  "owner": "gregcha",
+                  "name": "bretzel-site",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 466482535,
+                  "owner": "gregcha",
+                  "name": "bretzel-ressources",
+                  "description": null,
+                  "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                  "stars": 0,
+                  "forkCount": 0,
+                  "hasIssues": true,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": true
+                },
+                {
+                  "id": 659718526,
+                  "owner": "KasarLabs",
+                  "name": "deoxys-telemetry",
+                  "description": "Deoxys Telemetry service",
+                  "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                  "stars": 0,
+                  "forkCount": 1,
+                  "hasIssues": false,
+                  "isIncludedInProject": null,
+                  "isAuthorizedInGithubApp": false
+                }
+              ],
+              "organizations": [
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                  "name": "Grégoire CHARLES",
+                  "repos": [
+                    {
+                      "id": 380954304,
+                      "owner": "gregcha",
+                      "name": "bretzel-app",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    },
+                    {
+                      "id": 452047076,
+                      "owner": "gregcha",
+                      "name": "bretzel-site",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    },
+                    {
+                      "id": 466482535,
+                      "owner": "gregcha",
+                      "name": "bretzel-ressources",
+                      "description": null,
+                      "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                      "stars": 0,
+                      "forkCount": 0,
+                      "hasIssues": true,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": true
+                    }
+                  ],
+                  "installed": true,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": 44637372
+                },
+                {
+                  "githubUserId": 119948009,
+                  "login": "KasarLabs",
+                  "htmlUrl": "https://github.com/KasarLabs",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
+                  "name": "KasarLabs",
+                  "repos": [
+                    {
+                      "id": 659718526,
+                      "owner": "KasarLabs",
+                      "name": "deoxys-telemetry",
+                      "description": "Deoxys Telemetry service",
+                      "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                      "stars": 0,
+                      "forkCount": 1,
+                      "hasIssues": false,
+                      "isIncludedInProject": true,
+                      "isAuthorizedInGithubApp": false
+                    }
+                  ],
+                  "installed": false,
+                  "isCurrentUserAdmin": null,
+                  "isPersonal": null,
+                  "installationId": null
+                }
+              ],
+              "leaders": [
+                {
+                  "githubUserId": 8642470,
+                  "login": "gregcha",
+                  "htmlUrl": "https://github.com/gregcha",
+                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                },
+                {
+                  "githubUserId": 98735421,
+                  "login": "pacovilletard",
+                  "htmlUrl": "https://github.com/pacovilletard",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                }
+              ],
+              "invitedLeaders": [
+                {
+                  "githubUserId": 16590657,
+                  "login": "PierreOucif",
+                  "htmlUrl": "https://github.com/PierreOucif",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                  "id": null
+                }
+              ],
+              "sponsors": [
+                {
+                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                  "name": "OGC Nissa Ineos",
+                  "url": "https://www.ogcnice.com/fr/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                },
+                {
+                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                  "name": "Coca Cola",
+                  "url": null,
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                }
+              ],
+              "technologies": {
+                "TypeScript": 190809,
+                "Dockerfile": 1982,
+                "CSS": 423688,
+                "Shell": 732,
+                "Rust": 408641,
+                "SCSS": 98360,
+                "JavaScript": 62716,
+                "HTML": 121874
+              },
+              "hasRemainingBudget": true,
+              "rewardSettings": {
+                "ignorePullRequests": false,
+                "ignoreIssues": false,
+                "ignoreCodeReviews": false,
+                "ignoreContributionsBefore": null
+              },
+              "indexingComplete": true,
+              "indexedAt": "2023-12-04T14:35:10.986567Z",
+              "me": {
+                "isMember": false,
+                "isContributor": false,
+                "isProjectLead": false,
+                "isInvitedAsProjectLead": false,
+                "hasApplied": false
+              },
+              "tags": [
+                "BEGINNERS_WELCOME",
+                "STRONG_EXPERTISE"
+              ]
+            }            
             """;
 
     private static final String B_CONSEIL_OVERVIEW_JSON = """
@@ -2670,30 +2908,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final String slug = "bretzel";
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().json(BRETZEL_OVERVIEW_JSON);
 
         // When user is authenticated
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.me.isMember").isEqualTo(false)
-                .jsonPath("$.me.isContributor").isEqualTo(false)
-                .jsonPath("$.me.isProjectLead").isEqualTo(false)
-                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
-                .json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(false).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
     }
 
     @Test
@@ -2703,57 +2926,33 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final String id = "7d04163c-4187-4313-8066-61504d34fc56";
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().json(BRETZEL_OVERVIEW_JSON);
 
         // When user is authenticated
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.me.isMember").isEqualTo(false)
-                .jsonPath("$.me.isContributor").isEqualTo(false)
-                .jsonPath("$.me.isProjectLead").isEqualTo(false)
-                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
-                .json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(false).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
     }
 
     @Test
     @Order(4)
     void should_get_projects_given_anonymous_user() {
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100"))).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE);
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE);
     }
 
     @Test
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsorId",
-                        "2639563e-4437-4bde-a4f4-654977c0cb39", "search", "t", "pageIndex", "0", "pageSize", "100")))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsorId", "2639563e-4437-4bde-a4f4" +
+                                                                                                                          "-654977c0cb39", "search", "t",
+                        "pageIndex", "0", "pageSize",
+                        "100"))).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
     }
 
     @Test
@@ -2763,15 +2962,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
     }
 
     @Test
@@ -2781,19 +2974,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final var auth = userAuthHelper.authenticatePierre();
 
         final ProjectViewEntity bretzel = projectViewRepository.findByKey("bretzel").orElseThrow();
-        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(),
-                auth.user().getGithubUserId()));
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(), auth.user().getGithubUserId()));
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true")))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
     }
 
     @Test
@@ -2803,60 +2990,27 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final String slug = "b-conseil";
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()
                 // Then
-                .expectStatus()
-                .isForbidden();
+                .expectStatus().isForbidden();
 
         // When a contributor gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateOlivier().jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.me.isMember").isEqualTo(true)
-                .jsonPath("$.me.isContributor").isEqualTo(true)
-                .jsonPath("$.me.isProjectLead").isEqualTo(false)
-                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
-                .json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(true).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.me.isMember").isEqualTo(true)
-                .jsonPath("$.me.isContributor").isEqualTo(false)
-                .jsonPath("$.me.isProjectLead").isEqualTo(true)
-                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
-                .json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(true).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.me.isMember").isEqualTo(true)
-                .jsonPath("$.me.isContributor").isEqualTo(false)
-                .jsonPath("$.me.isProjectLead").isEqualTo(false)
-                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
-                .json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
     }
 
     @Test
@@ -2866,16 +3020,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         final String id = "27ca7e18-9e71-468f-8825-c64fe6b79d66";
 
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).exchange()
                 // Then
-                .expectStatus()
-                .isForbidden();
+                .expectStatus().isForbidden();
 
         // When a contributor gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .exchange()
                 // Then
@@ -2890,14 +3040,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
+                .is2xxSuccessful().expectBody()
                 .jsonPath("$.me.isMember").isEqualTo(true)
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(true)
@@ -2906,9 +3054,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
-        client.get()
-                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -2926,14 +3072,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(10)
     public void should_update_project_ranking() {
         // When
-        client.get()
-                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "5", "sort", "RANK")))
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "5", "sort", "RANK")))
                 // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
+                .exchange().expectStatus().is2xxSuccessful().expectBody().json("""
                         {
                           "projects": [
                             {
@@ -3230,5 +3371,549 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1
                         }
                         """);
+    }
+
+    @Autowired
+    public ProjectTagRepository projectTagRepository;
+
+    @Test
+    @Order(11)
+    void should_get_projects_given_anonymous_user_and_project_tags() {
+        // Given
+        projectTagRepository.saveAll(List.of(
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.BEGINNERS_WELCOME)
+                                                .build()
+                                ).build(),
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.STRONG_EXPERTISE)
+                                                .build()
+                                ).build(),
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"))
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.STRONG_EXPERTISE)
+                                                .build()
+                                ).build()
+                )
+        );
+
+        // When
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_PACED"))).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful().expectBody().json("""
+                        {
+                            "projects": [],
+                            "technologies": [
+                                "Batchfile",
+                                "C",
+                                "C++",
+                                "CMake",
+                                "COBOL",
+                                "CSS",
+                                "Cairo",
+                                "Dart",
+                                "Dockerfile",
+                                "HTML",
+                                "Haskell",
+                                "JavaScript",
+                                "Jinja",
+                                "Jupyter Notebook",
+                                "Kotlin",
+                                "MDX",
+                                "Makefile",
+                                "Nix",
+                                "Objective-C",
+                                "PHP",
+                                "PLpgSQL",
+                                "Procfile",
+                                "Python",
+                                "Ruby",
+                                "Rust",
+                                "SCSS",
+                                "Scheme",
+                                "Shell",
+                                "Solidity",
+                                "Swift",
+                                "TypeScript"
+                            ],
+                            "sponsors": [
+                                {
+                                    "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                                    "name": "AS Nancy Lorraine",
+                                    "url": null,
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                                },
+                                {
+                                    "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                    "name": "Coca Cola",
+                                    "url": null,
+                                    "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                },
+                                {
+                                    "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                                    "name": "Coca Colax",
+                                    "url": "https://www.coca-cola-france.fr/",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                                },
+                                {
+                                    "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                                    "name": "OGC Nissa Ineos",
+                                    "url": "https://www.ogcnice.com/fr/",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                },
+                                {
+                                    "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                                    "name": "PSG",
+                                    "url": "https://www.psg.fr/",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                                },
+                                {
+                                    "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                                    "name": "Red Bull",
+                                    "url": "https://www.redbull.com/",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                                },
+                                {
+                                    "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                                    "name": "Starknet Foundation",
+                                    "url": "https://starknet.io",
+                                    "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                                },
+                                {
+                                    "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                                    "name": "Theodo",
+                                    "url": null,
+                                    "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                                }
+                            ],
+                            "hasMore": false,
+                            "totalPageNumber": 0,
+                            "totalItemNumber": 0,
+                            "nextPageIndex": 0
+                        }""");
+
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "STRONG_EXPERTISE"))).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful().expectBody().json("""
+                        {
+                          "projects": [
+                            {
+                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                              "slug": "bretzel",
+                              "name": "Bretzel",
+                              "shortDescription": "A project for people who love fruits",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "hiring": true,
+                              "visibility": "PUBLIC",
+                              "repoCount": 4,
+                              "contributorCount": 4,
+                              "leaders": [
+                                {
+                                  "githubUserId": 8642470,
+                                  "login": "gregcha",
+                                  "htmlUrl": "https://github.com/gregcha",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                },
+                                {
+                                  "githubUserId": 98735421,
+                                  "login": "pacovilletard",
+                                  "htmlUrl": "https://github.com/pacovilletard",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                                }
+                              ],
+                              "sponsors": [
+                                {
+                                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                                  "name": "OGC Nissa Ineos",
+                                  "url": "https://www.ogcnice.com/fr/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                },
+                                {
+                                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                  "name": "Coca Cola",
+                                  "url": null,
+                                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                }
+                              ],
+                              "technologies": {
+                                "TypeScript": 190809,
+                                "Dockerfile": 1982,
+                                "Shell": 732,
+                                "CSS": 423688,
+                                "Rust": 408641,
+                                "SCSS": 98360,
+                                "JavaScript": 62716,
+                                "HTML": 121874
+                              },
+                              "isInvitedAsProjectLead": false,
+                              "isMissingGithubAppInstallation": null,
+                              "tags": [
+                                "BEGINNERS_WELCOME",
+                                "STRONG_EXPERTISE"
+                              ]
+                            },
+                            {
+                              "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "slug": "qa-new-contributions",
+                              "name": "QA new contributions",
+                              "shortDescription": "QA new contributions",
+                              "logoUrl": null,
+                              "hiring": false,
+                              "visibility": "PUBLIC",
+                              "repoCount": 1,
+                              "contributorCount": 18,
+                              "leaders": [
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "htmlUrl": "https://github.com/PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                },
+                                {
+                                  "githubUserId": 8642470,
+                                  "login": "gregcha",
+                                  "htmlUrl": "https://github.com/gregcha",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                }
+                              ],
+                              "sponsors": [],
+                              "technologies": {
+                                "TypeScript": 3175211,
+                                "MDX": 2520,
+                                "CSS": 6065,
+                                "Shell": 12431,
+                                "PLpgSQL": 1372,
+                                "JavaScript": 24023,
+                                "HTML": 1520
+                              },
+                              "isInvitedAsProjectLead": false,
+                              "isMissingGithubAppInstallation": null,
+                              "tags": [
+                                "STRONG_EXPERTISE"
+                              ]
+                            }
+                          ],
+                          "technologies": [
+                            "Batchfile",
+                            "C",
+                            "C++",
+                            "CMake",
+                            "COBOL",
+                            "CSS",
+                            "Cairo",
+                            "Dart",
+                            "Dockerfile",
+                            "HTML",
+                            "Haskell",
+                            "JavaScript",
+                            "Jinja",
+                            "Jupyter Notebook",
+                            "Kotlin",
+                            "MDX",
+                            "Makefile",
+                            "Nix",
+                            "Objective-C",
+                            "PHP",
+                            "PLpgSQL",
+                            "Procfile",
+                            "Python",
+                            "Ruby",
+                            "Rust",
+                            "SCSS",
+                            "Scheme",
+                            "Shell",
+                            "Solidity",
+                            "Swift",
+                            "TypeScript"
+                          ],
+                          "sponsors": [
+                            {
+                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                              "name": "AS Nancy Lorraine",
+                              "url": null,
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                            },
+                            {
+                              "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                              "name": "Coca Cola",
+                              "url": null,
+                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                            },
+                            {
+                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                              "name": "Coca Colax",
+                              "url": "https://www.coca-cola-france.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                            },
+                            {
+                              "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                              "name": "OGC Nissa Ineos",
+                              "url": "https://www.ogcnice.com/fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                            },
+                            {
+                              "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                              "name": "PSG",
+                              "url": "https://www.psg.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                            },
+                            {
+                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                              "name": "Red Bull",
+                              "url": "https://www.redbull.com/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                            },
+                            {
+                              "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                              "name": "Starknet Foundation",
+                              "url": "https://starknet.io",
+                              "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                            },
+                            {
+                              "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                              "name": "Theodo",
+                              "url": null,
+                              "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "nextPageIndex": 0
+                        }
+                        """);
+
+
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "STRONG_EXPERTISE,BEGINNERS_WELCOME"))).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful().expectBody().json("""
+                            {
+                           "projects": [
+                             {
+                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                               "slug": "bretzel",
+                               "name": "Bretzel",
+                               "shortDescription": "A project for people who love fruits",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                               "hiring": true,
+                               "visibility": "PUBLIC",
+                               "repoCount": 4,
+                               "contributorCount": 4,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 8642470,
+                                   "login": "gregcha",
+                                   "htmlUrl": "https://github.com/gregcha",
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                 },
+                                 {
+                                   "githubUserId": 98735421,
+                                   "login": "pacovilletard",
+                                   "htmlUrl": "https://github.com/pacovilletard",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                                   "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                                 }
+                               ],
+                               "sponsors": [
+                                 {
+                                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                                   "name": "OGC Nissa Ineos",
+                                   "url": "https://www.ogcnice.com/fr/",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                 },
+                                 {
+                                   "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                   "name": "Coca Cola",
+                                   "url": null,
+                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                 }
+                               ],
+                               "technologies": {
+                                 "TypeScript": 190809,
+                                 "Dockerfile": 1982,
+                                 "Shell": 732,
+                                 "CSS": 423688,
+                                 "Rust": 408641,
+                                 "SCSS": 98360,
+                                 "JavaScript": 62716,
+                                 "HTML": 121874
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null,
+                               "tags": [
+                                 "STRONG_EXPERTISE",
+                                 "BEGINNERS_WELCOME"
+                               ]
+                             },
+                             {
+                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                               "slug": "qa-new-contributions",
+                               "name": "QA new contributions",
+                               "shortDescription": "QA new contributions",
+                               "logoUrl": null,
+                               "hiring": false,
+                               "visibility": "PUBLIC",
+                               "repoCount": 1,
+                               "contributorCount": 18,
+                               "leaders": [
+                                 {
+                                   "githubUserId": 16590657,
+                                   "login": "PierreOucif",
+                                   "htmlUrl": "https://github.com/PierreOucif",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                   "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                 },
+                                 {
+                                   "githubUserId": 8642470,
+                                   "login": "gregcha",
+                                   "htmlUrl": "https://github.com/gregcha",
+                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                 }
+                               ],
+                               "sponsors": [],
+                               "technologies": {
+                                 "TypeScript": 3175211,
+                                 "MDX": 2520,
+                                 "CSS": 6065,
+                                 "Shell": 12431,
+                                 "PLpgSQL": 1372,
+                                 "JavaScript": 24023,
+                                 "HTML": 1520
+                               },
+                               "isInvitedAsProjectLead": false,
+                               "isMissingGithubAppInstallation": null,
+                               "tags": [
+                                 "STRONG_EXPERTISE"
+                               ]
+                             }
+                           ],
+                           "technologies": [
+                             "Batchfile",
+                             "C",
+                             "C++",
+                             "CMake",
+                             "COBOL",
+                             "CSS",
+                             "Cairo",
+                             "Dart",
+                             "Dockerfile",
+                             "HTML",
+                             "Haskell",
+                             "JavaScript",
+                             "Jinja",
+                             "Jupyter Notebook",
+                             "Kotlin",
+                             "MDX",
+                             "Makefile",
+                             "Nix",
+                             "Objective-C",
+                             "PHP",
+                             "PLpgSQL",
+                             "Procfile",
+                             "Python",
+                             "Ruby",
+                             "Rust",
+                             "SCSS",
+                             "Scheme",
+                             "Shell",
+                             "Solidity",
+                             "Swift",
+                             "TypeScript"
+                           ],
+                           "sponsors": [
+                             {
+                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                               "name": "AS Nancy Lorraine",
+                               "url": null,
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                             },
+                             {
+                               "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                               "name": "Coca Cola",
+                               "url": null,
+                               "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                             },
+                             {
+                               "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
+                               "name": "Coca Colax",
+                               "url": "https://www.coca-cola-france.fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                             },
+                             {
+                               "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                               "name": "OGC Nissa Ineos",
+                               "url": "https://www.ogcnice.com/fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                             },
+                             {
+                               "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
+                               "name": "PSG",
+                               "url": "https://www.psg.fr/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                             },
+                             {
+                               "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                               "name": "Red Bull",
+                               "url": "https://www.redbull.com/",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                             },
+                             {
+                               "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
+                               "name": "Starknet Foundation",
+                               "url": "https://starknet.io",
+                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                             },
+                             {
+                               "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                               "name": "Theodo",
+                               "url": null,
+                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                             }
+                           ],
+                           "hasMore": false,
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 2,
+                           "nextPageIndex": 0
+                         }
+                        """);
+    }
+
+    @Test
+    @Order(12)
+    void should_get_projects_given_authenticated_user_for_mine_with_tags() {
+        // Given
+        final var auth = userAuthHelper.authenticatePierre();
+        // When
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true", "tags", "BEGINNERS_WELCOME,STRONG_EXPERTISE"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt()).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(13)
+    public void should_get_a_project_by_slug_with_tags() {
+        // Given
+        final String slug = "bretzel";
+
+        // When
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful().expectBody()
+                .json(BRETZEL_OVERVIEW_WITH_TAGS_JSON);
     }
 }
