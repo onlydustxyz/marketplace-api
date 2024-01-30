@@ -243,4 +243,9 @@ public class PostgresConfiguration {
     public PostgresIsoCurrencyServiceAdapter postgresIsoCurrencyServiceAdapter(final IsoCurrencyRepository isoCurrencyRepository) {
         return new PostgresIsoCurrencyServiceAdapter(isoCurrencyRepository);
     }
+
+    @Bean
+    public PostgresAccountBookEventStorage postgresAccountBookEventStorage(final AccountBookRepository accountBookRepository) {
+        return new PostgresAccountBookEventStorage(accountBookRepository);
+    }
 }
