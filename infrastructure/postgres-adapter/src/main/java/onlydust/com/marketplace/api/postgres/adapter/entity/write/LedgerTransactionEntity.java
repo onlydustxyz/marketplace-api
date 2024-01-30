@@ -24,7 +24,7 @@ import java.util.UUID;
 public class LedgerTransactionEntity {
     @Id
     @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
-    @NonNull BigInteger id;
+    BigInteger id;
 
     @NonNull UUID ledgerId;
 
@@ -40,8 +40,9 @@ public class LedgerTransactionEntity {
         return new Ledger.Transaction(Amount.of(amount), network.toNetwork(), lockedUntil);
     }
 
-    public static LedgerTransactionEntity of(Ledger.Transaction transaction) {
+    public static LedgerTransactionEntity of(Ledger.Id ledgerId, Ledger.Transaction transaction) {
         return LedgerTransactionEntity.builder()
+                .ledgerId(ledgerId.value())
                 .amount(transaction.amount().getValue())
                 .network(NetworkEnumEntity.of(transaction.network()))
                 .lockedUntil(transaction.lockedUntil())

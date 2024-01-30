@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -261,6 +262,17 @@ public interface BackOfficeMapper {
         return switch (type) {
             case FIAT -> CurrencyType.FIAT;
             case CRYPTO -> CurrencyType.CRYPTO;
+        };
+    }
+
+    static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {
+        return switch (network) {
+            case ETHEREUM -> Network.ETHEREUM;
+            case OPTIMISM -> Network.OPTIMISM;
+            case STARKNET -> Network.STARKNET;
+            case APTOS -> Network.APTOS;
+            case SEPA -> Network.SEPA;
+            case SWIFT -> Network.SWIFT;
         };
     }
 }

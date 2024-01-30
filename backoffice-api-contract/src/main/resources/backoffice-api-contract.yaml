@@ -41,12 +41,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionRequest'
       responses:
-        "201":
+        "204":
           description: 'The transaction has been registered'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -77,14 +73,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionRequest'
+              $ref: '#/components/schemas/FundsRequest'
       responses:
-        "201":
+        "204":
           description: 'The transaction has been registered'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -113,7 +105,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BudgetAllocationRequest'
       responses:
-        "201":
+        "204":
           description: 'The budget has been allocated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
@@ -143,7 +135,7 @@ paths:
             schema:
               $ref: '#/components/schemas/BudgetAllocationRequest'
       responses:
-        "200":
+        "204":
           description: 'The sponsor has been refunded'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
@@ -841,6 +833,25 @@ components:
           type: string
           format: uri
 
+    FundsRequest:
+      type: object
+      required:
+        - type
+        - amount
+        - currencyId
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        lockedUntil:
+          type: string
+          format: date-time
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
     TransactionRequest:
       type: object
       required:
@@ -860,14 +871,6 @@ components:
           format: date-time
         receipt:
           $ref: '#/components/schemas/TransactionReceipt'
-
-    TransactionResponse:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          $ref: '#/components/schemas/TransactionId'
 
     TransactionType:
       type: string
