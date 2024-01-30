@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain;
 
+import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
@@ -36,6 +37,7 @@ public class AccountingServiceTest {
     final LedgerStorageStub<Object> ledgerStorage = new LedgerStorageStub<>();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
+    final Faker faker = new Faker();
 
     @Nested
     class GivenAnUnknownCurrency {
@@ -184,8 +186,8 @@ public class AccountingServiceTest {
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final Ledger projectLedger2 = new Ledger(projectId2, currency);
-        final ContributorId contributorId1 = ContributorId.random();
-        final ContributorId contributorId2 = ContributorId.random();
+        final ContributorId contributorId1 = ContributorId.of(faker.number().randomNumber());
+        final ContributorId contributorId2 = ContributorId.of(faker.number().randomNumber());
         final Ledger contributorLedger2 = new Ledger(contributorId2, currency);
 
         @BeforeEach
@@ -522,7 +524,7 @@ public class AccountingServiceTest {
         final Ledger sponsorLedger2 = new Ledger(sponsorId2, currency);
         final ProjectId projectId = ProjectId.random();
         final Ledger projectLedger = new Ledger(projectId, currency);
-        final ContributorId contributorId = ContributorId.random();
+        final ContributorId contributorId = ContributorId.of(faker.number().randomNumber());
         final Ledger contributorLedger = new Ledger(contributorId, currency);
 
         @BeforeEach

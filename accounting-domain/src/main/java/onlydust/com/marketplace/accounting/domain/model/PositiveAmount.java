@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PositiveAmount extends Amount {
 
     public static final PositiveAmount ZERO = PositiveAmount.of(BigDecimal.ZERO);

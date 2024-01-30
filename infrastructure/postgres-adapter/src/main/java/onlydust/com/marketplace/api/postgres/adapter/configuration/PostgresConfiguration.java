@@ -243,4 +243,29 @@ public class PostgresConfiguration {
     public PostgresIsoCurrencyServiceAdapter postgresIsoCurrencyServiceAdapter(final IsoCurrencyRepository isoCurrencyRepository) {
         return new PostgresIsoCurrencyServiceAdapter(isoCurrencyRepository);
     }
+
+    @Bean
+    public PostgresAccountBookEventStorage postgresAccountBookEventStorage(final AccountBookRepository accountBookRepository) {
+        return new PostgresAccountBookEventStorage(accountBookRepository);
+    }
+
+    @Bean
+    public PostgresLedgerStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresLedgerStorageAdapter(ledgerRepository);
+    }
+
+    @Bean
+    public PostgresSponsorLedgerProviderAdapter postgresSponsorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresSponsorLedgerProviderAdapter(ledgerRepository);
+    }
+
+    @Bean
+    public PostgresContributorLedgerProviderAdapter postgresContributorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresContributorLedgerProviderAdapter(ledgerRepository);
+    }
+
+    @Bean
+    public PostgresProjectLedgerProviderAdapter postgresProjectLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresProjectLedgerProviderAdapter(ledgerRepository);
+    }
 }

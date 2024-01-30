@@ -32,6 +32,7 @@ public class ProjectTagEntity {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class Id implements Serializable {
         UUID projectId;
         @Type(type = "project_tag")

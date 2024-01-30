@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @EqualsAndHashCode
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+@NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 public class Amount {
     public static final Amount ZERO = Amount.of(BigDecimal.ZERO);
 
