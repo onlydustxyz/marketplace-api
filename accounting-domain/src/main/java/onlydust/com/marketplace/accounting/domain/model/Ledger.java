@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
@@ -21,6 +18,7 @@ public class Ledger {
     final @NonNull Id id;
     final @NonNull Object ownerId;
     final @NonNull Currency currency;
+    @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
     public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
@@ -79,6 +77,6 @@ public class Ledger {
         }
     }
 
-    private record Transaction(@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
+    public record Transaction(@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
     }
 }

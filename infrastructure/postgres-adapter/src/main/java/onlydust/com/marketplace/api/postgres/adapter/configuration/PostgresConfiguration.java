@@ -248,4 +248,9 @@ public class PostgresConfiguration {
     public PostgresAccountBookEventStorage postgresAccountBookEventStorage(final AccountBookRepository accountBookRepository) {
         return new PostgresAccountBookEventStorage(accountBookRepository);
     }
+
+    @Bean
+    public PostgresLedgerStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresLedgerStorageAdapter(ledgerRepository);
+    }
 }
