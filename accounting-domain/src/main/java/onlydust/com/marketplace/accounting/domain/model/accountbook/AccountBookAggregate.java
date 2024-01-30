@@ -70,9 +70,9 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
-    public record BurnEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent<Collection<Transaction>> {
+    public record BurnEvent(Ledger.Id account, PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Collection<Transaction> visit(AccountBookState state) {
+        public List<Transaction> visit(AccountBookState state) {
             return state.burn(account, amount);
         }
     }

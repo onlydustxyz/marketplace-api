@@ -33,7 +33,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public Collection<Transaction> burn(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
+    public List<Transaction> burn(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(account, ROOT);
         final var unspentVertices = unspentVerticesOf(account);
         try {
@@ -128,8 +128,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return hasParent(directParent, parent);
     }
 
-    private Collection<Transaction> sendFromVertices(@NonNull final Ledger.Id to, @NonNull final PositiveAmount amount,
-                                                     @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
+    private List<Transaction> sendFromVertices(@NonNull final Ledger.Id to, @NonNull final PositiveAmount amount,
+                                               @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {
             throw new InsufficientFundsException("Insufficient funds: %s < %s".formatted(unspentTotal, amount));

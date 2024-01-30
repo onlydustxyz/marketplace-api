@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.LedgerStorageStub;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -16,14 +17,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AccountingServiceTest {
-    final AccountBookStorage accountBookStorage = mock(AccountBookStorage.class);
+    final AccountBookEventStorageStub accountBookEventStorage = new AccountBookEventStorageStub();
     final LedgerProvider<SponsorId> sponsorLedgerProvider = new LedgerStorageStub<>();
     final LedgerProvider<CommitteeId> committeeLedgerProvider = new LedgerStorageStub<>();
     final LedgerProvider<ProjectId> projectLedgerProvider = new LedgerStorageStub<>();
@@ -32,7 +35,7 @@ public class AccountingServiceTest {
             sponsorLedgerProvider, committeeLedgerProvider, projectLedgerProvider, contributorLedgerProvider);
     final LedgerStorageStub<Object> ledgerStorage = new LedgerStorageStub<>();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(accountBookStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
 
     @Nested
     class GivenAnUnknownCurrency {
@@ -58,7 +61,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
 
         /*
@@ -74,7 +77,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
 
 
@@ -91,7 +94,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
 
         /*
@@ -107,7 +110,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
     }
 
@@ -116,12 +119,10 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final SponsorId sponsorId = SponsorId.random();
         final ProjectId projectId = ProjectId.random();
-        final AccountBookAggregate accountBook = AccountBookAggregate.empty();
 
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
         }
 
         /*
@@ -136,9 +137,7 @@ public class AccountingServiceTest {
 
             // Then
             final var sponsorLedger = sponsorLedgerProvider.get(sponsorId, currency).orElseThrow();
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(10L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
         }
 
         /*
@@ -154,7 +153,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
 
         /*
@@ -170,7 +169,7 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
 
-            verify(accountBookStorage, never()).save(any());
+            assertThat(accountBookEventStorage.events).isEmpty();
         }
     }
 
@@ -188,18 +187,16 @@ public class AccountingServiceTest {
         final ContributorId contributorId1 = ContributorId.random();
         final ContributorId contributorId2 = ContributorId.random();
         final Ledger contributorLedger2 = new Ledger(contributorId2, currency);
-        AccountBookAggregate accountBook;
 
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             ledgerStorage.save(sponsorLedger, committeeLedger, projectLedger2, contributorLedger2);
 
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger.id(), PositiveAmount.of(300L)),
                     new TransferEvent(sponsorLedger.id(), committeeLedger.id(), PositiveAmount.of(200L))
-            );
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            ));
         }
 
         /*
@@ -213,9 +210,7 @@ public class AccountingServiceTest {
             accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(110L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
         }
 
 
@@ -230,9 +225,7 @@ public class AccountingServiceTest {
             accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new BurnEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
         }
 
         /*
@@ -247,8 +240,6 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot burn");
-
-            verify(accountBookStorage, never()).save(any());
         }
 
         /*
@@ -262,11 +253,8 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
-            assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(210L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), committeeLedger.id())).isEqualTo(PositiveAmount.of(210L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), committeeLedger.id(),
+                    PositiveAmount.of(10L)));
         }
 
         /*
@@ -281,11 +269,8 @@ public class AccountingServiceTest {
 
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
-            assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), projectLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), projectLedger1.id(),
+                    PositiveAmount.of(10L)));
         }
 
         /*
@@ -299,11 +284,8 @@ public class AccountingServiceTest {
             accountingService.refund(committeeId, sponsorId, PositiveAmount.of(150L), currency.id());
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(250L));
-            assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(50L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), committeeLedger.id())).isEqualTo(PositiveAmount.of(50L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new RefundEvent(committeeLedger.id(), sponsorLedger.id(),
+                    PositiveAmount.of(150L)));
         }
 
         /*
@@ -318,8 +300,6 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("No ledger found for owner %s in currency %s".formatted(projectId1, currency));
-
-            verify(accountBookStorage, never()).save(any());
         }
 
         /*
@@ -334,8 +314,6 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot refund");
-
-            verify(accountBookStorage, never()).save(any());
         }
 
         /*
@@ -350,11 +328,8 @@ public class AccountingServiceTest {
 
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(90L));
-            assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), projectLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-
-            verify(accountBookStorage).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), projectLedger1.id(),
+                    PositiveAmount.of(10L)));
         }
 
         /*
@@ -410,24 +385,17 @@ public class AccountingServiceTest {
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
             final var contributorLedger1 = contributorLedgerProvider.get(contributorId1, currency).orElseThrow();
-
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(15L));
-            assertThat(accountBook.state().balanceOf(committeeLedger.id())).isEqualTo(PositiveAmount.of(200L));
-            assertThat(accountBook.state().balanceOf(projectLedger1.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.of(30L));
-
-            assertThat(accountBook.state().balanceOf(contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-            assertThat(accountBook.state().transferredAmount(projectLedger1.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-            assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger1.id())).isEqualTo(PositiveAmount.of(10L));
-
-            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().transferredAmount(projectLedger1.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(20L));
-            assertThat(accountBook.state().transferredAmount(projectLedger2.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(25L));
-            assertThat(accountBook.state().transferredAmount(sponsorLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(45L));
-            assertThat(accountBook.state().transferredAmount(committeeLedger.id(), contributorLedger2.id())).isEqualTo(PositiveAmount.of(40L));
-
-            verify(accountBookStorage, times(10)).save(accountBook);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new TransferEvent(sponsorLedger.id(), committeeLedger.id(), PositiveAmount.of(70L)),
+                    new TransferEvent(committeeLedger.id(), projectLedger1.id(), PositiveAmount.of(40L)),
+                    new TransferEvent(projectLedger1.id(), contributorLedger1.id(), PositiveAmount.of(10L)),
+                    new TransferEvent(projectLedger1.id(), contributorLedger2.id(), PositiveAmount.of(20L)),
+                    new RefundEvent(projectLedger1.id(), committeeLedger.id(), PositiveAmount.of(10L)),
+                    new TransferEvent(committeeLedger.id(), projectLedger2.id(), PositiveAmount.of(20L)),
+                    new RefundEvent(committeeLedger.id(), sponsorLedger.id(), PositiveAmount.of(20L)),
+                    new TransferEvent(sponsorLedger.id(), projectLedger2.id(), PositiveAmount.of(35L)),
+                    new TransferEvent(projectLedger2.id(), contributorLedger2.id(), PositiveAmount.of(25L))
+            );
         }
 
 
@@ -451,9 +419,13 @@ public class AccountingServiceTest {
             accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new TransferEvent(sponsorLedger.id(), projectLedger2.id(), PositiveAmount.of(100L)),
+                    new TransferEvent(projectLedger2.id(), contributorLedger2.id(), PositiveAmount.of(100L))
+            );
+
+            assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(contributorLedgerProvider.get(contributorId2, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -477,10 +449,6 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
-
-            // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.of(20L));
-            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -520,9 +488,6 @@ public class AccountingServiceTest {
             accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(contributorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(contributorLedger2.unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
         }
 
@@ -559,7 +524,6 @@ public class AccountingServiceTest {
         final Ledger projectLedger = new Ledger(projectId, currency);
         final ContributorId contributorId = ContributorId.random();
         final Ledger contributorLedger = new Ledger(contributorId, currency);
-        AccountBookAggregate accountBook;
 
         @BeforeEach
         void setup() {
@@ -575,14 +539,12 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // Given
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
                     new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(100L))
-            );
-
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            ));
 
             // When
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
@@ -602,15 +564,13 @@ public class AccountingServiceTest {
         @Test
         void should_allow_contributor_to_withdraw_only_what_is_funded() {
             // Given
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
                     new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(200L))
-            );
-
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
+            ));
 
             // When
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
@@ -618,10 +578,10 @@ public class AccountingServiceTest {
             accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger1.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.of(100L));
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Not enough fund");
         }
 
 
@@ -633,15 +593,14 @@ public class AccountingServiceTest {
         @Test
         void should_spend_first_fundings_even_if_locked() {
             // Given
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
                     new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(100L))
-            );
+            ));
 
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
@@ -661,15 +620,14 @@ public class AccountingServiceTest {
         @Test
         void should_withdraw_tokens_even_if_some_are_locked_after() {
             // Given
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
                     new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(200L))
-            );
+            ));
 
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
 
@@ -677,10 +635,10 @@ public class AccountingServiceTest {
             accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger1.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.of(100L));
+            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Not enough fund");
         }
 
         /*
@@ -691,15 +649,14 @@ public class AccountingServiceTest {
         @Test
         void should_withdraw_on_both_networks() {
             // Given
-            accountBook = AccountBookAggregate.fromEvents(
+            accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
                     new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
                     new TransferEvent(projectLedger.id(), contributorLedger.id(), PositiveAmount.of(200L))
-            );
+            ));
 
-            when(accountBookStorage.get(currency)).thenReturn(accountBook);
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
             accountingService.fund(sponsorId2, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
             assertThat(ledgerStorage.get(sponsorLedger1.id()).orElseThrow().unlockedBalance(Network.ETHEREUM)).isEqualTo(PositiveAmount.of(100L));
@@ -710,10 +667,6 @@ public class AccountingServiceTest {
             accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
 
             // Then
-            assertThat(accountBook.state().balanceOf(sponsorLedger1.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(sponsorLedger2.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(projectLedger.id())).isEqualTo(PositiveAmount.ZERO);
-            assertThat(accountBook.state().balanceOf(contributorLedger.id())).isEqualTo(PositiveAmount.ZERO);
             assertThat(ledgerStorage.get(sponsorLedger1.id()).orElseThrow().unlockedBalance(Network.ETHEREUM)).isEqualTo(PositiveAmount.ZERO);
             assertThat(ledgerStorage.get(sponsorLedger2.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.ZERO);
         }
