@@ -22,7 +22,7 @@ public class ProjectCardView {
     Integer repoCount;
     Integer contributorCount;
     @Builder.Default
-    Set<SponsorView> sponsors = new HashSet<>();
+    Set<EcosystemView> ecosystems = new HashSet<>();
     @Builder.Default
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
     @Builder.Default
@@ -38,8 +38,8 @@ public class ProjectCardView {
         this.getLeaders().add(leader);
     }
 
-    public void addSponsor(final SponsorView sponsor) {
-        this.getSponsors().add(sponsor);
+    public void addEcosystem(final EcosystemView ecosystem) {
+        this.getEcosystems().add(ecosystem);
     }
 
     public void addTechnologies(final Map<String, Long> technologiesToAdd) {
@@ -63,6 +63,6 @@ public class ProjectCardView {
     }
 
     public enum FilterBy {
-        TECHNOLOGIES, SPONSORS
+        TECHNOLOGIES, ECOSYSTEMS
     }
 }

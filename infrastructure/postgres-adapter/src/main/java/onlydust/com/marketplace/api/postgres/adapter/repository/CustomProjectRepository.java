@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 
 import javax.persistence.EntityManager;
@@ -14,14 +15,28 @@ import static java.util.Objects.isNull;
 @Slf4j
 public class CustomProjectRepository {
 
+    protected static final String FIND_PROJECT_ECOSYSTEMS_QUERY = """
+                select
+                    e.*
+                from ecosystems e
+                join projects_ecosystems pe on pe.ecosystem_id = e.id and pe.project_id = :projectId
+            """;
+
+    private final EntityManager entityManager;
+
+    public List<EcosystemEntity> getProjectEcosystems(UUID projectId) {
+        return entityManager
+                .createNativeQuery(FIND_PROJECT_ECOSYSTEMS_QUERY, EcosystemEntity.class)
+                .setParameter("projectId", projectId)
+                .getResultList();
+    }
+
     protected static final String FIND_PROJECT_SPONSORS_QUERY = """
                 select
                     s.*
                 from sponsors s
                 join projects_sponsors ps on ps.sponsor_id = s.id and ps.project_id = :projectId
             """;
-
-    private final EntityManager entityManager;
 
     public List<SponsorEntity> getProjectSponsors(UUID projectId) {
         return entityManager

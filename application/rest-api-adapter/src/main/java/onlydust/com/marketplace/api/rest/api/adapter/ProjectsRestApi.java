@@ -70,7 +70,7 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies, List<UUID> sponsorId,
+    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies, List<UUID> ecosystemId,
                                                            List<ProjectTag> tags, Boolean mine, String search) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -78,11 +78,11 @@ public class ProjectsRestApi implements ProjectsApi {
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final List<Project.Tag> projectTags = mapTagsParameter(tags);
         final Page<ProjectCardView> projectCardViewPage =
-                optionalUser.map(user -> projectFacadePort.getByTagsTechnologiesSponsorsUserIdSearchSortBy(projectTags, technologies,
-                                sponsorId, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
+                optionalUser.map(user -> projectFacadePort.getByTagsTechnologiesEcosystemsUserIdSearchSortBy(projectTags, technologies,
+                                ecosystemId, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
                                 sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getByTagsTechnologiesSponsorsSearchSortBy(projectTags, technologies,
-                                sponsorId, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
+                        .orElseGet(() -> projectFacadePort.getByTagsTechnologiesEcosystemsSearchSortBy(projectTags, technologies,
+                                ecosystemId, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }
 

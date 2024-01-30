@@ -17,45 +17,45 @@ public class ProjectPageItemViewEntityTest {
     protected static final Faker faker = new Faker();
 
     @Nested
-    public class ShouldReturnSponsorsJsonPath {
+    public class ShouldReturnEcosystemsJsonPath {
 
         @Test
-        void given_no_sponsors() {
+        void given_no_ecosystems() {
             // Given
-            final List<UUID> sponsors = null;
+            final List<UUID> ecosystems = null;
 
             // When
-            final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystems);
 
             // Then
-            assertNull(sponsorsJsonPath);
+            assertNull(ecosystemsJsonPath);
         }
 
         @Test
-        void given_one_sponsor() {
+        void given_one_ecosystem() {
             // Given
-            final UUID sponsorId1 = UUID.randomUUID();
-            final List<UUID> sponsors = List.of(sponsorId1);
+            final UUID ecosystemId1 = UUID.randomUUID();
+            final List<UUID> ecosystems = List.of(ecosystemId1);
 
             // When
-            final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsors);
+            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystems);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + sponsorId1 + "\")", sponsorsJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\")", ecosystemsJsonPath);
         }
 
         @Test
-        void given_two_sponsors() {
+        void given_two_ecosystems() {
             // Given
-            final UUID sponsorId1 = UUID.randomUUID();
-            final UUID sponsorId2 = UUID.randomUUID();
-            final List<UUID> sponsorIds = List.of(sponsorId1, sponsorId2);
+            final UUID ecosystemId1 = UUID.randomUUID();
+            final UUID ecosystemId2 = UUID.randomUUID();
+            final List<UUID> ecosystemIds = List.of(ecosystemId1, ecosystemId2);
 
             // When
-            final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
+            final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(ecosystemIds);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + sponsorId1 + "\" || @.id == \"" + sponsorId2 + "\")", sponsorsJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\" || @.id == \"" + ecosystemId2 + "\")", ecosystemsJsonPath);
         }
 
 

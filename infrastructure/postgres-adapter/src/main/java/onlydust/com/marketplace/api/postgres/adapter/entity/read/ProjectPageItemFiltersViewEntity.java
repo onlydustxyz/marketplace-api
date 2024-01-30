@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
+import onlydust.com.marketplace.api.domain.view.EcosystemView;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
-import onlydust.com.marketplace.api.domain.view.SponsorView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -29,16 +29,14 @@ public class ProjectPageItemFiltersViewEntity {
     @Column(name = "project_id")
     UUID projectId;
     @Type(type = "jsonb")
-    List<Sponsor> sponsors;
+    List<Ecosystem> ecosystems;
     @Type(type = "jsonb")
     List<Map<String, Long>> technologies;
 
     @EqualsAndHashCode
-    public static class Sponsor {
-
+    public static class Ecosystem {
         @JsonProperty("url")
         String url;
-
         @JsonProperty("logoUrl")
         String logoUrl;
         @JsonProperty("id")
@@ -50,7 +48,7 @@ public class ProjectPageItemFiltersViewEntity {
     public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersViewEntity> filtersViewEntities) {
         final Map<String, Set<Object>> filters = new HashMap<>();
         final Set<String> technologyNames = new HashSet<>();
-        final Set<SponsorView> sponsors = new HashSet<>();
+        final Set<EcosystemView> ecosystems = new HashSet<>();
         for (ProjectPageItemFiltersViewEntity filtersViewEntity : filtersViewEntities) {
             if (nonNull(filtersViewEntity.technologies)) {
                 filtersViewEntity.technologies.stream()
@@ -58,21 +56,21 @@ public class ProjectPageItemFiltersViewEntity {
                         .map(Map::keySet)
                         .forEach(technologyNames::addAll);
             }
-            if (nonNull(filtersViewEntity.sponsors)) {
-                filtersViewEntity.sponsors.stream()
+            if (nonNull(filtersViewEntity.ecosystems)) {
+                filtersViewEntity.ecosystems.stream()
                         .filter(sponsor -> nonNull(sponsor.name))
-                        .map(sponsor -> SponsorView.builder()
+                        .map(sponsor -> EcosystemView.builder()
                                 .id(sponsor.id)
                                 .url(sponsor.url)
                                 .logoUrl(sponsor.logoUrl)
                                 .name(sponsor.name).build())
-                        .forEach(sponsors::add);
+                        .forEach(ecosystems::add);
             }
         }
         filters.put(ProjectCardView.FilterBy.TECHNOLOGIES.name(),
                 technologyNames.stream().map(Object.class::cast).collect(Collectors.toSet()));
-        filters.put(ProjectCardView.FilterBy.SPONSORS.name(),
-                sponsors.stream().map(Object.class::cast).collect(Collectors.toSet()));
+        filters.put(ProjectCardView.FilterBy.ECOSYSTEMS.name(),
+                ecosystems.stream().map(Object.class::cast).collect(Collectors.toSet()));
         return filters;
     }
 

@@ -12,7 +12,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select t.technologies,
-                   s.sponsor_json as sponsors,
+                   s.ecosystem_json as ecosystems,
                    p.project_id
             from project_details p
                      left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
@@ -20,13 +20,13 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                  group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
-                                               'url', sponsor.url,
-                                               'logoUrl', sponsor.logo_url,
-                                               'id', sponsor.id,
-                                               'name', sponsor.name
-                                                 )) sponsor_json
-                                from sponsors sponsor
-                                         join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                               'url', ecosystem.url,
+                                               'logoUrl', ecosystem.logo_url,
+                                               'id', ecosystem.id,
+                                               'name', ecosystem.name
+                                                 )) ecosystem_json
+                                from ecosystems ecosystem
+                                         join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.project_id
             where (select count(github_repo_id)
                    from project_github_repos pgr_count
@@ -35,30 +35,30 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    and gr.visibility = 'PUBLIC') > 0
               and p.visibility = 'PUBLIC'
               and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
-              and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')""",
             nativeQuery = true)
     List<ProjectPageItemFiltersViewEntity> findFiltersForAnonymousUser(@Param("technologiesJsonPath") String technologiesJsonPath,
-                                                                       @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                                       @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                                        @Param("search") String search);
 
     @Query(value = """
             select p.project_id,
                    t.technologies                             as technologies,
-                   s.sponsor_json                             as   sponsors
+                   s.ecosystem_json                             as   ecosystems
             from project_details p
                      left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                                  from project_technologies pt
                                  group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
-                                               'url', sponsor.url,
-                                               'logoUrl', sponsor.logo_url,
-                                               'id', sponsor.id,
-                                               'name', sponsor.name
-                                                 )) sponsor_json
-                                from sponsors sponsor
-                                         join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                               'url', ecosystem.url,
+                                               'logoUrl', ecosystem.logo_url,
+                                               'id', ecosystem.id,
+                                               'name', ecosystem.name
+                                                 )) ecosystem_json
+                                from ecosystems ecosystem
+                                         join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
@@ -95,8 +95,8 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
                    jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
-              and (coalesce(:sponsorsJsonPath) is null or
-                   jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or
+                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
@@ -104,6 +104,6 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
     List<ProjectPageItemFiltersViewEntity> findFiltersForUser(@Param("userId") UUID userId,
                                                               @Param("mine") Boolean mine,
                                                               @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                              @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                              @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                               @Param("search") String search);
 }
