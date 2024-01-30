@@ -23,13 +23,13 @@ VALUES ('Aptos', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946
 INSERT INTO ecosystems (name, logo_url, url)
 VALUES ('Ethereum', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png', 'https://ethereum.foundation/');
 INSERT INTO ecosystems (name, logo_url, url)
-VALUES ('Lava ', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg', 'https://www.lavanet.xyz/');
+VALUES ('Lava', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg', 'https://www.lavanet.xyz/');
 INSERT INTO ecosystems (name, logo_url, url)
 VALUES ('Aztec', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg', 'https://aztec.network/');
 INSERT INTO ecosystems (name, logo_url, url)
 VALUES ('Optimism', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png', 'https://www.optimism.io/');
 INSERT INTO ecosystems (name, logo_url, url)
-VALUES ('Avail ', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png', 'https://www.availproject.org/');
+VALUES ('Avail', 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png', 'https://www.availproject.org/');
 
 INSERT INTO projects_ecosystems as pe (project_id, ecosystem_id)
 select ps.project_id, (select e.id from ecosystems e where e.name = 'Zama')

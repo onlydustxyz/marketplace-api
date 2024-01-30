@@ -33,14 +33,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    join indexer_exp.github_repos gr on pgr_count.github_repo_id = gr.id
                    where pgr_count.project_id = p.project_id
                    and gr.visibility = 'PUBLIC') > 0
-              and p.visibility = 'PUBLIC'
-              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
-              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
-              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')""",
+              and p.visibility = 'PUBLIC'""",
             nativeQuery = true)
-    List<ProjectPageItemFiltersViewEntity> findFiltersForAnonymousUser(@Param("technologiesJsonPath") String technologiesJsonPath,
-                                                                       @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                                       @Param("search") String search);
+    List<ProjectPageItemFiltersViewEntity> findFiltersForAnonymousUser();
 
     @Query(value = """
             select p.project_id,
@@ -93,17 +88,8 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
                     and (coalesce(is_contributor.is_c, false) or coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
-              and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
-              and (coalesce(:ecosystemsJsonPath) is null or
-                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
-              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
-                   p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
                      """, nativeQuery = true)
     List<ProjectPageItemFiltersViewEntity> findFiltersForUser(@Param("userId") UUID userId,
-                                                              @Param("mine") Boolean mine,
-                                                              @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                              @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                              @Param("search") String search);
+                                                              @Param("mine") Boolean mine);
 }

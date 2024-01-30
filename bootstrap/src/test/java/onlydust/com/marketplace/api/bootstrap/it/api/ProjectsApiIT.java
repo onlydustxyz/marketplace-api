@@ -653,32 +653,39 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
                     }
                   ],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                      "name": "Ethereum",
+                      "url": "https://ethereum.foundation/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                     },
                     {
-                      "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                      "name": "Coca Cola",
-                      "url": null,
-                      "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                      "name": "Zama",
+                      "url": "https://www.zama.ai/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                    },
+                    {
+                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                      "name": "Aptos",
+                      "url": "https://aptosfoundation.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                     }
                   ],
                   "technologies": {
                     "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 423688,
                     "Shell": 732,
+                    "CSS": 423688,
                     "Rust": 408641,
                     "SCSS": 98360,
                     "JavaScript": 62716,
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": true,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -706,10 +713,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3175211,
+                    "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -717,7 +724,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false
+                  "isMissingGithubAppInstallation": false,
+                  "tags": []
                 }
               ],
               "technologies": [
@@ -732,18 +740,24 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "Shell",
                 "TypeScript"
               ],
-              "sponsors": [
+              "ecosystems": [
                 {
-                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                  "name": "Coca Cola",
-                  "url": null,
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                 },
                 {
-                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                  "name": "OGC Nissa Ineos",
-                  "url": "https://www.ogcnice.com/fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                },
+                {
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
                 }
               ],
               "hasMore": false,
@@ -751,8 +765,155 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "totalItemNumber": 2,
               "nextPageIndex": 0
             }
-                        
             """;
+    private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_WITH_TAGS_JSON_RESPONSE = """
+            {
+              "projects": [
+                {
+                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                  "slug": "bretzel",
+                  "name": "Bretzel",
+                  "shortDescription": "A project for people who love fruits",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                  "hiring": true,
+                  "visibility": "PUBLIC",
+                  "repoCount": 4,
+                  "contributorCount": 4,
+                  "leaders": [
+                    {
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
+                    {
+                      "githubUserId": 98735421,
+                      "login": "pacovilletard",
+                      "htmlUrl": "https://github.com/pacovilletard",
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                      "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                    }
+                  ],
+                  "ecosystems": [
+                    {
+                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                      "name": "Ethereum",
+                      "url": "https://ethereum.foundation/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                    },
+                    {
+                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                      "name": "Zama",
+                      "url": "https://www.zama.ai/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                    },
+                    {
+                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                      "name": "Aptos",
+                      "url": "https://aptosfoundation.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                    }
+                  ],
+                  "technologies": {
+                    "TypeScript": 190809,
+                    "Dockerfile": 1982,
+                    "Shell": 732,
+                    "CSS": 423688,
+                    "Rust": 408641,
+                    "SCSS": 98360,
+                    "JavaScript": 62716,
+                    "HTML": 121874
+                  },
+                  "isInvitedAsProjectLead": true,
+                  "isMissingGithubAppInstallation": null,
+                  "tags": [
+                    "BEGINNERS_WELCOME",
+                    "STRONG_EXPERTISE"
+                  ]
+                },
+                {
+                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                  "slug": "qa-new-contributions",
+                  "name": "QA new contributions",
+                  "shortDescription": "QA new contributions",
+                  "logoUrl": null,
+                  "hiring": false,
+                  "visibility": "PUBLIC",
+                  "repoCount": 1,
+                  "contributorCount": 18,
+                  "leaders": [
+                    {
+                      "githubUserId": 16590657,
+                      "login": "PierreOucif",
+                      "htmlUrl": "https://github.com/PierreOucif",
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                      "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                    },
+                    {
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    }
+                  ],
+                  "ecosystems": [],
+                  "technologies": {
+                    "TypeScript": 3175211,
+                    "MDX": 2520,
+                    "CSS": 6065,
+                    "Shell": 12431,
+                    "PLpgSQL": 1372,
+                    "JavaScript": 24023,
+                    "HTML": 1520
+                  },
+                  "isInvitedAsProjectLead": false,
+                  "isMissingGithubAppInstallation": false,
+                  "tags": [
+                    "STRONG_EXPERTISE"
+                  ]
+                }
+              ],
+              "technologies": [
+                "CSS",
+                "Dockerfile",
+                "HTML",
+                "JavaScript",
+                "MDX",
+                "PLpgSQL",
+                "Rust",
+                "SCSS",
+                "Shell",
+                "TypeScript"
+              ],
+              "ecosystems": [
+                {
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                },
+                {
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                },
+                {
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                }
+              ],
+              "hasMore": false,
+              "totalPageNumber": 1,
+              "totalItemNumber": 2,
+              "nextPageIndex": 0
+            }
+            """;
+
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE = """
             {
               "projects": [
@@ -775,35 +936,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                      "name": "AS Nancy Lorraine",
-                      "url": null,
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                    },
-                    {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                    },
-                    {
-                      "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                      "name": "Coca Cola",
-                      "url": null,
-                      "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                    },
-                    {
-                      "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                      "name": "Coca Colax",
-                      "url": "https://www.coca-cola-france.fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
@@ -831,20 +968,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                      "name": "AS Nancy Lorraine",
-                      "url": null,
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                    },
-                    {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 114,
                     "Makefile": 49,
@@ -852,7 +976,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 235
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
@@ -873,10 +998,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
@@ -897,7 +1023,26 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "83612081-949a-47c4-a467-6f28f6adad6d"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [
+                    {
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                    },
+                    {
+                      "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                      "name": "Optimism",
+                      "url": "https://www.optimism.io/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png"
+                    },
+                    {
+                      "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
+                      "name": "Lava",
+                      "url": "https://www.lavanet.xyz/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg"
+                    }
+                  ],
                   "technologies": {
                     "CSS": 323507,
                     "Rust": 527,
@@ -906,7 +1051,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -934,32 +1080,39 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
                     }
                   ],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                      "name": "Ethereum",
+                      "url": "https://ethereum.foundation/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                     },
                     {
-                      "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                      "name": "Coca Cola",
-                      "url": null,
-                      "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                      "name": "Zama",
+                      "url": "https://www.zama.ai/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                    },
+                    {
+                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                      "name": "Aptos",
+                      "url": "https://aptosfoundation.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                     }
                   ],
                   "technologies": {
                     "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 423688,
                     "Shell": 732,
+                    "CSS": 423688,
                     "Rust": 408641,
                     "SCSS": 98360,
                     "JavaScript": 62716,
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
@@ -980,7 +1133,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -988,7 +1141,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
@@ -1009,7 +1163,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "9a779f53-5762-4110-94b8-5596bbbd74ec"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [
+                    {
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                    }
+                  ],
                   "technologies": {
                     "MDX": 109316,
                     "TypeScript": 7052833,
@@ -1022,7 +1183,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 119986
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "97ab7c1f-f86d-4cb7-83bf-6062e6847564",
@@ -1035,7 +1197,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 0,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -1043,7 +1205,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f992349c-e30c-4156-8b55-0a9dbc20b873",
@@ -1056,12 +1219,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 2,
                   "contributorCount": 36,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Ruby": 9708
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -1082,19 +1246,20 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 3592913,
                     "MDX": 2520,
-                    "CSS": 6065,
                     "Shell": 12431,
+                    "CSS": 6065,
                     "Cairo": 72428,
                     "PLpgSQL": 1372,
                     "JavaScript": 26108,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": false
+                  "isMissingGithubAppInstallation": false,
+                  "tags": []
                 },
                 {
                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
@@ -1115,18 +1280,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                      "name": "Theodo",
-                      "url": null,
-                      "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                     },
                     {
-                      "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                      "name": "Starknet Foundation",
-                      "url": "https://starknet.io",
-                      "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                      "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                      "name": "Aztec",
+                      "url": "https://aztec.network/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                     }
                   ],
                   "technologies": {
@@ -1147,7 +1312,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
@@ -1168,19 +1334,27 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "dd0ab03c-5875-424b-96db-a35522eab365"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [
+                    {
+                      "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                      "name": "Avail",
+                      "url": "https://www.availproject.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
+                    }
+                  ],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3175211,
+                    "MDX": 2520,
                     "Dockerfile": 325,
-                    "CSS": 6065,
                     "Shell": 12431,
+                    "CSS": 6065,
                     "PLpgSQL": 1372,
                     "JavaScript": 24365,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
@@ -1201,13 +1375,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "COBOL": 10808,
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": true
+                  "isMissingGithubAppInstallation": true,
+                  "tags": []
                 },
                 {
                   "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
@@ -1220,10 +1395,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 3,
                   "contributorCount": 455,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
-                    "CSS": 323507,
                     "C++": 2226,
+                    "CSS": 323507,
                     "CMake": 460,
                     "Makefile": 1714,
                     "HTML": 169898,
@@ -1235,11 +1410,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Dart": 121265,
-                    "Python": 6719
+                    "Python": 6719,
+                    "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "b58b40b8-1521-41cf-972c-9c08d58eaff8",
@@ -1252,7 +1428,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 3,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 609777,
                     "Solidity": 420744,
@@ -1262,7 +1438,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 5416
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
@@ -1290,13 +1467,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
                     },
                     {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
                       "githubUserId": 31901905,
                       "login": "kaelsky",
                       "htmlUrl": "https://github.com/kaelsky",
@@ -1309,15 +1479,22 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                    },
+                    {
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
+                    "Jinja": 2398,
                     "C++": 23419,
                     "CSS": 1396,
-                    "Jinja": 2398,
-                    "C": 1425,
                     "Rust": 527,
+                    "C": 1425,
                     "CMake": 18862,
                     "Makefile": 2213,
                     "HTML": 7303,
@@ -1338,7 +1515,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -1366,10 +1544,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3175211,
+                    "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -1377,7 +1555,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -1419,7 +1598,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "6115f024-159a-4b1f-b713-1e2ad5c6063e"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -1427,7 +1606,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -1441,25 +1621,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "contributorCount": 45,
                   "leaders": [
                     {
+                      "githubUserId": 141839618,
+                      "login": "Blumebee",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
+                      "id": "46fec596-7a91-422e-8532-5f479e790217"
+                    },
+                    {
                       "githubUserId": 139852598,
                       "login": "mat-yas",
                       "htmlUrl": "https://github.com/mat-yas",
                       "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4",
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
-                    },
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
-                      "githubUserId": 122993337,
-                      "login": "GregGamb",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
-                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
                       "githubUserId": 31901905,
@@ -1476,21 +1649,21 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
                     },
                     {
-                      "githubUserId": 141839618,
-                      "login": "Blumebee",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
-                      "id": "46fec596-7a91-422e-8532-5f479e790217"
-                    }
-                  ],
-                  "sponsors": [
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
                     {
-                      "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                      "name": "Red Bull",
-                      "url": "https://www.redbull.com/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                      "githubUserId": 122993337,
+                      "login": "GregGamb",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
+                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     }
                   ],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 617035,
                     "Dockerfile": 5694,
@@ -1505,7 +1678,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 11538
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "61076487-6ec5-4751-ab0d-3b876c832239",
@@ -1526,19 +1700,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                      "name": "PSG",
-                      "url": "https://www.psg.fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {
                     "Rust": 23314
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
@@ -1551,14 +1719,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 18,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Shell": 3429,
                     "Cairo": 42100,
                     "Python": 45301
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
@@ -1571,18 +1740,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 453,
                   "leaders": [],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                      "name": "Theodo",
-                      "url": null,
-                      "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                    },
-                    {
-                      "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                      "name": "Starknet Foundation",
-                      "url": "https://starknet.io",
-                      "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                     }
                   ],
                   "technologies": {
@@ -1594,7 +1757,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f25e3389-d681-4811-b45c-3d1106d8e478",
@@ -1615,10 +1779,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "4f7bcc3e-3d3d-4a8f-8280-bb6df33382da",
@@ -1639,10 +1804,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
@@ -1663,7 +1829,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "dd0ab03c-5875-424b-96db-a35522eab365"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Dockerfile": 325,
                     "Scheme": 43698,
@@ -1671,7 +1837,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
@@ -1692,14 +1859,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Shell": 4429,
                     "Rust": 2017307,
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 }
               ],
               "technologies": [
@@ -1735,54 +1903,54 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "Swift",
                 "TypeScript"
               ],
-              "sponsors": [
+              "ecosystems": [
                 {
-                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                  "name": "AS Nancy Lorraine",
-                  "url": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                 },
                 {
-                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                  "name": "Coca Cola",
-                  "url": null,
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                  "name": "Avail",
+                  "url": "https://www.availproject.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
                 },
                 {
-                  "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                  "name": "Coca Colax",
-                  "url": "https://www.coca-cola-france.fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                  "name": "Aztec",
+                  "url": "https://aztec.network/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                 },
                 {
-                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                  "name": "OGC Nissa Ineos",
-                  "url": "https://www.ogcnice.com/fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                 },
                 {
-                  "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                  "name": "PSG",
-                  "url": "https://www.psg.fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                  "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
+                  "name": "Lava",
+                  "url": "https://www.lavanet.xyz/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg"
                 },
                 {
-                  "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                  "name": "Red Bull",
-                  "url": "https://www.redbull.com/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                  "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                  "name": "Optimism",
+                  "url": "https://www.optimism.io/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png"
                 },
                 {
-                  "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                  "name": "Starknet Foundation",
-                  "url": "https://starknet.io",
-                  "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                  "name": "Starknet",
+                  "url": "https://www.starknet.io/en",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                 },
                 {
-                  "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                  "name": "Theodo",
-                  "url": null,
-                  "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
                 }
               ],
               "hasMore": false,
@@ -1793,98 +1961,85 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {
-               "projects": [
-                 {
-                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                   "slug": "mooooooonlight",
-                   "name": "Mooooooonlight",
-                   "shortDescription": "hello la team",
-                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                   "hiring": false,
-                   "visibility": "PUBLIC",
-                   "repoCount": 4,
-                   "contributorCount": 20,
-                   "leaders": [
-                     {
-                       "githubUserId": 8642470,
-                       "login": "gregcha",
-                       "htmlUrl": "https://github.com/gregcha",
-                       "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                     }
-                   ],
-                   "sponsors": [
-                     {
-                       "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                       "name": "Theodo",
-                       "url": null,
-                       "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                     },
-                     {
-                       "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                       "name": "Starknet Foundation",
-                       "url": "https://starknet.io",
-                       "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                     }
-                   ],
-                   "technologies": {
-                     "MDX": 2520,
-                     "C++": 2226,
-                     "CSS": 6065,
-                     "Rust": 453557,
-                     "CMake": 460,
-                     "PLpgSQL": 1372,
-                     "HTML": 1520,
-                     "Kotlin": 1381,
-                     "TypeScript": 3175211,
-                     "Dockerfile": 325,
-                     "Shell": 12431,
-                     "JavaScript": 24365,
-                     "Objective-C": 38,
-                     "Swift": 404,
-                     "Dart": 121265
-                   },
-                   "isInvitedAsProjectLead": false,
-                   "isMissingGithubAppInstallation": null
-                 }
-               ],
-               "technologies": [
-                 "C++",
-                 "CMake",
-                 "CSS",
-                 "Dart",
-                 "Dockerfile",
-                 "HTML",
-                 "JavaScript",
-                 "Kotlin",
-                 "MDX",
-                 "Objective-C",
-                 "PLpgSQL",
-                 "Rust",
-                 "Shell",
-                 "Swift",
-                 "TypeScript"
-               ],
-               "sponsors": [
-                 {
-                   "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                   "name": "Starknet Foundation",
-                   "url": "https://starknet.io",
-                   "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                 },
-                 {
-                   "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                   "name": "Theodo",
-                   "url": null,
-                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                 }
-               ],
-               "hasMore": false,
-               "totalPageNumber": 1,
-               "totalItemNumber": 1,
-               "nextPageIndex": 0
-             }
+              "projects": [],
+              "technologies": [
+                "Batchfile",
+                "C",
+                "C++",
+                "CMake",
+                "COBOL",
+                "CSS",
+                "Cairo",
+                "Dart",
+                "Dockerfile",
+                "HTML",
+                "Haskell",
+                "JavaScript",
+                "Jinja",
+                "Jupyter Notebook",
+                "Kotlin",
+                "MDX",
+                "Makefile",
+                "Nix",
+                "Objective-C",
+                "PHP",
+                "PLpgSQL",
+                "Procfile",
+                "Python",
+                "Ruby",
+                "Rust",
+                "SCSS",
+                "Scheme",
+                "Shell",
+                "Solidity",
+                "Swift",
+                "TypeScript"
+              ],
+              "ecosystems": [
+                {
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                },
+                {
+                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                  "name": "Avail",
+                  "url": "https://www.availproject.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
+                },
+                {
+                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                  "name": "Aztec",
+                  "url": "https://aztec.network/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
+                },
+                {
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                },
+                {
+                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                  "name": "Starknet",
+                  "url": "https://www.starknet.io/en",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                },
+                {
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                }
+              ],
+              "hasMore": false,
+              "totalPageNumber": 0,
+              "totalItemNumber": 0,
+              "nextPageIndex": 0
+            }
             """;
+
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_JSON_RESPONSE = """
             {
               "projects": [
@@ -1907,35 +2062,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                      "name": "AS Nancy Lorraine",
-                      "url": null,
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                    },
-                    {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                    },
-                    {
-                      "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                      "name": "Coca Cola",
-                      "url": null,
-                      "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                    },
-                    {
-                      "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                      "name": "Coca Colax",
-                      "url": "https://www.coca-cola-france.fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
@@ -1963,20 +2094,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                      "name": "AS Nancy Lorraine",
-                      "url": null,
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                    },
-                    {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 114,
                     "Makefile": 49,
@@ -1984,7 +2102,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 235
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
@@ -2005,10 +2124,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -2036,32 +2156,39 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
                     }
                   ],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                      "name": "OGC Nissa Ineos",
-                      "url": "https://www.ogcnice.com/fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                      "name": "Ethereum",
+                      "url": "https://ethereum.foundation/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                     },
                     {
-                      "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                      "name": "Coca Cola",
-                      "url": null,
-                      "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                      "name": "Zama",
+                      "url": "https://www.zama.ai/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                    },
+                    {
+                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                      "name": "Aptos",
+                      "url": "https://aptosfoundation.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                     }
                   ],
                   "technologies": {
                     "TypeScript": 190809,
                     "Dockerfile": 1982,
-                    "CSS": 423688,
                     "Shell": 732,
+                    "CSS": 423688,
                     "Rust": 408641,
                     "SCSS": 98360,
                     "JavaScript": 62716,
                     "HTML": 121874
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
@@ -2082,7 +2209,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -2090,7 +2217,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
@@ -2111,7 +2239,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "9a779f53-5762-4110-94b8-5596bbbd74ec"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [
+                    {
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                    }
+                  ],
                   "technologies": {
                     "MDX": 109316,
                     "TypeScript": 7052833,
@@ -2124,7 +2259,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 119986
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "97ab7c1f-f86d-4cb7-83bf-6062e6847564",
@@ -2137,7 +2273,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 0,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -2145,7 +2281,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f992349c-e30c-4156-8b55-0a9dbc20b873",
@@ -2158,12 +2295,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 2,
                   "contributorCount": 36,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Ruby": 9708
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -2184,19 +2322,20 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 3592913,
                     "MDX": 2520,
-                    "CSS": 6065,
                     "Shell": 12431,
+                    "CSS": 6065,
                     "Cairo": 72428,
                     "PLpgSQL": 1372,
                     "JavaScript": 26108,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
@@ -2217,18 +2356,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                      "name": "Theodo",
-                      "url": null,
-                      "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                     },
                     {
-                      "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                      "name": "Starknet Foundation",
-                      "url": "https://starknet.io",
-                      "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                      "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                      "name": "Aztec",
+                      "url": "https://aztec.network/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                     }
                   ],
                   "technologies": {
@@ -2249,7 +2388,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
@@ -2270,19 +2410,27 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "dd0ab03c-5875-424b-96db-a35522eab365"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [
+                    {
+                      "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                      "name": "Avail",
+                      "url": "https://www.availproject.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
+                    }
+                  ],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3175211,
+                    "MDX": 2520,
                     "Dockerfile": 325,
-                    "CSS": 6065,
                     "Shell": 12431,
+                    "CSS": 6065,
                     "PLpgSQL": 1372,
                     "JavaScript": 24365,
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
@@ -2303,13 +2451,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "COBOL": 10808,
                     "JavaScript": 6987
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
@@ -2322,10 +2471,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 3,
                   "contributorCount": 455,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
-                    "CSS": 323507,
                     "C++": 2226,
+                    "CSS": 323507,
                     "CMake": 460,
                     "Makefile": 1714,
                     "HTML": 169898,
@@ -2337,11 +2486,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Dart": 121265,
-                    "Python": 6719
+                    "Python": 6719,
+                    "Dart": 121265
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "b58b40b8-1521-41cf-972c-9c08d58eaff8",
@@ -2354,7 +2504,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 3,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 609777,
                     "Solidity": 420744,
@@ -2364,7 +2514,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 5416
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
@@ -2392,13 +2543,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
                     },
                     {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
                       "githubUserId": 31901905,
                       "login": "kaelsky",
                       "htmlUrl": "https://github.com/kaelsky",
@@ -2411,15 +2555,22 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "htmlUrl": null,
                       "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                    },
+                    {
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
+                    "Jinja": 2398,
                     "C++": 23419,
                     "CSS": 1396,
-                    "Jinja": 2398,
-                    "C": 1425,
                     "Rust": 527,
+                    "C": 1425,
                     "CMake": 18862,
                     "Makefile": 2213,
                     "HTML": 7303,
@@ -2440,7 +2591,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 1676320
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -2468,10 +2620,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
-                    "MDX": 2520,
                     "TypeScript": 3175211,
+                    "MDX": 2520,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -2479,7 +2631,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 1520
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -2521,7 +2674,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "6115f024-159a-4b1f-b713-1e2ad5c6063e"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "CSS": 323507,
                     "SCSS": 102453,
@@ -2529,7 +2682,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "HTML": 169898
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -2543,25 +2697,18 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "contributorCount": 45,
                   "leaders": [
                     {
+                      "githubUserId": 141839618,
+                      "login": "Blumebee",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
+                      "id": "46fec596-7a91-422e-8532-5f479e790217"
+                    },
+                    {
                       "githubUserId": 139852598,
                       "login": "mat-yas",
                       "htmlUrl": "https://github.com/mat-yas",
                       "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4",
                       "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
-                    },
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
-                      "githubUserId": 122993337,
-                      "login": "GregGamb",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
-                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     },
                     {
                       "githubUserId": 31901905,
@@ -2578,21 +2725,21 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
                     },
                     {
-                      "githubUserId": 141839618,
-                      "login": "Blumebee",
-                      "htmlUrl": null,
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
-                      "id": "46fec596-7a91-422e-8532-5f479e790217"
-                    }
-                  ],
-                  "sponsors": [
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
                     {
-                      "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                      "name": "Red Bull",
-                      "url": "https://www.redbull.com/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                      "githubUserId": 122993337,
+                      "login": "GregGamb",
+                      "htmlUrl": null,
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
+                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
                     }
                   ],
+                  "ecosystems": [],
                   "technologies": {
                     "TypeScript": 617035,
                     "Dockerfile": 5694,
@@ -2607,7 +2754,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 11538
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "61076487-6ec5-4751-ab0d-3b876c832239",
@@ -2628,19 +2776,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
-                  "sponsors": [
-                    {
-                      "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                      "name": "PSG",
-                      "url": "https://www.psg.fr/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                    }
-                  ],
+                  "ecosystems": [],
                   "technologies": {
                     "Rust": 23314
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
@@ -2653,14 +2795,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 18,
                   "leaders": [],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Shell": 3429,
                     "Cairo": 42100,
                     "Python": 45301
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
@@ -2673,18 +2816,12 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "repoCount": 1,
                   "contributorCount": 453,
                   "leaders": [],
-                  "sponsors": [
+                  "ecosystems": [
                     {
-                      "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                      "name": "Theodo",
-                      "url": null,
-                      "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                    },
-                    {
-                      "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                      "name": "Starknet Foundation",
-                      "url": "https://starknet.io",
-                      "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                      "name": "Starknet",
+                      "url": "https://www.starknet.io/en",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                     }
                   ],
                   "technologies": {
@@ -2696,7 +2833,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "f25e3389-d681-4811-b45c-3d1106d8e478",
@@ -2717,10 +2855,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "4f7bcc3e-3d3d-4a8f-8280-bb6df33382da",
@@ -2741,10 +2880,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {},
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
@@ -2765,7 +2905,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "dd0ab03c-5875-424b-96db-a35522eab365"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Dockerfile": 325,
                     "Scheme": 43698,
@@ -2773,7 +2913,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Haskell": 16365
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 },
                 {
                   "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
@@ -2794,14 +2935,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                       "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                     }
                   ],
-                  "sponsors": [],
+                  "ecosystems": [],
                   "technologies": {
                     "Shell": 4429,
                     "Rust": 2017307,
                     "HTML": 871
                   },
                   "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null
+                  "isMissingGithubAppInstallation": null,
+                  "tags": []
                 }
               ],
               "technologies": [
@@ -2837,54 +2979,42 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "Swift",
                 "TypeScript"
               ],
-              "sponsors": [
+              "ecosystems": [
                 {
-                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                  "name": "AS Nancy Lorraine",
-                  "url": null,
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                 },
                 {
-                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                  "name": "Coca Cola",
-                  "url": null,
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                  "name": "Avail",
+                  "url": "https://www.availproject.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
                 },
                 {
-                  "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                  "name": "Coca Colax",
-                  "url": "https://www.coca-cola-france.fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                  "name": "Aztec",
+                  "url": "https://aztec.network/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                 },
                 {
-                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                  "name": "OGC Nissa Ineos",
-                  "url": "https://www.ogcnice.com/fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                 },
                 {
-                  "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                  "name": "PSG",
-                  "url": "https://www.psg.fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                  "name": "Starknet",
+                  "url": "https://www.starknet.io/en",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                 },
                 {
-                  "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                  "name": "Red Bull",
-                  "url": "https://www.redbull.com/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                },
-                {
-                  "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                  "name": "Starknet Foundation",
-                  "url": "https://starknet.io",
-                  "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                },
-                {
-                  "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                  "name": "Theodo",
-                  "url": null,
-                  "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
                 }
               ],
               "hasMore": false,
@@ -2944,8 +3074,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "sponsorId", "2639563e-4437-4bde-a4f4" +
-                                                                                                                          "-654977c0cb39", "search", "t",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "ecosystemId", "c848d288-e6d9-4c93-ad8b-1db94483aaa6", "search", "t",
                         "pageIndex", "0", "pageSize",
                         "100"))).exchange()
                 // Then
@@ -3093,7 +3222,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "9a779f53-5762-4110-94b8-5596bbbd74ec"
                                 }
                               ],
-                              "sponsors": [],
+                              "ecosystems": [
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                                }
+                              ],
                               "technologies": {
                                 "MDX": 109316,
                                 "TypeScript": 7052833,
@@ -3106,7 +3242,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 119986
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null
+                              "isMissingGithubAppInstallation": null,
+                              "tags": []
                             },
                             {
                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -3134,7 +3271,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                                 }
                               ],
-                              "sponsors": [],
+                              "ecosystems": [],
                               "technologies": {
                                 "TypeScript": 3175211,
                                 "MDX": 2520,
@@ -3145,7 +3282,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 1520
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null
+                              "isMissingGithubAppInstallation": null,
+                              "tags": []
                             },
                             {
                               "id": "61076487-6ec5-4751-ab0d-3b876c832239",
@@ -3166,19 +3304,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                                 }
                               ],
-                              "sponsors": [
-                                {
-                                  "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                                  "name": "PSG",
-                                  "url": "https://www.psg.fr/",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                                }
-                              ],
+                              "ecosystems": [],
                               "technologies": {
                                 "Rust": 23314
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null
+                              "isMissingGithubAppInstallation": null,
+                              "tags": []
                             },
                             {
                               "id": "98873240-31df-431a-81dc-7d6fe01143a0",
@@ -3199,35 +3331,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                                 }
                               ],
-                              "sponsors": [
-                                {
-                                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                                  "name": "AS Nancy Lorraine",
-                                  "url": null,
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                                },
-                                {
-                                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                                  "name": "OGC Nissa Ineos",
-                                  "url": "https://www.ogcnice.com/fr/",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                },
-                                {
-                                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                  "name": "Coca Cola",
-                                  "url": null,
-                                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                  "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                                  "name": "Coca Colax",
-                                  "url": "https://www.coca-cola-france.fr/",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                                }
-                              ],
+                              "ecosystems": [],
                               "technologies": {},
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null
+                              "isMissingGithubAppInstallation": null,
+                              "tags": []
                             },
                             {
                               "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
@@ -3255,20 +3363,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "f2215429-83c7-49ce-954b-66ed453c3315"
                                 }
                               ],
-                              "sponsors": [
-                                {
-                                  "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                                  "name": "AS Nancy Lorraine",
-                                  "url": null,
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                                },
-                                {
-                                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                                  "name": "OGC Nissa Ineos",
-                                  "url": "https://www.ogcnice.com/fr/",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                }
-                              ],
+                              "ecosystems": [],
                               "technologies": {
                                 "CSS": 114,
                                 "Makefile": 49,
@@ -3276,7 +3371,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 "HTML": 235
                               },
                               "isInvitedAsProjectLead": false,
-                              "isMissingGithubAppInstallation": null
+                              "isMissingGithubAppInstallation": null,
+                              "tags": []
                             }
                           ],
                           "technologies": [
@@ -3312,54 +3408,42 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             "Swift",
                             "TypeScript"
                           ],
-                          "sponsors": [
+                          "ecosystems": [
                             {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "url": null,
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                              "name": "Aptos",
+                              "url": "https://aptosfoundation.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                             },
                             {
-                              "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                              "name": "Coca Cola",
-                              "url": null,
-                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                              "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                              "name": "Avail",
+                              "url": "https://www.availproject.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
                             },
                             {
-                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                              "name": "Coca Colax",
-                              "url": "https://www.coca-cola-france.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                              "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                              "name": "Aztec",
+                              "url": "https://aztec.network/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                             },
                             {
-                              "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                              "name": "OGC Nissa Ineos",
-                              "url": "https://www.ogcnice.com/fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                              "name": "Ethereum",
+                              "url": "https://ethereum.foundation/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                             },
                             {
-                              "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                              "name": "PSG",
-                              "url": "https://www.psg.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                              "name": "Starknet",
+                              "url": "https://www.starknet.io/en",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                             },
                             {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                            },
-                            {
-                              "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                              "name": "Starknet Foundation",
-                              "url": "https://starknet.io",
-                              "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                            },
-                            {
-                              "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "name": "Theodo",
-                              "url": null,
-                              "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                              "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                              "name": "Zama",
+                              "url": "https://www.zama.ai/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
                             }
                           ],
                           "hasMore": true,
@@ -3407,95 +3491,84 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                         {
-                            "projects": [],
-                            "technologies": [
-                                "Batchfile",
-                                "C",
-                                "C++",
-                                "CMake",
-                                "COBOL",
-                                "CSS",
-                                "Cairo",
-                                "Dart",
-                                "Dockerfile",
-                                "HTML",
-                                "Haskell",
-                                "JavaScript",
-                                "Jinja",
-                                "Jupyter Notebook",
-                                "Kotlin",
-                                "MDX",
-                                "Makefile",
-                                "Nix",
-                                "Objective-C",
-                                "PHP",
-                                "PLpgSQL",
-                                "Procfile",
-                                "Python",
-                                "Ruby",
-                                "Rust",
-                                "SCSS",
-                                "Scheme",
-                                "Shell",
-                                "Solidity",
-                                "Swift",
-                                "TypeScript"
-                            ],
-                            "sponsors": [
-                                {
-                                    "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                                    "name": "AS Nancy Lorraine",
-                                    "url": null,
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                                },
-                                {
-                                    "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                    "name": "Coca Cola",
-                                    "url": null,
-                                    "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                },
-                                {
-                                    "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                                    "name": "Coca Colax",
-                                    "url": "https://www.coca-cola-france.fr/",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                                },
-                                {
-                                    "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                                    "name": "OGC Nissa Ineos",
-                                    "url": "https://www.ogcnice.com/fr/",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                },
-                                {
-                                    "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                                    "name": "PSG",
-                                    "url": "https://www.psg.fr/",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                                },
-                                {
-                                    "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                                    "name": "Red Bull",
-                                    "url": "https://www.redbull.com/",
-                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                                },
-                                {
-                                    "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                                    "name": "Starknet Foundation",
-                                    "url": "https://starknet.io",
-                                    "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                                },
-                                {
-                                    "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                                    "name": "Theodo",
-                                    "url": null,
-                                    "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                                }
-                            ],
-                            "hasMore": false,
-                            "totalPageNumber": 0,
-                            "totalItemNumber": 0,
-                            "nextPageIndex": 0
-                        }""");
+                          "projects": [],
+                          "technologies": [
+                            "Batchfile",
+                            "C",
+                            "C++",
+                            "CMake",
+                            "COBOL",
+                            "CSS",
+                            "Cairo",
+                            "Dart",
+                            "Dockerfile",
+                            "HTML",
+                            "Haskell",
+                            "JavaScript",
+                            "Jinja",
+                            "Jupyter Notebook",
+                            "Kotlin",
+                            "MDX",
+                            "Makefile",
+                            "Nix",
+                            "Objective-C",
+                            "PHP",
+                            "PLpgSQL",
+                            "Procfile",
+                            "Python",
+                            "Ruby",
+                            "Rust",
+                            "SCSS",
+                            "Scheme",
+                            "Shell",
+                            "Solidity",
+                            "Swift",
+                            "TypeScript"
+                          ],
+                          "ecosystems": [
+                            {
+                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                              "name": "Aptos",
+                              "url": "https://aptosfoundation.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                            },
+                            {
+                              "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                              "name": "Avail",
+                              "url": "https://www.availproject.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
+                            },
+                            {
+                              "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                              "name": "Aztec",
+                              "url": "https://aztec.network/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
+                            },
+                            {
+                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                              "name": "Ethereum",
+                              "url": "https://ethereum.foundation/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                            },
+                            {
+                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                              "name": "Starknet",
+                              "url": "https://www.starknet.io/en",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                            },
+                            {
+                              "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                              "name": "Zama",
+                              "url": "https://www.zama.ai/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 0,
+                          "totalItemNumber": 0,
+                          "nextPageIndex": 0
+                        }
+                         """);
 
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "STRONG_EXPERTISE"))).exchange()
                 // Then
@@ -3528,18 +3601,24 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
                                 }
                               ],
-                              "sponsors": [
+                              "ecosystems": [
                                 {
-                                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                                  "name": "OGC Nissa Ineos",
-                                  "url": "https://www.ogcnice.com/fr/",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                                  "name": "Ethereum",
+                                  "url": "https://ethereum.foundation/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                                 },
                                 {
-                                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                  "name": "Coca Cola",
-                                  "url": null,
-                                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                                  "name": "Zama",
+                                  "url": "https://www.zama.ai/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                                },
+                                {
+                                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                                  "name": "Aptos",
+                                  "url": "https://aptosfoundation.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                                 }
                               ],
                               "technologies": {
@@ -3585,7 +3664,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
                                 }
                               ],
-                              "sponsors": [],
+                              "ecosystems": [],
                               "technologies": {
                                 "TypeScript": 3175211,
                                 "MDX": 2520,
@@ -3635,54 +3714,42 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             "Swift",
                             "TypeScript"
                           ],
-                          "sponsors": [
+                          "ecosystems": [
                             {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "url": null,
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                              "name": "Aptos",
+                              "url": "https://aptosfoundation.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
                             },
                             {
-                              "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                              "name": "Coca Cola",
-                              "url": null,
-                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                              "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                              "name": "Avail",
+                              "url": "https://www.availproject.org/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
                             },
                             {
-                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                              "name": "Coca Colax",
-                              "url": "https://www.coca-cola-france.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                              "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                              "name": "Aztec",
+                              "url": "https://aztec.network/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
                             },
                             {
-                              "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                              "name": "OGC Nissa Ineos",
-                              "url": "https://www.ogcnice.com/fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                              "name": "Ethereum",
+                              "url": "https://ethereum.foundation/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
                             },
                             {
-                              "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                              "name": "PSG",
-                              "url": "https://www.psg.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                              "name": "Starknet",
+                              "url": "https://www.starknet.io/en",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
                             },
                             {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                            },
-                            {
-                              "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                              "name": "Starknet Foundation",
-                              "url": "https://starknet.io",
-                              "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                            },
-                            {
-                              "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "name": "Theodo",
-                              "url": null,
-                              "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
+                              "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                              "name": "Zama",
+                              "url": "https://www.zama.ai/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
                             }
                           ],
                           "hasMore": false,
@@ -3697,195 +3764,189 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                             {
-                           "projects": [
-                             {
-                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                               "slug": "bretzel",
-                               "name": "Bretzel",
-                               "shortDescription": "A project for people who love fruits",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                               "hiring": true,
-                               "visibility": "PUBLIC",
-                               "repoCount": 4,
-                               "contributorCount": 4,
-                               "leaders": [
-                                 {
-                                   "githubUserId": 8642470,
-                                   "login": "gregcha",
-                                   "htmlUrl": "https://github.com/gregcha",
-                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                                 },
-                                 {
-                                   "githubUserId": 98735421,
-                                   "login": "pacovilletard",
-                                   "htmlUrl": "https://github.com/pacovilletard",
-                                   "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                                   "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
-                                 }
-                               ],
-                               "sponsors": [
-                                 {
-                                   "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                                   "name": "OGC Nissa Ineos",
-                                   "url": "https://www.ogcnice.com/fr/",
-                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                                 },
-                                 {
-                                   "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                   "name": "Coca Cola",
-                                   "url": null,
-                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                 }
-                               ],
-                               "technologies": {
-                                 "TypeScript": 190809,
-                                 "Dockerfile": 1982,
-                                 "Shell": 732,
-                                 "CSS": 423688,
-                                 "Rust": 408641,
-                                 "SCSS": 98360,
-                                 "JavaScript": 62716,
-                                 "HTML": 121874
-                               },
-                               "isInvitedAsProjectLead": false,
-                               "isMissingGithubAppInstallation": null,
-                               "tags": [
-                                 "STRONG_EXPERTISE",
-                                 "BEGINNERS_WELCOME"
-                               ]
-                             },
-                             {
-                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                               "slug": "qa-new-contributions",
-                               "name": "QA new contributions",
-                               "shortDescription": "QA new contributions",
-                               "logoUrl": null,
-                               "hiring": false,
-                               "visibility": "PUBLIC",
-                               "repoCount": 1,
-                               "contributorCount": 18,
-                               "leaders": [
-                                 {
-                                   "githubUserId": 16590657,
-                                   "login": "PierreOucif",
-                                   "htmlUrl": "https://github.com/PierreOucif",
-                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                   "id": "fc92397c-3431-4a84-8054-845376b630a0"
-                                 },
-                                 {
-                                   "githubUserId": 8642470,
-                                   "login": "gregcha",
-                                   "htmlUrl": "https://github.com/gregcha",
-                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                                   "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                                 }
-                               ],
-                               "sponsors": [],
-                               "technologies": {
-                                 "TypeScript": 3175211,
-                                 "MDX": 2520,
-                                 "CSS": 6065,
-                                 "Shell": 12431,
-                                 "PLpgSQL": 1372,
-                                 "JavaScript": 24023,
-                                 "HTML": 1520
-                               },
-                               "isInvitedAsProjectLead": false,
-                               "isMissingGithubAppInstallation": null,
-                               "tags": [
-                                 "STRONG_EXPERTISE"
-                               ]
-                             }
-                           ],
-                           "technologies": [
-                             "Batchfile",
-                             "C",
-                             "C++",
-                             "CMake",
-                             "COBOL",
-                             "CSS",
-                             "Cairo",
-                             "Dart",
-                             "Dockerfile",
-                             "HTML",
-                             "Haskell",
-                             "JavaScript",
-                             "Jinja",
-                             "Jupyter Notebook",
-                             "Kotlin",
-                             "MDX",
-                             "Makefile",
-                             "Nix",
-                             "Objective-C",
-                             "PHP",
-                             "PLpgSQL",
-                             "Procfile",
-                             "Python",
-                             "Ruby",
-                             "Rust",
-                             "SCSS",
-                             "Scheme",
-                             "Shell",
-                             "Solidity",
-                             "Swift",
-                             "TypeScript"
-                           ],
-                           "sponsors": [
-                             {
-                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                               "name": "AS Nancy Lorraine",
-                               "url": null,
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                             },
-                             {
-                               "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                               "name": "Coca Cola",
-                               "url": null,
-                               "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                             },
-                             {
-                               "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                               "name": "Coca Colax",
-                               "url": "https://www.coca-cola-france.fr/",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                             },
-                             {
-                               "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                               "name": "OGC Nissa Ineos",
-                               "url": "https://www.ogcnice.com/fr/",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                             },
-                             {
-                               "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
-                               "name": "PSG",
-                               "url": "https://www.psg.fr/",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                             },
-                             {
-                               "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                               "name": "Red Bull",
-                               "url": "https://www.redbull.com/",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                             },
-                             {
-                               "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
-                               "name": "Starknet Foundation",
-                               "url": "https://starknet.io",
-                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
-                             },
-                             {
-                               "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                               "name": "Theodo",
-                               "url": null,
-                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
-                             }
-                           ],
-                           "hasMore": false,
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 2,
-                           "nextPageIndex": 0
-                         }
+                              "projects": [
+                                {
+                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                  "slug": "bretzel",
+                                  "name": "Bretzel",
+                                  "shortDescription": "A project for people who love fruits",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                                  "hiring": true,
+                                  "visibility": "PUBLIC",
+                                  "repoCount": 4,
+                                  "contributorCount": 4,
+                                  "leaders": [
+                                    {
+                                      "githubUserId": 8642470,
+                                      "login": "gregcha",
+                                      "htmlUrl": "https://github.com/gregcha",
+                                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                    },
+                                    {
+                                      "githubUserId": 98735421,
+                                      "login": "pacovilletard",
+                                      "htmlUrl": "https://github.com/pacovilletard",
+                                      "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                                      "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                                    }
+                                  ],
+                                  "ecosystems": [
+                                    {
+                                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                                      "name": "Ethereum",
+                                      "url": "https://ethereum.foundation/",
+                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                                    },
+                                    {
+                                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                                      "name": "Zama",
+                                      "url": "https://www.zama.ai/",
+                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                                    },
+                                    {
+                                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                                      "name": "Aptos",
+                                      "url": "https://aptosfoundation.org/",
+                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                                    }
+                                  ],
+                                  "technologies": {
+                                    "TypeScript": 190809,
+                                    "Dockerfile": 1982,
+                                    "Shell": 732,
+                                    "CSS": 423688,
+                                    "Rust": 408641,
+                                    "SCSS": 98360,
+                                    "JavaScript": 62716,
+                                    "HTML": 121874
+                                  },
+                                  "isInvitedAsProjectLead": false,
+                                  "isMissingGithubAppInstallation": null,
+                                  "tags": [
+                                    "BEGINNERS_WELCOME",
+                                    "STRONG_EXPERTISE"
+                                  ]
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "shortDescription": "QA new contributions",
+                                  "logoUrl": null,
+                                  "hiring": false,
+                                  "visibility": "PUBLIC",
+                                  "repoCount": 1,
+                                  "contributorCount": 18,
+                                  "leaders": [
+                                    {
+                                      "githubUserId": 16590657,
+                                      "login": "PierreOucif",
+                                      "htmlUrl": "https://github.com/PierreOucif",
+                                      "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                      "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                    },
+                                    {
+                                      "githubUserId": 8642470,
+                                      "login": "gregcha",
+                                      "htmlUrl": "https://github.com/gregcha",
+                                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                    }
+                                  ],
+                                  "ecosystems": [],
+                                  "technologies": {
+                                    "TypeScript": 3175211,
+                                    "MDX": 2520,
+                                    "CSS": 6065,
+                                    "Shell": 12431,
+                                    "PLpgSQL": 1372,
+                                    "JavaScript": 24023,
+                                    "HTML": 1520
+                                  },
+                                  "isInvitedAsProjectLead": false,
+                                  "isMissingGithubAppInstallation": null,
+                                  "tags": [
+                                    "STRONG_EXPERTISE"
+                                  ]
+                                }
+                              ],
+                              "technologies": [
+                                "Batchfile",
+                                "C",
+                                "C++",
+                                "CMake",
+                                "COBOL",
+                                "CSS",
+                                "Cairo",
+                                "Dart",
+                                "Dockerfile",
+                                "HTML",
+                                "Haskell",
+                                "JavaScript",
+                                "Jinja",
+                                "Jupyter Notebook",
+                                "Kotlin",
+                                "MDX",
+                                "Makefile",
+                                "Nix",
+                                "Objective-C",
+                                "PHP",
+                                "PLpgSQL",
+                                "Procfile",
+                                "Python",
+                                "Ruby",
+                                "Rust",
+                                "SCSS",
+                                "Scheme",
+                                "Shell",
+                                "Solidity",
+                                "Swift",
+                                "TypeScript"
+                              ],
+                              "ecosystems": [
+                                {
+                                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                                  "name": "Aptos",
+                                  "url": "https://aptosfoundation.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                                },
+                                {
+                                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                  "name": "Avail",
+                                  "url": "https://www.availproject.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png"
+                                },
+                                {
+                                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                  "name": "Aztec",
+                                  "url": "https://aztec.network/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg"
+                                },
+                                {
+                                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                                  "name": "Ethereum",
+                                  "url": "https://ethereum.foundation/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png"
+                                },
+                                {
+                                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                                  "name": "Zama",
+                                  "url": "https://www.zama.ai/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                                }
+                              ],
+                              "hasMore": false,
+                              "totalPageNumber": 1,
+                              "totalItemNumber": 2,
+                              "nextPageIndex": 0
+                            }
                         """);
     }
 
@@ -3897,7 +3958,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true", "tags", "BEGINNERS_WELCOME,STRONG_EXPERTISE"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE);
+                .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_WITH_TAGS_JSON_RESPONSE);
     }
 
     @Test

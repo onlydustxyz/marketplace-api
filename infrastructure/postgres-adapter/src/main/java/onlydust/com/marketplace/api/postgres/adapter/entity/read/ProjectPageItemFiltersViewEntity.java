@@ -58,12 +58,12 @@ public class ProjectPageItemFiltersViewEntity {
             }
             if (nonNull(filtersViewEntity.ecosystems)) {
                 filtersViewEntity.ecosystems.stream()
-                        .filter(sponsor -> nonNull(sponsor.name))
-                        .map(sponsor -> EcosystemView.builder()
-                                .id(sponsor.id)
-                                .url(sponsor.url)
-                                .logoUrl(sponsor.logoUrl)
-                                .name(sponsor.name).build())
+                        .filter(ecosystem -> nonNull(ecosystem.name))
+                        .map(ecosystem -> EcosystemView.builder()
+                                .id(ecosystem.id)
+                                .url(ecosystem.url)
+                                .logoUrl(ecosystem.logoUrl)
+                                .name(ecosystem.name).build())
                         .forEach(ecosystems::add);
             }
         }

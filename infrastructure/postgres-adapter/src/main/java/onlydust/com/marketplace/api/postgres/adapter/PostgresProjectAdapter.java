@@ -173,8 +173,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
         final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForUser(userId, mine, technologiesJsonPath, ecosystemsJsonPath,
-                        search));
+                projectsPageFiltersRepository.findFiltersForUser(userId, mine));
         return Page.<ProjectCardView>builder()
                 .content(projectsForUserId.stream().map(p -> p.toView(userId)).toList())
                 .totalItemNumber(count.intValue())
@@ -202,8 +201,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath,
                 ecosystemsJsonPath, search);
         final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForAnonymousUser(technologiesJsonPath, ecosystemsJsonPath,
-                        search));
+                projectsPageFiltersRepository.findFiltersForAnonymousUser());
         return Page.<ProjectCardView>builder()
                 .content(projectsForAnonymousUser.stream().map(p -> p.toView(null)).toList())
                 .totalItemNumber(count.intValue())
