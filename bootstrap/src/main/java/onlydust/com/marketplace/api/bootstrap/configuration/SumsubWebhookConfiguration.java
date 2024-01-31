@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import com.github.javafaker.Faker;
 import lombok.Data;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.LegalVerificationFacadePort;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubProperties;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookDTO;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,12 +13,9 @@ import org.springframework.context.annotation.Configuration;
 public class SumsubWebhookConfiguration {
 
     @Bean
+    @ConfigurationProperties("application.sumsub.kyc")
     public SumsubProperties sumsubProperties() {
-        final Faker faker = new Faker();
-        final SumsubProperties sumsubProperties = new SumsubProperties();
-        sumsubProperties.setSecret(faker.rickAndMorty().character());
-        sumsubProperties.setOdApiHeader(faker.harryPotter().character());
-        return sumsubProperties;
+        return new SumsubProperties();
     }
 
     @Bean

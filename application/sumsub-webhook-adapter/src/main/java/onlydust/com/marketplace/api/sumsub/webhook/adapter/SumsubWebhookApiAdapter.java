@@ -27,8 +27,7 @@ public class SumsubWebhookApiAdapter {
                                                   final @RequestHeader(X_OD_API) String odAPiHeader,
                                                   final @RequestHeader(X_SUMSUB_PAYLOAD_DIGEST) String signature) {
         if (!odAPiHeader.equals(sumsubProperties.getOdApiHeader())) {
-            throw OnlyDustException.forbidden(String.format("Invalid sumsub header %s for value %s, expecting %s", X_OD_API, odAPiHeader,
-                    sumsubProperties.getOdApiHeader()));
+            throw OnlyDustException.forbidden(String.format("Invalid sumsub header %s for value %s", X_OD_API));
         }
         SumsubSignatureVerifier.validateWebhook(payload, sumsubProperties.getSecret(), signature);
         legalVerificationFacadePort.update(SumsubWebhookSerdes.deserialize(payload, objectMapper));
