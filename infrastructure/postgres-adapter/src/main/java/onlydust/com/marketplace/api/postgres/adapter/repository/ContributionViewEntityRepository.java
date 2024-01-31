@@ -65,7 +65,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', i.author_login,
                         'github_author_html_url', i.author_html_url,
                         'github_author_avatar_url', user_avatar_url(i.author_id, i.author_avatar_url),
-                        'is_mine', :contributorId = i.author_id,
+                        'is_mine', :rewardId = i.author_id,
                         'repo_id', i.repo_id,
                         'repo_owner', i.repo_owner_login,
                         'repo_name', i.repo_name,
@@ -93,7 +93,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
-                        'is_mine', :contributorId = pr.author_id,
+                        'is_mine', :rewardId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -121,7 +121,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                         'github_author_login', pr.author_login,
                         'github_author_html_url', pr.author_html_url,
                         'github_author_avatar_url', user_avatar_url(pr.author_id, pr.author_avatar_url),
-                        'is_mine', :contributorId = pr.author_id,
+                        'is_mine', :rewardId = pr.author_id,
                         'repo_id', pr.repo_id,
                         'repo_owner', pr.repo_owner_login,
                         'repo_name', pr.repo_name,
@@ -155,7 +155,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 (:fromDate IS NULL OR coalesce(c.completed_at, c.created_at) >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR coalesce(c.completed_at, c.created_at) < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<ContributionViewEntity> findContributions(Long contributorId,
+    Page<ContributionViewEntity> findContributions(Long rewardId,
                                                    List<Long> contributorIds,
                                                    List<UUID> projectIds,
                                                    List<Long> repoIds,

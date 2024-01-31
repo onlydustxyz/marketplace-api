@@ -269,8 +269,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresContributorLedgerProviderAdapter postgresContributorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresContributorLedgerProviderAdapter(ledgerRepository);
+    public PostgresRewardLedgerProviderAdapter postgresRewardLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
+        return new PostgresRewardLedgerProviderAdapter(ledgerRepository);
     }
 
     @Bean

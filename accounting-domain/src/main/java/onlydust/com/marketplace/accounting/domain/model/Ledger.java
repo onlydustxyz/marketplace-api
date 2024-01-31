@@ -48,7 +48,7 @@ public class Ledger {
     public PositiveAmount unlockedBalance(final @NonNull Network network) {
         return PositiveAmount.of(transactions.stream()
                 .filter(transaction -> transaction.network.equals(network))
-                .takeWhile(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
+                .filter(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
     }
@@ -81,7 +81,7 @@ public class Ledger {
         }
     }
 
-    public record Transaction(@NonNull Transaction.Id id,@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
+    public record Transaction(@NonNull Transaction.Id id, @NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
         @NoArgsConstructor(staticName = "random")
         @EqualsAndHashCode(callSuper = true)
         @SuperBuilder

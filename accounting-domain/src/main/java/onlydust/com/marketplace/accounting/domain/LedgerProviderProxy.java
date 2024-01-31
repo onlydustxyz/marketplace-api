@@ -13,7 +13,7 @@ public class LedgerProviderProxy implements LedgerProvider<Object> {
     private final LedgerProvider<SponsorId> sponsorLedgerProvider;
     private final LedgerProvider<CommitteeId> committeeLedgerProvider;
     private final LedgerProvider<ProjectId> projectLedgerProvider;
-    private final LedgerProvider<ContributorId> contributorLedgerProvider;
+    private final LedgerProvider<RewardId> rewardLedgerProvider;
 
 
     @Override
@@ -24,8 +24,8 @@ public class LedgerProviderProxy implements LedgerProvider<Object> {
             return committeeLedgerProvider.get(committeeId, currency);
         } else if (ownerId instanceof ProjectId projectId) {
             return projectLedgerProvider.get(projectId, currency);
-        } else if (ownerId instanceof ContributorId contributorId) {
-            return contributorLedgerProvider.get(contributorId, currency);
+        } else if (ownerId instanceof RewardId rewardId) {
+            return rewardLedgerProvider.get(rewardId, currency);
         } else {
             throw badRequest("Unknown owner type: " + ownerId.getClass());
         }

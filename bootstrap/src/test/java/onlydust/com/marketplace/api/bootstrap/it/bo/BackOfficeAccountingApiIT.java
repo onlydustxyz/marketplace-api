@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.TransactionResponse;
-import onlydust.com.marketplace.accounting.domain.model.ContributorId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -15,9 +14,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     static final ProjectId BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
     static final ProjectId KAAPER = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
-
-    static final ContributorId ANTHO = ContributorId.of(43467246L);
-    static final ContributorId OFUX = ContributorId.of(595505L);
 
     static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
 

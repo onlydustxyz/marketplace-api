@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubRepoViewEntity;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -31,7 +30,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
                     INNER JOIN indexer_exp.github_repos gr on gr.id = c.repo_id
                     INNER JOIN project_github_repos pgr ON pgr.github_repo_id = r.id
                     WHERE 
-                        c.repo_id = r.id AND contributor_id = :contributorId 
+                        c.repo_id = r.id AND contributor_id = :rewardId 
                         AND gr.visibility = 'PUBLIC' AND
                         (COALESCE(:projectIds) IS NULL OR pgr.project_id IN (:projectIds))
                 ) 
@@ -39,7 +38,7 @@ public interface GithubRepoViewEntityRepository extends JpaRepository<GithubRepo
             ORDER BY 
                 r.name 
             """, nativeQuery = true)
-    List<GithubRepoViewEntity> listReposByContributor(Long contributorId,
+    List<GithubRepoViewEntity> listReposByContributor(Long rewardId,
                                                       List<UUID> projectIds,
                                                       List<Long> repoIds);
 

@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.ContributorId;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
 import javax.persistence.*;
@@ -31,7 +31,7 @@ public class LedgerEntity {
     ProjectLedgerEntity project;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "ledger")
-    ContributorLedgerEntity contributor;
+    RewardLedgerEntity reward;
 
     @OneToMany(mappedBy = "ledgerId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
@@ -42,8 +42,8 @@ public class LedgerEntity {
             return SponsorId.of(sponsor.getSponsorId());
         } else if (project != null) {
             return ProjectId.of(project.getProjectId());
-        } else if (contributor != null) {
-            return ContributorId.of(contributor.getGithubUserId());
+        } else if (reward != null) {
+            return RewardId.of(reward.getRewardId());
         } else {
             throw new IllegalStateException("Ledger must have an owner");
         }
@@ -66,8 +66,8 @@ public class LedgerEntity {
             entity.setSponsor(SponsorLedgerEntity.of(entity, sponsorId));
         } else if (ledger.ownerId() instanceof ProjectId projectId) {
             entity.setProject(ProjectLedgerEntity.of(entity, projectId));
-        } else if (ledger.ownerId() instanceof ContributorId contributorId) {
-            entity.setContributor(ContributorLedgerEntity.of(entity, contributorId));
+        } else if (ledger.ownerId() instanceof RewardId rewardId) {
+            entity.setReward(RewardLedgerEntity.of(entity, rewardId));
         } else {
             throw new IllegalStateException("Ledger must have an owner (%s)".formatted(ledger.ownerId().getClass()));
         }

@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.LedgerProviderProxy;
-import onlydust.com.marketplace.accounting.domain.model.ContributorId;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
@@ -28,8 +28,8 @@ public class AccountingConfiguration {
     public LedgerProvider<Object> ledgerProvider(
             final @NonNull LedgerProvider<SponsorId> sponsorLedgerProvider,
             final @NonNull LedgerProvider<ProjectId> projectLedgerProvider,
-            final @NonNull LedgerProvider<ContributorId> contributorLedgerProvider
+            final @NonNull LedgerProvider<RewardId> rewardLedgerProvider
     ) {
-        return new LedgerProviderProxy(sponsorLedgerProvider, null, projectLedgerProvider, contributorLedgerProvider);
+        return new LedgerProviderProxy(sponsorLedgerProvider, null, projectLedgerProvider, rewardLedgerProvider);
     }
 }
