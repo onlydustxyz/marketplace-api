@@ -4,13 +4,16 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
+import static onlydust.com.marketplace.accounting.domain.model.Network.OPTIMISM;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 
 public interface BackOfficeMapper {
     static SponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
@@ -228,7 +231,7 @@ public interface BackOfficeMapper {
 
     static Blockchain mapBlockchain(BlockchainContract blockchain) {
         return switch (blockchain) {
-            case ETHEREUM -> Blockchain.ETHEREUM;
+            case ETHEREUM -> ETHEREUM;
             case STARKNET -> Blockchain.STARKNET;
             case OPTIMISM -> Blockchain.OPTIMISM;
             case APTOS -> Blockchain.APTOS;
@@ -301,7 +304,7 @@ public interface BackOfficeMapper {
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {
         return switch (network) {
             case ETHEREUM -> Network.ETHEREUM;
-            case OPTIMISM -> Network.OPTIMISM;
+            case OPTIMISM -> OPTIMISM;
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
             case SEPA -> Network.SEPA;
