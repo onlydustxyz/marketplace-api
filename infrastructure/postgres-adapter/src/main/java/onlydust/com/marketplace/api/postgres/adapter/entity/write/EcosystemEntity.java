@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,4 +27,22 @@ public class EcosystemEntity {
     String logoUrl;
     @Column(name = "url")
     String url;
+
+    public static EcosystemEntity fromDomain(final Ecosystem ecosystem) {
+        return EcosystemEntity.builder()
+                .id(ecosystem.getId())
+                .url(ecosystem.getUrl())
+                .name(ecosystem.getName())
+                .logoUrl(ecosystem.getLogoUrl())
+                .build();
+    }
+
+    public Ecosystem toDomain() {
+        return Ecosystem.builder()
+                .id(this.id)
+                .logoUrl(this.logoUrl)
+                .url(this.url)
+                .name(this.name)
+                .build();
+    }
 }

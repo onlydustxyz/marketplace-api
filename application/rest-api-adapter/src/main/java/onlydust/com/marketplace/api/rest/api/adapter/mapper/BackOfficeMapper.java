@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -26,6 +27,22 @@ public interface BackOfficeMapper {
                 .hasMore(hasMore(pageIndex, sponsorPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorPage.getTotalPageNumber()));
     }
+
+    static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
+        return new EcosystemPage()
+                .ecosystems(ecosystemViewPage.getContent().stream().map(ecosystemView -> new EcosystemPageItemResponse()
+                        .id(ecosystemView.getId())
+                        .name(ecosystemView.getName())
+                        .url(ecosystemView.getUrl())
+                        .logoUrl(ecosystemView.getLogoUrl())
+                        .projectIds(ecosystemView.getProjectIds())
+                ).toList())
+                .totalPageNumber(ecosystemViewPage.getTotalPageNumber())
+                .totalItemNumber(ecosystemViewPage.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, ecosystemViewPage.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, ecosystemViewPage.getTotalPageNumber()));
+    }
+
 
     static GithubRepositoryPage mapGithubRepositoryPageToResponse(Page<ProjectRepositoryView> projectRepositoryViewPage,
                                                                   int sanitizedPageIndex) {
@@ -263,6 +280,22 @@ public interface BackOfficeMapper {
             case FIAT -> CurrencyType.FIAT;
             case CRYPTO -> CurrencyType.CRYPTO;
         };
+    }
+
+    static Ecosystem mapEcosystemToDomain(final EcosystemRequest ecosystemRequest) {
+        return Ecosystem.builder()
+                .name(ecosystemRequest.getName())
+                .url(ecosystemRequest.getUrl())
+                .logoUrl(ecosystemRequest.getLogoUrl())
+                .build();
+    }
+
+    static EcosystemResponse mapEcosystemToResponse(final Ecosystem ecosystem) {
+        return new EcosystemResponse()
+                .id(ecosystem.getId())
+                .url(ecosystem.getUrl())
+                .name(ecosystem.getName())
+                .logoUrl(ecosystem.getLogoUrl());
     }
 
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {

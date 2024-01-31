@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,6 +28,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     private final BoUserRepository boUserRepository;
     private final BoPaymentRepository boPaymentRepository;
     private final BoProjectRepository boProjectRepository;
+    private final BoEcosystemRepository boEcosystemRepository;
+    private final EcosystemRepository ecosystemRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -88,6 +90,17 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     }
 
     @Override
+    public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {
+        final var page = boEcosystemRepository.findAll(filters.getProjects(), filters.getEcosystems(),
+                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
+        return Page.<EcosystemView>builder()
+                .content(page.getContent().stream().map(BoEcosystemEntity::toView).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<ProjectLeadInvitationView> findProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids,
                                                                          List<UUID> projectIds) {
@@ -119,7 +132,8 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
 
     @Override
     public Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters) {
-        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "requested_at")));
+        final var page = boPaymentRepository.findAll(filters.getProjects(), filters.getPayments(), PageRequest.of(pageIndex, pageSize,
+                Sort.by(Sort.Direction.DESC, "requested_at")));
         return Page.<PaymentView>builder()
                 .content(page.getContent().stream().map(BoPaymentEntity::toView).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -136,5 +150,11 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public Ecosystem createEcosystem(Ecosystem ecosystem) {
+        return ecosystemRepository.save(EcosystemEntity.fromDomain(ecosystem)).toDomain();
     }
 }

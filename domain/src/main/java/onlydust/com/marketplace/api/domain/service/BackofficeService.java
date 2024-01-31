@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
@@ -30,6 +31,11 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
+    public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {
+        return backofficeStoragePort.listEcosystems(pageIndex, pageSize, filters);
+    }
+
+    @Override
     public Page<ProjectLeadInvitationView> getProjectLeadInvitationPage(int pageIndex, int pageSize, List<UUID> ids, List<UUID> projectIds) {
         return backofficeStoragePort.findProjectLeadInvitationPage(pageIndex, pageSize, ids, projectIds);
     }
@@ -47,5 +53,10 @@ public class BackofficeService implements BackofficeFacadePort {
     @Override
     public Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds) {
         return backofficeStoragePort.listProjects(pageIndex, pageSize, projectIds);
+    }
+
+    @Override
+    public Ecosystem createEcosystem(Ecosystem ecosystem) {
+        return backofficeStoragePort.createEcosystem(ecosystem);
     }
 }

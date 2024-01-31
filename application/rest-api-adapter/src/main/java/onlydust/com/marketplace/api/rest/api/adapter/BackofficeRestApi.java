@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -42,6 +43,45 @@ public class BackofficeRestApi implements BackofficeApi {
         return githubRepositoryPage.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(githubRepositoryPage) :
                 ResponseEntity.ok(githubRepositoryPage);
+    }
+
+    @Override
+    public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize,
+                                                      List<UUID> projectIds, List<UUID> sponsorIds) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var filters = SponsorView.Filters.builder()
+                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
+                .sponsors(Optional.ofNullable(sponsorIds).orElse(List.of()))
+                .build();
+
+        final var sponsorPage =
+                backofficeFacadePort.listSponsors(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
+
+        final var response = mapSponsorPageToContract(sponsorPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<EcosystemPage> getEcosystemPage(Integer pageIndex, Integer pageSize, List<UUID> projectIds, List<UUID> ecosystemIds) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+
+        final var filters = EcosystemView.Filters.builder()
+                .projects(Optional.ofNullable(projectIds).orElse(List.of()))
+                .ecosystems(Optional.ofNullable(ecosystemIds).orElse(List.of()))
+                .build();
+
+        final var ecosystemViewPage =
+                backofficeFacadePort.listEcosystems(sanitizedPageIndex, sanitizePageSize(pageSize, MAX_PAGE_SIZE), filters);
+
+        final var response = mapEcosystemPageToContract(ecosystemViewPage, sanitizedPageIndex);
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
     }
 
     @Override
@@ -115,5 +155,11 @@ public class BackofficeRestApi implements BackofficeApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<EcosystemResponse> postEcosystem(EcosystemRequest ecosystemRequest) {
+        final Ecosystem ecosystem = backofficeFacadePort.createEcosystem(mapEcosystemToDomain(ecosystemRequest));
+        return ResponseEntity.ok(mapEcosystemToResponse(ecosystem));
     }
 }
