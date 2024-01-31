@@ -38,7 +38,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                     where pl.project_id = p.project_id
                     group by pl.project_id)                   as   project_leads,
                    t.technologies as  technologies,
-                   s.sponsor_json                                 sponsors,
+                   s.ecosystem_json                                 ecosystems,
                    tags.names                                    tags
             from project_details p
                 left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
@@ -46,13 +46,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                             group by pt.project_id)) as t on t.project_id = p.project_id
                 left join (select ps.project_id,
                                            jsonb_agg(jsonb_build_object(
-                                                   'url', sponsor.url,
-                                                   'logoUrl', sponsor.logo_url,
-                                                   'id', sponsor.id,
-                                                   'name', sponsor.name
-                                           )) sponsor_json
-                                    from sponsors sponsor
-                                             join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                                   'url', ecosystem.url,
+                                                   'logoUrl', ecosystem.logo_url,
+                                                   'id', ecosystem.id,
+                                                   'name', ecosystem.name
+                                           )) ecosystem_json
+                                    from ecosystems ecosystem
+                                             join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                     group by ps.project_id) s on s.project_id = p.project_id
                 left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
@@ -68,7 +68,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
             where r_count.repo_count > 0
               and p.visibility = 'PUBLIC'
               and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
-              and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
               order by case
@@ -81,7 +81,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
               """, nativeQuery = true)
     List<ProjectPageItemViewEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
                                                                  @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                                 @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                                  @Param("search") String search,
                                                                  @Param("orderBy") String orderBy,
                                                                  @Param("offset") int offset,
@@ -111,7 +111,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                     where pl.project_id = p.project_id
                     group by pl.project_id)                     as project_leads,
                    t.technologies                               as technologies,
-                   s.sponsor_json                               as sponsors,
+                   s.ecosystem_json                               as ecosystems,
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
                    (select count(pgr.github_repo_id) > count(agr.repo_id)
                            from project_github_repos pgr
@@ -125,13 +125,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                  group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
-                                               'url', sponsor.url,
-                                               'logoUrl', sponsor.logo_url,
-                                               'id', sponsor.id,
-                                               'name', sponsor.name
-                                       )) sponsor_json
-                                from sponsors sponsor
-                                join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                               'url', ecosystem.url,
+                                               'logoUrl', ecosystem.logo_url,
+                                               'id', ecosystem.id,
+                                               'name', ecosystem.name
+                                       )) ecosystem_json
+                                from ecosystems ecosystem
+                                join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
@@ -168,8 +168,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
                    jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
-              and (coalesce(:sponsorsJsonPath) is null or
-                   jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or
+                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
@@ -186,7 +186,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                                           @Param("mine") Boolean mine,
                                                           @Param("tagsJsonPath") String tagsJsonPath,
                                                           @Param("technologiesJsonPath") String technologiesJsonPath,
-                                                          @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                                          @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                           @Param("search") String search,
                                                           @Param("orderBy") String orderBy,
                                                           @Param("offset") int offset,
@@ -200,13 +200,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                     group by pt.project_id)) as t on t.project_id = p.project_id
                         left join (select ps.project_id,
                                                    jsonb_agg(jsonb_build_object(
-                                                           'url', sponsor.url,
-                                                           'logoUrl', sponsor.logo_url,
-                                                           'id', sponsor.id,
-                                                           'name', sponsor.name
-                                                   )) sponsor_json
-                                            from sponsors sponsor
-                                                     join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                                           'url', ecosystem.url,
+                                                           'logoUrl', ecosystem.logo_url,
+                                                           'id', ecosystem.id,
+                                                           'name', ecosystem.name
+                                                   )) ecosystem_json
+                                            from ecosystems ecosystem
+                                                     join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                             group by ps.project_id) s on s.project_id = p.project_id
                         left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
@@ -217,14 +217,14 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                            where pgr_count.project_id = p.project_id and gr2.visibility = 'PUBLIC') > 0
                                        and p.visibility = 'PUBLIC'
                                        and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
-                                       and (coalesce(:sponsorsJsonPath) is null or jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath )))
+                                       and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
             , nativeQuery = true)
     Long countProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
                                        @Param("technologiesJsonPath") String technologiesJsonPath,
-                                       @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                       @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                        @Param("search") String search);
 
     @Query(value = """
@@ -235,13 +235,13 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                  group by pt.project_id)) as t on t.project_id = p.project_id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
-                                               'url', sponsor.url,
-                                               'logoUrl', sponsor.logo_url,
-                                               'id', sponsor.id,
-                                               'name', sponsor.name
-                                       )) sponsor_json
-                                from sponsors sponsor
-                                join public.projects_sponsors ps on ps.sponsor_id = sponsor.id
+                                               'url', ecosystem.url,
+                                               'logoUrl', ecosystem.logo_url,
+                                               'id', ecosystem.id,
+                                               'name', ecosystem.name
+                                       )) ecosystem_json
+                                from ecosystems ecosystem
+                                join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.project_id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
@@ -278,8 +278,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:technologiesJsonPath) is null or
                    jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
-              and (coalesce(:sponsorsJsonPath) is null or
-                   jsonb_path_exists(s.sponsor_json, cast(cast(:sponsorsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or
+                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
@@ -289,6 +289,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemVie
                                 @Param("mine") Boolean mine,
                                 @Param("tagsJsonPath") String tagsJsonPath,
                                 @Param("technologiesJsonPath") String technologiesJsonPath,
-                                @Param("sponsorsJsonPath") String sponsorsJsonPath,
+                                @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                 @Param("search") String search);
 }

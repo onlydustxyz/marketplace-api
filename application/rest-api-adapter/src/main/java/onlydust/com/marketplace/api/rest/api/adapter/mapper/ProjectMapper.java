@@ -64,6 +64,7 @@ public interface ProjectMapper {
                 .sorted(Comparator.comparing(RegisteredUserResponse::getGithubUserId))
                 .collect(Collectors.toList()));
         projectResponse.setTags(project.getTags().stream().map(ProjectMapper::mapTag).toList());
+        projectResponse.setEcosystems(project.getEcosystems().stream().map(ProjectMapper::mapEcosystem).collect(Collectors.toList()));
         projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
@@ -169,17 +170,17 @@ public interface ProjectMapper {
                 .stream()
                 .map(String.class::cast)
                 .collect(Collectors.toSet());
-        final Set<SponsorResponse> sponsors = page.getFilters().get(ProjectCardView.FilterBy.SPONSORS.name())
+        final Set<EcosystemResponse> ecosystems = page.getFilters().get(ProjectCardView.FilterBy.ECOSYSTEMS.name())
                 .stream()
-                .map(SponsorView.class::cast)
-                .map(ProjectMapper::mapSponsor)
+                .map(EcosystemView.class::cast)
+                .map(ProjectMapper::mapEcosystem)
                 .collect(Collectors.toSet());
         for (ProjectCardView projectCardView : page.getContent()) {
             projectPageItemResponses.add(mapProjectCard(projectCardView));
         }
         projectPageResponse.setProjects(projectPageItemResponses);
         projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
-        projectPageResponse.setSponsors(sponsors.stream().sorted(Comparator.comparing(SponsorResponse::getName)).toList());
+        projectPageResponse.setEcosystems(ecosystems.stream().sorted(Comparator.comparing(EcosystemResponse::getName)).toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
@@ -192,8 +193,8 @@ public interface ProjectMapper {
         for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
             projectListItemResponse.addLeadersItem(mapRegisteredUser(leader));
         }
-        for (SponsorView sponsor : projectCardView.getSponsors()) {
-            projectListItemResponse.addSponsorsItem(mapSponsor(sponsor));
+        for (EcosystemView ecosystemView : projectCardView.getEcosystems()) {
+            projectListItemResponse.addEcosystemsItem(mapEcosystem(ecosystemView));
         }
         projectListItemResponse.setTechnologies(projectCardView.getTechnologies());
         return projectListItemResponse;
@@ -225,14 +226,25 @@ public interface ProjectMapper {
         };
     }
 
-    private static SponsorResponse mapSponsor(final SponsorView sponsor) {
+    private static EcosystemResponse mapEcosystem(final EcosystemView ecosystem) {
+        final EcosystemResponse ecosystemResponse = new EcosystemResponse();
+        ecosystemResponse.setId(ecosystem.getId());
+        ecosystemResponse.setName(ecosystem.getName());
+        ecosystemResponse.setLogoUrl(ecosystem.getLogoUrl());
+        ecosystemResponse.setUrl(ecosystem.getUrl());
+        return ecosystemResponse;
+    }
+
+    private static SponsorResponse mapSponsor(final SponsorView sponsorView) {
         final SponsorResponse sponsorResponse = new SponsorResponse();
-        sponsorResponse.setId(sponsor.getId());
-        sponsorResponse.setName(sponsor.getName());
-        sponsorResponse.setLogoUrl(sponsor.getLogoUrl());
-        sponsorResponse.setUrl(sponsor.getUrl());
+        sponsorResponse.setId(sponsorView.getId());
+        sponsorResponse.setName(sponsorView.getName());
+        sponsorResponse.setLogoUrl(sponsorView.getLogoUrl());
+        sponsorResponse.setUrl(sponsorView.getUrl());
         return sponsorResponse;
     }
+
+
 
     private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
         final var organizationRepo = mapOrganizationRepo(repo);

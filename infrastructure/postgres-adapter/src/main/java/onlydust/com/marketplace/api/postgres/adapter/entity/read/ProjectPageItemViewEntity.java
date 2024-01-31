@@ -6,9 +6,9 @@ import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.api.domain.view.EcosystemView;
 import onlydust.com.marketplace.api.domain.view.ProjectCardView;
 import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.api.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Type;
@@ -45,7 +45,7 @@ public class ProjectPageItemViewEntity {
     Boolean isPendingProjectLead;
     Boolean isMissingGithubAppInstallation;
     @Type(type = "jsonb")
-    List<Sponsor> sponsors;
+    List<Ecosystem> ecosystems;
     @Type(type = "jsonb")
     List<ProjectLead> projectLeads;
     @Type(type = "jsonb")
@@ -53,11 +53,11 @@ public class ProjectPageItemViewEntity {
     @Type(type = "jsonb")
     List<Tag> tags;
 
-    public static String getSponsorsJsonPath(List<UUID> sponsorIds) {
-        if (isNull(sponsorIds) || sponsorIds.isEmpty()) {
+    public static String getEcosystemsJsonPath(List<UUID> ecosystemIds) {
+        if (isNull(ecosystemIds) || ecosystemIds.isEmpty()) {
             return null;
         }
-        return "$[*] ? (" + String.join(" || ", sponsorIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
+        return "$[*] ? (" + String.join(" || ", ecosystemIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
     }
 
     public static String getTechnologiesJsonPath(List<String> technologies) {
@@ -93,12 +93,12 @@ public class ProjectPageItemViewEntity {
         if (nonNull(this.technologies) && !this.technologies.isEmpty()) {
             this.technologies.forEach(view::addTechnologies);
         }
-        if (nonNull(this.sponsors) && !this.sponsors.isEmpty()) {
-            this.sponsors.forEach(sponsor -> view.addSponsor(SponsorView.builder()
-                    .id(sponsor.id)
-                    .logoUrl(sponsor.logoUrl)
-                    .name(sponsor.name)
-                    .url(sponsor.url)
+        if (nonNull(this.ecosystems) && !this.ecosystems.isEmpty()) {
+            this.ecosystems.forEach(ecosystem -> view.addEcosystem(EcosystemView.builder()
+                    .id(ecosystem.id)
+                    .logoUrl(ecosystem.logoUrl)
+                    .name(ecosystem.name)
+                    .url(ecosystem.url)
                     .build()));
         }
         if (nonNull(this.projectLeads) && !this.projectLeads.isEmpty()) {
@@ -142,7 +142,7 @@ public class ProjectPageItemViewEntity {
     }
 
     @EqualsAndHashCode
-    public static class Sponsor {
+    public static class Ecosystem {
 
         @JsonProperty("url")
         String url;

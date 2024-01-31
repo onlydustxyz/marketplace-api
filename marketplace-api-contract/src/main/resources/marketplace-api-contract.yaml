@@ -930,8 +930,8 @@ paths:
             items:
               type: string
         - in: query
-          name: sponsorId
-          description: Sponsor filter
+          name: ecosystemId
+          description: Ecosystem filter
           schema:
             type: array
             items:
@@ -2288,6 +2288,11 @@ components:
       format: uuid
       description: OnlyDust sponsor ID
 
+    EcosystemId:
+      type: string
+      format: uuid
+      description: OnlyDust ecosystem ID
+
     RewardId:
       type: string
       format: uuid
@@ -2846,6 +2851,30 @@ components:
           format: url
           description: Direct URL to sponsor's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+    EcosystemResponse:
+      type: object
+      required:
+        - id
+        - name
+        - url
+        - logoUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/EcosystemId'
+        name:
+          type: string
+          description: Ecosystem name
+          example: Ethereum Foundation
+        url:
+          type: string
+          format: url
+          description: URL of ecosystem's website
+          example: 'https://ethereum.org'
+        logoUrl:
+          type: string
+          format: url
+          description: Direct URL to ecosystem's logo image
+          example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
 
     ProjectPageResponse:
       type: object
@@ -2864,10 +2893,10 @@ components:
           type: array
           items:
             type: string
-        sponsors:
+        ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/SponsorResponse'
+            $ref: '#/components/schemas/EcosystemResponse'
         hasMore:
           type: boolean
           example: true
@@ -2891,7 +2920,7 @@ components:
         - repoCount
         - contributorCount
         - leaders
-        - sponsors
+        - ecosystems
         - technologies
         - isInvitedAsProjectLead
       properties:
@@ -2927,10 +2956,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RegisteredUserResponse'
-        sponsors:
+        ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/SponsorResponse'
+            $ref: '#/components/schemas/EcosystemResponse'
         technologies:
           $ref: '#/components/schemas/Technologies'
         isInvitedAsProjectLead:
@@ -2960,7 +2989,7 @@ components:
         - topContributors
         - leaders
         - invitedLeaders
-        - sponsors
+        - ecosystems
         - technologies
         - hasRemainingBudget
         - indexingComplete
@@ -3026,6 +3055,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RegisteredUserResponse'
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemResponse'
         sponsors:
           type: array
           items:

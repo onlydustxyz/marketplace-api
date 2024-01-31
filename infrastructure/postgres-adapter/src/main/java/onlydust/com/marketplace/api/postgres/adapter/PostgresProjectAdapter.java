@@ -131,6 +131,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
+        final var ecosystems = customProjectRepository.getProjectEcosystems(projectView.getId());
         final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
         final Boolean hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
@@ -149,31 +150,30 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 applicationRepository.findByProjectIdAndApplicantId(projectView.getId(), caller.getId()).isPresent()
         );
         return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders
-                , sponsors, hasRemainingBudget, me);
+                , sponsors, ecosystems, hasRemainingBudget, me);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectCardView> findByTagsTechnologiesSponsorsUserIdSearchSortBy(List<Project.Tag> tags,
-                                                                                  List<String> technologies,
-                                                                                  List<UUID> sponsorIds, UUID userId,
-                                                                                  String search,
-                                                                                  ProjectCardView.SortBy sort,
-                                                                                  Boolean mine, Integer pageIndex,
-                                                                                  Integer pageSize) {
-        final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
+    public Page<ProjectCardView> findByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags,
+                                                                                    List<String> technologies,
+                                                                                    List<UUID> sponsorIds, UUID userId,
+                                                                                    String search,
+                                                                                    ProjectCardView.SortBy sort,
+                                                                                    Boolean mine, Integer pageIndex,
+                                                                                    Integer pageSize) {
+        final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(sponsorIds);
         final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
         final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath, technologiesJsonPath,
-                sponsorsJsonPath, search);
+                ecosystemsJsonPath, search);
         final List<ProjectPageItemViewEntity> projectsForUserId =
                 projectsPageRepository.findProjectsForUserId(userId, mine, tagsJsonPath,
-                        technologiesJsonPath, sponsorsJsonPath, search, isNull(sort) ?
+                        technologiesJsonPath, ecosystemsJsonPath, search, isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
         final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForUser(userId, mine, technologiesJsonPath, sponsorsJsonPath,
-                        search));
+                projectsPageFiltersRepository.findFiltersForUser(userId, mine));
         return Page.<ProjectCardView>builder()
                 .content(projectsForUserId.stream().map(p -> p.toView(userId)).toList())
                 .totalItemNumber(count.intValue())
@@ -184,25 +184,24 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProjectCardView> findByTagsTechnologiesSponsorsSearchSortBy(List<Project.Tag> tags,
-                                                                            List<String> technologies,
-                                                                            List<UUID> sponsorIds, String search,
-                                                                            ProjectCardView.SortBy sort,
-                                                                            Integer pageIndex, Integer pageSize) {
+    public Page<ProjectCardView> findByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags,
+                                                                              List<String> technologies,
+                                                                              List<UUID> sponsorIds, String search,
+                                                                              ProjectCardView.SortBy sort,
+                                                                              Integer pageIndex, Integer pageSize) {
 
-        final String sponsorsJsonPath = ProjectPageItemViewEntity.getSponsorsJsonPath(sponsorIds);
+        final String ecosystemsJsonPath = ProjectPageItemViewEntity.getEcosystemsJsonPath(sponsorIds);
         final String technologiesJsonPath = ProjectPageItemViewEntity.getTechnologiesJsonPath(technologies);
         final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
         final List<ProjectPageItemViewEntity> projectsForAnonymousUser =
-                projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, sponsorsJsonPath, search,
+                projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, ecosystemsJsonPath, search,
                         isNull(sort) ?
                                 ProjectCardView.SortBy.NAME.name() : sort.name(),
                         PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath,
-                sponsorsJsonPath, search);
+                ecosystemsJsonPath, search);
         final Map<String, Set<Object>> filters = ProjectPageItemFiltersViewEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForAnonymousUser(technologiesJsonPath, sponsorsJsonPath,
-                        search));
+                projectsPageFiltersRepository.findFiltersForAnonymousUser());
         return Page.<ProjectCardView>builder()
                 .content(projectsForAnonymousUser.stream().map(p -> p.toView(null)).toList())
                 .totalItemNumber(count.intValue())

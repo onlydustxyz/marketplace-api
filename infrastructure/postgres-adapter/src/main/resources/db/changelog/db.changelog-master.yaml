@@ -72,4 +72,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000035_create_project_tags_table.sql
   - include:
+      file: db/changelog/changelogs/00000036_add_ecosystems.sql
+  - include:
       file: db/changelog/changelogs/00000037_create_accounting_schema.sql
+

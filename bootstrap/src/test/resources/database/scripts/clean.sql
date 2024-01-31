@@ -15,3 +15,4 @@ $$ LANGUAGE plpgsql;
 
 SELECT truncate_tables('public');
 SELECT truncate_tables('iam');
+SELECT truncate_tables('rfd');

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
@@ -62,6 +63,15 @@ public class ProjectViewEntity {
     Boolean ignoreCodeReviews;
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "projects_ecosystems",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "ecosystem_id")
+    )
+    List<EcosystemEntity> ecosystems;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(

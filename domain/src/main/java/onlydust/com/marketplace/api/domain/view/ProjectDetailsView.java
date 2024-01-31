@@ -31,6 +31,8 @@ public class ProjectDetailsView {
     @Setter(AccessLevel.NONE)
     Set<ProjectOrganizationView> organizations = new HashSet<>();
     @Builder.Default
+    Set<EcosystemView> ecosystems = new HashSet<>();
+    @Builder.Default
     Set<SponsorView> sponsors = new HashSet<>();
     @Builder.Default
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
