@@ -89,15 +89,15 @@ public interface BackOfficeMapper {
         return budgetPage;
     }
 
-    static Currency mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
+    static CurrencyCode mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
         return switch (currency) {
-            case Strk -> Currency.STRK;
-            case Usd -> Currency.USD;
-            case Apt -> Currency.APT;
-            case Op -> Currency.OP;
-            case Eth -> Currency.ETH;
-            case Lords -> Currency.LORDS;
-            case Usdc -> Currency.USDC;
+            case Strk -> CurrencyCode.STRK;
+            case Usd -> CurrencyCode.USD;
+            case Apt -> CurrencyCode.APT;
+            case Op -> CurrencyCode.OP;
+            case Eth -> CurrencyCode.ETH;
+            case Lords -> CurrencyCode.LORDS;
+            case Usdc -> CurrencyCode.USDC;
         };
     }
 

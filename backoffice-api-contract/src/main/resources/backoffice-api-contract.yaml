@@ -311,7 +311,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorPageItemResponse'
+                $ref: '#/components/schemas/SponsorResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -962,6 +962,20 @@ components:
             type: string
             format: uuid
 
+    SponsorResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorPageItemResponse'
+        - type: object
+          properties:
+            refundableBalances:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionData'
+            availableBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/AllocationData'
+
     EcosystemPage:
       type: object
       required:
@@ -1184,7 +1198,7 @@ components:
           type: string
           format: uuid
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyCode'
         initialAmount:
           type: number
         remainingAmount:
@@ -1383,7 +1397,7 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyCode'
         recipientId:
           type: integer
           format: int64
@@ -1487,7 +1501,8 @@ components:
           type: number
         strkAmountSent:
           type: number
-    Currency:
+
+    CurrencyCode:
       type: string
       enum:
         - USD
@@ -1544,36 +1559,25 @@ components:
             $ref: '#/components/schemas/CurrencyResponse'
 
     CurrencyResponse:
-      type: object
-      required:
-        - id
-        - type
-        - name
-        - code
-        - logoUrl
-        - decimals
-      properties:
-        id:
-          $ref: '#/components/schemas/CurrencyId'
-        type:
-          $ref: '#/components/schemas/CurrencyType'
-        standard:
-          $ref: '#/components/schemas/CurrencyStandard'
-        tokens:
-          type: array
-          items:
-            $ref: '#/components/schemas/Token'
-        name:
-          type: string
-        code:
-          type: string
-        logoUrl:
-          type: string
-          format: uri
-        decimals:
-          type: integer
-        description:
-          type: string
+      allOf:
+        - $ref: '#/components/schemas/Currency'
+        - type: object
+          required:
+            - type
+            - decimals
+          properties:
+            type:
+              $ref: '#/components/schemas/CurrencyType'
+            standard:
+              $ref: '#/components/schemas/CurrencyStandard'
+            tokens:
+              type: array
+              items:
+                $ref: '#/components/schemas/Token'
+            decimals:
+              type: integer
+            description:
+              type: string
 
     Token:
       type: object
@@ -1598,6 +1602,61 @@ components:
           description: The direct URL to the uploaded image
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+
+    TransactionData:
+      type: object
+      description: Contains the necessary information to perform a transaction.
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/TransactionalCurrency'
+
+    AllocationData:
+      type: object
+      description: Available budget that can be allocated
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    Currency:
+      type: object
+      description: Minimal information about a currency
+      properties:
+        id:
+          $ref: '#/components/schemas/CurrencyId'
+        code:
+          type: string
+        name:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+
+    TransactionalCurrency:
+      allOf:
+        - $ref: '#/components/schemas/Currency'
+        - type: object
+          description: Information about a currency that can be used to perform transactions
+          required:
+            - type
+          properties:
+            type:
+              $ref: '#/components/schemas/CurrencyType'
+            standard:
+              $ref: '#/components/schemas/CurrencyStandard'
+            blockchain:
+              $ref: '#/components/schemas/BlockchainContract'
+            address:
+              $ref: '#/components/schemas/ContractAddress'
 
     SponsorId:
       type: string
