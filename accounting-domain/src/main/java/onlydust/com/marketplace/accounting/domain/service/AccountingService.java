@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
@@ -14,7 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @AllArgsConstructor
-public class AccountingService {
+public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
     private final LedgerProvider<Object> ledgerProvider;
     private final LedgerStorage ledgerStorage;
@@ -24,6 +25,7 @@ public class AccountingService {
         fund(sponsorId, amount, currencyId, network, null);
     }
 
+    @Override
     public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var ledger = getOrCreateLedger(sponsorId, currency);
@@ -32,18 +34,32 @@ public class AccountingService {
         ledgerStorage.save(ledger);
     }
 
-    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        burn(to, amount, currencyId).forEach(transaction -> {
+    @Override
+    public void pay(ContributorId from, PositiveAmount amount, Currency.Id currencyId, Network network) {
+        burn(from, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount(), network);
-            ledgerStorage.save(ledger);
+            withdraw(ledger, transaction.amount(), network);
         });
     }
 
-    public <From> void mint(From from, PositiveAmount amount, Currency.Id currencyId) {
+    @Override
+    public void withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
+        final var currency = getCurrency(currencyId);
+        final var ledger = getLedger(sponsorId, currency);
+
+        withdraw(ledger, amount, network);
+    }
+
+    private void withdraw(Ledger ledger, PositiveAmount amount, Network network) {
+        ledger.debit(amount, network);
+        ledgerStorage.save(ledger);
+    }
+
+    @Override
+    public <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var ledger = getOrCreateLedger(from, currency);
+        final var ledger = getOrCreateLedger(to, currency);
 
         accountBook.mint(ledger.id(), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
@@ -53,6 +69,7 @@ public class AccountingService {
         return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
     }
 
+    @Override
     public <To> Collection<Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
@@ -64,6 +81,7 @@ public class AccountingService {
         return transactions;
     }
 
+    @Override
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
@@ -74,6 +92,7 @@ public class AccountingService {
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
+    @Override
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);

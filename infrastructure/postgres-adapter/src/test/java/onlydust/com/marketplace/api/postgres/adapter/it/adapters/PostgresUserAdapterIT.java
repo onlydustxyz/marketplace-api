@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.it.repository;
+package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserRole;

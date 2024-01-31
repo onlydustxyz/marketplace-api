@@ -39,11 +39,11 @@ public class LedgerEntity {
 
     private Object owner() {
         if (sponsor != null) {
-            return sponsor.getSponsorId();
+            return SponsorId.of(sponsor.getSponsorId());
         } else if (project != null) {
-            return project.getProjectId();
+            return ProjectId.of(project.getProjectId());
         } else if (contributor != null) {
-            return contributor.getGithubUserId();
+            return ContributorId.of(contributor.getGithubUserId());
         } else {
             throw new IllegalStateException("Ledger must have an owner");
         }
@@ -59,7 +59,7 @@ public class LedgerEntity {
         final var entity = LedgerEntity.builder()
                 .id(ledger.id().value())
                 .currency(CurrencyEntity.of(ledger.currency()))
-                .transactions(ledger.getTransactions().stream().map(LedgerTransactionEntity::of).toList())
+                .transactions(ledger.getTransactions().stream().map(t -> LedgerTransactionEntity.of(ledger.id(), t)).toList())
                 .build();
 
         if (ledger.ownerId() instanceof SponsorId sponsorId) {
@@ -69,7 +69,7 @@ public class LedgerEntity {
         } else if (ledger.ownerId() instanceof ContributorId contributorId) {
             entity.setContributor(ContributorLedgerEntity.of(entity, contributorId));
         } else {
-            throw new IllegalStateException("Ledger must have an owner");
+            throw new IllegalStateException("Ledger must have an owner (%s)".formatted(ledger.ownerId().getClass()));
         }
 
         return entity;

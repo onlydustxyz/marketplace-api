@@ -10,8 +10,8 @@ public class ContributorId {
     @NonNull
     private final Long value;
 
-    public static ContributorId of(@NonNull final String uuid) {
-        return ContributorId.of(Long.parseLong(uuid));
+    public static ContributorId of(@NonNull final String id) {
+        return ContributorId.of(Long.parseLong(id));
     }
 
     public Long value() {

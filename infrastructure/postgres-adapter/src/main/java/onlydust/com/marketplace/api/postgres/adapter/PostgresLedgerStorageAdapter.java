@@ -15,7 +15,9 @@ public class PostgresLedgerStorageAdapter implements LedgerStorage {
 
     @Override
     public Optional<Ledger> get(Ledger.Id id) {
-        return ledgerRepository.findById(id.value()).map(LedgerEntity::toLedger);
+
+        final var ledger = ledgerRepository.findById(id.value()).map(LedgerEntity::toLedger);
+        return ledger;
     }
 
     @Override
