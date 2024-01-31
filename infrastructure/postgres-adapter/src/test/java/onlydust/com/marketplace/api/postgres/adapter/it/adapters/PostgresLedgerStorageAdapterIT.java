@@ -1,10 +1,11 @@
-package onlydust.com.marketplace.api.postgres.adapter.it;
+package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,8 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     @Test
     void should_return_sponsor_ledger_when_found() {
         // Given
-        final SponsorEntity sponsor = new SponsorEntity(SponsorId.random().value(), "sponsor", "", "");
+        final var sponsorId = SponsorId.random();
+        final SponsorEntity sponsor = new SponsorEntity(sponsorId.value(), "sponsor", "", "");
         sponsorRepository.save(sponsor);
         final var ledger = new Ledger(SponsorId.of(sponsor.getId()), currency);
 
@@ -59,15 +61,15 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
             final var savedLedger = adapter.get(ledger.id());
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsor.getId());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsorId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
 
         {
-            final var savedLedger = sponsorLedgerProvider.get(SponsorId.of(sponsor.getId()), currency);
+            final var savedLedger = sponsorLedgerProvider.get(sponsorId, currency);
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsor.getId());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(sponsorId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
     }
@@ -76,7 +78,8 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
     @Test
     void should_return_project_ledger_when_found() {
         // Given
-        final ProjectIdEntity project = new ProjectIdEntity(ProjectId.random().value());
+        final var projectId = ProjectId.random();
+        final ProjectIdEntity project = new ProjectIdEntity(projectId.value());
         projectIdRepository.save(project);
         final var ledger = new Ledger(ProjectId.of(project.getId()), currency);
 
@@ -88,15 +91,15 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
             final var savedLedger = adapter.get(ledger.id());
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(project.getId());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(projectId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
 
         {
-            final var savedLedger = projectLedgerProvider.get(ProjectId.of(project.getId()), currency);
+            final var savedLedger = projectLedgerProvider.get(projectId, currency);
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(project.getId());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(projectId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
     }
@@ -115,7 +118,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
             final var savedLedger = adapter.get(ledger.id());
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId.value());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
 
@@ -123,7 +126,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
             final var savedLedger = contributorLedgerProvider.get(contributorId, currency);
             assertThat(savedLedger).isPresent();
             assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId.value());
+            assertThat(savedLedger.get().ownerId()).isEqualTo(contributorId);
             assertThat(savedLedger.get().currency()).isEqualTo(currency);
         }
     }
