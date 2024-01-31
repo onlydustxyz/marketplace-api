@@ -1061,9 +1061,9 @@ components:
     TransactionResponse:
       type: object
       required:
-        - transactionId
+        - id
       properties:
-        transactionId:
+        id:
           $ref: '#/components/schemas/TransactionId'
 
     TransactionType:

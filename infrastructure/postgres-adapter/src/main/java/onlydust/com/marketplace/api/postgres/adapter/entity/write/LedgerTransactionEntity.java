@@ -8,9 +8,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Netwo
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -23,8 +25,7 @@ import java.util.UUID;
 @Table(name = "ledger_transactions", schema = "accounting")
 public class LedgerTransactionEntity {
     @Id
-    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
-    BigInteger id;
+    @NonNull UUID id;
 
     @NonNull UUID ledgerId;
 
@@ -37,11 +38,12 @@ public class LedgerTransactionEntity {
     ZonedDateTime lockedUntil;
 
     public Ledger.Transaction toTransaction() {
-        return new Ledger.Transaction(Amount.of(amount), network.toNetwork(), lockedUntil);
+        return new Ledger.Transaction(Ledger.Transaction.Id.of(id), Amount.of(amount), network.toNetwork(), lockedUntil);
     }
 
     public static LedgerTransactionEntity of(Ledger.Id ledgerId, Ledger.Transaction transaction) {
         return LedgerTransactionEntity.builder()
+                .id(transaction.id().value())
                 .ledgerId(ledgerId.value())
                 .amount(transaction.amount().getValue())
                 .network(NetworkEnumEntity.of(transaction.network()))

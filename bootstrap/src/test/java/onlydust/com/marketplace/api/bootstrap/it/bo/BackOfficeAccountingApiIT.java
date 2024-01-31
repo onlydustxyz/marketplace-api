@@ -1,11 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
-import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
+import onlydust.com.backoffice.api.contract.model.TransactionResponse;
 import onlydust.com.marketplace.accounting.domain.model.ContributorId;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -20,32 +19,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     static final ContributorId ANTHO = ContributorId.of(43467246L);
     static final ContributorId OFUX = ContributorId.of(595505L);
 
-    Currency.Id currency;
-
-    @BeforeEach
-    void setup() {
-        currency = Currency.Id.of(client
-                .post()
-                .uri(getApiURI(POST_CURRENCIES))
-                .contentType(APPLICATION_JSON)
-                .header("Api-Key", apiKey())
-                .bodyValue("""
-                        {
-                            "type": "CRYPTO",
-                            "standard": "ERC20",
-                            "blockchain": "ETHEREUM",
-                            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(CurrencyResponse.class)
-                .returnResult()
-                .getResponseBody()
-                .getId()
-        );
-    }
+    static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
 
     @Test
     void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {
@@ -59,7 +33,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "amount": 100,
                             "currencyId": "%s"
                         }
-                        """.formatted(currency))
+                        """.formatted(BTC))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -82,11 +56,13 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(currency))
+                        """.formatted(BTC))
                 // Then
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody().consumeWith(System.out::println)
+                .jsonPath("$.id").isNotEmpty();
 
         // When
         client.post()
@@ -99,7 +75,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "amount": 90,
                             "currencyId": "%s"
                         }
-                        """.formatted(COCA_COLAX, currency))
+                        """.formatted(COCA_COLAX, BTC))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -117,7 +93,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "amount": 50,
                             "currencyId": "%s"
                         }
-                        """.formatted(COCA_COLAX, currency))
+                        """.formatted(COCA_COLAX, BTC))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -140,11 +116,13 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(currency))
+                        """.formatted(BTC))
                 // Then
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty();
 
 
         // When
@@ -157,7 +135,46 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "amount": 60,
                             "currencyId": "%s"
                         }
-                        """.formatted(currency))
+                        """.formatted(BTC))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
+
+
+    @Test
+    void should_delete_transaction_registered_by_mistake() {
+
+        // When
+        final var transactionId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "type": "CREDIT",
+                            "amount": 100,
+                            "currencyId": "%s",
+                            "receipt": {
+                                "network": "ETHEREUM",
+                                "reference": "0x0",
+                                "thirdPartyName": "Coca Cola LTD",
+                                "thirdPartyAccountNumber": "coca.cola.eth"
+                            }
+                        }
+                        """.formatted(BTC))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(TransactionResponse.class)
+                .returnResult().getResponseBody().getId();
+
+        // When
+        client.delete()
+                .uri(getApiURI(DELETE_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX, transactionId)))
+                .header("Api-Key", apiKey())
                 // Then
                 .exchange()
                 .expectStatus()

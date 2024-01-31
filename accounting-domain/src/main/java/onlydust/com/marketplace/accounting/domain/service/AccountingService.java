@@ -26,12 +26,13 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
+    public Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var ledger = getOrCreateLedger(sponsorId, currency);
 
-        ledger.credit(amount, network, lockedUntil);
+        final var transaction = ledger.credit(amount, network, lockedUntil);
         ledgerStorage.save(ledger);
+        return transaction.id();
     }
 
     @Override
@@ -43,16 +44,17 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
+    public Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
         final var currency = getCurrency(currencyId);
         final var ledger = getLedger(sponsorId, currency);
 
-        withdraw(ledger, amount, network);
+        return withdraw(ledger, amount, network);
     }
 
-    private void withdraw(Ledger ledger, PositiveAmount amount, Network network) {
-        ledger.debit(amount, network);
+    private Ledger.Transaction.Id withdraw(Ledger ledger, PositiveAmount amount, Network network) {
+        final var transaction = ledger.debit(amount, network);
         ledgerStorage.save(ledger);
+        return transaction.id();
     }
 
     @Override
@@ -101,6 +103,11 @@ public class AccountingService implements AccountingFacadePort {
 
         accountBook.refund(fromLedger.id(), toLedger.id(), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+    }
+
+    @Override
+    public void delete(Ledger.Transaction.Id transactionId) {
+        ledgerStorage.delete(transactionId);
     }
 
     private Currency getCurrency(Currency.Id id) {

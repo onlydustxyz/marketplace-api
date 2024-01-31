@@ -8,10 +8,7 @@ import onlydust.com.backoffice.api.contract.model.ProjectBudgetAllocationRequest
 import onlydust.com.backoffice.api.contract.model.SponsorBudgetAllocationRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionResponse;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,11 +76,17 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var currencyId = Currency.Id.of(request.getCurrencyId());
         final var network = mapTransactionNetwork(request.getReceipt().getNetwork());
 
-        switch (request.getType()) {
+        final var transactionId = switch (request.getType()) {
             case CREDIT -> accountingFacadePort.fund(sponsorId, amount, currencyId, network, request.getLockedUntil());
             case DEBIT -> accountingFacadePort.withdraw(sponsorId, amount, currencyId, network);
-        }
+        };
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(new TransactionResponse().id(transactionId.value()));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteTransactionForSponsor(UUID sponsorId, UUID transactionId) {
+        accountingFacadePort.delete(Ledger.Transaction.Id.of(transactionId));
+        return ResponseEntity.noContent().build();
     }
 }

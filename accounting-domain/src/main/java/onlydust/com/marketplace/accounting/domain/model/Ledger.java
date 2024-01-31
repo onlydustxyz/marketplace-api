@@ -53,15 +53,19 @@ public class Ledger {
                 .reduce(Amount.ZERO, Amount::add));
     }
 
-    public void credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
-        transactions.add(new Transaction(amount, network, lockedUntil));
+    public Transaction credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
+        final var transaction = new Transaction(Transaction.Id.random(), amount, network, lockedUntil);
+        transactions.add(transaction);
+        return transaction;
     }
 
-    public void debit(PositiveAmount amount, Network network) {
+    public Transaction debit(PositiveAmount amount, Network network) {
         if (unlockedBalance(network).isStrictlyLowerThan(amount))
             throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
 
-        transactions.add(new Transaction(amount.negate(), network, null));
+        final var transaction = new Transaction(Transaction.Id.random(), amount.negate(), network, null);
+        transactions.add(transaction);
+        return transaction;
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -77,6 +81,18 @@ public class Ledger {
         }
     }
 
-    public record Transaction(@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
+    public record Transaction(@NonNull Transaction.Id id,@NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
+        @NoArgsConstructor(staticName = "random")
+        @EqualsAndHashCode(callSuper = true)
+        @SuperBuilder
+        public static class Id extends UuidWrapper {
+            public static Transaction.Id of(@NonNull final UUID uuid) {
+                return Transaction.Id.builder().uuid(uuid).build();
+            }
+
+            public static Transaction.Id of(@NonNull final String uuid) {
+                return Transaction.Id.of(UUID.fromString(uuid));
+            }
+        }
     }
 }
