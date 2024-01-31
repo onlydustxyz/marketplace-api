@@ -4,7 +4,6 @@ import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
