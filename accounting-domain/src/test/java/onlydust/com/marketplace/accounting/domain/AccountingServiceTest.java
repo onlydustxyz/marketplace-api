@@ -345,10 +345,28 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, contributorId1, PositiveAmount.of(10L), currency.id());
 
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId1, PositiveAmount.of(10L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId1, PositiveAmount.of(10L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
+        }
+
+        /*
+         * Given a sponsor with a ledger
+         * When I fund money from a project without minting the corresponding amount
+         * Then I can withdraw this money
+         */
+        @Test
+        void should_fund_and_withdraw() {
+            // When
+            accountingService.fund(sponsorId, PositiveAmount.of(10L), currency.id(), network);
+            // Then
+            assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.of(10L));
+
+            // When
+            accountingService.withdraw(sponsorId, PositiveAmount.of(10L), currency.id(), network);
+            // Then
+            assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -382,7 +400,7 @@ public class AccountingServiceTest {
 
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(25L), currency.id());
 
-            accountingService.withdraw(contributorId2, PositiveAmount.of(45L), currency.id(), network);
+            accountingService.pay(contributorId2, PositiveAmount.of(45L), currency.id(), network);
 
             // Then
             final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
@@ -418,7 +436,7 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorId, PositiveAmount.of(30L), currency.id(), network);
             accountingService.fund(sponsorId, PositiveAmount.of(40L), currency.id(), network);
 
-            accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), network);
+            accountingService.pay(contributorId2, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -445,9 +463,9 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(80L), currency.id());
 
-            accountingService.withdraw(contributorId2, PositiveAmount.of(40L), currency.id(), network);
+            accountingService.pay(contributorId2, PositiveAmount.of(40L), currency.id(), network);
 
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(40L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId2, PositiveAmount.of(40L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -467,7 +485,7 @@ public class AccountingServiceTest {
             // When
             accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
 
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId2, PositiveAmount.of(100L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -487,7 +505,7 @@ public class AccountingServiceTest {
 
             // When
             accountingService.fund(sponsorId, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().minusDays(1));
-            accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), network);
+            accountingService.pay(contributorId2, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
             assertThat(contributorLedger2.unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
@@ -507,7 +525,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, contributorId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId2, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM))
+            assertThatThrownBy(() -> accountingService.pay(contributorId2, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Not enough fund on ledger %s on network OPTIMISM".formatted(sponsorLedger.id()));
@@ -551,7 +569,7 @@ public class AccountingServiceTest {
             // When
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -577,10 +595,10 @@ public class AccountingServiceTest {
             // When
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
-            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network);
+            accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -607,7 +625,7 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
 
             // When
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -634,10 +652,10 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
 
             // When
-            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network);
+            accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network);
 
             // Then
-            assertThatThrownBy(() -> accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), network))
+            assertThatThrownBy(() -> accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), network))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Not enough fund");
@@ -665,8 +683,8 @@ public class AccountingServiceTest {
             assertThat(ledgerStorage.get(sponsorLedger2.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.of(100L));
 
             // When
-            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
-            accountingService.withdraw(contributorId, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
+            accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
+            accountingService.pay(contributorId, PositiveAmount.of(100L), currency.id(), Network.OPTIMISM);
 
             // Then
             assertThat(ledgerStorage.get(sponsorLedger1.id()).orElseThrow().unlockedBalance(Network.ETHEREUM)).isEqualTo(PositiveAmount.ZERO);

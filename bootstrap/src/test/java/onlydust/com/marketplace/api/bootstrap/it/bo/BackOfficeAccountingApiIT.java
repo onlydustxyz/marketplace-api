@@ -129,5 +129,23 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SPONSOR_FUNDS.formatted(COCA_COLAX)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "type": "DEBIT",
+                            "amount": 60,
+                            "currencyId": "%s"
+                        }
+                        """.formatted(currency))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
     }
 }

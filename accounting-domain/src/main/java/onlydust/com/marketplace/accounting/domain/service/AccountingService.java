@@ -35,19 +35,31 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public <To> void withdraw(To to, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        burn(to, amount, currencyId).forEach(transaction -> {
+    public void pay(ContributorId from, PositiveAmount amount, Currency.Id currencyId, Network network) {
+        burn(from, amount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            ledger.debit(transaction.amount(), network);
-            ledgerStorage.save(ledger);
+            withdraw(ledger, transaction.amount(), network);
         });
     }
 
     @Override
-    public <From> void mint(From from, PositiveAmount amount, Currency.Id currencyId) {
+    public void withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
+        final var currency = getCurrency(currencyId);
+        final var ledger = getLedger(sponsorId, currency);
+
+        withdraw(ledger, amount, network);
+    }
+
+    private void withdraw(Ledger ledger, PositiveAmount amount, Network network) {
+        ledger.debit(amount, network);
+        ledgerStorage.save(ledger);
+    }
+
+    @Override
+    public <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var ledger = getOrCreateLedger(from, currency);
+        final var ledger = getOrCreateLedger(to, currency);
 
         accountBook.mint(ledger.id(), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
