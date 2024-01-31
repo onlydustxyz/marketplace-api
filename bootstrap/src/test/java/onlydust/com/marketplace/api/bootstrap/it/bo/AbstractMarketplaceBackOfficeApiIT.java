@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.recording.RecordingStatus;
@@ -92,6 +93,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_SPONSOR_TRANSACTIONS = "/bo/v1/sponsors/%s/transactions";
     protected static final String POST_PROJECT_ALLOCATIONS = "/bo/v1/projects/%s/allocations";
     protected static final String POST_PROJECT_REFUNDS = "/bo/v1/projects/%s/refunds";
+    protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_BUDGETS = "/bo/v1/budgets";
     protected static final String GET_USERS = "/bo/v1/users";
     protected static final String GET_PAYMENTS = "/bo/v1/payments";
@@ -206,4 +208,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
             });
         }
     }
+
+    protected final static Faker faker = new Faker();
 }

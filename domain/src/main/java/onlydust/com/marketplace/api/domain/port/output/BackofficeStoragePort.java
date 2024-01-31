@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 
@@ -20,4 +21,8 @@ public interface BackofficeStoragePort {
     Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
 
     Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
+
+    Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters);
+
+    Ecosystem createEcosystem(Ecosystem ecosystem);
 }

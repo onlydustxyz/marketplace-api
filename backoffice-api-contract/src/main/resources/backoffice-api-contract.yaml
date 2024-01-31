@@ -193,7 +193,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
     post:
       security:
         - apiKey: [ ]
@@ -282,7 +281,81 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+  /bo/v1/ecosystems:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Get ecosystem page
+      operationId: getEcosystemPage
+      description: |
+        Get ecosystem page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+        - in: query
+          name: ecosystemIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: simple
+      responses:
+        "200":
+          description: 'Ecosystem page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - Backoffice
+      summary: Create ecosystem
+      operationId: postEcosystem
+      description: |
+        Create ecosystem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EcosystemRequest'
+      responses:
+        "200":
+          description: 'Ecosystem page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   # Backoffice ===============================================================
   /bo/v1/repositories:
     get:
@@ -820,6 +893,70 @@ components:
           items:
             type: string
             format: uuid
+
+    EcosystemPage:
+      type: object
+      required:
+        - ecosystems
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemPageItemResponse'
+
+    EcosystemPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
+        projectIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    EcosystemRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
+
+    EcosystemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
 
     SponsorRequest:
       type: object
