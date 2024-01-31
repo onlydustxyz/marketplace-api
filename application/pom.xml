@@ -16,6 +16,7 @@
     <modules>
         <module>rest-api-adapter</module>
         <module>cron-adapter</module>
+        <module>sumsub-webhook-adapter</module>
     </modules>
 
     <properties>
