@@ -15,7 +15,7 @@ servers:
 
 paths:
   # BackofficeAccountingManagement ===============================================================
-  /bo/v1/sponsors/{sponsorId}/transactions:
+  /bo/v1/sponsors/{sponsorId}/accounting/transactions:
     post:
       security:
         - apiKey: [ ]
@@ -24,7 +24,7 @@ paths:
       summary: Register a credit or debit transaction on the given sponsor's account
       operationId: registerTransactionForSponsor
       description: |
-        Register a credit or debit transaction on the given sponsor's account
+        Register a real-world credit or debit transaction on the given sponsor's account.
         This increases/decreases the available budget to actually pay contributors.
         For credits, the funds will only be available after the optional lockedUntil date.
       parameters:
@@ -41,21 +41,57 @@ paths:
             schema:
               $ref: '#/components/schemas/TransactionRequest'
       responses:
-        "204":
+        "200":
           description: 'The transaction has been registered'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/funds:
+  /bo/v1/sponsors/{sponsorId}/accounting/transactions/{transactionId}:
+    delete:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Delete a credit or debit transaction on the given sponsor's account
+      operationId: deleteTransactionForSponsor
+      description: |
+        Delete a real-world credit or debit transaction on the given sponsor's account.
+        This allows to cancel a transaction that has been registered by mistake.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: path
+          name: transactionId
+          required: true
+          schema:
+            $ref: '#/components/schemas/TransactionId'
+      responses:
+        "204":
+          description: 'The transaction has been deleted'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsors/{sponsorId}/budgets/allocate:
     post:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
       summary: Increase the sponsor's funds
-      operationId: fundsSponsor
+      operationId: allocateBudgetToSponsor
       description: |
         Increase the sponsor's funds. 
         This enable internal transactions between sponsors, projects and contributors.
@@ -73,16 +109,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FundsRequest'
+              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
       responses:
         "204":
-          description: 'The transaction has been registered'
+          description: 'The funds have been allocated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/allocations:
+
+  /bo/v1/sponsors/{sponsorId}/budgets/unallocate:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Decrease the sponsor's funds
+      operationId: unallocateBudgetFromSponsor
+      description: |
+        Decrease the sponsor's funds.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Transaction to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
+      responses:
+        "204":
+          description: 'The funds have been unallocated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/projects/{projectId}/budgets/allocate:
     post:
       security:
         - apiKey: [ ]
@@ -103,23 +171,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BudgetAllocationRequest'
+              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
       responses:
         "204":
-          description: 'The budget has been allocated'
+          description: 'The funds have been allocated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/refunds:
+  /bo/v1/projects/{projectId}/budgets/unallocate:
     post:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Refund a sponsor
-      operationId: refundSponsorFromProject
+      summary: Refund a sponsor by unallocating funds from a project
+      operationId: unallocateBudgetFromProject
       description: Refund a sponsor
       parameters:
         - in: path
@@ -128,15 +196,15 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
       requestBody:
-        description: Budget to refund
+        description: Budget to unallocate
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BudgetAllocationRequest'
+              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
       responses:
         "204":
-          description: 'The sponsor has been refunded'
+          description: 'The funds have been unallocated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -970,25 +1038,6 @@ components:
           type: string
           format: uri
 
-    FundsRequest:
-      type: object
-      required:
-        - type
-        - amount
-        - currencyId
-      properties:
-        type:
-          $ref: '#/components/schemas/TransactionType'
-        amount:
-          type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
-        lockedUntil:
-          type: string
-          format: date-time
-        receipt:
-          $ref: '#/components/schemas/TransactionReceipt'
-
     TransactionRequest:
       type: object
       required:
@@ -1008,6 +1057,14 @@ components:
           format: date-time
         receipt:
           $ref: '#/components/schemas/TransactionReceipt'
+
+    TransactionResponse:
+      type: object
+      required:
+        - transactionId
+      properties:
+        transactionId:
+          $ref: '#/components/schemas/TransactionId'
 
     TransactionType:
       type: string
@@ -1047,7 +1104,18 @@ components:
       type: string
       format: uuid
 
-    BudgetAllocationRequest:
+    SponsorBudgetAllocationRequest:
+      type: object
+      required:
+        - amount
+        - currencyId
+      properties:
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
+    ProjectBudgetAllocationRequest:
       type: object
       required:
         - sponsorId

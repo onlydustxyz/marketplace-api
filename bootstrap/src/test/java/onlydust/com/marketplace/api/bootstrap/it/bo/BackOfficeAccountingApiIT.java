@@ -51,7 +51,23 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {
         // When
         client.post()
-                .uri(getApiURI(POST_SPONSOR_FUNDS.formatted(COCA_COLAX)))
+                .uri(getApiURI(POST_SPONSORS_BUDGETS_ALLOCATE.formatted(COCA_COLAX)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "amount": 100,
+                            "currencyId": "%s"
+                        }
+                        """.formatted(currency))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -70,11 +86,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 // Then
                 .exchange()
                 .expectStatus()
-                .isNoContent();
+                .isOk();
 
         // When
         client.post()
-                .uri(getApiURI(POST_PROJECT_ALLOCATIONS.formatted(BRETZEL)))
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(BRETZEL)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -92,7 +108,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // When
         client.post()
-                .uri(getApiURI(POST_PROJECT_REFUNDS.formatted(BRETZEL)))
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_UNALLOCATE.formatted(BRETZEL)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -109,7 +125,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // When
         client.post()
-                .uri(getApiURI(POST_SPONSOR_TRANSACTIONS.formatted(COCA_COLAX)))
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -128,17 +144,16 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 // Then
                 .exchange()
                 .expectStatus()
-                .isNoContent();
+                .isOk();
 
 
         // When
         client.post()
-                .uri(getApiURI(POST_SPONSOR_FUNDS.formatted(COCA_COLAX)))
+                .uri(getApiURI(POST_SPONSORS_BUDGETS_UNALLOCATE.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "type": "DEBIT",
                             "amount": 60,
                             "currencyId": "%s"
                         }
