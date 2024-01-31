@@ -89,10 +89,12 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     protected static final String GET_GITHUB_REPOS = "/bo/v1/repositories";
     protected static final String GET_SPONSORS = "/bo/v1/sponsors";
-    protected static final String POST_SPONSOR_FUNDS = "/bo/v1/sponsors/%s/funds";
-    protected static final String POST_SPONSOR_TRANSACTIONS = "/bo/v1/sponsors/%s/transactions";
-    protected static final String POST_PROJECT_ALLOCATIONS = "/bo/v1/projects/%s/allocations";
-    protected static final String POST_PROJECT_REFUNDS = "/bo/v1/projects/%s/refunds";
+    protected static final String POST_SPONSORS_BUDGETS_ALLOCATE = "/bo/v1/sponsors/%s/budgets/allocate";
+    protected static final String POST_SPONSORS_BUDGETS_UNALLOCATE = "/bo/v1/sponsors/%s/budgets/unallocate";
+    protected static final String POST_SPONSORS_ACCOUNTING_TRANSACTIONS = "/bo/v1/sponsors/%s/accounting/transactions";
+    protected static final String DELETE_SPONSORS_ACCOUNTING_TRANSACTIONS = "/bo/v1/sponsors/%s/accounting/transactions/%s";
+    protected static final String POST_PROJECTS_BUDGETS_ALLOCATE = "/bo/v1/projects/%s/budgets/allocate";
+    protected static final String POST_PROJECTS_BUDGETS_UNALLOCATE = "/bo/v1/projects/%s/budgets/unallocate";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_BUDGETS = "/bo/v1/budgets";
     protected static final String GET_USERS = "/bo/v1/users";

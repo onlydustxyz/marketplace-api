@@ -264,61 +264,71 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.currencies[*].id").isNotEmpty()
                 .json("""
                         {
-                           "currencies": [
-                             {
-                               "type": "CRYPTO",
-                               "standard": null,
-                               "tokens": [],
-                               "name": "Ethereum",
-                               "code": "ETH",
-                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
-                               "decimals": 18,
-                               "description": "Ethereum (ETH) is a cryptocurrency"
-                             },
-                             {
-                               "type": "FIAT",
-                               "standard": "ISO4217",
-                               "tokens": [],
-                               "name": "Euro2",
-                               "code": "EUR",
-                               "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
-                               "decimals": 3,
-                               "description": "Euro is the official currency of the European Union"
-                             },
-                             {
-                               "type": "CRYPTO",
-                               "standard": "ERC20",
-                               "tokens": [
-                                 {
-                                   "blockchain": "ETHEREUM",
-                                   "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                                   "decimals": 6,
-                                   "symbol": "USDC",
-                                   "name": "USD Coin"
-                                 },
-                                 {
-                                   "blockchain": "OPTIMISM",
-                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                                   "decimals": 6,
-                                   "symbol": "USDC",
-                                   "name": "USD Coin"
-                                 },
-                                 {
-                                   "blockchain": "STARKNET",
-                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                                   "decimals": 6,
-                                   "symbol": "USDC",
-                                   "name": "USD Coin"
-                                 }
-                               ],
-                               "name": "USD Coin",
-                               "code": "USDC",
-                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                               "decimals": 6,
-                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
-                             }
-                           ]
-                         }
+                          "currencies": [
+                            {
+                              "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "type": "CRYPTO",
+                              "standard": null,
+                              "tokens": [],
+                              "name": "Bitcoin",
+                              "code": "BTC",
+                              "decimals": 8
+                            },
+                            {
+                              "type": "CRYPTO",
+                              "standard": null,
+                              "tokens": [],
+                              "name": "Ethereum",
+                              "code": "ETH",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
+                              "decimals": 18,
+                              "description": "Ethereum (ETH) is a cryptocurrency"
+                            },
+                            {
+                              "type": "FIAT",
+                              "standard": "ISO4217",
+                              "tokens": [],
+                              "name": "Euro2",
+                              "code": "EUR",
+                              "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
+                              "decimals": 3,
+                              "description": "Euro is the official currency of the European Union"
+                            },
+                            {
+                              "type": "CRYPTO",
+                              "standard": "ERC20",
+                              "tokens": [
+                                {
+                                  "blockchain": "ETHEREUM",
+                                  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                },
+                                {
+                                  "blockchain": "STARKNET",
+                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                },
+                                {
+                                  "blockchain": "OPTIMISM",
+                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                }
+                              ],
+                              "name": "USD Coin",
+                              "code": "USDC",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6,
+                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
+                            }
+                          ]
+                        }
+                                                
                         """)
         ;
     }

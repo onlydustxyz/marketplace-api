@@ -75,4 +75,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000036_add_ecosystems.sql
   - include:
       file: db/changelog/changelogs/00000037_create_accounting_schema.sql
-
+  - include:
+      file: db/changelog/changelogs/00000038_add_transaction_id.sql

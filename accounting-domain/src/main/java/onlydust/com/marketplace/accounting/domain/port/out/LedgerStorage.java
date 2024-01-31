@@ -8,4 +8,6 @@ public interface LedgerStorage {
     Optional<Ledger> get(Ledger.Id id);
 
     void save(Ledger... ledgers);
+
+    void delete(Ledger.Transaction.Id transactionId);
 }

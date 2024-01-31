@@ -29,4 +29,9 @@ public class LedgerStorageStub<OwnerId> implements LedgerStorage, LedgerProvider
     public Optional<Ledger> get(OwnerId ownerId, Currency currency) {
         return ledgers.stream().filter(l -> l.ownerId().equals(ownerId) && l.currency().equals(currency)).findFirst().map(Ledger::of);
     }
+
+    @Override
+    public void delete(Ledger.Transaction.Id transactionId) {
+        ledgers.forEach(l -> l.getTransactions().removeIf(t -> t.id().equals(transactionId)));
+    }
 }

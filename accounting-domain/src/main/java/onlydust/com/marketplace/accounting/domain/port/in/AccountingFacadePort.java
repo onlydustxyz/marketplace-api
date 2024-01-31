@@ -7,11 +7,13 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 
 public interface AccountingFacadePort {
-    void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil);
+    Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil);
 
-    void withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network);
+    Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network);
 
     void pay(ContributorId from, PositiveAmount amount, Currency.Id currencyId, Network network);
+
+    void delete(Ledger.Transaction.Id transactionId);
 
     <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId);
 
