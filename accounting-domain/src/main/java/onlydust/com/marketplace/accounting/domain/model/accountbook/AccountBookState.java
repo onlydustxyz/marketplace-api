@@ -13,6 +13,7 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
     public static final Ledger.Id ROOT = Ledger.Id.of(UUID.fromString("10000000-0000-0000-0000-000000000000"));
@@ -96,6 +97,15 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
         startVertices.forEach(startVertex -> aggregateIncomingTransactions(startVertex, aggregatedAmounts));
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
+    }
+
+    public @NonNull Map<Ledger.Id, PositiveAmount> transferredAmountPerOrigin(@NonNull Ledger.Id to) {
+        return accountVertices(to).stream()
+                .map(v -> new Transaction(source(v).accountId(), to, balanceOf(v)))
+                .collect(Collectors.groupingBy(Transaction::from,
+                        Collectors.mapping(Transaction::amount,
+                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                ));
     }
 
     private void aggregateOutgoingTransactions(Vertex startVertex, Map<FromTo, PositiveAmount> aggregatedAmounts) {
@@ -217,8 +227,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             accountVertices.put(to, new ArrayList<>(List.of(toVertex)));
         }
 
-        final var transaction = new Edge(amount, graph.outgoingEdgesOf(from).size());
-        graph.addEdge(from, toVertex, transaction);
+        final var edge = new Edge(amount, graph.outgoingEdgesOf(from).size());
+        graph.addEdge(from, toVertex, edge);
 
         return new Transaction(source(from).accountId(), to, amount);
     }

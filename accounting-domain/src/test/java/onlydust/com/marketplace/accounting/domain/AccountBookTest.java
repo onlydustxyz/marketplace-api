@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -527,5 +528,38 @@ public class AccountBookTest {
         );
 
         assertThat(accountBook.pendingEvents()).isEmpty();
+    }
+
+
+    @Test
+    public void should_get_the_list_of_origin_accounts_that_sent_money_to_me_with_the_corresponding_amount() {
+        // Given
+        final var account0 = Ledger.Id.random();
+        final var account1 = Ledger.Id.random();
+        final var account2 = Ledger.Id.random();
+        final var account3 = Ledger.Id.random();
+
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(account0, PositiveAmount.of(100L)),
+                new MintEvent(account1, PositiveAmount.of(100L)),
+
+                new TransferEvent(account0, account2, PositiveAmount.of(30L)),
+                new RefundEvent(account2, account0, PositiveAmount.of(5L)),
+                new TransferEvent(account2, account3, PositiveAmount.of(20L)),
+
+                new TransferEvent(account1, account3, PositiveAmount.of(15L)),
+
+                new TransferEvent(account0, account2, PositiveAmount.of(50L)),
+                new TransferEvent(account2, account3, PositiveAmount.of(10L))
+        );
+
+        // When
+        final var amounts = accountBook.state().transferredAmountPerOrigin(account3);
+
+        // Then
+        assertThat(amounts).containsOnly(
+                Map.entry(account0, PositiveAmount.of(30L)),
+                Map.entry(account1, PositiveAmount.of(15L))
+        );
     }
 }

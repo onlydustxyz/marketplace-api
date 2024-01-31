@@ -14,6 +14,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
+import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
+
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
@@ -36,24 +38,32 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void pay(RewardId from, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        burn(from, amount, currencyId).forEach(transaction -> {
+    public void pay(RewardId rewardId, Currency.Id currencyId, Network network) {
+        final var currency = getCurrency(currencyId);
+        final var rewardLedger = getLedger(rewardId, currency);
+        final var accountBook = getAccountBook(currency);
+        final var rewardAmount = accountBook.state().balanceOf(rewardLedger.id());
+
+        burn(rewardId, rewardAmount, currencyId).forEach(transaction -> {
             final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            withdraw(ledger, transaction.amount(), network);
+            withdraw(ledger, min(transaction.amount(), ledger.unlockedBalance(network)), network);
         });
     }
 
-//    public void pay(RewardId rewardId, Currency.Id currencyId, Network network) {
-//        final var currency = getCurrency(currencyId);
-//        final var rewardLedger = getLedger(rewardId, currency);
-//        final var accountBook = getAccountBook(currency);
-//        final var rewardAmount =  accountBook.state().balanceOf(rewardLedger.id());
-//
-//        burn(rewardLedger, rewardAmount, currencyId).forEach(transaction -> {
-//            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-//            withdraw(ledger, transaction.amount(), network);
-//        });
-//    }
+    @Override
+    public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var rewardLedger = getLedger(rewardId, currency);
+        final var accountBook = getAccountBook(currency);
+
+        return accountBook.state().transferredAmountPerOrigin(rewardLedger.id())
+                .entrySet()
+                .stream()
+                .noneMatch(entry -> {
+                    final var sponsorLedger = ledgerStorage.get(entry.getKey()).orElseThrow();
+                    return sponsorLedger.unlockedBalance().isStrictlyLowerThan(entry.getValue());
+                });
+    }
 
     @Override
     public Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {

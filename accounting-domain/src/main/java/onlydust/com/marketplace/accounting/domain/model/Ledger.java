@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
@@ -45,12 +46,23 @@ public class Ledger {
         return this.currency;
     }
 
+    public PositiveAmount unlockedBalance() {
+        return PositiveAmount.of(transactions.stream()
+                .filter(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
+                .map(Transaction::amount)
+                .reduce(Amount.ZERO, Amount::add));
+    }
+
     public PositiveAmount unlockedBalance(final @NonNull Network network) {
         return PositiveAmount.of(transactions.stream()
                 .filter(transaction -> transaction.network.equals(network))
                 .filter(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
+    }
+
+    public PositiveAmount payableAmount(final @NonNull PositiveAmount amount, final @NonNull Network network) {
+        return min(amount, unlockedBalance(network));
     }
 
     public Transaction credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {

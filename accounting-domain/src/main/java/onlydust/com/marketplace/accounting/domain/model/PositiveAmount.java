@@ -38,4 +38,8 @@ public class PositiveAmount extends Amount {
     public @NonNull PositiveAmount add(@NonNull PositiveAmount amount) {
         return new PositiveAmount(value.add(amount.value));
     }
+
+    public static @NonNull PositiveAmount min(PositiveAmount amount1, PositiveAmount amount2) {
+        return amount1.isStrictlyLowerThan(amount2) ? amount1 : amount2;
+    }
 }

@@ -11,7 +11,9 @@ public interface AccountingFacadePort {
 
     Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network);
 
-    void pay(RewardId from, PositiveAmount amount, Currency.Id currencyId, Network network);
+    void pay(RewardId from, Currency.Id currencyId, Network network);
+
+    boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
     void delete(Ledger.Transaction.Id transactionId);
 
