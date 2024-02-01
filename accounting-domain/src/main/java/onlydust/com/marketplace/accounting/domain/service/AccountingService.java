@@ -14,8 +14,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 
-import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
-
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
@@ -42,11 +40,12 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var rewardLedger = getLedger(rewardId, currency);
         final var accountBook = getAccountBook(currency);
-        final var rewardAmount = accountBook.state().balanceOf(rewardLedger.id());
 
-        burn(rewardId, rewardAmount, currencyId).forEach(transaction -> {
-            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            withdraw(ledger, min(transaction.amount(), ledger.unlockedBalance(network)), network);
+        accountBook.state().transferredAmountPerOrigin(rewardLedger.id()).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
+            final var sponsorLedger = ledgerStorage.get(sponsorLedgerId).orElseThrow();
+            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, network);
+            burn(rewardId, payableAmount, currencyId);
+            withdraw(sponsorLedger, payableAmount, network);
         });
     }
 
