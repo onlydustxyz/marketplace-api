@@ -15,18 +15,20 @@ servers:
 
 paths:
   # BackofficeAccountingManagement ===============================================================
-  /bo/v1/sponsors/{sponsorId}/accounting/transactions:
+
+  /bo/v1/sponsors/{sponsorId}/wallets:
     post:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Register a credit or debit transaction on the given sponsor's account
-      operationId: registerTransactionForSponsor
+      summary: Create a new wallet for the given sponsor
+      operationId: createWallet
       description: |
-        Register a real-world credit or debit transaction on the given sponsor's account.
-        This increases/decreases the available budget to actually pay contributors.
-        For credits, the funds will only be available after the optional lockedUntil date.
+        Create a new wallet for the given sponsor.
+        This enables internal transactions between the sponsor, projects and contributors. (mint)
+        If the receipt is provided, the funds will be available to pay contributors right away.
+        Otherwise, the funds will only be available to pay contributors once the incoming transaction receipt has been registered.
       parameters:
         - in: path
           name: sponsorId
@@ -34,117 +36,128 @@ paths:
           schema:
             $ref: '#/components/schemas/SponsorId'
       requestBody:
-        description: Transaction to register
+        description: Wallet
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionRequest'
+              $ref: '#/components/schemas/CreateWalletRequest'
       responses:
         "200":
-          description: 'The transaction has been registered'
+          description: 'The wallet has been created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                $ref: '#/components/schemas/WalletResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/accounting/transactions/{transactionId}:
-    delete:
-      security:
-        - apiKey: [ ]
-      tags:
-        - BackofficeAccountingManagement
-      summary: Delete a credit or debit transaction on the given sponsor's account
-      operationId: deleteTransactionForSponsor
-      description: |
-        Delete a real-world credit or debit transaction on the given sponsor's account.
-        This allows to cancel a transaction that has been registered by mistake.
-      parameters:
-        - in: path
-          name: sponsorId
-          required: true
-          schema:
-            $ref: '#/components/schemas/SponsorId'
-        - in: path
-          name: transactionId
-          required: true
-          schema:
-            $ref: '#/components/schemas/TransactionId'
-      responses:
-        "204":
-          description: 'The transaction has been deleted'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/budgets/allocate:
-    post:
+  /bo/v1/wallets/{walletId}/virtual-balance:
+    put:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Increase the sponsor's funds
-      operationId: allocateBudgetToSponsor
+      summary: Update the virtual balance of the given wallet.
+      operationId: updateWalletVirtualBalance
       description: |
-        Increase the sponsor's funds. 
-        This enable internal transactions between sponsors, projects and contributors.
-        The funds will only be available to pay contributors once the incoming transaction has been registered, 
-        i.e. money actually received on OnlyDust account.
+        Update the virtual balance of the given wallet.
+        This will return an error if the new virtual balance is not enough to cover the spent amounts.
       parameters:
         - in: path
-          name: sponsorId
+          name: walletId
           required: true
           schema:
-            $ref: '#/components/schemas/SponsorId'
+            $ref: '#/components/schemas/WalletId'
       requestBody:
-        description: Transaction to register
+        description: New virtual balance
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
+              $ref: '#/components/schemas/UpdateWalletVirtualBalanceRequest'
       responses:
-        "204":
-          description: 'The funds have been allocated'
+        "200":
+          description: 'The wallet virtual balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
-  /bo/v1/sponsors/{sponsorId}/budgets/unallocate:
-    post:
+  /bo/v1/wallets/{walletId}/physical-balance:
+    put:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Decrease the sponsor's funds
-      operationId: unallocateBudgetFromSponsor
+      summary: Update the physical balance of the given wallet.
+      operationId: updateWalletPhysicalBalance
       description: |
-        Decrease the sponsor's funds.
+        Update the physical balance of the given wallet.
+        This will return an error if the new physical balance is not enough to cover the spent amounts.
+        This will return an error if the receipt's network is different from the wallet's network.
       parameters:
         - in: path
-          name: sponsorId
+          name: walletId
           required: true
           schema:
-            $ref: '#/components/schemas/SponsorId'
+            $ref: '#/components/schemas/WalletId'
       requestBody:
-        description: Transaction to register
+        description: Transaction receipts to register
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
+              $ref: '#/components/schemas/UpdateWalletPhysicalBalanceRequest'
       responses:
-        "204":
-          description: 'The funds have been unallocated'
+        "200":
+          description: 'The wallet physical balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/wallets/{walletId}:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update some attributes of the wallet
+      operationId: updateWalletAttributes
+      description: |
+        Update some attributes of the wallet.
+      parameters:
+        - in: path
+          name: walletId
+          required: true
+          schema:
+            $ref: '#/components/schemas/WalletId'
+      requestBody:
+        description: Wallet attributes to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWalletRequest'
+      responses:
+        "200":
+          description: 'The wallet has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1052,6 +1065,74 @@ components:
           type: string
           format: uri
 
+    CreateWalletRequest:
+      type: object
+      required:
+        - currencyId
+        - virtualBalance
+      properties:
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        virtualBalance:
+          type: number
+        lockedUntil:
+          type: string
+          format: date-time
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
+    UpdateWalletVirtualBalanceRequest:
+      type: object
+      required:
+        - virtualBalance
+      properties:
+        virtualBalance:
+          type: number
+
+    UpdateWalletPhysicalBalanceRequest:
+      type: object
+      required:
+        - receipt
+      properties:
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
+    UpdateWalletRequest:
+      type: object
+      properties:
+        lockedUntil:
+          type: string
+          format: date-time
+
+    WalletResponse:
+      type: object
+      required:
+        - walletId
+        - sponsorId
+        - currencyId
+        - physicalBalance
+        - virtualBalance
+        - receipts
+      properties:
+        walletId:
+          $ref: '#/components/schemas/WalletId'
+        sponsorId:
+          $ref: '#/components/schemas/SponsorId'
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        physicalBalance:
+          type: number
+          description: This is equal to the sum of receipts amounts
+        virtualBalance:
+          type: number
+        lockedUntil:
+          type: string
+          format: date-time
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionReceipt'
+
     TransactionRequest:
       type: object
       required:
@@ -1092,7 +1173,15 @@ components:
 
     TransactionReceipt:
       type: object
+      required:
+        - amount
+        - network
+        - reference
+        - thirdPartyName
+        - thirdPartyAccountNumber
       properties:
+        amount:
+          type: number
         network:
           $ref: '#/components/schemas/TransactionNetwork'
         reference:
@@ -1118,30 +1207,16 @@ components:
       type: string
       format: uuid
 
-    SponsorBudgetAllocationRequest:
-      type: object
-      required:
-        - amount
-        - currencyId
-      properties:
-        amount:
-          type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
-
     ProjectBudgetAllocationRequest:
       type: object
       required:
-        - sponsorId
+        - walletId
         - amount
-        - currencyId
       properties:
-        sponsorId:
-          $ref: '#/components/schemas/SponsorId'
+        walletId:
+          $ref: '#/components/schemas/WalletId'
         amount:
           type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
 
     Technologies:
       type: object
@@ -1659,6 +1734,10 @@ components:
               $ref: '#/components/schemas/ContractAddress'
 
     SponsorId:
+      type: string
+      format: uuid
+
+    WalletId:
       type: string
       format: uuid
 
