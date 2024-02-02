@@ -6,13 +6,15 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import java.time.ZonedDateTime;
 
 public interface AccountingFacadePort {
-    SponsorAccount createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
-                                        final ZonedDateTime lockedUntil);
+    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                 final @NonNull PositiveAmount amountToMint,
+                                                 final ZonedDateTime lockedUntil);
 
-    SponsorAccount createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
-                                        final ZonedDateTime lockedUntil, final @NonNull SponsorAccount.Transaction transaction);
+    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                 final @NonNull PositiveAmount amountToMint,
+                                                 final ZonedDateTime lockedUntil, final @NonNull SponsorAccount.Transaction transaction);
 
-    SponsorAccount fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
+    SponsorAccountStatement fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
 
     void pay(RewardId from, Currency.Id currencyId, SponsorAccount.Transaction transaction);
 

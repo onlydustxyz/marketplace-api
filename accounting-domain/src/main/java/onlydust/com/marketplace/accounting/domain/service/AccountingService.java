@@ -22,22 +22,22 @@ public class AccountingService implements AccountingFacadePort {
     private final CurrencyStorage currencyStorage;
 
     @Override
-    public SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
-                                               ZonedDateTime lockedUntil) {
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                                        ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
         sponsorAccountStorage.save(sponsorAccount);
 
         increaseAllowance(sponsorAccount.id(), amountToMint, currencyId);
-        return sponsorAccount;
+        return new SponsorAccountStatement(sponsorAccount, getAccountBook(currency).state());
     }
 
     @Override
-    public SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
-                                               ZonedDateTime lockedUntil,
-                                               @NonNull SponsorAccount.Transaction transaction) {
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                                        ZonedDateTime lockedUntil,
+                                                        @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, amountToMint, lockedUntil);
-        return fund(sponsorAccount.id(), transaction);
+        return fund(sponsorAccount.account().id(), transaction);
     }
 
     @Override
@@ -54,11 +54,11 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public SponsorAccount fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
+    public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = getSponsorAccount(sponsorAccountId);
         sponsorAccount.add(transaction);
         sponsorAccountStorage.save(sponsorAccount);
-        return sponsorAccount;
+        return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
     }
 
     @Override

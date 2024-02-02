@@ -131,12 +131,13 @@ public class AccountingServiceTest {
             final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amountToMint, null);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), amountToMint));
-            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(Amount.ZERO);
-            assertThat(sponsorAccount.currency()).isEqualTo(currency);
-            assertThat(sponsorAccount.ownerId()).isEqualTo(sponsorId);
-            assertThat(sponsorAccount.network()).isEmpty();
-            assertThat(sponsorAccount.lockedUntil()).isEmpty();
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amountToMint));
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
+            assertThat(sponsorAccount.account().ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.account().network()).isEmpty();
+            assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
+            assertThat(sponsorAccount.allowance()).isEqualTo(amountToMint);
         }
 
         /*
@@ -154,22 +155,23 @@ public class AccountingServiceTest {
             final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), PositiveAmount.of(amount)));
-            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(amount);
-            assertThat(sponsorAccount.currency()).isEqualTo(currency);
-            assertThat(sponsorAccount.ownerId()).isEqualTo(sponsorId);
-            assertThat(sponsorAccount.network()).contains(transaction.network());
-            assertThat(sponsorAccount.getTransactions()).containsExactly(transaction);
-            assertThat(sponsorAccount.lockedUntil()).isEmpty();
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(amount)));
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(amount);
+            assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
+            assertThat(sponsorAccount.account().ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.account().network()).contains(transaction.network());
+            assertThat(sponsorAccount.account().getTransactions()).containsExactly(transaction);
+            assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
 
-            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow();
-            assertThat(savedAccount.id()).isEqualTo(sponsorAccount.id());
-            assertThat(savedAccount.unlockedBalance()).isEqualTo(sponsorAccount.unlockedBalance());
-            assertThat(savedAccount.currency()).isEqualTo(sponsorAccount.currency());
-            assertThat(savedAccount.ownerId()).isEqualTo(sponsorAccount.ownerId());
-            assertThat(savedAccount.network()).isEqualTo(sponsorAccount.network());
-            assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.getTransactions());
-            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.lockedUntil());
+            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.account().id()).orElseThrow();
+            assertThat(savedAccount.id()).isEqualTo(sponsorAccount.account().id());
+            assertThat(savedAccount.unlockedBalance()).isEqualTo(sponsorAccount.account().unlockedBalance());
+            assertThat(savedAccount.currency()).isEqualTo(sponsorAccount.account().currency());
+            assertThat(savedAccount.ownerId()).isEqualTo(sponsorAccount.account().ownerId());
+            assertThat(savedAccount.network()).isEqualTo(sponsorAccount.account().network());
+            assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.account().getTransactions());
+            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
         }
 
         /*
@@ -188,13 +190,13 @@ public class AccountingServiceTest {
             final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amount, lockedUntil, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), amount));
-            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(sponsorAccount.lockedUntil()).contains(lockedUntil.toInstant());
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amount));
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccount.account().lockedUntil()).contains(lockedUntil.toInstant());
 
-            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow();
+            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.account().id()).orElseThrow();
             assertThat(savedAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.lockedUntil());
+            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
         }
 
         /*
@@ -232,7 +234,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
+            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
         }
 
         /*
@@ -484,7 +486,7 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
-        SponsorAccount sponsorSponsorAccount;
+        SponsorAccount sponsorAccount;
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
@@ -493,7 +495,8 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorSponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(300L), ZonedDateTime.now().plusDays(1));
+            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(300L), ZonedDateTime.now().plusDays(1))
+                    .account();
         }
 
         /*
@@ -504,16 +507,16 @@ public class AccountingServiceTest {
         @Test
         void should_register_allowance() {
             // Given
-            final var amount = PositiveAmount.of(faker.number().randomNumber());
+            final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount, currency.id());
-            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount.negate(), currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate(), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new MintEvent(AccountId.of(sponsorSponsorAccount.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorSponsorAccount.id()), amount)
+                    new MintEvent(AccountId.of(sponsorAccount.id()), amount),
+                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
             );
         }
 
@@ -528,13 +531,13 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, amount, currency.id());
-            accountingService.refund(projectId1, sponsorSponsorAccount.id(), amount, currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId1, amount, currency.id());
+            accountingService.refund(projectId1, sponsorAccount.id(), amount, currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorSponsorAccount.id()), AccountId.of(projectId1), amount),
-                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorSponsorAccount.id()), amount)
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), amount),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount)
             );
         }
 
@@ -546,7 +549,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorSponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund");
         }
@@ -559,7 +562,7 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // When
-            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -580,20 +583,20 @@ public class AccountingServiceTest {
         @Test
         void should_allow_multiple_times_funding() {
             // When
-            accountingService.transfer(sponsorSponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorSponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
             );
 
-            assertThat(sponsorAccountStorage.get(sponsorSponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -609,10 +612,10 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().randomNumber());
 
             // When
-            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, amount));
-            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount, currency.id());
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount));
+            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
 
-            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, amount, currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId1, amount, currency.id());
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -637,10 +640,10 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
-            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
+            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
+            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
             lockedSponsorSponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L),
-                    ZonedDateTime.now().plusDays(1));
+                    ZonedDateTime.now().plusDays(1)).account();
         }
 
         /*
