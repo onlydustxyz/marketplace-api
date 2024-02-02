@@ -137,10 +137,8 @@ public class AccountingService implements AccountingFacadePort {
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var fromLedger = getLedger(from, currency);
-        final var toLedger = getLedger(to, currency);
 
-        accountBook.refund(AccountId.of(fromLedger.id()), AccountId.of(toLedger.id()), amount);
+        accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 

@@ -308,47 +308,21 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor with a ledger
-         * When I allocate money to a project with no ledger
-         * Then a ledger is created for the project and the transfer is registered from my ledger to the project ledger
-         */
-        @Test
-        void should_create_account_and_register_allocation_to_project() {
-            // When
-            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
-
-            // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
-                    PositiveAmount.of(10L)));
-        }
-
-        /*
          * Given a sponsor that has allocated money to a project
          * When I refund money from the project
          * Then The refund is registered on my ledger
          */
         @Test
         void should_register_refund_from_project() {
+            // Given
+            final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 200L));
+
             // When
-            accountingService.refund(projectId1, sponsorId, PositiveAmount.of(150L), currency.id());
+            accountingService.refund(projectId1, sponsorLedger.id(), amount, currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()),
-                    PositiveAmount.of(150L)));
-        }
-
-        /*
-         * Given a sponsor with a ledger
-         * When I refund money from a project with no ledger
-         * Then The refund is rejected
-         */
-        @Test
-        void should_reject_unallocation_when_no_project_account_found() {
-            // When
-            assertThatThrownBy(() -> accountingService.refund(sponsorId, projectId1, PositiveAmount.of(10L), currency.id()))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("No ledger found for owner %s in currency %s".formatted(projectId1, currency));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()), amount));
         }
 
         /*
@@ -359,7 +333,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(sponsorId, projectId1, PositiveAmount.of(10L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorLedger.id(), PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot refund");
