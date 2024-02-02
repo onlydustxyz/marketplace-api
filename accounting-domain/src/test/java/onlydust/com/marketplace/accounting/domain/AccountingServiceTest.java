@@ -244,23 +244,17 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
-        final Ledger sponsorLedger = new Ledger(sponsorId, currency);
+        Ledger sponsorLedger;
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
-        final Ledger projectLedger2 = new Ledger(projectId2, currency);
         final RewardId rewardId1 = RewardId.random();
         final RewardId rewardId2 = RewardId.random();
-        final Ledger rewardLedger2 = new Ledger(rewardId2, currency);
 
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            ledgerStorage.save(sponsorLedger, projectLedger2, rewardLedger2);
-
-            accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(300L)),
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), PositiveAmount.of(200L))
-            ));
+            sponsorLedger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(300L), null);
+            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(200L), currency.id());
         }
 
         /*
@@ -571,7 +565,7 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId2, currency.id(), network);
 
             // Then
-            assertThat(rewardLedger2.unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorLedger.unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -628,20 +622,18 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId1 = SponsorId.random();
-        final Ledger sponsorLedger1 = new Ledger(sponsorId1, currency);
+        Ledger sponsorLedger1;
         final SponsorId sponsorId2 = SponsorId.random();
-        final Ledger sponsorLedger2 = new Ledger(sponsorId2, currency);
+        Ledger sponsorLedger2;
         final ProjectId projectId = ProjectId.random();
-        final Ledger projectLedger = new Ledger(projectId, currency);
         final RewardId rewardId = RewardId.random();
-        final Ledger rewardLedger = new Ledger(rewardId, currency);
         final RewardId rewardId2 = RewardId.random();
-        final Ledger rewardLedger2 = new Ledger(rewardId2, currency);
 
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            ledgerStorage.save(sponsorLedger1, sponsorLedger2, projectLedger, rewardLedger, rewardLedger2);
+            sponsorLedger1 = accountingService.createLedger(sponsorId1, currency.id(), PositiveAmount.ZERO, null);
+            sponsorLedger2 = accountingService.createLedger(sponsorId2, currency.id(), PositiveAmount.ZERO, null);
         }
 
         /*
