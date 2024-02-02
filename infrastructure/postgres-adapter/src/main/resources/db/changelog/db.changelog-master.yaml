@@ -77,3 +77,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000037_create_accounting_schema.sql
   - include:
       file: db/changelog/changelogs/00000038_add_transaction_id.sql
+  - include:
+      file: db/changelog/changelogs/00000039_create_user_verification_outbox_table.sql
+

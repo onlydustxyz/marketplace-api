@@ -49,6 +49,10 @@ application:
       retry:
         retry-count: 1
         retry-interval: 0
+  sumsub:
+    webhook:
+      secret: fake-sumsub-kyc-secret
+      od-api-header: fake-sumsub-od-api-header
 spring:
   main:
     allow-bean-definition-overriding: true

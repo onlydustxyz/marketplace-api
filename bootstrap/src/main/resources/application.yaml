@@ -24,7 +24,7 @@ application:
     refresh-active-user-profiles: 86400000 # 1 day
     tracking-job-delay: 60000 # 1 minute
   sumsub:
-    kyc:
+    webhook:
       secret: ${SUMSUB_KYC_WEBHOOK_SECRET}
       od-api-header: ${SUMSUB_KYC_WEBHOOK_HEADER}
 
