@@ -156,7 +156,7 @@ public class AccountingServiceTest {
         void should_create_ledger_and_funds_it() {
             // Given
             final var amount = PositiveAmount.of(10L);
-            final var transaction = Transaction.create(amount, Network.ETHEREUM);
+            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
 
             // When
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, transaction);
@@ -167,6 +167,7 @@ public class AccountingServiceTest {
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
             assertThat(ledger.network()).contains(transaction.network());
+            assertThat(ledger.getTransactions()).containsExactly(transaction);
 
             final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
             assertThat(savedLedger.id()).isEqualTo(ledger.id());
@@ -174,6 +175,7 @@ public class AccountingServiceTest {
             assertThat(savedLedger.currency()).isEqualTo(ledger.currency());
             assertThat(savedLedger.ownerId()).isEqualTo(ledger.ownerId());
             assertThat(savedLedger.network()).isEqualTo(ledger.network());
+            assertThat(savedLedger.getTransactions()).isEqualTo(ledger.getTransactions());
         }
 
         /*

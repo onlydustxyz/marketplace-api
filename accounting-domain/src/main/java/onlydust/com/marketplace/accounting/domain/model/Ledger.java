@@ -68,7 +68,7 @@ public class Ledger {
     }
 
     public Transaction credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
-        final var transaction = new Transaction(Transaction.Id.random(), amount, network, lockedUntil);
+        final var transaction = Transaction.create(network, null, amount, lockedUntil, null, null);
         transactions.add(transaction);
         return transaction;
     }
@@ -77,7 +77,7 @@ public class Ledger {
         if (unlockedBalance(network).isStrictlyLowerThan(amount))
             throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
 
-        final var transaction = new Transaction(Transaction.Id.random(), amount.negate(), network, null);
+        final var transaction = Transaction.create(network, null, amount.negate(), null, null, null);
         transactions.add(transaction);
         return transaction;
     }
@@ -103,13 +103,34 @@ public class Ledger {
         }
     }
 
-    public record Transaction(@NonNull Transaction.Id id, @NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
-        public static Transaction create(final @NonNull Amount amount, final @NonNull Network network) {
-            return new Transaction(Id.random(), amount, network, null);
+    public record Transaction(
+            @NonNull Transaction.Id id,
+            @NonNull Network network,
+            @NonNull String reference,
+            @NonNull Amount amount,
+            ZonedDateTime lockedUntil,
+            @NonNull String thirdPartyName,
+            @NonNull String thirdPartyAccountNumber
+    ) {
+        public static Transaction create(
+                final @NonNull Network network,
+                final @NonNull String reference,
+                final @NonNull Amount amount,
+                final @NonNull String thirdPartyName,
+                final @NonNull String thirdPartyAccountNumber
+        ) {
+            return new Transaction(Id.random(), network, reference, amount, null, thirdPartyName, thirdPartyAccountNumber);
         }
 
-        public static Transaction create(final @NonNull Amount amount, final @NonNull Network network, final @NonNull ZonedDateTime lockedUntil) {
-            return new Transaction(Id.random(), amount, network, lockedUntil);
+        public static Transaction create(
+                final @NonNull Network network,
+                final @NonNull String reference,
+                final @NonNull Amount amount,
+                final @NonNull ZonedDateTime lockedUntil,
+                final @NonNull String thirdPartyName,
+                final @NonNull String thirdPartyAccountNumber
+        ) {
+            return new Transaction(Id.random(), network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
         }
 
         @NoArgsConstructor(staticName = "random")
