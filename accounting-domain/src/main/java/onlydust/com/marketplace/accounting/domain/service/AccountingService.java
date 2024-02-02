@@ -65,7 +65,7 @@ public class AccountingService implements AccountingFacadePort {
 
         accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
             final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
-            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, transaction.network());
+            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor);
             accountBook.burn(AccountId.of(rewardId), payableAmount);
             sponsorLedger.add(transaction.withAmount(payableAmount.negate()));
             ledgerStorage.save(sponsorLedger);

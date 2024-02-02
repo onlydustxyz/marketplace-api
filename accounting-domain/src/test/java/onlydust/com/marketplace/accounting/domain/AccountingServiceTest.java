@@ -333,7 +333,7 @@ public class AccountingServiceTest {
                 // When
                 accountingService.fund(sponsorLedger.id(), transaction);
                 // Then
-                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(amount);
+                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
             }
 
             {
@@ -342,7 +342,7 @@ public class AccountingServiceTest {
                 // When
                 accountingService.fund(sponsorLedger.id(), transaction);
                 // Then
-                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
             }
         }
 
@@ -424,7 +424,7 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
 
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -599,7 +599,7 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
 
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -755,7 +755,7 @@ public class AccountingServiceTest {
                 accountingService.fund(unlockedSponsorLedger2.id(), optimismTransaction);
             }
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.of(200L));
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.of(100L));
+            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.of(100L));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
@@ -768,9 +768,9 @@ public class AccountingServiceTest {
             }
 
             // Then
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance(Network.ETHEREUM)).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
     }
 }

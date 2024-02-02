@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -61,33 +60,14 @@ public class Ledger {
         return locked() ? PositiveAmount.ZERO : balance();
     }
 
-    public PositiveAmount unlockedBalance(final @NonNull Network network) {
-        return unlockedBalance();
-    }
-
     public PositiveAmount balance() {
         return PositiveAmount.of(transactions.stream()
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
     }
 
-    public PositiveAmount payableAmount(final @NonNull PositiveAmount amount, final @NonNull Network network) {
-        return min(amount, unlockedBalance(network));
-    }
-
-    public Transaction credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
-        final var transaction = Transaction.create(network, "null", amount, lockedUntil, "null", "null");
-        transactions.add(transaction);
-        return transaction;
-    }
-
-    public Transaction debit(PositiveAmount amount, Network network) {
-        if (unlockedBalance(network).isStrictlyLowerThan(amount))
-            throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
-
-        final var transaction = Transaction.create(network, "null", amount.negate(), "null", "null");
-        transactions.add(transaction);
-        return transaction;
+    public PositiveAmount payableAmount(final @NonNull PositiveAmount amount) {
+        return min(amount, unlockedBalance());
     }
 
     public Optional<Network> network() {
