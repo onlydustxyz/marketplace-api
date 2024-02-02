@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
 import javax.persistence.*;
@@ -49,27 +49,27 @@ public class LedgerEntity {
         }
     }
 
-    public Ledger toLedger() {
-        final var ledger = new Ledger(Ledger.Id.of(id), owner(), currency.toDomain());
+    public SponsorAccount toLedger() {
+        final var ledger = new SponsorAccount(SponsorAccount.Id.of(id), owner(), currency.toDomain());
         ledger.getTransactions().addAll(transactions.stream().map(LedgerTransactionEntity::toTransaction).toList());
         return ledger;
     }
 
-    public static LedgerEntity of(Ledger ledger) {
+    public static LedgerEntity of(SponsorAccount sponsorAccount) {
         final var entity = LedgerEntity.builder()
-                .id(ledger.id().value())
-                .currency(CurrencyEntity.of(ledger.currency()))
-                .transactions(ledger.getTransactions().stream().map(t -> LedgerTransactionEntity.of(ledger.id(), t)).toList())
+                .id(sponsorAccount.id().value())
+                .currency(CurrencyEntity.of(sponsorAccount.currency()))
+                .transactions(sponsorAccount.getTransactions().stream().map(t -> LedgerTransactionEntity.of(sponsorAccount.id(), t)).toList())
                 .build();
 
-        if (ledger.ownerId() instanceof SponsorId sponsorId) {
+        if (sponsorAccount.ownerId() instanceof SponsorId sponsorId) {
             entity.setSponsor(SponsorLedgerEntity.of(entity, sponsorId));
-        } else if (ledger.ownerId() instanceof ProjectId projectId) {
+        } else if (sponsorAccount.ownerId() instanceof ProjectId projectId) {
             entity.setProject(ProjectLedgerEntity.of(entity, projectId));
-        } else if (ledger.ownerId() instanceof RewardId rewardId) {
+        } else if (sponsorAccount.ownerId() instanceof RewardId rewardId) {
             entity.setReward(RewardLedgerEntity.of(entity, rewardId));
         } else {
-            throw new IllegalStateException("Ledger must have an owner (%s)".formatted(ledger.ownerId().getClass()));
+            throw new IllegalStateException("Ledger must have an owner (%s)".formatted(sponsorAccount.ownerId().getClass()));
         }
 
         return entity;

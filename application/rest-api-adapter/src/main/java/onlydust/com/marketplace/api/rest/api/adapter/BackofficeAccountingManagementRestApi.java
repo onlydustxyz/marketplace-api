@@ -86,7 +86,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<Void> deleteTransactionForSponsor(UUID sponsorId, UUID transactionId) {
-        accountingFacadePort.deleteTransaction(Ledger.Transaction.Id.of(transactionId));
+        accountingFacadePort.deleteTransaction(SponsorAccount.Transaction.Id.of(transactionId));
         return ResponseEntity.noContent().build();
     }
 }

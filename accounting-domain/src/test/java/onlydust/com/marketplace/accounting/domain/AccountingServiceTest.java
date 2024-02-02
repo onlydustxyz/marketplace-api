@@ -2,7 +2,7 @@ package onlydust.com.marketplace.accounting.domain;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.Ledger.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.stubs.LedgerStorageStub;
+import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.when;
 
 public class AccountingServiceTest {
     final AccountBookEventStorageStub accountBookEventStorage = new AccountBookEventStorageStub();
-    final LedgerStorageStub ledgerStorage = new LedgerStorageStub();
+    final SponsorAccountStorageStub sponsorAccountStorage = new SponsorAccountStorageStub();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerStorage, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage);
     final Faker faker = new Faker();
 
     @Nested
@@ -45,14 +45,14 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I transfer money to OnlyDust in an unknown currency
          * Then The transfer is rejected
          */
         @Test
         void should_reject_transfer() {
             // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(SponsorAccount.Id.random(), PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -60,14 +60,14 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I refund money from OnlyDust in an unknown currency
          * Then The refund is rejected
          */
         @Test
         void should_reject_refund() {
             // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(Ledger.Id.random(), Amount.of(-10L), currencyId))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(SponsorAccount.Id.random(), Amount.of(-10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -76,7 +76,7 @@ public class AccountingServiceTest {
 
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I allocate money to a project in an unknown currency
          * Then The allocation is rejected
          */
@@ -120,92 +120,92 @@ public class AccountingServiceTest {
         /*
          * Given a newly created sponsor
          * When I allocate money on it
-         * Then A new ledger is created and the mint is registered
+         * Then A new sponsor account is created and the mint is registered
          */
         @Test
-        void should_create_ledger_and_mint_virtual_balance() {
+        void should_create_sponsor_account_and_mint_virtual_balance() {
             // Given
             final var amountToMint = PositiveAmount.of(10L);
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amountToMint, null);
+            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amountToMint, null);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amountToMint));
-            assertThat(ledger.unlockedBalance()).isEqualTo(Amount.ZERO);
-            assertThat(ledger.currency()).isEqualTo(currency);
-            assertThat(ledger.ownerId()).isEqualTo(sponsorId);
-            assertThat(ledger.network()).isEmpty();
-            assertThat(ledger.lockedUntil()).isEmpty();
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), amountToMint));
+            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccount.currency()).isEqualTo(currency);
+            assertThat(sponsorAccount.ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.network()).isEmpty();
+            assertThat(sponsorAccount.lockedUntil()).isEmpty();
         }
 
         /*
          * Given a newly created sponsor
          * When I allocate money on it and provide a receipt
-         * Then A new ledger is created, the mint is registered and the physical balance is updated
+         * Then A new sponsor account is created, the mint is registered and the physical balance is updated
          */
         @Test
-        void should_create_ledger_and_funds_it() {
+        void should_create_sponsor_account_and_funds_it() {
             // Given
             final var amount = Amount.of(10L);
             final var transaction = fakeTransaction(Network.ETHEREUM, amount);
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
+            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), PositiveAmount.of(amount)));
-            assertThat(ledger.unlockedBalance()).isEqualTo(amount);
-            assertThat(ledger.currency()).isEqualTo(currency);
-            assertThat(ledger.ownerId()).isEqualTo(sponsorId);
-            assertThat(ledger.network()).contains(transaction.network());
-            assertThat(ledger.getTransactions()).containsExactly(transaction);
-            assertThat(ledger.lockedUntil()).isEmpty();
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), PositiveAmount.of(amount)));
+            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(amount);
+            assertThat(sponsorAccount.currency()).isEqualTo(currency);
+            assertThat(sponsorAccount.ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.network()).contains(transaction.network());
+            assertThat(sponsorAccount.getTransactions()).containsExactly(transaction);
+            assertThat(sponsorAccount.lockedUntil()).isEmpty();
 
-            final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
-            assertThat(savedLedger.id()).isEqualTo(ledger.id());
-            assertThat(savedLedger.unlockedBalance()).isEqualTo(ledger.unlockedBalance());
-            assertThat(savedLedger.currency()).isEqualTo(ledger.currency());
-            assertThat(savedLedger.ownerId()).isEqualTo(ledger.ownerId());
-            assertThat(savedLedger.network()).isEqualTo(ledger.network());
-            assertThat(savedLedger.getTransactions()).isEqualTo(ledger.getTransactions());
-            assertThat(savedLedger.lockedUntil()).isEqualTo(ledger.lockedUntil());
+            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow();
+            assertThat(savedAccount.id()).isEqualTo(sponsorAccount.id());
+            assertThat(savedAccount.unlockedBalance()).isEqualTo(sponsorAccount.unlockedBalance());
+            assertThat(savedAccount.currency()).isEqualTo(sponsorAccount.currency());
+            assertThat(savedAccount.ownerId()).isEqualTo(sponsorAccount.ownerId());
+            assertThat(savedAccount.network()).isEqualTo(sponsorAccount.network());
+            assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.getTransactions());
+            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.lockedUntil());
         }
 
         /*
          * Given a newly created sponsor
-         * When I create a locked ledger
+         * When I create a locked sponsor account
          * Then The balance is always ZERO if the lock date is in the future
          */
         @Test
-        void should_create_locked_ledger_and_funds_it() {
+        void should_create_locked_sponsor_account_and_funds_it() {
             // Given
             final var amount = PositiveAmount.of(10L);
             final var transaction = fakeTransaction(Network.ETHEREUM, amount);
             final var lockedUntil = ZonedDateTime.now().plusDays(1);
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, lockedUntil, transaction);
+            final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amount, lockedUntil, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amount));
-            assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledger.lockedUntil()).contains(lockedUntil.toInstant());
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.id()), amount));
+            assertThat(sponsorAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccount.lockedUntil()).contains(lockedUntil.toInstant());
 
-            final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
-            assertThat(savedLedger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(savedLedger.lockedUntil()).isEqualTo(ledger.lockedUntil());
+            final var savedAccount = sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow();
+            assertThat(savedAccount.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.lockedUntil());
         }
 
         /*
-         * Given a sponsor with no ledger
+         * Given a sponsor with no account
          * When I refund money from a project
          * Then The refund is rejected
          */
         @Test
         void should_reject_unallocation_when_no_sponsor_account_found() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(projectId, Ledger.Id.random(), PositiveAmount.of(10L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(projectId, SponsorAccount.Id.random(), PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot refund");
@@ -223,7 +223,7 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
-        Ledger sponsorLedger;
+        SponsorAccount sponsorAccount;
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
@@ -232,7 +232,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorLedger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(100L), null);
+            sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
         }
 
         /*
@@ -246,33 +246,33 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
-            accountingService.increaseAllowance(sponsorLedger.id(), amount.negate(), currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate(), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new MintEvent(AccountId.of(sponsorLedger.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorLedger.id()), amount)
+                    new MintEvent(AccountId.of(sponsorAccount.id()), amount),
+                    new BurnEvent(AccountId.of(sponsorAccount.id()), amount)
             );
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I refund money from OnlyDust of more than I sent
          * Then The refund is rejected
          */
         @Test
         void should_reject_refund_when_not_enough_received() {
             // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorLedger.id(), Amount.of(-110L), currency.id()))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorAccount.id(), Amount.of(-110L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot burn");
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I allocate money to a project
-         * Then The transfer is registered from my ledger to the project ledger
+         * Then The transfer is registered from my account to the project
          */
         @Test
         void should_register_allocations_to_project() {
@@ -280,38 +280,38 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
-            accountingService.refund(projectId1, sponsorLedger.id(), amount, currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId1, amount, currency.id());
+            accountingService.refund(projectId1, sponsorAccount.id(), amount, currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), amount),
-                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()), amount)
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), amount),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount)
             );
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I refund money from a project
          * Then The refund is rejected if the sponsor has not allocated enough money
          */
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorLedger.id(), PositiveAmount.of(400L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund");
         }
 
         /*
-         * Given a sponsor, a project and a contributor with a ledger
+         * Given a sponsor, a project and a contributor with a sponsor account
          * When the contributor is rewarded by the project but the sponsor is not funded (no real money received)
          * Then The contributor cannot withdraw his money
          */
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -319,11 +319,11 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Sponsor account %s is not funded".formatted(sponsorLedger.id()));
+                    .hasMessage("Sponsor account %s is not funded".formatted(sponsorAccount.id()));
         }
 
         /*
-         * Given a sponsor with a ledger
+         * Given a sponsor account
          * When I fund money from a project without minting the corresponding amount
          * Then I can withdraw this money
          */
@@ -332,14 +332,14 @@ public class AccountingServiceTest {
             final var amount = Amount.of(faker.number().randomNumber());
 
             // When
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount));
             // Then
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
             // When
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount.negate()));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount.negate()));
             // Then
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -357,17 +357,17 @@ public class AccountingServiceTest {
         @Test
         void should_do_everything() {
             // When
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(300L)));
-            accountingService.transfer(sponsorLedger.id(), projectId1, PositiveAmount.of(70L), currency.id());
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(300L)));
+            accountingService.transfer(sponsorAccount.id(), projectId1, PositiveAmount.of(70L), currency.id());
 
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, rewardId2, PositiveAmount.of(20L), currency.id());
 
             accountingService.transfer(projectId1, projectId2, PositiveAmount.of(20L), currency.id());
 
-            accountingService.refund(projectId1, sponsorLedger.id(), PositiveAmount.of(20L), currency.id());
+            accountingService.refund(projectId1, sponsorAccount.id(), PositiveAmount.of(20L), currency.id());
 
-            accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(35L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId2, PositiveAmount.of(35L), currency.id());
 
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(25L), currency.id());
 
@@ -376,12 +376,12 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), PositiveAmount.of(70L)),
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), PositiveAmount.of(70L)),
                     new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(10L)),
                     new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId2), PositiveAmount.of(20L)),
                     new TransferEvent(AccountId.of(projectId1), AccountId.of(projectId2), PositiveAmount.of(20L)),
-                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()), PositiveAmount.of(20L)),
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(35L)),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), PositiveAmount.of(20L)),
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(35L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(25L)),
                     new BurnEvent(AccountId.of(rewardId2), PositiveAmount.of(45L))
             );
@@ -397,22 +397,22 @@ public class AccountingServiceTest {
         @Test
         void should_allow_multiple_times_funding() {
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(40L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
             final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
             accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
 
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -425,9 +425,9 @@ public class AccountingServiceTest {
         @Test
         void should_reject_withdraw_more_than_funded() {
             // When
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(50L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(50L)));
 
-            accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(80L), currency.id());
+            accountingService.transfer(sponsorAccount.id(), projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, rewardId1, PositiveAmount.of(40L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(40L), currency.id());
 
@@ -450,10 +450,10 @@ public class AccountingServiceTest {
         @Test
         void should_forbid_different_networks_on_same_account() {
             // Given
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(sponsorAccount.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             // When
-            assertThatThrownBy(() -> accountingService.fund(sponsorLedger.id(), fakeTransaction(Network.STARKNET, PositiveAmount.of(100L))))
+            assertThatThrownBy(() -> accountingService.fund(sponsorAccount.id(), fakeTransaction(Network.STARKNET, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot mix transactions from different networks");
@@ -469,10 +469,10 @@ public class AccountingServiceTest {
         void should_forbid_same_reference_on_same_account() {
             // Given
             final var transaction = fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L));
-            accountingService.fund(sponsorLedger.id(), transaction);
+            accountingService.fund(sponsorAccount.id(), transaction);
 
             // When
-            assertThatThrownBy(() -> accountingService.fund(sponsorLedger.id(), transaction))
+            assertThatThrownBy(() -> accountingService.fund(sponsorAccount.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Transaction with reference %s already exists".formatted(transaction.reference()));
@@ -484,7 +484,7 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
-        Ledger sponsorLedger;
+        SponsorAccount sponsorSponsorAccount;
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
@@ -493,7 +493,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            sponsorLedger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(300L), ZonedDateTime.now().plusDays(1));
+            sponsorSponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(300L), ZonedDateTime.now().plusDays(1));
         }
 
         /*
@@ -507,20 +507,20 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().randomNumber());
 
             // When
-            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
-            accountingService.increaseAllowance(sponsorLedger.id(), amount.negate(), currency.id());
+            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount.negate(), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new MintEvent(AccountId.of(sponsorLedger.id()), amount),
-                    new BurnEvent(AccountId.of(sponsorLedger.id()), amount)
+                    new MintEvent(AccountId.of(sponsorSponsorAccount.id()), amount),
+                    new BurnEvent(AccountId.of(sponsorSponsorAccount.id()), amount)
             );
         }
 
         /*
          * Given a sponsor with a locked account
          * When I allocate money to a project
-         * Then The transfer is registered from my ledger to the project ledger
+         * Then The transfer is registered from my account to the project
          */
         @Test
         void should_register_allocations_to_project() {
@@ -528,13 +528,13 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
-            accountingService.refund(projectId1, sponsorLedger.id(), amount, currency.id());
+            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, amount, currency.id());
+            accountingService.refund(projectId1, sponsorSponsorAccount.id(), amount, currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), amount),
-                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()), amount)
+                    new TransferEvent(AccountId.of(sponsorSponsorAccount.id()), AccountId.of(projectId1), amount),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorSponsorAccount.id()), amount)
             );
         }
 
@@ -546,7 +546,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorLedger.id(), PositiveAmount.of(400L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(projectId1, sponsorSponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund");
         }
@@ -559,7 +559,7 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -580,20 +580,20 @@ public class AccountingServiceTest {
         @Test
         void should_allow_multiple_times_funding() {
             // When
-            accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(sponsorSponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
 
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(40L)));
+            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorSponsorAccount.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
             );
 
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(sponsorAccountStorage.get(sponsorSponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -609,10 +609,10 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().randomNumber());
 
             // When
-            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount));
-            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
+            accountingService.fund(sponsorSponsorAccount.id(), fakeTransaction(network, amount));
+            accountingService.increaseAllowance(sponsorSponsorAccount.id(), amount, currency.id());
 
-            accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
+            accountingService.transfer(sponsorSponsorAccount.id(), projectId1, amount, currency.id());
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
@@ -627,9 +627,9 @@ public class AccountingServiceTest {
     class GivenSeveralSponsorAccounts {
         final Currency currency = Currencies.USDC;
         final SponsorId sponsorId = SponsorId.random();
-        Ledger unlockedSponsorLedger1;
-        Ledger unlockedSponsorLedger2;
-        Ledger lockedSponsorLedger;
+        SponsorAccount unlockedSponsorSponsorAccount1;
+        SponsorAccount unlockedSponsorSponsorAccount2;
+        SponsorAccount lockedSponsorSponsorAccount;
         final ProjectId projectId = ProjectId.random();
         final RewardId rewardId = RewardId.random();
         final RewardId rewardId2 = RewardId.random();
@@ -637,25 +637,26 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            unlockedSponsorLedger1 = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(100L), null);
-            unlockedSponsorLedger2 = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(100L), null);
-            lockedSponsorLedger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(100L), ZonedDateTime.now().plusDays(1));
+            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
+            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null);
+            lockedSponsorSponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L),
+                    ZonedDateTime.now().plusDays(1));
         }
 
         /*
-         * Given 2 sponsors with ledgers
-         * When Only sponsor 1 funds its account
-         * Then The contributor paid by sponsor 2 cannot withdraw his money
+         * Given 2 sponsor accounts
+         * When Only the first account is funded
+         * Then The contributor paid by the other account cannot withdraw his money
          */
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // Given
-            accountingService.transfer(unlockedSponsorLedger1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(200L), currency.id());
 
             // When
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
             assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
@@ -666,20 +667,20 @@ public class AccountingServiceTest {
 
 
         /*
-         * Given 2 sponsors with ledgers that rewarded 2 contributors via the same project
-         * When Only sponsor 1 funds its account
+         * Given 2 sponsor accounts that rewarded 2 contributors via the same project
+         * When Only sponsor account 1 funds its account
          * Then Only the first contributor can withdraw its reward
          */
         @Test
         void should_allow_contributor_to_withdraw_only_what_is_funded() {
             // Given
-            accountingService.transfer(unlockedSponsorLedger1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
@@ -702,12 +703,12 @@ public class AccountingServiceTest {
         @Test
         void should_not_pay_partially_locked_rewards() {
             // Given
-            accountingService.transfer(unlockedSponsorLedger1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.transfer(lockedSponsorLedger.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(lockedSponsorSponsorAccount.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(200L), currency.id());
 
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
-            accountingService.fund(lockedSponsorLedger.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(lockedSponsorSponsorAccount.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
@@ -725,17 +726,17 @@ public class AccountingServiceTest {
         @Test
         void should_withdraw_on_both_networks() {
             // Given
-            accountingService.increaseAllowance(unlockedSponsorLedger1.id(), PositiveAmount.of(200L), currency.id());
-            accountingService.increaseAllowance(unlockedSponsorLedger2.id(), PositiveAmount.of(100L), currency.id());
-            accountingService.transfer(unlockedSponsorLedger1.id(), projectId, PositiveAmount.of(200L), currency.id());
-            accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L), currency.id());
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
 
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(200L)));
-            accountingService.fund(unlockedSponsorLedger2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(200L)));
+            accountingService.fund(unlockedSponsorSponsorAccount2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
 
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(100L));
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(100L));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
@@ -744,9 +745,9 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(1000L)));
 
             // Then
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
     }
 }

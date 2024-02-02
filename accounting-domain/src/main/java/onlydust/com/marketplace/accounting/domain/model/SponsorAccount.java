@@ -15,7 +15,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Ledger {
+public class SponsorAccount {
     @EqualsAndHashCode.Include
     final @NonNull Id id;
     final @NonNull Object ownerId;
@@ -25,23 +25,23 @@ public class Ledger {
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
-    public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
+    public <OwnerId> SponsorAccount(final @NonNull OwnerId ownerId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
         this.id = Id.random();
         this.ownerId = ownerId;
         this.currency = currency;
         this.lockedUntil = lockedUntil == null ? null : lockedUntil.toInstant();
     }
 
-    public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
+    public <OwnerId> SponsorAccount(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
         this.id = Id.random();
         this.ownerId = ownerId;
         this.currency = currency;
     }
 
-    public static Ledger of(Ledger other) {
-        final var ledger = new Ledger(other.id, other.ownerId, other.currency, other.lockedUntil);
-        ledger.transactions.addAll(other.transactions);
-        return ledger;
+    public static SponsorAccount of(SponsorAccount other) {
+        final var sponsorAccount = new SponsorAccount(other.id, other.ownerId, other.currency, other.lockedUntil);
+        sponsorAccount.transactions.addAll(other.transactions);
+        return sponsorAccount;
     }
 
     public Id id() {

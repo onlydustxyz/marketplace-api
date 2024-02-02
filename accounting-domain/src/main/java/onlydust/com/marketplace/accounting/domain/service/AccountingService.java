@@ -8,7 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 
 import java.time.ZonedDateTime;
 
@@ -18,28 +18,30 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
-    private final LedgerStorage ledgerStorage;
+    private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
 
     @Override
-    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil) {
+    public SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                               ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
-        final var ledger = new Ledger(sponsorId, currency, lockedUntil);
-        ledgerStorage.save(ledger);
+        final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
+        sponsorAccountStorage.save(sponsorAccount);
 
-        increaseAllowance(ledger.id(), amountToMint, currencyId);
-        return ledger;
+        increaseAllowance(sponsorAccount.id(), amountToMint, currencyId);
+        return sponsorAccount;
     }
 
     @Override
-    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil,
-                               @NonNull Ledger.Transaction transaction) {
-        final var ledger = createLedger(sponsorId, currencyId, amountToMint, lockedUntil);
-        return fund(ledger.id(), transaction);
+    public SponsorAccount createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                               ZonedDateTime lockedUntil,
+                                               @NonNull SponsorAccount.Transaction transaction) {
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, amountToMint, lockedUntil);
+        return fund(sponsorAccount.id(), transaction);
     }
 
     @Override
-    public void increaseAllowance(Ledger.Id sponsorAccountId, Amount amount, Currency.Id currencyId) {
+    public void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
@@ -52,28 +54,28 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Ledger fund(@NonNull Ledger.Id sponsorLedgerId, @NonNull Ledger.Transaction transaction) {
-        final var ledger = getLedger(sponsorLedgerId);
-        ledger.add(transaction);
-        ledgerStorage.save(ledger);
-        return ledger;
+    public SponsorAccount fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
+        final var sponsorAccount = getSponsorAccount(sponsorAccountId);
+        sponsorAccount.add(transaction);
+        sponsorAccountStorage.save(sponsorAccount);
+        return sponsorAccount;
     }
 
     @Override
-    public void pay(RewardId rewardId, Currency.Id currencyId, Ledger.Transaction transaction) {
+    public void pay(RewardId rewardId, Currency.Id currencyId, SponsorAccount.Transaction transaction) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, amount) -> {
-            final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
-            final var sponsorAccountNetwork = sponsorLedger.network().orElseThrow(
-                    () -> internalServerError("Sponsor account %s is not funded".formatted(sponsorLedgerId.sponsorAccountId()))
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorAccountId, amount) -> {
+            final var sponsorAccount = sponsorAccountStorage.get(sponsorAccountId.sponsorAccountId()).orElseThrow();
+            final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow(
+                    () -> internalServerError("Sponsor account %s is not funded".formatted(sponsorAccountId.sponsorAccountId()))
             );
 
             if (transaction.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
-                sponsorLedger.add(transaction.withAmount(amount.negate()));
-                ledgerStorage.save(sponsorLedger);
+                sponsorAccount.add(transaction.withAmount(amount.negate()));
+                sponsorAccountStorage.save(sponsorAccount);
             }
         });
 
@@ -87,14 +89,14 @@ public class AccountingService implements AccountingFacadePort {
 
         return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
                 .noneMatch(entry -> {
-                    final var sponsorLedger = ledgerStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
-                    return sponsorLedger.unlockedBalance().isStrictlyLowerThan(entry.getValue());
+                    final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
+                    return sponsorAccount.unlockedBalance().isStrictlyLowerThan(entry.getValue());
                 });
     }
 
-    private Ledger getLedger(Ledger.Id sponsorLedgerId) {
-        return ledgerStorage.get(sponsorLedgerId)
-                .orElseThrow(() -> notFound("Ledger %s not found".formatted(sponsorLedgerId)));
+    private SponsorAccount getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId)
+                .orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
     }
 
     private AccountBookAggregate getAccountBook(Currency currency) {
@@ -120,7 +122,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     public void deleteTransaction(String reference) {
-        ledgerStorage.deleteTransaction(reference);
+        sponsorAccountStorage.deleteTransaction(reference);
     }
 
     private Currency getCurrency(Currency.Id id) {

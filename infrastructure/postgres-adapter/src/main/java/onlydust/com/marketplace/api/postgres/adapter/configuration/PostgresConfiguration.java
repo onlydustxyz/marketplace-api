@@ -258,9 +258,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresLedgerStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository,
-                                                                     final LedgerTransactionRepository ledgerTransactionRepository) {
-        return new PostgresLedgerStorageAdapter(ledgerRepository, ledgerTransactionRepository);
+    public PostgresSponsorAccountStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository,
+                                                                             final LedgerTransactionRepository ledgerTransactionRepository) {
+        return new PostgresSponsorAccountStorageAdapter(ledgerRepository, ledgerTransactionRepository);
     }
 
     @Bean

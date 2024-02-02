@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
@@ -44,13 +44,13 @@ public class PostgresAccountBookEventStorageIT extends AbstractPostgresIT {
     @Test
     void should_save_and_get_events() {
         final List<AccountBookEvent> events1 = List.of(
-                new MintEvent(Ledger.Id.random(), PositiveAmount.of(100L)),
-                new MintEvent(Ledger.Id.random(), PositiveAmount.of(100L))
+                new MintEvent(SponsorAccount.Id.random(), PositiveAmount.of(100L)),
+                new MintEvent(SponsorAccount.Id.random(), PositiveAmount.of(100L))
         );
 
         final List<AccountBookEvent> events2 = List.of(
-                new TransferEvent(Ledger.Id.random(), Ledger.Id.random(), PositiveAmount.of(100L)),
-                new TransferEvent(Ledger.Id.random(), Ledger.Id.random(), PositiveAmount.of(100L))
+                new TransferEvent(SponsorAccount.Id.random(), SponsorAccount.Id.random(), PositiveAmount.of(100L)),
+                new TransferEvent(SponsorAccount.Id.random(), SponsorAccount.Id.random(), PositiveAmount.of(100L))
         );
 
         postgresAccountBookEventStorage.save(currency, events1);
@@ -60,7 +60,7 @@ public class PostgresAccountBookEventStorageIT extends AbstractPostgresIT {
         assertThat(postgresAccountBookEventStorage.get(currency)).containsExactlyElementsOf(allEvents);
     }
 
-    private record TestEvent(Ledger.Id id, PositiveAmount amount) implements AccountBookEvent<Void> {
+    private record TestEvent(SponsorAccount.Id id, PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
             return null;

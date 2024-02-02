@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -37,11 +37,11 @@ public class LedgerTransactionEntity {
 
     ZonedDateTime lockedUntil;
 
-    public Ledger.Transaction toTransaction() {
-        return new Ledger.Transaction(Ledger.Transaction.Id.of(id), Amount.of(amount), network.toNetwork(), lockedUntil);
+    public SponsorAccount.Transaction toTransaction() {
+        return new SponsorAccount.Transaction(SponsorAccount.Transaction.Id.of(id), Amount.of(amount), network.toNetwork(), lockedUntil);
     }
 
-    public static LedgerTransactionEntity of(Ledger.Id ledgerId, Ledger.Transaction transaction) {
+    public static LedgerTransactionEntity of(SponsorAccount.Id ledgerId, SponsorAccount.Transaction transaction) {
         return LedgerTransactionEntity.builder()
                 .id(transaction.id().value())
                 .ledgerId(ledgerId.value())

@@ -20,9 +20,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
+class PostgresSponsorAccountStorageAdapterIT extends AbstractPostgresIT {
     @Autowired
-    private PostgresLedgerStorageAdapter adapter;
+    private PostgresSponsorAccountStorageAdapter adapter;
     @Autowired
     private PostgresCurrencyAdapter postgresCurrencyAdapter;
     @Autowired
@@ -49,7 +49,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
 
     @Test
     void should_return_empty_when_ledger_not_found() {
-        assertThat(adapter.get(Ledger.Id.random())).isEmpty();
+        assertThat(adapter.get(SponsorAccount.Id.random())).isEmpty();
     }
 
     @Test
@@ -58,7 +58,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
         final var sponsorId = SponsorId.random();
         final SponsorEntity sponsor = new SponsorEntity(sponsorId.value(), "sponsor", "", "");
         sponsorRepository.save(sponsor);
-        final var ledger = new Ledger(SponsorId.of(sponsor.getId()), currency);
+        final var ledger = new SponsorAccount(SponsorId.of(sponsor.getId()), currency);
 
         // When
         adapter.save(ledger);
@@ -88,7 +88,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
         final var projectId = ProjectId.random();
         final ProjectIdEntity project = new ProjectIdEntity(projectId.value());
         projectIdRepository.save(project);
-        final var ledger = new Ledger(ProjectId.of(project.getId()), currency);
+        final var ledger = new SponsorAccount(ProjectId.of(project.getId()), currency);
 
         // When
         adapter.save(ledger);
@@ -124,7 +124,7 @@ class PostgresLedgerStorageAdapterIT extends AbstractPostgresIT {
                 .hoursWorked(0)
                 .projectId(UUID.randomUUID())
                 .currency(CurrencyEnumEntity.eth).build());
-        final var ledger = new Ledger(rewardId, currency);
+        final var ledger = new SponsorAccount(rewardId, currency);
 
         // When
         adapter.save(ledger);

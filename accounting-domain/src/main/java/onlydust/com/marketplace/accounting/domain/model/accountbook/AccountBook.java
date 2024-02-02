@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 
 import java.util.Collection;
 
@@ -30,7 +30,7 @@ public interface AccountBook {
         private Type type;
         private String id;
 
-        public static AccountId of(Ledger.Id id) {
+        public static AccountId of(SponsorAccount.Id id) {
             return new AccountId(Type.SPONSOR_ACCOUNT, id.toString());
         }
 
@@ -43,8 +43,8 @@ public interface AccountBook {
         }
 
         public static <T> AccountId of(T id) {
-            if (id instanceof Ledger.Id ledgerId) {
-                return of(ledgerId);
+            if (id instanceof SponsorAccount.Id sponsorAccountId) {
+                return of(sponsorAccountId);
             } else if (id instanceof ProjectId projectId) {
                 return of(projectId);
             } else if (id instanceof RewardId rewardId) {
@@ -54,11 +54,11 @@ public interface AccountBook {
             }
         }
 
-        public Ledger.Id sponsorAccountId() {
+        public SponsorAccount.Id sponsorAccountId() {
             if (type != Type.SPONSOR_ACCOUNT) {
                 throw new IllegalArgumentException("Only sponsor accounts can be converted to sponsor account id");
             }
-            return Ledger.Id.of(id);
+            return SponsorAccount.Id.of(id);
         }
 
         public ProjectId projectId() {
