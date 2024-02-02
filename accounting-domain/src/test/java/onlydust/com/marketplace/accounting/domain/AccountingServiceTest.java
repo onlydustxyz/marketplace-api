@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -149,7 +148,7 @@ public class AccountingServiceTest {
         void should_create_ledger_and_funds_it() {
             // Given
             final var amount = Amount.of(10L);
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
+            final var transaction = fakeTransaction(Network.ETHEREUM, amount);
 
             // When
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
@@ -182,7 +181,7 @@ public class AccountingServiceTest {
         void should_create_locked_ledger_and_funds_it() {
             // Given
             final var amount = PositiveAmount.of(10L);
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
+            final var transaction = fakeTransaction(Network.ETHEREUM, amount);
             final var lockedUntil = ZonedDateTime.now().plusDays(1);
 
             // When
@@ -213,6 +212,10 @@ public class AccountingServiceTest {
 
             assertThat(accountBookEventStorage.events).isEmpty();
         }
+    }
+
+    private static Transaction fakeTransaction(Network network, Amount amount) {
+        return Transaction.create(network, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
     }
 
     @Nested
@@ -312,7 +315,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(10L), "StrarkNet Foundation", "starknet.eth");
+            final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
@@ -328,23 +331,15 @@ public class AccountingServiceTest {
         void should_fund_and_withdraw() {
             final var amount = Amount.of(faker.number().randomNumber());
 
-            {
-                // Given
-                final var transaction = Transaction.create(network, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
-                // When
-                accountingService.fund(sponsorLedger.id(), transaction);
-                // Then
-                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
-            }
+            // When
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount));
+            // Then
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
-            {
-                // Given
-                final var transaction = Transaction.create(network, "0x123456", amount.negate(), "StrarkNet Foundation", "starknet.eth");
-                // When
-                accountingService.fund(sponsorLedger.id(), transaction);
-                // Then
-                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
-            }
+            // When
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount.negate()));
+            // Then
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -361,11 +356,8 @@ public class AccountingServiceTest {
          */
         @Test
         void should_do_everything() {
-            // Given
-            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(300L), "StarkNet Foundation", "starknet.eth");
-
             // When
-            accountingService.fund(sponsorLedger.id(), transaction);
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(300L)));
             accountingService.transfer(sponsorLedger.id(), projectId1, PositiveAmount.of(70L), currency.id());
 
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
@@ -380,7 +372,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(25L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
-            accountingService.pay(rewardId2, currency.id(), transaction);
+            accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(300L)));
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -404,18 +396,13 @@ public class AccountingServiceTest {
          */
         @Test
         void should_allow_multiple_times_funding() {
-            // Given
-            final var transactions = List.of(
-                    Transaction.create(network, "0x123456", PositiveAmount.of(30L), "StarkNet Foundation", "starknet.eth"),
-                    Transaction.create(network, "0x123456", PositiveAmount.of(30L), "StarkNet Foundation", "starknet.eth"),
-                    Transaction.create(network, "0x123456", PositiveAmount.of(40L), "StarkNet Foundation", "starknet.eth")
-            );
-
             // When
             accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
 
-            transactions.forEach(transaction -> accountingService.fund(sponsorLedger.id(), transaction));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
             final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
             accountingService.pay(rewardId2, currency.id(), transaction);
@@ -541,7 +528,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(10L), "StrarkNet Foundation", "starknet.eth");
+            final var transaction = fakeTransaction(network, PositiveAmount.of(10L));
             assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
@@ -557,18 +544,13 @@ public class AccountingServiceTest {
          */
         @Test
         void should_allow_multiple_times_funding() {
-            // Given
-            final var transactions = List.of(
-                    Transaction.create(network, "0x123456", PositiveAmount.of(30L), "StarkNet Foundation", "starknet.eth"),
-                    Transaction.create(network, "0x123456", PositiveAmount.of(30L), "StarkNet Foundation", "starknet.eth"),
-                    Transaction.create(network, "0x123456", PositiveAmount.of(40L), "StarkNet Foundation", "starknet.eth")
-            );
-
             // When
             accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
 
-            transactions.forEach(transaction -> accountingService.fund(sponsorLedger.id(), transaction));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(30L)));
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -592,15 +574,14 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().randomNumber());
 
             // When
-            final var transaction = Transaction.create(network, "0x123456", amount, "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(sponsorLedger.id(), transaction);
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, amount));
             accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
 
             accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, amount)))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot spend from locked account");
@@ -639,11 +620,10 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(200L), currency.id());
 
             // When
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(unlockedSponsorLedger1.id(), transaction);
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("is not funded");
@@ -664,23 +644,16 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId, rewardId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            {
-                final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-                accountingService.fund(unlockedSponsorLedger1.id(), transaction);
-            }
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
 
-            {
-                final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
-                accountingService.pay(rewardId, currency.id(), transaction);
-            }
+            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L)
-                    , "StarkNet Foundation", "starknet.eth")))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("is not funded");
@@ -698,13 +671,12 @@ public class AccountingServiceTest {
             accountingService.transfer(lockedSponsorLedger.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(200L), currency.id());
 
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(unlockedSponsorLedger1.id(), transaction);
-            accountingService.fund(lockedSponsorLedger.id(), transaction);
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(lockedSponsorLedger.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot spend from locked account");
@@ -724,26 +696,18 @@ public class AccountingServiceTest {
             accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
 
-            {
-                final var ethTransaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-                final var optimismTransaction = Transaction.create(Network.OPTIMISM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet" +
-                                                                                                                                                 ".eth");
-                accountingService.fund(unlockedSponsorLedger1.id(), ethTransaction);
-                accountingService.fund(unlockedSponsorLedger1.id(), optimismTransaction);
-                accountingService.fund(unlockedSponsorLedger2.id(), optimismTransaction);
-            }
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorLedger2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
+
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
             assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(100L));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
 
-            {
-                final var ethTransaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
-                final var opTransaction = Transaction.create(Network.OPTIMISM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
-                accountingService.pay(rewardId, currency.id(), ethTransaction);
-                accountingService.pay(rewardId, currency.id(), opTransaction);
-            }
+            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
+            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(1000L)));
 
             // Then
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
