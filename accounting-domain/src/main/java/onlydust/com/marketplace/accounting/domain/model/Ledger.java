@@ -20,9 +20,17 @@ public class Ledger {
     final @NonNull Id id;
     final @NonNull Object ownerId;
     final @NonNull Currency currency;
+    ZonedDateTime lockedUntil;
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
+
+    public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
+        this.id = Id.random();
+        this.ownerId = ownerId;
+        this.currency = currency;
+        this.lockedUntil = lockedUntil;
+    }
 
     public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
         this.id = Id.random();
@@ -31,7 +39,7 @@ public class Ledger {
     }
 
     public static Ledger of(Ledger other) {
-        final var ledger = new Ledger(other.id, other.ownerId, other.currency);
+        final var ledger = new Ledger(other.id, other.ownerId, other.currency, other.lockedUntil);
         ledger.transactions.addAll(other.transactions);
         return ledger;
     }
@@ -49,16 +57,15 @@ public class Ledger {
     }
 
     public PositiveAmount unlockedBalance() {
-        return PositiveAmount.of(transactions.stream()
-                .filter(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
-                .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add));
+        return locked() ? PositiveAmount.ZERO : balance();
     }
 
     public PositiveAmount unlockedBalance(final @NonNull Network network) {
+        return unlockedBalance();
+    }
+
+    public PositiveAmount balance() {
         return PositiveAmount.of(transactions.stream()
-                .filter(transaction -> transaction.network.equals(network))
-                .filter(transaction -> transaction.lockedUntil == null || transaction.lockedUntil.isBefore(ZonedDateTime.now()))
                 .map(Transaction::amount)
                 .reduce(Amount.ZERO, Amount::add));
     }
@@ -84,6 +91,14 @@ public class Ledger {
 
     public Optional<Network> network() {
         return transactions.stream().map(Transaction::network).findFirst();
+    }
+
+    public Optional<ZonedDateTime> lockedUntil() {
+        return Optional.ofNullable(lockedUntil);
+    }
+
+    public boolean locked() {
+        return lockedUntil != null && lockedUntil.isAfter(ZonedDateTime.now());
     }
 
     public void add(Transaction transaction) {

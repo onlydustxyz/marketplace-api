@@ -27,19 +27,22 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint) {
+    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
-        final var ledger = createLedger(sponsorId, currency);
+
+        final var ledger = createLedger(sponsorId, currency, lockedUntil);
+
         final var accountBook = getAccountBook(currency);
         accountBook.mint(ledger.id(), amountToMint);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+
         return ledger;
     }
 
     @Override
-    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil,
                                @NonNull Ledger.Transaction transaction) {
-        final var ledger = createLedger(sponsorId, currencyId, amountToMint);
+        final var ledger = createLedger(sponsorId, currencyId, amountToMint, lockedUntil);
         ledger.add(transaction);
         ledgerStorage.save(ledger);
         return ledger;
@@ -158,11 +161,11 @@ public class AccountingService implements AccountingFacadePort {
 
     private <From> Ledger getOrCreateLedger(From from, Currency currency) {
         return ledgerProvider.get(from, currency)
-                .orElseGet(() -> createLedger(from, currency));
+                .orElseGet(() -> createLedger(from, currency, null));
     }
 
-    private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency) {
-        final var ledger = new Ledger(ownerId, currency);
+    private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency, ZonedDateTime lockedUntil) {
+        final var ledger = new Ledger(ownerId, currency, lockedUntil);
         ledgerStorage.save(ledger);
         return ledger;
     }

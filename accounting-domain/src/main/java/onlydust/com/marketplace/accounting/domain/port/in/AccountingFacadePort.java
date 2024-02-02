@@ -8,10 +8,11 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 
 public interface AccountingFacadePort {
-    Ledger createLedger(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint);
+    Ledger createLedger(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
+                        final ZonedDateTime lockedUntil);
 
     Ledger createLedger(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
-                        final @NonNull Ledger.Transaction transaction);
+                        final ZonedDateTime lockedUntil, final @NonNull Ledger.Transaction transaction);
 
     Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil);
 

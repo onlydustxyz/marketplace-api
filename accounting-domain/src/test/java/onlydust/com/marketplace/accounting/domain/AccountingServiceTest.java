@@ -137,7 +137,7 @@ public class AccountingServiceTest {
             final var amountToMint = PositiveAmount.of(10L);
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amountToMint);
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amountToMint, null);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amountToMint));
@@ -145,6 +145,7 @@ public class AccountingServiceTest {
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
             assertThat(ledger.network()).isEmpty();
+            assertThat(ledger.lockedUntil()).isEmpty();
         }
 
         /*
@@ -159,7 +160,7 @@ public class AccountingServiceTest {
             final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, transaction);
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, null, transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amount));
@@ -168,6 +169,7 @@ public class AccountingServiceTest {
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
             assertThat(ledger.network()).contains(transaction.network());
             assertThat(ledger.getTransactions()).containsExactly(transaction);
+            assertThat(ledger.lockedUntil()).isEmpty();
 
             final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
             assertThat(savedLedger.id()).isEqualTo(ledger.id());
@@ -176,6 +178,32 @@ public class AccountingServiceTest {
             assertThat(savedLedger.ownerId()).isEqualTo(ledger.ownerId());
             assertThat(savedLedger.network()).isEqualTo(ledger.network());
             assertThat(savedLedger.getTransactions()).isEqualTo(ledger.getTransactions());
+            assertThat(savedLedger.lockedUntil()).isEqualTo(ledger.lockedUntil());
+        }
+
+        /*
+         * Given a newly created sponsor
+         * When I create a locked ledger
+         * Then The balance is always ZERO if the lock date is in the future
+         */
+        @Test
+        void should_create_locked_ledger_and_funds_it() {
+            // Given
+            final var amount = PositiveAmount.of(10L);
+            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
+            final var lockedUntil = ZonedDateTime.now().plusDays(1);
+
+            // When
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, lockedUntil, transaction);
+
+            // Then
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amount));
+            assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledger.lockedUntil()).contains(lockedUntil);
+
+            final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
+            assertThat(savedLedger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(savedLedger.lockedUntil()).isEqualTo(ledger.lockedUntil());
         }
 
         /*
