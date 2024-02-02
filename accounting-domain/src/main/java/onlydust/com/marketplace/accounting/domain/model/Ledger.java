@@ -88,6 +88,9 @@ public class Ledger {
         if (network().orElse(transaction.network()) != transaction.network())
             throw badRequest("Cannot mix transactions from different networks");
 
+        if (transactions.stream().map(Transaction::reference).anyMatch(transaction.reference()::equals))
+            throw badRequest("Transaction with reference %s already exists".formatted(transaction.reference()));
+
         transactions.add(transaction);
     }
 

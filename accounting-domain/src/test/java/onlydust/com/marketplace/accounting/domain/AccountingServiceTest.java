@@ -214,8 +214,8 @@ public class AccountingServiceTest {
         }
     }
 
-    private static Transaction fakeTransaction(Network network, Amount amount) {
-        return Transaction.create(network, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
+    private Transaction fakeTransaction(Network network, Amount amount) {
+        return Transaction.create(network, faker.random().hex(), amount, faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
     }
 
     @Nested
@@ -425,8 +425,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_withdraw_more_than_funded() {
             // When
-            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(50L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(sponsorLedger.id(), transaction);
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(network, PositiveAmount.of(50L)));
 
             accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.transfer(projectId2, rewardId1, PositiveAmount.of(40L), currency.id());
@@ -435,10 +434,10 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
 
-            accountingService.pay(rewardId1, currency.id(), transaction);
+            accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, PositiveAmount.of(50L)));
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), transaction))
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(50L))))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
         }
@@ -460,6 +459,24 @@ public class AccountingServiceTest {
                     .hasMessageContaining("Cannot mix transactions from different networks");
         }
 
+
+        /*
+         * Given a sponsor account
+         * When I fund it with a given transaction reference
+         * Then I cannot fund it again with the same reference
+         */
+        @Test
+        void should_forbid_same_reference_on_same_account() {
+            // Given
+            final var transaction = fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L));
+            accountingService.fund(sponsorLedger.id(), transaction);
+
+            // When
+            assertThatThrownBy(() -> accountingService.fund(sponsorLedger.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Transaction with reference %s already exists".formatted(transaction.reference()));
+        }
     }
 
     @Nested
