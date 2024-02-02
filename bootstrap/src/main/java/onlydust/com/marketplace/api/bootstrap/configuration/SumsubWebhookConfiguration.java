@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import lombok.Data;
-import onlydust.com.marketplace.api.sumsub.webhook.adapter.LegalVerificationFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
+import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
+import onlydust.com.marketplace.api.domain.service.UserVerificationService;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubProperties;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter;
-import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookDTO;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,30 +13,19 @@ import org.springframework.context.annotation.Configuration;
 public class SumsubWebhookConfiguration {
 
     @Bean
-    @ConfigurationProperties("application.sumsub.kyc")
+    @ConfigurationProperties("application.sumsub.webhook")
     public SumsubProperties sumsubProperties() {
         return new SumsubProperties();
     }
 
     @Bean
-    public LegalVerificationFacadePort legalVerificationFacadePort() {
-        return new LegalVerificationFacadePortSpy();
+    public UserVerificationFacadePort userVerificationFacadePort(OutboxPort userVerificationOutbox) {
+        return new UserVerificationService(userVerificationOutbox);
     }
 
     @Bean
-    public SumsubWebhookApiAdapter sumsubWebhookApiAdapter(final LegalVerificationFacadePort legalVerificationFacadePort, SumsubProperties sumsubProperties) {
-        return new SumsubWebhookApiAdapter(sumsubProperties, legalVerificationFacadePort);
-    }
-
-    @Data
-    public static class LegalVerificationFacadePortSpy implements LegalVerificationFacadePort {
-
-        private SumsubWebhookDTO sumsubWebhookDTO;
-
-        @Override
-        public void update(SumsubWebhookDTO sumsubWebhookDTO) {
-            this.sumsubWebhookDTO = sumsubWebhookDTO;
-        }
+    public SumsubWebhookApiAdapter sumsubWebhookApiAdapter(final UserVerificationFacadePort userVerificationFacadePort, SumsubProperties sumsubProperties) {
+        return new SumsubWebhookApiAdapter(sumsubProperties, userVerificationFacadePort);
     }
 
 }

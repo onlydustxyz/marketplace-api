@@ -43,7 +43,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/").permitAll()
                 .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/version").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/sumsub/*/webhook").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/sumsub/webhook").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)

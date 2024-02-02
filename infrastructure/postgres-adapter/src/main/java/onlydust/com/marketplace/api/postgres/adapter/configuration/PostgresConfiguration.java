@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.TrackingEventEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -219,6 +220,11 @@ public class PostgresConfiguration {
     @Bean
     public PostgresOutboxAdapter<TrackingEventEntity> trackingOutbox(final TrackingEventRepository trackingEventRepository) {
         return new PostgresOutboxAdapter<>(trackingEventRepository);
+    }
+
+    @Bean
+    public PostgresOutboxAdapter<UserVerificationEventEntity> userVerificationOutbox(final UserVerificationEventRepository userVerificationEventRepository) {
+        return new PostgresOutboxAdapter<>(userVerificationEventRepository);
     }
 
     @Bean
