@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -20,45 +24,62 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {
         // When
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_BUDGETS_ALLOCATE.formatted(COCA_COLAX)))
+        final var response = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "amount": 100,
-                            "currencyId": "%s"
-                        }
-                        """.formatted(BTC))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        // When
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
-                .header("Api-Key", apiKey())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "type": "CREDIT",
-                            "amount": 100,
                             "currencyId": "%s",
-                            "receipt": {
-                                "network": "ETHEREUM",
-                                "reference": "0x0",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
+                            "allowance": 100
                         }
                         """.formatted(BTC))
                 // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody().consumeWith(System.out::println)
-                .jsonPath("$.id").isNotEmpty();
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        final var accountId = response.getId();
+        assertThat(accountId).isNotNull();
+        assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
+        assertThat(response.getCurrencyId()).isEqualTo(BTC.value());
+        assertThat(response.getAllowance()).isEqualTo(BigDecimal.valueOf(100));
+        assertThat(response.getBalance()).isEqualTo(BigDecimal.ZERO);
+        assertThat(response.getLockedUntil()).isNull();
+        assertThat(response.getAwaitingPaymentAmount()).isEqualTo(BigDecimal.ZERO);
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "ETHEREUM",
+                                "thirdPartyName": "Coca Cola LTD",
+                                "thirdPartyAccountNumber": "coca.cola.eth"
+                            }
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.balance").isEqualTo(100)
+                .jsonPath("$.allowance").isEqualTo(100)
+                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
+                .jsonPath("$.receipts[0].amount").isEqualTo(100)
+                .jsonPath("$.receipts[0].network").isEqualTo("ETHEREUM")
+                .jsonPath("$.receipts[0].thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.receipts[0].thirdPartyAccountNumber").isEqualTo("coca.cola.eth");
+        ;
 
         // When
         client.post()
@@ -67,11 +88,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorId": "%s",
-                            "amount": 90,
-                            "currencyId": "%s"
+                            "sponsorAccountId": "%s",
+                            "amount": 90
                         }
-                        """.formatted(COCA_COLAX, BTC))
+                        """.formatted(accountId))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -85,11 +105,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorId": "%s",
-                            "amount": 50,
-                            "currencyId": "%s"
+                            "sponsorAccountId": "%s",
+                            "amount": 50
                         }
-                        """.formatted(COCA_COLAX, BTC))
+                        """.formatted(accountId))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -97,45 +116,59 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // When
         client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
+                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "type": "DEBIT",
-                            "amount": 60,
-                            "currencyId": "%s",
                             "receipt": {
+                                "reference": "0x02",
+                                "amount": -60,
                                 "network": "ETHEREUM",
-                                "reference": "0x0",
                                 "thirdPartyName": "Coca Cola LTD",
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(BTC))
+                        """)
                 // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.balance").isEqualTo(40)
+                .jsonPath("$.allowance").isEqualTo(60)
+                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
+                .jsonPath("$.receipts[0].amount").isEqualTo(100)
+                .jsonPath("$.receipts[0].network").isEqualTo("ETHEREUM")
+                .jsonPath("$.receipts[0].thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.receipts[0].thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
+                .jsonPath("$.receipts[1].reference").isEqualTo("0x02")
+                .jsonPath("$.receipts[1].amount").isEqualTo(-60)
+                .jsonPath("$.receipts[1].network").isEqualTo("ETHEREUM")
+                .jsonPath("$.receipts[1].thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.receipts[1].thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
+        ;
 
 
         // When
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_BUDGETS_UNALLOCATE.formatted(COCA_COLAX)))
+        client.put()
+                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_ALLOWANCE.formatted(accountId)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "amount": 60,
-                            "currencyId": "%s"
+                            "allowance": 40
                         }
-                        """.formatted(BTC))
+                        """)
                 // Then
                 .exchange()
                 .expectStatus()
-                .isNoContent();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.balance").isEqualTo(40)
+                .jsonPath("$.allowance").isEqualTo(20)
+                .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
+        ;
     }
 
 
@@ -144,7 +177,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // When
         final var transactionId = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX)))
+                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
