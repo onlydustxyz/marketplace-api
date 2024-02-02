@@ -60,15 +60,16 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void pay(RewardId rewardId, Currency.Id currencyId, Network network) {
+    public void pay(RewardId rewardId, Currency.Id currencyId, Ledger.Transaction transaction) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
         accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
             final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
-            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, network);
+            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, transaction.network());
             accountBook.burn(AccountId.of(rewardId), payableAmount);
-            withdraw(sponsorLedger, payableAmount, network);
+            sponsorLedger.add(transaction.withAmount(payableAmount.negate()));
+            ledgerStorage.save(sponsorLedger);
         });
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
@@ -84,20 +85,6 @@ public class AccountingService implements AccountingFacadePort {
                     final var sponsorLedger = ledgerStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorLedger.unlockedBalance().isStrictlyLowerThan(entry.getValue());
                 });
-    }
-
-    @Override
-    public Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        final var currency = getCurrency(currencyId);
-        final var ledger = getLedger(sponsorId, currency);
-
-        return withdraw(ledger, amount, network);
-    }
-
-    private Ledger.Transaction.Id withdraw(Ledger ledger, PositiveAmount amount, Network network) {
-        final var transaction = ledger.debit(amount, network);
-        ledgerStorage.save(ledger);
-        return transaction.id();
     }
 
     @Override
@@ -150,11 +137,6 @@ public class AccountingService implements AccountingFacadePort {
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
                 .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
-    }
-
-    private <From> Ledger getOrCreateLedger(From from, Currency currency) {
-        return ledgerProvider.get(from, currency)
-                .orElseGet(() -> createLedger(from, currency, null));
     }
 
     private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency, ZonedDateTime lockedUntil) {

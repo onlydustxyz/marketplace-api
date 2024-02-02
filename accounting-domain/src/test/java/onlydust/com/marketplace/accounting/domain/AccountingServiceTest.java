@@ -384,7 +384,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(25L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
-            accountingService.pay(rewardId2, currency.id(), network);
+            accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -421,14 +421,15 @@ public class AccountingServiceTest {
 
             transactions.forEach(transaction -> accountingService.fund(sponsorLedger.id(), transaction));
 
-            accountingService.pay(rewardId2, currency.id(), network);
+            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+            accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
 
-            assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
         }
 
         /*
@@ -450,7 +451,8 @@ public class AccountingServiceTest {
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
-            accountingService.pay(rewardId1, currency.id(), network);
+
+            accountingService.pay(rewardId1, currency.id(), transaction);
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
             // TODO: remove or restore
@@ -594,7 +596,8 @@ public class AccountingServiceTest {
 
             transactions.forEach(transaction -> accountingService.fund(sponsorLedger.id(), transaction));
 
-            accountingService.pay(rewardId2, currency.id(), network);
+            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+            accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -689,12 +692,18 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId, rewardId2, PositiveAmount.of(100L), currency.id());
 
             // When
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(unlockedSponsorLedger1.id(), transaction);
+            {
+                final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
+                accountingService.fund(unlockedSponsorLedger1.id(), transaction);
+            }
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            accountingService.pay(rewardId, currency.id(), Network.ETHEREUM);
+
+            {
+                final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+                accountingService.pay(rewardId, currency.id(), transaction);
+            }
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
@@ -742,18 +751,26 @@ public class AccountingServiceTest {
             accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
 
-            final var ethTransaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            final var optimismTransaction = Transaction.create(Network.OPTIMISM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(unlockedSponsorLedger1.id(), ethTransaction);
-            accountingService.fund(unlockedSponsorLedger1.id(), optimismTransaction);
-            accountingService.fund(unlockedSponsorLedger2.id(), optimismTransaction);
+            {
+                final var ethTransaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
+                final var optimismTransaction = Transaction.create(Network.OPTIMISM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet" +
+                                                                                                                                                 ".eth");
+                accountingService.fund(unlockedSponsorLedger1.id(), ethTransaction);
+                accountingService.fund(unlockedSponsorLedger1.id(), optimismTransaction);
+                accountingService.fund(unlockedSponsorLedger2.id(), optimismTransaction);
+            }
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.of(200L));
             assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance(Network.OPTIMISM)).isEqualTo(PositiveAmount.of(100L));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
-            accountingService.pay(rewardId, currency.id(), Network.ETHEREUM);
-            accountingService.pay(rewardId, currency.id(), Network.OPTIMISM);
+
+            {
+                final var ethTransaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+                final var opTransaction = Transaction.create(Network.OPTIMISM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+                accountingService.pay(rewardId, currency.id(), ethTransaction);
+                accountingService.pay(rewardId, currency.id(), opTransaction);
+            }
 
             // Then
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance(Network.ETHEREUM)).isEqualTo(PositiveAmount.ZERO);

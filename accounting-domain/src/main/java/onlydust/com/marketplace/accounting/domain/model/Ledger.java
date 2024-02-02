@@ -149,6 +149,10 @@ public class Ledger {
             return new Transaction(Id.random(), network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
         }
 
+        public Transaction withAmount(Amount amount) {
+            return new Transaction(id, network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
+        }
+
         @NoArgsConstructor(staticName = "random")
         @EqualsAndHashCode(callSuper = true)
         @SuperBuilder
