@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 
 import java.time.ZonedDateTime;
@@ -20,7 +19,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
-    private final LedgerProvider<Object> ledgerProvider;
     private final LedgerStorage ledgerStorage;
     private final CurrencyStorage currencyStorage;
 
@@ -143,10 +141,5 @@ public class AccountingService implements AccountingFacadePort {
         final var ledger = new Ledger(ownerId, currency, lockedUntil);
         ledgerStorage.save(ledger);
         return ledger;
-    }
-
-    private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
-        return ledgerProvider.get(ownerId, currency)
-                .orElseThrow(() -> notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 }

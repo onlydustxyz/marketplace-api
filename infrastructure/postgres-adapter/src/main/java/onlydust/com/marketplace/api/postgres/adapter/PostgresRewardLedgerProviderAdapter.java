@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.LedgerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.LedgerRepository;
 

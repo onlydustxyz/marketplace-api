@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -30,13 +29,9 @@ import static org.mockito.Mockito.when;
 
 public class AccountingServiceTest {
     final AccountBookEventStorageStub accountBookEventStorage = new AccountBookEventStorageStub();
-    final LedgerProvider<SponsorId> sponsorLedgerProvider = new LedgerStorageStub<>();
-    final LedgerProvider<ProjectId> projectLedgerProvider = new LedgerStorageStub<>();
-    final LedgerProvider<RewardId> rewardLedgerProvider = new LedgerStorageStub<>();
-    final LedgerProviderProxy ledgerProviderProxy = new LedgerProviderProxy(sponsorLedgerProvider, projectLedgerProvider, rewardLedgerProvider);
-    final LedgerStorageStub<Object> ledgerStorage = new LedgerStorageStub<>();
+    final LedgerStorageStub ledgerStorage = new LedgerStorageStub();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
+    final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerStorage, currencyStorage);
     final Faker faker = new Faker();
 
     @Nested
@@ -338,7 +333,7 @@ public class AccountingServiceTest {
                 // When
                 accountingService.fund(sponsorLedger.id(), transaction);
                 // Then
-                assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(amount);
+                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(amount);
             }
 
             {
@@ -347,7 +342,7 @@ public class AccountingServiceTest {
                 // When
                 accountingService.fund(sponsorLedger.id(), transaction);
                 // Then
-                assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
+                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
             }
         }
 
