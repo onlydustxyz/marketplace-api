@@ -24,7 +24,7 @@ public class LedgerStorageStub implements LedgerStorage {
     }
 
     @Override
-    public void delete(Ledger.Transaction.Id transactionId) {
-        ledgers.forEach(l -> l.getTransactions().removeIf(t -> t.id().equals(transactionId)));
+    public void deleteTransaction(String reference) {
+        ledgers.forEach(l -> l.getTransactions().removeIf(t -> t.reference().equals(reference)));
     }
 }

@@ -113,9 +113,8 @@ public class AccountingService implements AccountingFacadePort {
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
-    @Override
-    public void delete(Ledger.Transaction.Id transactionId) {
-        ledgerStorage.delete(transactionId);
+    public void deleteTransaction(String reference) {
+        ledgerStorage.deleteTransaction(reference);
     }
 
     private Currency getCurrency(Currency.Id id) {

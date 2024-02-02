@@ -120,7 +120,6 @@ public class Ledger {
     }
 
     public record Transaction(
-            @NonNull Transaction.Id id,
             @NonNull Network network,
             @NonNull String reference,
             @NonNull Amount amount,
@@ -146,24 +145,11 @@ public class Ledger {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            return new Transaction(Id.random(), network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
+            return new Transaction(network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public Transaction withAmount(Amount amount) {
-            return new Transaction(id, network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
-        }
-
-        @NoArgsConstructor(staticName = "random")
-        @EqualsAndHashCode(callSuper = true)
-        @SuperBuilder
-        public static class Id extends UuidWrapper {
-            public static Transaction.Id of(@NonNull final UUID uuid) {
-                return Transaction.Id.builder().uuid(uuid).build();
-            }
-
-            public static Transaction.Id of(@NonNull final String uuid) {
-                return Transaction.Id.of(UUID.fromString(uuid));
-            }
+            return new Transaction(network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
         }
     }
 }

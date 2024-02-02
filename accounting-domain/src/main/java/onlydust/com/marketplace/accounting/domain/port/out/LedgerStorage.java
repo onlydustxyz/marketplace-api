@@ -9,5 +9,5 @@ public interface LedgerStorage {
 
     void save(Ledger... ledgers);
 
-    void delete(Ledger.Transaction.Id transactionId);
+    void deleteTransaction(String reference);
 }
