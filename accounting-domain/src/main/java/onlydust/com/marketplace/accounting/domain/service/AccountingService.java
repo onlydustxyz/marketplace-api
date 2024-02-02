@@ -67,9 +67,11 @@ public class AccountingService implements AccountingFacadePort {
         accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
             final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
             final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, network);
-            burn(rewardId, payableAmount, currencyId);
+            accountBook.burn(AccountId.of(rewardId), payableAmount);
             withdraw(sponsorLedger, payableAmount, network);
         });
+
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     @Override
@@ -112,12 +114,11 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public <To> Collection<AccountBook.Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public Collection<AccountBook.Transaction> burn(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var ledger = getLedger(to, currency);
 
-        final var transactions = accountBook.burn(AccountId.of(ledger.id()), amount);
+        final var transactions = accountBook.burn(AccountId.of(sponsorAccountId), amount);
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
         return transactions;
@@ -127,10 +128,8 @@ public class AccountingService implements AccountingFacadePort {
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var fromLedger = getLedger(from, currency);
-        final var toLedger = getOrCreateLedger(to, currency);
 
-        accountBook.transfer(AccountId.of(fromLedger.id()), AccountId.of(toLedger.id()), amount);
+        accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 

@@ -30,7 +30,7 @@ public class Ledger {
         this.id = Id.random();
         this.ownerId = ownerId;
         this.currency = currency;
-        this.lockedUntil = lockedUntil.toInstant();
+        this.lockedUntil = lockedUntil == null ? null : lockedUntil.toInstant();
     }
 
     public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {

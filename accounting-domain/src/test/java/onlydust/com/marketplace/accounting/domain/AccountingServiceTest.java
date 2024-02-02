@@ -75,7 +75,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund() {
             // When
-            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.burn(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
@@ -210,22 +210,6 @@ public class AccountingServiceTest {
 
         /*
          * Given a sponsor with no ledger
-         * When I refund money from OnlyDust
-         * Then The refund is rejected
-         */
-        @Test
-        void should_reject_refund_when_no_account_found() {
-            // When
-            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id()))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("No ledger found for owner %s in currency %s".formatted(sponsorId, currency));
-
-            assertThat(accountBookEventStorage.events).isEmpty();
-        }
-
-        /*
-         * Given a sponsor with no ledger
          * When I refund money from a project
          * Then The refund is rejected
          */
@@ -256,7 +240,7 @@ public class AccountingServiceTest {
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             sponsorLedger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(300L), null);
-            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(200L), currency.id());
+            accountingService.transfer(sponsorLedger.id(), projectId1, PositiveAmount.of(200L), currency.id());
         }
 
         /*
@@ -284,7 +268,7 @@ public class AccountingServiceTest {
         @Test
         void should_register_negative_allowance() {
             // When
-            accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id());
+            accountingService.burn(sponsorLedger.id(), PositiveAmount.of(10L), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new BurnEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(10L)));
@@ -298,7 +282,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund_when_not_enough_received() {
             // When
-            assertThatThrownBy(() -> accountingService.burn(sponsorId, PositiveAmount.of(110L), currency.id()))
+            assertThatThrownBy(() -> accountingService.burn(sponsorLedger.id(), PositiveAmount.of(110L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot burn");
@@ -311,12 +295,16 @@ public class AccountingServiceTest {
          */
         @Test
         void should_register_allocation_to_project() {
+            // Given
+            final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
+
             // When
-            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
-                    PositiveAmount.of(10L)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), amount)
+            );
         }
 
         /*

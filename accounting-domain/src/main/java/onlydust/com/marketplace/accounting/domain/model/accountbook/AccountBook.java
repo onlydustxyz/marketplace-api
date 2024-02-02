@@ -42,6 +42,18 @@ public interface AccountBook {
             return new AccountId(Type.REWARD, id.toString());
         }
 
+        public static <T> AccountId of(T id) {
+            if (id instanceof Ledger.Id ledgerId) {
+                return of(ledgerId);
+            } else if (id instanceof ProjectId projectId) {
+                return of(projectId);
+            } else if (id instanceof RewardId rewardId) {
+                return of(rewardId);
+            } else {
+                throw new IllegalArgumentException("Unsupported id type: " + id.getClass());
+            }
+        }
+
         public Ledger.Id sponsorAccountId() {
             if (type != Type.SPONSOR_ACCOUNT) {
                 throw new IllegalArgumentException("Only sponsor accounts can be converted to sponsor account id");
