@@ -217,8 +217,14 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.increaseAllowance(sponsorAccount.id(), amount);
-            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate());
+            {
+                final var sponsorAccountStatement = accountingService.increaseAllowance(sponsorAccount.id(), amount);
+                assertThat(sponsorAccountStatement.allowance()).isEqualTo(PositiveAmount.of(100L).add(amount));
+            }
+            {
+                final var sponsorAccountStatement = accountingService.increaseAllowance(sponsorAccount.id(), amount.negate());
+                assertThat(sponsorAccountStatement.allowance()).isEqualTo(PositiveAmount.of(100L));
+            }
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -309,6 +315,27 @@ public class AccountingServiceTest {
 
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount.negate()));
+            // Then
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+        }
+
+        /*
+         * Given a sponsor account
+         * When I register a transaction
+         * Then I can delete it
+         */
+        @Test
+        void should_fund_and_remove_transaction() {
+            final var amount = Amount.of(faker.number().randomNumber());
+            final var transaction = fakeTransaction(network, amount);
+
+            // When
+            accountingService.fund(sponsorAccount.id(), transaction);
+            // Then
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
+
+            // When
+            accountingService.deleteTransaction(sponsorAccount.id(), transaction.reference());
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }

@@ -91,7 +91,7 @@ paths:
         Update the allowance of the given account, making funds available for internal transactions 
         between the sponsor and projects (and eventually contributors).
         
-        This will return an error if the new allowance is not enough to cover the spent amounts.
+        Allowance cannot be negative.
       parameters:
         - in: path
           name: accountId
@@ -1185,15 +1185,9 @@ components:
         allowance:
           type: number
           description: This is the amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
-        paidSpentAmount:
+        awaitingPaymentAmount:
           type: number
-          description: This is equal to the sum of spent amounts which have already been paid (in the real world)
-        awaitingPaymentSpentAmount:
-          type: number
-          description: This is equal to the sum of spent amounts which have not been paid yet (in the real world)
-        spentAmount:
-          type: number
-          description: This is equal to the sum of paidSpentAmount and awaitingPaymentSpentAmount
+          description: This is the sum of reward amounts which have not been paid yet (in the real world)
         lockedUntil:
           type: string
           format: date-time

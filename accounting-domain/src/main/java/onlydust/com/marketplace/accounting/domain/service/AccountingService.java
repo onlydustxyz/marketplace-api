@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -42,8 +43,8 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount) {
-        final var sponsorAccount = getSponsorAccount(sponsorAccountId);
+    public SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount) {
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         final var accountBook = getAccountBook(sponsorAccount.currency());
 
         if (amount.isPositive())
@@ -52,11 +53,12 @@ public class AccountingService implements AccountingFacadePort {
             accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
 
         accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
+        return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
     }
 
     @Override
     public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
-        final var sponsorAccount = getSponsorAccount(sponsorAccountId);
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         sponsorAccount.add(transaction);
         sponsorAccountStorage.save(sponsorAccount);
         return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
@@ -95,7 +97,7 @@ public class AccountingService implements AccountingFacadePort {
                 });
     }
 
-    private SponsorAccount getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
+    private SponsorAccount mustGetSponsorAccount(SponsorAccount.Id sponsorAccountId) {
         return sponsorAccountStorage.get(sponsorAccountId)
                 .orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
     }
@@ -128,8 +130,20 @@ public class AccountingService implements AccountingFacadePort {
                 .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state()));
     }
 
-    public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
+    @Override
+    public Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId);
+    }
+
+    @Override
+    public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
+        // TODO implement
+        return null;
+    }
+
+    public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
         sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
+        return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
     }
 
     private Currency getCurrency(Currency.Id id) {

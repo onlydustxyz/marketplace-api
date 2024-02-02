@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountingFacadePort {
@@ -21,13 +22,17 @@ public interface AccountingFacadePort {
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
-    void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
+    SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
 
-    void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
+    SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
     <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
     Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
+
+    Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
+
+    List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId);
 }
