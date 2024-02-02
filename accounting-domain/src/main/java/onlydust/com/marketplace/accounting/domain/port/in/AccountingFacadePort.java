@@ -23,11 +23,11 @@ public interface AccountingFacadePort {
 
     void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
 
-    void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount, Currency.Id currencyId);
+    void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
     <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
-    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId, Currency.Id currencyId);
+    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
 }

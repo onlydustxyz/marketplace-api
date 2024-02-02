@@ -43,38 +43,7 @@ public class AccountingServiceTest {
         void setup() {
             when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
         }
-
-        /*
-         * Given a sponsor account
-         * When I transfer money to OnlyDust in an unknown currency
-         * Then The transfer is rejected
-         */
-        @Test
-        void should_reject_transfer() {
-            // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(SponsorAccount.Id.random(), PositiveAmount.of(10L), currencyId))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
-
-            assertThat(accountBookEventStorage.events).isEmpty();
-        }
-
-        /*
-         * Given a sponsor account
-         * When I refund money from OnlyDust in an unknown currency
-         * Then The refund is rejected
-         */
-        @Test
-        void should_reject_refund() {
-            // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(SponsorAccount.Id.random(), Amount.of(-10L), currencyId))
-                    // Then
-                    .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
-
-            assertThat(accountBookEventStorage.events).isEmpty();
-        }
-
-
+        
         /*
          * Given a sponsor account
          * When I allocate money to a project in an unknown currency
@@ -248,8 +217,8 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
-            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate(), currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount);
+            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -266,7 +235,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund_when_not_enough_received() {
             // When
-            assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorAccount.id(), Amount.of(-110L), currency.id()))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorAccount.id(), Amount.of(-110L)))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot burn");
         }
@@ -434,7 +403,7 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(40L), currency.id());
 
             {
-                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id(), currency.id()).orElseThrow();
+                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(80L));
             }
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
@@ -443,7 +412,7 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, PositiveAmount.of(50L)));
 
             {
-                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id(), currency.id()).orElseThrow();
+                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(40L));
                 assertThat(account.account().balance()).isEqualTo(Amount.of(10L));
                 assertThat(account.allowance()).isEqualTo(PositiveAmount.of(20L));
@@ -521,8 +490,8 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
-            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate(), currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount);
+            accountingService.increaseAllowance(sponsorAccount.id(), amount.negate());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -624,7 +593,7 @@ public class AccountingServiceTest {
 
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount));
-            accountingService.increaseAllowance(sponsorAccount.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorAccount.id(), amount);
 
             accountingService.transfer(sponsorAccount.id(), projectId1, amount, currency.id());
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
@@ -701,12 +670,12 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
 
             {
-                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id(), currency.id()).orElseThrow();
+                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
             }
             accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
             {
-                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id(), currency.id()).orElseThrow();
+                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id()).orElseThrow();
                 assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.ZERO);
             }
 
@@ -749,8 +718,8 @@ public class AccountingServiceTest {
         @Test
         void should_withdraw_on_both_networks() {
             // Given
-            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L), currency.id());
-            accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L), currency.id());
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
             accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
             accountingService.transfer(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());

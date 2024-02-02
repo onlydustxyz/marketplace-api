@@ -29,7 +29,7 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
         sponsorAccountStorage.save(sponsorAccount);
 
-        increaseAllowance(sponsorAccount.id(), amountToMint, currencyId);
+        increaseAllowance(sponsorAccount.id(), amountToMint);
         return new SponsorAccountStatement(sponsorAccount, getAccountBook(currency).state());
     }
 
@@ -42,16 +42,16 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount, Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
+    public void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount) {
+        final var sponsorAccount = getSponsorAccount(sponsorAccountId);
+        final var accountBook = getAccountBook(sponsorAccount.currency());
 
         if (amount.isPositive())
             accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
         else
             accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
 
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
     }
 
     @Override
@@ -123,9 +123,9 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId, Currency.Id currencyId) {
+    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
         return sponsorAccountStorage.get(sponsorAccountId)
-                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(getCurrency(currencyId)).state()));
+                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state()));
     }
 
     public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
