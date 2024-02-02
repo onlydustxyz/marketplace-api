@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Ledger.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
@@ -155,7 +156,7 @@ public class AccountingServiceTest {
         void should_create_ledger_and_funds_it() {
             // Given
             final var amount = PositiveAmount.of(10L);
-            final var transaction = new Ledger.Transaction(Ledger.Transaction.Id.random(), amount, Network.ETHEREUM, null);
+            final var transaction = Transaction.create(amount, Network.ETHEREUM);
 
             // When
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, transaction);

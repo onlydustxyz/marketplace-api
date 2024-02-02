@@ -104,6 +104,14 @@ public class Ledger {
     }
 
     public record Transaction(@NonNull Transaction.Id id, @NonNull Amount amount, @NonNull Network network, ZonedDateTime lockedUntil) {
+        public static Transaction create(final @NonNull Amount amount, final @NonNull Network network) {
+            return new Transaction(Id.random(), amount, network, null);
+        }
+
+        public static Transaction create(final @NonNull Amount amount, final @NonNull Network network, final @NonNull ZonedDateTime lockedUntil) {
+            return new Transaction(Id.random(), amount, network, lockedUntil);
+        }
+
         @NoArgsConstructor(staticName = "random")
         @EqualsAndHashCode(callSuper = true)
         @SuperBuilder
