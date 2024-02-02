@@ -55,24 +55,36 @@ public interface AccountBook {
         }
 
         public SponsorAccount.Id sponsorAccountId() {
-            if (type != Type.SPONSOR_ACCOUNT) {
+            if (!isSponsorAccount())
                 throw new IllegalArgumentException("Only sponsor accounts can be converted to sponsor account id");
-            }
+            
             return SponsorAccount.Id.of(id);
         }
 
         public ProjectId projectId() {
-            if (type != Type.PROJECT) {
+            if (!isProject())
                 throw new IllegalArgumentException("Only projects can be converted to project id");
-            }
+
             return ProjectId.of(id);
         }
 
         public RewardId rewardId() {
-            if (type != Type.REWARD) {
+            if (!isReward())
                 throw new IllegalArgumentException("Only rewards can be converted to reward id");
-            }
+
             return RewardId.of(id);
+        }
+
+        public boolean isReward() {
+            return type == Type.REWARD;
+        }
+
+        public boolean isProject() {
+            return type == Type.PROJECT;
+        }
+
+        public boolean isSponsorAccount() {
+            return type == Type.SPONSOR_ACCOUNT;
         }
     }
 

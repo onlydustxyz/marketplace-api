@@ -433,10 +433,21 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, rewardId1, PositiveAmount.of(40L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(40L), currency.id());
 
+            {
+                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id(), currency.id()).orElseThrow();
+                assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(80L));
+            }
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
-            assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+            assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
 
             accountingService.pay(rewardId1, currency.id(), fakeTransaction(network, PositiveAmount.of(50L)));
+
+            {
+                final var account = accountingService.getSponsorAccountStatement(sponsorAccount.id(), currency.id()).orElseThrow();
+                assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(40L));
+                assertThat(account.account().balance()).isEqualTo(Amount.of(10L));
+                assertThat(account.allowance()).isEqualTo(PositiveAmount.of(20L));
+            }
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
             assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(50L))))
@@ -659,7 +670,8 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(200L), currency.id());
 
             // When
-            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            final var account = accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+            assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
             assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L))))
@@ -688,7 +700,15 @@ public class AccountingServiceTest {
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
 
+            {
+                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id(), currency.id()).orElseThrow();
+                assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.of(100L));
+            }
             accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
+            {
+                final var account = accountingService.getSponsorAccountStatement(unlockedSponsorSponsorAccount1.id(), currency.id()).orElseThrow();
+                assertThat(account.awaitingPaymentAmount()).isEqualTo(PositiveAmount.ZERO);
+            }
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();

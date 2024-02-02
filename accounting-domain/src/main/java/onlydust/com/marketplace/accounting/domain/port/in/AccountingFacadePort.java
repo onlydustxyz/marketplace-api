@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public interface AccountingFacadePort {
     SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
@@ -27,4 +28,6 @@ public interface AccountingFacadePort {
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
     <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId);
+
+    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId, Currency.Id currencyId);
 }

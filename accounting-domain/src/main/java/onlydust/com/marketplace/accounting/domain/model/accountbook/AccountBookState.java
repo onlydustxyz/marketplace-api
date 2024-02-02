@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
@@ -194,6 +195,25 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 .map(v -> new VertexWithBalance(v, balanceOf(v)))
                 .filter(v -> v.balance().isStrictlyGreaterThan(PositiveAmount.ZERO))
                 .toList();
+    }
+
+    public Map<AccountId, PositiveAmount> unspentChildren(AccountId of) {
+        return accountVertices(of).stream()
+                .flatMap(v -> unspentChildren(v).entrySet().stream())
+                .collect(Collectors.groupingBy(e -> e.getKey().accountId(),
+                        Collectors.mapping(Map.Entry::getValue,
+                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                ));
+    }
+
+    private Map<Vertex, PositiveAmount> unspentChildren(Vertex of) {
+        final var children = new HashMap<Vertex, PositiveAmount>();
+
+        new DepthFirstIterator<>(graph, of).forEachRemaining(v -> {
+            if (!v.equals(of) && balanceOf(v).isStrictlyGreaterThan(Amount.ZERO)) children.put(v, balanceOf(v));
+        });
+
+        return children;
     }
 
     private @NonNull PositiveAmount balanceOf(@NonNull final Vertex vertex) {

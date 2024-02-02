@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -119,6 +120,12 @@ public class AccountingService implements AccountingFacadePort {
 
         accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+    }
+
+    @Override
+    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId, Currency.Id currencyId) {
+        return sponsorAccountStorage.get(sponsorAccountId)
+                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(getCurrency(currencyId)).state()));
     }
 
     public void deleteTransaction(String reference) {
