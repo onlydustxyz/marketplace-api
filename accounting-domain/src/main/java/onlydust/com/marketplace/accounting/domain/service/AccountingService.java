@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 
 import java.time.ZonedDateTime;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -63,12 +64,17 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, amount) -> {
             final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
-            final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor);
-            accountBook.burn(AccountId.of(rewardId), payableAmount);
-            sponsorLedger.add(transaction.withAmount(payableAmount.negate()));
-            ledgerStorage.save(sponsorLedger);
+            final var sponsorAccountNetwork = sponsorLedger.network().orElseThrow(
+                    () -> internalServerError("Sponsor account %s is not funded".formatted(sponsorLedgerId.sponsorAccountId()))
+            );
+
+            if (transaction.network().equals(sponsorAccountNetwork)) {
+                accountBook.burn(AccountId.of(rewardId), amount);
+                sponsorLedger.add(transaction.withAmount(amount.negate()));
+                ledgerStorage.save(sponsorLedger);
+            }
         });
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());

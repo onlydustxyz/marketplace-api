@@ -133,7 +133,7 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amountToMint));
-            assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledger.unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
             assertThat(ledger.network()).isEmpty();
@@ -148,14 +148,14 @@ public class AccountingServiceTest {
         @Test
         void should_create_ledger_and_funds_it() {
             // Given
-            final var amount = PositiveAmount.of(10L);
+            final var amount = Amount.of(10L);
             final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", amount, "StrarkNet Foundation", "starknet.eth");
 
             // When
-            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, null, transaction);
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amount));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), PositiveAmount.of(amount)));
             assertThat(ledger.unlockedBalance()).isEqualTo(amount);
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
@@ -312,10 +312,11 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), network))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(10L), "StrarkNet Foundation", "starknet.eth");
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Sponsor account %s is not funded".formatted(sponsorLedger.id()));
         }
 
         /*
@@ -325,7 +326,7 @@ public class AccountingServiceTest {
          */
         @Test
         void should_fund_and_withdraw() {
-            final var amount = PositiveAmount.of(faker.number().randomNumber());
+            final var amount = Amount.of(faker.number().randomNumber());
 
             {
                 // Given
@@ -342,7 +343,7 @@ public class AccountingServiceTest {
                 // When
                 accountingService.fund(sponsorLedger.id(), transaction);
                 // Then
-                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+                assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             }
         }
 
@@ -424,7 +425,7 @@ public class AccountingServiceTest {
                     new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
                     new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
 
-            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
         /*
@@ -450,32 +451,9 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId1, currency.id(), transaction);
 
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), network))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
-        }
-
-        /*
-         * Given a sponsor that funded its account on Ethereum
-         * When A contributor is rewarded by the project
-         * Then The contributor cannot withdraw his money on Optimism
-         */
-        @Test
-        void should_withdraw_on_correct_network() {
-            // Given
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L), "StarkNet Foundation", "starknet.eth");
-            accountingService.fund(sponsorLedger.id(), transaction);
-            accountingService.transfer(sponsorLedger.id(), projectId2, PositiveAmount.of(100L), currency.id());
-            accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
-
-            // When
-            assertThat(accountingService.isPayable(rewardId2, currency.id())).isTrue();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), Network.OPTIMISM))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessage("Not enough fund on ledger %s on network OPTIMISM".formatted(AccountId.of
-//                    (sponsorLedger.id())));
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
         }
     }
 
@@ -563,10 +541,11 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), network))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(10L), "StrarkNet Foundation", "starknet.eth");
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("is not funded");
         }
 
         /*
@@ -591,13 +570,11 @@ public class AccountingServiceTest {
 
             transactions.forEach(transaction -> accountingService.fund(sponsorLedger.id(), transaction));
 
-            final var transaction = Transaction.create(network, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
-            accountingService.pay(rewardId2, currency.id(), transaction);
-
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
                     new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
-                    new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)));
+                    new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
+            );
 
             assertThat(ledgerStorage.get(sponsorLedger.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
         }
@@ -623,10 +600,10 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), network))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId1, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend from locked account");
         }
     }
 
@@ -666,10 +643,10 @@ public class AccountingServiceTest {
             accountingService.fund(unlockedSponsorLedger1.id(), transaction);
 
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), Network.ETHEREUM))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("is not funded");
         }
 
 
@@ -702,10 +679,11 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountingService.isPayable(rewardId2, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), Network.ETHEREUM))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(100L)
+                    , "StarkNet Foundation", "starknet.eth")))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("is not funded");
         }
 
         /*
@@ -726,10 +704,10 @@ public class AccountingServiceTest {
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isFalse();
-            // TODO: remove or restore
-//            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), Network.ETHEREUM))
-//                    // Then
-//                    .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
+            assertThatThrownBy(() -> accountingService.pay(rewardId, currency.id(), transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot spend from locked account");
         }
 
         /*
@@ -754,8 +732,8 @@ public class AccountingServiceTest {
                 accountingService.fund(unlockedSponsorLedger1.id(), optimismTransaction);
                 accountingService.fund(unlockedSponsorLedger2.id(), optimismTransaction);
             }
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.of(200L));
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.of(100L));
+            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
+            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(100L));
 
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
@@ -768,9 +746,9 @@ public class AccountingServiceTest {
             }
 
             // Then
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(ledgerStorage.get(unlockedSponsorLedger2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
     }
 }

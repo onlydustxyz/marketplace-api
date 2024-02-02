@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -56,18 +56,14 @@ public class Ledger {
         return this.currency;
     }
 
-    public PositiveAmount unlockedBalance() {
+    public Amount unlockedBalance() {
         return locked() ? PositiveAmount.ZERO : balance();
     }
 
-    public PositiveAmount balance() {
-        return PositiveAmount.of(transactions.stream()
+    public Amount balance() {
+        return transactions.stream()
                 .map(Transaction::amount)
-                .reduce(Amount.ZERO, Amount::add));
-    }
-
-    public PositiveAmount payableAmount(final @NonNull PositiveAmount amount) {
-        return min(amount, unlockedBalance());
+                .reduce(Amount.ZERO, Amount::add);
     }
 
     public Optional<Network> network() {
@@ -83,6 +79,12 @@ public class Ledger {
     }
 
     public void add(Transaction transaction) {
+        if (transaction.amount.isNegative() && locked())
+            throw badRequest("Cannot spend from locked account %s".formatted(id));
+
+        if (transaction.amount.add(balance()).isNegative())
+            throw badRequest("Not enough fund on account %s".formatted(id));
+
         transactions.add(transaction);
     }
 
