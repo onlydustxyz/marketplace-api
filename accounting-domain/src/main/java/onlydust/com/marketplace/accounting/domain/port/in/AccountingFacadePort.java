@@ -14,7 +14,7 @@ public interface AccountingFacadePort {
     Ledger createLedger(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
                         final ZonedDateTime lockedUntil, final @NonNull Ledger.Transaction transaction);
 
-    void fund(final @NonNull Ledger.Id sponsorAccountId, final @NonNull Ledger.Transaction transaction);
+    Ledger fund(final @NonNull Ledger.Id sponsorAccountId, final @NonNull Ledger.Transaction transaction);
 
     void pay(RewardId from, Currency.Id currencyId, Ledger.Transaction transaction);
 

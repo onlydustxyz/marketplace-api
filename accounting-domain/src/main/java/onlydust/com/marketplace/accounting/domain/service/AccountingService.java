@@ -25,12 +25,9 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
-
         final var ledger = createLedger(sponsorId, currency, lockedUntil);
 
-        final var accountBook = getAccountBook(currency);
-        accountBook.mint(AccountId.of(ledger.id()), amountToMint);
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        mint(ledger.id(), amountToMint, currencyId);
 
         return ledger;
     }
@@ -39,17 +36,24 @@ public class AccountingService implements AccountingFacadePort {
     public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil,
                                @NonNull Ledger.Transaction transaction) {
         final var ledger = createLedger(sponsorId, currencyId, amountToMint, lockedUntil);
-        // TODO fund
-        ledger.add(transaction);
-        ledgerStorage.save(ledger);
-        return ledger;
+        return fund(ledger.id(), transaction);
     }
 
     @Override
-    public void fund(@NonNull Ledger.Id sponsorLedgerId, @NonNull Ledger.Transaction transaction) {
+    public void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.mint(AccountId.of(sponsorAccountId), amount);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+    }
+
+    @Override
+    public Ledger fund(@NonNull Ledger.Id sponsorLedgerId, @NonNull Ledger.Transaction transaction) {
         final var ledger = getLedger(sponsorLedgerId);
         ledger.add(transaction);
         ledgerStorage.save(ledger);
+        return ledger;
     }
 
     private Ledger getLedger(Ledger.Id sponsorLedgerId) {
@@ -83,15 +87,6 @@ public class AccountingService implements AccountingFacadePort {
                     final var sponsorLedger = ledgerStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorLedger.unlockedBalance().isStrictlyLowerThan(entry.getValue());
                 });
-    }
-
-    @Override
-    public void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-
-        accountBook.mint(AccountId.of(sponsorAccountId), amount);
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     private AccountBookAggregate getAccountBook(Currency currency) {
@@ -137,8 +132,8 @@ public class AccountingService implements AccountingFacadePort {
                 .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
     }
 
-    private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency, ZonedDateTime lockedUntil) {
-        final var ledger = new Ledger(ownerId, currency, lockedUntil);
+    private Ledger createLedger(SponsorId sponsorId, Currency currency, ZonedDateTime lockedUntil) {
+        final var ledger = new Ledger(sponsorId, currency, lockedUntil);
         ledgerStorage.save(ledger);
         return ledger;
     }
