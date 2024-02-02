@@ -99,12 +99,11 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var ledger = getOrCreateLedger(to, currency);
 
-        accountBook.mint(AccountId.of(ledger.id()), amount);
+        accountBook.mint(AccountId.of(sponsorAccountId), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 

@@ -24,7 +24,7 @@ public interface AccountingFacadePort {
 
     void delete(Ledger.Transaction.Id transactionId);
 
-    <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId);
+    void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId);
 
     <From> Collection<AccountBook.Transaction> burn(From from, PositiveAmount amount, Currency.Id currencyId);
 

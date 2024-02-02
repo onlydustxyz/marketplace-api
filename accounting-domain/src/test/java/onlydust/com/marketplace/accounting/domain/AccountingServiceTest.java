@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain;
 
+import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Ledger.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -37,6 +38,7 @@ public class AccountingServiceTest {
     final LedgerStorageStub<Object> ledgerStorage = new LedgerStorageStub<>();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
+    final Faker faker = new Faker();
 
     @Nested
     class GivenAnUnknownCurrency {
@@ -57,7 +59,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_transfer() {
             // When
-            assertThatThrownBy(() -> accountingService.mint(sponsorId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.mint(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not found".formatted(currencyId));
@@ -258,17 +260,19 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor with a ledger
-         * When I transfer money to OnlyDust
-         * Then The transfer is registered on my ledger
+         * Given a sponsor with an account
+         * When I allocate money to for the sponsor
+         * Then The account allowance is updated
          */
         @Test
-        void should_register_transfer() {
+        void should_register_allowance() {
+            // Given
+            final var amount = PositiveAmount.of(faker.number().randomNumber());
             // When
-            accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
+            accountingService.mint(sponsorLedger.id(), amount, currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(10L)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorLedger.id()), amount));
         }
 
 
@@ -278,7 +282,7 @@ public class AccountingServiceTest {
          * Then The refund is registered on my ledger
          */
         @Test
-        void should_register_refund() {
+        void should_register_negative_allowance() {
             // When
             accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id());
 
