@@ -30,11 +30,10 @@ import static org.mockito.Mockito.when;
 public class AccountingServiceTest {
     final AccountBookEventStorageStub accountBookEventStorage = new AccountBookEventStorageStub();
     final LedgerProvider<SponsorId> sponsorLedgerProvider = new LedgerStorageStub<>();
-    final LedgerProvider<CommitteeId> committeeLedgerProvider = new LedgerStorageStub<>();
     final LedgerProvider<ProjectId> projectLedgerProvider = new LedgerStorageStub<>();
     final LedgerProvider<RewardId> rewardLedgerProvider = new LedgerStorageStub<>();
     final LedgerProviderProxy ledgerProviderProxy = new LedgerProviderProxy(
-            sponsorLedgerProvider, committeeLedgerProvider, projectLedgerProvider, rewardLedgerProvider);
+            sponsorLedgerProvider, projectLedgerProvider, rewardLedgerProvider);
     final LedgerStorageStub<Object> ledgerStorage = new LedgerStorageStub<>();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingService accountingService = new AccountingService(accountBookEventStorage, ledgerProviderProxy, ledgerStorage, currencyStorage);
@@ -100,7 +99,7 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor that has allocated money to a committee
+         * Given a sponsor that has allocated money to a project
          * When I refund money from the project in an unknown currency
          * Then The refund is rejected
          */
@@ -246,8 +245,6 @@ public class AccountingServiceTest {
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
         final Ledger sponsorLedger = new Ledger(sponsorId, currency);
-        final CommitteeId committeeId = CommitteeId.random();
-        final Ledger committeeLedger = new Ledger(committeeId, currency);
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final Ledger projectLedger2 = new Ledger(projectId2, currency);
@@ -258,7 +255,7 @@ public class AccountingServiceTest {
         @BeforeEach
         void setup() {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
-            ledgerStorage.save(sponsorLedger, committeeLedger, projectLedger2, rewardLedger2);
+            ledgerStorage.save(sponsorLedger, projectLedger2, rewardLedger2);
 
             accountBookEventStorage.events.put(currency, List.of(
                     new MintEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(300L)),
@@ -311,13 +308,13 @@ public class AccountingServiceTest {
 
         /*
          * Given a sponsor with a ledger
-         * When I allocate money to a committee
-         * Then The transfer is registered from my ledger to the committee ledger
+         * When I allocate money to a project
+         * Then The transfer is registered from my ledger to the project ledger
          */
         @Test
-        void should_register_allocation_to_committee() {
+        void should_register_allocation_to_project() {
             // When
-            accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
+            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
@@ -326,8 +323,8 @@ public class AccountingServiceTest {
 
         /*
          * Given a sponsor with a ledger
-         * When I allocate money to a committee with no ledger
-         * Then a ledger is created for the committee and the transfer is registered from my ledger to the committee ledger
+         * When I allocate money to a project with no ledger
+         * Then a ledger is created for the project and the transfer is registered from my ledger to the project ledger
          */
         @Test
         void should_create_account_and_register_allocation_to_project() {
@@ -340,14 +337,14 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor that has allocated money to a committee
-         * When I refund money from the committee
+         * Given a sponsor that has allocated money to a project
+         * When I refund money from the project
          * Then The refund is registered on my ledger
          */
         @Test
-        void should_register_refund_from_committee() {
+        void should_register_refund_from_project() {
             // When
-            accountingService.refund(committeeId, sponsorId, PositiveAmount.of(150L), currency.id());
+            accountingService.refund(projectId1, sponsorId, PositiveAmount.of(150L), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()),
@@ -370,13 +367,13 @@ public class AccountingServiceTest {
 
         /*
          * Given a sponsor with a ledger
-         * When I refund money from a committee
+         * When I refund money from a project
          * Then The refund is rejected if the sponsor has not allocated enough money
          */
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.refund(sponsorId, committeeId, PositiveAmount.of(10L), currency.id()))
+            assertThatThrownBy(() -> accountingService.refund(sponsorId, projectId1, PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot refund");
@@ -434,12 +431,12 @@ public class AccountingServiceTest {
         }
 
         /*
-         * Given a sponsor, a committee, 2 projects and 2 contributors
+         * Given a sponsor, a project, 2 projects and 2 contributors
          * When
-         *    - the sponsor funds project 1 via the committee
+         *    - the sponsor funds project 1
          *    - project 1 rewards the 2 contributors
-         *    - the committee re-allocate unspent funds from project 1 to project 2
-         *    - the committee refunds the remaining unspent funds to the sponsor
+         *    - some project1 unspent funds are re-allocated to project 2
+         *    - the project 1 refunds the remaining unspent funds to the sponsor
          *    - the sponsor funds project 2 directly
          *    - project 2 rewards contributor 2
          *    - contributor 2 withdraws his money
@@ -449,16 +446,14 @@ public class AccountingServiceTest {
         void should_do_everything() {
             // When
             accountingService.fund(sponsorId, PositiveAmount.of(300L), currency.id(), network);
-            accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(70L), currency.id());
-            accountingService.transfer(committeeId, projectId1, PositiveAmount.of(40L), currency.id());
+            accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(70L), currency.id());
 
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
             accountingService.transfer(projectId1, rewardId2, PositiveAmount.of(20L), currency.id());
 
-            accountingService.refund(projectId1, committeeId, PositiveAmount.of(10L), currency.id());
-            accountingService.transfer(committeeId, projectId2, PositiveAmount.of(20L), currency.id());
+            accountingService.transfer(projectId1, projectId2, PositiveAmount.of(20L), currency.id());
 
-            accountingService.refund(committeeId, sponsorId, PositiveAmount.of(20L), currency.id());
+            accountingService.refund(projectId1, sponsorId, PositiveAmount.of(20L), currency.id());
 
             accountingService.transfer(sponsorId, projectId2, PositiveAmount.of(35L), currency.id());
 
