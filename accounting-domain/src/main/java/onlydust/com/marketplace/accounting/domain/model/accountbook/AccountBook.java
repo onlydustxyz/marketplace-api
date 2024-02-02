@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
@@ -20,6 +21,7 @@ public interface AccountBook {
     void refund(AccountId from, AccountId to, PositiveAmount amount);
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @EqualsAndHashCode
     class AccountId {
         public static final AccountId ROOT = new AccountId(null, null);
 
