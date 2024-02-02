@@ -9,5 +9,5 @@ public interface SponsorAccountStorage {
 
     void save(SponsorAccount... sponsorAccounts);
 
-    void deleteTransaction(String reference);
+    void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
 }

@@ -21,7 +21,7 @@ public interface AccountingFacadePort {
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
-    void deleteTransaction(String reference);
+    void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
 
     void increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount, Currency.Id currencyId);
 

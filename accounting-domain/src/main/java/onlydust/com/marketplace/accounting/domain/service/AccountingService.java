@@ -128,8 +128,8 @@ public class AccountingService implements AccountingFacadePort {
                 .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(getCurrency(currencyId)).state()));
     }
 
-    public void deleteTransaction(String reference) {
-        sponsorAccountStorage.deleteTransaction(reference);
+    public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
+        sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
     }
 
     private Currency getCurrency(Currency.Id id) {
