@@ -3,11 +3,12 @@ package onlydust.com.marketplace.accounting.domain;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +22,7 @@ public class AccountBookTest {
     @Test
     public void should_mint() {
         // Given
-        final var account = Ledger.Id.random();
+        final var account = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents();
 
@@ -35,7 +36,7 @@ public class AccountBookTest {
     @Test
     public void should_burn() {
         // Given
-        final var account = Ledger.Id.random();
+        final var account = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account, amount)
@@ -51,7 +52,7 @@ public class AccountBookTest {
     @Test
     public void should_not_burn_money_we_dont_have() {
         // Given
-        final var account = Ledger.Id.random();
+        final var account = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents();
 
@@ -67,8 +68,8 @@ public class AccountBookTest {
     @Test
     public void should_transfer_money_from_an_account_to_another() {
         // Given
-        final var sender = Ledger.Id.random();
-        final var recipient = Ledger.Id.random();
+        final var sender = AccountId.of(Ledger.Id.random());
+        final var recipient = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sender, amount)
@@ -85,7 +86,7 @@ public class AccountBookTest {
     @Test
     public void should_not_transfer_money_from_an_account_to_itself() {
         // Given
-        final var sender = Ledger.Id.random();
+        final var sender = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sender, amount)
@@ -103,8 +104,8 @@ public class AccountBookTest {
     @Test
     public void should_not_transfer_money_we_dont_have() {
         // Given
-        final var sender = Ledger.Id.random();
-        final var recipient = Ledger.Id.random();
+        final var sender = AccountId.of(Ledger.Id.random());
+        final var recipient = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents();
 
@@ -121,8 +122,8 @@ public class AccountBookTest {
     @Test
     public void should_get_refund_from_an_account_to_another() {
         // Given
-        final var sender = Ledger.Id.random();
-        final var recipient = Ledger.Id.random();
+        final var sender = AccountId.of(Ledger.Id.random());
+        final var recipient = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sender, amount),
@@ -142,9 +143,9 @@ public class AccountBookTest {
     @Test
     public void should_refund_refunded_money() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, amount),
@@ -176,9 +177,9 @@ public class AccountBookTest {
     @Test
     public void should_refund_money_from_account_with_partial_spent() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(100L)),
@@ -207,8 +208,8 @@ public class AccountBookTest {
     @Test
     public void should_not_refund_more_than_received() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, amount),
@@ -230,9 +231,9 @@ public class AccountBookTest {
     @Test
     public void should_not_refund_spent_money() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, amount),
@@ -258,9 +259,9 @@ public class AccountBookTest {
     @Test
     public void should_receive_money_from_multiple_accounts() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new MintEvent(account2, PositiveAmount.of(100L))
@@ -284,9 +285,9 @@ public class AccountBookTest {
     @Test
     public void should_transfer_to_multiple_accounts() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L))
         );
@@ -309,13 +310,13 @@ public class AccountBookTest {
     @Test
     public void should_handle_multiple_transfers_and_refunds_from_multiple_accounts() {
         // Given
-        final var sponsor1 = Ledger.Id.random();
-        final var sponsor2 = Ledger.Id.random();
-        final var committee1 = Ledger.Id.random();
-        final var committee2 = Ledger.Id.random();
-        final var project1 = Ledger.Id.random();
-        final var project2 = Ledger.Id.random();
-        final var contributor = Ledger.Id.random();
+        final var sponsor1 = AccountId.of(Ledger.Id.random());
+        final var sponsor2 = AccountId.of(Ledger.Id.random());
+        final var committee1 = AccountId.of(Ledger.Id.random());
+        final var committee2 = AccountId.of(Ledger.Id.random());
+        final var project1 = AccountId.of(Ledger.Id.random());
+        final var project2 = AccountId.of(Ledger.Id.random());
+        final var contributor = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(sponsor1, PositiveAmount.of(100_000L)),
                 new MintEvent(sponsor2, PositiveAmount.of(100_000L)),
@@ -372,7 +373,7 @@ public class AccountBookTest {
     @Test
     public void should_get_account_balance() {
         // Given
-        final var recipient = Ledger.Id.random();
+        final var recipient = AccountId.of(Ledger.Id.random());
         final var amount = PositiveAmount.of(100L);
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(recipient, amount)
@@ -389,9 +390,9 @@ public class AccountBookTest {
     @Test
     public void should_get_refundable_balance() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(50L)),
@@ -417,9 +418,9 @@ public class AccountBookTest {
     @Test
     public void should_get_the_amount_of_money_transferred_from_an_account_to_another() {
         // Given
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account1, PositiveAmount.of(100L)),
                 new TransferEvent(account1, account2, PositiveAmount.of(50L)),
@@ -447,11 +448,11 @@ public class AccountBookTest {
     @Test
     public void should_get_the_list_of_accounts_that_received_money_from_me() {
         // Given
-        final var account0 = Ledger.Id.random();
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
-        final var account4 = Ledger.Id.random();
+        final var account0 = AccountId.of(Ledger.Id.random());
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
+        final var account4 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),
                 new TransferEvent(account0, account1, PositiveAmount.of(100L)),
@@ -464,19 +465,19 @@ public class AccountBookTest {
         );
 
         // When
-        final List<Transaction> transactionsFromAccount1 = accountBook.state().transactionsFrom(account1);
-        final List<Transaction> transactionsFromAccount2 = accountBook.state().transactionsFrom(account2);
-        final List<Transaction> transactionsFromAccount3 = accountBook.state().transactionsFrom(account3);
-        final List<Transaction> transactionsFromAccount4 = accountBook.state().transactionsFrom(account4);
+        final List<AccountBook.Transaction> transactionsFromAccount1 = accountBook.state().transactionsFrom(account1);
+        final List<AccountBook.Transaction> transactionsFromAccount2 = accountBook.state().transactionsFrom(account2);
+        final List<AccountBook.Transaction> transactionsFromAccount3 = accountBook.state().transactionsFrom(account3);
+        final List<AccountBook.Transaction> transactionsFromAccount4 = accountBook.state().transactionsFrom(account4);
 
         // Then
         assertThat(transactionsFromAccount1).containsExactlyInAnyOrder(
-                new Transaction(account1, account2, PositiveAmount.of(10L)),
-                new Transaction(account2, account3, PositiveAmount.of(4L)),
-                new Transaction(account1, account4, PositiveAmount.of(42L))
+                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L)),
+                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L)),
+                new AccountBook.Transaction(account1, account4, PositiveAmount.of(42L))
         );
         assertThat(transactionsFromAccount2).containsExactlyInAnyOrder(
-                new Transaction(account2, account3, PositiveAmount.of(4L))
+                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L))
         );
         assertThat(transactionsFromAccount3).isEmpty();
         assertThat(transactionsFromAccount4).isEmpty();
@@ -487,11 +488,11 @@ public class AccountBookTest {
     @Test
     public void should_get_the_list_of_accounts_that_sent_money_to_me() {
         // Given
-        final var account0 = Ledger.Id.random();
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
-        final var account4 = Ledger.Id.random();
+        final var account0 = AccountId.of(Ledger.Id.random());
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
+        final var account4 = AccountId.of(Ledger.Id.random());
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),
                 new TransferEvent(account0, account1, PositiveAmount.of(100L)),
@@ -504,27 +505,27 @@ public class AccountBookTest {
         );
 
         // When
-        final List<Transaction> transactionsToAccount1 = accountBook.state().transactionsTo(account1);
-        final List<Transaction> transactionsToAccount2 = accountBook.state().transactionsTo(account2);
-        final List<Transaction> transactionsToAccount3 = accountBook.state().transactionsTo(account3);
-        final List<Transaction> transactionsToAccount4 = accountBook.state().transactionsTo(account4);
+        final List<AccountBook.Transaction> transactionsToAccount1 = accountBook.state().transactionsTo(account1);
+        final List<AccountBook.Transaction> transactionsToAccount2 = accountBook.state().transactionsTo(account2);
+        final List<AccountBook.Transaction> transactionsToAccount3 = accountBook.state().transactionsTo(account3);
+        final List<AccountBook.Transaction> transactionsToAccount4 = accountBook.state().transactionsTo(account4);
 
         // Then
         assertThat(transactionsToAccount1).containsExactlyInAnyOrder(
-                new Transaction(account0, account1, PositiveAmount.of(99L))
+                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L))
         );
         assertThat(transactionsToAccount2).containsExactlyInAnyOrder(
-                new Transaction(account0, account1, PositiveAmount.of(99L)),
-                new Transaction(account1, account2, PositiveAmount.of(10L))
+                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L))
         );
         assertThat(transactionsToAccount3).containsExactlyInAnyOrder(
-                new Transaction(account0, account1, PositiveAmount.of(99L)),
-                new Transaction(account1, account2, PositiveAmount.of(10L)),
-                new Transaction(account2, account3, PositiveAmount.of(4L))
+                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L)),
+                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L))
         );
         assertThat(transactionsToAccount4).containsExactlyInAnyOrder(
-                new Transaction(account0, account1, PositiveAmount.of(99L)),
-                new Transaction(account1, account4, PositiveAmount.of(42L))
+                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(account1, account4, PositiveAmount.of(42L))
         );
 
         assertThat(accountBook.pendingEvents()).isEmpty();
@@ -534,10 +535,10 @@ public class AccountBookTest {
     @Test
     public void should_get_the_list_of_origin_accounts_that_sent_money_to_me_with_the_corresponding_amount() {
         // Given
-        final var account0 = Ledger.Id.random();
-        final var account1 = Ledger.Id.random();
-        final var account2 = Ledger.Id.random();
-        final var account3 = Ledger.Id.random();
+        final var account0 = AccountId.of(Ledger.Id.random());
+        final var account1 = AccountId.of(Ledger.Id.random());
+        final var account2 = AccountId.of(Ledger.Id.random());
+        final var account3 = AccountId.of(Ledger.Id.random());
 
         final var accountBook = AccountBookAggregate.fromEvents(
                 new MintEvent(account0, PositiveAmount.of(100L)),

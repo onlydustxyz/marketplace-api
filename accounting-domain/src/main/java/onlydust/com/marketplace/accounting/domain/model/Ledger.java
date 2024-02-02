@@ -75,7 +75,7 @@ public class Ledger {
     }
 
     public Transaction credit(PositiveAmount amount, Network network, ZonedDateTime lockedUntil) {
-        final var transaction = Transaction.create(network, null, amount, lockedUntil, null, null);
+        final var transaction = Transaction.create(network, "null", amount, lockedUntil, "null", "null");
         transactions.add(transaction);
         return transaction;
     }
@@ -84,7 +84,7 @@ public class Ledger {
         if (unlockedBalance(network).isStrictlyLowerThan(amount))
             throw badRequest("Not enough fund on ledger %s on network %s".formatted(id, network));
 
-        final var transaction = Transaction.create(network, null, amount.negate(), null, null, null);
+        final var transaction = Transaction.create(network, "null", amount.negate(), "null", "null");
         transactions.add(transaction);
         return transaction;
     }
@@ -134,14 +134,14 @@ public class Ledger {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            return new Transaction(Id.random(), network, reference, amount, null, thirdPartyName, thirdPartyAccountNumber);
+            return create(network, reference, amount, null, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public static Transaction create(
                 final @NonNull Network network,
                 final @NonNull String reference,
                 final @NonNull Amount amount,
-                final @NonNull ZonedDateTime lockedUntil,
+                final ZonedDateTime lockedUntil,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {

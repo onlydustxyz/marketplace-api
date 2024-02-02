@@ -2,7 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -26,7 +26,7 @@ public interface AccountingFacadePort {
 
     <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId);
 
-    <From> Collection<Transaction> burn(From from, PositiveAmount amount, Currency.Id currencyId);
+    <From> Collection<AccountBook.Transaction> burn(From from, PositiveAmount amount, Currency.Id currencyId);
 
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 

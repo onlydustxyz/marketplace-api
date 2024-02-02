@@ -3,8 +3,9 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
@@ -33,7 +34,7 @@ public class AccountingService implements AccountingFacadePort {
         final var ledger = createLedger(sponsorId, currency, lockedUntil);
 
         final var accountBook = getAccountBook(currency);
-        accountBook.mint(ledger.id(), amountToMint);
+        accountBook.mint(AccountId.of(ledger.id()), amountToMint);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
 
         return ledger;
@@ -61,11 +62,10 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public void pay(RewardId rewardId, Currency.Id currencyId, Network network) {
         final var currency = getCurrency(currencyId);
-        final var rewardLedger = getLedger(rewardId, currency);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.state().transferredAmountPerOrigin(rewardLedger.id()).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
-            final var sponsorLedger = ledgerStorage.get(sponsorLedgerId).orElseThrow();
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorLedgerId, remainingAmountForSponsor) -> {
+            final var sponsorLedger = ledgerStorage.get(sponsorLedgerId.sponsorAccountId()).orElseThrow();
             final var payableAmount = sponsorLedger.payableAmount(remainingAmountForSponsor, network);
             burn(rewardId, payableAmount, currencyId);
             withdraw(sponsorLedger, payableAmount, network);
@@ -75,14 +75,11 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
-        final var rewardLedger = getLedger(rewardId, currency);
         final var accountBook = getAccountBook(currency);
 
-        return accountBook.state().transferredAmountPerOrigin(rewardLedger.id())
-                .entrySet()
-                .stream()
+        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
                 .noneMatch(entry -> {
-                    final var sponsorLedger = ledgerStorage.get(entry.getKey()).orElseThrow();
+                    final var sponsorLedger = ledgerStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorLedger.unlockedBalance().isStrictlyLowerThan(entry.getValue());
                 });
     }
@@ -107,7 +104,7 @@ public class AccountingService implements AccountingFacadePort {
         final var accountBook = getAccountBook(currency);
         final var ledger = getOrCreateLedger(to, currency);
 
-        accountBook.mint(ledger.id(), amount);
+        accountBook.mint(AccountId.of(ledger.id()), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
@@ -116,12 +113,12 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public <To> Collection<Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public <To> Collection<AccountBook.Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
         final var ledger = getLedger(to, currency);
 
-        final var transactions = accountBook.burn(ledger.id(), amount);
+        final var transactions = accountBook.burn(AccountId.of(ledger.id()), amount);
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
         return transactions;
@@ -134,7 +131,7 @@ public class AccountingService implements AccountingFacadePort {
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getOrCreateLedger(to, currency);
 
-        accountBook.transfer(fromLedger.id(), toLedger.id(), amount);
+        accountBook.transfer(AccountId.of(fromLedger.id()), AccountId.of(toLedger.id()), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
@@ -145,7 +142,7 @@ public class AccountingService implements AccountingFacadePort {
         final var fromLedger = getLedger(from, currency);
         final var toLedger = getLedger(to, currency);
 
-        accountBook.refund(fromLedger.id(), toLedger.id(), amount);
+        accountBook.refund(AccountId.of(fromLedger.id()), AccountId.of(toLedger.id()), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 

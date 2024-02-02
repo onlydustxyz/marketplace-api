@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain;
 
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Ledger.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
@@ -140,7 +141,7 @@ public class AccountingServiceTest {
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), amountToMint, null);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amountToMint));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amountToMint));
             assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
@@ -163,7 +164,7 @@ public class AccountingServiceTest {
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, null, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amount));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amount));
             assertThat(ledger.unlockedBalance()).isEqualTo(amount);
             assertThat(ledger.currency()).isEqualTo(currency);
             assertThat(ledger.ownerId()).isEqualTo(sponsorId);
@@ -197,7 +198,7 @@ public class AccountingServiceTest {
             final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, lockedUntil, transaction);
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amount));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amount));
             assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
             assertThat(ledger.lockedUntil()).contains(lockedUntil);
 
@@ -260,8 +261,8 @@ public class AccountingServiceTest {
             ledgerStorage.save(sponsorLedger, committeeLedger, projectLedger2, rewardLedger2);
 
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger.id(), PositiveAmount.of(300L)),
-                    new TransferEvent(sponsorLedger.id(), committeeLedger.id(), PositiveAmount.of(200L))
+                    new MintEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(300L)),
+                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), PositiveAmount.of(200L))
             ));
         }
 
@@ -276,7 +277,7 @@ public class AccountingServiceTest {
             accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(10L)));
         }
 
 
@@ -291,7 +292,7 @@ public class AccountingServiceTest {
             accountingService.burn(sponsorId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new BurnEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new BurnEvent(AccountId.of(sponsorLedger.id()), PositiveAmount.of(10L)));
         }
 
         /*
@@ -319,7 +320,7 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, committeeId, PositiveAmount.of(10L), currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), committeeLedger.id(),
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
                     PositiveAmount.of(10L)));
         }
 
@@ -334,8 +335,7 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
 
             // Then
-            final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), projectLedger1.id(),
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
                     PositiveAmount.of(10L)));
         }
 
@@ -350,7 +350,7 @@ public class AccountingServiceTest {
             accountingService.refund(committeeId, sponsorId, PositiveAmount.of(150L), currency.id());
 
             // Then
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new RefundEvent(committeeLedger.id(), sponsorLedger.id(),
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()),
                     PositiveAmount.of(150L)));
         }
 
@@ -393,8 +393,7 @@ public class AccountingServiceTest {
             accountingService.transfer(sponsorId, projectId1, PositiveAmount.of(10L), currency.id());
 
             // Then
-            final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(sponsorLedger.id(), projectLedger1.id(),
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1),
                     PositiveAmount.of(10L)));
         }
 
@@ -469,21 +468,18 @@ public class AccountingServiceTest {
             accountingService.pay(rewardId2, currency.id(), network);
 
             // Then
-            final var projectLedger1 = projectLedgerProvider.get(projectId1, currency).orElseThrow();
-            final var rewardLedger1 = rewardLedgerProvider.get(rewardId1, currency).orElseThrow();
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(sponsorLedger.id(), committeeLedger.id(), PositiveAmount.of(70L)),
-                    new TransferEvent(committeeLedger.id(), projectLedger1.id(), PositiveAmount.of(40L)),
-                    new TransferEvent(projectLedger1.id(), rewardLedger1.id(), PositiveAmount.of(10L)),
-                    new TransferEvent(projectLedger1.id(), rewardLedger2.id(), PositiveAmount.of(20L)),
-                    new RefundEvent(projectLedger1.id(), committeeLedger.id(), PositiveAmount.of(10L)),
-                    new TransferEvent(committeeLedger.id(), projectLedger2.id(), PositiveAmount.of(20L)),
-                    new RefundEvent(committeeLedger.id(), sponsorLedger.id(), PositiveAmount.of(20L)),
-                    new TransferEvent(sponsorLedger.id(), projectLedger2.id(), PositiveAmount.of(35L)),
-                    new TransferEvent(projectLedger2.id(), rewardLedger2.id(), PositiveAmount.of(25L))
+                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId1), PositiveAmount.of(70L)),
+                    new TransferEvent(AccountId.of(projectId1), AccountId.of(projectId1), PositiveAmount.of(40L)),
+                    new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(10L)),
+                    new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId2), PositiveAmount.of(20L)),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(projectId1), PositiveAmount.of(10L)),
+                    new TransferEvent(AccountId.of(projectId1), AccountId.of(projectId2), PositiveAmount.of(20L)),
+                    new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorLedger.id()), PositiveAmount.of(20L)),
+                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(35L)),
+                    new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(25L))
             );
         }
-
 
         /*
          * Given a sponsor, a project and a contributor
@@ -506,8 +502,8 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
-                    new TransferEvent(sponsorLedger.id(), projectLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger2.id(), rewardLedger2.id(), PositiveAmount.of(100L))
+                    new TransferEvent(AccountId.of(sponsorLedger.id()), AccountId.of(projectId2), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L))
             );
 
             assertThat(sponsorLedgerProvider.get(sponsorId, currency).orElseThrow().unlockedBalance(network)).isEqualTo(PositiveAmount.ZERO);
@@ -628,7 +624,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.pay(rewardId2, currency.id(), Network.OPTIMISM))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Not enough fund on ledger %s on network OPTIMISM".formatted(sponsorLedger.id()));
+                    .hasMessage("Not enough fund on ledger %s on network OPTIMISM".formatted(AccountId.of(sponsorLedger.id())));
         }
     }
 
@@ -662,10 +658,10 @@ public class AccountingServiceTest {
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // Given
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
-                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger.id(), PositiveAmount.of(100L))
+                    new MintEvent(AccountId.of(sponsorLedger1.id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorLedger2.id()), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(100L))
             ));
 
             // When
@@ -688,12 +684,12 @@ public class AccountingServiceTest {
         void should_allow_contributor_to_withdraw_only_what_is_funded() {
             // Given
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
-                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger2.id(), PositiveAmount.of(100L))
+                    new MintEvent(AccountId.of(sponsorLedger1.id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorLedger2.id()), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger1.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId2), PositiveAmount.of(100L))
             ));
 
             // When
@@ -721,11 +717,11 @@ public class AccountingServiceTest {
         void should_spend_first_fundings_even_if_locked() {
             // Given
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
-                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger.id(), PositiveAmount.of(100L))
+                    new MintEvent(AccountId.of(sponsorLedger1.id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorLedger2.id()), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger1.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(100L))
             ));
 
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network, ZonedDateTime.now().plusDays(1));
@@ -749,12 +745,12 @@ public class AccountingServiceTest {
         void should_withdraw_tokens_even_if_some_are_locked_after() {
             // Given
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(100L)),
-                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger2.id(), PositiveAmount.of(100L))
+                    new MintEvent(AccountId.of(sponsorLedger1.id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorLedger2.id()), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger1.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId2), PositiveAmount.of(100L))
             ));
 
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), network);
@@ -782,11 +778,11 @@ public class AccountingServiceTest {
         void should_withdraw_on_both_networks() {
             // Given
             accountBookEventStorage.events.put(currency, List.of(
-                    new MintEvent(sponsorLedger1.id(), PositiveAmount.of(200L)),
-                    new MintEvent(sponsorLedger2.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(sponsorLedger1.id(), projectLedger.id(), PositiveAmount.of(200L)),
-                    new TransferEvent(sponsorLedger2.id(), projectLedger.id(), PositiveAmount.of(100L)),
-                    new TransferEvent(projectLedger.id(), rewardLedger.id(), PositiveAmount.of(300L))
+                    new MintEvent(AccountId.of(sponsorLedger1.id()), PositiveAmount.of(200L)),
+                    new MintEvent(AccountId.of(sponsorLedger2.id()), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(sponsorLedger1.id()), AccountId.of(projectId), PositiveAmount.of(200L)),
+                    new TransferEvent(AccountId.of(sponsorLedger2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(300L))
             ));
 
             accountingService.fund(sponsorId1, PositiveAmount.of(100L), currency.id(), Network.ETHEREUM);
