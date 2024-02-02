@@ -2,10 +2,8 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
 
 public interface AccountingFacadePort {
     Ledger createLedger(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId, final @NonNull PositiveAmount amountToMint,
@@ -22,9 +20,7 @@ public interface AccountingFacadePort {
 
     void delete(Ledger.Transaction.Id transactionId);
 
-    void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId);
-
-    Collection<AccountBook.Transaction> burn(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId);
+    void increaseAllowance(Ledger.Id sponsorAccountId, Amount amount, Currency.Id currencyId);
 
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 

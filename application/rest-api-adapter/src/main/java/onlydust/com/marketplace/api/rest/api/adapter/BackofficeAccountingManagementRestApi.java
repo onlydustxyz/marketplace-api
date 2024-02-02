@@ -53,7 +53,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var amount = PositiveAmount.of(request.getAmount());
         final var currencyId = Currency.Id.of(request.getCurrencyId());
 
-        accountingFacadePort.mint(sponsorId, amount, currencyId);
+        accountingFacadePort.increaseAllowance(sponsorId, amount, currencyId);
 
         return ResponseEntity.noContent().build();
     }

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -12,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -25,10 +23,10 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
-        final var ledger = createLedger(sponsorId, currency, lockedUntil);
+        final var ledger = new Ledger(sponsorId, currency, lockedUntil);
+        ledgerStorage.save(ledger);
 
-        mint(ledger.id(), amountToMint, currencyId);
-
+        increaseAllowance(ledger.id(), amountToMint, currencyId);
         return ledger;
     }
 
@@ -40,11 +38,15 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void mint(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
+    public void increaseAllowance(Ledger.Id sponsorAccountId, Amount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.mint(AccountId.of(sponsorAccountId), amount);
+        if (amount.isPositive())
+            accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
+        else
+            accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
+
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
@@ -54,11 +56,6 @@ public class AccountingService implements AccountingFacadePort {
         ledger.add(transaction);
         ledgerStorage.save(ledger);
         return ledger;
-    }
-
-    private Ledger getLedger(Ledger.Id sponsorLedgerId) {
-        return ledgerStorage.get(sponsorLedgerId)
-                .orElseThrow(() -> notFound("Ledger %s not found".formatted(sponsorLedgerId)));
     }
 
     @Override
@@ -89,19 +86,13 @@ public class AccountingService implements AccountingFacadePort {
                 });
     }
 
-    private AccountBookAggregate getAccountBook(Currency currency) {
-        return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
+    private Ledger getLedger(Ledger.Id sponsorLedgerId) {
+        return ledgerStorage.get(sponsorLedgerId)
+                .orElseThrow(() -> notFound("Ledger %s not found".formatted(sponsorLedgerId)));
     }
 
-    @Override
-    public Collection<AccountBook.Transaction> burn(Ledger.Id sponsorAccountId, PositiveAmount amount, Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-
-        final var transactions = accountBook.burn(AccountId.of(sponsorAccountId), amount);
-
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        return transactions;
+    private AccountBookAggregate getAccountBook(Currency currency) {
+        return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
     }
 
     @Override
@@ -130,11 +121,5 @@ public class AccountingService implements AccountingFacadePort {
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
                 .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
-    }
-
-    private Ledger createLedger(SponsorId sponsorId, Currency currency, ZonedDateTime lockedUntil) {
-        final var ledger = new Ledger(sponsorId, currency, lockedUntil);
-        ledgerStorage.save(ledger);
-        return ledger;
     }
 }

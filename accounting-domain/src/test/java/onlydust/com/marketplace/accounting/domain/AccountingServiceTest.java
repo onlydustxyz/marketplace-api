@@ -53,7 +53,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_transfer() {
             // When
-            assertThatThrownBy(() -> accountingService.mint(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -68,7 +68,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund() {
             // When
-            assertThatThrownBy(() -> accountingService.burn(Ledger.Id.random(), PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(Ledger.Id.random(), Amount.of(-10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -240,11 +240,11 @@ public class AccountingServiceTest {
         @Test
         void should_register_allowance() {
             // Given
-            final var amount = PositiveAmount.of(faker.number().randomNumber());
+            final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.mint(sponsorLedger.id(), amount, currency.id());
-            accountingService.burn(sponsorLedger.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorLedger.id(), amount.negate(), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -261,7 +261,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_refund_when_not_enough_received() {
             // When
-            assertThatThrownBy(() -> accountingService.burn(sponsorLedger.id(), PositiveAmount.of(110L), currency.id()))
+            assertThatThrownBy(() -> accountingService.increaseAllowance(sponsorLedger.id(), Amount.of(-110L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot burn");
         }
@@ -507,8 +507,8 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().randomNumber());
 
             // When
-            accountingService.mint(sponsorLedger.id(), amount, currency.id());
-            accountingService.burn(sponsorLedger.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorLedger.id(), amount.negate(), currency.id());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -617,7 +617,7 @@ public class AccountingServiceTest {
             // When
             final var transaction = Transaction.create(network, "0x123456", amount, "StarkNet Foundation", "starknet.eth");
             accountingService.fund(sponsorLedger.id(), transaction);
-            accountingService.mint(sponsorLedger.id(), amount, currency.id());
+            accountingService.increaseAllowance(sponsorLedger.id(), amount, currency.id());
 
             accountingService.transfer(sponsorLedger.id(), projectId1, amount, currency.id());
             accountingService.transfer(projectId1, rewardId1, amount, currency.id());
@@ -740,8 +740,8 @@ public class AccountingServiceTest {
         @Test
         void should_withdraw_on_both_networks() {
             // Given
-            accountingService.mint(unlockedSponsorLedger1.id(), PositiveAmount.of(200L), currency.id());
-            accountingService.mint(unlockedSponsorLedger2.id(), PositiveAmount.of(100L), currency.id());
+            accountingService.increaseAllowance(unlockedSponsorLedger1.id(), PositiveAmount.of(200L), currency.id());
+            accountingService.increaseAllowance(unlockedSponsorLedger2.id(), PositiveAmount.of(100L), currency.id());
             accountingService.transfer(unlockedSponsorLedger1.id(), projectId, PositiveAmount.of(200L), currency.id());
             accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
