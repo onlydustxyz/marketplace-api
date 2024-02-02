@@ -16,19 +16,19 @@ servers:
 paths:
   # BackofficeAccountingManagement ===============================================================
 
-  /bo/v1/sponsors/{sponsorId}/wallets:
+  /bo/v1/sponsors/{sponsorId}/accounts:
     post:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Create a new wallet for the given sponsor
-      operationId: createWallet
+      summary: Create a new account for the given sponsor
+      operationId: createSponsorAccount
       description: |
-        Create a new wallet for the given sponsor.
-        This enables internal transactions between the sponsor, projects and contributors. (mint)
-        If the receipt is provided, the funds will be available to pay contributors right away.
-        Otherwise, the funds will only be available to pay contributors once the incoming transaction receipt has been registered.
+        Create a new account for the given sponsor.
+        An account allows to:
+          - register physical transactions (from the real world) by providing transaction receipts.
+          - make funds available for internal transactions between the sponsor and projects (and eventually contributors) by providing an allowance.
       parameters:
         - in: path
           name: sponsorId
@@ -36,128 +36,187 @@ paths:
           schema:
             $ref: '#/components/schemas/SponsorId'
       requestBody:
-        description: Wallet
+        description: Account
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateWalletRequest'
+              $ref: '#/components/schemas/CreateAccountRequest'
       responses:
         "200":
-          description: 'The wallet has been created'
+          description: 'The account has been created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WalletResponse'
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
-  /bo/v1/wallets/{walletId}/virtual-balance:
-    put:
+    get:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Update the virtual balance of the given wallet.
-      operationId: updateWalletVirtualBalance
-      description: |
-        Update the virtual balance of the given wallet.
-        This will return an error if the new virtual balance is not enough to cover the spent amounts.
+      summary: Get sponsor accounts
+      operationId: getSponsorAccounts
       parameters:
         - in: path
-          name: walletId
+          name: sponsorId
           required: true
           schema:
-            $ref: '#/components/schemas/WalletId'
-      requestBody:
-        description: New virtual balance
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateWalletVirtualBalanceRequest'
+            $ref: '#/components/schemas/SponsorId'
       responses:
         "200":
-          description: 'The wallet virtual balance has been updated'
+          description: 'The sponsor accounts'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WalletResponse'
+                $ref: '#/components/schemas/AccountListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/wallets/{walletId}/physical-balance:
+  /bo/v1/sponsor-accounts/{accountId}/allowance:
     put:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Update the physical balance of the given wallet.
-      operationId: updateWalletPhysicalBalance
+      summary: Update the allowance of the given account.
+      operationId: updateAccountAllowance
       description: |
-        Update the physical balance of the given wallet.
-        This will return an error if the new physical balance is not enough to cover the spent amounts.
-        This will return an error if the receipt's network is different from the wallet's network.
+        Update the allowance of the given account, making funds available for internal transactions 
+        between the sponsor and projects (and eventually contributors).
+        
+        This will return an error if the new allowance is not enough to cover the spent amounts.
       parameters:
         - in: path
-          name: walletId
+          name: accountId
           required: true
           schema:
-            $ref: '#/components/schemas/WalletId'
+            $ref: '#/components/schemas/SponsorAccountId'
       requestBody:
-        description: Transaction receipts to register
+        description: New allowance
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateWalletPhysicalBalanceRequest'
+              $ref: '#/components/schemas/UpdateAccountAllowanceRequest'
       responses:
         "200":
-          description: 'The wallet physical balance has been updated'
+          description: 'The account allowance has been updated'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WalletResponse'
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/wallets/{walletId}:
+  /bo/v1/sponsor-accounts/{accountId}/receipts:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update the balance of the given account by providing a transaction receipt.
+      operationId: registerTransactionReceipt
+      description: |
+        Update the (physical) balance of the given account by providing a transaction receipt (from the real world).
+        This will return an error if the new balance is negative.
+        This will return an error if the receipt's network is different from the account's network.
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorAccountId'
+      requestBody:
+        description: Transaction receipt to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterTransactionReceiptRequest'
+      responses:
+        "200":
+          description: 'The transaction receipt has been registered and account balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsor-accounts/{accountId}/receipts/{reference}:
+    delete:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update the balance of the given account by removing a transaction receipt.
+      operationId: removeTransactionReceipt
+      description: |
+        Update the (physical) balance of the given account by removing a transaction receipt (from the real world).
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorAccountId'
+        - in: path
+          name: reference
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'The transaction receipt has been removed and the account balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsor-accounts/{accountId}:
     put:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Update some attributes of the wallet
-      operationId: updateWalletAttributes
+      summary: Update some attributes of the account
+      operationId: updateAccountAttributes
       description: |
-        Update some attributes of the wallet.
+        Update some attributes of the account.
       parameters:
         - in: path
-          name: walletId
+          name: accountId
           required: true
           schema:
-            $ref: '#/components/schemas/WalletId'
+            $ref: '#/components/schemas/SponsorAccountId'
       requestBody:
-        description: Wallet attributes to update
+        description: Account attributes to update
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateWalletRequest'
+              $ref: '#/components/schemas/UpdateAccountRequest'
       responses:
         "200":
-          description: 'The wallet has been updated'
+          description: 'The account has been updated'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WalletResponse'
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1065,15 +1124,15 @@ components:
           type: string
           format: uri
 
-    CreateWalletRequest:
+    CreateAccountRequest:
       type: object
       required:
         - currencyId
-        - virtualBalance
+        - allowance
       properties:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
-        virtualBalance:
+        allowance:
           type: number
         lockedUntil:
           type: string
@@ -1081,15 +1140,15 @@ components:
         receipt:
           $ref: '#/components/schemas/TransactionReceipt'
 
-    UpdateWalletVirtualBalanceRequest:
+    UpdateAccountAllowanceRequest:
       type: object
       required:
-        - virtualBalance
+        - allowance
       properties:
-        virtualBalance:
+        allowance:
           type: number
 
-    UpdateWalletPhysicalBalanceRequest:
+    RegisterTransactionReceiptRequest:
       type: object
       required:
         - receipt
@@ -1097,34 +1156,44 @@ components:
         receipt:
           $ref: '#/components/schemas/TransactionReceipt'
 
-    UpdateWalletRequest:
+    UpdateAccountRequest:
       type: object
       properties:
         lockedUntil:
           type: string
           format: date-time
 
-    WalletResponse:
+    AccountResponse:
       type: object
       required:
-        - walletId
+        - id
         - sponsorId
         - currencyId
-        - physicalBalance
-        - virtualBalance
+        - balance
+        - allowance
         - receipts
       properties:
-        walletId:
-          $ref: '#/components/schemas/WalletId'
+        id:
+          $ref: '#/components/schemas/SponsorAccountId'
         sponsorId:
           $ref: '#/components/schemas/SponsorId'
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
-        physicalBalance:
+        balance:
           type: number
-          description: This is equal to the sum of receipts amounts
-        virtualBalance:
+          description: This is equal to the sum of receipts amounts (including credits and debits)
+        allowance:
           type: number
+          description: This is the amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+        paidSpentAmount:
+          type: number
+          description: This is equal to the sum of spent amounts which have already been paid (in the real world)
+        awaitingPaymentSpentAmount:
+          type: number
+          description: This is equal to the sum of spent amounts which have not been paid yet (in the real world)
+        spentAmount:
+          type: number
+          description: This is equal to the sum of paidSpentAmount and awaitingPaymentSpentAmount
         lockedUntil:
           type: string
           format: date-time
@@ -1132,6 +1201,16 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TransactionReceipt'
+
+    AccountListResponse:
+      type: object
+      required:
+        - accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountResponse'
 
     TransactionRequest:
       type: object
@@ -1174,18 +1253,18 @@ components:
     TransactionReceipt:
       type: object
       required:
+        - reference
         - amount
         - network
-        - reference
         - thirdPartyName
         - thirdPartyAccountNumber
       properties:
+        reference:
+          type: string
         amount:
           type: number
         network:
           $ref: '#/components/schemas/TransactionNetwork'
-        reference:
-          type: string
         thirdPartyName:
           type: string
           description: Name of the third party for which the transaction has been made
@@ -1210,11 +1289,11 @@ components:
     ProjectBudgetAllocationRequest:
       type: object
       required:
-        - walletId
+        - sponsorAccountId
         - amount
       properties:
-        walletId:
-          $ref: '#/components/schemas/WalletId'
+        sponsorAccountId:
+          $ref: '#/components/schemas/SponsorAccountId'
         amount:
           type: number
 
@@ -1737,7 +1816,7 @@ components:
       type: string
       format: uuid
 
-    WalletId:
+    SponsorAccountId:
       type: string
       format: uuid
 
