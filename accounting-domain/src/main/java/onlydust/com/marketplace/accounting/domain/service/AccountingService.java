@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
@@ -23,6 +24,25 @@ public class AccountingService implements AccountingFacadePort {
 
     public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
         fund(sponsorId, amount, currencyId, network, null);
+    }
+
+    @Override
+    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint) {
+        final var currency = getCurrency(currencyId);
+        final var ledger = createLedger(sponsorId, currency);
+        final var accountBook = getAccountBook(currency);
+        accountBook.mint(ledger.id(), amountToMint);
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        return ledger;
+    }
+
+    @Override
+    public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                               @NonNull Ledger.Transaction transaction) {
+        final var ledger = createLedger(sponsorId, currencyId, amountToMint);
+        ledger.add(transaction);
+        ledgerStorage.save(ledger);
+        return ledger;
     }
 
     @Override

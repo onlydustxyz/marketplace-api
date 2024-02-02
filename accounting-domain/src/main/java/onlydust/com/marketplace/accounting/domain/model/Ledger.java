@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
@@ -19,6 +20,7 @@ public class Ledger {
     final @NonNull Id id;
     final @NonNull Object ownerId;
     final @NonNull Currency currency;
+
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
@@ -78,6 +80,14 @@ public class Ledger {
         final var transaction = new Transaction(Transaction.Id.random(), amount.negate(), network, null);
         transactions.add(transaction);
         return transaction;
+    }
+
+    public Optional<Network> network() {
+        return transactions.stream().map(Transaction::network).findFirst();
+    }
+
+    public void add(Transaction transaction) {
+        transactions.add(transaction);
     }
 
     @NoArgsConstructor(staticName = "random")

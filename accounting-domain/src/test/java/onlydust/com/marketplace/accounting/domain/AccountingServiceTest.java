@@ -20,8 +20,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -127,17 +127,52 @@ public class AccountingServiceTest {
 
         /*
          * Given a newly created sponsor
-         * When I transfer money to OnlyDust
-         * Then A new ledger is created for me and the transfer is registered on it
+         * When I allocate money on it
+         * Then A new ledger is created and the mint is registered
          */
         @Test
-        void should_create_ledger_and_register_transfer() {
+        void should_create_ledger_and_mint_virtual_balance() {
+            // Given
+            final var amountToMint = PositiveAmount.of(10L);
+
             // When
-            accountingService.mint(sponsorId, PositiveAmount.of(10L), currency.id());
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amountToMint);
 
             // Then
-            final var sponsorLedger = sponsorLedgerProvider.get(sponsorId, currency).orElseThrow();
-            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(sponsorLedger.id(), PositiveAmount.of(10L)));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amountToMint));
+            assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
+            assertThat(ledger.currency()).isEqualTo(currency);
+            assertThat(ledger.ownerId()).isEqualTo(sponsorId);
+            assertThat(ledger.network()).isEmpty();
+        }
+
+        /*
+         * Given a newly created sponsor
+         * When I allocate money on it and provide a receipt
+         * Then A new ledger is created, the mint is registered and the physical balance is updated
+         */
+        @Test
+        void should_create_ledger_and_funds_it() {
+            // Given
+            final var amount = PositiveAmount.of(10L);
+            final var transaction = new Ledger.Transaction(Ledger.Transaction.Id.random(), amount, Network.ETHEREUM, null);
+
+            // When
+            final var ledger = accountingService.createLedger(sponsorId, currency.id(), amount, transaction);
+
+            // Then
+            assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(ledger.id(), amount));
+            assertThat(ledger.unlockedBalance()).isEqualTo(amount);
+            assertThat(ledger.currency()).isEqualTo(currency);
+            assertThat(ledger.ownerId()).isEqualTo(sponsorId);
+            assertThat(ledger.network()).contains(transaction.network());
+
+            final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
+            assertThat(savedLedger.id()).isEqualTo(ledger.id());
+            assertThat(savedLedger.unlockedBalance()).isEqualTo(ledger.unlockedBalance());
+            assertThat(savedLedger.currency()).isEqualTo(ledger.currency());
+            assertThat(savedLedger.ownerId()).isEqualTo(ledger.ownerId());
+            assertThat(savedLedger.network()).isEqualTo(ledger.network());
         }
 
         /*
