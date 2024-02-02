@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Ledger {
     final @NonNull Id id;
     final @NonNull Object ownerId;
     final @NonNull Currency currency;
-    ZonedDateTime lockedUntil;
+    Instant lockedUntil;
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
@@ -29,7 +30,7 @@ public class Ledger {
         this.id = Id.random();
         this.ownerId = ownerId;
         this.currency = currency;
-        this.lockedUntil = lockedUntil;
+        this.lockedUntil = lockedUntil.toInstant();
     }
 
     public <OwnerId> Ledger(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
@@ -93,12 +94,12 @@ public class Ledger {
         return transactions.stream().map(Transaction::network).findFirst();
     }
 
-    public Optional<ZonedDateTime> lockedUntil() {
+    public Optional<Instant> lockedUntil() {
         return Optional.ofNullable(lockedUntil);
     }
 
     public boolean locked() {
-        return lockedUntil != null && lockedUntil.isAfter(ZonedDateTime.now());
+        return lockedUntil != null && lockedUntil.isAfter(Instant.now());
     }
 
     public void add(Transaction transaction) {

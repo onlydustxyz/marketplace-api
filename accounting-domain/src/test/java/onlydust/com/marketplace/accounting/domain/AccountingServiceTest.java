@@ -199,7 +199,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(ledger.id()), amount));
             assertThat(ledger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
-            assertThat(ledger.lockedUntil()).contains(lockedUntil);
+            assertThat(ledger.lockedUntil()).contains(lockedUntil.toInstant());
 
             final var savedLedger = ledgerStorage.get(ledger.id()).orElseThrow();
             assertThat(savedLedger.unlockedBalance()).isEqualTo(PositiveAmount.ZERO);
