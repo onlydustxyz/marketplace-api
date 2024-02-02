@@ -85,6 +85,9 @@ public class Ledger {
         if (transaction.amount.add(balance()).isNegative())
             throw badRequest("Not enough fund on account %s".formatted(id));
 
+        if (network().orElse(transaction.network()) != transaction.network())
+            throw badRequest("Cannot mix transactions from different networks");
+
         transactions.add(transaction);
     }
 

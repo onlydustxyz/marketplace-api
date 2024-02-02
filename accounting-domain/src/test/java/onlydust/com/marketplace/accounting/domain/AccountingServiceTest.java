@@ -442,6 +442,24 @@ public class AccountingServiceTest {
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Not enough fund");
         }
+
+        /*
+         * Given a sponsor account
+         * When I fund it on a given network
+         * Then I cannot fund it on a different network
+         */
+        @Test
+        void should_forbid_different_networks_on_same_account() {
+            // Given
+            accountingService.fund(sponsorLedger.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+
+            // When
+            assertThatThrownBy(() -> accountingService.fund(sponsorLedger.id(), fakeTransaction(Network.STARKNET, PositiveAmount.of(100L))))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot mix transactions from different networks");
+        }
+
     }
 
     @Nested
@@ -696,8 +714,7 @@ public class AccountingServiceTest {
             accountingService.transfer(unlockedSponsorLedger2.id(), projectId, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
 
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
-            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
+            accountingService.fund(unlockedSponsorLedger1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(200L)));
             accountingService.fund(unlockedSponsorLedger2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
 
             assertThat(ledgerStorage.get(unlockedSponsorLedger1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
