@@ -43,7 +43,7 @@ public class AccountingServiceTest {
         void setup() {
             when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
         }
-        
+
         /*
          * Given a sponsor account
          * When I allocate money to a project in an unknown currency
@@ -103,7 +103,7 @@ public class AccountingServiceTest {
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amountToMint));
             assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
-            assertThat(sponsorAccount.account().ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
             assertThat(sponsorAccount.account().network()).isEmpty();
             assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
             assertThat(sponsorAccount.allowance()).isEqualTo(amountToMint);
@@ -128,7 +128,7 @@ public class AccountingServiceTest {
                     new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(amount)));
             assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(amount);
             assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
-            assertThat(sponsorAccount.account().ownerId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
             assertThat(sponsorAccount.account().network()).contains(transaction.network());
             assertThat(sponsorAccount.account().getTransactions()).containsExactly(transaction);
             assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
@@ -137,7 +137,7 @@ public class AccountingServiceTest {
             assertThat(savedAccount.id()).isEqualTo(sponsorAccount.account().id());
             assertThat(savedAccount.unlockedBalance()).isEqualTo(sponsorAccount.account().unlockedBalance());
             assertThat(savedAccount.currency()).isEqualTo(sponsorAccount.account().currency());
-            assertThat(savedAccount.ownerId()).isEqualTo(sponsorAccount.account().ownerId());
+            assertThat(savedAccount.sponsorId()).isEqualTo(sponsorAccount.account().sponsorId());
             assertThat(savedAccount.network()).isEqualTo(sponsorAccount.account().network());
             assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.account().getTransactions());
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());

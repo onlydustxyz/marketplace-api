@@ -258,24 +258,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresSponsorAccountStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository,
-                                                                             final LedgerTransactionRepository ledgerTransactionRepository) {
-        return new PostgresSponsorAccountStorageAdapter(ledgerRepository, ledgerTransactionRepository);
-    }
-
-    @Bean
-    public PostgresSponsorLedgerProviderAdapter postgresSponsorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresSponsorLedgerProviderAdapter(ledgerRepository);
-    }
-
-    @Bean
-    public PostgresRewardLedgerProviderAdapter postgresRewardLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresRewardLedgerProviderAdapter(ledgerRepository);
-    }
-
-    @Bean
-    public PostgresProjectLedgerProviderAdapter postgresProjectLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresProjectLedgerProviderAdapter(ledgerRepository);
+    public PostgresSponsorAccountStorageAdapter postgresLedgerStorageAdapter(final SponsorAccountRepository sponsorAccountRepository) {
+        return new PostgresSponsorAccountStorageAdapter(sponsorAccountRepository);
     }
 
     @Bean

@@ -8,12 +8,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Netwo
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,32 +18,34 @@ import java.util.UUID;
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
 @Value
 @Builder(access = AccessLevel.PRIVATE)
-@Table(name = "ledger_transactions", schema = "accounting")
-public class LedgerTransactionEntity {
+@Table(name = "sponsor_account_transactions", schema = "accounting")
+public class SponsorAccountTransactionsEntity {
     @Id
-    @NonNull UUID id;
-
-    @NonNull UUID ledgerId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+    @NonNull UUID accountId;
 
     @Enumerated(javax.persistence.EnumType.STRING)
     @Type(type = "network")
     @NonNull NetworkEnumEntity network;
 
+    @NonNull String reference;
     @NonNull BigDecimal amount;
-
-    ZonedDateTime lockedUntil;
+    @NonNull String thirdPartyName;
+    @NonNull String thirdPartyAccountNumber;
 
     public SponsorAccount.Transaction toTransaction() {
-        return new SponsorAccount.Transaction(SponsorAccount.Transaction.Id.of(id), Amount.of(amount), network.toNetwork(), lockedUntil);
+        return new SponsorAccount.Transaction(network.toNetwork(), reference, Amount.of(amount), thirdPartyName, thirdPartyAccountNumber);
     }
 
-    public static LedgerTransactionEntity of(SponsorAccount.Id ledgerId, SponsorAccount.Transaction transaction) {
-        return LedgerTransactionEntity.builder()
-                .id(transaction.id().value())
-                .ledgerId(ledgerId.value())
+    public static SponsorAccountTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction transaction) {
+        return SponsorAccountTransactionsEntity.builder()
+                .accountId(sponsorAccountId.value())
                 .amount(transaction.amount().getValue())
                 .network(NetworkEnumEntity.of(transaction.network()))
-                .lockedUntil(transaction.lockedUntil())
+                .reference(transaction.reference())
+                .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber())
+                .thirdPartyName(transaction.thirdPartyName())
                 .build();
     }
 }

@@ -18,28 +18,28 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 public class SponsorAccount {
     @EqualsAndHashCode.Include
     final @NonNull Id id;
-    final @NonNull Object ownerId;
+    final @NonNull SponsorId sponsorId;
     final @NonNull Currency currency;
     Instant lockedUntil;
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
 
-    public <OwnerId> SponsorAccount(final @NonNull OwnerId ownerId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
+    public SponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
         this.id = Id.random();
-        this.ownerId = ownerId;
+        this.sponsorId = sponsorId;
         this.currency = currency;
         this.lockedUntil = lockedUntil == null ? null : lockedUntil.toInstant();
     }
 
-    public <OwnerId> SponsorAccount(final @NonNull OwnerId ownerId, final @NonNull Currency currency) {
+    public SponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency currency) {
         this.id = Id.random();
-        this.ownerId = ownerId;
+        this.sponsorId = sponsorId;
         this.currency = currency;
     }
 
     public static SponsorAccount of(SponsorAccount other) {
-        final var sponsorAccount = new SponsorAccount(other.id, other.ownerId, other.currency, other.lockedUntil);
+        final var sponsorAccount = new SponsorAccount(other.id, other.sponsorId, other.currency, other.lockedUntil);
         sponsorAccount.transactions.addAll(other.transactions);
         return sponsorAccount;
     }
@@ -48,8 +48,8 @@ public class SponsorAccount {
         return this.id;
     }
 
-    public Object ownerId() {
-        return this.ownerId;
+    public SponsorId sponsorId() {
+        return this.sponsorId;
     }
 
     public Currency currency() {
@@ -111,7 +111,6 @@ public class SponsorAccount {
             @NonNull Network network,
             @NonNull String reference,
             @NonNull Amount amount,
-            ZonedDateTime lockedUntil,
             @NonNull String thirdPartyName,
             @NonNull String thirdPartyAccountNumber
     ) {
@@ -122,22 +121,11 @@ public class SponsorAccount {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            return create(network, reference, amount, null, thirdPartyName, thirdPartyAccountNumber);
-        }
-
-        public static Transaction create(
-                final @NonNull Network network,
-                final @NonNull String reference,
-                final @NonNull Amount amount,
-                final ZonedDateTime lockedUntil,
-                final @NonNull String thirdPartyName,
-                final @NonNull String thirdPartyAccountNumber
-        ) {
-            return new Transaction(network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
+            return new Transaction(network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
         }
 
         public Transaction withAmount(Amount amount) {
-            return new Transaction(network, reference, amount, lockedUntil, thirdPartyName, thirdPartyAccountNumber);
+            return new Transaction(network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
         }
     }
 }

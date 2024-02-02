@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -20,8 +18,10 @@ public interface AccountBook {
 
     void refund(AccountId from, AccountId to, PositiveAmount amount);
 
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @EqualsAndHashCode
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
     class AccountId {
         public static final AccountId ROOT = new AccountId(null, null);
 
@@ -57,7 +57,7 @@ public interface AccountBook {
         public SponsorAccount.Id sponsorAccountId() {
             if (!isSponsorAccount())
                 throw new IllegalArgumentException("Only sponsor accounts can be converted to sponsor account id");
-            
+
             return SponsorAccount.Id.of(id);
         }
 
