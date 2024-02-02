@@ -11,10 +11,11 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStora
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
 import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
@@ -22,10 +23,6 @@ public class AccountingService implements AccountingFacadePort {
     private final LedgerProvider<Object> ledgerProvider;
     private final LedgerStorage ledgerStorage;
     private final CurrencyStorage currencyStorage;
-
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        fund(sponsorId, amount, currencyId, network, null);
-    }
 
     @Override
     public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil) {
@@ -44,19 +41,22 @@ public class AccountingService implements AccountingFacadePort {
     public Ledger createLedger(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint, ZonedDateTime lockedUntil,
                                @NonNull Ledger.Transaction transaction) {
         final var ledger = createLedger(sponsorId, currencyId, amountToMint, lockedUntil);
+        // TODO fund
         ledger.add(transaction);
         ledgerStorage.save(ledger);
         return ledger;
     }
 
     @Override
-    public Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
-        final var currency = getCurrency(currencyId);
-        final var ledger = getOrCreateLedger(sponsorId, currency);
-
-        final var transaction = ledger.credit(amount, network, lockedUntil);
+    public void fund(@NonNull Ledger.Id sponsorLedgerId, @NonNull Ledger.Transaction transaction) {
+        final var ledger = getLedger(sponsorLedgerId);
+        ledger.add(transaction);
         ledgerStorage.save(ledger);
-        return transaction.id();
+    }
+
+    private Ledger getLedger(Ledger.Id sponsorLedgerId) {
+        return ledgerStorage.get(sponsorLedgerId)
+                .orElseThrow(() -> notFound("Ledger %s not found".formatted(sponsorLedgerId)));
     }
 
     @Override
@@ -149,7 +149,7 @@ public class AccountingService implements AccountingFacadePort {
 
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
-                .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
+                .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
     }
 
     private <From> Ledger getOrCreateLedger(From from, Currency currency) {
@@ -165,6 +165,6 @@ public class AccountingService implements AccountingFacadePort {
 
     private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
         return ledgerProvider.get(ownerId, currency)
-                .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
+                .orElseThrow(() -> notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
     }
 }
