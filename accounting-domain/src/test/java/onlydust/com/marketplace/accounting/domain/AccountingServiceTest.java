@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -785,6 +788,188 @@ public class AccountingServiceTest {
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+        }
+    }
+
+    @Nested
+    class GivenAProjectWithBudget {
+        final Currency usdc = Currencies.USDC;
+        final Currency op = Currencies.OP;
+        final SponsorId sponsorId = SponsorId.random();
+        SponsorAccount unlockedSponsorAccountUsdc1;
+        SponsorAccount unlockedSponsorAccountUsdc2;
+        SponsorAccount unlockedSponsorAccountOp;
+        SponsorAccount lockedSponsorAccountUsdc;
+        final ProjectId projectId = ProjectId.random();
+        final RewardId rewardId1 = RewardId.random();
+        final RewardId rewardId2 = RewardId.random();
+        final RewardId rewardId3 = RewardId.random();
+        final RewardId rewardId4 = RewardId.random();
+        final RewardId rewardId5 = RewardId.random();
+        final RewardId rewardId6 = RewardId.random();
+
+        @BeforeEach
+        void setup() {
+            usdc.erc20().add(ERC20Tokens.OP_USDC);
+
+            when(currencyStorage.get(usdc.id())).thenReturn(Optional.of(usdc));
+            when(currencyStorage.get(op.id())).thenReturn(Optional.of(op));
+            when(currencyStorage.all()).thenReturn(Set.of(usdc, op));
+
+            unlockedSponsorAccountUsdc1 = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(200L), null).account();
+            unlockedSponsorAccountUsdc2 = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(100L), null).account();
+            unlockedSponsorAccountOp = accountingService.createSponsorAccount(sponsorId, op.id(), PositiveAmount.of(100L), null).account();
+            lockedSponsorAccountUsdc = accountingService.createSponsorAccount(sponsorId, usdc.id(), PositiveAmount.of(100L),
+                    ZonedDateTime.now().plusDays(1)).account();
+
+            accountingService.transfer(unlockedSponsorAccountUsdc1.id(), projectId, PositiveAmount.of(200L), usdc.id());
+            accountingService.transfer(unlockedSponsorAccountUsdc2.id(), projectId, PositiveAmount.of(100L), usdc.id());
+            accountingService.transfer(unlockedSponsorAccountOp.id(), projectId, PositiveAmount.of(100L), op.id());
+            accountingService.transfer(lockedSponsorAccountUsdc.id(), projectId, PositiveAmount.of(100L), usdc.id());
+
+            accountingService.transfer(projectId, rewardId1, PositiveAmount.of(75L), usdc.id());
+            accountingService.transfer(projectId, rewardId2, PositiveAmount.of(75L), usdc.id());
+            accountingService.transfer(projectId, rewardId3, PositiveAmount.of(75L), usdc.id());
+            accountingService.transfer(projectId, rewardId4, PositiveAmount.of(75L), usdc.id());
+            accountingService.transfer(projectId, rewardId5, PositiveAmount.of(90L), op.id());
+            accountingService.transfer(projectId, rewardId6, PositiveAmount.of(75L), usdc.id());
+        }
+
+        /*
+         * Given a project with a budget
+         * When I reward contributors
+         * Then We can list the payable rewards
+         */
+        @Test
+        void should_return_no_payable_reward_if_no_fund() {
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).isEmpty();
+        }
+
+        @Test
+        void should_return_payable_rewards_on_one_currency_and_one_network() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(150L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).containsExactlyInAnyOrder(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L))
+            );
+        }
+
+        @Test
+        void should_return_payable_rewards_on_multiple_currencies() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(150L)));
+            accountingService.fund(unlockedSponsorAccountOp.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(90L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).containsExactlyInAnyOrder(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId5, op.forNetwork(Network.ETHEREUM), PositiveAmount.of(90L))
+            );
+        }
+
+        @Test
+        void should_return_payable_rewards_on_multiple_networks() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(200L)));
+            accountingService.fund(unlockedSponsorAccountUsdc2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(50L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).containsExactlyInAnyOrder(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+            );
+        }
+
+        @Test
+        void should_return_payable_rewards_on_multiple_currencies_on_multiple_networks() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(125L)));
+            accountingService.fund(unlockedSponsorAccountUsdc2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(30L)));
+            accountingService.fund(unlockedSponsorAccountOp.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            // rewardId1 is payable because it is entirely funded on network ETHEREUM
+            // rewardId2 is NOT payable because it is NOT entirely funded on network ETHEREUM (we funded 125L but 150L would have been required)
+            // rewardId3 is payable because it is entirely funded on networks ETHEREUM and OPTIMISM (50 are coming from the 125 on ETHEREUM and 25 from the
+            // 30 on OPTIMISM)
+            // rewardId5 is payable because it is entirely funded on network OPTIMISM (for currency OP)
+            assertThat(payableRewards).hasSize(4);
+            assertThat(payableRewards).containsOnlyOnce(
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)),
+                    new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+            );
+            assertThat(List.of(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)),
+                    new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L)))).containsAll(payableRewards);
+        }
+
+        @Test
+        void should_return_payable_rewards_unless_they_are_locked() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100_000L)));
+            accountingService.fund(unlockedSponsorAccountUsdc2.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100_000L)));
+            accountingService.fund(lockedSponsorAccountUsdc.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100_000L)));
+            accountingService.fund(unlockedSponsorAccountOp.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(100_000L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).containsExactlyInAnyOrder(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId4, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
+            );
+        }
+
+        /*
+        We don't want to just return a list of payable-rewards.
+        We actually want to return a payable-list of rewards, meaning th whole list can be paid in one go, and in any order.
+        Hence, in this test, we want to return only one reward (among rewardId1 and rewardId2), because if we were returning both of them,
+        the second one wouldn't be payable anymore once the first one has been paid (there is enough funds to pay one reward, not both).
+         */
+        @Test
+        void should_return_payable_rewards_up_to_sponsor_balance() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(75L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).hasSize(1);
+            assertThat(List.of(
+                    new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
+                    new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)))
+            ).contains(payableRewards.get(0));
         }
     }
 }

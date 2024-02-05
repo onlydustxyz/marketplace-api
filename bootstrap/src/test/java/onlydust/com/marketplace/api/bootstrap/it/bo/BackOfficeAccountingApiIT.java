@@ -407,7 +407,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .bodyValue("""
                         {
                             "recipientId": "%d",
-                            "amount": 0.01,
+                            "amount": 30,
                             "currency": "STRK",
                             "items": [{
                                 "type": "PULL_REQUEST",
@@ -420,5 +420,28 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isOk();
+
+        // Then
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accounts[0].balance").isEqualTo(100)
+                .jsonPath("$.accounts[0].allowance").isEqualTo(0)
+                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+        ;
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_PENDING_PAYMENTS))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .consumeWith(System.out::println);
     }
 }

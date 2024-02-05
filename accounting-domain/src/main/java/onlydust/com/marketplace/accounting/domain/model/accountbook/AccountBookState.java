@@ -206,6 +206,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
                 ));
     }
 
+    public Map<AccountId, PositiveAmount> unspentChildren() {
+        return unspentChildren(ROOT);
+    }
+
     private Map<Vertex, PositiveAmount> unspentChildren(Vertex of) {
         final var children = new HashMap<Vertex, PositiveAmount>();
 

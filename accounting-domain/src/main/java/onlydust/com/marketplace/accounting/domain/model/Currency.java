@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
@@ -38,7 +39,7 @@ public class Currency {
                 .code(Code.of(token.getSymbol()))
                 .type(Type.CRYPTO)
                 .standard(Standard.ERC20)
-                .erc20(Set.of(token))
+                .erc20(new HashSet<>(Set.of(token)))
                 .decimals(token.getDecimals())
                 .build();
     }
@@ -124,6 +125,32 @@ public class Currency {
         return toBuilder().erc20(erc20).build();
     }
 
+    public PayableCurrency forNetwork(final @NonNull Network network) {
+        if (!type.equals(network.type()))
+            throw OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network));
+
+        if (type == Type.FIAT)
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), standard, null, null);
+
+        if (network.equals(nativeNetwork()))
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, nativeNetwork().blockchain(), null);
+
+        final var erc20 = erc20().stream().filter(e -> e.getBlockchain().equals(network.blockchain()))
+                .findFirst().orElseThrow(() -> OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network)));
+
+        return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), standard, erc20.getBlockchain(), erc20.getAddress());
+    }
+
+    private Network nativeNetwork() {
+        return switch (code.toString()) {
+            case Code.ETH -> Network.ETHEREUM;
+            case Code.APT -> Network.APTOS;
+            case Code.STRK -> Network.STARKNET;
+            case Code.OP -> Network.OPTIMISM;
+            default -> null;
+        };
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
@@ -140,6 +167,11 @@ public class Currency {
     @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Code {
+        public final static String ETH = "ETH";
+        public final static String APT = "APT";
+        public final static String STRK = "STRK";
+        public final static String OP = "OP";
+
         String inner;
 
         @Override

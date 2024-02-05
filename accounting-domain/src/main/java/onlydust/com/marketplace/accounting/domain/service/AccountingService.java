@@ -6,14 +6,15 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -150,6 +151,13 @@ public class AccountingService implements AccountingFacadePort {
         return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
     }
 
+    @Override
+    public List<PayableReward> getPayableRewards() {
+        return currencyStorage.all().stream()
+                .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards())
+                .toList();
+    }
+
     public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
         sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
         return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
@@ -158,5 +166,57 @@ public class AccountingService implements AccountingFacadePort {
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
                 .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
+    }
+
+    class PayableRewardAggregator {
+        private final @NonNull CachedSponsorAccountProvider sponsorAccountProvider;
+        private final @NonNull Currency currency;
+        private final @NonNull AccountBookAggregate accountBook;
+
+        public PayableRewardAggregator(final @NonNull SponsorAccountProvider sponsorAccountProvider, final @NonNull Currency currency) {
+            this.sponsorAccountProvider = new CachedSponsorAccountProvider(sponsorAccountProvider);
+            this.currency = currency;
+            this.accountBook = getAccountBook(currency);
+        }
+
+        public Stream<PayableReward> getPayableRewards() {
+            final var distinctPayableRewards = accountBook.state().unspentChildren().keySet().stream()
+                    .filter(AccountId::isReward)
+                    .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId(), currency.id()))
+                    .flatMap(this::trySpend)
+                    .collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
+
+            return distinctPayableRewards.values().stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get);
+        }
+
+        private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
+            return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream()
+                    .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
+                    .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
+                    .map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));
+        }
+
+        private void spend(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
+            final var sponsorAccount = sponsorAccount(sponsorAccountId);
+
+            final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
+            sponsorAccount.add(SponsorAccount.Transaction.create(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
+        }
+
+        private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
+            final var sponsorAccountNetwork = sponsorAccount(sponsorAccountId).network().orElseThrow();
+            return new PayableReward(rewardId, currency.forNetwork(sponsorAccountNetwork), amount);
+        }
+
+        private boolean stillEnoughBalance(SponsorAccount.Id sponsorAccountId, PositiveAmount amount) {
+            return sponsorAccount(sponsorAccountId).unlockedBalance().isGreaterThanOrEqual(amount);
+        }
+
+        private SponsorAccount sponsorAccount(SponsorAccount.Id sponsorAccountId) {
+            return sponsorAccountProvider.get(sponsorAccountId)
+                    .orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
+        }
     }
 }

@@ -1,5 +1,28 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+
 public enum Network {
-    ETHEREUM, OPTIMISM, STARKNET, APTOS, SEPA, SWIFT;
+    ETHEREUM(Currency.Type.CRYPTO, Blockchain.ETHEREUM),
+    OPTIMISM(Currency.Type.CRYPTO, Blockchain.OPTIMISM),
+    STARKNET(Currency.Type.CRYPTO, Blockchain.STARKNET),
+    APTOS(Currency.Type.CRYPTO, Blockchain.APTOS),
+    SEPA(Currency.Type.FIAT, null),
+    SWIFT(Currency.Type.FIAT, null);
+
+    private final Currency.Type type;
+    private final Blockchain nativeBlockchain;
+
+    Network(Currency.Type type, Blockchain nativeBlockchain) {
+        this.type = type;
+        this.nativeBlockchain = nativeBlockchain;
+    }
+
+    public Currency.Type type() {
+        return type;
+    }
+
+    public Blockchain blockchain() {
+        return nativeBlockchain;
+    }
 }
