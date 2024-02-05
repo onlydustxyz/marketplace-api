@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     static final SponsorId COCA_COLAX = SponsorId.of("44c6807c-48d1-4987-a0a6-ac63f958bdae");
     static final SponsorId THEODO = SponsorId.of("2639563e-4437-4bde-a4f4-654977c0cb39");
+    static final SponsorId REDBULL = SponsorId.of("0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa");
 
     static final ProjectId BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
     static final ProjectId KAAPER = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
@@ -294,7 +295,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
     }
 
-
     @Test
     void should_update_sponsor_account() {
         // Given
@@ -341,5 +341,51 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .jsonPath("$.lockedUntil").isEqualTo("2024-03-31T00:00:00Z")
         ;
+    }
+
+    @Test
+    void should_allocate_budget_to_project_and_pay_rewards() {
+        // Given
+        final var accountId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 100,
+                            "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "ETHEREUM",
+                                "thirdPartyName": "RedBull",
+                                "thirdPartyAccountNumber": "red-bull.eth"
+                            }
+                        }
+                        """.formatted(BTC))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody().getId();
+
+        // Given
+        client.post()
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "sponsorAccountId": "%s",
+                            "amount": 100
+                        }
+                        """.formatted(accountId))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+
     }
 }
