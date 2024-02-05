@@ -79,25 +79,25 @@ public class ProjectPageItemViewEntityTest {
         @Test
         void given_one_tag() {
             // Given
-            final List<Project.Tag> tags = List.of(Project.Tag.BEGINNERS_WELCOME);
+            final List<Project.Tag> tags = List.of(Project.Tag.NEWBIES_WELCOME);
 
             // When
             final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
 
             // Then
-            assertEquals("$[*] ? (@.name == \"BEGINNERS_WELCOME\")", tagsJsonPath);
+            assertEquals("$[*] ? (@.name == \"NEWBIES_WELCOME\")", tagsJsonPath);
         }
 
         @Test
         void given_two_tags() {
             // Given
-            final List<Project.Tag> tags = List.of(Project.Tag.BEGINNERS_WELCOME, Project.Tag.STRONG_EXPERTISE);
+            final List<Project.Tag> tags = List.of(Project.Tag.LIKELY_TO_REWARD, Project.Tag.FAST_AND_FURIOUS);
 
             // When
             final String tagsJsonPath = ProjectPageItemViewEntity.getTagsJsonPath(tags);
 
             // Then
-            assertEquals("$[*] ? (@.name == \"BEGINNERS_WELCOME\" || @.name == \"STRONG_EXPERTISE\")", tagsJsonPath);
+            assertEquals("$[*] ? (@.name == \"LIKELY_TO_REWARD\" || @.name == \"FAST_AND_FURIOUS\")", tagsJsonPath);
         }
 
 

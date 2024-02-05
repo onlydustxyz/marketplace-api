@@ -466,8 +466,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "hasApplied": false
               },
               "tags": [
-                "BEGINNERS_WELCOME",
-                "STRONG_EXPERTISE"
+                "NEWBIES_WELCOME",
+                "FAST_AND_FURIOUS"
               ]
             }            
             """;
@@ -828,8 +828,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": true,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
-                    "BEGINNERS_WELCOME",
-                    "STRONG_EXPERTISE"
+                    "NEWBIES_WELCOME",
+                    "FAST_AND_FURIOUS"
                   ]
                 },
                 {
@@ -871,7 +871,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": false,
                   "tags": [
-                    "STRONG_EXPERTISE"
+                    "FAST_AND_FURIOUS"
                   ]
                 }
               ],
@@ -3466,28 +3466,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.BEGINNERS_WELCOME)
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.NEWBIES_WELCOME)
                                                 .build()
                                 ).build(),
                         ProjectTagEntity.builder()
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.STRONG_EXPERTISE)
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.FAST_AND_FURIOUS)
                                                 .build()
                                 ).build(),
                         ProjectTagEntity.builder()
                                 .id(
                                         ProjectTagEntity.Id.builder()
                                                 .projectId(UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"))
-                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.STRONG_EXPERTISE)
+                                                .tag(ProjectTagEntity.ProjectTagEnumEntity.FAST_AND_FURIOUS)
                                                 .build()
                                 ).build()
                 )
         );
 
         // When
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_PACED"))).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "NEWBIES_WELCOME"))).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                         {
@@ -3570,7 +3570,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                         }
                          """);
 
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "STRONG_EXPERTISE"))).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_AND_FURIOUS"))).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                         {
@@ -3634,8 +3634,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                               "isInvitedAsProjectLead": false,
                               "isMissingGithubAppInstallation": null,
                               "tags": [
-                                "BEGINNERS_WELCOME",
-                                "STRONG_EXPERTISE"
+                                "NEWBIES_WELCOME",
+                                "FAST_AND_FURIOUS"
                               ]
                             },
                             {
@@ -3677,7 +3677,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                               "isInvitedAsProjectLead": false,
                               "isMissingGithubAppInstallation": null,
                               "tags": [
-                                "STRONG_EXPERTISE"
+                                "FAST_AND_FURIOUS"
                               ]
                             }
                           ],
@@ -3760,7 +3760,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                         """);
 
 
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "STRONG_EXPERTISE,BEGINNERS_WELCOME"))).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_AND_FURIOUS,NEWBIES_WELCOME"))).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                             {
@@ -3824,8 +3824,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "isInvitedAsProjectLead": false,
                                   "isMissingGithubAppInstallation": null,
                                   "tags": [
-                                    "BEGINNERS_WELCOME",
-                                    "STRONG_EXPERTISE"
+                                    "NEWBIES_WELCOME",
+                                    "FAST_AND_FURIOUS"
                                   ]
                                 },
                                 {
@@ -3867,7 +3867,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                   "isInvitedAsProjectLead": false,
                                   "isMissingGithubAppInstallation": null,
                                   "tags": [
-                                    "STRONG_EXPERTISE"
+                                    "FAST_AND_FURIOUS"
                                   ]
                                 }
                               ],
@@ -3956,7 +3956,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var auth = userAuthHelper.authenticatePierre();
         // When
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true", "tags", "BEGINNERS_WELCOME,STRONG_EXPERTISE"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt()).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true", "tags", "NEWBIES_WELCOME,FAST_AND_FURIOUS"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + auth.jwt()).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_WITH_TAGS_JSON_RESPONSE);
     }
