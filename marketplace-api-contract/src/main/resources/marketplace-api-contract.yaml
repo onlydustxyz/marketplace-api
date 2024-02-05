@@ -782,7 +782,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BillingProfileType'
+              $ref: '#/components/schemas/BillingProfileTypeRequest'
       responses:
         "204":
           description: 'User billing profile type updated'
@@ -4036,7 +4036,11 @@ components:
       enum:
         - INDIVIDUAL
         - COMPANY
-
+    BillingProfileTypeRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
     ProjectLedShortResponse:
       type: object
       required:
