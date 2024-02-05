@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationEventRepository;
@@ -149,4 +150,20 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
         assertThat(entity.getError()).isEqualTo("Some error");
     }
 
+    @Test
+    void should_skip() {
+        // Given
+        final Event event = new ProjectLeaderAssigned(UUID.randomUUID(), UUID.randomUUID(),
+                faker.date().birthday());
+
+        // When
+        postgresOutboxAdapter.push(event);
+        final var notificationPeeked = postgresOutboxAdapter.peek();
+        postgresOutboxAdapter.skip("Some reason to skip");
+
+        // Then
+        final var entity = notificationEventRepository.findAll().get(0);
+        assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.SKIPPED);
+        assertThat(entity.getError()).isEqualTo("Some reason to skip");
+    }
 }

@@ -1,0 +1,71 @@
+package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
+
+import onlydust.com.marketplace.api.domain.model.BillingProfileType;
+import onlydust.com.marketplace.api.domain.model.VerificationStatus;
+import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+import java.util.UUID;
+
+import static java.util.Objects.isNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class SumsubMapperTest {
+
+    private final SumsubMapper sumsubMapper = new SumsubMapper();
+    private final UUID externalId = UUID.randomUUID();
+
+    // type :
+    // - applicantReviewed
+    // - applicantPending
+    // - applicantCreated
+    // - applicantOnHold
+    // - applicantPersonalInfoChanged
+    // - applicantDeleted
+    // - applicantLevelChanged
+    // - videoIdentStatusChanged
+    // - applicantReset
+    // - applicantActionPending
+    // - applicantActionOnHold
+    // - applicantWorkflowCompleted
+
+    // reviewStatus :
+    // - init
+    // - pending
+    // - completed
+    @Test
+    void should_map_type_and_review_result_to_domain() {
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "init", null, false)), expectedStatus(VerificationStatus.STARTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "pending", null, false)), expectedStatus(VerificationStatus.STARTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "completed", null, false)), expectedStatus(VerificationStatus.STARTED));
+
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "init", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "pending", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "completed", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "init", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "pending", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "GREEN", false)), expectedStatus(VerificationStatus.VERIFIED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", false)), expectedStatus(VerificationStatus.REJECTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", true)), expectedStatus(VerificationStatus.CLOSED));
+    }
+
+
+    private SumsubWebhookEventDTO stubSumsubEvent(final String type, final String reviewStatus, final String reviewResult, final Boolean finalDecision) {
+        final SumsubWebhookEventDTO sumsubWebhookEventDTO = new SumsubWebhookEventDTO();
+        sumsubWebhookEventDTO.setApplicantType("individual");
+        sumsubWebhookEventDTO.setExternalUserId(externalId.toString());
+        sumsubWebhookEventDTO.setType(type);
+        sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
+        sumsubWebhookEventDTO.setReviewResult(isNull(reviewResult) ? null : finalDecision ?
+                Map.of("reviewAnswer", reviewResult, "reviewRejectType", "FINAL") : Map.of("reviewAnswer", reviewResult));
+        return sumsubWebhookEventDTO;
+    }
+
+    private BillingProfileUpdated expectedStatus(final VerificationStatus verificationStatus) {
+        return BillingProfileUpdated.builder()
+                .billingProfileId(externalId).type(BillingProfileType.INDIVIDUAL).verificationStatus(verificationStatus).build();
+    }
+}

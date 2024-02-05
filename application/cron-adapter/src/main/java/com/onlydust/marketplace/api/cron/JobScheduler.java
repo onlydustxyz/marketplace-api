@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ public class JobScheduler {
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
     private final Properties cronProperties;
+    private final OutboxConsumerJob billingProfileOutboxJob;
 
     @Scheduled(fixedDelayString = "${application.cron.notification-job-delay}")
     public void processPendingNotifications() {
@@ -62,6 +64,12 @@ public class JobScheduler {
         userFacadePort.refreshActiveUserProfiles(ZonedDateTime.now().minusDays(cronProperties.activeUserProfilesRefreshPeriodInDays));
     }
 
+    @Scheduled(fixedDelayString = "${application.cron.billing-profile-verification-job}")
+    public void verifyBillingProfile(){
+        LOGGER.info("Verifying billing profiles");
+        billingProfileOutboxJob.run();
+    }
+
     @Data
     public static class Properties {
         Long notificationJobDelay;
@@ -71,5 +79,6 @@ public class JobScheduler {
         Long refreshActiveUserProfiles;
         Long activeUserProfilesRefreshPeriodInDays;
         Long trackingJobDelay;
+        Long billingProfileVerificationJob;
     }
 }

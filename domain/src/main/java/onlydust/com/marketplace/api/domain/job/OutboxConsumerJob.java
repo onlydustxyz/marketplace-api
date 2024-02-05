@@ -23,8 +23,13 @@ public class OutboxConsumerJob implements Runnable {
                 outbox.ack();
             }
         } catch (Exception e) {
-            LOGGER.error("Error while processing event", e);
-            outbox.nack(e.getMessage());
+            if (e instanceof OutboxSkippingException) {
+                LOGGER.warn("Skipping event", e);
+                outbox.skip(e.getMessage());
+            } else {
+                LOGGER.error("Error while processing event", e);
+                outbox.nack(e.getMessage());
+            }
         }
     }
 }

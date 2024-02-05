@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class IndividualBillingProfile {
     @NonNull
     UUID id;
+    @NonNull
+    UUID userId;
     @NonNull
     VerificationStatus status;
     String firstName;
@@ -24,10 +26,11 @@ public class IndividualBillingProfile {
     String idDocumentNumber;
     Date validUntil;
 
-    public static IndividualBillingProfile init() {
+    public static IndividualBillingProfile initForUser(final UUID userId) {
         return IndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
+                .userId(userId)
                 .build();
     }
 

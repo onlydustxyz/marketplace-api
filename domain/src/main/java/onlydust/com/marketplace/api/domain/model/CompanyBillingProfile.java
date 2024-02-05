@@ -8,10 +8,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class CompanyBillingProfile {
     @NonNull
     UUID id;
+    @NonNull
+    UUID userId;
     @NonNull
     VerificationStatus status;
     String name;
@@ -23,9 +25,10 @@ public class CompanyBillingProfile {
     Boolean subjectToEuropeVAT;
     String euVATNumber;
 
-    public static CompanyBillingProfile init() {
+    public static CompanyBillingProfile initForUser(final UUID userId) {
         return CompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
+                .userId(userId)
                 .status(VerificationStatus.NOT_STARTED)
                 .build();
     }

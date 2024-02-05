@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
-import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
-import onlydust.com.marketplace.api.domain.service.UserVerificationService;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubProperties;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,11 +14,6 @@ public class SumsubWebhookConfiguration {
     @ConfigurationProperties("application.sumsub.webhook")
     public SumsubProperties sumsubProperties() {
         return new SumsubProperties();
-    }
-
-    @Bean
-    public UserVerificationFacadePort userVerificationFacadePort(OutboxPort userVerificationOutbox) {
-        return new UserVerificationService(userVerificationOutbox);
     }
 
     @Bean

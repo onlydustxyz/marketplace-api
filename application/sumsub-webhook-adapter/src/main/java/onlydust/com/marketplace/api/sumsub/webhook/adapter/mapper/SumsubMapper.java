@@ -1,0 +1,96 @@
+package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
+
+import onlydust.com.marketplace.api.domain.model.BillingProfileType;
+import onlydust.com.marketplace.api.domain.model.VerificationStatus;
+import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.api.domain.model.notification.Event;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+
+public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
+
+    /*
+    *   Unstarted - user hasn't started process
+        Started - user has start process
+        Under review - user has submit for review and is waiting results
+        Verified - user got approved
+        Rejected - user got rejected and can fix problems
+        Invalidated - user got invalidated over time and need to take action (ID card is overdue)
+        Closed - user is a terrorist babay
+    * */
+
+    @Override
+    public BillingProfileUpdated apply(Event event) {
+        if (event instanceof SumsubWebhookEventDTO) {
+            final SumsubWebhookEventDTO sumsubWebhookEventDTO = (SumsubWebhookEventDTO) event;
+            return BillingProfileUpdated.builder()
+                    .billingProfileId(UUID.fromString(sumsubWebhookEventDTO.getExternalUserId()))
+                    .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
+                    .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                            sumsubWebhookEventDTO.getReviewResult()))
+                    .build();
+        }
+        throw OnlyDustException.internalServerError("Invalid sumsub event format");
+    }
+
+    private BillingProfileType applicationTypeToDomain(final String applicationType) {
+        return switch (applicationType) {
+            case "individual" -> BillingProfileType.INDIVIDUAL;
+            case "company" -> BillingProfileType.COMPANY;
+            default -> throw OnlyDustException.internalServerError(String.format("Invalid application type from sumsub : %s",
+                    applicationType));
+        };
+    }
+
+    private VerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus, final Object reviewResult) {
+        return switch (type) {
+            case "applicantCreated" -> VerificationStatus.STARTED;
+            case "applicantPending" -> VerificationStatus.UNDER_REVIEW;
+            case "applicantReviewed" -> switch (reviewStatus) {
+                case "completed":
+                    final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
+                    if (answer.isPresent()) {
+                        yield switch (answer.get()) {
+                            case RED -> {
+                                if (isAFinalRejection(reviewResult)) {
+                                    yield VerificationStatus.CLOSED;
+                                } else {
+                                    yield VerificationStatus.REJECTED;
+                                }
+                            }
+                            case GREEN -> VerificationStatus.VERIFIED;
+                        };
+                    }
+                default:
+                    yield VerificationStatus.UNDER_REVIEW;
+            };
+            default -> VerificationStatus.INVALIDATED;
+        };
+    }
+
+    private Optional<Answer> reviewResultToAnswer(final Object reviewResult) {
+        final Map<String, Object> stringObjectMap = (Map<String, Object>) reviewResult;
+        if (stringObjectMap.containsKey("reviewAnswer")) {
+            return switch ((String) stringObjectMap.get("reviewAnswer")) {
+                case "RED" -> Optional.of(Answer.RED);
+                case "GREEN" -> Optional.of(Answer.GREEN);
+                default -> throw OnlyDustException.internalServerError(String.format("Invalid Sumsub answer %s", stringObjectMap.get("reviewAnswer")));
+            };
+        }
+        return Optional.empty();
+    }
+
+    private Boolean isAFinalRejection(final Object reviewResult) {
+        final Map<String, Object> stringObjectMap = (Map<String, Object>) reviewResult;
+        return stringObjectMap.containsKey("reviewRejectType") && stringObjectMap.get("reviewRejectType").equals("FINAL");
+    }
+
+    private enum Answer {
+        GREEN, RED;
+    }
+}

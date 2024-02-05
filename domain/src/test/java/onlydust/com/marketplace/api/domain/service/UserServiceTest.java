@@ -671,6 +671,7 @@ public class UserServiceTest {
         final CompanyBillingProfile expected = CompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.CLOSED)
+                .userId(userId)
                 .build();
 
         // When
@@ -696,12 +697,11 @@ public class UserServiceTest {
         ArgumentCaptor<CompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(CompanyBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
-        verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(billingProfileArgumentCaptor.capture());
         verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
         assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
-        assertThat(uuidCaptor.getAllValues().get(0)).isEqualTo(userId);
-        assertThat(uuidCaptor.getAllValues().get(1)).isEqualTo(userId);
+        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
         assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.COMPANY);
     }
 
@@ -712,6 +712,7 @@ public class UserServiceTest {
         final IndividualBillingProfile expected = IndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
+                .userId(userId)
                 .build();
 
         // When
@@ -737,12 +738,11 @@ public class UserServiceTest {
         ArgumentCaptor<IndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(IndividualBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
-        verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(billingProfileArgumentCaptor.capture());
         verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
         assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
-        assertThat(uuidCaptor.getAllValues().get(0)).isEqualTo(userId);
-        assertThat(uuidCaptor.getAllValues().get(1)).isEqualTo(userId);
+        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
         assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.INDIVIDUAL);
     }
 }

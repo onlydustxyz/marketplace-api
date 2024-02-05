@@ -62,13 +62,14 @@ public class CompanyBillingProfileEntity {
                 .name(this.name)
                 .registrationNumber(this.registrationNumber)
                 .country(this.country)
+                .userId(this.userId)
                 .build();
     }
 
-    public static CompanyBillingProfileEntity fromDomain(final CompanyBillingProfile companyBillingProfile, final UUID userId) {
+    public static CompanyBillingProfileEntity fromDomain(final CompanyBillingProfile companyBillingProfile) {
         return CompanyBillingProfileEntity.builder()
                 .id(companyBillingProfile.getId())
-                .userId(userId)
+                .userId(companyBillingProfile.getUserId())
                 .usEntity(companyBillingProfile.getUsEntity())
                 .address(companyBillingProfile.getAddress())
                 .country(companyBillingProfile.getCountry())
