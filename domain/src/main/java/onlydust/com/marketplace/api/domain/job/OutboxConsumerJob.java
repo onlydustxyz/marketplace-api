@@ -16,19 +16,19 @@ public class OutboxConsumerJob implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Optional<Event> event;
-            while ((event = outbox.peek()).isPresent()) {
+        Optional<Event> event;
+        while ((event = outbox.peek()).isPresent()) {
+            try {
                 consumer.process(event.get());
                 outbox.ack();
-            }
-        } catch (Exception e) {
-            if (e instanceof OutboxSkippingException) {
-                LOGGER.warn("Skipping event", e);
-                outbox.skip(e.getMessage());
-            } else {
-                LOGGER.error("Error while processing event", e);
-                outbox.nack(e.getMessage());
+            } catch (Exception e) {
+                if (e instanceof OutboxSkippingException) {
+                    LOGGER.warn("Skipping event", e);
+                    outbox.skip(e.getMessage());
+                } else {
+                    LOGGER.error("Error while processing event", e);
+                    outbox.nack(e.getMessage());
+                }
             }
         }
     }
