@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.domain.service;
 
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
@@ -10,6 +9,7 @@ import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
 import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ public class RewardServiceTest {
         final var newRewardId = UUID.randomUUID();
 
         // When
-        when(rewardServicePort.requestPayment(projectLeadId, requestRewardCommand))
+        when(rewardServicePort.create(projectLeadId, requestRewardCommand))
                 .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
@@ -265,7 +265,7 @@ public class RewardServiceTest {
         rewardService.cancelPayment(projectLeadId, projectId, rewardId);
 
         // Then
-        verify(rewardServicePort).cancelPayment(rewardId);
+        verify(rewardServicePort).cancel(rewardId);
     }
 
     @Test

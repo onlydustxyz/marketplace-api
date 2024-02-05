@@ -40,13 +40,13 @@ public class RewardService implements RewardFacadePort {
         }
 
         indexerPort.indexUser(command.getRecipientId());
-        return rewardServicePort.requestPayment(projectLeadId, command);
+        return rewardServicePort.create(projectLeadId, command);
     }
 
     @Override
     public void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            rewardServicePort.cancelPayment(rewardId);
+            rewardServicePort.cancel(rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
         }
