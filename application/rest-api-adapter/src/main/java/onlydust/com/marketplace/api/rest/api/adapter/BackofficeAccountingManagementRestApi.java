@@ -56,7 +56,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<AccountResponse> updateAccountAllowance(UUID accountId, UpdateAccountAllowanceRequest updateAccountAllowanceRequest) {
         final var sponsorAccountStatement = accountingFacadePort.increaseAllowance(SponsorAccount.Id.of(accountId),
-                PositiveAmount.of(updateAccountAllowanceRequest.getAllowance()));
+                Amount.of(updateAccountAllowanceRequest.getAllowance()));
         return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
     }
 

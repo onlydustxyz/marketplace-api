@@ -19,16 +19,20 @@ import java.util.UUID;
 @Value
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "sponsor_account_transactions", schema = "accounting")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SponsorAccountTransactionsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    @EqualsAndHashCode.Include
     @NonNull UUID accountId;
 
+    @EqualsAndHashCode.Include
     @Enumerated(javax.persistence.EnumType.STRING)
     @Type(type = "network")
     @NonNull NetworkEnumEntity network;
 
+    @EqualsAndHashCode.Include
     @NonNull String reference;
     @NonNull BigDecimal amount;
     @NonNull String thirdPartyName;

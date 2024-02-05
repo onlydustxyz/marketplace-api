@@ -6,9 +6,10 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @AllArgsConstructor
@@ -29,7 +30,7 @@ public class SponsorAccountEntity {
 
     @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
-    List<SponsorAccountTransactionsEntity> transactions = new ArrayList<>();
+    Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
     public SponsorAccount toLedger() {
         final var ledger = new SponsorAccount(SponsorAccount.Id.of(id), SponsorId.of(sponsorId), currency.toDomain(), lockedUntil);
@@ -43,7 +44,7 @@ public class SponsorAccountEntity {
                 .currency(CurrencyEntity.of(sponsorAccount.currency()))
                 .lockedUntil(sponsorAccount.lockedUntil().orElse(null))
                 .sponsorId(sponsorAccount.sponsorId().value())
-                .transactions(sponsorAccount.getTransactions().stream().map(t -> SponsorAccountTransactionsEntity.of(sponsorAccount.id(), t)).toList())
+                .transactions(sponsorAccount.getTransactions().stream().map(t -> SponsorAccountTransactionsEntity.of(sponsorAccount.id(), t)).collect(Collectors.toUnmodifiableSet()))
                 .build();
     }
 }

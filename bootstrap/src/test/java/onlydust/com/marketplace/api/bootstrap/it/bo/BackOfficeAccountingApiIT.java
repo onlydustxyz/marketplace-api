@@ -157,7 +157,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "allowance": 40
+                            "allowance": -40
                         }
                         """)
                 // Then
