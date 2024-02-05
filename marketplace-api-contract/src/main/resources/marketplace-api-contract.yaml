@@ -658,7 +658,6 @@ paths:
       operationId: getMyRewardCurrencies
       description: |
         Get the list of currencies the caller received rewards in
-
       responses:
         "200":
           description: 'Currency list'
@@ -769,7 +768,32 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
+  /api/v1/me/billing-profiles:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Update user billing profile type
+      operationId: updateBillingProfileType
+      description: |
+        Update user billing profile type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileType'
+      responses:
+        "204":
+          description: 'User billing profile type updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/technologies:
     get:
@@ -4004,6 +4028,14 @@ components:
               type: string
               format: email
               description: User email
+            billingProfileType:
+              $ref: '#/components/schemas/BillingProfileType'
+
+    BillingProfileType:
+      type: string
+      enum:
+        - INDIVIDUAL
+        - COMPANY
 
     ProjectLedShortResponse:
       type: object
@@ -4723,10 +4755,13 @@ components:
     ProjectTag:
       type: string
       enum:
-        - BEGINNERS_WELCOME
-        - STRONG_EXPERTISE
-        - LIKELY_TO_SEND_REWARDS
-        - FAST_PACED
+        - HOT_COMMUNITY
+        - NEWBIES_WELCOME
+        - LIKELY_TO_REWARD
+        - WORK_IN_PROGRESS
+        - FAST_AND_FURIOUS
+        - BIG_WHALE
+        - UPDATED_ROADMAP
 
     VerificationStatus:
       type: string
