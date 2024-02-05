@@ -293,4 +293,53 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.receipts.size()").isEqualTo(0)
         ;
     }
+
+
+    @Test
+    void should_update_sponsor_account() {
+        // Given
+        final var response = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 100,
+                            "lockedUntil": "2024-01-31T00:00:00Z",
+                            "receipt": {
+                                "amount": 100,
+                                "network": "ETHEREUM",
+                                "reference": "0x01",
+                                "thirdPartyName": "Coca Cola LTD",
+                                "thirdPartyAccountNumber": "coca.cola.eth"
+                            }
+                        }
+                        """.formatted(BTC))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getLockedUntil().toString()).isEqualTo("2024-01-31T00:00Z[UTC]");
+
+        // When
+        client.patch()
+                .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "lockedUntil": "2024-03-31T00:00:00Z"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.lockedUntil").isEqualTo("2024-03-31T00:00:00Z")
+        ;
+    }
 }

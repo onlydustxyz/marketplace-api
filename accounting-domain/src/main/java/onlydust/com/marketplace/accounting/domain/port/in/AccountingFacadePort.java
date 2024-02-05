@@ -35,4 +35,6 @@ public interface AccountingFacadePort {
     Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
 
     List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
+
+    SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 }

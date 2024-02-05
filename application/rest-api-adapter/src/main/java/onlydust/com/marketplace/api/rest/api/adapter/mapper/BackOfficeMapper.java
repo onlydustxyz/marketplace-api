@@ -8,7 +8,7 @@ import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
-import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
@@ -22,7 +22,7 @@ public interface BackOfficeMapper {
                 .id(account.id().value())
                 .sponsorId(account.sponsorId().value())
                 .currencyId(account.currency().id().value())
-                .lockedUntil(account.lockedUntil().map(ZonedDateTime::from).orElse(null))
+                .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                 .balance(account.balance().getValue())
                 .allowance(accountStatement.allowance().getValue())
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())

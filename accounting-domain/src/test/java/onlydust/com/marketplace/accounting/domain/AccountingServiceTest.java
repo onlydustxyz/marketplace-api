@@ -631,6 +631,24 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot spend from locked account");
         }
+
+        /*
+         * Given a sponsor account
+         * When I update the unlock date
+         * Then the unlock date is updated
+         */
+        @Test
+        void should_update_unlock_date() {
+            // Given
+            final var unlockDate = ZonedDateTime.now().plusDays(2);
+
+            // When
+            final var newSponsorAccount = accountingService.updateSponsorAccount(sponsorAccount.id(), unlockDate);
+
+            // Then
+            assertThat(newSponsorAccount.account().lockedUntil()).contains(unlockDate.toInstant());
+            assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().lockedUntil()).contains(unlockDate.toInstant());
+        }
     }
 
     @Nested

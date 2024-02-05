@@ -94,6 +94,10 @@ public class SponsorAccount {
         transactions.add(transaction);
     }
 
+    public void lockUntil(ZonedDateTime lockedUntil) {
+        this.lockedUntil = lockedUntil.toInstant();
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

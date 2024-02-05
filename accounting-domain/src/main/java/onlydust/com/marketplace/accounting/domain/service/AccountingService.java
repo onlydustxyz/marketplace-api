@@ -142,6 +142,14 @@ public class AccountingService implements AccountingFacadePort {
                 .toList();
     }
 
+    @Override
+    public SponsorAccountStatement updateSponsorAccount(SponsorAccount.@NonNull Id sponsorAccountId, ZonedDateTime lockedUntil) {
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
+        sponsorAccount.lockUntil(lockedUntil);
+        sponsorAccountStorage.save(sponsorAccount);
+        return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
+    }
+
     public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
         sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
         return getSponsorAccountStatement(sponsorAccountId).orElseThrow();

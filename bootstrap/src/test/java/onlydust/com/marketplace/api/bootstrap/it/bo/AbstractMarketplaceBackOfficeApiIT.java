@@ -92,6 +92,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_SPONSORS_ACCOUNTS = "/bo/v1/sponsors/%s/accounts";
     protected static final String GET_SPONSORS_ACCOUNTS = "/bo/v1/sponsors/%s/accounts";
     protected static final String POST_SPONSOR_ACCOUNTS_ALLOWANCE = "/bo/v1/sponsor-accounts/%s/allowance";
+    protected static final String PATCH_SPONSOR_ACCOUNTS = "/bo/v1/sponsor-accounts/%s";
     protected static final String POST_SPONSOR_ACCOUNTS_RECEIPTS = "/bo/v1/sponsor-accounts/%s/receipts";
     protected static final String DELETE_SPONSOR_ACCOUNTS_RECEIPTS = "/bo/v1/sponsor-accounts/%s/receipts/%s";
     protected static final String POST_PROJECTS_BUDGETS_ALLOCATE = "/bo/v1/projects/%s/budgets/allocate";

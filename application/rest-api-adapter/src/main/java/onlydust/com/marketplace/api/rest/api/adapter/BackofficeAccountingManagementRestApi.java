@@ -9,7 +9,6 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -69,7 +68,8 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
     @Override
     public ResponseEntity<AccountResponse> updateAccountAttributes(UUID accountId, UpdateAccountRequest updateAccountRequest) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        final var sponsorAccountStatement = accountingFacadePort.updateSponsorAccount(SponsorAccount.Id.of(accountId), updateAccountRequest.getLockedUntil());
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
