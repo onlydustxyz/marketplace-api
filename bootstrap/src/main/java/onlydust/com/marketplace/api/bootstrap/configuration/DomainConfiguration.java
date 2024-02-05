@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationOutboxConsumer;
+import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
@@ -208,6 +209,15 @@ public class DomainConfiguration {
     @Bean
     public BillingProfileStoragePort billingProfileStoragePort() {
         return new BillingProfileStoragePort() {
+            @Override
+            public void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId) {
+
+            }
+
+            @Override
+            public Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId) {
+                return Optional.empty();
+            }
 
             final Map<UUID, CompanyBillingProfile> companyBillingProfileMap = new HashMap<>();
             final Map<UUID, IndividualBillingProfile> individualBillingProfileMap = new HashMap<>();

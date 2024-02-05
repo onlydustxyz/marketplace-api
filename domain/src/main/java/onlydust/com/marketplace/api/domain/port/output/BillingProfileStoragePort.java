@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 
@@ -14,4 +15,8 @@ public interface BillingProfileStoragePort {
     Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId);
 
     void saveIndividualProfileForUser(UUID userId,IndividualBillingProfile individualBillingProfile);
+
+    void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId);
+
+    Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId);
 }

@@ -418,4 +418,24 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
 
+    @Test
+    void should_return_default_billing_profile() {
+        // Given
+        final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final var userId = UUID.randomUUID();
+        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header("Authorization", "Bearer " + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfileType").isEqualTo("INDIVIDUAL");
+    }
 }
