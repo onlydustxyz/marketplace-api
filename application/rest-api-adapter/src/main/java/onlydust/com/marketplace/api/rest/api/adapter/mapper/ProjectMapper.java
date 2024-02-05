@@ -219,10 +219,13 @@ public interface ProjectMapper {
 
     private static ProjectTag mapTag(final Project.Tag tag) {
         return switch (tag) {
-            case BEGINNERS_WELCOME -> ProjectTag.BEGINNERS_WELCOME;
-            case STRONG_EXPERTISE -> ProjectTag.STRONG_EXPERTISE;
-            case FAST_PACED -> ProjectTag.FAST_PACED;
-            case LIKELY_TO_SEND_REWARDS -> ProjectTag.LIKELY_TO_SEND_REWARDS;
+            case HOT_COMMUNITY -> ProjectTag.HOT_COMMUNITY;
+            case UPDATED_ROADMAP -> ProjectTag.UPDATED_ROADMAP;
+            case BIG_WHALE -> ProjectTag.BIG_WHALE;
+            case FAST_AND_FURIOUS -> ProjectTag.FAST_AND_FURIOUS;
+            case LIKELY_TO_REWARD -> ProjectTag.LIKELY_TO_REWARD;
+            case NEWBIES_WELCOME -> ProjectTag.NEWBIES_WELCOME;
+            case WORK_IN_PROGRESS -> ProjectTag.WORK_IN_PROGRESS;
         };
     }
 
@@ -243,7 +246,6 @@ public interface ProjectMapper {
         sponsorResponse.setUrl(sponsorView.getUrl());
         return sponsorResponse;
     }
-
 
 
     private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
@@ -328,10 +330,13 @@ public interface ProjectMapper {
 
     private static Project.Tag mapTagParameter(final ProjectTag projectTag) {
         return switch (projectTag) {
-            case BEGINNERS_WELCOME -> Project.Tag.BEGINNERS_WELCOME;
-            case LIKELY_TO_SEND_REWARDS -> Project.Tag.LIKELY_TO_SEND_REWARDS;
-            case STRONG_EXPERTISE -> Project.Tag.STRONG_EXPERTISE;
-            case FAST_PACED -> Project.Tag.FAST_PACED;
+            case BIG_WHALE -> Project.Tag.BIG_WHALE;
+            case FAST_AND_FURIOUS -> Project.Tag.FAST_AND_FURIOUS;
+            case HOT_COMMUNITY -> Project.Tag.HOT_COMMUNITY;
+            case LIKELY_TO_REWARD -> Project.Tag.LIKELY_TO_REWARD;
+            case NEWBIES_WELCOME -> Project.Tag.NEWBIES_WELCOME;
+            case UPDATED_ROADMAP -> Project.Tag.UPDATED_ROADMAP;
+            case WORK_IN_PROGRESS -> Project.Tag.WORK_IN_PROGRESS;
         };
     }
 

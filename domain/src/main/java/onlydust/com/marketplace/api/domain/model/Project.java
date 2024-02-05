@@ -21,6 +21,12 @@ public class Project {
     List<Tag> tags;
 
     public enum Tag {
-        BEGINNERS_WELCOME,STRONG_EXPERTISE,LIKELY_TO_SEND_REWARDS,FAST_PACED
+        HOT_COMMUNITY,
+        NEWBIES_WELCOME,
+        LIKELY_TO_REWARD,
+        WORK_IN_PROGRESS,
+        FAST_AND_FURIOUS,
+        BIG_WHALE,
+        UPDATED_ROADMAP
     }
 }

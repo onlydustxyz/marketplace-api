@@ -115,10 +115,13 @@ public class ProjectPageItemViewEntity {
         }
         if (nonNull(this.tags)) {
             this.tags.forEach(tag -> view.addTag(switch (tag.name) {
-                case "BEGINNERS_WELCOME" -> Project.Tag.BEGINNERS_WELCOME;
-                case "STRONG_EXPERTISE" -> Project.Tag.STRONG_EXPERTISE;
-                case "LIKELY_TO_SEND_REWARDS" -> Project.Tag.LIKELY_TO_SEND_REWARDS;
-                case "FAST_PACED" -> Project.Tag.FAST_PACED;
+                case "NEWBIES_WELCOME" -> Project.Tag.NEWBIES_WELCOME;
+                case "BIG_WHALE" -> Project.Tag.BIG_WHALE;
+                case "LIKELY_TO_REWARD" -> Project.Tag.LIKELY_TO_REWARD;
+                case "FAST_AND_FURIOUS" -> Project.Tag.FAST_AND_FURIOUS;
+                case "WORK_IN_PROGRESS" -> Project.Tag.WORK_IN_PROGRESS;
+                case "HOT_COMMUNITY" -> Project.Tag.HOT_COMMUNITY;
+                case "UPDATED_ROADMAP" -> Project.Tag.UPDATED_ROADMAP;
                 default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
             }));
         }
