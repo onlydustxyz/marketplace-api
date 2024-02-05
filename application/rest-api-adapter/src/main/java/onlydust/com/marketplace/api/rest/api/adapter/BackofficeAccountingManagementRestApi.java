@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,18 +27,24 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
 
     @Override
-    public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorId, CreateAccountRequest createAccountRequest) {
-        final var sponsorAccountStatement = accountingFacadePort.createSponsorAccount(SponsorId.of(sponsorId),
-                Currency.Id.of(createAccountRequest.getCurrencyId()),
-                PositiveAmount.of(createAccountRequest.getAllowance()),
-                createAccountRequest.getLockedUntil());
+    public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
+        final var sponsorId = SponsorId.of(sponsorUuid);
+        final var currencyId = Currency.Id.of(createAccountRequest.getCurrencyId());
+        final var allowance = PositiveAmount.of(createAccountRequest.getAllowance());
+        final var lockedUntil = createAccountRequest.getLockedUntil();
+        final var transaction = createAccountRequest.getReceipt() == null ? null : mapReceiptToTransaction(createAccountRequest.getReceipt());
+
+        final var sponsorAccountStatement = transaction == null ?
+                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil) :
+                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil, transaction);
 
         return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
     public ResponseEntity<AccountListResponse> getSponsorAccounts(UUID sponsorId) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        final var sponsorAccounts = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
+        return ResponseEntity.ok(new AccountListResponse().accounts(sponsorAccounts.stream().map(BackOfficeMapper::mapAccountToResponse).toList()));
     }
 
     @Override

@@ -34,5 +34,5 @@ public interface AccountingFacadePort {
 
     Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
 
-    List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId);
+    List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
 }

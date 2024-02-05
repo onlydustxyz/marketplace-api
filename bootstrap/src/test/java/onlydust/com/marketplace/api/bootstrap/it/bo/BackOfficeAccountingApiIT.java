@@ -186,6 +186,89 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
     }
 
+    @Test
+    void should_get_list_of_sponsor_accounts() {
+        // Given
+        client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 100,
+                             "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "ETHEREUM",
+                                "thirdPartyName": "Coca Cola LTD",
+                                "thirdPartyAccountNumber": "coca.cola.eth"
+                            }
+                        }
+                        """.formatted(BTC))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 200
+                        }
+                        """.formatted(BTC))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(THEODO)))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "accounts": [
+                            {
+                              "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                              "currencyId": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "balance": 100,
+                              "allowance": 100,
+                              "awaitingPaymentAmount": 0,
+                              "lockedUntil": null,
+                              "receipts": [
+                                {
+                                  "reference": "0x01",
+                                  "amount": 100,
+                                  "network": "ETHEREUM",
+                                  "thirdPartyName": "Coca Cola LTD",
+                                  "thirdPartyAccountNumber": "coca.cola.eth"
+                                }
+                              ]
+                            },
+                            {
+                              "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
+                              "currencyId": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "balance": 0,
+                              "allowance": 200,
+                              "awaitingPaymentAmount": 0,
+                              "lockedUntil": null,
+                              "receipts": []
+                            }
+                          ]
+                        }
+                        """);
+    }
+
 
     @Test
     void should_delete_transaction_registered_by_mistake() {

@@ -2,12 +2,14 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -31,5 +33,10 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
 
         sponsorAccount.getTransactions().removeIf(t -> t.getReference().equals(reference));
         sponsorAccountRepository.save(sponsorAccount);
+    }
+
+    @Override
+    public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
+        return sponsorAccountRepository.findAllBySponsorId(sponsorId.value()).stream().map(SponsorAccountEntity::toLedger).toList();
     }
 }

@@ -136,9 +136,10 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
-        // TODO implement
-        return null;
+    public List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId) {
+        return sponsorAccountStorage.getSponsorAccounts(sponsorId).stream()
+                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state()))
+                .toList();
     }
 
     public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.stubs;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 
 import java.util.ArrayList;
@@ -27,5 +28,10 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
     public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
         SPONSOR_ACCOUNTS.stream().filter(a -> a.id().equals(sponsorAccountId))
                 .forEach(l -> l.getTransactions().removeIf(t -> t.reference().equals(reference)));
+    }
+
+    @Override
+    public List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId) {
+        return SPONSOR_ACCOUNTS.stream().filter(l -> l.sponsorId().equals(sponsorId)).toList();
     }
 }
