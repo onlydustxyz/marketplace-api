@@ -91,10 +91,11 @@ public class IndividualBillingProfileEntity {
                 .idDocumentNumber(this.idDocumentNumber)
                 .usCitizen(this.usCitizen)
                 .birthdate(this.birthdate)
+                .userId(this.userId)
                 .build();
     }
 
-    public static IndividualBillingProfileEntity fromDomain(final IndividualBillingProfile individualBillingProfile, final UUID userId) {
+    public static IndividualBillingProfileEntity fromDomain(final IndividualBillingProfile individualBillingProfile) {
         return IndividualBillingProfileEntity.builder()
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
@@ -105,7 +106,7 @@ public class IndividualBillingProfileEntity {
                 .validUntil(individualBillingProfile.getValidUntil())
                 .idDocumentNumber(individualBillingProfile.getIdDocumentNumber())
                 .idDocumentType(IdDocumentTypeEnumEntity.fromDomain(individualBillingProfile.getIdDocumentType()))
-                .userId(userId)
+                .userId(individualBillingProfile.getUserId())
                 .usCitizen(individualBillingProfile.getUsCitizen())
                 .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
                 .build();

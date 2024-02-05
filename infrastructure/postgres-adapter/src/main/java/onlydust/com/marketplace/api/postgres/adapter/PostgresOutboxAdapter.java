@@ -39,4 +39,13 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
             outboxRepository.save(entity);
         });
     }
+
+    @Override
+    public void skip(String message) {
+        outboxRepository.findNextToProcess().ifPresent(entity -> {
+            entity.setStatus(EventEntity.Status.SKIPPED);
+            entity.setError(message);
+            outboxRepository.save(entity);
+        });
+    }
 }

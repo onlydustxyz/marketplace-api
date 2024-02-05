@@ -10,25 +10,25 @@ import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationOutboxConsumer;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.api.domain.observer.UserObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresBillingProfileAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificationEventEntity;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 @Configuration
 @EnableRetry
@@ -204,5 +204,23 @@ public class DomainConfiguration {
                                                      final @NonNull ERC20Provider starknetERC20Provider
     ) {
         return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
+    }
+
+    @Bean
+    public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
+                                                                 final BillingProfileStoragePort billingProfileStoragePort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort);
+    }
+
+    @Bean
+    public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
+                                                         final BillingProfileStoragePort billingProfileStoragePort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort);
+    }
+
+    @Bean
+    OutboxConsumerJob billingProfileOutboxJob(final PostgresOutboxAdapter<UserVerificationEventEntity> userVerificationOutbox,
+                                              final OutboxConsumer userVerificationOutboxConsumer) {
+        return new OutboxConsumerJob(userVerificationOutbox, userVerificationOutboxConsumer);
     }
 }

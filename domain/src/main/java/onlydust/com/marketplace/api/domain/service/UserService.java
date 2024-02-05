@@ -235,8 +235,8 @@ public class UserService implements UserFacadePort {
     public CompanyBillingProfile getCompanyBillingProfile(UUID userId) {
         return billingProfileStoragePort.findCompanyProfileForUser(userId)
                 .orElseGet(() -> {
-                    CompanyBillingProfile newCompanyBillingProfile = CompanyBillingProfile.init();
-                    billingProfileStoragePort.saveCompanyProfileForUser(userId, newCompanyBillingProfile);
+                    CompanyBillingProfile newCompanyBillingProfile = CompanyBillingProfile.initForUser(userId);
+                    billingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
                     billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.COMPANY, userId);
                     return newCompanyBillingProfile;
                 });
@@ -247,8 +247,8 @@ public class UserService implements UserFacadePort {
     public IndividualBillingProfile getIndividualBillingProfile(UUID userId) {
         return billingProfileStoragePort.findIndividualBillingProfile(userId)
                 .orElseGet(() -> {
-                    IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.init();
-                    billingProfileStoragePort.saveIndividualProfileForUser(userId, individualBillingProfile);
+                    IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.initForUser(userId);
+                    billingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
                     billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.INDIVIDUAL, userId);
                     return individualBillingProfile;
                 });

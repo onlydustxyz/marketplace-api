@@ -31,8 +31,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveCompanyProfileForUser(UUID userId, CompanyBillingProfile companyBillingProfile) {
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile, userId));
+    public void saveCompanyProfileForUser(CompanyBillingProfile companyBillingProfile) {
+        companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile));
     }
 
     @Override
@@ -44,8 +44,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveIndividualProfileForUser(UUID userId, IndividualBillingProfile individualBillingProfile) {
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile, userId));
+    public void saveIndividualProfileForUser(IndividualBillingProfile individualBillingProfile) {
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile));
     }
 
     @Override
@@ -79,5 +79,29 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                     case INDIVIDUAL -> UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL;
                 })
                 .build());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<CompanyBillingProfile> findCompanyProfileById(UUID billingProfileId) {
+        return companyBillingProfileRepository.findById(billingProfileId).map(CompanyBillingProfileEntity::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId) {
+        return individualBillingProfileRepository.findById(billingProfileId).map(IndividualBillingProfileEntity::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void saveCompanyProfile(CompanyBillingProfile companyBillingProfile) {
+        companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile));
+    }
+
+    @Override
+    @Transactional
+    public void saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile));
     }
 }

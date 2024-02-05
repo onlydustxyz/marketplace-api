@@ -10,15 +10,23 @@ import java.util.UUID;
 public interface BillingProfileStoragePort {
     Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId);
 
-    void saveCompanyProfileForUser(UUID userId, CompanyBillingProfile companyBillingProfile);
+    void saveCompanyProfileForUser(CompanyBillingProfile companyBillingProfile);
 
     Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId);
 
-    void saveIndividualProfileForUser(UUID userId,IndividualBillingProfile individualBillingProfile);
+    void saveIndividualProfileForUser(IndividualBillingProfile individualBillingProfile);
 
     void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId);
 
     Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId);
 
     void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
+
+    Optional<CompanyBillingProfile> findCompanyProfileById(UUID billingProfileId);
+
+    Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId);
+
+    void saveCompanyProfile(CompanyBillingProfile companyBillingProfile);
+
+    void saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
 }

@@ -12,4 +12,6 @@ public interface OutboxPort {
     void ack();
 
     void nack(String message);
+
+    void skip(String someReasonToSkip);
 }

@@ -67,6 +67,6 @@ public abstract class EventEntity {
     }
 
     public enum Status {
-        PENDING, PROCESSED, FAILED
+        PENDING, PROCESSED, FAILED, SKIPPED
     }
 }
