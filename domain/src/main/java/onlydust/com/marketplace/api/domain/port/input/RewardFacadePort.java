@@ -6,10 +6,10 @@ import java.util.UUID;
 
 public interface RewardFacadePort {
 
-    UUID requestPayment(UUID projectLeadId,
-                        RequestRewardCommand requestRewardCommand);
+    UUID createReward(UUID projectLeadId,
+                      RequestRewardCommand requestRewardCommand);
 
-    void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId);
+    void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId);
 
     void markInvoiceAsReceived(Long recipientId);
 }

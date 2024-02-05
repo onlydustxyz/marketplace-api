@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -346,6 +347,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_allocate_budget_to_project_and_pay_rewards() {
         // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var ofux = userAuthHelper.authenticateOlivier();
+
         final var accountId = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
                 .header("Api-Key", apiKey())
@@ -386,6 +390,25 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .isNoContent();
 
         // When
-
+        client.post()
+                .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "recipientId": "%d",
+                            "amount": 0.01,
+                            "currency": "BTC",
+                            "items": [{
+                                "type": "PULL_REQUEST",
+                                "id": "1703880973",
+                                "number": 325,
+                                "repoId": 698096830
+                            }]
+                        }
+                        """.formatted(ofux.user().getGithubUserId()))
+                .exchange()
+                .expectStatus()
+                .isOk();
     }
 }

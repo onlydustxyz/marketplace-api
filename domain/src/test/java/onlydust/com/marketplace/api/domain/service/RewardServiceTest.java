@@ -56,7 +56,7 @@ public class RewardServiceTest {
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
-        final UUID rewardId = rewardService.requestPayment(projectLeadId,
+        final UUID rewardId = rewardService.createReward(projectLeadId,
                 requestRewardCommand);
 
         // Then
@@ -96,7 +96,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -140,7 +140,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -182,7 +182,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -228,7 +228,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -262,7 +262,7 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
-        rewardService.cancelPayment(projectLeadId, projectId, rewardId);
+        rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
         verify(rewardServicePort).cancel(rewardId);
@@ -290,7 +290,7 @@ public class RewardServiceTest {
                 .thenReturn(false);
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.cancelPayment(projectLeadId, projectId, rewardId);
+            rewardService.cancelReward(projectLeadId, projectId, rewardId);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }

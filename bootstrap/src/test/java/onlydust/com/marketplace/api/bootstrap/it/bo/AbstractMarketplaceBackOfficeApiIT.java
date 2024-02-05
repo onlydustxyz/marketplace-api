@@ -1,16 +1,24 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.recording.RecordingStatus;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,13 +48,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-@ActiveProfiles({"it", "bo", "jobs"})
+@ActiveProfiles({"it", "bo", "jobs", "api"})
 @AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers
 @Slf4j
 @Import(SwaggerConfiguration.class)
 @ContextConfiguration(initializers = AbstractMarketplaceBackOfficeApiIT.WireMockInitializer.class)
+@EnableWireMock({
+        @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
+})
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
             .withDatabaseName("marketplace_db")
@@ -69,8 +80,31 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer starknetWireMockServer;
     @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
+    @InjectWireMock("auth0")
+    protected WireMockServer auth0WireMockServer;
     @Autowired
     ApiKeyAuthenticationService.Config config;
+
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    JWTVerifier jwtVerifier;
+    @Autowired
+    GithubAuthenticationPort githubAuthenticationPort;
+    protected UserAuthHelper userAuthHelper;
+
+    @BeforeEach
+    void setupUserAuthHelper() {
+        userAuthHelper = new UserAuthHelper(userRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
+
+        userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
+        userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");
+        userAuthHelper.mockAuth0UserInfo(8642470L, "gregcha");
+        userAuthHelper.mockAuth0UserInfo(5160414L, "haydencleary", "haydenclearymusic@gmail.com");
+        userAuthHelper.mockAuth0UserInfo(595505L, "ofux");
+        userAuthHelper.mockAuth0UserInfo(21149076L, "oscarwroche");
+        userAuthHelper.mockAuth0UserInfo(16590657L, "PierreOucif");
+    }
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
@@ -102,6 +136,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_USERS = "/bo/v1/users";
     protected static final String GET_PAYMENTS = "/bo/v1/payments";
     protected static final String GET_PROJECTS = "/bo/v1/projects";
+    protected static final String PROJECTS_REWARDS = "/api/v2/projects/%s/rewards";
     protected static final String GET_PROJECT_LEAD_INVITATIONS = "/bo/v1/project-lead-invitations";
     protected static final String POST_CURRENCIES = "/bo/v1/currencies";
     protected static final String PUT_CURRENCIES = "/bo/v1/currencies/%s";

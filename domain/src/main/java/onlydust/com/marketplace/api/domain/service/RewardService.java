@@ -23,8 +23,8 @@ public class RewardService implements RewardFacadePort {
     private final UserStoragePort userStoragePort;
 
     @Override
-    public UUID requestPayment(UUID projectLeadId,
-                               RequestRewardCommand command) {
+    public UUID createReward(UUID projectLeadId,
+                             RequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId)) {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }
@@ -44,7 +44,7 @@ public class RewardService implements RewardFacadePort {
     }
 
     @Override
-    public void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId) {
+    public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             rewardServicePort.cancel(rewardId);
         } else {

@@ -51,6 +51,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final ProjectFacadePort projectFacadePort;
     private final AuthenticationService authenticationService;
     private final RewardFacadePort rewardFacadePort;
+    private final RewardFacadePort rewardFacadePortV2;
     private final ContributionFacadePort contributionsFacadePort;
 
     @Override
@@ -191,7 +192,17 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final var rewardId = rewardFacadePort.requestPayment(authenticatedUser.getId(),
+        final var rewardId = rewardFacadePort.createReward(authenticatedUser.getId(),
+                RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
+        final var response = new CreateRewardResponse();
+        response.setId(rewardId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CreateRewardResponse> createRewardV2(UUID projectId, RewardRequest rewardRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var rewardId = rewardFacadePortV2.createReward(authenticatedUser.getId(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
         final var response = new CreateRewardResponse();
         response.setId(rewardId);
@@ -201,7 +212,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<Void> cancelReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        rewardFacadePort.cancelPayment(authenticatedUser.getId(), projectId, rewardId);
+        rewardFacadePort.cancelReward(authenticatedUser.getId(), projectId, rewardId);
         return ResponseEntity.noContent().build();
     }
 

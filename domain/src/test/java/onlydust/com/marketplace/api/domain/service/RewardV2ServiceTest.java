@@ -60,7 +60,7 @@ public class RewardV2ServiceTest {
 
 
             // When
-            final var rewardId = rewardService.requestPayment(projectLeadId, command);
+            final var rewardId = rewardService.createReward(projectLeadId, command);
 
             // Then
             assertThat(rewardId).isNotNull();
@@ -92,7 +92,7 @@ public class RewardV2ServiceTest {
                     .build();
 
             // When
-            assertThatThrownBy(() -> rewardService.requestPayment(projectLeadId, command))
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User must be project lead to request a reward");
@@ -110,7 +110,7 @@ public class RewardV2ServiceTest {
                     .build();
 
             // When
-            assertThatThrownBy(() -> rewardService.requestPayment(projectLeadId, command))
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Amount must be greater than 0");
@@ -128,7 +128,7 @@ public class RewardV2ServiceTest {
                     .build();
 
             // When
-            assertThatThrownBy(() -> rewardService.requestPayment(projectLeadId, command))
+            assertThatThrownBy(() -> rewardService.createReward(projectLeadId, command))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Amount must be greater than 0");
@@ -142,7 +142,7 @@ public class RewardV2ServiceTest {
             when(rewardStoragePort.get(rewardId)).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> rewardService.cancelPayment(projectLeadId, projectId, rewardId))
+            assertThatThrownBy(() -> rewardService.cancelReward(projectLeadId, projectId, rewardId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Reward %s not found".formatted(rewardId));
@@ -176,7 +176,7 @@ public class RewardV2ServiceTest {
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
 
             // When
-            rewardService.cancelPayment(projectLeadId, projectId, rewardId);
+            rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
             // Then
             verify(rewardStoragePort).delete(rewardId);
@@ -189,7 +189,7 @@ public class RewardV2ServiceTest {
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
 
             // When
-            assertThatThrownBy(() -> rewardService.cancelPayment(projectLeadId, projectId, rewardId))
+            assertThatThrownBy(() -> rewardService.cancelReward(projectLeadId, projectId, rewardId))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User must be project lead to cancel a reward");
