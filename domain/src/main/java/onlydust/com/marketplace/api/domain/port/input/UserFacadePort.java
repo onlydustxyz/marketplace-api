@@ -57,4 +57,6 @@ public interface UserFacadePort {
     CompanyBillingProfile getCompanyBillingProfile(UUID userId);
 
     IndividualBillingProfile getIndividualBillingProfile(UUID userId);
+
+    void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
 }

@@ -19,4 +19,6 @@ public interface BillingProfileStoragePort {
     void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId);
 
     Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId);
+
+    void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
 }

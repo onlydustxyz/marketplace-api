@@ -253,4 +253,9 @@ public class UserService implements UserFacadePort {
                     return individualBillingProfile;
                 });
     }
+
+    @Override
+    public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
+        billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
+    }
 }

@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.domain.observer.UserObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBillingProfileAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
@@ -203,50 +204,5 @@ public class DomainConfiguration {
                                                      final @NonNull ERC20Provider starknetERC20Provider
     ) {
         return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
-    }
-
-
-    @Bean
-    public BillingProfileStoragePort billingProfileStoragePort() {
-        return new BillingProfileStoragePort() {
-            @Override
-            public void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId) {
-
-            }
-
-            @Override
-            public Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId) {
-                return Optional.empty();
-            }
-
-            final Map<UUID, CompanyBillingProfile> companyBillingProfileMap = new HashMap<>();
-            final Map<UUID, IndividualBillingProfile> individualBillingProfileMap = new HashMap<>();
-
-            @Override
-            public Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId) {
-                if (companyBillingProfileMap.containsKey(userId)) {
-                    return Optional.of(companyBillingProfileMap.get(userId));
-                }
-                return Optional.empty();
-            }
-
-            @Override
-            public void saveCompanyProfileForUser(UUID userId, CompanyBillingProfile companyBillingProfile) {
-                companyBillingProfileMap.put(userId, companyBillingProfile);
-            }
-
-            @Override
-            public Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
-                if (individualBillingProfileMap.containsKey(userId)) {
-                    return Optional.of(individualBillingProfileMap.get(userId));
-                }
-                return Optional.empty();
-            }
-
-            @Override
-            public void saveIndividualProfileForUser(UUID userId, IndividualBillingProfile individualBillingProfile) {
-                individualBillingProfileMap.put(userId, individualBillingProfile);
-            }
-        };
     }
 }

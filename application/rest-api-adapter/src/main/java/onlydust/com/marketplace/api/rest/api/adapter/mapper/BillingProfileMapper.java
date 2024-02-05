@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.api.contract.model.BillingProfileTypeRequest;
 import onlydust.com.marketplace.api.contract.model.CompanyBillingProfileResponse;
 import onlydust.com.marketplace.api.contract.model.IndividualBillingProfileResponse;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
+import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 
@@ -59,6 +61,13 @@ public interface BillingProfileMapper {
             case PASSPORT -> IndividualBillingProfileResponse.IdDocumentTypeEnum.PASSPORT;
             case DRIVER_LICENSE -> IndividualBillingProfileResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
             case RESIDENCE_PERMIT -> IndividualBillingProfileResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+        };
+    }
+
+    static BillingProfileType billingProfileToDomain(final BillingProfileTypeRequest billingProfileTypeRequest) {
+        return switch (billingProfileTypeRequest.getType()) {
+            case COMPANY -> BillingProfileType.COMPANY;
+            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
         };
     }
 }

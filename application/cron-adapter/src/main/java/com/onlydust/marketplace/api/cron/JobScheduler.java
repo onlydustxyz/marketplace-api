@@ -50,7 +50,7 @@ public class JobScheduler {
         projectFacadePort.updateProjectsRanking();
     }
 
-    @Scheduled(fixedDelayString = "${application.cron.refresh-currency-quotes}")
+    @Scheduled(fixedDelayString = "${application.cron.refresh-currency-quotes}", initialDelay = 60000L)
     public void refreshCurrencyQuotes() {
         LOGGER.info("Refreshing currency quotes");
         currencyFacadePort.refreshQuotes();
