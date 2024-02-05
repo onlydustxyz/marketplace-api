@@ -10,6 +10,8 @@ import onlydust.com.marketplace.api.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.job.WebhookNotificationOutboxConsumer;
+import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.api.domain.observer.UserObserver;
@@ -24,8 +26,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 @Configuration
 @EnableRetry
@@ -84,11 +85,13 @@ public class DomainConfiguration {
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort) {
+                                         final ImageStoragePort imageStoragePort,
+                                         final BillingProfileStoragePort billingProfileStoragePort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort);
+                imageStoragePort,
+                billingProfileStoragePort);
     }
 
     @Bean
@@ -199,5 +202,41 @@ public class DomainConfiguration {
                                                      final @NonNull ERC20Provider starknetERC20Provider
     ) {
         return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider);
+    }
+
+
+    @Bean
+    public BillingProfileStoragePort billingProfileStoragePort() {
+        return new BillingProfileStoragePort() {
+
+            final Map<UUID, CompanyBillingProfile> companyBillingProfileMap = new HashMap<>();
+            final Map<UUID, IndividualBillingProfile> individualBillingProfileMap = new HashMap<>();
+
+            @Override
+            public Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId) {
+                if (companyBillingProfileMap.containsKey(userId)) {
+                    return Optional.of(companyBillingProfileMap.get(userId));
+                }
+                return Optional.empty();
+            }
+
+            @Override
+            public void saveCompanyProfileForUser(UUID userId, CompanyBillingProfile companyBillingProfile) {
+                companyBillingProfileMap.put(userId, companyBillingProfile);
+            }
+
+            @Override
+            public Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
+                if (individualBillingProfileMap.containsKey(userId)) {
+                    return Optional.of(individualBillingProfileMap.get(userId));
+                }
+                return Optional.empty();
+            }
+
+            @Override
+            public void saveIndividualProfileForUser(UUID userId, IndividualBillingProfile individualBillingProfile) {
+                individualBillingProfileMap.put(userId, individualBillingProfile);
+            }
+        };
     }
 }

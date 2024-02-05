@@ -1,3 +1,4 @@
+
 openapi: 3.0.3
 info:
   title: OnlyDust Marketplace API
@@ -715,6 +716,60 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/billing-profiles/individual:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my individual billing profile
+      operationId: getMyIndividualBillingProfile
+      description: |
+        Get my individual billing profile
+      responses:
+        "200":
+          description: 'My individual billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndividualBillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/billing-profiles/company:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my company billing profile
+      operationId: getMyCompanyBillingProfile
+      description: |
+        Get my company billing profile
+      responses:
+        "200":
+          description: 'My company billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyBillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
 
   /api/v1/technologies:
     get:
@@ -3423,6 +3478,8 @@ components:
       enum:
         - PENDING_INVOICE
         - PENDING_SIGNUP
+        - PENDING_CONTRIBUTOR
+        - PENDING_VERIFICATION
         - MISSING_PAYOUT_INFO
         - PROCESSING
         - COMPLETE
@@ -3922,6 +3979,9 @@ components:
             hasValidPayoutInfos:
               type: boolean
               description: False if the user has invalid payout information
+            hasValidBillingProfile:
+              type: boolean
+              description: False if at least one billing profiles is not valid
             projectsLed:
               type: array
               items:
@@ -4667,3 +4727,81 @@ components:
         - STRONG_EXPERTISE
         - LIKELY_TO_SEND_REWARDS
         - FAST_PACED
+
+    VerificationStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - STARTED
+        - UNDER_REVIEW
+        - VERIFIED
+        - REJECTED
+        - INVALIDATED
+        - CLOSED
+
+    CompanyBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref : '#/components/schemas/VerificationStatus'
+        name:
+          type: string
+        registrationNumber:
+          type: string
+        registrationDate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+        usEntity:
+          type: boolean
+        subjectToEuropeVAT:
+          type: boolean
+        euVATNumber:
+          type: string
+
+    IndividualBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthdate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+        usCitizen:
+          type: boolean
+        idDocumentType:
+          type: string
+          enum:
+            - PASSPORT
+            - ID_CARD
+            - RESIDENCE_PERMIT
+            - DRIVER_LICENSE
+        idDocumentNumber:
+          type: string
+        validUntil:
+          type: string
+          format: date-time
+

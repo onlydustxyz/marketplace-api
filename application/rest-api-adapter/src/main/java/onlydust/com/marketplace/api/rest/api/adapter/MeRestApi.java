@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
@@ -18,6 +17,7 @@ import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -312,5 +312,17 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<CompanyBillingProfileResponse> getMyCompanyBillingProfile() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        return ResponseEntity.ok(BillingProfileMapper.companyDomainToResponse(userFacadePort.getCompanyBillingProfile(authenticatedUser.getId())));
+    }
+
+    @Override
+    public ResponseEntity<IndividualBillingProfileResponse> getMyIndividualBillingProfile() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        return ResponseEntity.ok(BillingProfileMapper.individualDomainToResponse(userFacadePort.getIndividualBillingProfile(authenticatedUser.getId())));
     }
 }
