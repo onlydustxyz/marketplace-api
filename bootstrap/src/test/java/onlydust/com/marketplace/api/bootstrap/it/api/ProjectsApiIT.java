@@ -3487,7 +3487,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         );
 
         // When
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "NEWBIES_WELCOME"))).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "BIG_WHALE"))).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json("""
                         {
