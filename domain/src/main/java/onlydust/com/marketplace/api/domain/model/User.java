@@ -27,6 +27,7 @@ public class User {
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
     @Builder.Default
     List<UUID> projectsAppliedTo = new ArrayList<>();
+    BillingProfileType billingProfileType;
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

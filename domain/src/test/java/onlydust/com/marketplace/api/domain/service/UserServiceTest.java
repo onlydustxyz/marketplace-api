@@ -84,13 +84,53 @@ public class UserServiceTest {
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
         when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.empty());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(BillingProfileType.INDIVIDUAL, userByGithubIdentity.getBillingProfileType());
     }
+
+    @Test
+    void should_find_user_given_a_github_id_and_update_it_with_a_billing_profile() {
+        // Given
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder()
+                        .githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubLogin(faker.hacker().verb())
+                        .email(faker.internet().emailAddress())
+                        .build();
+
+        final User user = User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .githubEmail(githubUserIdentity.getEmail())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
+                .build();
+
+        // When
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
+        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
+
+        // Then
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
+        assertEquals(user, userByGithubIdentity);
+        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+    }
+
+
 
     @Test
     void should_find_user_given_a_github_id_but_not_update_it_when_read_only_is_true() {
@@ -134,7 +174,9 @@ public class UserServiceTest {
                 .roles(List.of(UserRole.USER))
                 .hasAcceptedLatestTermsAndConditions(false)
                 .createdAt(createdAt)
-                .hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
+                .hasSeenOnboardingWizard(false)
+                .billingProfileType(BillingProfileType.INDIVIDUAL)
+                .build(), userByGithubIdentity);
     }
 
     @Test
@@ -653,10 +695,14 @@ public class UserServiceTest {
         // Then
         ArgumentCaptor<CompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(CompanyBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
+        ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
         verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
         assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
-        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
+        assertThat(uuidCaptor.getAllValues().get(0)).isEqualTo(userId);
+        assertThat(uuidCaptor.getAllValues().get(1)).isEqualTo(userId);
+        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.COMPANY);
     }
 
     @Test
@@ -690,9 +736,13 @@ public class UserServiceTest {
         // Then
         ArgumentCaptor<IndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(IndividualBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
+        ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
         verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
         assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
-        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
+        assertThat(uuidCaptor.getAllValues().get(0)).isEqualTo(userId);
+        assertThat(uuidCaptor.getAllValues().get(1)).isEqualTo(userId);
+        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.INDIVIDUAL);
     }
 }

@@ -277,4 +277,11 @@ public class PostgresConfiguration {
     public PostgresProjectLedgerProviderAdapter postgresProjectLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
         return new PostgresProjectLedgerProviderAdapter(ledgerRepository);
     }
+
+    @Bean
+    public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
+                                                                       final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                       final CompanyBillingProfileRepository companyBillingProfileRepository) {
+        return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository);
+    }
 }

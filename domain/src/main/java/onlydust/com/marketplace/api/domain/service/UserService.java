@@ -46,6 +46,7 @@ public class UserService implements UserFacadePort {
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
+                    user.setBillingProfileType(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(BillingProfileType.INDIVIDUAL));
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
 
@@ -62,6 +63,7 @@ public class UserService implements UserFacadePort {
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
+                            .billingProfileType(BillingProfileType.INDIVIDUAL)
                             .build();
                     final User createdUser = userStoragePort.createUser(user);
                     user = user.toBuilder()
@@ -229,22 +231,31 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    @Transactional
     public CompanyBillingProfile getCompanyBillingProfile(UUID userId) {
         return billingProfileStoragePort.findCompanyProfileForUser(userId)
                 .orElseGet(() -> {
                     CompanyBillingProfile newCompanyBillingProfile = CompanyBillingProfile.init();
                     billingProfileStoragePort.saveCompanyProfileForUser(userId, newCompanyBillingProfile);
+                    billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.COMPANY, userId);
                     return newCompanyBillingProfile;
                 });
     }
 
     @Override
+    @Transactional
     public IndividualBillingProfile getIndividualBillingProfile(UUID userId) {
         return billingProfileStoragePort.findIndividualBillingProfile(userId)
                 .orElseGet(() -> {
                     IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.init();
                     billingProfileStoragePort.saveIndividualProfileForUser(userId, individualBillingProfile);
+                    billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.INDIVIDUAL, userId);
                     return individualBillingProfile;
                 });
+    }
+
+    @Override
+    public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
+        billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
     }
 }

@@ -325,4 +325,11 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         return ResponseEntity.ok(BillingProfileMapper.individualDomainToResponse(userFacadePort.getIndividualBillingProfile(authenticatedUser.getId())));
     }
+
+    @Override
+    public ResponseEntity<Void> updateBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.updateBillingProfileType(authenticatedUser.getId(), BillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
+        return ResponseEntity.noContent().build();
+    }
 }
