@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
+import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
@@ -18,6 +19,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -43,6 +45,7 @@ public class UserServiceTest {
     private UserService userService;
     private ProjectObserverPort projectObserverPort;
     private UserObserverPort userObserverPort;
+    private BillingProfileStoragePort billingProfileStoragePort;
 
     @BeforeEach
     void setUp() {
@@ -52,8 +55,9 @@ public class UserServiceTest {
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
+        billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort);
+                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort);
     }
 
     @Test
@@ -615,5 +619,80 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, times(1)).saveUsers(updatedUserProfiles);
+    }
+
+
+    @Test
+    void should_return_company_billing_profile() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+        final CompanyBillingProfile expected = CompanyBillingProfile.builder()
+                .id(UUID.randomUUID())
+                .status(VerificationStatus.CLOSED)
+                .build();
+
+        // When
+        when(billingProfileStoragePort.findCompanyProfileForUser(userId))
+                .thenReturn(Optional.of(expected));
+        final CompanyBillingProfile result = userService.getCompanyBillingProfile(userId);
+
+        // Then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void should_create_and_return_company_billing_profile_given_no_existing_one() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+
+        // When
+        when(billingProfileStoragePort.findCompanyProfileForUser(userId))
+                .thenReturn(Optional.empty());
+        userService.getCompanyBillingProfile(userId);
+
+        // Then
+        ArgumentCaptor<CompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(CompanyBillingProfile.class);
+        ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
+        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
+        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
+    }
+
+    @Test
+    void should_return_individual_billing_profile() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+        final IndividualBillingProfile expected = IndividualBillingProfile.builder()
+                .id(UUID.randomUUID())
+                .status(VerificationStatus.NOT_STARTED)
+                .build();
+
+        // When
+        when(billingProfileStoragePort.findIndividualBillingProfile(userId))
+                .thenReturn(Optional.of(expected));
+        final IndividualBillingProfile result = userService.getIndividualBillingProfile(userId);
+
+        // Then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void should_create_and_return_individual_billing_profile_given_no_existing_one() {
+        // Given
+        final UUID userId = UUID.randomUUID();
+
+        // When
+        when(billingProfileStoragePort.findIndividualBillingProfile(userId))
+                .thenReturn(Optional.empty());
+        userService.getIndividualBillingProfile(userId);
+
+        // Then
+        ArgumentCaptor<IndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(IndividualBillingProfile.class);
+        ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
+        verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(uuidCaptor.capture(), billingProfileArgumentCaptor.capture());
+        assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
+        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
+        assertThat(uuidCaptor.getValue()).isEqualTo(userId);
     }
 }

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
+import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
@@ -35,6 +36,7 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
+    private final BillingProfileStoragePort billingProfileStoragePort;
 
     @Override
     @Transactional
@@ -46,7 +48,7 @@ public class UserService implements UserFacadePort {
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
-                    
+
                     return user;
                 })
                 .orElseGet(() -> {
@@ -224,5 +226,25 @@ public class UserService implements UserFacadePort {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public CompanyBillingProfile getCompanyBillingProfile(UUID userId) {
+        return billingProfileStoragePort.findCompanyProfileForUser(userId)
+                .orElseGet(() -> {
+                    CompanyBillingProfile newCompanyBillingProfile = CompanyBillingProfile.init();
+                    billingProfileStoragePort.saveCompanyProfileForUser(userId, newCompanyBillingProfile);
+                    return newCompanyBillingProfile;
+                });
+    }
+
+    @Override
+    public IndividualBillingProfile getIndividualBillingProfile(UUID userId) {
+        return billingProfileStoragePort.findIndividualBillingProfile(userId)
+                .orElseGet(() -> {
+                    IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.init();
+                    billingProfileStoragePort.saveIndividualProfileForUser(userId, individualBillingProfile);
+                    return individualBillingProfile;
+                });
     }
 }

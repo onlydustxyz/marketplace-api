@@ -3979,7 +3979,7 @@ components:
             hasValidPayoutInfos:
               type: boolean
               description: False if the user has invalid payout information
-            hasValidBillingProfiles:
+            hasValidBillingProfile:
               type: boolean
               description: False if at least one billing profiles is not valid
             projectsLed:
@@ -4731,12 +4731,12 @@ components:
     VerificationStatus:
       type: string
       enum:
-        - UNSTARTED
+        - NOT_STARTED
         - STARTED
         - UNDER_REVIEW
         - VERIFIED
         - REJECTED
-        - INVALITATED
+        - INVALIDATED
         - CLOSED
 
     CompanyBillingProfileResponse:

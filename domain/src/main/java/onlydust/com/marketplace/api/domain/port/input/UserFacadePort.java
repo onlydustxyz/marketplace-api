@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.input;
 
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
-import onlydust.com.marketplace.api.domain.model.UserProfile;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -56,4 +53,8 @@ public interface UserFacadePort {
     void claimProjectForAuthenticatedUser(UUID projectId, User user);
 
     URL saveAvatarImage(InputStream imageInputStream);
+
+    CompanyBillingProfile getCompanyBillingProfile(UUID userId);
+
+    IndividualBillingProfile getIndividualBillingProfile(UUID userId);
 }

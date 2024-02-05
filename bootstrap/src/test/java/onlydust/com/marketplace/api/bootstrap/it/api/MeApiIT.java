@@ -379,4 +379,43 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(user.getLastSeenAt()).isAfter(before);
         assertThat(user.getLastSeenAt()).isBefore(after);
     }
+
+    @Test
+    void should_get_individual_billing_profile() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
+        // When
+        client.get()
+                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+    }
+
+    @Test
+    void should_get_company_billing_profile() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
+        // When
+        client.get()
+                .uri(ME_GET_INDIVIDUAL_BILLING_COMPANY)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+    }
+
+
 }
