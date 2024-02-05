@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -8,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -21,6 +24,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     static final ProjectId KAAPER = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
     static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");
+    static final Currency.Id STRK = Currency.Id.of("81b7e948-954f-4718-bad3-b70a0edd27e1");
 
     @Test
     void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {
@@ -366,7 +370,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "red-bull.eth"
                             }
                         }
-                        """.formatted(BTC))
+                        """.formatted(STRK))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -389,6 +393,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isNoContent();
 
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
         // When
         client.post()
                 .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
@@ -398,7 +408,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         {
                             "recipientId": "%d",
                             "amount": 0.01,
-                            "currency": "BTC",
+                            "currency": "STRK",
                             "items": [{
                                 "type": "PULL_REQUEST",
                                 "id": "1703880973",

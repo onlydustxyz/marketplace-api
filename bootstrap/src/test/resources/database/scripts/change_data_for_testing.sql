@@ -23,6 +23,8 @@ update payment_requests
 set currency = 'usd'
 where id = '0341317f-b831-412a-9cec-a5a16a9d749c';
 
-
+insert into currencies (id, name, code, decimals, type)
+values ('3f6e1c98-8659-493a-b941-943a803bd91f', 'Bitcoin', 'BTC', 8, 'CRYPTO'),
+       ('81b7e948-954f-4718-bad3-b70a0edd27e1', 'StarkNet Token', 'STRK', 18, 'CRYPTO');
 
 

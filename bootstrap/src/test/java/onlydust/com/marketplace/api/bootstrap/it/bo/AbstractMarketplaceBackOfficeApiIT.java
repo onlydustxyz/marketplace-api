@@ -57,6 +57,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(initializers = AbstractMarketplaceBackOfficeApiIT.WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
+        @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
@@ -82,6 +83,9 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")
     protected WireMockServer auth0WireMockServer;
+    @InjectWireMock("indexer-api")
+    protected WireMockServer indexerApiWireMockServer;
+
     @Autowired
     ApiKeyAuthenticationService.Config config;
 
