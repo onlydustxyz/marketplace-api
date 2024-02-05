@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
-import onlydust.com.backoffice.api.contract.model.TransactionResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -169,21 +168,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.allowance").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
-
-        // When
-        client.delete()
-                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId, "0x02")))
-                .header("Api-Key", apiKey())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.balance").isEqualTo(100)
-                .jsonPath("$.allowance").isEqualTo(20)
-                .jsonPath("$.receipts.size()").isEqualTo(1)
-                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
-        ;
     }
 
     @Test
@@ -269,42 +253,44 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """);
     }
 
-
     @Test
     void should_delete_transaction_registered_by_mistake() {
-
-        // When
-        final var transactionId = client.post()
-                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(COCA_COLAX)))
+        // Given
+        final var accountId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "type": "CREDIT",
-                            "amount": 100,
                             "currencyId": "%s",
+                            "allowance": 100,
                             "receipt": {
+                                "amount": 100,
                                 "network": "ETHEREUM",
-                                "reference": "0x0",
+                                "reference": "0x01",
                                 "thirdPartyName": "Coca Cola LTD",
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
                         """.formatted(BTC))
-                // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(TransactionResponse.class)
+                .expectBody(AccountResponse.class)
                 .returnResult().getResponseBody().getId();
 
         // When
         client.delete()
-                .uri(getApiURI(DELETE_SPONSORS_ACCOUNTING_TRANSACTIONS.formatted(COCA_COLAX, transactionId)))
+                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId, "0x01")))
                 .header("Api-Key", apiKey())
-                // Then
                 .exchange()
+                // Then
                 .expectStatus()
-                .isNoContent();
+                .isOk()
+                .expectBody()
+                .jsonPath("$.balance").isEqualTo(0)
+                .jsonPath("$.allowance").isEqualTo(100)
+                .jsonPath("$.receipts.size()").isEqualTo(0)
+        ;
     }
 }
