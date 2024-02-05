@@ -169,6 +169,21 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.allowance").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
+
+        // When
+        client.delete()
+                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId, "0x02")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.balance").isEqualTo(100)
+                .jsonPath("$.allowance").isEqualTo(20)
+                .jsonPath("$.receipts.size()").isEqualTo(1)
+                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
+        ;
     }
 
 

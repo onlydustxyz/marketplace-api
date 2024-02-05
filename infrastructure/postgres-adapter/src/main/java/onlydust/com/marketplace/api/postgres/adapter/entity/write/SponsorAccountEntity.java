@@ -28,7 +28,7 @@ public class SponsorAccountEntity {
 
     Instant lockedUntil;
 
-    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @Builder.Default
     Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
