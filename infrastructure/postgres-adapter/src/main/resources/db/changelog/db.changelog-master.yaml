@@ -86,6 +86,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000042_fix_ecosystems_migration.sql
 
-      file: db/changelog/changelogs/00000039_refactor_contributor_ledgers.sql
+      file: db/changelog/changelogs/00000042_refactor_contributor_ledgers.sql
   - include:
-      file: db/changelog/changelogs/00000040_refactor_accounting_schema.sql
+      file: db/changelog/changelogs/00000043_refactor_accounting_schema.sql
