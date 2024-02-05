@@ -381,7 +381,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                         .id(faker.pokemon().name())
                         .number(faker.number().randomNumber())
                         .repoId(faker.number().randomNumber())
-                        .type(Reward.Item.Type.pullRequest)
+                        .type(Reward.Item.Type.PULL_REQUEST)
                         .build()
                 )
         ));

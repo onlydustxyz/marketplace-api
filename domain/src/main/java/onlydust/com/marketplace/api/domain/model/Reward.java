@@ -31,7 +31,7 @@ public record Reward(
         Type type;
 
         public enum Type {
-            pullRequest, issue, codeReview
+            PULL_REQUEST, ISSUE, CODE_REVIEW
         }
     }
 }

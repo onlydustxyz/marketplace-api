@@ -9,15 +9,26 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ShortProjectView
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresRewardAdapter implements RewardStoragePort {
 
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
 
+    @Override
+    public void save(Reward reward) {
+        throw OnlyDustException.internalServerError("Not implemented for v1");
+    }
 
     @Override
-    public void createReward(Reward reward) {
+    public void delete(UUID rewardId) {
+        throw OnlyDustException.internalServerError("Not implemented for v1");
+    }
+
+    @Override
+    public Optional<Reward> get(UUID rewardId) {
         throw OnlyDustException.internalServerError("Not implemented for v1");
     }
 

@@ -57,12 +57,24 @@ public class RewardItemEntity {
                 .repoId(item.repoId())
                 .id(item.id())
                 .type(switch (item.type()) {
-                    case issue -> ContributionType.ISSUE;
-                    case pullRequest -> ContributionType.PULL_REQUEST;
-                    case codeReview -> ContributionType.CODE_REVIEW;
+                    case ISSUE -> ContributionType.ISSUE;
+                    case PULL_REQUEST -> ContributionType.PULL_REQUEST;
+                    case CODE_REVIEW -> ContributionType.CODE_REVIEW;
                 })
                 .projectId(reward.projectId())
                 .recipientId(reward.recipientId())
                 .build()).toList();
+    }
+
+    public Reward.Item toRewardItem() {
+        return Reward.Item.builder()
+                .id(id)
+                .number(number)
+                .repoId(repoId)
+                .type(switch (type) {
+                    case ISSUE -> Reward.Item.Type.ISSUE;
+                    case PULL_REQUEST -> Reward.Item.Type.PULL_REQUEST;
+                    case CODE_REVIEW -> Reward.Item.Type.CODE_REVIEW;
+                }).build();
     }
 }

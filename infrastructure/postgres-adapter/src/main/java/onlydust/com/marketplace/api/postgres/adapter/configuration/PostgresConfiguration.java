@@ -183,6 +183,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository) {
+        return new PostgresRewardV2Adapter(rewardRepository);
+    }
+
+    @Bean
     public CustomRewardRepository customRewardRepository(final EntityManager entityManager) {
         return new CustomRewardRepository(entityManager);
     }

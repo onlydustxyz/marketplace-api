@@ -4,9 +4,15 @@ import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.Reward;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface RewardStoragePort {
-    void createReward(Reward reward);
+    void save(Reward reward);
+
+    void delete(UUID rewardId);
+
+    Optional<Reward> get(UUID rewardId);
 
     List<Project> listProjectsByRecipient(Long githubUserId);
 }

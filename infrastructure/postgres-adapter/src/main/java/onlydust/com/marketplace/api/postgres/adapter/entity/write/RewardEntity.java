@@ -52,4 +52,17 @@ public class RewardEntity {
                 .rewardItems(RewardItemEntity.of(reward))
                 .build();
     }
+
+    public Reward toReward() {
+        return new Reward(
+                id,
+                projectId,
+                requestorId,
+                recipientId,
+                amount,
+                currency.toDomain(),
+                requestedAt,
+                invoiceReceivedAt,
+                rewardItems.stream().map(RewardItemEntity::toRewardItem).toList());
+    }
 }

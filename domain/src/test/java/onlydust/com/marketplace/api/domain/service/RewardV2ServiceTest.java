@@ -6,11 +6,12 @@ import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.model.Reward;
 import onlydust.com.marketplace.api.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
-import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
+import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,12 +24,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class RewardV2ServiceTest {
-    final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
+    final RewardStoragePort rewardStoragePort = mock(RewardStoragePort.class);
     final PermissionService permissionService = mock(PermissionService.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingServicePort accountingServicePort = mock(AccountingServicePort.class);
     final RewardV2Service rewardService = new RewardV2Service(
-            rewardServicePort,
+            rewardStoragePort,
             permissionService,
             indexerPort,
             accountingServicePort
@@ -37,11 +38,10 @@ public class RewardV2ServiceTest {
     final UUID projectId = UUID.randomUUID();
     final Faker faker = new Faker();
     final Long recipientId = faker.number().randomNumber(5, true);
-    final UUID rewardId = UUID.randomUUID();
 
     @BeforeEach
     void setup() {
-        reset(rewardServicePort, permissionService, indexerPort, accountingServicePort);
+        reset(rewardStoragePort, permissionService, indexerPort, accountingServicePort);
     }
 
     @Nested
@@ -55,15 +55,28 @@ public class RewardV2ServiceTest {
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
                     .currency(Currency.Usdc)
+                    .items(List.of())
                     .build();
-            when(rewardServicePort.create(projectLeadId, command)).thenReturn(rewardId);
+
 
             // When
-            final var createdRewardId = rewardService.requestPayment(projectLeadId, command);
+            final var rewardId = rewardService.requestPayment(projectLeadId, command);
 
             // Then
-            assertThat(createdRewardId).isEqualTo(rewardId);
+            assertThat(rewardId).isNotNull();
             verify(indexerPort).indexUser(recipientId);
+
+            final var reward = ArgumentCaptor.forClass(Reward.class);
+            verify(rewardStoragePort).save(reward.capture());
+            final var capturedReward = reward.getValue();
+            assertThat(capturedReward.id()).isEqualTo(rewardId);
+            assertThat(capturedReward.projectId()).isEqualTo(projectId);
+            assertThat(capturedReward.requestorId()).isEqualTo(projectLeadId);
+            assertThat(capturedReward.recipientId()).isEqualTo(recipientId);
+            assertThat(capturedReward.amount()).isEqualTo(BigDecimal.TEN);
+            assertThat(capturedReward.currency()).isEqualTo(Currency.Usdc);
+            assertThat(capturedReward.rewardItems()).isEmpty();
+
             verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, "USDC");
         }
 
@@ -124,8 +137,9 @@ public class RewardV2ServiceTest {
         @Test
         void should_prevent_cancelling_a_non_existing_reward() {
             // Given
+            final var rewardId = UUID.randomUUID();
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-            when(rewardServicePort.get(rewardId)).thenReturn(Optional.empty());
+            when(rewardStoragePort.get(rewardId)).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> rewardService.cancelPayment(projectLeadId, projectId, rewardId))
@@ -137,6 +151,8 @@ public class RewardV2ServiceTest {
 
     @Nested
     class GivenAProjectWithAReward {
+        final UUID rewardId = UUID.randomUUID();
+
         final Reward reward = new Reward(
                 rewardId,
                 projectId,
@@ -151,7 +167,7 @@ public class RewardV2ServiceTest {
 
         @BeforeEach
         void setup() {
-            when(rewardServicePort.get(rewardId)).thenReturn(Optional.of(reward));
+            when(rewardStoragePort.get(rewardId)).thenReturn(Optional.of(reward));
         }
 
         @Test
@@ -163,7 +179,7 @@ public class RewardV2ServiceTest {
             rewardService.cancelPayment(projectLeadId, projectId, rewardId);
 
             // Then
-            verify(rewardServicePort).cancel(rewardId);
+            verify(rewardStoragePort).delete(rewardId);
             verify(accountingServicePort).cancelReward(projectId, rewardId, BigDecimal.TEN, "USDC");
         }
 
