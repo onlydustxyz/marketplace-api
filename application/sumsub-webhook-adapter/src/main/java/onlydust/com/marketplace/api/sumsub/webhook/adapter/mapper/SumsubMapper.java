@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
+import onlydust.com.marketplace.api.domain.job.OutboxSkippingException;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.VerificationStatus;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
@@ -26,16 +27,21 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
 
     @Override
     public BillingProfileUpdated apply(Event event) {
-        if (event instanceof SumsubWebhookEventDTO) {
-            final SumsubWebhookEventDTO sumsubWebhookEventDTO = (SumsubWebhookEventDTO) event;
-            return BillingProfileUpdated.builder()
-                    .billingProfileId(UUID.fromString(sumsubWebhookEventDTO.getExternalUserId()))
-                    .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                    .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
-                            sumsubWebhookEventDTO.getReviewResult()))
-                    .build();
+        try {
+            if (event instanceof SumsubWebhookEventDTO) {
+                final SumsubWebhookEventDTO sumsubWebhookEventDTO = (SumsubWebhookEventDTO) event;
+                final UUID billingProfileId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
+                return BillingProfileUpdated.builder()
+                        .billingProfileId(billingProfileId)
+                        .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
+                        .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                                sumsubWebhookEventDTO.getReviewResult()))
+                        .build();
+            }
+        } catch (Exception ignored) {
+
         }
-        throw OnlyDustException.internalServerError("Invalid sumsub event format");
+        throw new OutboxSkippingException(String.format("Invalid sumsub event format %s", event));
     }
 
     private BillingProfileType applicationTypeToDomain(final String applicationType) {
