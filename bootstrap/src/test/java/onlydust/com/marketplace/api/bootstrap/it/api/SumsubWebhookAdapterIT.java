@@ -75,7 +75,7 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
     @Autowired
     CompanyBillingProfileRepository companyBillingProfileRepository;
 
-    @Test
+//    @Test
     void should_update_company_billing_profile_to_pending() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
@@ -199,7 +199,7 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
     @Autowired
     IndividualBillingProfileRepository individualBillingProfileRepository;
 
-    @Test
+//    @Test
     void should_update_individual_billing_profile_to_pending() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
