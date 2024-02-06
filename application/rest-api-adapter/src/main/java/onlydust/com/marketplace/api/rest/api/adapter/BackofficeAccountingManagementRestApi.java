@@ -8,22 +8,27 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapAccountToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapReceiptToTransaction;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
 @AllArgsConstructor
 public class BackofficeAccountingManagementRestApi implements BackofficeAccountingManagementApi {
     private final AccountingFacadePort accountingFacadePort;
-
+    private final RewardFacadePort rewardFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
+    private final UserFacadePort userFacadePort;
 
     @Override
     public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
@@ -106,4 +111,27 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 .payments(payableRewards.stream().map(BackOfficeMapper::mapPendingPaymentToResponse).toList())
         );
     }
+
+    @Override
+    public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+        final var reward = rewardFacadePort.getReward(rewardId)
+                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+
+        final var currency =
+                currencyFacadePort.listCurrencies().stream().filter(c -> c.code().toString().equals(reward.currency().toString().toUpperCase())).findFirst()
+                        .orElseThrow(() -> notFound("Currency %s not found".formatted(reward.currency().toString().toUpperCase())));
+
+        final var recipient = userFacadePort.getProfileById(reward.recipientId());
+
+        final var transaction = SponsorAccount.Transaction.create(
+                mapTransactionNetwork(payRewardRequest.getNetwork()),
+                payRewardRequest.getReference(),
+                PositiveAmount.ZERO,
+                recipient.getLogin(),
+                payRewardRequest.getRecipientAccount());
+
+        accountingFacadePort.pay(RewardId.of(rewardId), currency.id(), transaction);
+        return ResponseEntity.noContent().build();
+    }
+
 }

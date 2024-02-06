@@ -306,6 +306,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/rewards/{rewardId}/pay:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Pay a reward
+      operationId: payReward
+      description: |
+        Pay a reward using the transaction reference and recipient account as input.
+        The provided reward will be marked as complete.
+      parameters:
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            $ref: '#/components/schemas/RewardId'
+      requestBody:
+        description: Payment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayRewardRequest'
+      responses:
+        "204":
+          description: 'The reward has been marked as complete'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
     get:
@@ -1341,6 +1374,20 @@ components:
           $ref: '#/components/schemas/SponsorAccountId'
         amount:
           type: number
+
+    PayRewardRequest:
+      type: object
+      required:
+        - network
+        - reference
+        - recipientAccount
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        reference:
+          type: string
+        recipientAccount:
+          type: string
 
     Technologies:
       type: object

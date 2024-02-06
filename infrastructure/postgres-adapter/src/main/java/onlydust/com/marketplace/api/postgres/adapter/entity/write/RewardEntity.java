@@ -36,7 +36,7 @@ public class RewardEntity {
     @NonNull Date requestedAt;
     Date invoiceReceivedAt;
 
-    @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull List<RewardItemEntity> rewardItems;
 
     public static RewardEntity of(Reward reward) {

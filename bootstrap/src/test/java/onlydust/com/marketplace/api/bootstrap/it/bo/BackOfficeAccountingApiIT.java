@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.backoffice.api.contract.model.AccountResponse;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
@@ -435,6 +435,47 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
 
         // When
+        final var response = client.get()
+                .uri(getApiURI(GET_PENDING_PAYMENTS))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(PendingPaymentListResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getPayments()).hasSize(1);
+        final var payment = response.getPayments().get(0);
+        assertThat(payment.getRecipientAccountNumber()).isNull();
+        assertThat(payment.getAmount()).isEqualTo(BigDecimal.valueOf(30));
+        assertThat(payment.getCurrency().getId()).isEqualTo(STRK.value());
+        assertThat(payment.getCurrency().getCode()).isEqualTo("STRK");
+        assertThat(payment.getCurrency().getName()).isEqualTo("StarkNet Token");
+        assertThat(payment.getCurrency().getType()).isEqualTo(CurrencyType.CRYPTO);
+        assertThat(payment.getCurrency().getStandard()).isEqualTo(CurrencyStandard.ERC20);
+        assertThat(payment.getCurrency().getBlockchain()).isEqualTo(BlockchainContract.ETHEREUM);
+        assertThat(payment.getCurrency().getAddress()).isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766");
+
+        final var rewardId = payment.getRewardId();
+        assertThat(rewardId).isNotNull();
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_REWARDS_PAY.formatted(rewardId)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "network": "ETHEREUM",
+                            "reference": "0x14",
+                            "recipientAccount": "ofux.eth"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
         client.get()
                 .uri(getApiURI(GET_PENDING_PAYMENTS))
                 .header("Api-Key", apiKey())
@@ -442,27 +483,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.payments[?(@.id empty true)].rewardId").doesNotExist()
-                .json("""
-                        {
-                          "payments": [
-                            {
-                              "recipientAccountNumber": null,
-                              "amount": 30,
-                              "currency": {
-                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                "code": "STRK",
-                                "name": "StarkNet Token",
-                                "logoUrl": null,
-                                "type": "CRYPTO",
-                                "standard": "ERC20",
-                                "blockchain": "ETHEREUM",
-                                "address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"
-                              }
-                            }
-                          ]
-                        }
-                        """)
+                .jsonPath("$.payments.size()").isEqualTo(0)
         ;
     }
 }

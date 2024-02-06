@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.model.Reward;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -57,5 +59,10 @@ public class RewardService implements RewardFacadePort {
         final var rewardIds = userStoragePort.findPendingInvoiceRewardsForRecipientId(recipientId).stream()
                 .map(UserRewardView::getId).toList();
         rewardServicePort.markInvoiceAsReceived(rewardIds);
+    }
+
+    @Override
+    public Optional<Reward> getReward(UUID rewardId) {
+        throw new UnsupportedOperationException("Not implemented in v1");
     }
 }

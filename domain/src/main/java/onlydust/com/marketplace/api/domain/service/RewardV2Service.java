@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -80,5 +81,10 @@ public class RewardV2Service implements RewardFacadePort {
     public void markInvoiceAsReceived(Long recipientId) {
         // TODO
         throw OnlyDustException.internalServerError("Not implemented yet");
+    }
+
+    @Override
+    public Optional<Reward> getReward(UUID rewardId) {
+        return rewardStoragePort.get(rewardId);
     }
 }
