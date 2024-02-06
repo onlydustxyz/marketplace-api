@@ -1,17 +1,18 @@
 package onlydust.com.marketplace.accounting.domain;
 
-import onlydust.com.marketplace.accounting.domain.model.Amount;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -562,5 +563,63 @@ public class AccountBookTest {
                 Map.entry(account0, PositiveAmount.of(30L)),
                 Map.entry(account1, PositiveAmount.of(15L))
         );
+    }
+
+    @Test
+    public void benchmark() {
+        // Given
+        final var iterations = 100;
+        final var sponsorAccountCount = 2L;
+        final var projectCount = 40L;
+        final var rewardCount = projectCount * 200L;
+
+        final List<AccountBookEvent> events = new ArrayList<>();
+
+        final List<AccountId> sponsorAccounts = new ArrayList<>();
+        for (int i = 0; i < sponsorAccountCount; i++) {
+            final var account = AccountId.of(SponsorAccount.Id.random());
+            sponsorAccounts.add(account);
+            events.add(new MintEvent(account, PositiveAmount.of(projectCount * rewardCount)));
+        }
+
+        final List<AccountId> projects = new ArrayList<>();
+        for (int i = 0; i < projectCount; i++) {
+            final var account = AccountId.of(ProjectId.random());
+            projects.add(account);
+            events.add(new TransferEvent(
+                    sponsorAccounts.get(i % sponsorAccounts.size()),
+                    account,
+                    PositiveAmount.of(rewardCount)));
+        }
+
+        final List<AccountId> rewards = new ArrayList<>();
+        for (int i = 0; i < rewardCount; i++) {
+            final var account = AccountId.of(RewardId.random());
+            rewards.add(account);
+            events.add(new TransferEvent(
+                    projects.get(i % projects.size()),
+                    account,
+                    PositiveAmount.of(1L)));
+
+            if (i % 10 == 0) {
+                events.add(new RefundEvent(
+                        account,
+                        projects.get(i % projects.size()),
+                        PositiveAmount.of(BigDecimal.valueOf(0.1))));
+            }
+        }
+
+        System.out.printf("Benchmarking with %d events%n", events.size());
+
+        Runtime.getRuntime().gc();
+        final var startMemory = Runtime.getRuntime().totalMemory();
+        final var startTime = System.currentTimeMillis();
+        AccountBookAggregate.fromEvents(events);
+        final var endMemory = Runtime.getRuntime().totalMemory();
+        for (int i = 1; i < iterations; i++) {
+            AccountBookAggregate.fromEvents(events);
+        }
+        final var endTime = System.currentTimeMillis();
+        System.out.printf("Benchmark took %d ms and %d MB%n", (endTime - startTime) / iterations, (endMemory - startMemory) / 1024 / 1024);
     }
 }
