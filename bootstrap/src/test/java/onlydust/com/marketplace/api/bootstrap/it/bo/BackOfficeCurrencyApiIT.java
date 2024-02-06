@@ -267,44 +267,60 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                           "currencies": [
                             {
                               "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "code": "BTC",
+                              "name": "Bitcoin",
+                              "logoUrl": null,
                               "type": "CRYPTO",
                               "standard": null,
                               "tokens": [],
-                              "name": "Bitcoin",
-                              "code": "BTC",
-                              "decimals": 8
+                              "decimals": 8,
+                              "description": null
                             },
                             {
+                              "code": "ETH",
+                              "name": "Ethereum",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
                               "type": "CRYPTO",
                               "standard": null,
                               "tokens": [],
-                              "name": "Ethereum",
-                              "code": "ETH",
-                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
                               "decimals": 18,
                               "description": "Ethereum (ETH) is a cryptocurrency"
                             },
                             {
+                              "code": "EUR",
+                              "name": "Euro2",
+                              "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
                               "type": "FIAT",
                               "standard": "ISO4217",
                               "tokens": [],
-                              "name": "Euro2",
-                              "code": "EUR",
-                              "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
                               "decimals": 3,
                               "description": "Euro is the official currency of the European Union"
                             },
                             {
+                              "code": "STRK",
+                              "name": "StarkNet Token",
+                              "logoUrl": null,
                               "type": "CRYPTO",
                               "standard": "ERC20",
                               "tokens": [
                                 {
                                   "blockchain": "ETHEREUM",
-                                  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                                  "decimals": 6,
-                                  "symbol": "USDC",
-                                  "name": "USD Coin"
-                                },
+                                  "address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766",
+                                  "decimals": 18,
+                                  "symbol": "STRK",
+                                  "name": "StarkNet Token"
+                                }
+                              ],
+                              "decimals": 18,
+                              "description": null
+                            },
+                            {
+                              "code": "USDC",
+                              "name": "USD Coin",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "type": "CRYPTO",
+                              "standard": "ERC20",
+                              "tokens": [
                                 {
                                   "blockchain": "STARKNET",
                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
@@ -318,11 +334,15 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"
+                                },
+                                {
+                                  "blockchain": "ETHEREUM",
+                                  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
                                 }
                               ],
-                              "name": "USD Coin",
-                              "code": "USDC",
-                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                               "decimals": 6,
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
                             }
