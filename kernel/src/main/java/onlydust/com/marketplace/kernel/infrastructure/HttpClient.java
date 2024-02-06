@@ -36,6 +36,18 @@ public abstract class HttpClient {
                 .build();
     }
 
+    private <Body> HttpRequest buildRequest(final HttpMethod method,
+                                            final String path,
+                                            final Body body,
+                                            final String... headers) throws JsonProcessingException {
+        return builder()
+                .uri(uri(path))
+                .header("Content-Type", "application/json")
+                .headers(headers)
+                .method(method.name(), isNull(body) ? noBody() : ofString(objectMapper.writeValueAsString(body)))
+                .build();
+    }
+
     public <RequestBody, ResponseBody> Optional<ResponseBody> send(final String path,
                                                                    final HttpMethod method,
                                                                    final RequestBody requestBody,
@@ -52,11 +64,21 @@ public abstract class HttpClient {
         return body.map(b -> decode(b, typeRef));
     }
 
+    public <RequestBody, ResponseBody> Optional<ResponseBody> send(final String path,
+                                                                   final HttpMethod method,
+                                                                   final RequestBody requestBody,
+                                                                   final Class<ResponseBody> responseClass,
+                                                                   final String... headers) {
+        final var body = send(path, method, requestBody, headers);
+        return Void.class.isAssignableFrom(responseClass) ? Optional.empty() : body.map(b -> decode(b, responseClass));
+    }
+
     private <RequestBody> Optional<byte[]> send(final String path,
                                                 final HttpMethod method,
-                                                final RequestBody requestBody) {
+                                                final RequestBody requestBody,
+                                                final String... headers) {
         try {
-            final var request = buildRequest(method, path, requestBody);
+            final var request = headers.length == 0 ? buildRequest(method, path, requestBody) : buildRequest(method, path, requestBody, headers);
             final var httpResponse = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
             final int statusCode = httpResponse.statusCode();
 
@@ -91,7 +113,7 @@ public abstract class HttpClient {
             throw internalServerError("Fail to deserialize response", e);
         }
     }
-    
+
     private static String bodyString(final byte[] body) {
         return body != null ? new String(body, StandardCharsets.UTF_8) : "null";
     }

@@ -208,14 +208,16 @@ public class DomainConfiguration {
 
     @Bean
     public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
-                                                                 final BillingProfileStoragePort billingProfileStoragePort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort);
+                                                                 final BillingProfileStoragePort billingProfileStoragePort,
+                                                                 final UserVerificationStoragePort userVerificationStoragePort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort);
     }
 
     @Bean
     public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
-                                                         final BillingProfileStoragePort billingProfileStoragePort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort);
+                                                         final BillingProfileStoragePort billingProfileStoragePort,
+                                                         final UserVerificationStoragePort userVerificationStoragePort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort);
     }
 
     @Bean

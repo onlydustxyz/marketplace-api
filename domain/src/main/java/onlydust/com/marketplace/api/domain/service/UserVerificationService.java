@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
+import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
 
 import java.util.function.Function;
 
@@ -17,6 +18,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private final OutboxPort outboxPort;
     private final Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
     private final BillingProfileStoragePort billingProfileStoragePort;
+    private final UserVerificationStoragePort userVerificationStoragePort;
 
     @Override
     public void consumeUserVerificationEvent(Event event) {
@@ -36,6 +38,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
         billingProfileStoragePort.saveCompanyProfile(
                 billingProfileStoragePort.findCompanyProfileById(billingProfileUpdated.getBillingProfileId())
                         .map(companyBillingProfile -> companyBillingProfile.toBuilder().status(billingProfileUpdated.getVerificationStatus()).build())
+                        .map(userVerificationStoragePort::updateCompanyVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));
     }
@@ -44,6 +47,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
         billingProfileStoragePort.saveIndividualProfile(
                 billingProfileStoragePort.findIndividualProfileById(billingProfileUpdated.getBillingProfileId())
                         .map(individualBillingProfile -> individualBillingProfile.toBuilder().status(billingProfileUpdated.getVerificationStatus()).build())
+                        .map(userVerificationStoragePort::updateIndividualVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));
     }

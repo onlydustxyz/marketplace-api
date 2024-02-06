@@ -26,6 +26,7 @@
         <module>infura-adapter</module>
         <module>coinmarketcap-adapter</module>
         <module>posthog-api-client-adapter</module>
+        <module>sumsub-api-client-adapter</module>
     </modules>
 
     <properties>

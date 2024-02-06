@@ -24,6 +24,7 @@ public class IndividualBillingProfile {
     Boolean usCitizen;
     IdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
+    String idDocumentCountryCode;
     Date validUntil;
 
     public static IndividualBillingProfile initForUser(final UUID userId) {
