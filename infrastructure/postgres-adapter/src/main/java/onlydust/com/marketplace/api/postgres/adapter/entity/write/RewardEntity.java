@@ -30,7 +30,7 @@ public class RewardEntity {
 
     @Enumerated(EnumType.STRING)
     @Type(type = "currency")
-    CurrencyEnumEntity currency;
+    @NonNull CurrencyEnumEntity currency;
 
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
