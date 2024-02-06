@@ -11,11 +11,11 @@ public enum Network {
     SWIFT(Currency.Type.FIAT, null);
 
     private final Currency.Type type;
-    private final Blockchain nativeBlockchain;
+    private final Blockchain blockchain;
 
-    Network(Currency.Type type, Blockchain nativeBlockchain) {
+    Network(Currency.Type type, Blockchain blockchain) {
         this.type = type;
-        this.nativeBlockchain = nativeBlockchain;
+        this.blockchain = blockchain;
     }
 
     public Currency.Type type() {
@@ -23,6 +23,6 @@ public enum Network {
     }
 
     public Blockchain blockchain() {
-        return nativeBlockchain;
+        return blockchain;
     }
 }

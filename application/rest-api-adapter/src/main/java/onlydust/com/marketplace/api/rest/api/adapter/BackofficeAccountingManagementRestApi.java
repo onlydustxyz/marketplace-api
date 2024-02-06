@@ -98,4 +98,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    public ResponseEntity<PendingPaymentListResponse> getPendingPayments() {
+        final var payableRewards = accountingFacadePort.getPayableRewards();
+
+        return ResponseEntity.ok(new PendingPaymentListResponse()
+                .payments(payableRewards.stream().map(BackOfficeMapper::mapPendingPaymentToResponse).toList())
+        );
+    }
 }

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.time.ZoneOffset;
 
@@ -354,5 +355,25 @@ public interface BackOfficeMapper {
             case SEPA -> TransactionNetwork.SEPA;
             case SWIFT -> TransactionNetwork.SWIFT;
         };
+    }
+
+    static PendingPaymentResponse mapPendingPaymentToResponse(PayableReward payableReward) {
+        return new PendingPaymentResponse()
+                .rewardId(payableReward.id().value())
+                .amount(payableReward.amount().getValue())
+                .currency(mapTransactionalCurrency(payableReward.currency()))
+                ;
+    }
+
+    static TransactionalCurrency mapTransactionalCurrency(PayableCurrency currency) {
+        return new TransactionalCurrency()
+                .id(currency.id().value())
+                .code(currency.code().toString())
+                .name(currency.name())
+                .logoUrl(currency.logoUrl().orElse(null))
+                .type(mapCurrencyType(currency.type()))
+                .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
+                .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
+                .address(currency.address().map(ContractAddress::toString).orElse(null));
     }
 }

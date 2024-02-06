@@ -1,19 +1,44 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.net.URI;
+import java.util.Optional;
 
-public record PayableCurrency(
-        @NonNull Currency.Id id,
-        @NonNull Currency.Code code,
-        @NonNull String name,
-        URI logoUrl,
-        @NonNull Currency.Type type,
-        Currency.Standard standard,
-        Blockchain blockchain,
-        ContractAddress address
-) {
+@AllArgsConstructor
+@Accessors(fluent = true)
+public class PayableCurrency {
+    @Getter
+    private final @NonNull Currency.Id id;
+    @Getter
+    private final @NonNull Currency.Code code;
+    @Getter
+    private final @NonNull String name;
+    URI logoUrl;
+    @Getter
+    private final @NonNull Currency.Type type;
+    private final Currency.Standard standard;
+    private final Blockchain blockchain;
+    private final ContractAddress address;
+
+    public Optional<Currency.Standard> standard() {
+        return Optional.ofNullable(standard);
+    }
+
+    public Optional<URI> logoUrl() {
+        return Optional.ofNullable(logoUrl);
+    }
+
+    public Optional<Blockchain> blockchain() {
+        return Optional.ofNullable(blockchain);
+    }
+
+    public Optional<ContractAddress> address() {
+        return Optional.ofNullable(address);
+    }
 }

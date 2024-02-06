@@ -442,6 +442,27 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(System.out::println);
+                .jsonPath("$.payments[?(@.id empty true)].rewardId").doesNotExist()
+                .json("""
+                        {
+                          "payments": [
+                            {
+                              "recipientAccountNumber": null,
+                              "amount": 30,
+                              "currency": {
+                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                "code": "STRK",
+                                "name": "StarkNet Token",
+                                "logoUrl": null,
+                                "type": "CRYPTO",
+                                "standard": "ERC20",
+                                "blockchain": "ETHEREUM",
+                                "address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766"
+                              }
+                            }
+                          ]
+                        }
+                        """)
+        ;
     }
 }
