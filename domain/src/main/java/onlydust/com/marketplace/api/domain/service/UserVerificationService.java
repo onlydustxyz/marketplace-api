@@ -32,6 +32,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
             case COMPANY -> updateCompanyProfile(billingProfileUpdated);
             case INDIVIDUAL -> updateIndividualProfile(billingProfileUpdated);
         }
+        userObserver.onBillingProfileUpdated(billingProfileUpdated);
     }
 
     private void updateCompanyProfile(final BillingProfileUpdated billingProfileUpdated) {
