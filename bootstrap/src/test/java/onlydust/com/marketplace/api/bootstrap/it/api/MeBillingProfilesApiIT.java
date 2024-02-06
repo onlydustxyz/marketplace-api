@@ -4,8 +4,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
@@ -16,7 +14,6 @@ import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -100,7 +97,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
-                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_INDIVIDUAL_RESPONSE)));
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_INDIVIDUAL_RESPONSE_JSON)));
 
         final byte[] sumsubPayload = String.format("""
                 {
@@ -164,25 +161,13 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
     // To delete when we'll have a test with Sumsub mocked to create a billing profile with the KYB flow
     @Test
-    void should_get_company_billing_profile_given_one() {
+    void should_get_company_billing_profile_given_one() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                .id(UUID.randomUUID())
-                .userId(userId)
-                .address(faker.address().fullAddress())
-                .country(faker.address().country())
-                .name(faker.rickAndMorty().character())
-                .registrationNumber(faker.harryPotter().character())
-                .euVATNumber(faker.hacker().abbreviation())
-                .usEntity(true)
-                .registrationDate(faker.date().past(10, TimeUnit.DAYS))
-                .verificationStatus(VerificationStatusEntity.UNDER_REVIEW)
-                .build());
 
         // When
         client.get()
@@ -193,9 +178,79 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("NOT_STARTED");
+
+        final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
+
+        final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
+                billingProfileId.toString());
+        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_RESPONSE_JSON)));
+
+        final String sumsubApiChecksPath = String.format("/resources/checks/latest?type=COMPANY&applicantId=%s",
+                "65bcb9e271117f5b7d4ea23e");
+        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiChecksPath))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_CHECKS_RESPONSE_JSON)));
+
+
+
+        final byte[] sumsubPayload = String.format("""
+                {
+                  "type": "applicantPending",
+                  "clientId": "onlydust",
+                  "levelName": "basic-kyb-level",
+                  "applicantId": "65bd228a2a99e9196014ccc5",
+                  "createdAtMs": "2024-02-02 17:23:16.368",
+                  "sandboxMode": false,
+                  "inspectionId": "65bd228a2a99e9196014ccc6",
+                  "reviewResult": null,
+                  "reviewStatus": "pending",
+                  "applicantType": "company",
+                  "correlationId": "0727edcd2fd452f64b7dd9f76516d815",
+                  "externalUserId": "%s",
+                  "applicantActionId": null,
+                  "applicantMemberOf": null,
+                  "previousLevelName": null,
+                  "videoIdentReviewStatus": null,
+                  "externalApplicantActionId": null
+                }""", billingProfileId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest)
+                .bodyValue(sumsubPayload)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        client.get()
+                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
                 .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.status").isEqualTo("UNDER_REVIEW");
+                .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
+                .jsonPath("$.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
+                .jsonPath("$.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
+                .jsonPath("$.country").isEqualTo("France")
+                .jsonPath("$.registrationNumber").isEqualTo("908233638")
+                .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
+                .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.usEntity").isEqualTo(false);
     }
 
 
@@ -246,7 +301,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfileType").isEqualTo("COMPANY");
     }
 
-    private static final String SUMSUB_INDIVIDUAL_RESPONSE = """
+    private static final String SUMSUB_INDIVIDUAL_RESPONSE_JSON = """
             {
                 "id": "65bd228a2a99e9196014ccc5",
                 "createdAt": "2024-02-02 17:12:42",
@@ -397,4 +452,199 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 }
             }
             """;
+
+    private static final String SUMSUB_COMPANY_RESPONSE_JSON = """
+            {
+                "id": "65bcb9e271117f5b7d4ea23e",
+                "createdAt": "2024-02-02 09:46:10",
+                "key": "CFLGUPVDEXFEAS",
+                "clientId": "onlydust",
+                "inspectionId": "65bcb9e271117f5b7d4ea23f",
+                "externalUserId": "level-5bf2c215-028f-4d34-84bd-8e4d1c3c9c84",
+                "info": {
+                    "companyInfo": {
+                        "companyName": "WAGMI",
+                        "registrationNumber": "908233638",
+                        "country": "FRA",
+                        "address": {},
+                        "beneficiaries": [
+                            {
+                                "applicantId": "65bcbd198405da4bad4565e6",
+                                "positions": [
+                                    "shareholder",
+                                    "director"
+                                ],
+                                "type": "ubo",
+                                "inRegistry": false,
+                                "imageIds": null,
+                                "applicant": null,
+                                "shareSize": null
+                            },
+                            {
+                                "applicantId": "65bcbd47a039895f4c2f9c15",
+                                "positions": [
+                                    "shareholder",
+                                    "director"
+                                ],
+                                "type": "ubo",
+                                "inRegistry": false,
+                                "imageIds": null,
+                                "applicant": null,
+                                "shareSize": null
+                            }
+                        ]
+                    }
+                },
+                "applicantPlatform": "Web",
+                "ipCountry": "FRA",
+                "authCode": "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MDcyMzU3ODMsImV4cCI6MTcwNzIzNjM4Mywic3ViIjoibGV2ZWwtNWJmMmMyMTUtMDI4Zi00ZDM0LTg0YmQtOGU0ZDFjM2M5Yzg0IiwiYXVkIjoib25seWR1c3QiLCJpc3MiOiJTdW1zdWIiLCJhcHBsaWNhbnRJZCI6IjY1YmNiOWUyNzExMTdmNWI3ZDRlYTIzZSIsImFwcGxpY2FudE5hbWUiOiJXQUdNSSJ9.VbUEvzvFY7sjMCDcYf4kdE-sRBDMPboa3mnpUuZhMks",
+                "agreement": {
+                    "createdAt": "2024-02-02 09:46:14",
+                    "source": "WebSDK",
+                    "targets": [
+                        "constConsentEn_v9"
+                    ],
+                    "privacyNoticeUrl": "https://sumsub.com/privacy-notice-service/"
+                },
+                "requiredIdDocs": {
+                    "docSets": [
+                        {
+                            "idDocSetType": "COMPANY",
+                            "types": [
+                                "COMPANY_DOC"
+                            ],
+                            "steps": [
+                                {
+                                    "name": "company",
+                                    "minDocsCnt": 1,
+                                    "applicantLevelName": "basic-kyb-level",
+                                    "idDocTypes": [
+                                        "COMPANY_DOC"
+                                    ],
+                                    "idDocSubTypes": [
+                                        "INCORPORATION_CERT"
+                                    ],
+                                    "fields": [
+                                        {
+                                            "name": "companyName",
+                                            "required": true
+                                        },
+                                        {
+                                            "name": "country",
+                                            "required": true
+                                        },
+                                        {
+                                            "name": "registrationNumber",
+                                            "required": true
+                                        }
+                                    ],
+                                    "customFields": null,
+                                    "captureMode": null
+                                },
+                                {
+                                    "name": "ubos",
+                                    "minDocsCnt": 0,
+                                    "applicantLevelName": "basic-kyc-level",
+                                    "idDocTypes": null,
+                                    "idDocSubTypes": null,
+                                    "fields": [
+                                        {
+                                            "name": "firstName",
+                                            "required": true
+                                        },
+                                        {
+                                            "name": "lastName",
+                                            "required": true
+                                        },
+                                        {
+                                            "name": "middleName",
+                                            "required": false
+                                        },
+                                        {
+                                            "name": "dob",
+                                            "required": false
+                                        },
+                                        {
+                                            "name": "email",
+                                            "required": true
+                                        },
+                                        {
+                                            "name": "phone",
+                                            "required": true
+                                        }
+                                    ],
+                                    "customFields": null,
+                                    "captureMode": null
+                                }
+                            ]
+                        },
+                        {
+                            "idDocSetType": "QUESTIONNAIRE",
+                            "questionnaireDefId": "kybCustom"
+                        }
+                    ]
+                },
+                "review": {
+                    "reviewId": "AVhry",
+                    "attemptId": "JmlAH",
+                    "attemptCnt": 2,
+                    "elapsedSincePendingMs": 86184382,
+                    "elapsedSinceQueuedMs": 2411178,
+                    "reprocessing": true,
+                    "levelName": "basic-kyb-level",
+                    "createDate": "2024-02-05 11:40:27+0000",
+                    "reviewDate": "2024-02-06 11:36:51+0000",
+                    "reviewResult": {
+                        "reviewAnswer": "GREEN"
+                    },
+                    "reviewStatus": "completed",
+                    "priority": 0,
+                    "moderatorNames": null
+                },
+                "lang": "en",
+                "type": "company",
+                "questionnaires": [
+                    {
+                        "id": "kybCustom",
+                        "sections": {
+                            "information": {
+                                "items": {
+                                    "whatIsYourVatRegistr": {
+                                        "value": "FR26908233638"
+                                    },
+                                    "areYouAUsPerson": {
+                                        "value": "no"
+                                    },
+                                    "isYourCompanySubject": {
+                                        "value": "yes"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }""";
+
+    private static final String SUMSUB_COMPANY_CHECKS_RESPONSE_JSON = """
+            {
+                "checks": [
+                    {
+                        "answer": "GREEN",
+                        "checkType": "COMPANY",
+                        "createdAt": "2024-02-05 10:11:23",
+                        "id": "46440094-7be0-4cd4-baff-eb547bc2e199",
+                        "companyCheckInfo": {
+                            "companyName": "WAGMI",
+                            "companyNumber": "SIREN: 908 233 638 / SIRET: 908 233 638 00026",
+                            "status": "Active",
+                            "type": "Société par actions simplifiée (simplified joint-stock company)",
+                            "incorporatedOn": "2021-12-15 00:00:00",
+                            "officeAddress": "54 rue du Faubourg Montmartre, 75009 Paris",
+                            "licenseInfo": {
+                                "issuedDate": "2021-12-15 00:00:00"
+                            }
+                        }
+                    }
+                ]
+            }""";
 }
