@@ -4,20 +4,21 @@ CREATE TYPE billing_profile_type AS ENUM ('INDIVIDUAL','COMPANY');
 
 CREATE TABLE individual_billing_profiles
 (
-    id                  uuid                NOT NULL,
-    user_id             uuid                NOT NULL,
-    verification_status verification_status NOT NULL,
-    first_name          TEXT,
-    last_name           TEXT,
-    address             TEXT,
-    country             TEXT,
-    birthdate           TIMESTAMP,
-    valid_until         TIMESTAMP,
-    id_document_number  TEXT,
-    id_document_type    id_document_type,
-    us_citizen          BOOLEAN,
-    created_at          TIMESTAMP           NOT NULL DEFAULT NOW(),
-    updated_at          TIMESTAMP           NOT NULL DEFAULT NOW()
+    id                       uuid                NOT NULL,
+    user_id                  uuid                NOT NULL,
+    verification_status      verification_status NOT NULL,
+    first_name               TEXT,
+    last_name                TEXT,
+    address                  TEXT,
+    country                  TEXT,
+    birthdate                TIMESTAMP,
+    valid_until              TIMESTAMP,
+    id_document_number       TEXT,
+    id_document_type         id_document_type,
+    id_document_country_code TEXT,
+    us_citizen               BOOLEAN,
+    created_at               TIMESTAMP           NOT NULL DEFAULT NOW(),
+    updated_at               TIMESTAMP           NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE company_billing_profiles
@@ -39,9 +40,9 @@ CREATE TABLE company_billing_profiles
 
 CREATE TABLE user_billing_profile_types
 (
-    user_id uuid NOT NULL,
+    user_id              uuid                 NOT NULL,
     billing_profile_type billing_profile_type NOT NULL,
-    created_at          TIMESTAMP           NOT NULL DEFAULT NOW(),
-    updated_at          TIMESTAMP           NOT NULL DEFAULT NOW()
+    created_at           TIMESTAMP            NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMP            NOT NULL DEFAULT NOW()
 )
 

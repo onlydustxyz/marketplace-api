@@ -134,3 +134,9 @@ infrastructure:
     base-uri: https://eu.posthog.com
     api-key: ${POSTHOG_API_KEY}
     user-agent: ${POSTHOG_USER_AGENT}
+  sumsub:
+    base-uri: https://api.sumsub.com
+    app-token: ${SUMSUB_APP_TOKEN}
+    secret-key: ${SUMSUB_SECRET_KEY}
+    kyc-questionnaire-name: kycCustom
+    kyb-questionnaire-name: kybCustom

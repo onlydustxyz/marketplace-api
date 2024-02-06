@@ -39,6 +39,7 @@ public interface BillingProfileMapper {
                 .lastName(individualBillingProfile.getLastName())
                 .validUntil(DateMapper.toZoneDateTime(individualBillingProfile.getValidUntil()))
                 .usCitizen(individualBillingProfile.getUsCitizen())
+                .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
                 .idDocumentType(idDocumentTypeToResponse(individualBillingProfile.getIdDocumentType()));
     }
 

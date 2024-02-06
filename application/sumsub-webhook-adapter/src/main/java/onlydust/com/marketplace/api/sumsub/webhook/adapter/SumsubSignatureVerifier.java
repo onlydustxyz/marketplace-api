@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter;
 
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 
@@ -9,7 +10,7 @@ public class SumsubSignatureVerifier {
                                        final String sumsub256Signature) {
         final String currentSha256Signature = hmac(sumsubWebhookBodyBytes, webhookSecret);
         if (!currentSha256Signature.equals(sumsub256Signature)) {
-            throw new BadCredentialsException("Invalid sha256 signature");
+            throw OnlyDustException.badRequest("Invalid sha256 signature");
         }
 
     }

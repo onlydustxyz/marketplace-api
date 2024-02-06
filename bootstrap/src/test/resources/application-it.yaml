@@ -31,7 +31,9 @@ infrastructure:
     api-key: INFURA_API_KEY
   coinmarketcap:
     api-key: CMC_API_KEY
-
+  sumsub:
+    app-token: sumsub-fake-app-token
+    secret-key: sumsub-fake-secret-key
 application:
   web:
     machine-to-machine:

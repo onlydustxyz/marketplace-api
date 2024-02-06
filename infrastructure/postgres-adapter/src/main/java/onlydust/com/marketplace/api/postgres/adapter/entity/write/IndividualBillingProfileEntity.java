@@ -42,6 +42,7 @@ public class IndividualBillingProfileEntity {
     @Enumerated(EnumType.STRING)
     IdDocumentTypeEnumEntity idDocumentType;
     String idDocumentNumber;
+    String idDocumentCountryCode;
     Date validUntil;
 
     @CreationTimestamp
@@ -89,6 +90,7 @@ public class IndividualBillingProfileEntity {
                 .lastName(this.lastName)
                 .validUntil(this.validUntil)
                 .idDocumentNumber(this.idDocumentNumber)
+                .idDocumentCountryCode(this.idDocumentCountryCode)
                 .usCitizen(this.usCitizen)
                 .birthdate(this.birthdate)
                 .userId(this.userId)
@@ -109,6 +111,7 @@ public class IndividualBillingProfileEntity {
                 .userId(individualBillingProfile.getUserId())
                 .usCitizen(individualBillingProfile.getUsCitizen())
                 .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
+                .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
                 .build();
     }
 }

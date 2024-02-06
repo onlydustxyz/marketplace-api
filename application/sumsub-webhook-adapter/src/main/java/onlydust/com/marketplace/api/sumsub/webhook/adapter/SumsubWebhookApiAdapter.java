@@ -19,7 +19,7 @@ public class SumsubWebhookApiAdapter {
 
     public static final String X_OD_API = "X-OD-Api";
     public static final String X_SUMSUB_PAYLOAD_DIGEST = "x-payload-digest";
-    private final SumsubProperties sumsubProperties;
+    private final SumsubWebhookProperties sumsubWebhookProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final UserVerificationFacadePort userVerificationFacadePort;
 
@@ -27,10 +27,10 @@ public class SumsubWebhookApiAdapter {
     public ResponseEntity<Void> consumeWebhook(final @RequestBody byte[] payload,
                                                   final @RequestHeader(X_OD_API) String odAPiHeader,
                                                   final @RequestHeader(X_SUMSUB_PAYLOAD_DIGEST) String signature) {
-        if (!odAPiHeader.equals(sumsubProperties.getOdApiHeader())) {
+        if (!odAPiHeader.equals(sumsubWebhookProperties.getOdApiHeader())) {
             throw OnlyDustException.forbidden(String.format("Invalid sumsub header %s for value %s", X_OD_API, odAPiHeader));
         }
-        SumsubSignatureVerifier.validateWebhook(payload, sumsubProperties.getSecret(), signature);
+        SumsubSignatureVerifier.validateWebhook(payload, sumsubWebhookProperties.getSecret(), signature);
         userVerificationFacadePort.consumeUserVerificationEvent(SumsubWebhookSerdes.deserialize(payload, objectMapper));
         return ResponseEntity.ok().build();
     }

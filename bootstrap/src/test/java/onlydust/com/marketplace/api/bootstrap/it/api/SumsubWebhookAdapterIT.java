@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
-import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubProperties;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    SumsubProperties sumsubProperties;
+    SumsubWebhookProperties sumsubWebhookProperties;
     @Autowired
     OutboxPort userVerificationOutbox;
 
@@ -55,12 +54,12 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
                   "clientId": "coolClientId",
                   "applicantMemberOf" : ["1","2"]
                 }""".getBytes(StandardCharsets.UTF_8);
-        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubProperties.getSecret());
+        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
-                .header(X_OD_API, sumsubProperties.getOdApiHeader())
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest)
                 .bodyValue(sumsubPayload)
                 .exchange()
@@ -120,12 +119,12 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
                 }""", companyBillingProfileEntity.getId().toString()).getBytes(StandardCharsets.UTF_8);
-        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubProperties.getSecret());
+        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
-                .header(X_OD_API, sumsubProperties.getOdApiHeader())
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest)
                 .bodyValue(sumsubPayload)
                 .exchange()
@@ -169,12 +168,12 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
                 }""", companyBillingProfileEntity.getId().toString()).getBytes(StandardCharsets.UTF_8);
-        final String sumsubDigest2 = SumsubSignatureVerifier.hmac(sumsubPayload2, sumsubProperties.getSecret());
+        final String sumsubDigest2 = SumsubSignatureVerifier.hmac(sumsubPayload2, sumsubWebhookProperties.getSecret());
 
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
-                .header(X_OD_API, sumsubProperties.getOdApiHeader())
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest2)
                 .bodyValue(sumsubPayload2)
                 .exchange()
@@ -244,12 +243,12 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
                 }""", individualBillingProfileEntity.getId().toString()).getBytes(StandardCharsets.UTF_8);
-        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubProperties.getSecret());
+        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
-                .header(X_OD_API, sumsubProperties.getOdApiHeader())
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest)
                 .bodyValue(sumsubPayload)
                 .exchange()
@@ -293,12 +292,12 @@ public class SumsubWebhookAdapterIT extends AbstractMarketplaceApiIT {
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
                 }""", individualBillingProfileEntity.getId().toString()).getBytes(StandardCharsets.UTF_8);
-        final String sumsubDigest2 = SumsubSignatureVerifier.hmac(sumsubPayload2, sumsubProperties.getSecret());
+        final String sumsubDigest2 = SumsubSignatureVerifier.hmac(sumsubPayload2, sumsubWebhookProperties.getSecret());
 
         // When
         client.post()
                 .uri(getApiURI("/api/v1/sumsub/webhook"))
-                .header(X_OD_API, sumsubProperties.getOdApiHeader())
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
                 .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest2)
                 .bodyValue(sumsubPayload2)
                 .exchange()

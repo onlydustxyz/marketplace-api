@@ -4843,4 +4843,6 @@ components:
         validUntil:
           type: string
           format: date-time
+        idDocumentCountryCode:
+          type: string
 
