@@ -66,7 +66,9 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public void pay(RewardId rewardId, Currency.Id currencyId, SponsorAccount.Transaction transaction) {
+    public void pay(final @NonNull RewardId rewardId,
+                    final @NonNull Currency.Id currencyId,
+                    final @NonNull SponsorAccount.PaymentReference paymentReference) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
@@ -76,9 +78,9 @@ public class AccountingService implements AccountingFacadePort {
                     () -> internalServerError("Sponsor account %s is not funded".formatted(sponsorAccountId.sponsorAccountId()))
             );
 
-            if (transaction.network().equals(sponsorAccountNetwork)) {
+            if (paymentReference.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
-                sponsorAccount.add(transaction.withAmount(amount.negate()));
+                sponsorAccount.add(new SponsorAccount.Transaction(paymentReference, amount.negate()));
                 sponsorAccountStorage.save(sponsorAccount);
             }
         });
@@ -203,7 +205,7 @@ public class AccountingService implements AccountingFacadePort {
             final var sponsorAccount = sponsorAccount(sponsorAccountId);
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
-            sponsorAccount.add(SponsorAccount.Transaction.create(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
+            sponsorAccount.add(new SponsorAccount.Transaction(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {

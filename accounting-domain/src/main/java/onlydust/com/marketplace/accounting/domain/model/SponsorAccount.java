@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
@@ -112,25 +113,38 @@ public class SponsorAccount {
         }
     }
 
-    public record Transaction(
-            @NonNull Network network,
-            @NonNull String reference,
-            @NonNull Amount amount,
-            @NonNull String thirdPartyName,
-            @NonNull String thirdPartyAccountNumber
-    ) {
-        public static Transaction create(
+    @AllArgsConstructor
+    @Accessors(fluent = true)
+    @Getter
+    public static class PaymentReference {
+        private final @NonNull Network network;
+        private final @NonNull String reference;
+        private final @NonNull String thirdPartyName;
+        private final @NonNull String thirdPartyAccountNumber;
+    }
+
+    @Accessors(fluent = true)
+    @Getter
+    public static class Transaction extends PaymentReference {
+        private final @NonNull Amount amount;
+
+        public Transaction(
+                final @NonNull PaymentReference paymentReference,
+                final @NonNull Amount amount
+        ) {
+            this(paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
+                    paymentReference.thirdPartyAccountNumber());
+        }
+
+        public Transaction(
                 final @NonNull Network network,
                 final @NonNull String reference,
                 final @NonNull Amount amount,
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
-            return new Transaction(network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
-        }
-
-        public Transaction withAmount(Amount amount) {
-            return new Transaction(network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+            super(network, reference, thirdPartyName, thirdPartyAccountNumber);
+            this.amount = amount;
         }
     }
 }

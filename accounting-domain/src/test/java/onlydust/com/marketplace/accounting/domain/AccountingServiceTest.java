@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentReference;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
@@ -188,8 +189,12 @@ public class AccountingServiceTest {
         }
     }
 
+    private PaymentReference fakePaymentReference(Network network) {
+        return new PaymentReference(network, faker.random().hex(), faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+    }
+
     private Transaction fakeTransaction(Network network, Amount amount) {
-        return Transaction.create(network, faker.random().hex(), amount, faker.rickAndMorty().character(), faker.internet().slug() + ".eth");
+        return new Transaction(fakePaymentReference(network), amount);
     }
 
     @Nested
@@ -405,7 +410,7 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
-            final var transaction = Transaction.create(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
+            final var transaction = new Transaction(Network.ETHEREUM, "0x123456", PositiveAmount.of(1000L), "StarkNet Foundation", "starknet.eth");
             accountingService.pay(rewardId2, currency.id(), transaction);
 
             // Then
@@ -984,7 +989,7 @@ public class AccountingServiceTest {
                     new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
             );
 
-            accountingService.pay(rewardId3, usdc.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
+            accountingService.pay(rewardId3, usdc.id(), fakePaymentReference(Network.ETHEREUM));
 
             // When
             final var payableRewards = accountingService.getPayableRewards();

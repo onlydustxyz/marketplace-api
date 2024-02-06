@@ -18,7 +18,9 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
 
-    void pay(RewardId from, Currency.Id currencyId, SponsorAccount.Transaction transaction);
+    void pay(final @NonNull RewardId rewardId,
+             final @NonNull Currency.Id currencyId,
+             final @NonNull SponsorAccount.PaymentReference paymentReference);
 
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 

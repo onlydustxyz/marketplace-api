@@ -123,14 +123,13 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         final var recipient = userFacadePort.getProfileById(reward.recipientId());
 
-        final var transaction = SponsorAccount.Transaction.create(
-                mapTransactionNetwork(payRewardRequest.getNetwork()),
+        final var paymentReference = new SponsorAccount.PaymentReference(mapTransactionNetwork(payRewardRequest.getNetwork()),
                 payRewardRequest.getReference(),
-                PositiveAmount.ZERO,
                 recipient.getLogin(),
                 payRewardRequest.getRecipientAccount());
 
-        accountingFacadePort.pay(RewardId.of(rewardId), currency.id(), transaction);
+        accountingFacadePort.pay(RewardId.of(rewardId), currency.id(), paymentReference);
+
         return ResponseEntity.noContent().build();
     }
 
