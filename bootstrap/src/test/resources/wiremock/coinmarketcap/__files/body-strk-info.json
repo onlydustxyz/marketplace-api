@@ -1,88 +1,49 @@
 {
     "status": {
-        "timestamp": "2024-02-05T13:00:26.321Z",
+        "timestamp": "2024-02-06T08:15:03.773Z",
         "error_code": 0,
         "error_message": null,
-        "elapsed": 66,
+        "elapsed": 13,
         "credit_count": 1,
         "notice": null
     },
     "data": {
-        "STRK": [
-            {
-                "id": 8911,
-                "name": "Strike",
-                "symbol": "STRK",
-                "category": "token",
-                "description": "Strike (STRK) is a cryptocurrency launched in 2021and operates on the Ethereum platform. Strike has a current supply of 6,540,888 with 4,435,214.96681681 in circulation. The last known price of Strike is 11.63274428 USD and is up 0.33 over the last 24 hours. It is currently trading on 19 active market(s) with $1,416,692.94 traded over the last 24 hours. More information can be found at https://strike.org.",
-                "slug": "strike",
-                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/8911.png",
-                "subreddit": "",
-                "tag-names": [
-                    "DeFi"
-                ],
-                "tag-groups": [
-                    "CATEGORY"
-                ],
-                "twitter_username": "StrikeFinance",
-                "is_hidden": 0,
-                "date_launched": "2021-03-29T00:00:00.000Z",
-                "contract_address": [
-                    {
-                        "contract_address": "0x74232704659ef37c08995e386a2e26cc27a8d7b1",
-                        "platform": {
+        "22691": {
+            "id": 22691,
+            "name": "Starknet Token",
+            "symbol": "STRK",
+            "category": "token",
+            "description": "StarkNet is a permissionless decentralized Validity-Rollup (also known as a “ZK-Rollup”). It operates as an L2 network over Ethereum, enabling any dApp to achieve unlimited scale for its computation –  without compromising Ethereum’s composability and security, thanks to StarkNet’s reliance on the safest and most scalable cryptographic proof system – STARK.\n\nStarkNet Contracts and the StarkNet OS are written in Cairo – supporting the deployment and scaling of any use case, whatever the business logic.",
+            "slug": "starknet-token",
+            "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/22691.png",
+            "subreddit": "",
+            "tag-names": [
+                "Zero Knowledge Proofs"
+            ],
+            "tag-groups": [
+                "CATEGORY"
+            ],
+            "twitter_username": "Starknet",
+            "is_hidden": 0,
+            "date_launched": null,
+            "contract_address": [
+                {
+                    "contract_address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766",
+                    "platform": {
+                        "name": "Ethereum",
+                        "coin": {
+                            "id": "1027",
                             "name": "Ethereum",
-                            "coin": {
-                                "id": "1027",
-                                "name": "Ethereum",
-                                "symbol": "ETH",
-                                "slug": "ethereum"
-                            }
+                            "symbol": "ETH",
+                            "slug": "ethereum"
                         }
                     }
-                ],
-                "self_reported_circulating_supply": null,
-                "self_reported_tags": null,
-                "self_reported_market_cap": null,
-                "infinite_supply": false
-            },
-            {
-                "id": 22691,
-                "name": "Starknet Token",
-                "symbol": "STRK",
-                "category": "token",
-                "description": "StarkNet is a permissionless decentralized Validity-Rollup (also known as a “ZK-Rollup”). It operates as an L2 network over Ethereum, enabling any dApp to achieve unlimited scale for its computation –  without compromising Ethereum’s composability and security, thanks to StarkNet’s reliance on the safest and most scalable cryptographic proof system – STARK.\n\nStarkNet Contracts and the StarkNet OS are written in Cairo – supporting the deployment and scaling of any use case, whatever the business logic.",
-                "slug": "starknet-token",
-                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/22691.png",
-                "subreddit": "",
-                "tag-names": [
-                    "Zero Knowledge Proofs"
-                ],
-                "tag-groups": [
-                    "CATEGORY"
-                ],
-                "twitter_username": "Starknet",
-                "is_hidden": 0,
-                "date_launched": null,
-                "contract_address": [
-                    {
-                        "contract_address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766",
-                        "platform": {
-                            "name": "Ethereum",
-                            "coin": {
-                                "id": "1027",
-                                "name": "Ethereum",
-                                "symbol": "ETH",
-                                "slug": "ethereum"
-                            }
-                        }
-                    }
-                ],
-                "self_reported_circulating_supply": null,
-                "self_reported_tags": null,
-                "self_reported_market_cap": null,
-                "infinite_supply": false
-            }
-        ]
+                }
+            ],
+            "self_reported_circulating_supply": null,
+            "self_reported_tags": null,
+            "self_reported_market_cap": null,
+            "infinite_supply": false
+        }
     }
 }
