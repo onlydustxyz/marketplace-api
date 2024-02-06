@@ -273,4 +273,10 @@ public class PostgresConfiguration {
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository);
     }
+
+    @Bean
+    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository,
+                                                                   final CurrencyRepository currencyRepository) {
+        return new PostgresRewardStatusAdapter(rewardStatusRepository, currencyRepository);
+    }
 }

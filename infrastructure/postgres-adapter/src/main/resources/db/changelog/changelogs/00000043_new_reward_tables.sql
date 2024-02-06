@@ -37,3 +37,27 @@ CREATE TRIGGER reward_items_set_tech_updated_at
     ON public.reward_items
     FOR EACH ROW
 EXECUTE PROCEDURE set_tech_updated_at();
+
+CREATE TABLE accounting.reward_statuses
+(
+    reward_id               UUID PRIMARY KEY REFERENCES rewards (id),
+    is_individual           BOOLEAN,
+    kycb_verified           BOOLEAN   NOT NULL,
+    us_recipient            BOOLEAN,
+    reward_currency         currency  NOT NULL,
+    current_year_usd_total  NUMERIC   NOT NULL,
+    payout_info_filled      BOOLEAN   NOT NULL,
+    sponsor_has_enough_fund BOOLEAN   NOT NULL,
+    unlock_date             TIMESTAMP,
+    payment_requested       BOOLEAN   NOT NULL,
+    invoice_approved        BOOLEAN   NOT NULL,
+    paid                    BOOLEAN   NOT NULL,
+    tech_created_at         TIMESTAMP NOT NULL DEFAULT now(),
+    tech_updated_at         TIMESTAMP NOT NULL DEFAULT now()
+);
+
+CREATE TRIGGER accounting_reward_statuses_set_tech_updated_at
+    BEFORE UPDATE
+    ON accounting.reward_statuses
+    FOR EACH ROW
+EXECUTE PROCEDURE set_tech_updated_at();
