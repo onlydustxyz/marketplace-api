@@ -193,6 +193,7 @@ public class AccountingService implements AccountingFacadePort {
 
         private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
             return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream()
+                    .filter(e -> e.getValue().isStrictlyPositive())
                     .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
                     .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
                     .map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));

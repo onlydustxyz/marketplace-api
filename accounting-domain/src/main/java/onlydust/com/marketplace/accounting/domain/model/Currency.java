@@ -15,7 +15,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder(toBuilder = true)
-public class Currency {
+public class Currency implements Cloneable {
     @EqualsAndHashCode.Include
     @NonNull
     private final Id id;
@@ -150,6 +150,14 @@ public class Currency {
             default -> null;
         };
     }
+
+    @Override
+    public Currency clone() {
+        return toBuilder().id(Id.random())
+                .erc20(new HashSet<>(erc20))
+                .build();
+    }
+
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)

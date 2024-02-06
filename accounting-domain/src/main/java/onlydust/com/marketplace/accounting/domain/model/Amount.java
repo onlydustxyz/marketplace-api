@@ -54,7 +54,11 @@ public class Amount {
      * @return true if the value is greater or equal to zero
      */
     public boolean isPositive() {
-        return value.compareTo(BigDecimal.ZERO) >= 0;
+        return isGreaterThanOrEqual(ZERO);
+    }
+
+    public boolean isStrictlyPositive() {
+        return isStrictlyGreaterThan(ZERO);
     }
 
     /***

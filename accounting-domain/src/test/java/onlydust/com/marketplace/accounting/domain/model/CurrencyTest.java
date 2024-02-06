@@ -68,9 +68,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(euro.code());
         assertThat(payableCurrency.name()).isEqualTo(euro.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.FIAT);
-        assertThat(payableCurrency.standard()).isEqualTo(Currency.Standard.ISO4217);
-        assertThat(payableCurrency.blockchain()).isNull();
-        assertThat(payableCurrency.address()).isNull();
+        assertThat(payableCurrency.standard()).contains(Currency.Standard.ISO4217);
+        assertThat(payableCurrency.blockchain()).isNotPresent();
+        assertThat(payableCurrency.address()).isNotPresent();
     }
 
     @ParameterizedTest
@@ -99,9 +99,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(ether.code());
         assertThat(payableCurrency.name()).isEqualTo(ether.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(payableCurrency.standard()).isNull();
-        assertThat(payableCurrency.blockchain()).isEqualTo(Blockchain.ETHEREUM);
-        assertThat(payableCurrency.address()).isNull();
+        assertThat(payableCurrency.standard()).isNotPresent();
+        assertThat(payableCurrency.blockchain()).contains(Blockchain.ETHEREUM);
+        assertThat(payableCurrency.address()).isNotPresent();
     }
 
     @Test
@@ -117,9 +117,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(op.code());
         assertThat(payableCurrency.name()).isEqualTo(op.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(payableCurrency.standard()).isNull();
-        assertThat(payableCurrency.blockchain()).isEqualTo(Blockchain.OPTIMISM);
-        assertThat(payableCurrency.address()).isNull();
+        assertThat(payableCurrency.standard()).isNotPresent();
+        assertThat(payableCurrency.blockchain()).contains(Blockchain.OPTIMISM);
+        assertThat(payableCurrency.address()).isNotPresent();
     }
 
     @Test
@@ -135,9 +135,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(strk.code());
         assertThat(payableCurrency.name()).isEqualTo(strk.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(payableCurrency.standard()).isEqualTo(Currency.Standard.ERC20);
-        assertThat(payableCurrency.blockchain()).isEqualTo(Blockchain.ETHEREUM);
-        assertThat(payableCurrency.address()).isEqualTo(ERC20Tokens.STRK.getAddress());
+        assertThat(payableCurrency.standard()).contains(Currency.Standard.ERC20);
+        assertThat(payableCurrency.blockchain()).contains(Blockchain.ETHEREUM);
+        assertThat(payableCurrency.address()).contains(ERC20Tokens.STRK.getAddress());
     }
 
     @Test

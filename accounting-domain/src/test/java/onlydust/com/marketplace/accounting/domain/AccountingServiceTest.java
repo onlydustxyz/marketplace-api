@@ -793,7 +793,7 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenAProjectWithBudget {
-        final Currency usdc = Currencies.USDC;
+        final Currency usdc = Currency.of(ERC20Tokens.ETH_USDC); // build a copy of USDC currency to avoid side effects
         final Currency op = Currencies.OP;
         final SponsorId sponsorId = SponsorId.random();
         SponsorAccount unlockedSponsorAccountUsdc1;
@@ -970,6 +970,27 @@ public class AccountingServiceTest {
                     new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
                     new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)))
             ).contains(payableRewards.get(0));
+        }
+
+        @Test
+        void should_return_partially_paid_payable_rewards() {
+            // Given
+            accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
+            accountingService.fund(unlockedSponsorAccountUsdc2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(25L)));
+
+
+            assertThat(accountingService.getPayableRewards()).containsExactlyInAnyOrder(
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
+                    new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
+            );
+
+            accountingService.pay(rewardId3, usdc.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
+
+            // When
+            final var payableRewards = accountingService.getPayableRewards();
+
+            // Then
+            assertThat(payableRewards).containsExactly(new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)));
         }
     }
 }

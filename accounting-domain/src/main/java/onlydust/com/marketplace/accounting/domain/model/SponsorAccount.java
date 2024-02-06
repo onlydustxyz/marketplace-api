@@ -15,6 +15,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 public class SponsorAccount {
     @EqualsAndHashCode.Include
     final @NonNull Id id;

@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
@@ -12,6 +10,8 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @Accessors(fluent = true)
+@EqualsAndHashCode
+@ToString(exclude = {"logoUrl"})
 public class PayableCurrency {
     @Getter
     private final @NonNull Currency.Id id;
