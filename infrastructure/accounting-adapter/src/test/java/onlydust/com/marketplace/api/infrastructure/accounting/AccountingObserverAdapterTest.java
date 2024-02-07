@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.domain.model.Reward;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -33,47 +34,71 @@ class AccountingObserverAdapterTest {
         reset(rewardStatusStorage, currencyFacadePort);
     }
 
-    @Test
-    void on_reward_created() {
-        // Given
-        final var reward = fakeReward();
-        when(currencyFacadePort.listCurrencies()).thenReturn(List.of(ETH));
+    @Nested
+    class GivenNoReward {
+        @Test
+        void on_reward_created() {
+            // Given
+            final var reward = fakeReward();
+            when(currencyFacadePort.listCurrencies()).thenReturn(List.of(ETH));
 
-        // When
-        accountingObserverAdapter.onRewardCreated(reward);
+            // When
+            accountingObserverAdapter.onRewardCreated(reward);
 
-        // Then
-        final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
-        verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-        final var rewardStatus = rewardStatusCaptor.getValue();
-        assertThat(rewardStatus.rewardId().value()).isEqualTo(reward.id());
-        assertThat(rewardStatus.rewardCurrency().code().toString()).isEqualTo(reward.currency().toString().toUpperCase());
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
+            final var rewardStatus = rewardStatusCaptor.getValue();
+            assertThat(rewardStatus.rewardId().value()).isEqualTo(reward.id());
+            assertThat(rewardStatus.rewardCurrency().code().toString()).isEqualTo(reward.currency().toString().toUpperCase());
+        }
     }
 
-    @Test
-    void on_reward_created_with_unsupported_currency() {
-        // Given
-        final var reward = fakeReward();
-        when(currencyFacadePort.listCurrencies()).thenReturn(List.of());
+    @Nested
+    class GivenAReward {
 
-        // When
-        assertThatThrownBy(() -> accountingObserverAdapter.onRewardCreated(reward))
-                // Then
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Unsupported currency Eth");
+        final Reward reward = fakeReward();
+        final RewardStatus rewardStatus = new RewardStatus(RewardId.of(reward.id())).rewardCurrency(ETH);
+
+        @BeforeEach
+        void setup() {
+            when(rewardStatusStorage.get(RewardId.of(reward.id()))).thenReturn(java.util.Optional.of(rewardStatus));
+        }
+
+        @Test
+        void on_reward_created_with_unsupported_currency() {
+            // Given
+            when(currencyFacadePort.listCurrencies()).thenReturn(List.of());
+
+            // When
+            assertThatThrownBy(() -> accountingObserverAdapter.onRewardCreated(reward))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Unsupported currency Eth");
+        }
+
+        @Test
+        void on_reward_cancelled() {
+            // When
+            accountingObserverAdapter.onRewardCancelled(reward.id());
+
+            // Then
+            verify(rewardStatusStorage).delete(RewardId.of(reward.id()));
+        }
+
+        @Test
+        void on_payment_requested() {
+            // When
+            accountingObserverAdapter.onPaymentRequested(reward.id());
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
+            final var rewardStatus = rewardStatusCaptor.getValue();
+            assertThat(rewardStatus.paymentRequested()).isTrue();
+        }
     }
 
-    @Test
-    void on_reward_cancelled() {
-        // Given
-        final var rewardId = UUID.randomUUID();
-
-        // When
-        accountingObserverAdapter.onRewardCancelled(rewardId);
-
-        // Then
-        verify(rewardStatusStorage).delete(RewardId.of(rewardId));
-    }
 
     private Reward fakeReward() {
         return new Reward(
