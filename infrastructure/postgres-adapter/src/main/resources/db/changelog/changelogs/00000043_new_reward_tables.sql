@@ -50,7 +50,6 @@ CREATE TABLE accounting.reward_statuses
     sponsor_has_enough_fund BOOLEAN   NOT NULL,
     unlock_date             TIMESTAMP,
     payment_requested       BOOLEAN   NOT NULL,
-    invoice_approved        BOOLEAN   NOT NULL,
     paid                    BOOLEAN   NOT NULL,
     tech_created_at         TIMESTAMP NOT NULL DEFAULT now(),
     tech_updated_at         TIMESTAMP NOT NULL DEFAULT now()

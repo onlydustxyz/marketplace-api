@@ -26,13 +26,12 @@ public class RewardStatus {
     @NonNull Boolean sponsorHasEnoughFund = false;
     ZonedDateTime unlockDate;
     @NonNull Boolean paymentRequested = false;
-    @NonNull Boolean invoiceApproved = false;
     @NonNull Boolean paid = false;
 
     public RewardStatus(RewardId rewardId) {
         this.rewardId = rewardId;
     }
-    
+
     public enum Status {
         PENDING_BILLING_PROFILE,
         PENDING_VERIFICATION,
@@ -84,7 +83,7 @@ public class RewardStatus {
     }
 
     private boolean pendingRequest() {
-        return !invoiceApproved || !paymentRequested;
+        return !paymentRequested;
     }
 
     private boolean complete() {

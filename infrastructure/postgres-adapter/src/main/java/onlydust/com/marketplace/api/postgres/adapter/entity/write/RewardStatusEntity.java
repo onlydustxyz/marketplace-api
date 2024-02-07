@@ -43,7 +43,6 @@ public class RewardStatusEntity {
     @NonNull Boolean sponsorHasEnoughFund;
     Date unlockDate;
     @NonNull Boolean paymentRequested;
-    @NonNull Boolean invoiceApproved;
     @NonNull Boolean paid;
 
     public static RewardStatusEntity of(RewardStatus rewardStatus) {
@@ -58,7 +57,6 @@ public class RewardStatusEntity {
                 .sponsorHasEnoughFund(rewardStatus.sponsorHasEnoughFund())
                 .unlockDate(Date.from(rewardStatus.unlockDate().toInstant()))
                 .paymentRequested(rewardStatus.paymentRequested())
-                .invoiceApproved(rewardStatus.invoiceApproved())
                 .paid(rewardStatus.paid())
                 .build();
     }
@@ -75,7 +73,6 @@ public class RewardStatusEntity {
                 .sponsorHasEnoughFund(sponsorHasEnoughFund)
                 .unlockDate(unlockDate != null ? ZonedDateTime.ofInstant(unlockDate.toInstant(), ZoneOffset.UTC) : null)
                 .paymentRequested(paymentRequested)
-                .invoiceApproved(invoiceApproved)
                 .paid(paid);
     }
 }

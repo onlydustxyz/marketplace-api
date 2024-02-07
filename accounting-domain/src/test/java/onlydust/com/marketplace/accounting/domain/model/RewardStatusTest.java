@@ -124,18 +124,9 @@ class RewardStatusTest {
     }
 
     @Test
-    void manual_invoice_sent() {
+    void payment_requested() {
         // Given
         status.isIndividual(false).kycbVerified(true).usRecipient(false).payoutInfoFilled(true).sponsorHasEnoughFund(true).paymentRequested(true);
-
-        // When
-        assertThat(status.get()).isEqualTo(RewardStatus.Status.PENDING_REQUEST);
-    }
-
-    @Test
-    void invoice_approved() {
-        // Given
-        status.isIndividual(false).kycbVerified(true).usRecipient(false).payoutInfoFilled(true).sponsorHasEnoughFund(true).paymentRequested(true).invoiceApproved(true);
 
         // When
         assertThat(status.get()).isEqualTo(RewardStatus.Status.PROCESSING);
