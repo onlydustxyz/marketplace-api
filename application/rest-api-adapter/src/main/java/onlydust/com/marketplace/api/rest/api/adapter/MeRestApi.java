@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
@@ -36,8 +36,8 @@ import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelp
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutInformationToDomain;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutInformationToResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutSettingsToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutSettingsToResponse;
 
 @RestController
 @Tags(@Tag(name = "Me"))
@@ -58,19 +58,19 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<UserPayoutInformationResponse> getMyPayoutInfo() {
+    public ResponseEntity<UserPayoutSettingsResponse> getMyPayoutSettings() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final UserPayoutInformation view = userFacadePort.getPayoutInformationForUserId(authenticatedUser.getId());
-        final UserPayoutInformationResponse userPayoutInformation = userPayoutInformationToResponse(view);
-        return ResponseEntity.ok(userPayoutInformation);
+        final UserPayoutSettings view = userFacadePort.getPayoutSettingsForUserId(authenticatedUser.getId());
+        final UserPayoutSettingsResponse userPayoutSettingsResponse = userPayoutSettingsToResponse(view);
+        return ResponseEntity.ok(userPayoutSettingsResponse);
     }
 
     @Override
-    public ResponseEntity<UserPayoutInformationResponse> putMyPayoutInfo(UserPayoutInformationRequest userPayoutInformationRequest) {
+    public ResponseEntity<UserPayoutSettingsResponse> putMyPayoutSettings(UserPayoutSettingsRequest userPayoutSettingsRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final UserPayoutInformation view = userFacadePort.updatePayoutInformation(authenticatedUser.getId(),
-                userPayoutInformationToDomain(userPayoutInformationRequest));
-        return ResponseEntity.ok(userPayoutInformationToResponse(view));
+        final UserPayoutSettings view = userFacadePort.updatePayoutSettings(authenticatedUser.getId(),
+                userPayoutSettingsToDomain(userPayoutSettingsRequest));
+        return ResponseEntity.ok(userPayoutSettingsToResponse(view));
     }
 
     @Override

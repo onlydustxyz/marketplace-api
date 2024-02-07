@@ -27,7 +27,7 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static onlydust.com.marketplace.api.domain.view.UserPayoutInformationTest.fakeValidUserPayoutInformation;
+import static onlydust.com.marketplace.api.domain.view.UserPayoutSettingsTest.fakeValidUserPayoutInformation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,7 +83,7 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
-        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
         when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
                 .thenReturn(Optional.empty());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
@@ -118,7 +118,7 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
-        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
         when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
                 .thenReturn(Optional.of(BillingProfileType.COMPANY));
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
@@ -142,7 +142,7 @@ public class UserServiceTest {
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
-        when(userStoragePort.getPayoutInformationById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
+        when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
 
         // Then
@@ -326,21 +326,21 @@ public class UserServiceTest {
     void should_validate_user_payout_info_and_update_it_given_valid_wallet_addresses() {
         // Given
         final UUID userId = UUID.randomUUID();
-        final UserPayoutInformation userPayoutInformation =
-                UserPayoutInformation.builder().payoutSettings(UserPayoutInformation.PayoutSettings.builder()
+        final UserPayoutSettings userPayoutSettings =
+                UserPayoutSettings.builder()
                         .optimismAddress(Optimism.accountAddress("0x2C6277931328e2028C3DB10625D767de19151e92"))
                         .starknetAddress(StarkNet.accountAddress(
                                 "0x00b112c41d5a1a2282ecbe1ca4f4eead5a6c19269e884fc23522ecb0581e3597"))
                         .ethWallet(Ethereum.wallet("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))
                         .aptosAddress(Aptos.accountAddress(
                                 "0Xeeff357ea5c1a4e7bc11b2b17ff2dc2dcca69750bfef1e1ebcaccf8c8018175b"))
-                        .build()).build();
+                        .build();
 
         // When
-        userService.updatePayoutInformation(userId, userPayoutInformation);
+        userService.updatePayoutSettings(userId, userPayoutSettings);
 
         // Then
-        verify(userStoragePort, times(1)).savePayoutInformationForUserId(userId, userPayoutInformation);
+        verify(userStoragePort, times(1)).savePayoutSettingsForUserId(userId, userPayoutSettings);
     }
 
     @Test

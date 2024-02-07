@@ -1,8 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -46,11 +53,25 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.githubPullRequestReviewState").isEqualTo("APPROVED");
     }
 
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
 
     @Test
     void should_return_contribution_details_when_found() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateAnthony();
+        final String jwt = authenticatedUser.jwt();
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                        .userId(authenticatedUser.user().getId())
+                .build());
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                        .id(UUID.randomUUID())
+                        .userId(authenticatedUser.user().getId())
+                        .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .build());
 
         // When
         client.get()

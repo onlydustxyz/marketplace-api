@@ -23,7 +23,7 @@ public interface UserFacadePort {
 
     UserProfileView updateProfile(UUID userId, UserProfile userProfile);
 
-    UserPayoutInformation getPayoutInformationForUserId(UUID id);
+    UserPayoutSettings getPayoutSettingsForUserId(UUID id);
 
     void refreshActiveUserProfiles(ZonedDateTime since);
 
@@ -41,7 +41,7 @@ public interface UserFacadePort {
 
     UserRewardTotalAmountsView getRewardTotalAmountsForUserId(UUID userId);
 
-    UserPayoutInformation updatePayoutInformation(UUID userId, UserPayoutInformation userPayoutInformation);
+    UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings);
 
     RewardView getRewardByIdForRecipientId(UUID rewardId, Long recipientId);
 

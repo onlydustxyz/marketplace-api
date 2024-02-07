@@ -34,7 +34,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:40:26.971981Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -49,7 +49,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-20T08:46:52.77875Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -87,7 +87,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:38:22.018458Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -102,7 +102,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:38:52.590518Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -117,7 +117,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:39:23.730967Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -132,7 +132,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:39:54.45638Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -170,7 +170,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-20T08:46:52.77875Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -185,7 +185,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:40:26.971981Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -200,7 +200,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:39:54.45638Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -215,7 +215,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:39:23.730967Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -230,7 +230,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:38:52.590518Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -245,7 +245,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "requestedAt": "2023-09-19T07:38:22.018458Z",
                   "processedAt": null,
-                  "status": "PROCESSING",
+                  "status": "PENDING_CONTRIBUTOR",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -416,41 +416,41 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .jsonPath("$.rewards[0].id").isEqualTo("2ac80cc6-7e83-4eef-bc0c-932b58f683c0")
-                .jsonPath("$.rewards[0].status").isEqualTo("PROCESSING")
+                .jsonPath("$.rewards[0].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[0].amount.currency").isEqualTo("APT")
                 .jsonPath("$.rewards[0].amount.dollarsEquivalent").isEqualTo("100000")
                 .jsonPath("$.rewards[0].amount.total").isEqualTo("500")
                 .jsonPath("$.rewards[0].requestedAt").isEqualTo("2023-09-19T07:38:22.018458Z")
 
                 .jsonPath("$.rewards[1].id").isEqualTo("e1498a17-5090-4071-a88a-6f0b0c337c3a")
-                .jsonPath("$.rewards[1].status").isEqualTo("PROCESSING")
+                .jsonPath("$.rewards[1].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[1].amount.currency").isEqualTo("ETH")
                 .jsonPath("$.rewards[1].amount.dollarsEquivalent").isEqualTo("75000")
                 .jsonPath("$.rewards[1].amount.total").isEqualTo("50")
                 .jsonPath("$.rewards[1].requestedAt").isEqualTo("2023-09-20T08:46:52.77875Z")
 
                 .jsonPath("$.rewards[2].id").isEqualTo("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")
-                .jsonPath("$.rewards[2].status").isEqualTo("COMPLETE")
+                .jsonPath("$.rewards[2].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[2].amount.currency").isEqualTo("ETH")
                 .jsonPath("$.rewards[2].amount.dollarsEquivalent").isEqualTo("15000")
                 .jsonPath("$.rewards[2].amount.total").isEqualTo("10")
                 .jsonPath("$.rewards[2].requestedAt").isEqualTo("2023-09-19T07:40:26.971981Z")
 
                 .jsonPath("$.rewards[3].id").isEqualTo("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")
-                .jsonPath("$.rewards[3].status").isEqualTo("PROCESSING")
+                .jsonPath("$.rewards[3].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[3].amount.currency").isEqualTo("APT")
                 .jsonPath("$.rewards[3].amount.dollarsEquivalent").isEqualTo("6000")
                 .jsonPath("$.rewards[3].amount.total").isEqualTo("30")
                 .jsonPath("$.rewards[3].requestedAt").isEqualTo("2023-09-19T07:39:54.45638Z")
 
                 .jsonPath("$.rewards[4].id").isEqualTo("5b96ca1e-4ad2-41c1-8819-520b885d9223")
-                .jsonPath("$.rewards[4].status").isEqualTo("PROCESSING")
+                .jsonPath("$.rewards[4].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[4].amount.currency").isEqualTo("USDC")
                 .jsonPath("$.rewards[4].amount.dollarsEquivalent").isEqualTo("1010.0")
                 .jsonPath("$.rewards[4].requestedAt").isEqualTo("2023-09-19T07:39:23.730967Z")
 
                 .jsonPath("$.rewards[5].id").isEqualTo("85f8358c-5339-42ac-a577-16d7760d1e28")
-                .jsonPath("$.rewards[5].status").isEqualTo("PROCESSING")
+                .jsonPath("$.rewards[5].status").isEqualTo("PENDING_CONTRIBUTOR")
                 .jsonPath("$.rewards[5].amount.currency").isEqualTo("USDC")
                 .jsonPath("$.rewards[5].amount.dollarsEquivalent").isEqualTo("1010.0")
                 .jsonPath("$.rewards[5].requestedAt").isEqualTo("2023-09-19T07:38:52.590518Z");

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.api.domain.model.ContributionType;
 import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.api.domain.model.Project;
@@ -14,9 +15,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatR
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserPayoutInfoMapper.OBJECT_MAPPER;
 
 public interface RewardMapper {
+    ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     static RewardView rewardToDomain(RewardViewEntity rewardViewEntityByd) {
         return RewardView.builder()
                 .id(rewardViewEntityByd.getId())
@@ -178,6 +180,7 @@ public interface RewardMapper {
             case "PENDING_INVOICE" -> UserRewardStatus.pendingInvoice;
             case "COMPLETE" -> UserRewardStatus.complete;
             case "MISSING_PAYOUT_INFO" -> UserRewardStatus.missingPayoutInfo;
+            case "PENDING_VERIFICATION" -> UserRewardStatus.pendingVerification;
             case "LOCKED" -> UserRewardStatus.locked;
             default -> UserRewardStatus.processing;
         };
@@ -186,6 +189,7 @@ public interface RewardMapper {
     static ProjectRewardView.RewardStatusView mapStatusForProject(String status) {
         return switch (status) {
             case "PENDING_SIGNUP" -> ProjectRewardView.RewardStatusView.pendingSignup;
+            case "PENDING_CONTRIBUTOR" -> ProjectRewardView.RewardStatusView.pendingContributor;
             case "COMPLETE" -> ProjectRewardView.RewardStatusView.complete;
             case "LOCKED" -> ProjectRewardView.RewardStatusView.locked;
             default -> ProjectRewardView.RewardStatusView.processing;

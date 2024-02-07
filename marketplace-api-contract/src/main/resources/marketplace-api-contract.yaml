@@ -163,23 +163,23 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/payout-info:
+  /api/v1/me/payout-settings:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Me
-      summary: Caller payout info
-      operationId: getMyPayoutInfo
+      summary: Caller payout settings
+      operationId: getMyPayoutSettings
       description: |
-        Get payout info of the caller
+        Get payout settings of the caller
       responses:
         "200":
-          description: 'Payout information'
+          description: 'Payout settings'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformationResponse'
+                $ref: '#/components/schemas/UserPayoutSettingsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -189,23 +189,23 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Me
-      summary: Update caller payout info
-      operationId: putMyPayoutInfo
+      summary: Update caller payout settings
+      operationId: putMyPayoutSettings
       description: |
-        Set payout info of the caller
+        Set payout settings of the caller
       requestBody:
-        description: 'Payout information'
+        description: 'Payout settings'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPayoutInformationRequest'
+              $ref: '#/components/schemas/UserPayoutSettingsRequest'
       responses:
         "200":
           description: 'Payout information'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPayoutInformationResponse'
+                $ref: '#/components/schemas/UserPayoutSettingsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2460,118 +2460,70 @@ components:
         owner:
           $ref: '#/components/schemas/PersonIdentity'
 
-    UserPayoutInformationResponse:
+    UserPayoutSettingsResponse:
       type: object
       properties:
-        person:
-          $ref: '#/components/schemas/PersonIdentity'
-        company:
-          $ref: '#/components/schemas/CompanyIdentity'
-        isCompany:
+        hasValidPayoutSettings:
           type: boolean
-        hasValidContactInfo:
-          type: boolean
-        location:
+        sepaAccount:
           type: object
           properties:
-            country:
+            bic:
               type: string
-              example: France
-            city:
+              example: DAAEFRPPCCT
+            iban:
               type: string
-              example: Paris
-            postalCode:
-              type: string
-              example: 75001
-            address:
-              type: string
-              example: 33 rue de Rivoli
-        payoutSettings:
-          type: object
-          properties:
-            hasValidPayoutSettings:
-              type: boolean
-            sepaAccount:
-              type: object
-              properties:
-                bic:
-                  type: string
-                  example: DAAEFRPPCCT
-                iban:
-                  type: string
-                  example: FR5417569000301995586997O41
-            missingSepaAccount:
-              type: boolean
-            ethWallet:
-              type: string
-              description: ETH wallet address or ENS
-              example: vitalik.eth
-            missingEthWallet:
-              type: boolean
-            optimismAddress:
-              type: string
-              example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
-            missingOptimismWallet:
-              type: boolean
-            aptosAddress:
-              type: string
-              example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
-            missingAptosWallet:
-              type: boolean
-            starknetAddress:
-              type: string
-              example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
-            missingStarknetWallet:
-              type: boolean
-    UserPayoutInformationRequest:
+              example: FR5417569000301995586997O41
+        missingSepaAccount:
+          type: boolean
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        missingEthWallet:
+          type: boolean
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        missingOptimismWallet:
+          type: boolean
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        missingAptosWallet:
+          type: boolean
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+        missingStarknetWallet:
+          type: boolean
+
+    UserPayoutSettingsRequest:
       type: object
       properties:
-        person:
-          $ref: '#/components/schemas/PersonIdentity'
-        company:
-          $ref: '#/components/schemas/CompanyIdentity'
-        isCompany:
-          type: boolean
-        location:
+        sepaAccount:
           type: object
           properties:
-            country:
+            bic:
               type: string
-              example: France
-            city:
+              example: DAAEFRPPCCT
+            iban:
               type: string
-              example: Paris
-            postalCode:
-              type: string
-              example: 75001
-            address:
-              type: string
-              example: 33 rue de Rivoli
-        payoutSettings:
-          type: object
-          properties:
-            sepaAccount:
-              type: object
-              properties:
-                bic:
-                  type: string
-                  example: DAAEFRPPCCT
-                iban:
-                  type: string
-                  example: FR5417569000301995586997O41
-            ethWallet:
-              type: string
-              description: ETH wallet address or ENS
-              example: vitalik.eth
-            optimismAddress:
-              type: string
-              example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
-            aptosAddress:
-              type: string
-              example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
-            starknetAddress:
-              type: string
-              example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+              example: FR5417569000301995586997O41
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+
 
     UserProfileRequest:
       type: object

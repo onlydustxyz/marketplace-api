@@ -14,117 +14,152 @@ import java.util.UUID;
 @AllArgsConstructor
 public class CustomRewardRepository {
     private static final String FIND_PROJECT_REWARD_BY_ID = """
-            select pr.requested_at,
-                   r.processed_at,
-                   gu_recipient.login                                                                       recipient_login,
-                   user_avatar_url(gu_recipient.id, gu_recipient.avatar_url)                                recipient_avatar_url,
-                   gu_recipient.id                                                                          recipient_id,
-                   gu_requestor.login                                                                       requestor_login,
-                   user_avatar_url(gu_requestor.id, gu_requestor.avatar_url)                                requestor_avatar_url,
-                   gu_requestor.id                                                                          requestor_id,
-                   pr.id,
-                   pr.amount,
-                   pr.currency,
-                   (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
-                   case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
-                   case
-                       when r.id is not null then 'COMPLETE'
-                       when pr.currency = 'strk' THEN 'LOCKED'
-                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
-                       when u.id is null then 'PENDING_SIGNUP'
-                       else 'PROCESSING'
-                       end                                                                                  status,
-                       r.receipt,
-                    p.project_id,
-                    p.key as project_key,
-                    p.name as project_name,
-                    p.short_description as project_short_description,
-                    p.long_description as project_long_description,
-                    p.logo_url as project_logo_url,
-                    p.telegram_link as project_telegram_link,
-                    p.hiring as project_hiring,
-                    p.visibility as project_visibility
-            from payment_requests pr
-                     join project_details p on p.project_id = pr.project_id
-                     left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
-                     left join iam.users u on pr.recipient_id = u.github_user_id
-                     left join iam.users u_requestor on u_requestor.id = pr.requestor_id
-                     left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
-                     left join crypto_usd_quotes cuq on cuq.currency = pr.currency
-                     left join payments r on r.request_id = pr.id
-                     where pr.id = :rewardId""";
+            with billing_profile_check as (select ubpt.user_id,
+                                          (
+                                              case
+                                                  when ubpt.billing_profile_type = 'INDIVIDUAL'
+                                                      then ibp.verification_status = 'VERIFIED'
+                                                  when ubpt.billing_profile_type = 'COMPANY'
+                                                      then cbp.verification_status = 'VERIFIED'
+                                                  else false
+                                                  end
+                                              ) billing_profile_verified
+                                   from user_billing_profile_types ubpt
+                                            left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
+                                            left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id),
+                payout_checks as (select u.github_user_id                           github_user_id,
+                                  coalesce(wallets.list, '{}')               wallets,
+                                  ba.iban is not null and ba.bic is not null has_bank_account
+                           from iam.users u
+                                    left join public.user_payout_info upi on u.id = upi.user_id
+                                    left join (select w.user_id, array_agg(distinct w.network) as list
+                                               from wallets w
+                                               group by w.user_id) wallets on wallets.user_id = u.id
+                                    left join bank_accounts ba on ba.user_id = u.id)
+                select pr.requested_at,
+                r.processed_at,
+                gu_recipient.login                                                          recipient_login,
+                user_avatar_url(gu_recipient.id, gu_recipient.avatar_url)                   recipient_avatar_url,
+                gu_recipient.id                                                             recipient_id,
+                gu_requestor.login                                                          requestor_login,
+                user_avatar_url(gu_requestor.id, gu_requestor.avatar_url)                   requestor_avatar_url,
+                gu_requestor.id                                                             requestor_id,
+                pr.id,
+                pr.amount,
+                pr.currency,
+                (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
+                case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
+                case
+                when r.id is not null then 'COMPLETE'
+                when pr.currency = 'strk' THEN 'LOCKED'
+                when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                when u.id is null then 'PENDING_SIGNUP'
+                when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_CONTRIBUTOR'
+                when (case
+                         when pr.currency in ('eth', 'lords', 'usdc')
+                             then not payout_checks.wallets @> array [cast('ethereum' as network)]
+                         when pr.currency = 'strk' then not payout_checks.wallets @> array [cast('starknet' as network)]
+                         when pr.currency = 'op' then not payout_checks.wallets @> array [cast('optimism' as network)]
+                         when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
+                         when pr.currency = 'usd' then not payout_checks.has_bank_account
+                   end) then 'PENDING_CONTRIBUTOR'
+                else 'PROCESSING'
+                end                                                                     status,
+                r.receipt,
+                p.project_id,
+                p.key               as                                                      project_key,
+                p.name              as                                                      project_name,
+                p.short_description as                                                      project_short_description,
+                p.long_description  as                                                      project_long_description,
+                p.logo_url          as                                                      project_logo_url,
+                p.telegram_link     as                                                      project_telegram_link,
+                p.hiring            as                                                      project_hiring,
+                p.visibility        as                                                      project_visibility
+                from payment_requests pr
+                join project_details p on p.project_id = pr.project_id
+                left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
+                left join iam.users u on pr.recipient_id = u.github_user_id
+                left join iam.users u_requestor on u_requestor.id = pr.requestor_id
+                left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
+                left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                left join payments r on r.request_id = pr.id
+                left join billing_profile_check bpc on bpc.user_id = u.id
+                LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
+                where pr.id = :rewardId""";
     private static final String FIND_USER_REWARD_BY_ID = """
-                with payout_checks as (select u.id                                                                        user_id,
-                                            (upi.identity is not null and upi.identity -> 'Person' is not null and
-                                             upi.identity -> 'Person' -> 'lastname' != cast('null' as jsonb) and
-                                             upi.identity -> 'Person' -> 'firstname' != cast('null' as jsonb))            valid_person,
-                                            (upi.location is not null and upi.location -> 'city' != cast('null' as jsonb) and
-                                             upi.location -> 'post_code' != cast('null' as jsonb) and
-                                             upi.location -> 'address' != cast('null' as jsonb) and
-                                             upi.location -> 'country' != cast('null' as jsonb))                          valid_location,
-                                            (upi.identity is not null and upi.identity -> 'Company' is not null and
-                                             upi.identity -> 'Company' -> 'name' != cast('null' as jsonb) and
-                                             upi.identity -> 'Company' -> 'identification_number' != cast('null' as jsonb) and
-                                             upi.identity -> 'Company' -> 'owner' is not null and
-                                             upi.identity -> 'Company' -> 'owner' -> 'firstname' != cast('null' as jsonb) and
-                                             upi.identity -> 'Company' -> 'owner' -> 'lastname' != cast('null' as jsonb)) valid_company,
-                                             coalesce(wallets.list, '{}')                                                 wallets,
-                                             ba.iban is not null and ba.bic is not null                                   has_bank_account
+            with billing_profile_check as (select ubpt.user_id,
+                                       ubpt.billing_profile_type type,
+                                                      (
+                                                          case
+                                                              when ubpt.billing_profile_type = 'INDIVIDUAL'
+                                                                  then ibp.verification_status = 'VERIFIED'
+                                                              when ubpt.billing_profile_type = 'COMPANY'
+                                                                  then cbp.verification_status = 'VERIFIED'
+                                                              else false
+                                                              end
+                                                          ) billing_profile_verified
+                                               from user_billing_profile_types ubpt
+                                                        left join individual_billing_profiles ibp on ibp.user_id = ubpt.user_id
+                                                        left join company_billing_profiles cbp on cbp.user_id = ubpt.user_id),
+                     payout_checks as (select u.github_user_id                           github_user_id,
+                                              coalesce(wallets.list, '{}')               wallets,
+                                              ba.iban is not null and ba.bic is not null has_bank_account
                                        from iam.users u
                                                 left join public.user_payout_info upi on u.id = upi.user_id
                                                 left join (select w.user_id, array_agg(distinct w.network) as list
                                                            from wallets w
                                                            group by w.user_id) wallets on wallets.user_id = u.id
                                                 left join bank_accounts ba on ba.user_id = u.id)
-            select pr.requested_at,
-                   r.processed_at,
-                   gu_recipient.login                                                                       recipient_login,
-                   user_avatar_url(gu_recipient.id, gu_recipient.avatar_url)                                recipient_avatar_url,
-                   gu_recipient.id                                                                          recipient_id,
-                   gu_requestor.login                                                                       requestor_login,
-                   user_avatar_url(gu_requestor.id, gu_requestor.avatar_url)                                requestor_avatar_url,
-                   gu_requestor.id                                                                          requestor_id,
-                   pr.id,
-                   pr.amount,
-                   pr.currency,
-                   (select count(id) from work_items wi where wi.payment_id = pr.id)                        contribution_count,
-                   case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
-                   case
-                       when r.id is not null then 'COMPLETE'
-                       when pr.currency = 'strk' THEN 'LOCKED'
-                       when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
-                       when not payout_checks.valid_location or
-                            (not payout_checks.valid_company and not payout_checks.valid_person) or
-                            (case
-                                 when pr.currency in ('eth','lords','usdc') then not payout_checks.wallets @> array[cast('ethereum' as network)]
-                                 when pr.currency = 'strk' then not payout_checks.wallets @> array[cast('starknet' as network)]
-                                 when pr.currency = 'op' then not payout_checks.wallets @> array[cast('optimism' as network)]
-                                 when pr.currency = 'apt' then not payout_checks.wallets @> array[cast('aptos' as network)]
-                                 when pr.currency = 'usd' then not payout_checks.has_bank_account
-                            end) then 'MISSING_PAYOUT_INFO'
-                       when payout_checks.valid_company and pr.invoice_received_at is null then 'PENDING_INVOICE'
-                       else 'PROCESSING'
-                    end                                                                                  status,
-                    r.receipt,
-                    p.project_id,
-                    p.key as project_key,
-                    p.name as project_name,
-                    p.short_description as project_short_description,
-                    p.long_description as project_long_description,
-                    p.logo_url as project_logo_url,
-                    p.telegram_link as project_telegram_link,
-                    p.hiring as project_hiring,
-                    p.visibility as project_visibility
-            from payment_requests pr
-                     join project_details p on p.project_id = pr.project_id
-                     left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
-                     left join iam.users u on pr.recipient_id = u.github_user_id
-                     left join iam.users u_requestor on u_requestor.id = pr.requestor_id
-                     left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
-                     left join crypto_usd_quotes cuq on cuq.currency = pr.currency
-                     left join payments r on r.request_id = pr.id
-                     left join payout_checks on payout_checks.user_id = u.id
-                     where pr.id = :rewardId""";
+                select pr.requested_at,
+                       r.processed_at,
+                       gu_recipient.login                                                          recipient_login,
+                       user_avatar_url(gu_recipient.id, gu_recipient.avatar_url)                   recipient_avatar_url,
+                       gu_recipient.id                                                             recipient_id,
+                       gu_requestor.login                                                          requestor_login,
+                       user_avatar_url(gu_requestor.id, gu_requestor.avatar_url)                   requestor_avatar_url,
+                       gu_requestor.id                                                             requestor_id,
+                       pr.id,
+                       pr.amount,
+                       pr.currency,
+                       (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
+                       case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end dollars_equivalent,
+                       case
+                           when r.id is not null then 'COMPLETE'
+                           when pr.currency = 'strk' THEN 'LOCKED'
+                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
+                           when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
+                           when (case
+                                     when pr.currency in ('eth', 'lords', 'usdc')
+                                         then not payout_checks.wallets @> array [cast('ethereum' as network)]
+                                     when pr.currency = 'strk' then not payout_checks.wallets @> array [cast('starknet' as network)]
+                                     when pr.currency = 'op' then not payout_checks.wallets @> array [cast('optimism' as network)]
+                                     when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
+                                     when pr.currency = 'usd' then not payout_checks.has_bank_account
+                               end) then 'MISSING_PAYOUT_INFO'
+                           when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
+                           else 'PROCESSING'
+                           end                                                                     status,
+                       r.receipt,
+                       p.project_id,
+                       p.key               as                                                      project_key,
+                       p.name              as                                                      project_name,
+                       p.short_description as                                                      project_short_description,
+                       p.long_description  as                                                      project_long_description,
+                       p.logo_url          as                                                      project_logo_url,
+                       p.telegram_link     as                                                      project_telegram_link,
+                       p.hiring            as                                                      project_hiring,
+                       p.visibility        as                                                      project_visibility
+                from payment_requests pr
+                         join project_details p on p.project_id = pr.project_id
+                         left join indexer_exp.github_accounts gu_recipient on gu_recipient.id = pr.recipient_id
+                         left join iam.users u on pr.recipient_id = u.github_user_id
+                         left join iam.users u_requestor on u_requestor.id = pr.requestor_id
+                         left join indexer_exp.github_accounts gu_requestor on gu_requestor.id = u_requestor.github_user_id
+                         left join crypto_usd_quotes cuq on cuq.currency = pr.currency
+                         left join payments r on r.request_id = pr.id
+                         LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
+                         LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
+                where pr.id = :rewardId""";
     private static final String COUNT_REWARD_ITEMS = """
             select count(distinct wi.id)
             from payment_requests pr

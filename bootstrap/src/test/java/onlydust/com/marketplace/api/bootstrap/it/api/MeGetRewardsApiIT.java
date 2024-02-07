@@ -1,13 +1,21 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import liquibase.pro.packaged.V;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -189,7 +197,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:40:26.971981Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -205,7 +213,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:39:54.45638Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -221,7 +229,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:39:23.730967Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -237,7 +245,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:38:52.590518Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -253,7 +261,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-19T07:38:22.018458Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -269,7 +277,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                   "requestedAt": "2023-09-20T08:46:52.77875Z",
                   "processedAt": null,
                   "projectId": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "status": "PENDING_INVOICE",
+                  "status": "PENDING_VERIFICATION",
                   "unlockDate": null,
                   "amount": {
                     "total": 1000,
@@ -330,10 +338,25 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json(ME_GET_REWARDS_RESPONSE_JSON);
     }
 
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
+
     @Order(2)
     @Test
     void should_get_my_rewards_given_multi_currencies() {
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
+        final String jwt = authenticatedUser.jwt();
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                        .userId(authenticatedUser.user().getId())
+                .build());
+        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                        .id(UUID.randomUUID())
+                        .userId(authenticatedUser.user().getId())
+                        .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .build());
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
                 .currency(CurrencyEnumEntity.eth)
                 .price(BigDecimal.valueOf(1500L))
@@ -421,26 +444,10 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
-        postgresUserAdapter.savePayoutInformationForUserId(pierre.user().getId(),
-                UserPayoutInformation.builder()
-                        .isACompany(true)
-                        .company(UserPayoutInformation.Company.builder()
-                                .name(faker.name().name())
-                                .identificationNumber(faker.random().hex())
-                                .owner(UserPayoutInformation.Person.builder().firstName(faker.name().firstName())
-                                        .lastName(faker.name().lastName())
-                                        .build())
-                                .build())
-                        .location(UserPayoutInformation.Location.builder()
-                                .country(faker.address().country())
-                                .city(faker.address().city())
-                                .postalCode(faker.address().zipCode())
-                                .address(faker.address().fullAddress())
-                                .build())
-                        .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                .ethWallet(Ethereum.wallet("vitalik.eth"))
+        postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
+                UserPayoutSettings.builder()
+                        .ethWallet(Ethereum.wallet("vitalik.eth"))
                                 .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
-                                .build())
                         .build());
 
         paymentRepository.save(
@@ -536,15 +543,40 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                          """);
     }
 
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
+
     @Test
-    void should_return_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
+    void should_return_pending_verification_info_then_missing_payout_info_given_first_authenticated_user_with_pending_reward() {
         // Given
         final long githubUserId = faker.number().randomNumber();
-        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId,
+        final UUID userId = UUID.randomUUID();
+        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId,
                 faker.rickAndMorty().character(), faker.internet().url(), false).jwt();
         paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(), githubUserId,
                 new Date(), BigDecimal.ONE, null, 1, UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c"),
                 CurrencyEnumEntity.usd));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of("pageIndex", "0", "pageSize", "100")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[0].status").isEqualTo("PENDING_VERIFICATION");
+
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                        .userId(userId)
+                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                .build());
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                        .verificationStatus(VerificationStatusEntity.VERIFIED)
+                        .userId(userId)
+                        .id(UUID.randomUUID())
+                .build());
 
         // When
         client.get()

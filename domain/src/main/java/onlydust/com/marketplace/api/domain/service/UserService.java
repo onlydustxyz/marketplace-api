@@ -44,7 +44,7 @@ public class UserService implements UserFacadePort {
         return userStoragePort
                 .getUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
-                    final var payoutInformationById = userStoragePort.getPayoutInformationById(user.getId());
+                    final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
                     user.setBillingProfileType(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(BillingProfileType.INDIVIDUAL));
                     if (!readOnly)
@@ -96,8 +96,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserPayoutInformation getPayoutInformationForUserId(UUID userId) {
-        return userStoragePort.getPayoutInformationById(userId);
+    public UserPayoutSettings getPayoutSettingsForUserId(UUID userId) {
+        return userStoragePort.getPayoutSettingsById(userId);
     }
 
     @Override
@@ -125,8 +125,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserPayoutInformation updatePayoutInformation(UUID userId, UserPayoutInformation userPayoutInformation) {
-        return userStoragePort.savePayoutInformationForUserId(userId, userPayoutInformation);
+    public UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings) {
+        return userStoragePort.savePayoutSettingsForUserId(userId, userPayoutSettings);
     }
 
     @Override

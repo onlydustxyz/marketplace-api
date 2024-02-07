@@ -70,8 +70,22 @@ public interface RewardMapper {
             case pendingInvoice -> RewardStatus.PENDING_INVOICE;
             case processing -> RewardStatus.PROCESSING;
             case locked -> RewardStatus.LOCKED;
+            case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
         };
     }
+
+     @NonNull
+    private static RewardStatus mapRewardStatusToProject(UserRewardStatus rewardView) {
+        return switch (rewardView) {
+            case complete -> RewardStatus.COMPLETE;
+            case missingPayoutInfo -> RewardStatus.PENDING_CONTRIBUTOR;
+            case locked -> RewardStatus.LOCKED;
+            case pendingVerification -> RewardStatus.PENDING_CONTRIBUTOR;
+            default -> RewardStatus.PROCESSING;
+        };
+    }
+
+
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {
         return new RewardResponse()
@@ -90,7 +104,7 @@ public interface RewardMapper {
                 .processedAt(DateMapper.toZoneDateTime(rewardView.getProcessedAt()))
                 .amount(rewardView.getAmount())
                 .currency(mapCurrency(rewardView.getCurrency()))
-                .status(mapRewardStatus(rewardView.getStatus()))
+                .status(mapRewardStatusToProject(rewardView.getStatus()))
                 .dollarsEquivalent(rewardView.getDollarsEquivalent())
                 .id(rewardView.getId())
                 ;

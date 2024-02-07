@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
@@ -10,62 +10,30 @@ import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UserPayoutInformationTest {
+public class UserPayoutSettingsTest {
 
-    public static UserPayoutInformation fakeValidUserPayoutInformation() {
-        return fakeUserPayoutInformation(false, false, true, true, null, List.of());
+    public static UserPayoutSettings fakeValidUserPayoutInformation() {
+        return fakeUserPayoutInformation(null, List.of());
     }
 
-    public static UserPayoutInformation fakeUserPayoutInformation(
-            boolean isACompany,
-            boolean hasValidCompany,
-            boolean hasValidPerson,
-            boolean hasValidLocation,
-            UserPayoutInformation.PayoutSettings payoutSettings,
+    public static UserPayoutSettings fakeUserPayoutInformation(
+            UserPayoutSettings payoutSettings,
             List<Currency> pendingPaymentsCurrencies
     ) {
-        final var builder = UserPayoutInformation.builder()
-                .isACompany(isACompany)
-                .payoutSettings(payoutSettings)
-                .pendingPaymentsCurrencies(pendingPaymentsCurrencies);
-        if (hasValidCompany) {
-            builder.company(UserPayoutInformation.Company.builder()
-                    .name("OnlyDust")
-                    .identificationNumber("12345678A")
-                    .owner(UserPayoutInformation.Person.builder()
-                            .firstName("John")
-                            .lastName("Doe")
-                            .build())
-                    .build());
-        }
-        if (hasValidPerson) {
-            builder.person(UserPayoutInformation.Person.builder()
-                    .firstName("John")
-                    .lastName("Doe")
-                    .build());
-        }
-        if (hasValidLocation) {
-            builder.location(UserPayoutInformation.Location.builder()
-                    .country("Spain")
-                    .address("Calle Falsa 123")
-                    .city("Madrid")
-                    .postalCode("28001")
-                    .build());
-        }
+        final var builder = Objects.isNull(payoutSettings) ? UserPayoutSettings.builder().pendingPaymentsCurrencies(pendingPaymentsCurrencies) :
+                payoutSettings.toBuilder()
+                        .pendingPaymentsCurrencies(pendingPaymentsCurrencies);
         return builder.build();
     }
 
     @Test
     void should_be_valid_when_nothing_is_missing() {
         var userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
@@ -73,11 +41,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
@@ -86,58 +50,9 @@ public class UserPayoutInformationTest {
     }
 
     @Test
-    void should_not_be_valid_when_not_a_valid_company() {
-        var userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                false,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
-                        .build(),
-                List.of(Currency.Eth)
-        );
-        assertThat(userPayoutInformation.isValid()).isFalse();
-    }
-
-    @Test
-    void should_not_be_valid_when_not_a_valid_person() {
-        var userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
-                        .build(),
-                List.of(Currency.Eth)
-        );
-        assertThat(userPayoutInformation.isValid()).isFalse();
-    }
-
-    @Test
-    void should_not_be_valid_when_not_a_valid_location() {
-        var userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                false,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
-                        .build(),
-                List.of(Currency.Eth)
-        );
-        assertThat(userPayoutInformation.isValid()).isFalse();
-    }
-
-    @Test
     void should_not_be_valid_when_wallet_is_missing() {
         var userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Eth)
         );
@@ -145,11 +60,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Usd)
         );
@@ -157,11 +68,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingSepaAccount()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Strk)
         );
@@ -169,11 +76,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingStarknetWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Lords)
         );
@@ -181,11 +84,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Op)
         );
@@ -193,11 +92,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingOptimismWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Apt)
         );
@@ -205,11 +100,7 @@ public class UserPayoutInformationTest {
         assertThat(userPayoutInformation.isMissingAptosWallet()).isTrue();
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .build(),
                 List.of(Currency.Usdc)
         );
@@ -221,16 +112,10 @@ public class UserPayoutInformationTest {
     @Test
     void should_be_always_valid_when_no_pending_payments() {
         var userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                false,
-                false,
                 null,
                 List.of()
         );
         assertThat(userPayoutInformation.isValid()).isTrue();
-        assertThat(userPayoutInformation.hasValidContactInfo()).isFalse();
-        assertThat(userPayoutInformation.hasValidPayoutSettings()).isFalse();
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isFalse();
         assertThat(userPayoutInformation.isMissingStarknetWallet()).isFalse();
         assertThat(userPayoutInformation.isMissingOptimismWallet()).isFalse();
@@ -241,12 +126,8 @@ public class UserPayoutInformationTest {
     @Test
     void should_be_valid() {
         var userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                UserPayoutSettings.builder()
+                        .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                                 .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
@@ -256,11 +137,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Strk)
@@ -268,11 +145,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Eth)
@@ -280,11 +153,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Eth)
@@ -292,11 +161,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Lords)
@@ -304,11 +169,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Lords)
@@ -316,11 +177,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
                 List.of(Currency.Usdc)
@@ -328,11 +185,7 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
+                UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
                 List.of(Currency.Usdc)
@@ -340,12 +193,8 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                true,
-                true,
-                false,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                UserPayoutSettings.builder()
+                        .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                                 .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
@@ -360,12 +209,8 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
 
         userPayoutInformation = fakeUserPayoutInformation(
-                false,
-                false,
-                true,
-                true,
-                UserPayoutInformation.PayoutSettings.builder()
-                        .sepaAccount(UserPayoutInformation.SepaAccount.builder()
+                UserPayoutSettings.builder()
+                        .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                                 .accountNumber(AccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
@@ -380,14 +225,13 @@ public class UserPayoutInformationTest {
         assertIsFullValid(userPayoutInformation);
     }
 
-    private static void assertIsFullValid(UserPayoutInformation userPayoutInformation) {
-        assertThat(userPayoutInformation.isValid()).isTrue();
-        assertThat(userPayoutInformation.hasValidContactInfo()).isTrue();
-        assertThat(userPayoutInformation.hasValidPayoutSettings()).isTrue();
-        assertThat(userPayoutInformation.isMissingEthereumWallet()).isFalse();
-        assertThat(userPayoutInformation.isMissingStarknetWallet()).isFalse();
-        assertThat(userPayoutInformation.isMissingOptimismWallet()).isFalse();
-        assertThat(userPayoutInformation.isMissingAptosWallet()).isFalse();
-        assertThat(userPayoutInformation.isMissingSepaAccount()).isFalse();
+    private static void assertIsFullValid(UserPayoutSettings userPayoutSettings) {
+        assertThat(userPayoutSettings.isValid()).isTrue();
+        assertThat(userPayoutSettings.hasValidPayoutSettings()).isTrue();
+        assertThat(userPayoutSettings.isMissingEthereumWallet()).isFalse();
+        assertThat(userPayoutSettings.isMissingStarknetWallet()).isFalse();
+        assertThat(userPayoutSettings.isMissingOptimismWallet()).isFalse();
+        assertThat(userPayoutSettings.isMissingAptosWallet()).isFalse();
+        assertThat(userPayoutSettings.isMissingSepaAccount()).isFalse();
     }
 }

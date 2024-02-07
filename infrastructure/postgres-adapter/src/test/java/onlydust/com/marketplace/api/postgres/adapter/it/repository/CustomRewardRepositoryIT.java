@@ -1,21 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomRewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserPayoutInfoRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -45,6 +42,12 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
     PostgresUserAdapter postgresUserAdapter;
     @Autowired
     CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
 
 
     @Nested
@@ -71,6 +74,15 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .lastSeenAt(new Date())
                             .build()
             );
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                    .userId(userId)
+                    .build());
+            individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                    .id(UUID.randomUUID())
+                    .userId(userId)
+                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .build());
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)
@@ -86,17 +98,6 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .ignoreIssues(false)
                             .ignoreCodeReviews(false)
                             .build());
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder()
-                            .person(UserPayoutInformation.Person.builder()
-                                    .lastName(faker.name().lastName()).firstName(faker.name().firstName())
-                                    .build())
-                            .location(UserPayoutInformation.Location.builder()
-                                    .address(faker.address().fullAddress())
-                                    .city(faker.address().city())
-                                    .postalCode(faker.address()
-                                            .zipCode()).country(faker.address().country()).build())
-                            .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
                     new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
 
@@ -106,26 +107,16 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
 
             // Then
             Assertions.assertEquals("MISSING_PAYOUT_INFO", userReward.getStatus());
-            Assertions.assertEquals("PROCESSING", projectReward.getStatus());
+            Assertions.assertEquals("PENDING_CONTRIBUTOR", projectReward.getStatus());
         }
 
         @Test
         @Order(2)
         void should_return_processing_for_an_individual() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder()
-                            .person(UserPayoutInformation.Person.builder()
-                                    .lastName(faker.name().lastName()).firstName(faker.name().firstName())
-                                    .build())
-                            .location(UserPayoutInformation.Location.builder()
-                                    .address(faker.address().fullAddress())
-                                    .city(faker.address().city())
-                                    .postalCode(faker.address()
-                                            .zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethWallet(Ethereum.wallet("0x01"))
-                                    .build())
+            postgresUserAdapter.savePayoutSettingsForUserId(userId,
+                    UserPayoutSettings.builder()
+                            .ethWallet(Ethereum.wallet("0x01"))
                             .build());
 
             // When
@@ -179,6 +170,15 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .lastSeenAt(new Date())
                             .build()
             );
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .userId(userId)
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                    .build());
+            companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                    .userId(userId)
+                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .id(UUID.randomUUID())
+                    .build());
             projectRepository.save(
                     ProjectEntity.builder()
                             .id(projectId)
@@ -194,22 +194,6 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                             .ignoreIssues(false)
                             .ignoreCodeReviews(false)
                             .build());
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder()
-                            .isACompany(true)
-                            .company(UserPayoutInformation.Company.builder()
-                                    .owner(UserPayoutInformation.Person.builder()
-                                            .lastName(faker.name().lastName()).firstName(faker.name().firstName())
-                                            .build())
-                                    .identificationNumber(faker.number().digit())
-                                    .name(faker.name().name())
-                                    .build())
-                            .location(UserPayoutInformation.Location.builder()
-                                    .address(faker.address().fullAddress())
-                                    .city(faker.address().city())
-                                    .postalCode(faker.address()
-                                            .zipCode()).country(faker.address().country()).build())
-                            .build());
             paymentRequestRepository.save(new PaymentRequestEntity(rewardId, UUID.randomUUID(), githubUserId,
                     new Date(), BigDecimal.ONE, null, 1, projectId, CurrencyEnumEntity.lords));
 
@@ -219,32 +203,16 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
 
             // Then
             Assertions.assertEquals("MISSING_PAYOUT_INFO", userReward.getStatus());
-            Assertions.assertEquals("PROCESSING", projectReward.getStatus());
+            Assertions.assertEquals("PENDING_CONTRIBUTOR", projectReward.getStatus());
         }
 
         @Test
         @Order(2)
         void should_return_pending_invoice_status() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder()
-                            .company(UserPayoutInformation.Company.builder()
-                                    .owner(UserPayoutInformation.Person.builder()
-                                            .lastName(faker.name().lastName())
-                                            .firstName(faker.name().firstName())
-                                            .build())
-                                    .identificationNumber(faker.number().digit())
-                                    .name(faker.name().name())
-                                    .build())
-                            .isACompany(true)
-                            .location(UserPayoutInformation.Location.builder()
-                                    .address(faker.address().fullAddress())
-                                    .city(faker.address().city())
-                                    .postalCode(faker.address()
-                                            .zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethWallet(Ethereum.wallet("0x01"))
-                                    .build())
+            postgresUserAdapter.savePayoutSettingsForUserId(userId,
+                    UserPayoutSettings.builder()
+                            .ethWallet(Ethereum.wallet("0x01"))
                             .build());
 
             // When

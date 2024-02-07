@@ -1,9 +1,16 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -30,6 +37,10 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     PaymentRepository paymentRepository;
     @Autowired
     CryptoUsdQuotesRepository cryptoUsdQuotesRepository;
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
 
     @Test
     void should_return_a_403_given_user_not_linked_to_reward() {
@@ -51,9 +62,18 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_user_reward() throws ParseException {
         // Given
-        final String jwt = userAuthHelper.authenticatePierre().jwt();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
+        final String jwt = authenticatedUser.jwt();
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
-
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                        .userId(authenticatedUser.user().getId())
+                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                .build());
+        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                        .id(UUID.randomUUID())
+                        .userId(authenticatedUser.user().getId())
+                        .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .build());
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))

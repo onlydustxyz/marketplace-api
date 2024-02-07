@@ -10,7 +10,7 @@ public class ContributorFaker {
     public Contributor contributor() {
         return Contributor.builder()
                 .id(GithubUserIdentity.builder()
-                        .githubUserId(faker.number().randomNumber())
+                        .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                         .githubLogin(faker.name().username())
                         .githubAvatarUrl(faker.internet().avatar())
                         .build())
