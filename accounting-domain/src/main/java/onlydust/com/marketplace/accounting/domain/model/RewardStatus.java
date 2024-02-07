@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Set;
 
 @Data
@@ -13,9 +14,21 @@ public class RewardStatus {
     @NonNull
     final RewardId rewardId;
 
-    Boolean sponsorHasEnoughFund;
+    @NonNull Boolean sponsorHasEnoughFund = false;
     ZonedDateTime unlockDate;
-    Boolean paymentRequestedAt;
-    Boolean paidAt;
-    Set<Network> networks;
+    ZonedDateTime paymentRequestedAt;
+    ZonedDateTime paidAt;
+    @NonNull Set<Network> networks = Set.of();
+
+    public Optional<ZonedDateTime> unlockDate() {
+        return Optional.ofNullable(unlockDate);
+    }
+
+    public Optional<ZonedDateTime> paymentRequestedAt() {
+        return Optional.ofNullable(paymentRequestedAt);
+    }
+
+    public Optional<ZonedDateTime> paidAt() {
+        return Optional.ofNullable(paidAt);
+    }
 }

@@ -5,16 +5,13 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 
 import java.util.Optional;
 
 @AllArgsConstructor
 public class PostgresRewardStatusAdapter implements RewardStatusStorage {
-
     private final RewardStatusRepository rewardStatusRepository;
-    private final CurrencyRepository currencyRepository;
 
     @Override
     public void save(RewardStatus rewardStatus) {
@@ -24,7 +21,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Override
     public Optional<RewardStatus> get(RewardId rewardId) {
         return rewardStatusRepository.findById(rewardId.value())
-                .map(r -> r.toRewardStatus(currencyRepository));
+                .map(RewardStatusEntity::toRewardStatus);
     }
 
     @Override

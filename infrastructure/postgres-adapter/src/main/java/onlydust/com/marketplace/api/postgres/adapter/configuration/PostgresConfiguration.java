@@ -275,8 +275,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository,
-                                                                   final CurrencyRepository currencyRepository) {
-        return new PostgresRewardStatusAdapter(rewardStatusRepository, currencyRepository);
+    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository) {
+        return new PostgresRewardStatusAdapter(rewardStatusRepository);
     }
 }
