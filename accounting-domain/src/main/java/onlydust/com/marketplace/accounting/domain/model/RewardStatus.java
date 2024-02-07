@@ -32,7 +32,7 @@ public class RewardStatus {
     public RewardStatus(RewardId rewardId) {
         this.rewardId = rewardId;
     }
-
+    
     public enum Status {
         PENDING_BILLING_PROFILE,
         PENDING_VERIFICATION,
