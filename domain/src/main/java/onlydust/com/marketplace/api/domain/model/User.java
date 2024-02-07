@@ -34,6 +34,8 @@ public class User {
     @Getter(AccessLevel.NONE)
     boolean hasSeenOnboardingWizard;
     Date createdAt;
+    String firstName;
+    String lastName;
 
     public boolean hasAcceptedLatestTermsAndConditions() {
         return hasAcceptedLatestTermsAndConditions;

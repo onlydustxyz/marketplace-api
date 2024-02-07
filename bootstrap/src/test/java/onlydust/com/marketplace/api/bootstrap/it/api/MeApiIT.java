@@ -379,4 +379,23 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(user.getLastSeenAt()).isAfter(before);
         assertThat(user.getLastSeenAt()).isBefore(after);
     }
+
+    @Test
+    void should_contains_first_and_last_names() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.firstName").isEqualTo("Pierre")
+                .jsonPath("$.lastName").isEqualTo("Oucif");
+
+    }
 }

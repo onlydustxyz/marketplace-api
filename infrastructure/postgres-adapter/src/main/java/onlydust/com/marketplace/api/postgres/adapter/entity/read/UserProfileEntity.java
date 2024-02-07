@@ -69,6 +69,10 @@ public class UserProfileEntity {
     Integer contributionsCount;
     @Column(name = "looking_for_a_job")
     Boolean isLookingForAJob;
+    @Column(name = "first_name")
+    String firstName;
+    @Column(name = "last_name")
+    String lastName;
 
     @Enumerated(EnumType.STRING)
     @Type(type = "allocated_time")

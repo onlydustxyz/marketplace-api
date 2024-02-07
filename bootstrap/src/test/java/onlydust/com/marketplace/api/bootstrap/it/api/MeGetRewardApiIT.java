@@ -65,15 +65,10 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
         final String jwt = authenticatedUser.jwt();
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
-        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                        .userId(authenticatedUser.user().getId())
-                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
-                .build());
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                        .id(UUID.randomUUID())
-                        .userId(authenticatedUser.user().getId())
-                        .verificationStatus(VerificationStatusEntity.VERIFIED)
-                .build());
+        final CompanyBillingProfileEntity companyBillingProfileEntity =
+                companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
+        companyBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        companyBillingProfileRepository.save(companyBillingProfileEntity);
         // When
         client.get()
                 .uri(getApiURI(String.format(ME_REWARD, rewardId)))

@@ -41,7 +41,8 @@ public class CustomUserRepository {
                    upi.cover,
                    upi.looking_for_a_job,
                    upi.weekly_allocated_time,
-                        
+                   upi.first_name,
+                   upi.last_name,
                    (SELECT jsonb_agg(jsonb_build_object(
                            'is_public', ci.public,
                            'channel', ci.channel,
@@ -233,6 +234,8 @@ public class CustomUserRepository {
                             case greater_than_three_days -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
                         })
                 .contacts(getContacts(row))
+                .firstName(row.getFirstName())
+                .lastName(row.getLastName())
                 .build();
     }
 

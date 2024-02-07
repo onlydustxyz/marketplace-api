@@ -2557,6 +2557,10 @@ components:
         isLookingForAJob:
           type: boolean
           description: Whether the user is looking for a job or not
+        firstName:
+          type: string
+        lastName:
+          type: string
 
     UserProfileCoverColor:
       type: string
@@ -2628,6 +2632,10 @@ components:
                 $ref: '#/components/schemas/UserProfileProjects'
             stats:
               $ref: '#/components/schemas/UserProfileStats'
+            firstName:
+              type: string
+            lastName:
+              type: string
 
     UserProfileStats:
       type: object
@@ -3982,6 +3990,10 @@ components:
               description: User email
             billingProfileType:
               $ref: '#/components/schemas/BillingProfileType'
+            firstName:
+              type: string
+            lastName:
+              type: string
 
     BillingProfileType:
       type: string

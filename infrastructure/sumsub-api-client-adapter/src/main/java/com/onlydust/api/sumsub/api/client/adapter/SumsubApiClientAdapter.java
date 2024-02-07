@@ -30,6 +30,7 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
 
     @Override
     public CompanyBillingProfile updateCompanyVerification(CompanyBillingProfile companyBillingProfile) {
+        System.out.println("IT - billingProfileId = " +companyBillingProfile.getId() );
         final SumsubCompanyApplicantsDataDTO applicantsDataFromCompanyBillingProfileId =
                 getApplicantsDataFromCompanyBillingProfileId(companyBillingProfile.getId());
         final SumsubCompanyChecksDTO companyChecksFromSumsubApplicantId =

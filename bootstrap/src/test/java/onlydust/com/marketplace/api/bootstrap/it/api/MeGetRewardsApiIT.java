@@ -348,15 +348,14 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     void should_get_my_rewards_given_multi_currencies() {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
         final String jwt = authenticatedUser.jwt();
-        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
-                        .userId(authenticatedUser.user().getId())
-                .build());
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                        .id(UUID.randomUUID())
-                        .userId(authenticatedUser.user().getId())
-                        .verificationStatus(VerificationStatusEntity.VERIFIED)
-                .build());
+        final UserBillingProfileTypeEntity userBillingProfileTypeEntity =
+                userBillingProfileTypeRepository.findById(authenticatedUser.user().getId()).orElseThrow();
+        userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY);
+        userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
+        final CompanyBillingProfileEntity companyBillingProfileEntity =
+                companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
+        companyBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        companyBillingProfileRepository.save(companyBillingProfileEntity);
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
                 .currency(CurrencyEnumEntity.eth)
                 .price(BigDecimal.valueOf(1500L))
@@ -447,7 +446,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         postgresUserAdapter.savePayoutSettingsForUserId(pierre.user().getId(),
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
-                                .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
+                        .aptosAddress(Aptos.accountAddress("0x" + faker.random().hex(40)))
                         .build());
 
         paymentRepository.save(
@@ -569,13 +568,13 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[0].status").isEqualTo("PENDING_VERIFICATION");
 
         userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                        .userId(userId)
-                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                .userId(userId)
+                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
                 .build());
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                        .verificationStatus(VerificationStatusEntity.VERIFIED)
-                        .userId(userId)
-                        .id(UUID.randomUUID())
+                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .userId(userId)
+                .id(UUID.randomUUID())
                 .build());
 
         // When

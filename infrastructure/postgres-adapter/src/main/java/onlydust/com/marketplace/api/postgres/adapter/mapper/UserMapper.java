@@ -58,6 +58,8 @@ public interface UserMapper {
                 .githubEmail(user.getGithubEmail())
                 .githubAvatarUrl(user.getProfile() != null && user.getProfile().getAvatarUrl() != null ?
                         user.getProfile().getAvatarUrl() : user.getGithubAvatarUrl())
+                .firstName(nonNull(user.getProfile()) ? user.getProfile().getFirstName() : null)
+                .lastName(nonNull(user.getProfile()) ? user.getProfile().getLastName() : null)
                 .roles(Arrays.stream(user.getRoles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.getOnboarding())
                                                      && nonNull(user.getOnboarding().getTermsAndConditionsAcceptanceDate())
@@ -122,6 +124,8 @@ public interface UserMapper {
                 .languages(userProfile.getTechnologies())
                 .allocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
                 .isLookingForAJob(userProfile.getIsLookingForAJob())
+                .lastName(userProfile.getLastName())
+                .firstName(userProfile.getFirstName())
                 .id(userId)
                 .build();
     }

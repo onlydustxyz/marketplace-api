@@ -68,7 +68,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     IndividualBillingProfileRepository individualBillingProfileRepository;
 
-    // To delete when we'll have a test with Sumsub mocked to create a billing profile with the KYC flow
     @Test
     void should_get_individual_billing_profile_given_one() throws InterruptedException {
         // Given
@@ -159,7 +158,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     CompanyBillingProfileRepository companyBillingProfileRepository;
 
-    // To delete when we'll have a test with Sumsub mocked to create a billing profile with the KYB flow
     @Test
     void should_get_company_billing_profile_given_one() throws InterruptedException {
         // Given
@@ -182,7 +180,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
         final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-
+        System.out.println("IT - billingProfileId = " +billingProfileId );
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 billingProfileId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
