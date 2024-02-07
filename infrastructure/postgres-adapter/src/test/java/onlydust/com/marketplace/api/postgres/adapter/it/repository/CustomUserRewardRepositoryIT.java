@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -16,10 +16,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserPayoutInfoRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
@@ -59,6 +56,12 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
     PostgresUserAdapter postgresUserAdapter;
     @Autowired
     CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
 
     @Test
     @Order(1)
@@ -119,7 +122,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                 JacksonUtil.toJsonNode("{}"), rewardPaid, new Date()));
 
         // When
-        final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
+        List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(userId,
                 List.of(), List.of(), null, null,
                 UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
 
@@ -136,6 +139,54 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                 CurrencyEnumEntity.strk
         );
         assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "LOCKED",
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "LOCKED",
+                "COMPLETE"
+        );
+
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                .userId(userId)
+                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                .build());
+
+        final UUID billingProfileId = UUID.randomUUID();
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                .id(billingProfileId)
+                .userId(userId)
+                .verificationStatus(VerificationStatusEntity.UNDER_REVIEW)
+                .build());
+
+        viewEntities = customUserRewardRepository.getViewEntities(userId,
+                List.of(), List.of(), null, null,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "LOCKED",
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "PENDING_VERIFICATION",
+                "LOCKED",
+                "COMPLETE"
+        );
+
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                .id(billingProfileId)
+                .userId(userId)
+                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .build());
+
+        viewEntities = customUserRewardRepository.getViewEntities(userId,
+                List.of(), List.of(), null, null,
+                UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
+
+        assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
                 "MISSING_PAYOUT_INFO",
                 "MISSING_PAYOUT_INFO",
                 "LOCKED",
@@ -145,6 +196,8 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                 "LOCKED",
                 "COMPLETE"
         );
+
+
     }
 
 
@@ -152,7 +205,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
     @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
     class GivenAValidIndividual {
 
-        private static UUID individualIserId = UUID.randomUUID();
+        private static UUID individualUserId = UUID.randomUUID();
         private static Long individualIgithubUserId = faker.random().nextLong();
 
         @Test
@@ -161,7 +214,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             // Given
             userRepository.save(
                     UserEntity.builder()
-                            .id(individualIserId)
+                            .id(individualUserId)
                             .githubUserId(individualIgithubUserId)
                             .githubLogin(faker.name().username())
                             .githubAvatarUrl(faker.internet().avatar())
@@ -170,17 +223,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .lastSeenAt(new Date())
                             .build()
             );
-            postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder()
-                                    .lastName(faker.name().lastName()).firstName(faker.name().firstName())
-                                    .build())
-                            .location(UserPayoutInformation.Location.builder()
-                                    .address(faker.address().fullAddress())
-                                    .city(faker.address().city())
-                                    .postalCode(faker.address()
-                                            .zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .starknetAddress(StarkNet.accountAddress("0x01")).build()).build());
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                    .userId(individualUserId)
+                    .build());
+            individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .userId(individualUserId)
+                    .id(UUID.randomUUID())
+                    .build());
+            postgresUserAdapter.savePayoutSettingsForUserId(individualUserId,
+                    UserPayoutSettings.builder().starknetAddress(StarkNet.accountAddress("0x01")).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             individualIgithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
                             CurrencyEnumEntity.usd),
@@ -201,7 +254,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId,
+                    customUserRewardRepository.getViewEntities(individualUserId,
                             List.of(), List.of(), null, null,
                             UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
@@ -233,13 +286,10 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(2)
         void should_return_user_rewards_given_a_user_with_only_op_wallet_and_valid_contact_info() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder()
-                            .person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
-                            .location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .optimismAddress(Optimism.accountAddress("0x01")).build()).build());
-            List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(individualIserId,
+            postgresUserAdapter.savePayoutSettingsForUserId(individualUserId,
+                    UserPayoutSettings.builder()
+                            .optimismAddress(Optimism.accountAddress("0x01")).build());
+            List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(individualUserId,
                     List.of(), List.of(), null, null,
                     UserRewardView.SortBy.amount,
                     SortDirection.desc, 0, 100);
@@ -248,7 +298,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
 
             // When
             viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId,
+                    customUserRewardRepository.getViewEntities(individualUserId,
                             List.of(), List.of(), null, null,
                             UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
@@ -279,12 +329,13 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(3)
         void should_return_user_rewards_given_a_user_with_only_apt_wallet_and_valid_contact_info() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().aptosAddress(Aptos.accountAddress("0x01")).build()).build());
+            postgresUserAdapter.savePayoutSettingsForUserId(individualUserId,
+                    UserPayoutSettings.builder()
+                            .aptosAddress(Aptos.accountAddress("0x01")).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId,
+                    customUserRewardRepository.getViewEntities(individualUserId,
                             List.of(), List.of(), null, null,
                             UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
@@ -315,12 +366,12 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(4)
         void should_return_user_rewards_given_a_user_with_only_eth_wallet_and_valid_contact_info() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(individualIserId,
-                    UserPayoutInformation.builder().person(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().ethWallet(Ethereum.wallet("0x01")).build()).build());
+            postgresUserAdapter.savePayoutSettingsForUserId(individualUserId,
+                    UserPayoutSettings.builder().ethWallet(Ethereum.wallet("0x01")).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities =
-                    customUserRewardRepository.getViewEntities(individualIserId,
+                    customUserRewardRepository.getViewEntities(individualUserId,
                             List.of(), List.of(), null, null,
                             UserRewardView.SortBy.amount,
                             SortDirection.desc, 0, 100);
@@ -371,13 +422,17 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .lastSeenAt(new Date())
                             .build()
             );
-            postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
-                    UserPayoutInformation.builder().isACompany(true)
-                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
-                                    .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
-                                    .identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethWallet(Ethereum.wallet("vitalik.eth")).build()).build());
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .userId(companyUserId)
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                    .build());
+            companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                    .id(UUID.randomUUID())
+                    .userId(companyUserId)
+                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .build());
+            postgresUserAdapter.savePayoutSettingsForUserId(companyUserId,
+                    UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth")).build());
             paymentRequestRepository.saveAll(List.of(new PaymentRequestEntity(UUID.randomUUID(), UUID.randomUUID(),
                             companyGithubUserId, new Date(), BigDecimal.valueOf(10000), null, 1, projectId,
                             CurrencyEnumEntity.usd),
@@ -470,57 +525,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(3)
         void should_return_user_rewards_given_a_user_with_only_banking_account_for_valid_company() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
-                    UserPayoutInformation.builder().isACompany(true).company(UserPayoutInformation.Company.builder().name(faker.name().name()).owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build()).identificationNumber(faker.number().digit()).build()).location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build()).payoutSettings(UserPayoutInformation.PayoutSettings.builder().sepaAccount(UserPayoutInformation.SepaAccount.builder().bic(faker.random().hex()).accountNumber(AccountNumber.of("FR1014508000702139488771C56")).build()).build()).build());
-
-            // When
-            final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
-                    List.of(), List.of(), null, null,
-                    UserRewardView.SortBy.amount, SortDirection.desc, 0, 100);
-
-            // Then
-            assertEquals(7, viewEntities.size());
-            assertThat(viewEntities.stream().map(UserRewardViewEntity::getCurrency).toList()).containsExactly(
-                    CurrencyEnumEntity.usd,
-                    CurrencyEnumEntity.eth,
-                    CurrencyEnumEntity.op,
-                    CurrencyEnumEntity.usdc,
-                    CurrencyEnumEntity.apt,
-                    CurrencyEnumEntity.lords,
-                    CurrencyEnumEntity.strk
-            );
-            assertThat(viewEntities.stream().map(UserRewardViewEntity::getStatus).toList()).containsExactly(
-                    "COMPLETE",
-                    "MISSING_PAYOUT_INFO",
-                    "LOCKED",
-                    "COMPLETE",
-                    "MISSING_PAYOUT_INFO",
-                    "MISSING_PAYOUT_INFO",
-                    "LOCKED"
-            );
-        }
-
-        @Test
-        @Order(4)
-        void should_return_user_rewards_payout_info_missing_given_missing_location() {
-            // Given
-            postgresUserAdapter.savePayoutInformationForUserId(companyUserId,
-                    UserPayoutInformation.builder().isACompany(true)
-                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
-                                    .owner(UserPayoutInformation.Person.builder()
-                                            .lastName(faker.name().lastName())
-                                            .firstName(faker.name().firstName()).build())
-                                    .identificationNumber(faker.number().digit()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of(
-                                                    "FR1014508000702139488771C56"
-                                            )).build())
-                                    .aptosAddress(Aptos.accountAddress("0x01"))
-                                    .starknetAddress(StarkNet.accountAddress("0x02"))
-                                    .aptosAddress(Aptos.accountAddress("0x03"))
-                                    .ethWallet(Ethereum.wallet("0x04"))
-                                    .build()).build());
+            postgresUserAdapter.savePayoutSettingsForUserId(companyUserId,
+                    UserPayoutSettings.builder().sepaAccount(UserPayoutSettings.SepaAccount.builder().bic(faker.random().hex())
+                            .accountNumber(AccountNumber.of("FR1014508000702139488771C56")).build()).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
@@ -664,18 +671,22 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                             .ignoreIssues(false)
                             .ignoreCodeReviews(false)
                             .build());
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder().isACompany(true)
-                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
-                                    .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
-                                    .identificationNumber(faker.number().digit()).build())
-                            .location(UserPayoutInformation.Location.builder().address(faker.address().fullAddress()).city(faker.address().city()).postalCode(faker.address().zipCode()).country(faker.address().country()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethWallet(Ethereum.wallet("vitalik.eth"))
-                                    .sepaAccount(UserPayoutInformation.SepaAccount.builder()
-                                            .bic(faker.random().hex()).accountNumber(AccountNumber.of(
-                                                    "ES6621000418401234567891")).build())
-                                    .build()).build());
+            postgresUserAdapter.savePayoutSettingsForUserId(userId,
+                    UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth"))
+                            .sepaAccount(UserPayoutSettings.SepaAccount.builder()
+                                    .bic(faker.random().hex()).accountNumber(AccountNumber.of(
+                                            "ES6621000418401234567891")).build())
+                            .build());
+
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .userId(userId)
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                    .build());
+            companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .id(UUID.randomUUID())
+                    .userId(userId)
+                    .build());
             final UUID completedReward = UUID.randomUUID();
             final UUID pendingInvoiceRewardIdUsdc = UUID.randomUUID();
             final UUID pendingInvoiceRewardIdLords = UUID.randomUUID();
@@ -714,14 +725,12 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         @Order(2)
         void should_return_no_reward() {
             // Given
-            postgresUserAdapter.savePayoutInformationForUserId(userId,
-                    UserPayoutInformation.builder().isACompany(true)
-                            .company(UserPayoutInformation.Company.builder().name(faker.name().name())
-                                    .owner(UserPayoutInformation.Person.builder().lastName(faker.name().lastName()).firstName(faker.name().firstName()).build())
-                                    .identificationNumber(faker.number().digit()).build())
-                            .payoutSettings(UserPayoutInformation.PayoutSettings.builder()
-                                    .ethWallet(Ethereum.wallet("vitalik.eth")).build()).build());
-
+            postgresUserAdapter.savePayoutSettingsForUserId(userId,
+                    UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth")).build());
+            userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                    .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                    .userId(userId)
+                    .build());
             // When
             final List<UserRewardViewEntity> pendingInvoicesViewEntities =
                     customUserRewardRepository.getPendingInvoicesViewEntities(githubUserId);

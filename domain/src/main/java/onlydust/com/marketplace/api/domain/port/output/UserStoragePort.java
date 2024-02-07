@@ -24,7 +24,7 @@ public interface UserStoragePort {
 
     void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
 
-    UserPayoutInformation getPayoutInformationById(UUID id);
+    UserPayoutSettings getPayoutSettingsById(UUID id);
 
     void updateOnboardingWizardDisplayDate(UUID userId, Date date);
 
@@ -34,7 +34,7 @@ public interface UserStoragePort {
 
     UUID createApplicationOnProject(UUID userId, UUID projectId);
 
-    UserPayoutInformation savePayoutInformationForUserId(UUID userId, UserPayoutInformation userPayoutInformation);
+    UserPayoutSettings savePayoutSettingsForUserId(UUID userId, UserPayoutSettings userPayoutSettings);
 
     UserRewardsPageView findRewardsForUserId(UUID userId, UserRewardView.Filters filters,
                                              int pageIndex, int pageSize,

@@ -23,13 +23,6 @@ public class UserPayoutInfoEntity {
     @Id
     @Column(name = "user_id")
     UUID userId;
-    @Enumerated(EnumType.STRING)
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
-    @Column(columnDefinition = "jsonb", name = "location")
-    private JsonNode location;
-    @Type(type = "com.vladmihalcea.hibernate.type.json.JsonType")
-    @Column(columnDefinition = "jsonb", name = "identity")
-    private JsonNode identity;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @Builder.Default

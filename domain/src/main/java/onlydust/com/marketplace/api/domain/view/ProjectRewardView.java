@@ -34,7 +34,7 @@ public class ProjectRewardView {
     }
 
     public enum RewardStatusView {
-        pendingSignup, processing, complete, locked
+        pendingSignup, processing, complete, locked, pendingContributor
     }
 
     public enum SortBy {

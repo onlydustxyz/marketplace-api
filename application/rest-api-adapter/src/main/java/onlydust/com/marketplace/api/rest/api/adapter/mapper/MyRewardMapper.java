@@ -46,6 +46,7 @@ public interface MyRewardMapper {
                     case processing -> RewardStatus.PROCESSING;
                     case missingPayoutInfo -> RewardStatus.MISSING_PAYOUT_INFO;
                     case locked -> RewardStatus.LOCKED;
+                    case pendingVerification -> RewardStatus.PENDING_VERIFICATION;
                 })
                 .requestedAt(DateMapper.toZoneDateTime(view.getRequestedAt()))
                 .processedAt(DateMapper.toZoneDateTime(view.getProcessedAt()))

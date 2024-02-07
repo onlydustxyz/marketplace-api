@@ -4,10 +4,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Company;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Location;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.Person;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation.SepaAccount;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings.SepaAccount;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -35,8 +32,8 @@ public class PaymentView {
     Integer issuesCount;
     Integer dustyIssuesCount;
     Integer codeReviewsCount;
-    Identity recipientIdentity;
-    Location recipientLocation;
+    //    Identity recipientIdentity;
+//    Location recipientLocation;
     SepaAccount recipientSepaAccount;
     String recipientEthWallet;
     String recipientStarkWallet;
@@ -52,21 +49,8 @@ public class PaymentView {
         List<UUID> payments = List.of();
     }
 
-    public record Identity(Company company, Person person) {
-        public boolean valid() {
-            return Optional.ofNullable(company).map(Company::valid).orElse(false) ||
-                   Optional.ofNullable(person).map(Person::valid).orElse(false);
-        }
-    }
-
     public Boolean recipientPayoutInfoValid() {
-        if (!Optional.ofNullable(recipientIdentity).map(Identity::valid).orElse(false)) {
-            return false;
-        }
-
-        if (!Optional.ofNullable(recipientLocation).map(Location::valid).orElse(false)) {
-            return false;
-        }
+        // TODO : replace with KYC/KYB verification status
 
         return switch (currency) {
             case Usd -> Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
