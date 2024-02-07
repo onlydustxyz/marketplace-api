@@ -88,4 +88,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000042_refactor_accounting_schema.sql
   - include:
-      file: db/changelog/changelogs/00000043_new_reward_tables.sql
+      file: db/changelog/changelogs/00000043_alter_enums.sql
+  - include:
+      file: db/changelog/changelogs/00000044_new_reward_tables.sql
