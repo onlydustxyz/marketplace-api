@@ -9,4 +9,6 @@ public interface RewardStatusStorage {
     void save(RewardStatus rewardStatus);
 
     Optional<RewardStatus> get(RewardId rewardId);
+
+    void delete(RewardId rewardId);
 }

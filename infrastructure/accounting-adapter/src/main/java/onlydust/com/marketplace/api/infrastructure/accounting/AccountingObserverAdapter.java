@@ -46,7 +46,7 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort, Ac
 
     @Override
     public void onRewardCancelled(UUID rewardId) {
-
+        rewardStatusStorage.delete(RewardId.of(rewardId));
     }
 
     @Override

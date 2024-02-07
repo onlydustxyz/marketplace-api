@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.infrastructure.accounting;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
@@ -60,6 +61,18 @@ class AccountingObserverAdapterTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Unsupported currency Eth");
+    }
+
+    @Test
+    void on_reward_cancelled() {
+        // Given
+        final var rewardId = UUID.randomUUID();
+
+        // When
+        accountingObserverAdapter.onRewardCancelled(rewardId);
+
+        // Then
+        verify(rewardStatusStorage).delete(RewardId.of(rewardId));
     }
 
     private Reward fakeReward() {
