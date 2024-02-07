@@ -48,7 +48,9 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort, Ac
 
     @Override
     public void onInvoiceRejected(UUID rewardId) {
-
+        final var rewardStatus = rewardStatusStorage.get(RewardId.of(rewardId))
+                .orElseThrow(() -> OnlyDustException.notFound("Reward status not found for reward %s".formatted(rewardId)));
+        rewardStatusStorage.save(rewardStatus.paymentRequested(false));
     }
 
     @Override

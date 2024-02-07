@@ -97,6 +97,18 @@ class AccountingObserverAdapterTest {
             final var rewardStatus = rewardStatusCaptor.getValue();
             assertThat(rewardStatus.paymentRequested()).isTrue();
         }
+
+        @Test
+        void on_invoice_rejected() {
+            // When
+            accountingObserverAdapter.onInvoiceRejected(reward.id());
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
+            final var rewardStatus = rewardStatusCaptor.getValue();
+            assertThat(rewardStatus.paymentRequested()).isFalse();
+        }
     }
 
 
