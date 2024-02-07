@@ -26,4 +26,9 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
         return rewardStatusRepository.findById(rewardId.value())
                 .map(r -> r.toRewardStatus(currencyRepository));
     }
+
+    @Override
+    public void delete(RewardId rewardId) {
+        rewardStatusRepository.deleteById(rewardId.value());
+    }
 }
