@@ -45,7 +45,7 @@ application:
     indexer-sync-job-delay: 500
     refresh-currency-quotes: 500
     tracking-job-delay: 500
-    billing-profile-verification-job: 500
+    billing-profile-verification-job: 100
   github:
     installation:
       retry:
