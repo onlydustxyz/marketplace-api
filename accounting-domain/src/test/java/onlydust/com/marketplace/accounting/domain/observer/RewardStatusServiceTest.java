@@ -60,4 +60,25 @@ public class RewardStatusServiceTest {
             verify(rewardStatusStorage).save(rewardStatus);
         }
     }
+
+    @Nested
+    class OnRewardCancelled {
+        RewardStatusService rewardStatusService;
+        RewardId rewardId = RewardId.random();
+
+        @BeforeEach
+        void setUp() {
+            rewardStatusStorage = mock(RewardStatusStorage.class);
+            rewardStatusService = new RewardStatusService(rewardStatusStorage);
+        }
+
+        @Test
+        public void should_delete_status() {
+            // When
+            rewardStatusService.onRewardCancelled(rewardId);
+
+            // Then
+            verify(rewardStatusStorage).delete(rewardId);
+        }
+    }
 }

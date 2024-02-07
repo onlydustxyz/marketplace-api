@@ -126,10 +126,8 @@ public class DomainConfiguration {
     public RewardV2Service rewardFacadePortV2(final PostgresRewardV2Adapter postgresRewardV2Adapter,
                                               final PermissionService permissionService,
                                               final IndexerPort indexerPort,
-                                              final AccountingServicePort accountingServicePort,
-                                              final AccountingRewardObserverPort accountingRewardObserverPort) {
-        return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort,
-                accountingServicePort, accountingRewardObserverPort);
+                                              final AccountingServicePort accountingServicePort) {
+        return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean

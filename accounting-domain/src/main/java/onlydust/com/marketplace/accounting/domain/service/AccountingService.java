@@ -27,7 +27,7 @@ public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
     private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
-    private final AccountingObserver sponsorAccountObserver;
+    private final AccountingObserver accountingObserver;
 
     @Override
     public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
@@ -146,7 +146,7 @@ public class AccountingService implements AccountingFacadePort {
         accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
         if (to instanceof RewardId rewardId)
-            sponsorAccountObserver.onRewardCreated(new RewardStatus(rewardId)
+            accountingObserver.onRewardCreated(new RewardStatus(rewardId)
                     .sponsorHasEnoughFund(isFunded(accountBook, rewardId))
                     .unlockDate(unlockDateOf(accountBook, rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
                     .networks(networksOf(accountBook, rewardId))

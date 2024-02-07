@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -18,5 +19,10 @@ public class RewardStatusService implements AccountingObserver {
     @Override
     public void onRewardCreated(RewardStatus rewardStatus) {
         rewardStatusStorage.save(rewardStatus);
+    }
+
+    @Override
+    public void onRewardCancelled(RewardId rewardId) {
+        rewardStatusStorage.delete(rewardId);
     }
 }

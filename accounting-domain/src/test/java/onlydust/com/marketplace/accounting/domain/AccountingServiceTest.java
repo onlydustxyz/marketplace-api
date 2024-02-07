@@ -206,9 +206,11 @@ public class AccountingServiceTest {
         assertThat(rewardStatus.rewardId()).isEqualTo(rewardId);
         assertThat(rewardStatus.sponsorHasEnoughFund()).isEqualTo(isFunded);
         if (unlockDate == null)
-            assertThat(rewardStatus.unlockDate()).isNull();
-        else
-            assertThat(rewardStatus.unlockDate()).isEqualTo(unlockDate);
+            assertThat(rewardStatus.unlockDate()).isEmpty();
+        else {
+            assertThat(rewardStatus.unlockDate()).isPresent();
+            assertThat(rewardStatus.unlockDate().orElseThrow()).isEqualToIgnoringNanos(unlockDate);
+        }
         assertThat(rewardStatus.networks()).isEqualTo(networks);
         reset(accountingObserver);
     }
