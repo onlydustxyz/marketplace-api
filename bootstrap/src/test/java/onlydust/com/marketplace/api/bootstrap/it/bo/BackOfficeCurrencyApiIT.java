@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.postgres.adapter.repository.QuoteRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
-    private QuoteRepository quoteRepository;
+    private HistoricalQuoteRepository historicalQuoteRepository;
 
     @Test
     @Order(1)
@@ -240,14 +240,14 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Order(90)
     void should_refresh_currency_quotes() {
         // Given
-        final var quotes = quoteRepository.findAll().stream().map(q -> q.toBuilder().price(BigDecimal.ZERO).build()).toList();
-        quoteRepository.saveAll(quotes);
+        final var quotes = historicalQuoteRepository.findAll().stream().map(q -> q.toBuilder().price(BigDecimal.ZERO).build()).toList();
+        historicalQuoteRepository.saveAll(quotes);
 
         // When
         Thread.sleep(700);
 
         // Then
-        assertThat(quoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
+        assertThat(historicalQuoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
     }
 
     @Test

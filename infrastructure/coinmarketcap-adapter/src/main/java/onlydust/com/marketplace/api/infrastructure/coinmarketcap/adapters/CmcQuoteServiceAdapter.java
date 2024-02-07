@@ -34,7 +34,8 @@ public class CmcQuoteServiceAdapter implements QuoteService {
 
                 Optional.ofNullable(response.get(currencyId.get()))
                         .flatMap(q -> Optional.ofNullable(q.quote().get(baseId.get())))
-                        .ifPresent(p -> quotes.add(new Quote(currency.id(), base.id(), p.price())));
+                        .filter(p -> p.price() != null)
+                        .ifPresent(p -> quotes.add(new Quote(currency.id(), base.id(), p.price(), p.lastUpdated().toInstant())));
             }
         }
 

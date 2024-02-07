@@ -135,7 +135,7 @@ public class CmcClient extends HttpClient {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record QuoteResponse(Integer id, Platform platform, Map<Integer, Quote> quote) {
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Quote(BigDecimal price) {
+        public record Quote(BigDecimal price, @JsonProperty("last_updated") Date lastUpdated) {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)

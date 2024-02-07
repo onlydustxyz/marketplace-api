@@ -9,17 +9,21 @@ import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "quotes", schema = "public")
+@Table(name = "historical_quotes", schema = "accounting")
 @Builder(toBuilder = true)
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@IdClass(QuoteEntity.PrimaryKey.class)
+@IdClass(HistoricalQuoteEntity.PrimaryKey.class)
 @ToString
-public class QuoteEntity {
+public class HistoricalQuoteEntity {
+    @Id
+    @EqualsAndHashCode.Include
+    private @NonNull Instant timestamp;
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID currencyId;
@@ -29,11 +33,12 @@ public class QuoteEntity {
     @Getter
     private @NonNull BigDecimal price;
 
-    public static QuoteEntity of(Quote quote) {
-        return QuoteEntity.builder()
+    public static HistoricalQuoteEntity of(Quote quote) {
+        return HistoricalQuoteEntity.builder()
                 .currencyId(quote.currencyId().value())
                 .baseId(quote.base().value())
                 .price(quote.price())
+                .timestamp(quote.timestamp())
                 .build();
     }
 
@@ -42,6 +47,7 @@ public class QuoteEntity {
     @NoArgsConstructor(force = true)
     @Data
     public static class PrimaryKey implements Serializable {
+        private final @NonNull Instant timestamp;
         private final @NonNull UUID currencyId;
         private final @NonNull UUID baseId;
     }

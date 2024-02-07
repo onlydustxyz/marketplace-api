@@ -243,8 +243,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresQuoteAdapter postgresQuoteAdapter(final QuoteRepository quoteRepository) {
-        return new PostgresQuoteAdapter(quoteRepository);
+    public PostgresQuoteAdapter postgresQuoteAdapter(final HistoricalQuoteRepository historicalQuoteRepository) {
+        return new PostgresQuoteAdapter(historicalQuoteRepository);
     }
 
     @Bean
