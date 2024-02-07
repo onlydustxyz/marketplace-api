@@ -7,11 +7,11 @@ import java.util.UUID;
 public interface AccountingRewardObserverPort {
     void onRewardCreated(Reward reward);
 
+    void onRewardCancelled(UUID rewardId);
+
     void onPaymentRequested(UUID rewardId);
 
     void onInvoiceApproved(UUID rewardId);
 
     void onInvoiceRejected(UUID rewardId);
-
-    void onRewardCancelled(UUID rewardId);
 }

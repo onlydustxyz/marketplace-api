@@ -30,6 +30,11 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort, Ac
     }
 
     @Override
+    public void onRewardCancelled(UUID rewardId) {
+        rewardStatusStorage.delete(RewardId.of(rewardId));
+    }
+
+    @Override
     public void onPaymentRequested(UUID rewardId) {
         final var rewardStatus = rewardStatusStorage.get(RewardId.of(rewardId))
                 .orElseThrow(() -> OnlyDustException.notFound("Reward status not found for reward %s".formatted(rewardId)));
@@ -44,11 +49,6 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort, Ac
     @Override
     public void onInvoiceRejected(UUID rewardId) {
 
-    }
-
-    @Override
-    public void onRewardCancelled(UUID rewardId) {
-        rewardStatusStorage.delete(RewardId.of(rewardId));
     }
 
     @Override
