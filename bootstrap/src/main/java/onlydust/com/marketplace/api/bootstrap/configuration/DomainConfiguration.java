@@ -19,10 +19,6 @@ import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.*;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificationEventEntity;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -130,9 +126,10 @@ public class DomainConfiguration {
     public RewardV2Service rewardFacadePortV2(final PostgresRewardV2Adapter postgresRewardV2Adapter,
                                               final PermissionService permissionService,
                                               final IndexerPort indexerPort,
-                                              final AccountingServicePort accountingServicePort) {
+                                              final AccountingServicePort accountingServicePort,
+                                              final AccountingRewardObserverPort accountingRewardObserverPort) {
         return new RewardV2Service(postgresRewardV2Adapter, permissionService, indexerPort,
-                accountingServicePort);
+                accountingServicePort, accountingRewardObserverPort);
     }
 
     @Bean
@@ -228,15 +225,17 @@ public class DomainConfiguration {
     @Bean
     public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
                                                                  final BillingProfileStoragePort billingProfileStoragePort,
-                                                                 final UserVerificationStoragePort userVerificationStoragePort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort);
+                                                                 final UserVerificationStoragePort userVerificationStoragePort,
+                                                                 final AccountingUserObserverPort accountingUserObserverPort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
     }
 
     @Bean
     public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
                                                          final BillingProfileStoragePort billingProfileStoragePort,
-                                                         final UserVerificationStoragePort userVerificationStoragePort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort);
+                                                         final UserVerificationStoragePort userVerificationStoragePort,
+                                                         final AccountingUserObserverPort accountingUserObserverPort) {
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
     }
 
     @Bean
