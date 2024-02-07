@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.model.Reward;
+import onlydust.com.marketplace.api.domain.port.input.AccountingRewardObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
@@ -22,6 +23,7 @@ public class RewardV2Service implements RewardFacadePort {
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
     private final AccountingServicePort accountingServicePort;
+    private final AccountingRewardObserverPort rewardObserver;
 
     @Override
     @Transactional
@@ -37,7 +39,7 @@ public class RewardV2Service implements RewardFacadePort {
 
         final var rewardId = UUID.randomUUID();
         // TODO: Refactor command to match new types
-        rewardStoragePort.save(new Reward(
+        final var reward = new Reward(
                 rewardId,
                 command.getProjectId(),
                 projectLeadId,
@@ -56,7 +58,9 @@ public class RewardV2Service implements RewardFacadePort {
                             case codeReview -> Reward.Item.Type.CODE_REVIEW;
                         })
                         .build()).toList()
-        ));
+        );
+        rewardStoragePort.save(reward);
+        rewardObserver.onRewardCreated(reward);
 
         // TODO: Use currencyId as input in REST API
         accountingServicePort.createReward(command.getProjectId(), rewardId, command.getAmount(), command.getCurrency().toString().toUpperCase());
@@ -74,6 +78,7 @@ public class RewardV2Service implements RewardFacadePort {
 
         // TODO: Use currencyId as input in REST API
         rewardStoragePort.delete(rewardId);
+        rewardObserver.onRewardCancelled(rewardId);
         accountingServicePort.cancelReward(projectId, rewardId, reward.amount(), reward.currency().toString().toUpperCase());
     }
 

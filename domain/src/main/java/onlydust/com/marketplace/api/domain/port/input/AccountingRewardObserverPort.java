@@ -12,4 +12,6 @@ public interface AccountingRewardObserverPort {
     void onInvoiceApproved(UUID rewardId);
 
     void onInvoiceRejected(UUID rewardId);
+
+    void onRewardCancelled(UUID rewardId);
 }

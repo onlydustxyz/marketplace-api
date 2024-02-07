@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.model.Reward;
+import onlydust.com.marketplace.api.domain.port.input.AccountingRewardObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
@@ -28,11 +29,13 @@ public class RewardV2ServiceTest {
     final PermissionService permissionService = mock(PermissionService.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingServicePort accountingServicePort = mock(AccountingServicePort.class);
+    final AccountingRewardObserverPort accountingRewardObserverPort = mock(AccountingRewardObserverPort.class);
     final RewardV2Service rewardService = new RewardV2Service(
             rewardStoragePort,
             permissionService,
             indexerPort,
-            accountingServicePort
+            accountingServicePort,
+            accountingRewardObserverPort
     );
     final UUID projectLeadId = UUID.randomUUID();
     final UUID projectId = UUID.randomUUID();
@@ -41,7 +44,7 @@ public class RewardV2ServiceTest {
 
     @BeforeEach
     void setup() {
-        reset(rewardStoragePort, permissionService, indexerPort, accountingServicePort);
+        reset(rewardStoragePort, permissionService, indexerPort, accountingServicePort, accountingRewardObserverPort);
     }
 
     @Nested
@@ -78,6 +81,7 @@ public class RewardV2ServiceTest {
             assertThat(capturedReward.rewardItems()).isEmpty();
 
             verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, "USDC");
+            verify(accountingRewardObserverPort).onRewardCreated(capturedReward);
         }
 
         @Test
@@ -181,6 +185,7 @@ public class RewardV2ServiceTest {
             // Then
             verify(rewardStoragePort).delete(rewardId);
             verify(accountingServicePort).cancelReward(projectId, rewardId, BigDecimal.TEN, "USDC");
+            verify(accountingRewardObserverPort).onRewardCancelled(rewardId);
         }
 
         @Test
