@@ -53,4 +53,9 @@ public class UserProfileInfoEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
+
+    @Column(name = "first_name")
+    String firstName;
+    @Column(name = "last_name")
+    String lastName;
 }

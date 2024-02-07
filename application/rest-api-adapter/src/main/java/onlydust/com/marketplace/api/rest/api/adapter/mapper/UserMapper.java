@@ -32,6 +32,8 @@ public interface UserMapper {
                 .technologies(userProfileRequest.getTechnologies())
                 .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
                 .isLookingForAJob(userProfileRequest.getIsLookingForAJob())
+                .firstName(userProfileRequest.getFirstName())
+                .lastName(userProfileRequest.getLastName())
                 .build();
     }
 
@@ -103,6 +105,8 @@ public interface UserMapper {
         userProfileResponse.setAllocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()));
         userProfileResponse.setIsLookingForAJob(userProfileView.getIsLookingForAJob());
         userProfileResponse.setFirstContributedAt(toZoneDateTime(userProfileView.getFirstContributedAt()));
+        userProfileResponse.setFirstName(userProfileView.getFirstName());
+        userProfileResponse.setLastName(userProfileView.getLastName());
         return userProfileResponse;
     }
 
@@ -245,6 +249,8 @@ public interface UserMapper {
             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
             case COMPANY -> BillingProfileType.COMPANY;
         });
+        getMeResponse.setFirstName(authenticatedUser.getFirstName());
+        getMeResponse.setLastName(authenticatedUser.getLastName());
         return getMeResponse;
     }
 

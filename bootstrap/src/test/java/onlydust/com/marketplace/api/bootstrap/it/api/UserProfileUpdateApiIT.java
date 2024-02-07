@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -28,6 +26,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo(
                         "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp")
                 .jsonPath("$.website").isEqualTo("https://linktr.ee/abuisset")
+                .jsonPath("$.firstName").isEqualTo("Anthony")
+                .jsonPath("$.lastName").isEqualTo("BUISSET")
                 .jsonPath("$.cover").isEqualTo("BLUE")
                 .jsonPath("$.technologies.length()").isEqualTo(14)
                 .jsonPath("$.technologies['Rust']").isEqualTo(404344)
@@ -54,6 +54,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "location": "Paris, France",
                             "bio": "FullStack engineer",
                             "website": "https://croute.org",
+                            "firstName": "AnthonyTest",
+                            "lastName": "BuissetTest",
                             "technologies": {
                                 "C++": 100,
                                 "Rust": 90,
@@ -85,6 +87,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.avatarUrl").isEqualTo("https://foobar.org/plop.jpg")
                 .jsonPath("$.website").isEqualTo("https://croute.org")
                 .jsonPath("$.cover").isEqualTo("YELLOW")
+                .jsonPath("$.firstName").isEqualTo("AnthonyTest")
+                .jsonPath("$.lastName").isEqualTo("BuissetTest")
                 .jsonPath("$.technologies.length()").isEqualTo(3)
                 .jsonPath("$.technologies['C++']").isEqualTo(100)
                 .jsonPath("$.technologies['Rust']").isEqualTo(90)

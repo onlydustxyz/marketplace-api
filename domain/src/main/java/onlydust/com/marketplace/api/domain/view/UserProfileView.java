@@ -40,6 +40,8 @@ public class UserProfileView {
     Set<ProjectStats> projectsStats = new HashSet<>();
     @Builder.Default
     Set<Contact> contacts = new HashSet<>();
+    String firstName;
+    String lastName;
 
     public void addProjectStats(final ProjectStats projectStats) {
         if (projectStats.getUserFirstContributedAt() != null && (firstContributedAt == null || projectStats.getUserFirstContributedAt().before(firstContributedAt))) {

@@ -63,15 +63,12 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateAnthony();
         final String jwt = authenticatedUser.jwt();
-        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
-                        .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
-                        .userId(authenticatedUser.user().getId())
-                .build());
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                        .id(UUID.randomUUID())
-                        .userId(authenticatedUser.user().getId())
-                        .verificationStatus(VerificationStatusEntity.VERIFIED)
-                .build());
+        final UserBillingProfileTypeEntity userBillingProfileTypeEntity = userBillingProfileTypeRepository.findById(authenticatedUser.user().getId()).orElseThrow();
+        userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL);
+        userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
+        final IndividualBillingProfileEntity individualBillingProfileEntity = individualBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
+        individualBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        individualBillingProfileRepository.save(individualBillingProfileEntity);
 
         // When
         client.get()

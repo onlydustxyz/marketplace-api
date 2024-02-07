@@ -24,4 +24,6 @@ public class UserProfile {
     private List<Contact> contacts = new ArrayList<>();
     private UserAllocatedTimeToContribute allocatedTimeToContribute;
     private Boolean isLookingForAJob;
+    private String firstName;
+    private String lastName;
 }

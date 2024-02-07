@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -19,6 +17,8 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "location": "Vence, France",
               "bio": "FullStack engineerr",
               "website": "https://linktr.ee/abuisset",
+              "firstName": "Anthony",
+              "lastName": "BUISSET",
               "technologies": {
                 "CSS": 4473,
                 "Rust": 404344,
