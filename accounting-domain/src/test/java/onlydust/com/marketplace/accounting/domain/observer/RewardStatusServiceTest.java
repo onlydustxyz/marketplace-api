@@ -8,12 +8,15 @@ import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class RewardStatusServiceTest {
 
@@ -79,6 +82,49 @@ public class RewardStatusServiceTest {
 
             // Then
             verify(rewardStatusStorage).delete(rewardId);
+        }
+    }
+
+    @Nested
+    class OnSponsorAccountBalanceChanged {
+        RewardStatusService rewardStatusService;
+        RewardId rewardId = RewardId.random();
+        RewardId rewardId2 = RewardId.random();
+        SponsorAccountStatement sponsorAccountStatement;
+        SponsorAccount sponsorAccount;
+
+        @BeforeEach
+        void setUp() {
+            rewardStatusStorage = mock(RewardStatusStorage.class);
+            sponsorAccount = mock(SponsorAccount.class);
+            sponsorAccountStatement = mock(SponsorAccountStatement.class);
+            rewardStatusService = new RewardStatusService(rewardStatusStorage);
+            when(sponsorAccountStatement.account()).thenReturn(sponsorAccount);
+        }
+
+        @Test
+        public void should_update_reward_statuses() {
+            // Given
+            when(sponsorAccountStatement.awaitingPayments()).thenReturn(Map.of(
+                    rewardId, PositiveAmount.of(100L),
+                    rewardId2, PositiveAmount.of(2000L)
+            ));
+            when(sponsorAccount.balance()).thenReturn(PositiveAmount.of(100L));
+            when(rewardStatusStorage.get(any())).then(invocation -> {
+                final var rewardId = invocation.getArgument(0, RewardId.class);
+                return Optional.of(new RewardStatus(rewardId));
+            });
+
+            // When
+            rewardStatusService.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
+            final var rewardStatuses = rewardStatusCaptor.getAllValues();
+            assertThat(rewardStatuses).hasSize(2);
+            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
+            assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
         }
     }
 }

@@ -128,6 +128,7 @@ public class AccountingServiceTest {
 
             // When
             final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(amount), null, transaction);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccount);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -163,6 +164,7 @@ public class AccountingServiceTest {
 
             // When
             final var sponsorAccount = accountingService.createSponsorAccount(sponsorId, currency.id(), amount, lockedUntil, transaction);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccount);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(new MintEvent(AccountId.of(sponsorAccount.account().id()), amount));
@@ -337,12 +339,15 @@ public class AccountingServiceTest {
 
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount));
+
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount.negate()));
+
             // Then
+            verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
 
@@ -358,6 +363,7 @@ public class AccountingServiceTest {
 
             // When
             accountingService.fund(sponsorAccount.id(), transaction);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
@@ -383,6 +389,7 @@ public class AccountingServiceTest {
         void should_do_everything() {
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(300L)));
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
             accountingService.transfer(sponsorAccount.id(), projectId1, PositiveAmount.of(70L), currency.id());
 
             accountingService.transfer(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
@@ -428,6 +435,7 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
+            verify(accountingObserver, times(3)).onSponsorAccountBalanceChanged(any());
 
             accountingService.transfer(sponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());

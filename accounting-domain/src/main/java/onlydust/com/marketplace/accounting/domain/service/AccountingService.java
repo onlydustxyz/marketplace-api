@@ -67,7 +67,9 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         sponsorAccount.add(transaction);
         sponsorAccountStorage.save(sponsorAccount);
-        return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
+        final var statement = new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
+        accountingObserver.onSponsorAccountBalanceChanged(statement);
+        return statement;
     }
 
     @Override

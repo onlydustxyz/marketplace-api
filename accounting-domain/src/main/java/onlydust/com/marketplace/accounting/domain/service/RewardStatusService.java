@@ -3,17 +3,23 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @AllArgsConstructor
 public class RewardStatusService implements AccountingObserver {
     private final RewardStatusStorage rewardStatusStorage;
 
     @Override
-    public void onSponsorAccountBalanceChanged(SponsorAccount sponsorAccount, AccountBookAggregate accountBook) {
+    public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
+        sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> {
+            final var rewardStatus = rewardStatusStorage.get(rewardId)
+                    .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+
+            rewardStatusStorage.save(rewardStatus.sponsorHasEnoughFund(sponsorAccount.account().balance().isGreaterThanOrEqual(amount)));
+        });
     }
 
     @Override
