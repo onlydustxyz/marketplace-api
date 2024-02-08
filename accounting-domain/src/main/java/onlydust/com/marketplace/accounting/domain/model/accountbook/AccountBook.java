@@ -18,6 +18,8 @@ public interface AccountBook {
 
     void refund(AccountId from, AccountId to, PositiveAmount amount);
 
+    void refund(AccountId from);
+
     @EqualsAndHashCode
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @NoArgsConstructor(access = AccessLevel.PRIVATE)

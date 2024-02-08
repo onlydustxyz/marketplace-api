@@ -48,6 +48,11 @@ public class AccountBookAggregate implements AccountBook {
         emit(new RefundEvent(from, to, amount));
     }
 
+    @Override
+    public void refund(AccountId from) {
+        emit(new FullRefundEvent(from));
+    }
+
     public AccountBookState state() {
         return state;
     }
@@ -88,6 +93,14 @@ public class AccountBookAggregate implements AccountBook {
         @Override
         public Void visit(AccountBookState state) {
             state.refund(from, to, amount);
+            return null;
+        }
+    }
+
+    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Void> {
+        @Override
+        public Void visit(AccountBookState state) {
+            state.refund(from);
             return null;
         }
     }

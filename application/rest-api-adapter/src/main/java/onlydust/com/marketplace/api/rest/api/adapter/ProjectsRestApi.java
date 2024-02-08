@@ -217,6 +217,13 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
+    public ResponseEntity<Void> cancelRewardV2(UUID projectId, UUID rewardId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        rewardFacadePortV2.cancelReward(authenticatedUser.getId(), projectId, rewardId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,

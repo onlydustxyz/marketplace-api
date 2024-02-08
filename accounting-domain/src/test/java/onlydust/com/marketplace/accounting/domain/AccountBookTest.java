@@ -258,6 +258,103 @@ public class AccountBookTest {
     }
 
     @Test
+    public void should_refund_entirely_from_an_account_to_sender() {
+        // Given
+        final var sender = AccountId.of(SponsorAccount.Id.random());
+        final var recipient = AccountId.of(SponsorAccount.Id.random());
+        final var amount = PositiveAmount.of(100L);
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sender, amount),
+                new TransferEvent(sender, recipient, amount)
+        );
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
+
+        // When
+        accountBook.refund(recipient);
+
+        // Then
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+    }
+
+    @Test
+    public void should_refund_entirely_from_an_account_to_multiple_senders() {
+        // Given
+        final var sender1 = AccountId.of(SponsorAccount.Id.random());
+        final var sender2 = AccountId.of(SponsorAccount.Id.random());
+        final var recipient = AccountId.of(SponsorAccount.Id.random());
+        final var amount1 = PositiveAmount.of(100L);
+        final var amount2 = PositiveAmount.of(70L);
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sender1, amount1),
+                new MintEvent(sender2, amount2),
+                new TransferEvent(sender1, recipient, amount1),
+                new TransferEvent(sender2, recipient, amount2)
+        );
+        assertThat(accountBook.state().balanceOf(sender1)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount1.add(amount2));
+
+        // When
+        accountBook.refund(recipient);
+
+        // Then
+        assertThat(accountBook.state().balanceOf(sender1)).isEqualTo(amount1);
+        assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(amount2);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+    }
+
+    @Test
+    public void should_refund_entirely_from_an_account_with_previous_partial_refund() {
+        // Given
+        final var sender = AccountId.of(SponsorAccount.Id.random());
+        final var recipient = AccountId.of(SponsorAccount.Id.random());
+        final var amount = PositiveAmount.of(100L);
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sender, amount),
+                new TransferEvent(sender, recipient, amount)
+        );
+        accountBook.refund(recipient, sender, PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.of(10L));
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
+
+        // When
+        accountBook.refund(recipient);
+
+        // Then
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+    }
+
+    @Test
+    public void should_not_refund_entirely_from_an_account_with_spent() {
+        // Given
+        final var sender = AccountId.of(SponsorAccount.Id.random());
+        final var recipient = AccountId.of(SponsorAccount.Id.random());
+        final var recipient2 = AccountId.of(SponsorAccount.Id.random());
+        final var amount = PositiveAmount.of(100L);
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sender, amount),
+                new TransferEvent(sender, recipient, amount),
+                new TransferEvent(recipient, recipient2, PositiveAmount.of(10L))
+        );
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(recipient2)).isEqualTo(PositiveAmount.of(10L));
+
+        // When
+        assertThatThrownBy(() -> accountBook.refund(recipient))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Cannot entirely refund %s because it has outgoing transactions".formatted(recipient));
+
+        // Then
+        assertThat(accountBook.state().balanceOf(sender)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
+        assertThat(accountBook.state().balanceOf(recipient2)).isEqualTo(PositiveAmount.of(10L));
+    }
+
+    @Test
     public void should_receive_money_from_multiple_accounts() {
         // Given
         final var account1 = AccountId.of(SponsorAccount.Id.random());

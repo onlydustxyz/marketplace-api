@@ -180,7 +180,7 @@ public class RewardV2ServiceTest {
 
             // Then
             verify(rewardStoragePort).delete(rewardId);
-            verify(accountingServicePort).cancelReward(projectId, rewardId, BigDecimal.TEN, "USDC");
+            verify(accountingServicePort).cancelReward(rewardId, "USDC");
         }
 
         @Test

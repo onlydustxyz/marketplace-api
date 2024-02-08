@@ -22,6 +22,8 @@ public interface AccountingFacadePort {
              final @NonNull Currency.Id currencyId,
              final @NonNull SponsorAccount.PaymentReference paymentReference);
 
+    void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
+
     boolean isPayable(RewardId rewardId, Currency.Id currencyId);
 
     SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);

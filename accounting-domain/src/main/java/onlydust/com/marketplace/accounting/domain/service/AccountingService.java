@@ -96,6 +96,16 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    public void cancel(@NonNull RewardId rewardId, @NonNull Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.refund(AccountId.of(rewardId));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        accountingObserver.onRewardCancelled(rewardId);
+    }
+
+    @Override
     public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);

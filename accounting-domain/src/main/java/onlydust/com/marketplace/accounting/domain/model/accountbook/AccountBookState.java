@@ -5,7 +5,6 @@ import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
@@ -16,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
@@ -40,7 +40,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         try {
             return sendFromVertices(ROOT, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot burn %s from %s".formatted(amount, account), e);
+            throw badRequest("Cannot burn %s from %s".formatted(amount, account), e);
         }
     }
 
@@ -51,7 +51,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         try {
             sendFromVertices(to, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot transfer %s from %s to %s".formatted(amount, from, to), e);
+            throw badRequest("Cannot transfer %s from %s to %s".formatted(amount, from, to), e);
         }
     }
 
@@ -62,8 +62,17 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         try {
             refundFromVertices(amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
+            throw badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
         }
+    }
+
+    @Override
+    public void refund(@NonNull final AccountId from) {
+        final var vertices = accountVertices(from);
+        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
+            throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
+        }
+        new ArrayList<>(vertices).forEach(this::removeTransaction);
     }
 
     public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
@@ -280,7 +289,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
     private void checkAccountsAreNotTheSame(@NonNull final AccountId from, @NonNull final AccountId to) {
         if (from.equals(to)) {
-            throw OnlyDustException.badRequest("An account (%s) cannot transfer money to itself".formatted(from));
+            throw badRequest("An account (%s) cannot transfer money to itself".formatted(from));
         }
     }
 

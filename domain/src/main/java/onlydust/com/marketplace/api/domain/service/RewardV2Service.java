@@ -75,7 +75,7 @@ public class RewardV2Service implements RewardFacadePort {
 
         // TODO: Use currencyId as input in REST API
         rewardStoragePort.delete(rewardId);
-        accountingServicePort.cancelReward(projectId, rewardId, reward.amount(), reward.currency().toString().toUpperCase());
+        accountingServicePort.cancelReward(rewardId, reward.currency().toString().toUpperCase());
     }
 
     @Override
