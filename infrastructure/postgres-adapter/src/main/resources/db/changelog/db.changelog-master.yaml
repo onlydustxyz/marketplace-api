@@ -91,3 +91,7 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000043_alter_enums.sql
   - include:
       file: db/changelog/changelogs/00000044_new_reward_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000045_refactor_reward_tables.sql
+#  - include:
+#      file: db/changelog/changelogs/00000046_reward_status.sql

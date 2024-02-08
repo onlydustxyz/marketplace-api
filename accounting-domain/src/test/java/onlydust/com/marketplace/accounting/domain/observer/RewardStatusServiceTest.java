@@ -103,7 +103,7 @@ public class RewardStatusServiceTest {
         }
 
         @Test
-        public void should_update_reward_statuses() {
+        public void should_update_reward_status_data() {
             // Given
             when(sponsorAccountStatement.awaitingPayments()).thenReturn(Map.of(
                     rewardId, PositiveAmount.of(100L),

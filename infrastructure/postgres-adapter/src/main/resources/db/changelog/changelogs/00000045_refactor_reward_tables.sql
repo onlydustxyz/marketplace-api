@@ -1,0 +1,4 @@
+ALTER TABLE accounting.reward_statuses
+    RENAME TO reward_status_data;
+
+ALTER TRIGGER accounting_reward_statuses_set_tech_updated_at ON accounting.reward_status_data RENAME TO accounting_reward_status_data_set_tech_updated_at;

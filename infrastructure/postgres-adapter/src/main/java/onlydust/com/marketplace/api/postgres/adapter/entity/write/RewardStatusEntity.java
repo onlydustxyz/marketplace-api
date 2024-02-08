@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Entity
 @Value
-@Table(name = "reward_statuses", schema = "accounting")
+@Table(name = "reward_status_data", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
