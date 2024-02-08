@@ -24,9 +24,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
     private final Map<AccountId, List<Vertex>> accountVertices = new HashMap<>();
 
-    private final Vertex root = new Vertex(0L, ROOT);
+    private final Vertex root = Vertex.of(ROOT);
 
-    private long vertexIdSequence = 1L;
 
     public AccountBookState() {
         graph.addVertex(root);
@@ -252,7 +251,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     private Transaction createTransaction(@NonNull final Vertex from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
-        final var toVertex = new Vertex(vertexIdSequence++, to);
+        final var toVertex = Vertex.of(to);
         graph.addVertex(toVertex);
         if (accountVertices.containsKey(to)) {
             accountVertices.get(to).add(toVertex);
