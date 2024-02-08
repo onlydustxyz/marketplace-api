@@ -1,20 +1,16 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
@@ -92,7 +88,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
-                .map(v -> incomingEdgeOf(v).getAmount()).reduce(PositiveAmount.ZERO, PositiveAmount::add);
+                .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
@@ -113,7 +109,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
     public @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
-                .map(v -> new Transaction(source(v).accountId(), to, balanceOf(v)))
+                .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
                 .collect(Collectors.groupingBy(Transaction::from,
                         Collectors.mapping(Transaction::amount,
                                 Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
@@ -125,26 +121,26 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         iterator.forEachRemaining(v -> {
             if (!v.equals(startVertex)) {
                 final var incomingEdge = incomingEdgeOf(v);
-                aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), v.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
+                aggregatedAmounts.merge(new FromTo(incomingEdge.source.accountId, v.accountId), incomingEdge.amount, PositiveAmount::add);
             }
         });
     }
 
     private void aggregateIncomingTransactions(@NonNull final Vertex vertex, @NonNull final Map<FromTo, PositiveAmount> aggregatedAmounts) {
         final var incomingEdge = incomingEdgeOf(vertex);
-        if (incomingEdge.getSource().equals(root)) {
+        if (incomingEdge.source.equals(root)) {
             return;
         }
-        aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), vertex.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
-        aggregateIncomingTransactions(incomingEdge.getSource(), aggregatedAmounts);
+        aggregatedAmounts.merge(new FromTo(incomingEdge.source.accountId, vertex.accountId), incomingEdge.amount, PositiveAmount::add);
+        aggregateIncomingTransactions(incomingEdge.source, aggregatedAmounts);
     }
 
     private boolean hasParent(@NonNull final Vertex vertex, @NonNull final AccountId parent) {
         if (vertex.equals(root)) {
             return false;
         }
-        final var directParent = incomingEdgeOf(vertex).getSource();
-        if (directParent.accountId().equals(parent)) {
+        final var directParent = incomingEdgeOf(vertex).source;
+        if (directParent.accountId.equals(parent)) {
             return true;
         }
         return hasParent(directParent, parent);
@@ -203,7 +199,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
     private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final AccountId accountId, @NonNull final AccountId from) {
         return accountVertices(accountId).stream()
-                .filter(v -> incomingEdgeOf(v).getSource().accountId().equals(from))
+                .filter(v -> incomingEdgeOf(v).source.accountId.equals(from))
                 .map(v -> new VertexWithBalance(v, balanceOf(v)))
                 .filter(v -> v.balance().isStrictlyGreaterThan(PositiveAmount.ZERO))
                 .toList();
@@ -212,7 +208,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     public Map<AccountId, PositiveAmount> unspentChildren(AccountId of) {
         return accountVertices(of).stream()
                 .flatMap(v -> unspentChildren(v).entrySet().stream())
-                .collect(Collectors.groupingBy(e -> e.getKey().accountId(),
+                .collect(Collectors.groupingBy(e -> e.getKey().accountId,
                         Collectors.mapping(Map.Entry::getValue,
                                 Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
                 ));
@@ -233,7 +229,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     private @NonNull PositiveAmount balanceOf(@NonNull final Vertex vertex) {
-        final PositiveAmount received = incomingEdgeOf(vertex).getAmount();
+        final PositiveAmount received = incomingEdgeOf(vertex).amount;
         final var spent = Edge.totalAmountOf(graph.outgoingEdgesOf(vertex));
         return PositiveAmount.of(received.subtract(spent));
     }
@@ -259,10 +255,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             accountVertices.put(to, new ArrayList<>(List.of(toVertex)));
         }
 
-        final var edge = new Edge(amount);
+        final var edge = new Edge(from, amount);
         graph.addEdge(from, toVertex, edge);
 
-        return new Transaction(source(from).accountId(), to, amount);
+        return new Transaction(source(from).accountId, to, amount);
     }
 
     private Vertex source(@NonNull final Vertex vertex) {
@@ -270,7 +266,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             return root;
         }
 
-        final var parent = incomingEdgeOf(vertex).getSource();
+        final var parent = incomingEdgeOf(vertex).source;
         if (parent.equals(root)) {
             return vertex;
         }
@@ -284,7 +280,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }
         graph.removeEdge(incomingEdgeOf(vertex));
         graph.removeVertex(vertex);
-        accountVertices.get(vertex.accountId()).remove(vertex);
+        accountVertices.get(vertex.accountId).remove(vertex);
     }
 
     private void checkAccountsAreNotTheSame(@NonNull final AccountId from, @NonNull final AccountId to) {
@@ -314,5 +310,30 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         public InsufficientFundsException(String message) {
             super(message);
         }
+    }
+
+    @AllArgsConstructor
+    private static class Edge {
+        private final Vertex source;
+        private PositiveAmount amount;
+
+        public void decreaseAmount(PositiveAmount amount) {
+            this.amount = PositiveAmount.of(this.amount.subtract(amount));
+        }
+
+        public static PositiveAmount totalAmountOf(Collection<Edge> edges) {
+            var acc = PositiveAmount.ZERO;
+            for (Edge edge : edges)
+                acc = acc.add(edge.amount);
+            return acc;
+        }
+    }
+
+    // We do not want a record here because we want to compare vertex
+    // pointer addresses in .equals and .hashcode
+    @SuppressWarnings("ClassCanBeRecord")
+    @AllArgsConstructor(staticName = "of")
+    private static class Vertex {
+        private final AccountId accountId;
     }
 }
