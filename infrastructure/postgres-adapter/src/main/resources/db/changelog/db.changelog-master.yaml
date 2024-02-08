@@ -83,4 +83,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000040_create_billing_profile_tables.sql
   - include:
       file: db/changelog/changelogs/00000041_add_skipped_status_to_event.sql
+  - include:
+      file: db/changelog/changelogs/00000042_fix_ecosystems_migration.sql
 
