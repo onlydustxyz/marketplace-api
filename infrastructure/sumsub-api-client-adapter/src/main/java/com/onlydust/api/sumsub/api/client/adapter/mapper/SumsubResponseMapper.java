@@ -130,16 +130,16 @@ public class SumsubResponseMapper {
             if (optionalQuestionnaireDTO.isPresent()) {
                 final SumsubCompanyApplicantsDataDTO.QuestionnaireDTO questionnaireDTO = optionalQuestionnaireDTO.get();
                 if (nonNull(questionnaireDTO.getSections()) && !questionnaireDTO.getSections().isEmpty()
-                    && questionnaireDTO.getSections().has("information") && questionnaireDTO.getSections().get("information").has("items")) {
-                    final JsonNode items = questionnaireDTO.getSections().get("information").get("items");
-                    if (items.has("whatIsYourVatRegistr")) {
+                    && questionnaireDTO.getSections().has("usAndEuropeanComplia") && questionnaireDTO.getSections().get("usAndEuropeanComplia").has("items")) {
+                    final JsonNode items = questionnaireDTO.getSections().get("usAndEuropeanComplia").get("items");
+                    if (items.has("whatIsYourEuVatRegis")) {
                         updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
-                                .euVATNumber(items.get("whatIsYourVatRegistr").get("value").asText())
+                                .euVATNumber(items.get("whatIsYourEuVatRegis").get("value").asText())
                                 .build();
                     }
-                    if (items.has("areYouAUsPerson")) {
+                    if (items.has("isYourEntityAUsPerso")) {
                         updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
-                                .usEntity(mapBoolean(items.get("areYouAUsPerson").get("value").asText()))
+                                .usEntity(mapBoolean(items.get("isYourEntityAUsPerso").get("value").asText()))
                                 .build();
                     }
                     if (items.has("isYourCompanySubject")) {

@@ -432,7 +432,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 "type": "individual",
                 "questionnaires": [
                     {
-                        "id": "kycCustom",
+                        "id": "odKycUsPersonDevelop",
                         "sections": {
                             "personalStatusVerifi": {
                                 "items": {
@@ -603,14 +603,14 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 "type": "company",
                 "questionnaires": [
                     {
-                        "id": "kybCustom",
+                        "id": "odKybFormDevelop",
                         "sections": {
-                            "information": {
+                            "usAndEuropeanComplia": {
                                 "items": {
-                                    "whatIsYourVatRegistr": {
+                                    "whatIsYourEuVatRegis": {
                                         "value": "FR26908233638"
                                     },
-                                    "areYouAUsPerson": {
+                                    "isYourEntityAUsPerso": {
                                         "value": "no"
                                     },
                                     "isYourCompanySubject": {

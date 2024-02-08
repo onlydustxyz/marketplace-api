@@ -26,8 +26,8 @@ application:
     billing-profile-verification-job: 60000 # 1 minute
   sumsub:
     webhook:
-      secret: ${SUMSUB_KYC_WEBHOOK_SECRET}
-      od-api-header: ${SUMSUB_KYC_WEBHOOK_HEADER}
+      secret: ${SUMSUB_WEBHOOK_SECRET}
+      od-api-header: ${SUMSUB_WEBHOOK_HEADER}
 
 spring:
   liquibase:
@@ -136,7 +136,7 @@ infrastructure:
     user-agent: ${POSTHOG_USER_AGENT}
   sumsub:
     base-uri: https://api.sumsub.com
-    app-token: ${SUMSUB_APP_TOKEN}
-    secret-key: ${SUMSUB_SECRET_KEY}
-    kyc-questionnaire-name: kycCustom
-    kyb-questionnaire-name: kybCustom
+    app-token: ${SUMSUB_API_APP_TOKEN}
+    secret-key: ${SUMSUB_API_SECRET_KEY}
+    kyc-questionnaire-name: ${SUMSUB_KYC_QUESTIONNAIRE}
+    kyb-questionnaire-name: ${SUMSUB_KYB_QUESTIONNAIRE}
