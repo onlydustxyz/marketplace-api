@@ -10,4 +10,6 @@ public interface AccountingObserver {
     void onRewardCreated(RewardStatus rewardStatus);
 
     void onRewardCancelled(RewardId rewardId);
+
+    void onRewardPaid(RewardId rewardId);
 }

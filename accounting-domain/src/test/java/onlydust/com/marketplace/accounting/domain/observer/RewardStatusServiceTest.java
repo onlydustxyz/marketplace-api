@@ -54,7 +54,7 @@ public class RewardStatusServiceTest {
                     .unlockDate(ZonedDateTime.now())
                     .paymentRequestedAt(null)
                     .paidAt(null)
-                    .networks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
+                    .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
             // When
             rewardStatusService.onRewardCreated(rewardStatus);
@@ -114,6 +114,7 @@ public class RewardStatusServiceTest {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
                 return Optional.of(new RewardStatus(rewardId));
             });
+            when(sponsorAccount.network()).thenReturn(Optional.of(Network.ETHEREUM));
 
             // When
             rewardStatusService.onSponsorAccountBalanceChanged(sponsorAccountStatement);
@@ -125,6 +126,7 @@ public class RewardStatusServiceTest {
             assertThat(rewardStatuses).hasSize(2);
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
+            assertThat(rewardStatuses).allMatch(r -> r.networks().contains(Network.ETHEREUM));
         }
     }
 }

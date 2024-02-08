@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,7 +19,8 @@ public class RewardStatus {
     ZonedDateTime unlockDate;
     ZonedDateTime paymentRequestedAt;
     ZonedDateTime paidAt;
-    @NonNull Set<Network> networks = Set.of();
+    @NonNull
+    final Set<Network> networks = new HashSet<>();
 
     public Optional<ZonedDateTime> unlockDate() {
         return Optional.ofNullable(unlockDate);
@@ -30,5 +32,14 @@ public class RewardStatus {
 
     public Optional<ZonedDateTime> paidAt() {
         return Optional.ofNullable(paidAt);
+    }
+
+    public RewardStatus withAdditionalNetworks(Set<Network> networks) {
+        this.networks.addAll(networks);
+        return this;
+    }
+
+    public RewardStatus withAdditionalNetworks(Network... networks) {
+        return withAdditionalNetworks(Set.of(networks));
     }
 }

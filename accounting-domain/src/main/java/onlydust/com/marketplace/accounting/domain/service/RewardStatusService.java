@@ -8,6 +8,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
+import java.time.ZonedDateTime;
+
 @AllArgsConstructor
 public class RewardStatusService implements AccountingObserver {
     private final RewardStatusStorage rewardStatusStorage;
@@ -18,6 +20,7 @@ public class RewardStatusService implements AccountingObserver {
             final var rewardStatus = rewardStatusStorage.get(rewardId)
                     .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
 
+            sponsorAccount.account().network().ifPresent(rewardStatus::withAdditionalNetworks);
             rewardStatusStorage.save(rewardStatus.sponsorHasEnoughFund(sponsorAccount.account().balance().isGreaterThanOrEqual(amount)));
         });
     }
@@ -30,5 +33,12 @@ public class RewardStatusService implements AccountingObserver {
     @Override
     public void onRewardCancelled(RewardId rewardId) {
         rewardStatusStorage.delete(rewardId);
+    }
+
+    @Override
+    public void onRewardPaid(RewardId rewardId) {
+        final var rewardStatus = rewardStatusStorage.get(rewardId)
+                .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+        rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
     }
 }

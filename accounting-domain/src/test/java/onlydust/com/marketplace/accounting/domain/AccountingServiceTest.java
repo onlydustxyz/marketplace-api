@@ -410,6 +410,7 @@ public class AccountingServiceTest {
             reset(accountingObserver);
             accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(300L)));
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
+            verify(accountingObserver).onRewardPaid(rewardId2);
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -868,6 +869,7 @@ public class AccountingServiceTest {
             reset(accountingObserver);
             accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
             verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
+            verify(accountingObserver).onRewardPaid(rewardId);
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
@@ -1087,6 +1089,7 @@ public class AccountingServiceTest {
             reset(accountingObserver);
             accountingService.pay(rewardId3, usdc.id(), fakePaymentReference(Network.ETHEREUM));
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());
+            verify(accountingObserver).onRewardPaid(rewardId3);
 
             // When
             final var payableRewards = accountingService.getPayableRewards();

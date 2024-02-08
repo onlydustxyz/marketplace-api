@@ -90,6 +90,7 @@ public class AccountingService implements AccountingFacadePort {
         });
 
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        accountingObserver.onRewardPaid(rewardId);
     }
 
     @Override
@@ -168,7 +169,7 @@ public class AccountingService implements AccountingFacadePort {
             accountingObserver.onRewardCreated(new RewardStatus(rewardId)
                     .sponsorHasEnoughFund(isFunded(accountBook, rewardId))
                     .unlockDate(unlockDateOf(accountBook, rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                    .networks(networksOf(accountBook, rewardId))
+                    .withAdditionalNetworks(networksOf(accountBook, rewardId))
             );
     }
 
