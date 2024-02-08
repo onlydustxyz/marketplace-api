@@ -11,7 +11,10 @@ import org.jgrapht.Graph;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
@@ -21,7 +24,9 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
     private final Map<AccountId, List<Vertex>> accountVertices = new HashMap<>();
 
-    private final Vertex root = new Vertex(UUID.randomUUID(), ROOT);
+    private final Vertex root = new Vertex(0L, ROOT);
+
+    private long vertexIdSequence = 1L;
 
     public AccountBookState() {
         graph.addVertex(root);
@@ -88,8 +93,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
-                .map(v -> incomingEdgeOf(v).getAmount())
-                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+                .map(v -> incomingEdgeOf(v).getAmount()).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
     public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
@@ -231,15 +235,12 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
 
     private @NonNull PositiveAmount balanceOf(@NonNull final Vertex vertex) {
         final PositiveAmount received = incomingEdgeOf(vertex).getAmount();
-        final PositiveAmount spent = graph.outgoingEdgesOf(vertex).stream()
-                .map(Edge::getAmount)
-                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+        final var spent = Edge.totalAmountOf(graph.outgoingEdgesOf(vertex));
         return PositiveAmount.of(received.subtract(spent));
     }
 
     private @NonNull Edge incomingEdgeOf(@NonNull final Vertex vertex) {
-        return graph.incomingEdgesOf(vertex).stream().findFirst()
-                .orElseThrow(() -> new IllegalStateException("Vertex %s has no incoming edge".formatted(vertex)));
+        return graph.incomingEdgesOf(vertex).iterator().next();
     }
 
     private @NonNull List<Vertex> accountVertices(@NonNull final AccountId accountId) {
@@ -251,7 +252,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     private Transaction createTransaction(@NonNull final Vertex from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
-        final var toVertex = new Vertex(UUID.randomUUID(), to);
+        final var toVertex = new Vertex(vertexIdSequence++, to);
         graph.addVertex(toVertex);
         if (accountVertices.containsKey(to)) {
             accountVertices.get(to).add(toVertex);
@@ -259,7 +260,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             accountVertices.put(to, new ArrayList<>(List.of(toVertex)));
         }
 
-        final var edge = new Edge(amount, graph.outgoingEdgesOf(from).size());
+        final var edge = new Edge(amount);
         graph.addEdge(from, toVertex, edge);
 
         return new Transaction(source(from).accountId(), to, amount);

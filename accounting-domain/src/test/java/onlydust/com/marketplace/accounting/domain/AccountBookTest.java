@@ -665,10 +665,10 @@ public class AccountBookTest {
     @Test
     public void benchmark() {
         // Given
-        final var iterations = 100;
+        final var iterations = 3;
         final var sponsorAccountCount = 2L;
         final var projectCount = 40L;
-        final var rewardCount = projectCount * 200L;
+        final var rewardCount = projectCount * 2000L;
 
         final List<AccountBookEvent> events = new ArrayList<>();
 
