@@ -92,4 +92,6 @@ public interface ProjectStoragePort {
     void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 
     void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+
+    void updateProjectsTags();
 }

@@ -47,9 +47,15 @@ public class JobScheduler {
     }
 
     @Scheduled(fixedDelayString = "${application.cron.update-projects-ranking}")
-    public void updateProjectRanking() {
+    public void updateProjectsRanking() {
         LOGGER.info("Updating projects ranking");
         projectFacadePort.updateProjectsRanking();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.update-projects-tags}")
+    public void updateProjectsTags() {
+        LOGGER.info("Updating projects tags");
+        projectFacadePort.updateProjectsTags();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.refresh-currency-quotes}")
@@ -75,6 +81,7 @@ public class JobScheduler {
         Long notificationJobDelay;
         Long indexerSyncJobDelay;
         Long updateProjectsRanking;
+        Long updateProjectsTags;
         Long refreshCurrencyQuotes;
         Long refreshActiveUserProfiles;
         Long activeUserProfilesRefreshPeriodInDays;

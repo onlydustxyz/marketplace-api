@@ -429,4 +429,9 @@ public class ProjectService implements ProjectFacadePort {
             throw OnlyDustException.forbidden("Only project leads can show contributors on their projects");
         }
     }
+
+    @Override
+    public void updateProjectsTags() {
+        projectStoragePort.updateProjectsTags();
+    }
 }

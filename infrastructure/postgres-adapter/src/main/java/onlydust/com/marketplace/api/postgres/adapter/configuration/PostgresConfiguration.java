@@ -63,7 +63,8 @@ public class PostgresConfiguration {
                                                          final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                          final ApplicationRepository applicationRepository,
                                                          final ContributionViewEntityRepository contributionViewEntityRepository,
-                                                         final HiddenContributorRepository hiddenContributorRepository) {
+                                                         final HiddenContributorRepository hiddenContributorRepository,
+                                                         final CustomProjectTagRepository customProjectTagRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -86,7 +87,8 @@ public class PostgresConfiguration {
                 contributorActivityViewEntityRepository,
                 applicationRepository,
                 contributionViewEntityRepository,
-                hiddenContributorRepository
+                hiddenContributorRepository,
+                customProjectTagRepository
         );
     }
 
@@ -283,5 +285,10 @@ public class PostgresConfiguration {
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository);
+    }
+
+    @Bean
+    public CustomProjectTagRepository customProjectTagRepository(final EntityManager entityManager){
+        return new CustomProjectTagRepository(entityManager);
     }
 }
