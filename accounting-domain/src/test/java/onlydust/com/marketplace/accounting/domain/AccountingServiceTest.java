@@ -407,7 +407,9 @@ public class AccountingServiceTest {
             accountingService.transfer(projectId2, rewardId2, PositiveAmount.of(25L), currency.id());
 
             assertThat(accountingService.isPayable(rewardId1, currency.id())).isTrue();
+            reset(accountingObserver);
             accountingService.pay(rewardId2, currency.id(), fakeTransaction(network, PositiveAmount.of(300L)));
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
 
             // Then
             assertThat(accountBookEventStorage.events.get(currency)).contains(
@@ -831,11 +833,43 @@ public class AccountingServiceTest {
             // When
             assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
 
-            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(1000L)));
-            accountingService.pay(rewardId, currency.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(1000L)));
+            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
+            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.OPTIMISM));
 
             // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+        }
+
+        /*
+         * Given 2 sponsors that funded their account on Ethereum
+         * When A contributor is rewarded by the project
+         * Then The contributor can withdraw his money from both sponsor accounts
+         */
+        @Test
+        void should_withdraw_on_both_sponsor_accounts() {
+            // Given
+            accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(200L)));
+            accountingService.fund(unlockedSponsorSponsorAccount2.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
+
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
+            accountingService.transfer(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.transfer(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.transfer(projectId, rewardId, PositiveAmount.of(300L), currency.id());
+            assertOnRewardCreated(rewardId, true, null, Set.of(Network.ETHEREUM));
+
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(200L));
+            assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.of(100L));
+
+            // When
+            assertThat(accountingService.isPayable(rewardId, currency.id())).isTrue();
+
+            reset(accountingObserver);
+            accountingService.pay(rewardId, currency.id(), fakePaymentReference(Network.ETHEREUM));
+            verify(accountingObserver, times(2)).onSponsorAccountBalanceChanged(any());
+
+            // Then
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
@@ -1039,14 +1073,20 @@ public class AccountingServiceTest {
         void should_return_partially_paid_payable_rewards() {
             // Given
             accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(50L)));
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
+
+            reset(accountingObserver);
             accountingService.fund(unlockedSponsorAccountUsdc2.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(25L)));
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
 
             assertThat(accountingService.getPayableRewards()).containsExactlyInAnyOrder(
                     new PayableReward(rewardId3, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(50L)),
                     new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L))
             );
 
+            reset(accountingObserver);
             accountingService.pay(rewardId3, usdc.id(), fakePaymentReference(Network.ETHEREUM));
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
 
             // When
             final var payableRewards = accountingService.getPayableRewards();

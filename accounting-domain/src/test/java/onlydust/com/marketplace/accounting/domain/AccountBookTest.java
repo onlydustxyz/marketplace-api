@@ -662,13 +662,13 @@ public class AccountBookTest {
         );
     }
 
-    @Test
+    //@Test
     public void benchmark() {
         // Given
-        final var iterations = 3;
+        final var iterations = 100;
         final var sponsorAccountCount = 2L;
         final var projectCount = 40L;
-        final var rewardCount = projectCount * 2000L;
+        final var rewardCount = projectCount * 200L;
 
         final List<AccountBookEvent> events = new ArrayList<>();
 

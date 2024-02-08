@@ -65,12 +65,10 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
-        sponsorAccount.add(transaction);
-        sponsorAccountStorage.save(sponsorAccount);
-        final var statement = new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
-        accountingObserver.onSponsorAccountBalanceChanged(statement);
-        return statement;
+        final var accountBook = getAccountBook(sponsorAccount.currency());
+        return registerSponsorAccountTransaction(accountBook, sponsorAccount, transaction);
     }
+
 
     @Override
     public void pay(final @NonNull RewardId rewardId,
@@ -87,8 +85,7 @@ public class AccountingService implements AccountingFacadePort {
 
             if (paymentReference.network().equals(sponsorAccountNetwork)) {
                 accountBook.burn(AccountId.of(rewardId), amount);
-                sponsorAccount.add(new SponsorAccount.Transaction(paymentReference, amount.negate()));
-                sponsorAccountStorage.save(sponsorAccount);
+                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(paymentReference, amount.negate()));
             }
         });
 
@@ -115,6 +112,16 @@ public class AccountingService implements AccountingFacadePort {
                     final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
                 });
+    }
+
+    private SponsorAccountStatement registerSponsorAccountTransaction(AccountBookAggregate accountBook,
+                                                                      SponsorAccount sponsorAccount,
+                                                                      SponsorAccount.Transaction transaction) {
+        sponsorAccount.add(transaction);
+        sponsorAccountStorage.save(sponsorAccount);
+        final var statement = new SponsorAccountStatement(sponsorAccount, accountBook.state());
+        accountingObserver.onSponsorAccountBalanceChanged(statement);
+        return statement;
     }
 
     private boolean isFunded(AccountBookAggregate accountBook, RewardId rewardId) {
