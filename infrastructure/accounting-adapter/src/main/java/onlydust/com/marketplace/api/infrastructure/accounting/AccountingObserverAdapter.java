@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 
@@ -18,7 +18,7 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort {
     }
 
     @Override
-    public void onBillingProfilePayoutSettingsUpdated(UUID billingProfileId, UserPayoutInformation.PayoutSettings payoutSettings) {
+    public void onBillingProfilePayoutSettingsUpdated(UUID billingProfileId, UserPayoutSettings payoutSettings) {
 
     }
 

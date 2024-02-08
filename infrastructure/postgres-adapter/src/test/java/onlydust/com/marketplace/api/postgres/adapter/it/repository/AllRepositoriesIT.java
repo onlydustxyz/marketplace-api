@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.Reward;
-import onlydust.com.marketplace.api.domain.model.UserPayoutInformation;
+import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
