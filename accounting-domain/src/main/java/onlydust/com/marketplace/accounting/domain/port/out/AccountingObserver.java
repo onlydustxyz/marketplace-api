@@ -7,6 +7,8 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 public interface AccountingObserver {
     void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount);
 
+    void onSponsorAccountUpdated(SponsorAccountStatement sponsorAccount);
+
     void onRewardCreated(RewardStatus rewardStatus);
 
     void onRewardCancelled(RewardId rewardId);

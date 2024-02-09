@@ -32,4 +32,8 @@ public class SponsorAccountStatement {
                 .map(e -> Map.entry(e.getKey().rewardId(), e.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
+
+    public AccountBookState accountBookState() {
+        return accountBookState;
+    }
 }

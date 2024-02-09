@@ -24,12 +24,21 @@ public class AccountingConfiguration {
     }
 
     @Bean
+    public AccountingFacadePort unobservedAccountingService(final @NonNull AccountBookEventStorage accountBookEventStorage,
+                                                            final @NonNull SponsorAccountStorage sponsorAccountStorage,
+                                                            final @NonNull CurrencyStorage currencyStorage
+    ) {
+        return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, null);
+    }
+
+    @Bean
     public AccountingObserverAdapter accountingObserverAdapter() {
         return new AccountingObserverAdapter();
     }
 
     @Bean
-    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage) {
-        return new RewardStatusService(rewardStatusStorage);
+    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage,
+                                                   final @NonNull AccountingFacadePort unobservedAccountingService) {
+        return new RewardStatusService(rewardStatusStorage, unobservedAccountingService);
     }
 }

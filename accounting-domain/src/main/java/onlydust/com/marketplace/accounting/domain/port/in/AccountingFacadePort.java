@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -41,6 +42,8 @@ public interface AccountingFacadePort {
     List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
+
+    RewardStatus uptodateRewardStatus(AccountBookState accountBook, RewardStatus rewardStatus);
 
     List<PayableReward> getPayableRewards();
 }

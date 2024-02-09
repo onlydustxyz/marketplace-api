@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -125,24 +126,24 @@ public class AccountingService implements AccountingFacadePort {
         return statement;
     }
 
-    private boolean isFunded(AccountBookAggregate accountBook, RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
+    private boolean isFunded(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
                 .allMatch(entry -> {
                     final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
                     return sponsorAccount.balance().isGreaterThanOrEqual(entry.getValue());
                 });
     }
 
-    private Set<Network> networksOf(AccountBookAggregate accountBook, RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
+    private Set<Network> networksOf(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().network())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private Optional<Instant> unlockDateOf(AccountBookAggregate accountBook, RewardId rewardId) {
-        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
+    private Optional<Instant> unlockDateOf(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
                 .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().lockedUntil())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -166,11 +167,15 @@ public class AccountingService implements AccountingFacadePort {
         accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
         if (to instanceof RewardId rewardId)
-            accountingObserver.onRewardCreated(new RewardStatus(rewardId)
-                    .sponsorHasEnoughFund(isFunded(accountBook, rewardId))
-                    .unlockDate(unlockDateOf(accountBook, rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                    .withAdditionalNetworks(networksOf(accountBook, rewardId))
-            );
+            accountingObserver.onRewardCreated(uptodateRewardStatus(accountBook.state(), new RewardStatus(rewardId)));
+    }
+
+    @Override
+    public RewardStatus uptodateRewardStatus(AccountBookState accountBookState, RewardStatus rewardStatus) {
+        return rewardStatus
+                .sponsorHasEnoughFund(isFunded(accountBookState, rewardStatus.rewardId()))
+                .unlockDate(unlockDateOf(accountBookState, rewardStatus.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .withAdditionalNetworks(networksOf(accountBookState, rewardStatus.rewardId()));
     }
 
     @Override
