@@ -368,9 +368,11 @@ public class AccountingServiceTest {
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
             // When
+            reset(accountingObserver);
             accountingService.deleteTransaction(sponsorAccount.id(), transaction.reference());
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
         }
 
         /*
@@ -693,6 +695,7 @@ public class AccountingServiceTest {
 
             // When
             final var newSponsorAccount = accountingService.updateSponsorAccount(sponsorAccount.id(), unlockDate);
+            verify(accountingObserver).onSponsorAccountUpdated(newSponsorAccount);
 
             // Then
             assertThat(newSponsorAccount.account().lockedUntil()).contains(unlockDate.toInstant());

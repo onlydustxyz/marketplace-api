@@ -155,7 +155,9 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
         sponsorAccount.lockUntil(lockedUntil);
         sponsorAccountStorage.save(sponsorAccount);
-        return sponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()));
+        final var sponsorAccountStatement = sponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()));
+        accountingObserver.onSponsorAccountUpdated(sponsorAccountStatement);
+        return sponsorAccountStatement;
     }
 
     @Override
@@ -186,7 +188,9 @@ public class AccountingService implements AccountingFacadePort {
 
     public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
         sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
-        return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
+        final var sponsorAccountStatement = getSponsorAccountStatement(sponsorAccountId).orElseThrow();
+        accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+        return sponsorAccountStatement;
     }
 
     private Currency getCurrency(Currency.Id id) {
