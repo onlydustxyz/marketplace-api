@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.model.VerificationStatus;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
+import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
 import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
@@ -29,6 +30,7 @@ public class UserVerificationServiceTest {
     private BillingProfileStoragePort billingProfileStoragePort;
     private OutboxPort outboxPort;
     private Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
+    private AccountingUserObserverPort accountingUserObserverPort;
     private UserVerificationStoragePort userVerificationStoragePort;
     private final Faker faker = new Faker();
 
@@ -37,8 +39,9 @@ public class UserVerificationServiceTest {
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         outboxPort = mock(OutboxPort.class);
         billingProfileExternalMapper = mock(Function.class);
+        accountingUserObserverPort = mock(AccountingUserObserverPort.class);
         userVerificationStoragePort = mock(UserVerificationStoragePort.class);
-        userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort, userVerificationStoragePort);
+        userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
     }
 
     @Test
@@ -84,6 +87,7 @@ public class UserVerificationServiceTest {
         verify(billingProfileStoragePort, times(1)).saveCompanyProfile(companyBillingProfileArgumentCaptor.capture());
         assertEquals(companyBillingProfileWithNewStatus, companyBillingProfileArgumentCaptor.getAllValues().get(0));
         assertEquals(updatedCompanyBillingProfile, companyBillingProfileArgumentCaptor.getAllValues().get(1));
+        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
     }
 
 
@@ -109,6 +113,7 @@ public class UserVerificationServiceTest {
         }
 
         // Then
+        verify(accountingUserObserverPort, never()).onBillingProfileUpdated(any());
         Assertions.assertTrue(exception instanceof OutboxSkippingException);
     }
 
@@ -151,6 +156,7 @@ public class UserVerificationServiceTest {
         verify(billingProfileStoragePort, times(1)).saveIndividualProfile(individualBillingProfileArgumentCaptor.capture());
         assertEquals(individualBillingProfileWithStatus, individualBillingProfileArgumentCaptor.getAllValues().get(0));
         assertEquals(updatedIndividualBillingProfile, individualBillingProfileArgumentCaptor.getAllValues().get(1));
+        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
     }
 
     @Test
@@ -176,7 +182,6 @@ public class UserVerificationServiceTest {
 
         // Then
         Assertions.assertTrue(exception instanceof OutboxSkippingException);
+        verify(accountingUserObserverPort, never()).onBillingProfileUpdated(any());
     }
-
-
 }

@@ -15,18 +15,20 @@ servers:
 
 paths:
   # BackofficeAccountingManagement ===============================================================
-  /bo/v1/sponsors/{sponsorId}/accounting/transactions:
+
+  /bo/v1/sponsors/{sponsorId}/accounts:
     post:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Register a credit or debit transaction on the given sponsor's account
-      operationId: registerTransactionForSponsor
+      summary: Create a new account for the given sponsor
+      operationId: createSponsorAccount
       description: |
-        Register a real-world credit or debit transaction on the given sponsor's account.
-        This increases/decreases the available budget to actually pay contributors.
-        For credits, the funds will only be available after the optional lockedUntil date.
+        Create a new account for the given sponsor.
+        An account allows to:
+          - register physical transactions (from the real world) by providing transaction receipts.
+          - make funds available for internal transactions between the sponsor and projects (and eventually contributors) by providing an allowance.
       parameters:
         - in: path
           name: sponsorId
@@ -34,117 +36,187 @@ paths:
           schema:
             $ref: '#/components/schemas/SponsorId'
       requestBody:
-        description: Transaction to register
+        description: Account
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionRequest'
+              $ref: '#/components/schemas/CreateAccountRequest'
       responses:
         "200":
-          description: 'The transaction has been registered'
+          description: 'The account has been created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionResponse'
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/accounting/transactions/{transactionId}:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get sponsor accounts
+      operationId: getSponsorAccounts
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      responses:
+        "200":
+          description: 'The sponsor accounts'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsor-accounts/{accountId}/allowance:
+    put:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update the allowance of the given account.
+      operationId: updateAccountAllowance
+      description: |
+        Update the allowance of the given account, making funds available for internal transactions 
+        between the sponsor and projects (and eventually contributors).
+        
+        Allowance cannot be negative.
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorAccountId'
+      requestBody:
+        description: New allowance
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountAllowanceRequest'
+      responses:
+        "200":
+          description: 'The account allowance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsor-accounts/{accountId}/receipts:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Update the balance of the given account by providing a transaction receipt.
+      operationId: registerTransactionReceipt
+      description: |
+        Update the (physical) balance of the given account by providing a transaction receipt (from the real world).
+        This will return an error if the new balance is negative.
+        This will return an error if the receipt's network is different from the account's network.
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorAccountId'
+      requestBody:
+        description: Transaction receipt to register
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterTransactionReceiptRequest'
+      responses:
+        "200":
+          description: 'The transaction receipt has been registered and account balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/sponsor-accounts/{accountId}/receipts/{reference}:
     delete:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Delete a credit or debit transaction on the given sponsor's account
-      operationId: deleteTransactionForSponsor
+      summary: Update the balance of the given account by removing a transaction receipt.
+      operationId: removeTransactionReceipt
       description: |
-        Delete a real-world credit or debit transaction on the given sponsor's account.
-        This allows to cancel a transaction that has been registered by mistake.
+        Update the (physical) balance of the given account by removing a transaction receipt (from the real world).
       parameters:
         - in: path
-          name: sponsorId
+          name: accountId
           required: true
           schema:
-            $ref: '#/components/schemas/SponsorId'
+            $ref: '#/components/schemas/SponsorAccountId'
         - in: path
-          name: transactionId
+          name: reference
           required: true
           schema:
-            $ref: '#/components/schemas/TransactionId'
+            type: string
       responses:
-        "204":
-          description: 'The transaction has been deleted'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
+        "200":
+          description: 'The transaction receipt has been removed and the account balance has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/budgets/allocate:
-    post:
+  /bo/v1/sponsor-accounts/{accountId}:
+    patch:
       security:
         - apiKey: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Increase the sponsor's funds
-      operationId: allocateBudgetToSponsor
+      summary: Update some attributes of the account
+      operationId: updateAccountAttributes
       description: |
-        Increase the sponsor's funds. 
-        This enable internal transactions between sponsors, projects and contributors.
-        The funds will only be available to pay contributors once the incoming transaction has been registered, 
-        i.e. money actually received on OnlyDust account.
+        Update some attributes of the account.
       parameters:
         - in: path
-          name: sponsorId
+          name: accountId
           required: true
           schema:
-            $ref: '#/components/schemas/SponsorId'
+            $ref: '#/components/schemas/SponsorAccountId'
       requestBody:
-        description: Transaction to register
+        description: Account attributes to update
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
+              $ref: '#/components/schemas/UpdateAccountRequest'
       responses:
-        "204":
-          description: 'The funds have been allocated'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-
-  /bo/v1/sponsors/{sponsorId}/budgets/unallocate:
-    post:
-      security:
-        - apiKey: [ ]
-      tags:
-        - BackofficeAccountingManagement
-      summary: Decrease the sponsor's funds
-      operationId: unallocateBudgetFromSponsor
-      description: |
-        Decrease the sponsor's funds.
-      parameters:
-        - in: path
-          name: sponsorId
-          required: true
-          schema:
-            $ref: '#/components/schemas/SponsorId'
-      requestBody:
-        description: Transaction to register
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SponsorBudgetAllocationRequest'
-      responses:
-        "204":
-          description: 'The funds have been unallocated'
+        "200":
+          description: 'The account has been updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -209,6 +281,63 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/pending-payments:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Get pending payments
+      operationId: getPendingPayments
+      description: |
+        Get list of payments to process. 
+        The returned list should contain all necessary information to process the payments.
+        Also, all payments present in the list are payable (all required conditions are matched).
+      responses:
+        "200":
+          description: 'List of payments to process'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PendingPaymentListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/rewards/{rewardId}/pay:
+    post:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Pay a reward
+      operationId: payReward
+      description: |
+        Pay a reward using the transaction reference and recipient account as input.
+        The provided reward will be marked as complete.
+      parameters:
+        - in: path
+          name: rewardId
+          required: true
+          schema:
+            $ref: '#/components/schemas/RewardId'
+      requestBody:
+        description: Payment information
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayRewardRequest'
+      responses:
+        "204":
+          description: 'The reward has been marked as complete'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
@@ -311,7 +440,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorPageItemResponse'
+                $ref: '#/components/schemas/SponsorResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -962,6 +1091,20 @@ components:
             type: string
             format: uuid
 
+    SponsorResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorPageItemResponse'
+        - type: object
+          properties:
+            refundableBalances:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionData'
+            availableBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/AllocationData'
+
     EcosystemPage:
       type: object
       required:
@@ -1038,6 +1181,88 @@ components:
           type: string
           format: uri
 
+    CreateAccountRequest:
+      type: object
+      required:
+        - currencyId
+        - allowance
+      properties:
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        allowance:
+          type: number
+        lockedUntil:
+          type: string
+          format: date-time
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
+    UpdateAccountAllowanceRequest:
+      type: object
+      required:
+        - allowance
+      properties:
+        allowance:
+          type: number
+
+    RegisterTransactionReceiptRequest:
+      type: object
+      required:
+        - receipt
+      properties:
+        receipt:
+          $ref: '#/components/schemas/TransactionReceipt'
+
+    UpdateAccountRequest:
+      type: object
+      properties:
+        lockedUntil:
+          type: string
+          format: date-time
+
+    AccountResponse:
+      type: object
+      required:
+        - id
+        - sponsorId
+        - currencyId
+        - balance
+        - allowance
+        - receipts
+      properties:
+        id:
+          $ref: '#/components/schemas/SponsorAccountId'
+        sponsorId:
+          $ref: '#/components/schemas/SponsorId'
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        balance:
+          type: number
+          description: This is equal to the sum of receipts amounts (including credits and debits)
+        allowance:
+          type: number
+          description: This is the amount of funds available for internal transactions between the sponsor and projects (and eventually contributors)
+        awaitingPaymentAmount:
+          type: number
+          description: This is the sum of reward amounts which have not been paid yet (in the real world)
+        lockedUntil:
+          type: string
+          format: date-time
+        receipts:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionReceipt'
+
+    AccountListResponse:
+      type: object
+      required:
+        - accounts
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountResponse'
+
     TransactionRequest:
       type: object
       required:
@@ -1066,6 +1291,33 @@ components:
         id:
           $ref: '#/components/schemas/TransactionId'
 
+    PendingPaymentListResponse:
+      type: object
+      required:
+        - payments
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingPaymentResponse'
+
+    PendingPaymentResponse:
+      type: object
+      required:
+        - rewardId
+        - recipientAccountNumber
+        - amount
+        - currency
+      properties:
+        rewardId:
+          $ref: '#/components/schemas/RewardId'
+        recipientAccountNumber:
+          type: string
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/TransactionalCurrency'
+
     TransactionType:
       type: string
       enum:
@@ -1078,11 +1330,19 @@ components:
 
     TransactionReceipt:
       type: object
+      required:
+        - reference
+        - amount
+        - network
+        - thirdPartyName
+        - thirdPartyAccountNumber
       properties:
-        network:
-          $ref: '#/components/schemas/TransactionNetwork'
         reference:
           type: string
+        amount:
+          type: number
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
         thirdPartyName:
           type: string
           description: Name of the third party for which the transaction has been made
@@ -1104,30 +1364,30 @@ components:
       type: string
       format: uuid
 
-    SponsorBudgetAllocationRequest:
-      type: object
-      required:
-        - amount
-        - currencyId
-      properties:
-        amount:
-          type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
-
     ProjectBudgetAllocationRequest:
       type: object
       required:
-        - sponsorId
+        - sponsorAccountId
         - amount
-        - currencyId
       properties:
-        sponsorId:
-          $ref: '#/components/schemas/SponsorId'
+        sponsorAccountId:
+          $ref: '#/components/schemas/SponsorAccountId'
         amount:
           type: number
-        currencyId:
-          $ref: '#/components/schemas/CurrencyId'
+
+    PayRewardRequest:
+      type: object
+      required:
+        - network
+        - reference
+        - recipientAccount
+      properties:
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        reference:
+          type: string
+        recipientAccount:
+          type: string
 
     Technologies:
       type: object
@@ -1184,7 +1444,7 @@ components:
           type: string
           format: uuid
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyCode'
         initialAmount:
           type: number
         remainingAmount:
@@ -1383,7 +1643,7 @@ components:
         amount:
           type: number
         currency:
-          $ref: '#/components/schemas/Currency'
+          $ref: '#/components/schemas/CurrencyCode'
         recipientId:
           type: integer
           format: int64
@@ -1487,7 +1747,8 @@ components:
           type: number
         strkAmountSent:
           type: number
-    Currency:
+
+    CurrencyCode:
       type: string
       enum:
         - USD
@@ -1544,36 +1805,25 @@ components:
             $ref: '#/components/schemas/CurrencyResponse'
 
     CurrencyResponse:
-      type: object
-      required:
-        - id
-        - type
-        - name
-        - code
-        - logoUrl
-        - decimals
-      properties:
-        id:
-          $ref: '#/components/schemas/CurrencyId'
-        type:
-          $ref: '#/components/schemas/CurrencyType'
-        standard:
-          $ref: '#/components/schemas/CurrencyStandard'
-        tokens:
-          type: array
-          items:
-            $ref: '#/components/schemas/Token'
-        name:
-          type: string
-        code:
-          type: string
-        logoUrl:
-          type: string
-          format: uri
-        decimals:
-          type: integer
-        description:
-          type: string
+      allOf:
+        - $ref: '#/components/schemas/Currency'
+        - type: object
+          required:
+            - type
+            - decimals
+          properties:
+            type:
+              $ref: '#/components/schemas/CurrencyType'
+            standard:
+              $ref: '#/components/schemas/CurrencyStandard'
+            tokens:
+              type: array
+              items:
+                $ref: '#/components/schemas/Token'
+            decimals:
+              type: integer
+            description:
+              type: string
 
     Token:
       type: object
@@ -1599,7 +1849,70 @@ components:
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
 
+    TransactionData:
+      type: object
+      description: Contains the necessary information to perform a transaction.
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/TransactionalCurrency'
+
+    AllocationData:
+      type: object
+      description: Available budget that can be allocated
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    Currency:
+      type: object
+      description: Minimal information about a currency
+      properties:
+        id:
+          $ref: '#/components/schemas/CurrencyId'
+        code:
+          type: string
+        name:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+
+    TransactionalCurrency:
+      allOf:
+        - $ref: '#/components/schemas/Currency'
+        - type: object
+          description: Information about a currency that can be used to perform transactions
+          required:
+            - type
+          properties:
+            type:
+              $ref: '#/components/schemas/CurrencyType'
+            standard:
+              $ref: '#/components/schemas/CurrencyStandard'
+            blockchain:
+              $ref: '#/components/schemas/BlockchainContract'
+            address:
+              $ref: '#/components/schemas/ContractAddress'
+
     SponsorId:
+      type: string
+      format: uuid
+
+    RewardId:
+      type: string
+      format: uuid
+
+    SponsorAccountId:
       type: string
       format: uuid
 

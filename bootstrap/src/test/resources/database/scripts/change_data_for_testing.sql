@@ -9,20 +9,8 @@ create table if not exists auth.user_providers
     id uuid primary key
 );
 
-update payment_requests
-set currency = 'eth'
-where id = '1c06c18c-1b76-4859-a093-f262b4f8e800'
-   or id = '966cd55c-7de8-45c4-8bba-b388c38ca15d';
+insert into currencies (id, name, code, decimals, type, standard)
+values ('81b7e948-954f-4718-bad3-b70a0edd27e1', 'StarkNet Token', 'STRK', 18, 'CRYPTO', 'ERC20');
 
-update payment_requests
-set currency = 'strk'
-where id = 'f0c1b882-76f2-47d0-9331-151ce1f99281'
-   or id = 'b31a4ef1-b5f7-4560-bf5d-b47983069509';
-
-update payment_requests
-set currency = 'usd'
-where id = '0341317f-b831-412a-9cec-a5a16a9d749c';
-
-
-
-
+insert into erc20(blockchain, address, name, symbol, decimals, total_supply, currency_id)
+values ('ethereum', '0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766', 'StarkNet Token', 'STRK', 18, 10000000000, '81b7e948-954f-4718-bad3-b70a0edd27e1');

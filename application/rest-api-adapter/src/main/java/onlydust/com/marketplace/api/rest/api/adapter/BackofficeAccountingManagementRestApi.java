@@ -4,89 +4,133 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
-import onlydust.com.backoffice.api.contract.model.ProjectBudgetAllocationRequest;
-import onlydust.com.backoffice.api.contract.model.SponsorBudgetAllocationRequest;
-import onlydust.com.backoffice.api.contract.model.TransactionRequest;
-import onlydust.com.backoffice.api.contract.model.TransactionResponse;
+import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapTransactionNetwork;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
 @AllArgsConstructor
 public class BackofficeAccountingManagementRestApi implements BackofficeAccountingManagementApi {
     private final AccountingFacadePort accountingFacadePort;
+    private final RewardFacadePort rewardFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
+    private final UserFacadePort userFacadePort;
 
     @Override
-    public ResponseEntity<Void> allocateBudgetToProject(UUID projectUuid, ProjectBudgetAllocationRequest request) {
-        final var sponsorId = SponsorId.of(request.getSponsorId());
-        final var amount = PositiveAmount.of(request.getAmount());
-        final var currencyId = Currency.Id.of(request.getCurrencyId());
-        final var projectId = ProjectId.of(projectUuid);
-
-        accountingFacadePort.transfer(sponsorId, projectId, amount, currencyId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> unallocateBudgetFromProject(UUID projectUuid, ProjectBudgetAllocationRequest request) {
-        final var sponsorId = SponsorId.of(request.getSponsorId());
-        final var amount = PositiveAmount.of(request.getAmount());
-        final var currencyId = Currency.Id.of(request.getCurrencyId());
-        final var projectId = ProjectId.of(projectUuid);
-
-        accountingFacadePort.refund(projectId, sponsorId, amount, currencyId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> allocateBudgetToSponsor(UUID sponsorUuid, SponsorBudgetAllocationRequest request) {
+    public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
         final var sponsorId = SponsorId.of(sponsorUuid);
-        final var amount = PositiveAmount.of(request.getAmount());
-        final var currencyId = Currency.Id.of(request.getCurrencyId());
+        final var currencyId = Currency.Id.of(createAccountRequest.getCurrencyId());
+        final var allowance = PositiveAmount.of(createAccountRequest.getAllowance());
+        final var lockedUntil = createAccountRequest.getLockedUntil();
+        final var transaction = createAccountRequest.getReceipt() == null ? null : mapReceiptToTransaction(createAccountRequest.getReceipt());
 
-        accountingFacadePort.mint(sponsorId, amount, currencyId);
+        final var sponsorAccountStatement = transaction == null ?
+                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil) :
+                accountingFacadePort.createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil, transaction);
+
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+    }
+
+    @Override
+    public ResponseEntity<AccountListResponse> getSponsorAccounts(UUID sponsorId) {
+        final var sponsorAccounts = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
+        return ResponseEntity.ok(new AccountListResponse().accounts(sponsorAccounts.stream().map(BackOfficeMapper::mapAccountToResponse).toList()));
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> registerTransactionReceipt(UUID accountId, RegisterTransactionReceiptRequest registerTransactionReceiptRequest) {
+        final var receipt = registerTransactionReceiptRequest.getReceipt();
+        final var sponsorAccountStatement = accountingFacadePort.fund(SponsorAccount.Id.of(accountId), mapReceiptToTransaction(receipt));
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> removeTransactionReceipt(UUID accountId, String reference) {
+        final var sponsorAccountStatement = accountingFacadePort.deleteTransaction(SponsorAccount.Id.of(accountId), reference);
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> updateAccountAllowance(UUID accountId, UpdateAccountAllowanceRequest updateAccountAllowanceRequest) {
+        final var sponsorAccountStatement = accountingFacadePort.increaseAllowance(SponsorAccount.Id.of(accountId),
+                Amount.of(updateAccountAllowanceRequest.getAllowance()));
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+    }
+
+    @Override
+    public ResponseEntity<AccountResponse> updateAccountAttributes(UUID accountId, UpdateAccountRequest updateAccountRequest) {
+        final var sponsorAccountStatement = accountingFacadePort.updateSponsorAccount(SponsorAccount.Id.of(accountId), updateAccountRequest.getLockedUntil());
+        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+    }
+
+    @Override
+    public ResponseEntity<Void> allocateBudgetToProject(UUID projectId, ProjectBudgetAllocationRequest request) {
+        final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
+                .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
+
+        accountingFacadePort.transfer(SponsorAccount.Id.of(request.getSponsorAccountId()),
+                ProjectId.of(projectId),
+                PositiveAmount.of(request.getAmount()),
+                sponsorAccount.currency().id());
 
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Void> unallocateBudgetFromSponsor(UUID sponsorUuid, SponsorBudgetAllocationRequest request) {
-        final var sponsorId = SponsorId.of(sponsorUuid);
-        final var amount = PositiveAmount.of(request.getAmount());
-        final var currencyId = Currency.Id.of(request.getCurrencyId());
+    public ResponseEntity<Void> unallocateBudgetFromProject(UUID projectId, ProjectBudgetAllocationRequest request) {
+        final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
+                .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
 
-        accountingFacadePort.burn(sponsorId, amount, currencyId);
+        accountingFacadePort.refund(ProjectId.of(projectId),
+                SponsorAccount.Id.of(request.getSponsorAccountId()),
+                PositiveAmount.of(request.getAmount()),
+                sponsorAccount.currency().id());
 
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<TransactionResponse> registerTransactionForSponsor(UUID sponsorUuid, TransactionRequest request) {
-        final var sponsorId = SponsorId.of(sponsorUuid);
-        final var amount = PositiveAmount.of(request.getAmount());
-        final var currencyId = Currency.Id.of(request.getCurrencyId());
-        final var network = mapTransactionNetwork(request.getReceipt().getNetwork());
+    public ResponseEntity<PendingPaymentListResponse> getPendingPayments() {
+        final var payableRewards = accountingFacadePort.getPayableRewards();
 
-        final var transactionId = switch (request.getType()) {
-            case CREDIT -> accountingFacadePort.fund(sponsorId, amount, currencyId, network, request.getLockedUntil());
-            case DEBIT -> accountingFacadePort.withdraw(sponsorId, amount, currencyId, network);
-        };
-
-        return ResponseEntity.ok().body(new TransactionResponse().id(transactionId.value()));
+        return ResponseEntity.ok(new PendingPaymentListResponse()
+                .payments(payableRewards.stream().map(BackOfficeMapper::mapPendingPaymentToResponse).toList())
+        );
     }
 
     @Override
-    public ResponseEntity<Void> deleteTransactionForSponsor(UUID sponsorId, UUID transactionId) {
-        accountingFacadePort.delete(Ledger.Transaction.Id.of(transactionId));
+    public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
+        final var reward = rewardFacadePort.getReward(rewardId)
+                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+
+        final var currency =
+                currencyFacadePort.listCurrencies().stream().filter(c -> c.code().toString().equals(reward.currency().toString().toUpperCase())).findFirst()
+                        .orElseThrow(() -> notFound("Currency %s not found".formatted(reward.currency().toString().toUpperCase())));
+
+        final var recipient = userFacadePort.getProfileById(reward.recipientId());
+
+        final var paymentReference = new SponsorAccount.PaymentReference(mapTransactionNetwork(payRewardRequest.getNetwork()),
+                payRewardRequest.getReference(),
+                recipient.getLogin(),
+                payRewardRequest.getRecipientAccount());
+
+        accountingFacadePort.pay(RewardId.of(rewardId), currency.id(), paymentReference);
+
         return ResponseEntity.noContent().build();
     }
+
 }

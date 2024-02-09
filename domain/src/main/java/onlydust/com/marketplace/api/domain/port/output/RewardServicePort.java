@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface RewardServicePort {
 
-    UUID requestPayment(UUID requestorId, RequestRewardCommand requestRewardCommand);
+    UUID create(UUID requestorId, RequestRewardCommand requestRewardCommand);
 
-    void cancelPayment(UUID rewardId);
+    void cancel(UUID rewardId);
 
     void markInvoiceAsReceived(List<UUID> rewardIds);
 }

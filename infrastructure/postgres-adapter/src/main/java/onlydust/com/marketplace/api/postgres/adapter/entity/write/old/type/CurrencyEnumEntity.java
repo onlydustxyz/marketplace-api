@@ -17,6 +17,10 @@ public enum CurrencyEnumEntity {
         };
     }
 
+    public static CurrencyEnumEntity of(onlydust.com.marketplace.accounting.domain.model.Currency currency) {
+        return CurrencyEnumEntity.valueOf(currency.code().toString().toLowerCase());
+    }
+
     public Currency toDomain() {
         return switch (this) {
             case op -> Currency.Op;

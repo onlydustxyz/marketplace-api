@@ -18,7 +18,7 @@ public class OdRustApiClientAdapter implements RewardServicePort {
     private final OdRustApiHttpClient httpClient;
 
     @Override
-    public UUID requestPayment(UUID requestorId, RequestRewardCommand requestRewardCommand) {
+    public UUID create(UUID requestorId, RequestRewardCommand requestRewardCommand) {
         final RequestRewardDTO requestRewardDTO = RewardMapper.mapCreateRewardCommandToDTO(requestorId,
                 requestRewardCommand);
         final var response = httpClient.send("/api/payments", HttpMethod.POST, requestRewardDTO, RequestRewardResponseDTO.class);
@@ -26,7 +26,7 @@ public class OdRustApiClientAdapter implements RewardServicePort {
     }
 
     @Override
-    public void cancelPayment(UUID rewardId) {
+    public void cancel(UUID rewardId) {
         httpClient.send("/api/payments/" + rewardId.toString(), HttpMethod.DELETE, null, Void.class);
     }
 

@@ -81,8 +81,8 @@ public class CurrencyServiceTest {
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
         verify(quoteStorage, times(1)).save(quotes.capture());
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
+                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
         );
     }
 
@@ -92,7 +92,7 @@ public class CurrencyServiceTest {
         final Set<Currency> bases = i.getArgument(1, Set.class);
         return currencies.stream().flatMap(
                 currency -> bases.stream().map(
-                        base -> new Quote(currency.id(), base.id(), currency.equals(base) ? BigDecimal.ONE : price)
+                        base -> new Quote(currency.id(), base.id(), currency.equals(base) ? BigDecimal.ONE : price, TIMESTAMP)
                 )).toList();
     }
 
@@ -144,8 +144,8 @@ public class CurrencyServiceTest {
         verify(quoteStorage, times(1)).save(quotes.capture());
 
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35)),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
+                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
         );
     }
 

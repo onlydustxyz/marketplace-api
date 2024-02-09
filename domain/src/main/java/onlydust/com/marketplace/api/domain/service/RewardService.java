@@ -1,16 +1,18 @@
 package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.api.domain.model.Reward;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -23,8 +25,8 @@ public class RewardService implements RewardFacadePort {
     private final UserStoragePort userStoragePort;
 
     @Override
-    public UUID requestPayment(UUID projectLeadId,
-                               RequestRewardCommand command) {
+    public UUID createReward(UUID projectLeadId,
+                             RequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId)) {
             throw OnlyDustException.forbidden("User must be project lead to request a reward");
         }
@@ -40,13 +42,13 @@ public class RewardService implements RewardFacadePort {
         }
 
         indexerPort.indexUser(command.getRecipientId());
-        return rewardServicePort.requestPayment(projectLeadId, command);
+        return rewardServicePort.create(projectLeadId, command);
     }
 
     @Override
-    public void cancelPayment(UUID projectLeadId, UUID projectId, UUID rewardId) {
+    public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            rewardServicePort.cancelPayment(rewardId);
+            rewardServicePort.cancel(rewardId);
         } else {
             throw OnlyDustException.forbidden("User must be project lead to cancel a reward");
         }
@@ -57,5 +59,10 @@ public class RewardService implements RewardFacadePort {
         final var rewardIds = userStoragePort.findPendingInvoiceRewardsForRecipientId(recipientId).stream()
                 .map(UserRewardView::getId).toList();
         rewardServicePort.markInvoiceAsReceived(rewardIds);
+    }
+
+    @Override
+    public Optional<Reward> getReward(UUID rewardId) {
+        throw new UnsupportedOperationException("Not implemented in v1");
     }
 }

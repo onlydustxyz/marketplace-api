@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
+import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Edge;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.graph.Vertex;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.visitor.Visitable;
 import onlydust.com.marketplace.kernel.visitor.Visitor;
 import org.jgrapht.Graph;
@@ -13,14 +11,17 @@ import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId.ROOT;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 public class AccountBookState implements AccountBook, Visitable<AccountBookState> {
-    public static final Ledger.Id ROOT = Ledger.Id.of(UUID.fromString("10000000-0000-0000-0000-000000000000"));
-
     private final Graph<Vertex, Edge> graph = new SimpleDirectedGraph<>(Edge.class);
-    private final Map<Ledger.Id, List<Vertex>> accountVertices = new HashMap<>();
+    private final Map<AccountId, List<Vertex>> accountVertices = new HashMap<>();
 
-    private final Vertex root = new Vertex(UUID.randomUUID(), ROOT);
+    private final Vertex root = Vertex.of(ROOT);
+
 
     public AccountBookState() {
         graph.addVertex(root);
@@ -28,61 +29,69 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void mint(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
+    public void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
     }
 
     @Override
-    public List<Transaction> burn(@NonNull final Ledger.Id account, @NonNull final PositiveAmount amount) {
+    public List<Transaction> burn(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(account, ROOT);
         final var unspentVertices = unspentVerticesOf(account);
         try {
             return sendFromVertices(ROOT, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot burn %s from %s".formatted(amount, account), e);
+            throw badRequest("Cannot burn %s from %s".formatted(amount, account), e);
         }
     }
 
     @Override
-    public void transfer(@NonNull final Ledger.Id from, @NonNull final Ledger.Id to, @NonNull final PositiveAmount amount) {
+    public void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
         try {
             sendFromVertices(to, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot transfer %s from %s to %s".formatted(amount, from, to), e);
+            throw badRequest("Cannot transfer %s from %s to %s".formatted(amount, from, to), e);
         }
     }
 
     @Override
-    public void refund(@NonNull final Ledger.Id from, @NonNull final Ledger.Id to, @NonNull final PositiveAmount amount) {
+    public void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
         try {
             refundFromVertices(amount, unspentVertices);
         } catch (InsufficientFundsException e) {
-            throw OnlyDustException.badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
+            throw badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
         }
     }
 
-    public @NonNull PositiveAmount balanceOf(@NonNull final Ledger.Id account) {
+    @Override
+    public void refund(@NonNull final AccountId from) {
+        final var vertices = accountVertices(from);
+        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
+            throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
+        }
+        new ArrayList<>(vertices).forEach(this::removeTransaction);
+    }
+
+    public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
         final var unspentVertices = unspentVerticesOf(account);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull PositiveAmount refundableBalance(@NonNull Ledger.Id from, @NonNull Ledger.Id to) {
+    public @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
         final var unspentVertices = unspentVerticesOf(from, to);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull PositiveAmount transferredAmount(@NonNull Ledger.Id from, @NonNull Ledger.Id to) {
+    public @NonNull PositiveAmount transferredAmount(@NonNull AccountId from, @NonNull AccountId to) {
         return accountVertices(to).stream()
                 .filter(v -> hasParent(v, from))
-                .map(v -> incomingEdgeOf(v).getAmount())
-                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+                .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
-    public @NonNull List<Transaction> transactionsFrom(@NonNull Ledger.Id from) {
+    public @NonNull List<Transaction> transactionsFrom(@NonNull AccountId from) {
         final var startVertices = accountVertices(from);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -90,7 +99,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
-    public @NonNull List<Transaction> transactionsTo(@NonNull Ledger.Id to) {
+    public @NonNull List<Transaction> transactionsTo(@NonNull AccountId to) {
         final var startVertices = accountVertices(to);
         final Map<FromTo, PositiveAmount> aggregatedAmounts = new HashMap<>();
 
@@ -98,37 +107,46 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return mapAggregatedAmountsToTransactions(aggregatedAmounts);
     }
 
+    public @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
+        return accountVertices(to).stream()
+                .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
+                .collect(Collectors.groupingBy(Transaction::from,
+                        Collectors.mapping(Transaction::amount,
+                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                ));
+    }
+
     private void aggregateOutgoingTransactions(Vertex startVertex, Map<FromTo, PositiveAmount> aggregatedAmounts) {
         final var iterator = new DepthFirstIterator<>(graph, startVertex);
         iterator.forEachRemaining(v -> {
             if (!v.equals(startVertex)) {
                 final var incomingEdge = incomingEdgeOf(v);
-                aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), v.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
+                aggregatedAmounts.merge(new FromTo(incomingEdge.source.accountId, v.accountId), incomingEdge.amount, PositiveAmount::add);
             }
         });
     }
 
     private void aggregateIncomingTransactions(@NonNull final Vertex vertex, @NonNull final Map<FromTo, PositiveAmount> aggregatedAmounts) {
         final var incomingEdge = incomingEdgeOf(vertex);
-        if (incomingEdge.getSource().equals(root)) {
+        if (incomingEdge.source.equals(root)) {
             return;
         }
-        aggregatedAmounts.merge(new FromTo(incomingEdge.getSource().accountId(), vertex.accountId()), incomingEdge.getAmount(), PositiveAmount::add);
-        aggregateIncomingTransactions(incomingEdge.getSource(), aggregatedAmounts);
+        aggregatedAmounts.merge(new FromTo(incomingEdge.source.accountId, vertex.accountId), incomingEdge.amount, PositiveAmount::add);
+        aggregateIncomingTransactions(incomingEdge.source, aggregatedAmounts);
     }
 
-    private boolean hasParent(@NonNull final Vertex vertex, @NonNull final Ledger.Id parent) {
+    private boolean hasParent(@NonNull final Vertex vertex, @NonNull final AccountId parent) {
         if (vertex.equals(root)) {
             return false;
         }
-        final var directParent = incomingEdgeOf(vertex).getSource();
-        if (directParent.accountId().equals(parent)) {
+        final var directParent = incomingEdgeOf(vertex).source;
+        if (directParent.accountId.equals(parent)) {
             return true;
         }
         return hasParent(directParent, parent);
     }
 
-    private List<Transaction> sendFromVertices(@NonNull final Ledger.Id to, @NonNull final PositiveAmount amount,
+    private List<Transaction> sendFromVertices(@NonNull final AccountId to, @NonNull final PositiveAmount amount,
                                                @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {
@@ -172,35 +190,55 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
 
-    private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final Ledger.Id accountId) {
+    private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final AccountId accountId) {
         return accountVertices(accountId).stream()
                 .map(v -> new VertexWithBalance(v, balanceOf(v)))
                 .filter(v -> v.balance().isStrictlyGreaterThan(PositiveAmount.ZERO))
                 .toList();
     }
 
-    private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final Ledger.Id accountId, @NonNull final Ledger.Id from) {
+    private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final AccountId accountId, @NonNull final AccountId from) {
         return accountVertices(accountId).stream()
-                .filter(v -> incomingEdgeOf(v).getSource().accountId().equals(from))
+                .filter(v -> incomingEdgeOf(v).source.accountId.equals(from))
                 .map(v -> new VertexWithBalance(v, balanceOf(v)))
                 .filter(v -> v.balance().isStrictlyGreaterThan(PositiveAmount.ZERO))
                 .toList();
+    }
+
+    public Map<AccountId, PositiveAmount> unspentChildren(AccountId of) {
+        return accountVertices(of).stream()
+                .flatMap(v -> unspentChildren(v).entrySet().stream())
+                .collect(Collectors.groupingBy(e -> e.getKey().accountId,
+                        Collectors.mapping(Map.Entry::getValue,
+                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                ));
+    }
+
+    public Map<AccountId, PositiveAmount> unspentChildren() {
+        return unspentChildren(ROOT);
+    }
+
+    private Map<Vertex, PositiveAmount> unspentChildren(Vertex of) {
+        final var children = new HashMap<Vertex, PositiveAmount>();
+
+        new DepthFirstIterator<>(graph, of).forEachRemaining(v -> {
+            if (!v.equals(of) && balanceOf(v).isStrictlyGreaterThan(Amount.ZERO)) children.put(v, balanceOf(v));
+        });
+
+        return children;
     }
 
     private @NonNull PositiveAmount balanceOf(@NonNull final Vertex vertex) {
-        final PositiveAmount received = incomingEdgeOf(vertex).getAmount();
-        final PositiveAmount spent = graph.outgoingEdgesOf(vertex).stream()
-                .map(Edge::getAmount)
-                .reduce(PositiveAmount.ZERO, PositiveAmount::add);
+        final PositiveAmount received = incomingEdgeOf(vertex).amount;
+        final var spent = Edge.totalAmountOf(graph.outgoingEdgesOf(vertex));
         return PositiveAmount.of(received.subtract(spent));
     }
 
     private @NonNull Edge incomingEdgeOf(@NonNull final Vertex vertex) {
-        return graph.incomingEdgesOf(vertex).stream().findFirst()
-                .orElseThrow(() -> new IllegalStateException("Vertex %s has no incoming edge".formatted(vertex)));
+        return graph.incomingEdgesOf(vertex).iterator().next();
     }
 
-    private @NonNull List<Vertex> accountVertices(@NonNull final Ledger.Id accountId) {
+    private @NonNull List<Vertex> accountVertices(@NonNull final AccountId accountId) {
         final var vertices = accountVertices.get(accountId);
         if (vertices != null) {
             return vertices;
@@ -208,8 +246,8 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return List.of();
     }
 
-    private Transaction createTransaction(@NonNull final Vertex from, @NonNull final Ledger.Id to, @NonNull final PositiveAmount amount) {
-        final var toVertex = new Vertex(UUID.randomUUID(), to);
+    private Transaction createTransaction(@NonNull final Vertex from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+        final var toVertex = Vertex.of(to);
         graph.addVertex(toVertex);
         if (accountVertices.containsKey(to)) {
             accountVertices.get(to).add(toVertex);
@@ -217,10 +255,10 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             accountVertices.put(to, new ArrayList<>(List.of(toVertex)));
         }
 
-        final var transaction = new Edge(amount, graph.outgoingEdgesOf(from).size());
-        graph.addEdge(from, toVertex, transaction);
+        final var edge = new Edge(from, amount);
+        graph.addEdge(from, toVertex, edge);
 
-        return new Transaction(source(from).accountId(), to, amount);
+        return new Transaction(source(from).accountId, to, amount);
     }
 
     private Vertex source(@NonNull final Vertex vertex) {
@@ -228,7 +266,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
             return root;
         }
 
-        final var parent = incomingEdgeOf(vertex).getSource();
+        final var parent = incomingEdgeOf(vertex).source;
         if (parent.equals(root)) {
             return vertex;
         }
@@ -242,12 +280,12 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }
         graph.removeEdge(incomingEdgeOf(vertex));
         graph.removeVertex(vertex);
-        accountVertices.get(vertex.accountId()).remove(vertex);
+        accountVertices.get(vertex.accountId).remove(vertex);
     }
 
-    private void checkAccountsAreNotTheSame(@NonNull final Ledger.Id from, @NonNull final Ledger.Id to) {
+    private void checkAccountsAreNotTheSame(@NonNull final AccountId from, @NonNull final AccountId to) {
         if (from.equals(to)) {
-            throw OnlyDustException.badRequest("An account (%s) cannot transfer money to itself".formatted(from));
+            throw badRequest("An account (%s) cannot transfer money to itself".formatted(from));
         }
     }
 
@@ -259,7 +297,7 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     private record VertexWithBalance(@NonNull Vertex vertex, @NonNull PositiveAmount balance) {
     }
 
-    private record FromTo(@NonNull Ledger.Id from, @NonNull Ledger.Id to) {
+    private record FromTo(@NonNull AccountId from, @NonNull AccountId to) {
     }
 
     private static ArrayList<Transaction> mapAggregatedAmountsToTransactions(Map<FromTo, PositiveAmount> aggregatedAmounts) {
@@ -272,5 +310,30 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         public InsufficientFundsException(String message) {
             super(message);
         }
+    }
+
+    @AllArgsConstructor
+    private static class Edge {
+        private final Vertex source;
+        private PositiveAmount amount;
+
+        public void decreaseAmount(PositiveAmount amount) {
+            this.amount = PositiveAmount.of(this.amount.subtract(amount));
+        }
+
+        public static PositiveAmount totalAmountOf(Collection<Edge> edges) {
+            var acc = PositiveAmount.ZERO;
+            for (Edge edge : edges)
+                acc = acc.add(edge.amount);
+            return acc;
+        }
+    }
+
+    // We do not want a record here because we want to compare vertex
+    // pointer addresses in .equals and .hashcode
+    @SuppressWarnings("ClassCanBeRecord")
+    @AllArgsConstructor(staticName = "of")
+    private static class Vertex {
+        private final AccountId accountId;
     }
 }

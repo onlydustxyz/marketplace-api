@@ -1,70 +1,158 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerProvider;
-import onlydust.com.marketplace.accounting.domain.port.out.LedgerStorage;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
-    private final LedgerProvider<Object> ledgerProvider;
-    private final LedgerStorage ledgerStorage;
+    private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
-
-    public void fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        fund(sponsorId, amount, currencyId, network, null);
-    }
+    private final AccountingObserver accountingObserver;
 
     @Override
-    public Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil) {
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                                        ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
-        final var ledger = getOrCreateLedger(sponsorId, currency);
+        final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
+        sponsorAccountStorage.save(sponsorAccount);
 
-        final var transaction = ledger.credit(amount, network, lockedUntil);
-        ledgerStorage.save(ledger);
-        return transaction.id();
+        increaseAllowance(sponsorAccount.id(), amountToMint);
+        return new SponsorAccountStatement(sponsorAccount, getAccountBook(currency).state());
     }
 
     @Override
-    public void pay(ContributorId from, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        burn(from, amount, currencyId).forEach(transaction -> {
-            final var ledger = ledgerStorage.get(transaction.from()).orElseThrow();
-            withdraw(ledger, transaction.amount(), network);
-        });
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+                                                        ZonedDateTime lockedUntil,
+                                                        @NonNull SponsorAccount.Transaction transaction) {
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, amountToMint, lockedUntil);
+        return fund(sponsorAccount.account().id(), transaction);
     }
 
     @Override
-    public Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network) {
-        final var currency = getCurrency(currencyId);
-        final var ledger = getLedger(sponsorId, currency);
+    public SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount) {
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
+        final var accountBook = getAccountBook(sponsorAccount.currency());
 
-        return withdraw(ledger, amount, network);
-    }
+        if (amount.isPositive())
+            accountBook.mint(AccountId.of(sponsorAccountId), PositiveAmount.of(amount));
+        else
+            accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
 
-    private Ledger.Transaction.Id withdraw(Ledger ledger, PositiveAmount amount, Network network) {
-        final var transaction = ledger.debit(amount, network);
-        ledgerStorage.save(ledger);
-        return transaction.id();
+        accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
+        return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
     }
 
     @Override
-    public <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId) {
+    public SponsorAccountStatement fund(@NonNull SponsorAccount.Id sponsorAccountId, @NonNull SponsorAccount.Transaction transaction) {
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
+        final var accountBook = getAccountBook(sponsorAccount.currency());
+        return registerSponsorAccountTransaction(accountBook, sponsorAccount, transaction);
+    }
+
+
+    @Override
+    public void pay(final @NonNull RewardId rewardId,
+                    final @NonNull Currency.Id currencyId,
+                    final @NonNull SponsorAccount.PaymentReference paymentReference) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var ledger = getOrCreateLedger(to, currency);
 
-        accountBook.mint(ledger.id(), amount);
+        accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).forEach((sponsorAccountId, amount) -> {
+            final var sponsorAccount = sponsorAccountStorage.get(sponsorAccountId.sponsorAccountId()).orElseThrow();
+            final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow(
+                    () -> internalServerError("Sponsor account %s is not funded".formatted(sponsorAccountId.sponsorAccountId()))
+            );
+
+            if (paymentReference.network().equals(sponsorAccountNetwork)) {
+                accountBook.burn(AccountId.of(rewardId), amount);
+                registerSponsorAccountTransaction(accountBook, sponsorAccount, new SponsorAccount.Transaction(paymentReference, amount.negate()));
+            }
+        });
+
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        accountingObserver.onRewardPaid(rewardId);
+    }
+
+    @Override
+    public void cancel(@NonNull RewardId rewardId, @NonNull Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        accountBook.refund(AccountId.of(rewardId));
+        accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        accountingObserver.onRewardCancelled(rewardId);
+    }
+
+    @Override
+    public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency);
+
+        return accountBook.state().transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
+                .allMatch(entry -> {
+                    final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
+                    return sponsorAccount.unlockedBalance().isGreaterThanOrEqual(entry.getValue());
+                });
+    }
+
+    private SponsorAccountStatement registerSponsorAccountTransaction(AccountBookAggregate accountBook,
+                                                                      SponsorAccount sponsorAccount,
+                                                                      SponsorAccount.Transaction transaction) {
+        sponsorAccount.add(transaction);
+        sponsorAccountStorage.save(sponsorAccount);
+        final var statement = new SponsorAccountStatement(sponsorAccount, accountBook.state());
+        accountingObserver.onSponsorAccountBalanceChanged(statement);
+        return statement;
+    }
+
+    private boolean isFunded(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).entrySet().stream()
+                .allMatch(entry -> {
+                    final var sponsorAccount = sponsorAccountStorage.get(entry.getKey().sponsorAccountId()).orElseThrow();
+                    return sponsorAccount.balance().isGreaterThanOrEqual(entry.getValue());
+                });
+    }
+
+    private Set<Network> networksOf(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
+                .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().network())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    private Optional<Instant> unlockDateOf(AccountBookState accountBookState, RewardId rewardId) {
+        return accountBookState.transferredAmountPerOrigin(AccountId.of(rewardId)).keySet().stream()
+                .map(accountId -> sponsorAccountStorage.get(accountId.sponsorAccountId()).orElseThrow().lockedUntil())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Instant::compareTo);
+    }
+
+    private SponsorAccount mustGetSponsorAccount(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId)
+                .orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
     }
 
     private AccountBookAggregate getAccountBook(Currency currency) {
@@ -72,62 +160,126 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public <To> Collection<Transaction> burn(To to, PositiveAmount amount, Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency);
-        final var ledger = getLedger(to, currency);
-
-        final var transactions = accountBook.burn(ledger.id(), amount);
-
-        accountBookEventStorage.save(currency, accountBook.pendingEvents());
-        return transactions;
-    }
-
-    @Override
     public <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var fromLedger = getLedger(from, currency);
-        final var toLedger = getOrCreateLedger(to, currency);
 
-        accountBook.transfer(fromLedger.id(), toLedger.id(), amount);
+        accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        if (to instanceof RewardId rewardId)
+            accountingObserver.onRewardCreated(uptodateRewardStatus(accountBook.state(), new RewardStatus(rewardId)));
+    }
+
+    @Override
+    public RewardStatus uptodateRewardStatus(AccountBookState accountBookState, RewardStatus rewardStatus) {
+        return rewardStatus
+                .sponsorHasEnoughFund(isFunded(accountBookState, rewardStatus.rewardId()))
+                .unlockDate(unlockDateOf(accountBookState, rewardStatus.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .withAdditionalNetworks(networksOf(accountBookState, rewardStatus.rewardId()));
     }
 
     @Override
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
-        final var fromLedger = getLedger(from, currency);
-        final var toLedger = getLedger(to, currency);
 
-        accountBook.refund(fromLedger.id(), toLedger.id(), amount);
+        accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
     }
 
     @Override
-    public void delete(Ledger.Transaction.Id transactionId) {
-        ledgerStorage.delete(transactionId);
+    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId)
+                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state()));
+    }
+
+    @Override
+    public Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId);
+    }
+
+    @Override
+    public List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId) {
+        return sponsorAccountStorage.getSponsorAccounts(sponsorId).stream()
+                .map(sponsorAccount -> new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state()))
+                .toList();
+    }
+
+    @Override
+    public SponsorAccountStatement updateSponsorAccount(SponsorAccount.@NonNull Id sponsorAccountId, ZonedDateTime lockedUntil) {
+        final var sponsorAccount = mustGetSponsorAccount(sponsorAccountId);
+        sponsorAccount.lockUntil(lockedUntil);
+        sponsorAccountStorage.save(sponsorAccount);
+        return new SponsorAccountStatement(sponsorAccount, getAccountBook(sponsorAccount.currency()).state());
+    }
+
+    @Override
+    public List<PayableReward> getPayableRewards() {
+        return currencyStorage.all().stream()
+                .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards())
+                .toList();
+    }
+
+    public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
+        sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
+        return getSponsorAccountStatement(sponsorAccountId).orElseThrow();
     }
 
     private Currency getCurrency(Currency.Id id) {
         return currencyStorage.get(id)
-                .orElseThrow(() -> OnlyDustException.notFound("Currency %s not found".formatted(id)));
+                .orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
     }
 
-    private <From> Ledger getOrCreateLedger(From from, Currency currency) {
-        return ledgerProvider.get(from, currency)
-                .orElseGet(() -> createLedger(from, currency));
-    }
+    class PayableRewardAggregator {
+        private final @NonNull CachedSponsorAccountProvider sponsorAccountProvider;
+        private final @NonNull Currency currency;
+        private final @NonNull AccountBookAggregate accountBook;
 
-    private <OwnerId> Ledger createLedger(OwnerId ownerId, Currency currency) {
-        final var ledger = new Ledger(ownerId, currency);
-        ledgerStorage.save(ledger);
-        return ledger;
-    }
+        public PayableRewardAggregator(final @NonNull SponsorAccountProvider sponsorAccountProvider, final @NonNull Currency currency) {
+            this.sponsorAccountProvider = new CachedSponsorAccountProvider(sponsorAccountProvider);
+            this.currency = currency;
+            this.accountBook = getAccountBook(currency);
+        }
 
-    private <OwnerId> Ledger getLedger(OwnerId ownerId, Currency currency) {
-        return ledgerProvider.get(ownerId, currency)
-                .orElseThrow(() -> OnlyDustException.notFound("No ledger found for owner %s in currency %s".formatted(ownerId, currency)));
+        public Stream<PayableReward> getPayableRewards() {
+            final var distinctPayableRewards = accountBook.state().unspentChildren().keySet().stream()
+                    .filter(AccountId::isReward)
+                    .filter(rewardAccountId -> isPayable(rewardAccountId.rewardId(), currency.id()))
+                    .flatMap(this::trySpend)
+                    .collect(groupingBy(PayableReward::key, reducing(PayableReward::add)));
+
+            return distinctPayableRewards.values().stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get);
+        }
+
+        private Stream<PayableReward> trySpend(AccountId rewardAccountId) {
+            return accountBook.state().transferredAmountPerOrigin(rewardAccountId).entrySet().stream()
+                    .filter(e -> e.getValue().isStrictlyPositive())
+                    .filter(e -> stillEnoughBalance(e.getKey().sponsorAccountId(), e.getValue()))
+                    .peek(e -> spend(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()))
+                    .map(e -> createPayableReward(e.getKey().sponsorAccountId(), rewardAccountId.rewardId(), e.getValue()));
+        }
+
+        private void spend(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
+            final var sponsorAccount = sponsorAccount(sponsorAccountId);
+
+            final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
+            sponsorAccount.add(new SponsorAccount.Transaction(sponsorAccountNetwork, rewardId.toString(), amount.negate(), "", ""));
+        }
+
+        private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
+            final var sponsorAccountNetwork = sponsorAccount(sponsorAccountId).network().orElseThrow();
+            return new PayableReward(rewardId, currency.forNetwork(sponsorAccountNetwork), amount);
+        }
+
+        private boolean stillEnoughBalance(SponsorAccount.Id sponsorAccountId, PositiveAmount amount) {
+            return sponsorAccount(sponsorAccountId).unlockedBalance().isGreaterThanOrEqual(amount);
+        }
+
+        private SponsorAccount sponsorAccount(SponsorAccount.Id sponsorAccountId) {
+            return sponsorAccountProvider.get(sponsorAccountId)
+                    .orElseThrow(() -> notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
+        }
     }
 }

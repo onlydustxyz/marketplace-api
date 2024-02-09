@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.infrastructure.coinmarketcap.CmcClient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -28,14 +29,13 @@ public class CmcQuoteServiceAdapter implements QuoteService {
 
             for (Currency base : bases) {
                 final var baseId = client.internalId(base);
-                if (baseId.isEmpty()) {
+                if (baseId.isEmpty())
                     continue;
-                }
 
-                quotes.add(new Quote(
-                        currency.id(),
-                        base.id(),
-                        response.get(currencyId.get()).quote().get(baseId.get()).price()));
+                Optional.ofNullable(response.get(currencyId.get()))
+                        .flatMap(q -> Optional.ofNullable(q.quote().get(baseId.get())))
+                        .filter(p -> p.price() != null)
+                        .ifPresent(p -> quotes.add(new Quote(currency.id(), base.id(), p.price(), p.lastUpdated().toInstant())));
             }
         }
 

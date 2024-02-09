@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.domain.service;
 
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
@@ -10,6 +9,7 @@ import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
 import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +45,7 @@ public class RewardServiceTest {
         final var newRewardId = UUID.randomUUID();
 
         // When
-        when(rewardServicePort.requestPayment(projectLeadId, requestRewardCommand))
+        when(rewardServicePort.create(projectLeadId, requestRewardCommand))
                 .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
@@ -56,7 +56,7 @@ public class RewardServiceTest {
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
-        final UUID rewardId = rewardService.requestPayment(projectLeadId,
+        final UUID rewardId = rewardService.createReward(projectLeadId,
                 requestRewardCommand);
 
         // Then
@@ -96,7 +96,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -140,7 +140,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -182,7 +182,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -228,7 +228,7 @@ public class RewardServiceTest {
                         .build());
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.requestPayment(projectLeadId, requestRewardCommand);
+            rewardService.createReward(projectLeadId, requestRewardCommand);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -262,10 +262,10 @@ public class RewardServiceTest {
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId))
                 .thenReturn(true);
-        rewardService.cancelPayment(projectLeadId, projectId, rewardId);
+        rewardService.cancelReward(projectLeadId, projectId, rewardId);
 
         // Then
-        verify(rewardServicePort).cancelPayment(rewardId);
+        verify(rewardServicePort).cancel(rewardId);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class RewardServiceTest {
                 .thenReturn(false);
         OnlyDustException onlyDustException = null;
         try {
-            rewardService.cancelPayment(projectLeadId, projectId, rewardId);
+            rewardService.cancelReward(projectLeadId, projectId, rewardId);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }

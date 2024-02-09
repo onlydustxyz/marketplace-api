@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
+import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
 import org.springframework.http.HttpStatus;
@@ -45,5 +46,10 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 }

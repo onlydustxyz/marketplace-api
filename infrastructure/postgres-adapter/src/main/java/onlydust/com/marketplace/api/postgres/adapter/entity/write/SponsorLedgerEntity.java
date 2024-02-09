@@ -20,11 +20,11 @@ public class SponsorLedgerEntity {
 
     @OneToOne
     @JoinColumn(insertable = false, updatable = false, name = "ledger_id")
-    @NonNull LedgerEntity ledger;
+    @NonNull SponsorAccountEntity ledger;
 
     @NonNull UUID sponsorId;
 
-    public static SponsorLedgerEntity of(LedgerEntity ledger, SponsorId sponsorId) {
+    public static SponsorLedgerEntity of(SponsorAccountEntity ledger, SponsorId sponsorId) {
         return new SponsorLedgerEntity(ledger.id, ledger, sponsorId.value());
     }
 }

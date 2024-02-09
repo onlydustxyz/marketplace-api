@@ -3,8 +3,10 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.service.BackofficeService;
+import onlydust.com.marketplace.api.domain.service.RewardV2Service;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeCurrencyManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeRestApi;
@@ -35,8 +37,12 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(final AccountingFacadePort accountingFacadePort) {
-        return new BackofficeAccountingManagementRestApi(accountingFacadePort);
+    public BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi(
+            final AccountingFacadePort accountingFacadePort,
+            final RewardV2Service rewardV2Service,
+            final CurrencyFacadePort currencyFacadePort,
+            final UserFacadePort userFacadePort) {
+        return new BackofficeAccountingManagementRestApi(accountingFacadePort, rewardV2Service, currencyFacadePort, userFacadePort);
     }
 
     @Bean

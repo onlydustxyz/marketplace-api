@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.domain.view.ContributionView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortProjectViewEntity;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -33,14 +31,14 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                     WHERE 
                         p.project_id = pgr.project_id AND
                         gr.visibility = 'PUBLIC' AND
-                        contributor_id = :contributorId AND 
+                        contributor_id = :rewardId AND 
                         (COALESCE(:repoIds) IS NULL OR pgr.github_repo_id IN (:repoIds))
                 )
                 AND (COALESCE(:projectIds) IS NULL OR p.project_id IN (:projectIds))
             ORDER BY 
                 p.name 
             """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByContributor(Long contributorId,
+    List<ShortProjectViewEntity> listProjectsByContributor(Long rewardId,
                                                            List<UUID> projectIds,
                                                            List<Long> repoIds);
 
@@ -59,9 +57,9 @@ public interface ShortProjectViewEntityRepository extends JpaRepository<ShortPro
                  project_details p
             JOIN payment_requests pr ON pr.project_id = p.project_id
             WHERE
-                pr.recipient_id = :contributorId
+                pr.recipient_id = :rewardId
             ORDER BY 
                 p.name 
             """, nativeQuery = true)
-    List<ShortProjectViewEntity> listProjectsByRewardRecipient(Long contributorId);
+    List<ShortProjectViewEntity> listProjectsByRewardRecipient(Long rewardId);
 }
