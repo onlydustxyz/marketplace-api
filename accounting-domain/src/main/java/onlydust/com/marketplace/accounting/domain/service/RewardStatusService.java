@@ -1,19 +1,26 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
-import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import static onlydust.com.marketplace.accounting.domain.model.Currency.Code.USD;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+
 @AllArgsConstructor
 public class RewardStatusService implements AccountingObserver {
     private final RewardStatusStorage rewardStatusStorage;
+    private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
+    private final HistoricalQuotesStorage historicalQuotesStorage;
+    private final CurrencyStorage currencyStorage;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -48,6 +55,22 @@ public class RewardStatusService implements AccountingObserver {
         final var rewardStatus = rewardStatusStorage.get(rewardId)
                 .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
+    }
+
+    public void updateUsdEquivalent(RewardId rewardId) {
+        final var rewardStatus = rewardStatusStorage.get(rewardId)
+                .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+        final var rewardUsdEquivalent = rewardUsdEquivalentStorage.get(rewardId)
+                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+        final var usd = currencyStorage.findByCode(Currency.Code.of(USD))
+                .orElseThrow(() -> internalServerError("Currency USD not found"));
+
+        final var usdEquivalent = rewardUsdEquivalent.equivalenceSealingDate()
+                .flatMap(date -> historicalQuotesStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
+                .map(quote -> quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount()))
+                .orElse(null);
+        
+        rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent));
     }
 
     private RewardStatus uptodateRewardStatus(AccountBookFacade accountBookFacade, RewardStatus rewardStatus) {
