@@ -2,10 +2,11 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -400,7 +401,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         // When
-        client.post()
+        final var rewardId = client.post()
                 .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .contentType(APPLICATION_JSON)
@@ -419,7 +420,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """.formatted(ofux.user().getGithubUserId()))
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody(CreateRewardResponse.class)
+                .returnResult().getResponseBody().getId();
 
         // Then
         client.get()
@@ -441,23 +444,17 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(PendingPaymentListResponse.class)
-                .returnResult().getResponseBody();
-
-        assertThat(response.getPayments()).hasSize(1);
-        final var payment = response.getPayments().get(0);
-        assertThat(payment.getRecipientAccountNumber()).isNull();
-        assertThat(payment.getAmount()).isEqualTo(BigDecimal.valueOf(30));
-        assertThat(payment.getCurrency().getId()).isEqualTo(STRK.value());
-        assertThat(payment.getCurrency().getCode()).isEqualTo("STRK");
-        assertThat(payment.getCurrency().getName()).isEqualTo("StarkNet Token");
-        assertThat(payment.getCurrency().getType()).isEqualTo(CurrencyType.CRYPTO);
-        assertThat(payment.getCurrency().getStandard()).isEqualTo(CurrencyStandard.ERC20);
-        assertThat(payment.getCurrency().getBlockchain()).isEqualTo(BlockchainContract.ETHEREUM);
-        assertThat(payment.getCurrency().getAddress()).isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766");
-
-        final var rewardId = payment.getRewardId();
-        assertThat(rewardId).isNotNull();
+                .expectBody()
+                .jsonPath("$.payments.size()").isEqualTo(1)
+                .jsonPath("$.payments[0].amount").isEqualTo(30)
+                .jsonPath("$.payments[0].currency.code").isEqualTo("STRK")
+                .jsonPath("$.payments[0].currency.name").isEqualTo("StarkNet Token")
+                .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
+                .jsonPath("$.payments[0].currency.standard").isEqualTo("ERC20")
+                .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
+                .jsonPath("$.payments[0].currency.address").isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766")
+                .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()
+                .jsonPath("$.payments[0].rewardId").isEqualTo(rewardId.toString());
 
         // When
         client.post()
@@ -482,6 +479,102 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isOk()
+                .expectBody()
+                .jsonPath("$.payments.size()").isEqualTo(0)
+        ;
+    }
+
+    @Test
+    void should_not_list_cancelled_rewards() {
+        // Given
+        final var antho = userAuthHelper.authenticateAnthony();
+        final var ofux = userAuthHelper.authenticateOlivier();
+
+        final var accountId = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 100,
+                            "receipt": {
+                                "reference": "0x01",
+                                "amount": 100,
+                                "network": "ETHEREUM",
+                                "thirdPartyName": "RedBull",
+                                "thirdPartyAccountNumber": "red-bull.eth"
+                            }
+                        }
+                        """.formatted(STRK))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody().getId();
+
+        // Given
+        client.post()
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "sponsorAccountId": "%s",
+                            "amount": 100
+                        }
+                        """.formatted(accountId))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        indexerApiWireMockServer.stubFor(WireMock.put(
+                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        // Given
+        final var rewardId = client.post()
+                .uri(getApiURI(PROJECTS_REWARDS.formatted(KAAPER)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "recipientId": "%d",
+                            "amount": 30,
+                            "currency": "STRK",
+                            "items": [{
+                                "type": "PULL_REQUEST",
+                                "id": "1703880973",
+                                "number": 325,
+                                "repoId": 698096830
+                            }]
+                        }
+                        """.formatted(ofux.user().getGithubUserId()))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(CreateRewardResponse.class)
+                .returnResult().getResponseBody().getId();
+
+        // Given
+        client.delete()
+                .uri(getApiURI(PROJECTS_REWARD.formatted(KAAPER, rewardId)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_PENDING_PAYMENTS))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                // Then
                 .expectBody()
                 .jsonPath("$.payments.size()").isEqualTo(0)
         ;
