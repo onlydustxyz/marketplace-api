@@ -2,19 +2,54 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.accounting.domain.model.ERC20;
-import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
-import static onlydust.com.marketplace.accounting.domain.model.Network.OPTIMISM;
+import java.time.ZoneOffset;
+
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 
 public interface BackOfficeMapper {
+
+    static AccountResponse mapAccountToResponse(final SponsorAccountStatement accountStatement) {
+        final var account = accountStatement.account();
+        return new AccountResponse()
+                .id(account.id().value())
+                .sponsorId(account.sponsorId().value())
+                .currencyId(account.currency().id().value())
+                .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .balance(account.balance().getValue())
+                .allowance(accountStatement.allowance().getValue())
+                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue())
+                .receipts(account.getTransactions().stream()
+                        .map(transaction -> mapTransactionToReceipt(account, transaction)).toList());
+    }
+
+    static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
+        return new TransactionReceipt()
+                .reference(transaction.reference())
+                .network(sponsorAccount.network().map(BackOfficeMapper::mapNetwork).orElse(null))
+                .amount(transaction.amount().getValue())
+                .thirdPartyName(transaction.thirdPartyName())
+                .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber());
+    }
+
+    static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
+        return new SponsorAccount.Transaction(
+                mapTransactionNetwork(transaction.getNetwork()),
+                transaction.getReference(),
+                Amount.of(transaction.getAmount()),
+                transaction.getThirdPartyName(),
+                transaction.getThirdPartyAccountNumber());
+    }
+
+
     static SponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
         return new SponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new SponsorPageItemResponse()
@@ -89,15 +124,15 @@ public interface BackOfficeMapper {
         return budgetPage;
     }
 
-    static Currency mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
+    static CurrencyCode mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
         return switch (currency) {
-            case Strk -> Currency.STRK;
-            case Usd -> Currency.USD;
-            case Apt -> Currency.APT;
-            case Op -> Currency.OP;
-            case Eth -> Currency.ETH;
-            case Lords -> Currency.LORDS;
-            case Usdc -> Currency.USDC;
+            case Strk -> CurrencyCode.STRK;
+            case Usd -> CurrencyCode.USD;
+            case Apt -> CurrencyCode.APT;
+            case Op -> CurrencyCode.OP;
+            case Eth -> CurrencyCode.ETH;
+            case Lords -> CurrencyCode.LORDS;
+            case Usdc -> CurrencyCode.USDC;
         };
     }
 
@@ -303,11 +338,42 @@ public interface BackOfficeMapper {
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {
         return switch (network) {
             case ETHEREUM -> Network.ETHEREUM;
-            case OPTIMISM -> OPTIMISM;
+            case OPTIMISM -> Network.OPTIMISM;
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
             case SEPA -> Network.SEPA;
             case SWIFT -> Network.SWIFT;
         };
+    }
+
+    static TransactionNetwork mapNetwork(final @NonNull Network network) {
+        return switch (network) {
+            case ETHEREUM -> TransactionNetwork.ETHEREUM;
+            case OPTIMISM -> TransactionNetwork.OPTIMISM;
+            case STARKNET -> TransactionNetwork.STARKNET;
+            case APTOS -> TransactionNetwork.APTOS;
+            case SEPA -> TransactionNetwork.SEPA;
+            case SWIFT -> TransactionNetwork.SWIFT;
+        };
+    }
+
+    static PendingPaymentResponse mapPendingPaymentToResponse(PayableReward payableReward) {
+        return new PendingPaymentResponse()
+                .rewardId(payableReward.id().value())
+                .amount(payableReward.amount().getValue())
+                .currency(mapTransactionalCurrency(payableReward.currency()))
+                ;
+    }
+
+    static TransactionalCurrency mapTransactionalCurrency(PayableCurrency currency) {
+        return new TransactionalCurrency()
+                .id(currency.id().value())
+                .code(currency.code().toString())
+                .name(currency.name())
+                .logoUrl(currency.logoUrl().orElse(null))
+                .type(mapCurrencyType(currency.type()))
+                .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
+                .blockchain(currency.blockchain().map(BackOfficeMapper::mapBlockchain).orElse(null))
+                .address(currency.address().map(ContractAddress::toString).orElse(null));
     }
 }

@@ -1,0 +1,13 @@
+ALTER TYPE network ADD VALUE 'sepa';
+ALTER TYPE network ADD VALUE 'swift';
+
+CREATE TYPE reward_status AS ENUM (
+    'PENDING_BILLING_PROFILE',
+    'PENDING_VERIFICATION',
+    'PAYMENT_BLOCKED',
+    'PAYOUT_INFO_MISSING',
+    'LOCKED',
+    'PENDING_REQUEST',
+    'PROCESSING',
+    'COMPLETE'
+    );

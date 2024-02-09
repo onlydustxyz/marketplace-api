@@ -301,7 +301,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                            "commitsCount": null,
                            "userCommitsCount": null,
                            "commentsCount": 0,
-                           "status": "CLOSED",
+                           "status": "COMPLETED",
                            "ignored": false,
                            "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/25"
                          }

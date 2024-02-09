@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.api.domain.job.OutboxSkippingException;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
+import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
@@ -19,6 +20,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private final Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final UserVerificationStoragePort userVerificationStoragePort;
+    private final AccountingUserObserverPort userObserver;
 
     @Override
     public void consumeUserVerificationEvent(Event event) {
@@ -32,6 +34,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
             case COMPANY -> updateCompanyProfile(billingProfileUpdated);
             case INDIVIDUAL -> updateIndividualProfile(billingProfileUpdated);
         }
+        userObserver.onBillingProfileUpdated(billingProfileUpdated);
     }
 
     private void updateCompanyProfile(final BillingProfileUpdated billingProfileUpdated) {

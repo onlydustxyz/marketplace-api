@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Ledger;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 
 import java.util.ArrayList;
@@ -30,23 +29,28 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public void mint(Ledger.Id account, PositiveAmount amount) {
+    public void mint(AccountId account, PositiveAmount amount) {
         emit(new MintEvent(account, amount));
     }
 
     @Override
-    public Collection<Transaction> burn(Ledger.Id account, PositiveAmount amount) {
+    public Collection<Transaction> burn(AccountId account, PositiveAmount amount) {
         return emit(new BurnEvent(account, amount));
     }
 
     @Override
-    public void transfer(Ledger.Id from, Ledger.Id to, PositiveAmount amount) {
+    public void transfer(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new TransferEvent(from, to, amount));
     }
 
     @Override
-    public void refund(Ledger.Id from, Ledger.Id to, PositiveAmount amount) {
+    public void refund(AccountId from, AccountId to, PositiveAmount amount) {
         emit(new RefundEvent(from, to, amount));
+    }
+
+    @Override
+    public void refund(AccountId from) {
+        emit(new FullRefundEvent(from));
     }
 
     public AccountBookState state() {
@@ -62,7 +66,7 @@ public class AccountBookAggregate implements AccountBook {
         return state.accept(event);
     }
 
-    public record MintEvent(@NonNull Ledger.Id account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
             state.mint(account, amount);
@@ -70,14 +74,14 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
-    public record BurnEvent(@NonNull Ledger.Id account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
+    public record BurnEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
         public List<Transaction> visit(AccountBookState state) {
             return state.burn(account, amount);
         }
     }
 
-    public record TransferEvent(@NonNull Ledger.Id from, @NonNull Ledger.Id to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
             state.transfer(from, to, amount);
@@ -85,10 +89,18 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
-    public record RefundEvent(@NonNull Ledger.Id from, @NonNull Ledger.Id to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
         @Override
         public Void visit(AccountBookState state) {
             state.refund(from, to, amount);
+            return null;
+        }
+    }
+
+    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Void> {
+        @Override
+        public Void visit(AccountBookState state) {
+            state.refund(from);
             return null;
         }
     }

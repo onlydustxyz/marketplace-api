@@ -19,7 +19,7 @@ application:
     notification-job-delay: 60000 # 1 minute
     update-projects-ranking: 7200000 # 2 hours
     indexer-sync-job-delay: 5000 # 5 seconds
-    refresh-currency-quotes: 7200000 # 2 hours
+    refresh-currency-quotes: 600000 # 10 minute
     active-user-profiles-refresh-period-in-days: 30
     refresh-active-user-profiles: 86400000 # 1 day
     tracking-job-delay: 60000 # 1 minute

@@ -85,3 +85,15 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000041_add_skipped_status_to_event.sql
   - include:
       file: db/changelog/changelogs/00000042_fix_ecosystems_migration.sql
+  - include:
+      file: db/changelog/changelogs/00000042_refactor_accounting_schema.sql
+  - include:
+      file: db/changelog/changelogs/00000043_alter_enums.sql
+  - include:
+      file: db/changelog/changelogs/00000044_new_reward_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000045_refactor_reward_tables.sql
+  #  - include:
+  #      file: db/changelog/changelogs/00000046_reward_status.sql
+  - include:
+      file: db/changelog/changelogs/00000047_defer_fkey.sql

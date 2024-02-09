@@ -185,6 +185,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public PostgresRewardV2Adapter postgresRewardV2Adapter(final RewardRepository rewardRepository) {
+        return new PostgresRewardV2Adapter(rewardRepository);
+    }
+
+    @Bean
     public CustomRewardRepository customRewardRepository(final EntityManager entityManager) {
         return new CustomRewardRepository(entityManager);
     }
@@ -240,8 +245,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresQuoteAdapter postgresQuoteAdapter(final QuoteRepository quoteRepository) {
-        return new PostgresQuoteAdapter(quoteRepository);
+    public PostgresQuoteAdapter postgresQuoteAdapter(final HistoricalQuoteRepository historicalQuoteRepository) {
+        return new PostgresQuoteAdapter(historicalQuoteRepository);
     }
 
     @Bean
@@ -260,24 +265,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresLedgerStorageAdapter postgresLedgerStorageAdapter(final LedgerRepository ledgerRepository,
-                                                                     final LedgerTransactionRepository ledgerTransactionRepository) {
-        return new PostgresLedgerStorageAdapter(ledgerRepository, ledgerTransactionRepository);
-    }
-
-    @Bean
-    public PostgresSponsorLedgerProviderAdapter postgresSponsorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresSponsorLedgerProviderAdapter(ledgerRepository);
-    }
-
-    @Bean
-    public PostgresContributorLedgerProviderAdapter postgresContributorLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresContributorLedgerProviderAdapter(ledgerRepository);
-    }
-
-    @Bean
-    public PostgresProjectLedgerProviderAdapter postgresProjectLedgerProviderAdapter(final LedgerRepository ledgerRepository) {
-        return new PostgresProjectLedgerProviderAdapter(ledgerRepository);
+    public PostgresSponsorAccountStorageAdapter postgresLedgerStorageAdapter(final SponsorAccountRepository sponsorAccountRepository) {
+        return new PostgresSponsorAccountStorageAdapter(sponsorAccountRepository);
     }
 
     @Bean
@@ -285,6 +274,11 @@ public class PostgresConfiguration {
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository);
+    }
+
+    @Bean
+    public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository) {
+        return new PostgresRewardStatusAdapter(rewardStatusRepository);
     }
 
 }

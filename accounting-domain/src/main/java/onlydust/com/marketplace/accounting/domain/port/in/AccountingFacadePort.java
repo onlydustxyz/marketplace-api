@@ -1,25 +1,49 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface AccountingFacadePort {
-    Ledger.Transaction.Id fund(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network, ZonedDateTime lockedUntil);
+    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                 final @NonNull PositiveAmount amountToMint,
+                                                 final ZonedDateTime lockedUntil);
 
-    Ledger.Transaction.Id withdraw(SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId, Network network);
+    SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency.Id currencyId,
+                                                 final @NonNull PositiveAmount amountToMint,
+                                                 final ZonedDateTime lockedUntil, final @NonNull SponsorAccount.Transaction transaction);
 
-    void pay(ContributorId from, PositiveAmount amount, Currency.Id currencyId, Network network);
+    SponsorAccountStatement fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
 
-    void delete(Ledger.Transaction.Id transactionId);
+    void pay(final @NonNull RewardId rewardId,
+             final @NonNull Currency.Id currencyId,
+             final @NonNull SponsorAccount.PaymentReference paymentReference);
 
-    <To> void mint(To to, PositiveAmount amount, Currency.Id currencyId);
+    void cancel(final @NonNull RewardId rewardId, @NonNull Currency.Id currencyId);
 
-    <From> Collection<Transaction> burn(From from, PositiveAmount amount, Currency.Id currencyId);
+    boolean isPayable(RewardId rewardId, Currency.Id currencyId);
+
+    SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
+
+    SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
     <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
 
     <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId);
+
+    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
+
+    Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
+
+    List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
+
+    SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
+
+    RewardStatus uptodateRewardStatus(AccountBookState accountBook, RewardStatus rewardStatus);
+
+    List<PayableReward> getPayableRewards();
 }
