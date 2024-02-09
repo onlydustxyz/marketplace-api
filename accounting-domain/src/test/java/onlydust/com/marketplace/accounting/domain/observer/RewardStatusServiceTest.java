@@ -3,14 +3,15 @@ package onlydust.com.marketplace.accounting.domain.observer;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
+import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -21,14 +22,14 @@ import static org.mockito.Mockito.*;
 
 public class RewardStatusServiceTest {
     private RewardStatusStorage rewardStatusStorage;
-    AccountingFacadePort accountingFacadePort;
+    private AccountBookFacade accountBookFacade;
     RewardStatusService rewardStatusService;
 
     @BeforeEach
     void setUp() {
         rewardStatusStorage = mock(RewardStatusStorage.class);
-        accountingFacadePort = mock(AccountingFacadePort.class);
-        rewardStatusService = new RewardStatusService(rewardStatusStorage, accountingFacadePort);
+        accountBookFacade = mock(AccountBookFacade.class);
+        rewardStatusService = new RewardStatusService(rewardStatusStorage);
     }
 
     @Nested
@@ -56,13 +57,17 @@ public class RewardStatusServiceTest {
             // Given
             final var rewardStatus = new RewardStatus(rewardId)
                     .sponsorHasEnoughFund(true)
-                    .unlockDate(ZonedDateTime.now())
+                    .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
                     .paymentRequestedAt(null)
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
+            when(accountBookFacade.isFunded(rewardId)).thenReturn(true);
+            when(accountBookFacade.unlockDateOf(rewardId)).thenReturn(rewardStatus.unlockDate().map(ZonedDateTime::toInstant));
+            when(accountBookFacade.networksOf(rewardId)).thenReturn(rewardStatus.networks());
+
             // When
-            rewardStatusService.onRewardCreated(rewardStatus);
+            rewardStatusService.onRewardCreated(rewardId, accountBookFacade);
 
             // Then
             verify(rewardStatusStorage).save(rewardStatus);
@@ -105,13 +110,11 @@ public class RewardStatusServiceTest {
                     rewardId1, PositiveAmount.of(100L),
                     rewardId2, PositiveAmount.of(2000L)
             ));
-            when(accountingFacadePort.uptodateRewardStatus(any(), any())).then(invocation -> {
-                final var rewardStatus = invocation.getArgument(1, RewardStatus.class);
-                return rewardStatus
-                        .sponsorHasEnoughFund(rewardStatus.rewardId().equals(rewardId1))
-                        .unlockDate(unlockDate)
-                        .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
-            });
+            when(sponsorAccountStatement.accountBookFacade()).thenReturn(accountBookFacade);
+            when(accountBookFacade.isFunded(rewardId1)).thenReturn(true);
+            when(accountBookFacade.isFunded(rewardId2)).thenReturn(false);
+            when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.toInstant()));
+            when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -129,7 +132,7 @@ public class RewardStatusServiceTest {
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId1)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
             assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.ETHEREUM, Network.OPTIMISM)));
-            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().equals(unlockDate));
+            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.toInstant()));
         }
     }
 
@@ -155,13 +158,11 @@ public class RewardStatusServiceTest {
                     rewardId1, PositiveAmount.of(100L),
                     rewardId2, PositiveAmount.of(2000L)
             ));
-            when(accountingFacadePort.uptodateRewardStatus(any(), any())).then(invocation -> {
-                final var rewardStatus = invocation.getArgument(1, RewardStatus.class);
-                return rewardStatus
-                        .sponsorHasEnoughFund(!rewardStatus.rewardId().equals(rewardId1))
-                        .unlockDate(unlockDate.plusDays(1))
-                        .withAdditionalNetworks(Set.of(Network.APTOS, Network.OPTIMISM));
-            });
+            when(sponsorAccountStatement.accountBookFacade()).thenReturn(accountBookFacade);
+            when(accountBookFacade.isFunded(rewardId1)).thenReturn(false);
+            when(accountBookFacade.isFunded(rewardId2)).thenReturn(true);
+            when(accountBookFacade.unlockDateOf(any())).thenReturn(Optional.of(unlockDate.plusDays(1).toInstant()));
+            when(accountBookFacade.networksOf(any())).thenReturn(Set.of(Network.APTOS, Network.OPTIMISM));
 
             when(rewardStatusStorage.get(any())).then(invocation -> {
                 final var rewardId = invocation.getArgument(0, RewardId.class);
@@ -182,7 +183,7 @@ public class RewardStatusServiceTest {
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId1)).findFirst().orElseThrow().sponsorHasEnoughFund()).isFalse();
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
             assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.APTOS, Network.OPTIMISM)));
-            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().equals(unlockDate.plusDays(1)));
+            assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.plusDays(1).toInstant()));
         }
     }
 }
