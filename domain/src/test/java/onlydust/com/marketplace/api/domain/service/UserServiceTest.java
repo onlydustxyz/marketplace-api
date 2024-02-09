@@ -5,10 +5,7 @@ import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -57,7 +54,7 @@ public class UserServiceTest {
         imageStoragePort = mock(ImageStoragePort.class);
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
         userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort);
+                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, mock(InvoiceStoragePort.class));
     }
 
     @Test

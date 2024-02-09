@@ -59,4 +59,6 @@ public interface UserFacadePort {
     IndividualBillingProfile getIndividualBillingProfile(UUID userId);
 
     void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
+
+    URL saveInvoicePdfForGithubUserId(Long githubUserId, InputStream pdfInputStream);
 }

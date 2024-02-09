@@ -795,6 +795,32 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/invoices:
+    post:
+      security:
+        - { }
+      tags:
+        - Me
+      summary: Upload an invoice
+      operationId: uploadInvoice
+      requestBody:
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadPdfResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -4466,6 +4492,16 @@ components:
           description: The direct URL to the uploaded image
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
+
+    UploadPdfResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: url
+          description: The direct URL to the uploaded pdf
+      example:
+        url: https://onlydust-app-invoices.s3.eu-west-1.amazonaws.com/invoice_1.pdf
 
     ProjectBudgetsResponse:
       type: object

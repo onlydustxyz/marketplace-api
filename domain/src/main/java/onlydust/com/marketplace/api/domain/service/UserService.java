@@ -7,10 +7,7 @@ import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
@@ -20,7 +17,9 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +36,7 @@ public class UserService implements UserFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
     private final BillingProfileStoragePort billingProfileStoragePort;
+    private final InvoiceStoragePort invoiceStoragePort;
 
     @Override
     @Transactional
@@ -257,5 +257,11 @@ public class UserService implements UserFacadePort {
     @Override
     public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
         billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
+    }
+
+    @Override
+    public URL saveInvoicePdfForGithubUserId(Long githubUserId, InputStream pdfInputStream) {
+        final String invoiceName = githubUserId + "_" + new SimpleDateFormat("ddMMyyyy-hhmmss").format(new Date()) + ".pdf";
+        return invoiceStoragePort.storePdfForName(invoiceName, pdfInputStream);
     }
 }

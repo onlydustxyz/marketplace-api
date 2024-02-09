@@ -87,12 +87,14 @@ public class DomainConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final BillingProfileStoragePort billingProfileStoragePort) {
+                                         final BillingProfileStoragePort billingProfileStoragePort,
+                                         final InvoiceStoragePort invoiceStoragePort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                billingProfileStoragePort);
+                billingProfileStoragePort,
+                invoiceStoragePort);
     }
 
     @Bean

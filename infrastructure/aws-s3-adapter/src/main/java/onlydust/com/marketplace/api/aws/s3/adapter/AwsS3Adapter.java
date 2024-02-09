@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.domain.port.output.InvoiceStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -24,7 +25,7 @@ import static java.lang.String.format;
 
 @AllArgsConstructor
 @Slf4j
-public class AwsS3Adapter implements ImageStoragePort {
+public class AwsS3Adapter implements ImageStoragePort, InvoiceStoragePort {
 
     private final AmazonS3Properties amazonS3Properties;
     private final AmazonS3 amazonS3;
@@ -46,6 +47,16 @@ public class AwsS3Adapter implements ImageStoragePort {
             return uploadByteArrayToS3Bucket(imageBytes, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
             throw OnlyDustException.badRequest("Failed to read image input stream", e);
+        }
+    }
+
+    @Override
+    public URL storePdfForName(String name, InputStream inputStream) {
+        try {
+            final byte[] bytes = inputStream.readAllBytes();
+            return uploadByteArrayToS3Bucket(bytes, amazonS3Properties.getImageBucket(), name);
+        } catch (IOException e) {
+            throw OnlyDustException.badRequest("Failed to read input stream", e);
         }
     }
 

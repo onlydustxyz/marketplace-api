@@ -332,4 +332,20 @@ public class MeRestApi implements MeApi {
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), BillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<UploadPdfResponse> uploadInvoice(Resource pdf) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        InputStream pdfInputStream;
+        try {
+            pdfInputStream = pdf.getInputStream();
+        } catch (IOException e) {
+            throw OnlyDustException.badRequest("Error while reading image data", e);
+        }
+
+        final URL pdfUrl = userFacadePort.saveInvoicePdfForGithubUserId(authenticatedUser.getGithubUserId(), pdfInputStream);
+        final UploadPdfResponse response = new UploadPdfResponse();
+        response.url(pdfUrl.toString());
+        return ResponseEntity.ok(response);
+    }
 }
