@@ -4006,6 +4006,69 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
             {
               "projects": [
                 {
+                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                  "slug": "bretzel",
+                  "name": "Bretzel",
+                  "shortDescription": "A project for people who love fruits",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                  "hiring": true,
+                  "visibility": "PUBLIC",
+                  "repoCount": 4,
+                  "contributorCount": 4,
+                  "leaders": [
+                    {
+                      "githubUserId": 8642470,
+                      "login": "gregcha",
+                      "htmlUrl": "https://github.com/gregcha",
+                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                    },
+                    {
+                      "githubUserId": 98735421,
+                      "login": "pacovilletard",
+                      "htmlUrl": "https://github.com/pacovilletard",
+                      "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                      "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+                    }
+                  ],
+                  "ecosystems": [
+                    {
+                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                      "name": "Ethereum",
+                      "url": "https://ethereum.foundation/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
+                    },
+                    {
+                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                      "name": "Zama",
+                      "url": "https://www.zama.ai/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
+                    },
+                    {
+                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                      "name": "Aptos",
+                      "url": "https://aptosfoundation.org/",
+                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
+                    }
+                  ],
+                  "technologies": {
+                    "TypeScript": 190809,
+                    "Dockerfile": 1982,
+                    "CSS": 423688,
+                    "Shell": 732,
+                    "Rust": 408641,
+                    "SCSS": 98360,
+                    "JavaScript": 62716,
+                    "HTML": 121874
+                  },
+                  "isInvitedAsProjectLead": true,
+                  "isMissingGithubAppInstallation": null,
+                  "tags": [
+                    "BIG_WHALE",
+                    "NEWBIES_WELCOME"
+                  ]
+                },
+                {
                   "id": "98873240-31df-431a-81dc-7d6fe01143a0",
                   "slug": "aiolia-du-lion",
                   "name": "Aiolia du Lion",
@@ -4095,69 +4158,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "tags": []
                 },
                 {
-                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                  "slug": "bretzel",
-                  "name": "Bretzel",
-                  "shortDescription": "A project for people who love fruits",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                  "hiring": true,
-                  "visibility": "PUBLIC",
-                  "repoCount": 4,
-                  "contributorCount": 4,
-                  "leaders": [
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "htmlUrl": "https://github.com/gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
-                      "githubUserId": 98735421,
-                      "login": "pacovilletard",
-                      "htmlUrl": "https://github.com/pacovilletard",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                      "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
-                    }
-                  ],
-                  "ecosystems": [
-                    {
-                      "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                      "name": "Ethereum",
-                      "url": "https://ethereum.foundation/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png"
-                    },
-                    {
-                      "id": "b599313c-a074-440f-af04-a466529ab2e7",
-                      "name": "Zama",
-                      "url": "https://www.zama.ai/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png"
-                    },
-                    {
-                      "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                      "name": "Aptos",
-                      "url": "https://aptosfoundation.org/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png"
-                    }
-                  ],
-                  "technologies": {
-                    "TypeScript": 190809,
-                    "Dockerfile": 1982,
-                    "Shell": 732,
-                    "CSS": 423688,
-                    "Rust": 408641,
-                    "SCSS": 98360,
-                    "JavaScript": 62716,
-                    "HTML": 121874
-                  },
-                  "isInvitedAsProjectLead": false,
-                  "isMissingGithubAppInstallation": null,
-                  "tags": [
-                    "BIG_WHALE",
-                    "NEWBIES_WELCOME"
-                  ]
-                },
-                {
                   "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
                   "slug": "bretzel-196",
                   "name": "Bretzel 196",
@@ -4215,8 +4215,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "MDX": 109316,
                     "TypeScript": 7052833,
+                    "MDX": 109316,
                     "Dockerfile": 2591,
                     "CSS": 41229,
                     "Shell": 6831,
@@ -4228,9 +4228,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4274,8 +4274,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
-                    "FAST_AND_FURIOUS",
                     "HOT_COMMUNITY",
+                    "FAST_AND_FURIOUS",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4300,10 +4300,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "ecosystems": [],
                   "technologies": {
-                    "TypeScript": 3592913,
                     "MDX": 2520,
-                    "Shell": 12431,
+                    "TypeScript": 3592913,
                     "CSS": 6065,
+                    "Shell": 12431,
                     "Cairo": 72428,
                     "PLpgSQL": 1372,
                     "JavaScript": 26108,
@@ -4312,11 +4312,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "LIKELY_TO_REWARD",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4355,8 +4355,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "technologies": {
                     "MDX": 2520,
-                    "C++": 2226,
                     "CSS": 6065,
+                    "C++": 2226,
                     "Rust": 453557,
                     "CMake": 460,
                     "PLpgSQL": 1372,
@@ -4373,9 +4373,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "LIKELY_TO_REWARD",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4407,8 +4407,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     }
                   ],
                   "technologies": {
-                    "TypeScript": 3175211,
                     "MDX": 2520,
+                    "TypeScript": 3175211,
                     "Dockerfile": 325,
                     "Shell": 12431,
                     "CSS": 6065,
@@ -4419,9 +4419,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4469,8 +4469,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "leaders": [],
                   "ecosystems": [],
                   "technologies": {
-                    "C++": 2226,
                     "CSS": 323507,
+                    "C++": 2226,
                     "CMake": 460,
                     "Makefile": 1714,
                     "HTML": 169898,
@@ -4482,15 +4482,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Objective-C": 38,
                     "Swift": 404,
                     "Ruby": 255376,
-                    "Python": 6719,
-                    "Dart": 121265
+                    "Dart": 121265,
+                    "Python": 6719
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4567,9 +4567,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "ecosystems": [],
                   "technologies": {
+                    "CSS": 1396,
                     "Jinja": 2398,
                     "C++": 23419,
-                    "CSS": 1396,
                     "Rust": 527,
                     "C": 1425,
                     "CMake": 18862,
@@ -4588,17 +4588,17 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     "Swift": 2384,
                     "Nix": 85,
                     "Ruby": 2803,
-                    "Dart": 204844,
-                    "Python": 1676320
+                    "Python": 1676320,
+                    "Dart": 204844
                   },
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "LIKELY_TO_REWARD",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4630,8 +4630,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   ],
                   "ecosystems": [],
                   "technologies": {
-                    "TypeScript": 3175211,
                     "MDX": 2520,
+                    "TypeScript": 3175211,
                     "CSS": 6065,
                     "Shell": 12431,
                     "PLpgSQL": 1372,
@@ -4641,9 +4641,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": false,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4772,11 +4772,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "LIKELY_TO_REWARD",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4827,9 +4827,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4863,9 +4863,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 },
@@ -4979,11 +4979,11 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "isInvitedAsProjectLead": false,
                   "isMissingGithubAppInstallation": null,
                   "tags": [
+                    "HOT_COMMUNITY",
                     "BIG_WHALE",
                     "LIKELY_TO_REWARD",
                     "WORK_IN_PROGRESS",
                     "FAST_AND_FURIOUS",
-                    "HOT_COMMUNITY",
                     "NEWBIES_WELCOME"
                   ]
                 }
