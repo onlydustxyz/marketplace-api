@@ -432,6 +432,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public void updateProjectsTags() {
-        projectStoragePort.updateProjectsTags();
+        final Date now = new Date();
+        projectStoragePort.updateProjectsTags(now);
     }
 }

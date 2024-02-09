@@ -62,7 +62,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ApplicationRepository applicationRepository;
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
-    private final CustomProjectTagRepository customProjectTagRepository;
+    private final ProjectTagRepository projectTagRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -570,13 +570,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void updateProjectsTags() {
-        customProjectTagRepository.deleteAllTags();
-        customProjectTagRepository.updateHotCommunityTags();
-        customProjectTagRepository.updateNewbiesWelcome();
-        customProjectTagRepository.updateLikelyToReward();
-        customProjectTagRepository.updateWorkInProgress();
-        customProjectTagRepository.updateFastAndFurious();
-        customProjectTagRepository.updateBigWhale();
+    public void updateProjectsTags(final Date now) {
+        projectTagRepository.deleteAll();
+        projectTagRepository.updateHotCommunityTag(now);
+        projectTagRepository.updateNewbiesWelcome(now);
+        projectTagRepository.updateLikelyToReward(now);
+        projectTagRepository.updateWorkInProgress(now);
+        projectTagRepository.updateFastAndFurious(now);
+        projectTagRepository.updateBigWhale(now);
     }
 }
