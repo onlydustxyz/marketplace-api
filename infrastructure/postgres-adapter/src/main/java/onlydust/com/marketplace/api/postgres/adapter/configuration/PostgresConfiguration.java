@@ -63,7 +63,8 @@ public class PostgresConfiguration {
                                                          final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                          final ApplicationRepository applicationRepository,
                                                          final ContributionViewEntityRepository contributionViewEntityRepository,
-                                                         final HiddenContributorRepository hiddenContributorRepository) {
+                                                         final HiddenContributorRepository hiddenContributorRepository,
+                                                         final ProjectTagRepository projectTagRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -86,7 +87,8 @@ public class PostgresConfiguration {
                 contributorActivityViewEntityRepository,
                 applicationRepository,
                 contributionViewEntityRepository,
-                hiddenContributorRepository
+                hiddenContributorRepository,
+                projectTagRepository
         );
     }
 
@@ -278,4 +280,5 @@ public class PostgresConfiguration {
     public PostgresRewardStatusAdapter postgresRewardStatusAdapter(final RewardStatusRepository rewardStatusRepository) {
         return new PostgresRewardStatusAdapter(rewardStatusRepository);
     }
+
 }

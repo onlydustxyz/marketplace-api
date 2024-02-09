@@ -5,10 +5,7 @@ import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
 import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public interface ProjectStoragePort {
     ProjectDetailsView getById(UUID projectId, User caller);
@@ -92,4 +89,6 @@ public interface ProjectStoragePort {
     void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 
     void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+
+    void updateProjectsTags(Date now);
 }
