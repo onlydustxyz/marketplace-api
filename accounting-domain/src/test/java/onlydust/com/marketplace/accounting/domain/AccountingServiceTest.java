@@ -369,7 +369,7 @@ public class AccountingServiceTest {
 
             // When
             reset(accountingObserver);
-            accountingService.deleteTransaction(sponsorAccount.id(), transaction.reference());
+            accountingService.delete(sponsorAccount.id(), transaction.id());
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             verify(accountingObserver).onSponsorAccountBalanceChanged(any());

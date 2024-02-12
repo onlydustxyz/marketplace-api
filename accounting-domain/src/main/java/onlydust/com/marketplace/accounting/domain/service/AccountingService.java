@@ -186,8 +186,8 @@ public class AccountingService implements AccountingFacadePort {
         return AccountBookAggregate.fromEvents(accountBookEventStorage.get(currency));
     }
 
-    public SponsorAccountStatement deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
-        sponsorAccountStorage.deleteTransaction(sponsorAccountId, reference);
+    public SponsorAccountStatement delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId) {
+        sponsorAccountStorage.delete(sponsorAccountId, transactionId);
         final var sponsorAccountStatement = getSponsorAccountStatement(sponsorAccountId).orElseThrow();
         accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
         return sponsorAccountStatement;

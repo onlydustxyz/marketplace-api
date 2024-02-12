@@ -25,9 +25,9 @@ public class SponsorAccountStorageStub implements SponsorAccountStorage {
     }
 
     @Override
-    public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
+    public void delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId) {
         SPONSOR_ACCOUNTS.stream().filter(a -> a.id().equals(sponsorAccountId))
-                .forEach(l -> l.getTransactions().removeIf(t -> t.reference().equals(reference)));
+                .forEach(l -> l.getTransactions().removeIf(t -> t.id().equals(transactionId)));
     }
 
     @Override

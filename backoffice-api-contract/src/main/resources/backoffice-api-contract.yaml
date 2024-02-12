@@ -154,7 +154,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsor-accounts/{accountId}/receipts/{reference}:
+  /bo/v1/sponsor-accounts/{accountId}/receipts/{receiptId}:
     delete:
       security:
         - apiKey: [ ]
@@ -171,10 +171,10 @@ paths:
           schema:
             $ref: '#/components/schemas/SponsorAccountId'
         - in: path
-          name: reference
+          name: receiptId
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/TransactionReceiptId'
       responses:
         "200":
           description: 'The transaction receipt has been removed and the account balance has been updated'
@@ -1337,6 +1337,8 @@ components:
         - thirdPartyName
         - thirdPartyAccountNumber
       properties:
+        id:
+          $ref: '#/components/schemas/TransactionReceiptId'
         reference:
           type: string
         amount:
@@ -1361,6 +1363,10 @@ components:
         - APTOS
 
     ProjectId:
+      type: string
+      format: uuid
+
+    TransactionReceiptId:
       type: string
       format: uuid
 
