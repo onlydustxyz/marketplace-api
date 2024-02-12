@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 
@@ -14,4 +15,6 @@ public interface RewardStatusStorage {
     void delete(RewardId rewardId);
 
     List<RewardStatus> notPaid();
+
+    List<RewardStatus> notPaid(BillingProfileId userId);
 }

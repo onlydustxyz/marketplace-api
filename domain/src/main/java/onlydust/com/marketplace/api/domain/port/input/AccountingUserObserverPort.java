@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.domain.port.input;
 
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 
@@ -13,7 +12,7 @@ public interface AccountingUserObserverPort {
 
     void onBillingProfilePayoutSettingsUpdated(UUID billingProfileId, UserPayoutSettings payoutSettings);
 
-    void onBillingProfileSelected(UUID projectId, User user, IndividualBillingProfile billingProfile);
+    void onBillingProfileSelected(UUID userId, IndividualBillingProfile billingProfile);
 
-    void onBillingProfileSelected(UUID projectId, User user, CompanyBillingProfile billingProfile);
+    void onBillingProfileSelected(UUID userId, CompanyBillingProfile billingProfile);
 }

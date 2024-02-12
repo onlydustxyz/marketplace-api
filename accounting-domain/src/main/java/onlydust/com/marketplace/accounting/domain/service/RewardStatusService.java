@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
+import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class RewardStatusService implements AccountingObserver {
+public class RewardStatusService implements AccountingObserver, RewardStatusFacadePort {
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
@@ -64,6 +65,7 @@ public class RewardStatusService implements AccountingObserver {
         rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent(rewardId)));
     }
 
+    @Override
     public BigDecimal usdEquivalent(RewardId rewardId) {
         final var rewardUsdEquivalent = rewardUsdEquivalentStorage.get(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));

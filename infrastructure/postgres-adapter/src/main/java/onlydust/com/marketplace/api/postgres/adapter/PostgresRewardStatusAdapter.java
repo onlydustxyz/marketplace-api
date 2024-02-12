@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
@@ -33,6 +34,14 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Override
     public List<RewardStatus> notPaid() {
         return rewardStatusRepository.findByPaidAtIsNull()
+                .stream()
+                .map(RewardStatusEntity::toRewardStatus)
+                .toList();
+    }
+
+    @Override
+    public List<RewardStatus> notPaid(BillingProfileId billingProfileId) {
+        return rewardStatusRepository.findNotPaidByBillingProfile(billingProfileId.value())
                 .stream()
                 .map(RewardStatusEntity::toRewardStatus)
                 .toList();
