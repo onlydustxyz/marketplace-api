@@ -710,19 +710,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/invoices:
-    post:
+  /api/v1/me/invoices/preview:
+    get:
       security:
         - bearerAuth: [ ]
       tags:
         - Me
-      summary: Mark invoice as received
-      operationId: markInvoiceAsReceived
+      summary: Preview new invoice from selected reward ids
+      operationId: previewNewInvoiceForRewardIds
       description: |
-        Mark invoice as received for all caller's pending-invoice rewards
+        Preview new invoice from selected reward ids
+      parameters:
+        - in: path
+          name: rewardIds
+          schema:
+            type: string
       responses:
-        "204":
-          description: 'Invoice marked as received'
+        "200":
+          description: 'Invoice created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewInvoiceResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -731,7 +740,33 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+  /api/v1/me/invoices:
+    post:
+      security:
+        - { }
+      tags:
+        - Me
+      summary: Upload an invoice
+      operationId: uploadInvoice
+      requestBody:
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      parameters:
+        - in: path
+          name: filename
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: 'Invoice uploaded'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/billing-profiles/individual:
     get:
       security:
@@ -808,32 +843,6 @@ paths:
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
           $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/invoices:
-    post:
-      security:
-        - { }
-      tags:
-        - Me
-      summary: Upload an invoice
-      operationId: uploadInvoice
-      requestBody:
-        content:
-          application/pdf:
-            schema:
-              type: string
-              format: binary
-      responses:
-        "200":
-          description: 'Image uploaded'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UploadPdfResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -4509,16 +4518,6 @@ components:
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
 
-    UploadPdfResponse:
-      type: object
-      properties:
-        url:
-          type: string
-          format: url
-          description: The direct URL to the uploaded pdf
-      example:
-        url: https://onlydust-app-invoices.s3.eu-west-1.amazonaws.com/invoice_1.pdf
-
     ProjectBudgetsResponse:
       type: object
       required:
@@ -5112,3 +5111,122 @@ components:
           type: string
         reviewMessage:
           type: string
+    NewInvoiceResponse:
+      type: object
+      required:
+        - id
+        - generationDate
+        - destinationAccounts
+        - billingProfileType
+        - destinationAccounts
+      properties:
+        id:
+          type: string
+        generationDate:
+          type: string
+          format: date-time
+        dueDate:
+          type: string
+          format: date-time
+        billingProfileType:
+          $ref: '#/components/schemas/BillingProfileType'
+        individualBillingProfile:
+          type: object
+          required:
+            - firstName
+            - lastName
+            - address
+          properties:
+            firstName:
+              type: string
+            lastName:
+              type: string
+            address:
+              type: string
+        companyBillingProfile:
+          type: object
+          required:
+            - registrationNumber
+            - name
+            - address
+          properties:
+            registrationNumber:
+              type: string
+            name:
+              type: string
+            address:
+              type: string
+        destinationAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/DestinationAccountResponse'
+        fiatEquivalents:
+          type: array
+          items:
+            $ref: '#/components/schemas/FiatEquivalentResponse'
+        vatRegulationState:
+          $ref : '#/components/schemas/VatRegulationState'
+        euVATNumber:
+          type: string
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceRewardItemResponse'
+
+    InvoiceRewardItemResponse:
+      type: object
+      required:
+        - amount
+        - id
+        - date
+        - projectName
+      properties:
+        amount:
+          $ref: '#/components/schemas/RewardAmountResponse'
+        id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date-time
+        projectName:
+          type: string
+
+    DestinationAccountResponse:
+      type: object
+      properties:
+        iban:
+          type: string
+        bic:
+          type: string
+        wallet:
+          $ref: '#/components/schemas/WalletResponse'
+
+    WalletResponse:
+      type: object
+      properties:
+        address:
+          type: string
+        network:
+          type: string
+
+    FiatEquivalentResponse:
+      type: object
+      properties:
+        fiat:
+          type: string
+          enum:
+            - USD
+            - EUR
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'
+        value:
+          type: number
+
+    VatRegulationState:
+      type: string
+      enum:
+        - VAT_APPLICABLE
+        - VAT_NOT_APPLICABLE_NON_UE
+        - VAT_NOT_APPLICABLE_FRENCH_NOT_SUBJECT
+        - VAT_REVERSE_CHARGE
