@@ -365,4 +365,17 @@ public class PostgresUserAdapter implements UserStoragePort {
                         .build())
                 .ifPresent(userRepository::save));
     }
+
+    @Override
+    public void saveUser(User user) {
+        userRepository.findByGithubUserId(user.getGithubUserId())
+                .map(userEntity -> userEntity.toBuilder()
+                        .githubLogin(user.getGithubLogin())
+                        .githubAvatarUrl(user.getGithubAvatarUrl())
+                        .githubEmail(user.getGithubEmail())
+                        .build())
+                .ifPresent(userRepository::save);
+    }
+
+
 }

@@ -128,7 +128,6 @@ public class UserServiceTest {
     }
 
 
-
     @Test
     void should_find_user_given_a_github_id_but_not_update_it_when_read_only_is_true() {
         // Given
@@ -741,5 +740,55 @@ public class UserServiceTest {
         assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
         assertThat(uuidCaptor.getValue()).isEqualTo(userId);
         assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.INDIVIDUAL);
+    }
+
+    @Test
+    void should_update_user_github_profile() {
+        // Given
+        final long githubUserId = 1L;
+        final User user = User.builder()
+                .githubUserId(githubUserId)
+                .githubLogin("a")
+                .githubAvatarUrl("b")
+                .githubEmail("c")
+                .build();
+        final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
+                .email(faker.harryPotter().book())
+                .githubLogin(faker.rickAndMorty().character())
+                .githubAvatarUrl(faker.gameOfThrones().character())
+                .build();
+
+        // When
+        when(githubSearchPort.getUserProfile(githubUserId))
+                .thenReturn(Optional.of(githubUserIdentity
+                ));
+        userService.updateGithubProfile(user);
+
+        // Then
+        final ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userStoragePort, times(1)).saveUser(userArgumentCaptor.capture());
+        assertEquals(githubUserIdentity.getGithubLogin(), userArgumentCaptor.getValue().getGithubLogin());
+        assertEquals(githubUserIdentity.getGithubAvatarUrl(), userArgumentCaptor.getValue().getGithubAvatarUrl());
+        assertEquals(githubUserIdentity.getEmail(), userArgumentCaptor.getValue().getGithubEmail());
+    }
+
+    @Test
+    void should_throw_exception_when_github_user_not_found() {
+        // Given
+        final long githubUserId = 2L;
+
+        // When
+        when(githubSearchPort.getUserProfile(githubUserId))
+                .thenReturn(Optional.empty());
+        OnlyDustException onlyDustException = null;
+        try {
+            userService.updateGithubProfile(User.builder().githubUserId(githubUserId).build());
+        } catch (OnlyDustException e) {
+            onlyDustException = e;
+        }
+        // Then
+        assertNotNull(onlyDustException);
+        assertEquals("Github user 2 to update was not found", onlyDustException.getMessage());
+        assertEquals(404, onlyDustException.getStatus());
     }
 }

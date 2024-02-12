@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -397,5 +398,62 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.firstName").isEqualTo("Pierre")
                 .jsonPath("$.lastName").isEqualTo("Oucif");
 
+    }
+
+    @Autowired
+    Auth0ApiClientStub auth0ApiClientStub;
+
+    @Test
+    void should_update_github_profile_data() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().numberBetween(1, 100) + faker.number().numberBetween(200, 1000), "fake-user",
+                faker.internet().url(), false);
+        final String githubPat = faker.rickAndMorty().character();
+        auth0ApiClientStub.withPat(authenticatedUser.user().getGithubUserId(), githubPat);
+        final String newUrl = faker.internet().url() + "/test";
+        final String newLogin = faker.gameOfThrones().character();
+        final String newEmail = faker.internet().emailAddress();
+
+        // When
+        githubWireMockServer.stubFor(get("/user").withHeader("Authorization", equalTo("Bearer " + githubPat))
+                .willReturn(okJson("""
+                        {
+                            "id": %d,
+                            "login": \"%s\",
+                            "avatar_url": \"%s\"
+                        }
+                        """.formatted(authenticatedUser.user().getGithubUserId(), newLogin, newUrl)))
+        );
+        githubWireMockServer.stubFor(get("/user/emails").withHeader("Authorization", equalTo("Bearer " + githubPat))
+                .willReturn(okJson("""
+                        [
+                            {
+                                "email": \"%s\",
+                                "primary": true
+                            }
+                        ]
+                        """.formatted(newEmail)))
+        );
+
+
+        client.get()
+                .uri(ME_GET_PROFILE_GITHUB)
+                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.login").isEqualTo(newLogin)
+                .jsonPath("$.avatarUrl").isEqualTo(newUrl)
+                .jsonPath("$.email").isEqualTo(newEmail);
     }
 }

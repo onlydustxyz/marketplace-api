@@ -125,6 +125,18 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    public void updateGithubProfile(User user) {
+        userStoragePort.saveUser(githubSearchPort.getUserProfile(user.getGithubUserId())
+                .map(githubUserProfile -> User.builder()
+                        .githubUserId(githubUserProfile.getGithubUserId())
+                        .githubLogin(githubUserProfile.getGithubLogin())
+                        .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
+                        .githubEmail(githubUserProfile.getEmail())
+                        .build()).orElseThrow(() -> OnlyDustException.notFound(String.format("Github user %s to update was not found",
+                        user.getGithubUserId()))));
+    }
+
+    @Override
     public UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings) {
         return userStoragePort.savePayoutSettingsForUserId(userId, userPayoutSettings);
     }
