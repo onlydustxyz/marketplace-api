@@ -32,7 +32,8 @@ SELECT r.id             as reward_id,
        c.id             as reward_currency_id,
        bp.verified_at   as kycb_verified_at,
        cqa.available_at as currency_quote_available_at,
-       rs.unlock_date   as unlock_date
+       rs.unlock_date   as unlock_date,
+       r.amount         as reward_amount
 FROM accounting.reward_status_data rs
          JOIN rewards r on r.id = rs.reward_id
          LEFT JOIN iam.users u on u.github_user_id = r.recipient_id
