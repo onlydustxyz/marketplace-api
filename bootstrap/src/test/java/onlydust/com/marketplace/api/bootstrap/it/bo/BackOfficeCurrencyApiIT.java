@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
+import onlydust.com.backoffice.api.contract.model.CurrencyStandard;
+import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.net.URI;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -184,28 +187,28 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "type": "FIAT",
-                            "code": "EUR"
+                            "code": "EUR",
+                            "logoUrl": "https://euro.io",
+                            "description": "Euro is the European currency"
                         }
                         """)
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody();
+                .expectBody(CurrencyResponse.class)
+                .returnResult()
+                .getResponseBody();
 
-        response
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.type").isEqualTo("FIAT")
-                .jsonPath("$.standard").isEqualTo("ISO4217")
-                .jsonPath("$.blockchain").doesNotExist()
-                .jsonPath("$.address").doesNotExist()
-                .jsonPath("$.name").isEqualTo("Euro")
-                .jsonPath("$.code").isEqualTo("EUR")
-                .jsonPath("$.logoUrl").doesNotExist()
-                .jsonPath("$.decimals").isEqualTo(2)
-                .jsonPath("$.description").doesNotExist()
-        ;
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getType()).isEqualTo(CurrencyType.FIAT);
+        assertThat(response.getStandard()).isEqualTo(CurrencyStandard.ISO4217);
+        assertThat(response.getName()).isEqualTo("Euro");
+        assertThat(response.getCode()).isEqualTo("EUR");
+        assertThat(response.getLogoUrl()).isEqualTo(URI.create("https://euro.io"));
+        assertThat(response.getDecimals()).isEqualTo(2);
+        assertThat(response.getDescription()).isEqualTo("Euro is the European currency");
 
-        final var currencyId = new ObjectMapper().readTree(response.returnResult().getResponseBody()).get("id").asText();
+        final var currencyId = response.getId();
 
         client
                 .put()

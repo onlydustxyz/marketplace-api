@@ -276,14 +276,14 @@ public class CurrencyServiceTest {
         when(isoCurrencyService.get(Currency.Code.of("EUR"))).thenReturn(Optional.of(Currency.fiat("Euro", Currency.Code.of("EUR"), 2)));
 
         // When
-        final var currency = currencyService.addIsoCurrencySupport(Currency.Code.of("EUR"));
+        final var currency = currencyService.addIsoCurrencySupport(Currency.Code.of("EUR"), "European currency", URI.create("https://euro.io"));
 
         // Then
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("Euro");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("EUR"));
-        assertThat(currency.description()).isEmpty();
-        assertThat(currency.logoUri()).isEmpty();
+        assertThat(currency.description()).contains("European currency");
+        assertThat(currency.logoUri()).contains(URI.create("https://euro.io"));
         assertThat(currency.decimals()).isEqualTo(2);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
@@ -299,7 +299,7 @@ public class CurrencyServiceTest {
         when(isoCurrencyService.get(Currency.Code.of("ZZZ"))).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> currencyService.addIsoCurrencySupport(Currency.Code.of("ZZZ")))
+        assertThatThrownBy(() -> currencyService.addIsoCurrencySupport(Currency.Code.of("ZZZ"), null, null))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Could not find ISO currency ZZZ");
     }
@@ -308,7 +308,7 @@ public class CurrencyServiceTest {
     @Test
     void should_return_existing_currency_upon_duplication() {
         // When
-        final var currency = currencyService.addIsoCurrencySupport(Currencies.USD.code());
+        final var currency = currencyService.addIsoCurrencySupport(Currencies.USD.code(), null, null);
 
         // Then
         assertThat(currency).isEqualTo(Currencies.USD);

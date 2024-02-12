@@ -1784,6 +1784,11 @@ components:
           $ref: '#/components/schemas/BlockchainContract'
         address:
           $ref: '#/components/schemas/ContractAddress'
+        logoUrl:
+          type: string
+          format: uri
+        description:
+          type: string
         code:
           type: string
         decimals:
