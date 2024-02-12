@@ -47,7 +47,8 @@ public class DomainConfiguration {
 
     @Bean
     public ProjectFacadePort projectFacadePort(final ProjectObserverPort projectObserverPort,
-                                               final PostgresProjectAdapter postgresProjectAdapter,
+                                               final ProjectStoragePort projectStoragePort,
+                                               final ProjectRewardStoragePort projectRewardStoragePort,
                                                final ImageStoragePort imageStoragePort,
                                                final UUIDGeneratorPort uuidGeneratorPort,
                                                final PermissionService permissionService,
@@ -57,10 +58,51 @@ public class DomainConfiguration {
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
                                                final GithubStoragePort githubStoragePort) {
-        return new ProjectService(projectObserverPort, postgresProjectAdapter, imageStoragePort, uuidGeneratorPort,
+        return new ProjectService(projectObserverPort,
+                projectStoragePort,
+                projectRewardStoragePort,
+                imageStoragePort,
+                uuidGeneratorPort,
                 permissionService,
-                indexerPort, dateProvider, eventStoragePort, contributionStoragePort, dustyBotStoragePort,
+                indexerPort,
+                dateProvider,
+                eventStoragePort,
+                contributionStoragePort,
+                dustyBotStoragePort,
                 githubStoragePort);
+    }
+
+    @Bean
+    public ProjectRewardFacadePort projectRewardFacadePort(final ProjectObserverPort projectObserverPort,
+                                                           final ProjectStoragePort projectStoragePort,
+                                                           final ProjectRewardStoragePort projectRewardStoragePort,
+                                                           final ImageStoragePort imageStoragePort,
+                                                           final UUIDGeneratorPort uuidGeneratorPort,
+                                                           final PermissionService permissionService,
+                                                           final IndexerPort indexerPort,
+                                                           final DateProvider dateProvider,
+                                                           final EventStoragePort eventStoragePort,
+                                                           final ContributionStoragePort contributionStoragePort,
+                                                           final DustyBotStoragePort dustyBotStoragePort,
+                                                           final GithubStoragePort githubStoragePort) {
+        return new ProjectService(projectObserverPort,
+                projectStoragePort,
+                projectRewardStoragePort,
+                imageStoragePort,
+                uuidGeneratorPort,
+                permissionService,
+                indexerPort,
+                dateProvider,
+                eventStoragePort,
+                contributionStoragePort,
+                dustyBotStoragePort,
+                githubStoragePort);
+    }
+
+    @Bean
+    public ProjectRewardFacadePort projectRewardFacadePortV2() {
+        // TODO
+        return null;
     }
 
 
@@ -118,11 +160,14 @@ public class DomainConfiguration {
 
     @Bean
     public RewardService rewardFacadePort(final RewardServicePort rewardServicePort,
-                                          final ProjectStoragePort projectStoragePort,
+                                          final ProjectRewardStoragePort projectRewardStoragePort,
                                           final PermissionService permissionService,
                                           final IndexerPort indexerPort,
                                           final UserStoragePort userStoragePort) {
-        return new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+        return new RewardService(rewardServicePort,
+                projectRewardStoragePort,
+                permissionService,
+                indexerPort,
                 userStoragePort);
     }
 
