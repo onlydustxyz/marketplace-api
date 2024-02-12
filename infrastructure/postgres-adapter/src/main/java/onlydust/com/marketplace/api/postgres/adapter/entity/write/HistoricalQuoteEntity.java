@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 
 import javax.persistence.Entity;
@@ -40,6 +41,14 @@ public class HistoricalQuoteEntity {
                 .price(quote.price())
                 .timestamp(quote.timestamp())
                 .build();
+    }
+
+    public Quote toDomain() {
+        return new Quote(
+                Currency.Id.of(currencyId),
+                Currency.Id.of(baseId),
+                price,
+                timestamp);
     }
 
     @EqualsAndHashCode

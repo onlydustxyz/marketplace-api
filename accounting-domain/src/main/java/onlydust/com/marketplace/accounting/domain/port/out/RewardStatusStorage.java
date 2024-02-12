@@ -1,14 +1,21 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
+import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RewardStatusStorage {
     void save(RewardStatus rewardStatus);
 
-    Optional<RewardStatus> get(RewardId rewardId);
+    Optional<RewardStatus> get(final @NonNull RewardId rewardId);
 
     void delete(RewardId rewardId);
+
+    List<RewardStatus> notPaid();
+
+    List<RewardStatus> notPaid(BillingProfileId userId);
 }

@@ -25,6 +25,7 @@ application:
     tracking-job-delay: 60000 # 1 minute
     billing-profile-verification-job: 60000 # 1 minute
     update-projects-tags: 7200000 # 2 hours
+    refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -140,4 +141,3 @@ infrastructure:
     app-token: ${SUMSUB_API_APP_TOKEN}
     secret-key: ${SUMSUB_API_SECRET_KEY}
     kyc-questionnaire-name: ${SUMSUB_KYC_QUESTIONNAIRE}
-    kyb-questionnaire-name: ${SUMSUB_KYB_QUESTIONNAIRE}

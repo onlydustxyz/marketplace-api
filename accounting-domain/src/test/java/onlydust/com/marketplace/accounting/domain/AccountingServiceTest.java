@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -202,18 +203,17 @@ public class AccountingServiceTest {
     }
 
     private void assertOnRewardCreated(RewardId rewardId, boolean isFunded, ZonedDateTime unlockDate, Set<Network> networks) {
-        final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
-        verify(accountingObserver).onRewardCreated(rewardStatusCaptor.capture());
-        final var rewardStatus = rewardStatusCaptor.getValue();
-        assertThat(rewardStatus.rewardId()).isEqualTo(rewardId);
-        assertThat(rewardStatus.sponsorHasEnoughFund()).isEqualTo(isFunded);
+        final var accountBookFacadeCaptor = ArgumentCaptor.forClass(AccountBookFacade.class);
+        verify(accountingObserver).onRewardCreated(eq(rewardId), accountBookFacadeCaptor.capture());
+        final var accountBookFacade = accountBookFacadeCaptor.getValue();
+        assertThat(accountBookFacade.isFunded(rewardId)).isEqualTo(isFunded);
         if (unlockDate == null)
-            assertThat(rewardStatus.unlockDate()).isEmpty();
+            assertThat(accountBookFacade.unlockDateOf(rewardId)).isEmpty();
         else {
-            assertThat(rewardStatus.unlockDate()).isPresent();
-            assertThat(rewardStatus.unlockDate().orElseThrow()).isEqualToIgnoringNanos(unlockDate);
+            assertThat(accountBookFacade.unlockDateOf(rewardId)).isPresent();
+            assertThat(accountBookFacade.unlockDateOf(rewardId).orElseThrow()).isEqualTo(unlockDate.toInstant());
         }
-        assertThat(rewardStatus.networks()).isEqualTo(networks);
+        assertThat(accountBookFacade.networksOf(rewardId)).isEqualTo(networks);
         reset(accountingObserver);
     }
 
@@ -368,9 +368,11 @@ public class AccountingServiceTest {
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(amount);
 
             // When
+            reset(accountingObserver);
             accountingService.deleteTransaction(sponsorAccount.id(), transaction.reference());
             // Then
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(any());
         }
 
         /*
@@ -693,6 +695,7 @@ public class AccountingServiceTest {
 
             // When
             final var newSponsorAccount = accountingService.updateSponsorAccount(sponsorAccount.id(), unlockDate);
+            verify(accountingObserver).onSponsorAccountUpdated(newSponsorAccount);
 
             // Then
             assertThat(newSponsorAccount.account().lockedUntil()).contains(unlockDate.toInstant());

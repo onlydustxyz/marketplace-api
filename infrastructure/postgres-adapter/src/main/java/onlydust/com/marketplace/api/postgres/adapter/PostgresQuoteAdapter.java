@@ -1,12 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class PostgresQuoteAdapter implements QuoteStorage {
@@ -15,5 +18,14 @@ public class PostgresQuoteAdapter implements QuoteStorage {
     @Override
     public void save(Collection<Quote> quotes) {
         repository.saveAll(quotes.stream().map(HistoricalQuoteEntity::of).toList());
+    }
+
+    @Override
+    public Optional<Quote> nearest(Currency.Id currencyId, Currency.Id baseId, ZonedDateTime date) {
+        return repository.findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(
+                        currencyId.value(),
+                        baseId.value(),
+                        date.toInstant())
+                .map(HistoricalQuoteEntity::toDomain);
     }
 }

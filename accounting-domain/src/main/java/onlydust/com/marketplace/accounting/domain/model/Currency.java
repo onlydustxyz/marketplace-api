@@ -175,6 +175,7 @@ public class Currency implements Cloneable {
     @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Code {
+        public final static String USD = "USD";
         public final static String ETH = "ETH";
         public final static String APT = "APT";
         public final static String STRK = "STRK";

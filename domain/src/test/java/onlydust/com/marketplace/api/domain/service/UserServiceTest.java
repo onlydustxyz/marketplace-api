@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.api.domain.port.output.*;
@@ -43,6 +44,7 @@ public class UserServiceTest {
     private ProjectObserverPort projectObserverPort;
     private UserObserverPort userObserverPort;
     private BillingProfileStoragePort billingProfileStoragePort;
+    private AccountingUserObserverPort accountingUserObserverPort;
 
     @BeforeEach
     void setUp() {
@@ -53,8 +55,10 @@ public class UserServiceTest {
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+        accountingUserObserverPort = mock(AccountingUserObserverPort.class);
+
         userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, mock(InvoiceStoragePort.class));
+                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, mock(InvoiceStoragePort.class), accountingUserObserverPort);
     }
 
     @Test

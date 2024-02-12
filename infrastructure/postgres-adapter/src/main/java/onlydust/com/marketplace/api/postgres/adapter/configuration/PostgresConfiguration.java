@@ -281,4 +281,8 @@ public class PostgresConfiguration {
         return new PostgresRewardStatusAdapter(rewardStatusRepository);
     }
 
+    @Bean
+    PostgresRewardUsdEquivalentAdapter postgresRewardUsdEquivalentAdapter(final RewardUsdEquivalentDataRepository rewardUsdEquivalentDataRepository) {
+        return new PostgresRewardUsdEquivalentAdapter(rewardUsdEquivalentDataRepository);
+    }
 }

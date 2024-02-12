@@ -315,19 +315,23 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "description": null
                             },
                             {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "type": "FIAT",
+                              "standard": "ISO4217",
+                              "tokens": [],
+                              "decimals": 2,
+                              "description": null
+                            },
+                            {
                               "code": "USDC",
                               "name": "USD Coin",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                               "type": "CRYPTO",
                               "standard": "ERC20",
                               "tokens": [
-                                {
-                                  "blockchain": "STARKNET",
-                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                                  "decimals": 6,
-                                  "symbol": "USDC",
-                                  "name": "USD Coin"
-                                },
                                 {
                                   "blockchain": "OPTIMISM",
                                   "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
@@ -341,14 +345,20 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"
+                                },
+                                {
+                                  "blockchain": "STARKNET",
+                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
                                 }
                               ],
                               "decimals": 6,
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
                             }
                           ]
-                        }
-                                                
+                        }                        
                         """)
         ;
     }

@@ -161,7 +161,6 @@ public class RewardV2ServiceTest {
                 BigDecimal.TEN,
                 Currency.Usdc,
                 new Date(),
-                null,
                 List.of()
         );
 

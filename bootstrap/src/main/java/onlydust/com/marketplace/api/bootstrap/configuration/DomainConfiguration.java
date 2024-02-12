@@ -88,13 +88,15 @@ public class DomainConfiguration {
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
                                          final BillingProfileStoragePort billingProfileStoragePort,
-                                         final InvoiceStoragePort invoiceStoragePort) {
+                                         final InvoiceStoragePort invoiceStoragePort,
+                                         final AccountingUserObserverPort accountingUserObserverPort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
                 billingProfileStoragePort,
-                invoiceStoragePort);
+                invoiceStoragePort,
+                accountingUserObserverPort);
     }
 
     @Bean
@@ -227,7 +229,8 @@ public class DomainConfiguration {
                                                                  final BillingProfileStoragePort billingProfileStoragePort,
                                                                  final UserVerificationStoragePort userVerificationStoragePort,
                                                                  final AccountingUserObserverPort accountingUserObserverPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
+                accountingUserObserverPort);
     }
 
     @Bean
@@ -235,7 +238,8 @@ public class DomainConfiguration {
                                                          final BillingProfileStoragePort billingProfileStoragePort,
                                                          final UserVerificationStoragePort userVerificationStoragePort,
                                                          final AccountingUserObserverPort accountingUserObserverPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
+                accountingUserObserverPort);
     }
 
     @Bean

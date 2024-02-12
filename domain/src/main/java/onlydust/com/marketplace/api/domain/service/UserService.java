@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
@@ -37,6 +38,7 @@ public class UserService implements UserFacadePort {
     private final ImageStoragePort imageStoragePort;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
+    private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
     @Transactional
@@ -269,6 +271,11 @@ public class UserService implements UserFacadePort {
     @Override
     public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
         billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
+        if (billingProfileType.equals(BillingProfileType.COMPANY)) {
+            accountingUserObserverPort.onBillingProfileSelected(userId, getCompanyBillingProfile(userId));
+        } else {
+            accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));
+        }
     }
 
     @Override

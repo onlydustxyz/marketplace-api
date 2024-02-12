@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public interface AccountBook {
     void mint(AccountId account, PositiveAmount amount);
@@ -30,18 +31,18 @@ public interface AccountBook {
         enum Type {SPONSOR_ACCOUNT, REWARD, PROJECT}
 
         private Type type;
-        private String id;
+        private UUID id;
 
         public static AccountId of(SponsorAccount.Id id) {
-            return new AccountId(Type.SPONSOR_ACCOUNT, id.toString());
+            return new AccountId(Type.SPONSOR_ACCOUNT, id.value());
         }
 
         public static AccountId of(ProjectId id) {
-            return new AccountId(Type.PROJECT, id.toString());
+            return new AccountId(Type.PROJECT, id.value());
         }
 
         public static AccountId of(RewardId id) {
-            return new AccountId(Type.REWARD, id.toString());
+            return new AccountId(Type.REWARD, id.value());
         }
 
         public static <T> AccountId of(T id) {
