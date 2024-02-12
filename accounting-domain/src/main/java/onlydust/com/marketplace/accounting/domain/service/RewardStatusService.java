@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
+import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
@@ -35,7 +35,7 @@ public class RewardStatusService implements AccountingObserver {
     private void refreshRelatedRewardsStatuses(SponsorAccountStatement sponsorAccount) {
         sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> {
             final var rewardStatus = rewardStatusStorage.get(rewardId)
-                    .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+                    .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
             rewardStatusStorage.save(uptodateRewardStatus(sponsorAccount.accountBookFacade(), rewardStatus));
         });
     }
@@ -43,6 +43,7 @@ public class RewardStatusService implements AccountingObserver {
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
         rewardStatusStorage.save(uptodateRewardStatus(accountBookFacade, new RewardStatus(rewardId)));
+        updateUsdEquivalent(rewardId);
     }
 
     @Override
@@ -53,30 +54,33 @@ public class RewardStatusService implements AccountingObserver {
     @Override
     public void onRewardPaid(RewardId rewardId) {
         final var rewardStatus = rewardStatusStorage.get(rewardId)
-                .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+                .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
     }
 
     public void updateUsdEquivalent(RewardId rewardId) {
         final var rewardStatus = rewardStatusStorage.get(rewardId)
-                .orElseThrow(() -> OnlyDustException.notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+                .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
+        rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent(rewardId)));
+    }
+
+    public BigDecimal usdEquivalent(RewardId rewardId) {
         final var rewardUsdEquivalent = rewardUsdEquivalentStorage.get(rewardId)
                 .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
         final var usd = currencyStorage.findByCode(Currency.Code.of(USD))
                 .orElseThrow(() -> internalServerError("Currency USD not found"));
 
-        final var usdEquivalent = rewardUsdEquivalent.equivalenceSealingDate()
+        return rewardUsdEquivalent.equivalenceSealingDate()
                 .flatMap(date -> historicalQuotesStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
                 .map(quote -> quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount()))
                 .orElse(null);
-        
-        rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent));
     }
 
     private RewardStatus uptodateRewardStatus(AccountBookFacade accountBookFacade, RewardStatus rewardStatus) {
         return rewardStatus
                 .sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatus.rewardId()))
                 .unlockDate(accountBookFacade.unlockDateOf(rewardStatus.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatus.rewardId()));
+                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatus.rewardId()))
+                .amountUsdEquivalent(usdEquivalent(rewardStatus.rewardId()));
     }
 }

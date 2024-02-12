@@ -36,6 +36,13 @@ public class RewardStatusServiceTest {
     CurrencyStorage currencyStorage;
     RewardStatusService rewardStatusService;
     final Faker faker = new Faker();
+    final Currency currency = Currencies.ETH;
+    final Currency usd = Currencies.USD;
+    final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
+    RewardId rewardId = RewardId.random();
+    final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
+    final ZonedDateTime equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
+    final BigDecimal price = BigDecimal.valueOf(123.25);
 
     @BeforeEach
     void setUp() {
@@ -45,13 +52,21 @@ public class RewardStatusServiceTest {
         historicalQuotesStorage = mock(HistoricalQuotesStorage.class);
         currencyStorage = mock(CurrencyStorage.class);
         rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, historicalQuotesStorage, currencyStorage);
+        when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
+
+        when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(new RewardStatus(rewardId)));
+        when(rewardUsdEquivalentStorage.get(any())).thenReturn(Optional.of(rewardUsdEquivalent));
+        when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
+        when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
+        when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.of(equivalenceSealingDate));
+        when(historicalQuotesStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
+                .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
     }
 
     @Nested
     class OnRewardCreated {
         final SponsorAccount.Id sponsorAccountId = SponsorAccount.Id.random();
         final ProjectId projectId1 = ProjectId.random();
-        RewardId rewardId = RewardId.random();
         AccountBookAggregate accountBook;
 
         @BeforeEach
@@ -68,7 +83,7 @@ public class RewardStatusServiceTest {
         }
 
         @Test
-        public void should_create_status() {
+        public void should_create_status_and_update_usd_equivalent() {
             // Given
             final var rewardStatus = new RewardStatus(rewardId)
                     .sponsorHasEnoughFund(true)
@@ -80,12 +95,14 @@ public class RewardStatusServiceTest {
             when(accountBookFacade.isFunded(rewardId)).thenReturn(true);
             when(accountBookFacade.unlockDateOf(rewardId)).thenReturn(rewardStatus.unlockDate().map(ZonedDateTime::toInstant));
             when(accountBookFacade.networksOf(rewardId)).thenReturn(rewardStatus.networks());
+            when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus));
 
             // When
             rewardStatusService.onRewardCreated(rewardId, accountBookFacade);
 
             // Then
-            verify(rewardStatusStorage).save(rewardStatus);
+            verify(rewardStatusStorage, times(2)).save(any());
+            assertThat(rewardStatus.amountUsdEquivalent()).isPresent();
         }
     }
 
@@ -199,19 +216,13 @@ public class RewardStatusServiceTest {
             assertThat(rewardStatuses.stream().filter(r -> r.rewardId().equals(rewardId2)).findFirst().orElseThrow().sponsorHasEnoughFund()).isTrue();
             assertThat(rewardStatuses).allMatch(r -> r.networks().containsAll(Set.of(Network.APTOS, Network.OPTIMISM)));
             assertThat(rewardStatuses).allMatch(r -> r.unlockDate().orElseThrow().toInstant().equals(unlockDate.plusDays(1).toInstant()));
+            assertThat(rewardStatuses).allMatch(r -> r.amountUsdEquivalent().isPresent());
         }
     }
 
     @Nested
     class UpdateUsdEquivalent {
         final RewardId rewardId = RewardId.random();
-        final Currency currency = Currencies.ETH;
-        final Currency usd = Currencies.USD;
-
-        @BeforeEach
-        void setUp() {
-            when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
-        }
 
         @Nested
         class GivenANonExistingReward {
