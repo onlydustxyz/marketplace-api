@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface RewardStatusStorage {
@@ -11,4 +12,6 @@ public interface RewardStatusStorage {
     Optional<RewardStatus> get(RewardId rewardId);
 
     void delete(RewardId rewardId);
+
+    List<RewardStatus> notPaid();
 }

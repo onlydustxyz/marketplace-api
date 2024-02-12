@@ -20,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,7 +40,6 @@ public class RewardStatusServiceTest {
     final Currency currency = Currencies.ETH;
     final Currency usd = Currencies.USD;
     final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
-    RewardId rewardId = RewardId.random();
     final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
     final ZonedDateTime equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
     final BigDecimal price = BigDecimal.valueOf(123.25);
@@ -54,7 +54,10 @@ public class RewardStatusServiceTest {
         rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, historicalQuotesStorage, currencyStorage);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
-        when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(new RewardStatus(rewardId)));
+        when(rewardStatusStorage.get(any())).then(invocation -> {
+            final var rewardId = invocation.getArgument(0, RewardId.class);
+            return Optional.of(new RewardStatus(rewardId));
+        });
         when(rewardUsdEquivalentStorage.get(any())).thenReturn(Optional.of(rewardUsdEquivalent));
         when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
         when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
@@ -68,6 +71,7 @@ public class RewardStatusServiceTest {
         final SponsorAccount.Id sponsorAccountId = SponsorAccount.Id.random();
         final ProjectId projectId1 = ProjectId.random();
         AccountBookAggregate accountBook;
+        RewardId rewardId = RewardId.random();
 
         @BeforeEach
         void setUp() {
@@ -285,6 +289,30 @@ public class RewardStatusServiceTest {
                 final var rewardStatus = rewardStatusCaptor.getValue();
                 assertThat(rewardStatus.amountUsdEquivalent()).contains(price.multiply(rewardAmount));
             }
+        }
+    }
+
+    @Nested
+    class RefreshRewardsUsdEquivalent {
+        @Test
+        void should_refresh_usd_equivalent_for_all_rewards_not_paid() {
+            // Given
+            final var rewardId1 = RewardId.random();
+            final var rewardId2 = RewardId.random();
+            when(rewardStatusStorage.notPaid()).thenReturn(List.of(
+                    new RewardStatus(rewardId1),
+                    new RewardStatus(rewardId2)
+            ));
+
+            // When
+            rewardStatusService.refreshRewardsUsdEquivalents();
+
+            // Then
+            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
+            final var rewardStatuses = rewardStatusCaptor.getAllValues();
+            assertThat(rewardStatuses).hasSize(2);
+            assertThat(rewardStatuses).allMatch(r -> r.amountUsdEquivalent().isPresent());
         }
     }
 }

@@ -83,4 +83,10 @@ public class RewardStatusService implements AccountingObserver {
                 .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatus.rewardId()))
                 .amountUsdEquivalent(usdEquivalent(rewardStatus.rewardId()));
     }
+
+    public void refreshRewardsUsdEquivalents() {
+        rewardStatusStorage.notPaid().forEach(rewardStatus ->
+                rewardStatusStorage.save(rewardStatus.amountUsdEquivalent(usdEquivalent(rewardStatus.rewardId())))
+        );
+    }
 }
