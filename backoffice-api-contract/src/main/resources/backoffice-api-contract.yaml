@@ -91,7 +91,7 @@ paths:
         Update the allowance of the given account, making funds available for internal transactions 
         between the sponsor and projects (and eventually contributors).
         
-        Allowance cannot be negative.
+        Specify the amount to add or remove from the current allowance.
       parameters:
         - in: path
           name: accountId
