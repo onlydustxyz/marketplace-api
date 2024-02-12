@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
@@ -37,7 +38,9 @@ public class AccountingServiceTest {
     final SponsorAccountStorageStub sponsorAccountStorage = new SponsorAccountStorageStub();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
     final AccountingObserver accountingObserver = mock(AccountingObserver.class);
-    final AccountingService accountingService = new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver);
+    final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
+    final AccountingService accountingService = new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver,
+            projectAccountingObserver);
     final Faker faker = new Faker();
 
     @Nested
@@ -938,24 +941,32 @@ public class AccountingServiceTest {
             accountingService.transfer(unlockedSponsorAccountUsdc2.id(), projectId, PositiveAmount.of(100L), usdc.id());
             accountingService.transfer(unlockedSponsorAccountOp.id(), projectId, PositiveAmount.of(100L), op.id());
             accountingService.transfer(lockedSponsorAccountUsdc.id(), projectId, PositiveAmount.of(100L), usdc.id());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(400L), PositiveAmount.of(400L));
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, op.id(), PositiveAmount.of(100L), PositiveAmount.of(100L));
 
             accountingService.transfer(projectId, rewardId1, PositiveAmount.of(75L), usdc.id());
             assertOnRewardCreated(rewardId1, false, null, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(325L), PositiveAmount.of(400L));
 
             accountingService.transfer(projectId, rewardId2, PositiveAmount.of(75L), usdc.id());
             assertOnRewardCreated(rewardId2, false, null, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(250L), PositiveAmount.of(400L));
 
             accountingService.transfer(projectId, rewardId3, PositiveAmount.of(75L), usdc.id());
             assertOnRewardCreated(rewardId3, false, null, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(175L), PositiveAmount.of(400L));
 
             accountingService.transfer(projectId, rewardId4, PositiveAmount.of(75L), usdc.id());
             assertOnRewardCreated(rewardId4, false, null, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(100L), PositiveAmount.of(400L));
 
             accountingService.transfer(projectId, rewardId5, PositiveAmount.of(90L), op.id());
             assertOnRewardCreated(rewardId5, false, null, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, op.id(), PositiveAmount.of(10L), PositiveAmount.of(100L));
 
             accountingService.transfer(projectId, rewardId6, PositiveAmount.of(75L), usdc.id());
             assertOnRewardCreated(rewardId6, false, lockDate, Set.of());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(25L), PositiveAmount.of(400L));
         }
 
         /*
