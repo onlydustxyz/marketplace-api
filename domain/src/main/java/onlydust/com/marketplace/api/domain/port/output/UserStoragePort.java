@@ -57,4 +57,6 @@ public interface UserStoragePort {
     List<User> getUsersLastSeenSince(ZonedDateTime since);
 
     void saveUsers(List<User> users);
+
+    void saveUser(User user);
 }

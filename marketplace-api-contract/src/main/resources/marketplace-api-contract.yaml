@@ -163,6 +163,22 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/profile/github:
+    get:
+      security:
+        - { }
+      tags:
+        - Me
+      summary: Update user's github profile data
+      operationId: updateMyGithubProfileData
+      responses:
+        "204":
+          description: 'Github login, avatar and email updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/payout-settings:
     get:
       security:

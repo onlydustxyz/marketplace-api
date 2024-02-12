@@ -110,6 +110,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_INDIVIDUAL_BILLING_PROFILE = "/api/v1/me/billing-profiles/individual";
     protected static final String ME_GET_COMPANY_BILLING_PROFILE = "/api/v1/me/billing-profiles/company";
     protected static final String ME_PATCH_BILLING_PROFILE_TYPE = "/api/v1/me/billing-profiles";
+    protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String GITHUB_INSTALLATIONS_GET = "/api/v1/github/installations";

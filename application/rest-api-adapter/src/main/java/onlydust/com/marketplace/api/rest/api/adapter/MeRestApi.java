@@ -348,4 +348,11 @@ public class MeRestApi implements MeApi {
         response.url(pdfUrl.toString());
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> updateMyGithubProfileData() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.updateGithubProfile(authenticatedUser);
+        return ResponseEntity.ok().build();
+    }
 }
