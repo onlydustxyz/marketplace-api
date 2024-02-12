@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
@@ -29,7 +26,10 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage) {
-        return new RewardStatusService(rewardStatusStorage);
+    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage,
+                                                   final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
+                                                   final @NonNull HistoricalQuotesStorage historicalQuotesStorage,
+                                                   final @NonNull CurrencyStorage currencyStorage) {
+        return new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, historicalQuotesStorage, currencyStorage);
     }
 }
