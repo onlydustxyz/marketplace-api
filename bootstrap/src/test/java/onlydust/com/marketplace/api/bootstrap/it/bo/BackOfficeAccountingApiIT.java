@@ -263,7 +263,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_delete_transaction_registered_by_mistake() {
         // Given
-        final var accountId = client.post()
+        final var account = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
                 .header("Api-Key", apiKey())
                 .contentType(APPLICATION_JSON)
@@ -284,11 +284,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody(AccountResponse.class)
-                .returnResult().getResponseBody().getId();
+                .returnResult().getResponseBody();
 
         // When
         client.delete()
-                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId, "0x01")))
+                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(account.getId(), account.getReceipts().get(0).getId())))
                 .header("Api-Key", apiKey())
                 .exchange()
                 // Then

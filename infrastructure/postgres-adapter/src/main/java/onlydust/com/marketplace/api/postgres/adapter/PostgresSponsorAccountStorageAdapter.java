@@ -27,11 +27,11 @@ public class PostgresSponsorAccountStorageAdapter implements SponsorAccountStora
     }
 
     @Override
-    public void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference) {
+    public void delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId) {
         final var sponsorAccount = sponsorAccountRepository.findById(sponsorAccountId.value())
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor account %s not found".formatted(sponsorAccountId)));
 
-        sponsorAccount.getTransactions().removeIf(t -> t.getReference().equals(reference));
+        sponsorAccount.getTransactions().removeIf(t -> t.getId().equals(transactionId.value()));
         sponsorAccountRepository.save(sponsorAccount);
     }
 

@@ -13,10 +13,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -64,11 +61,17 @@ public class CurrencyService implements CurrencyFacadePort {
     }
 
     @Override
-    public Currency addIsoCurrencySupport(final @NonNull Currency.Code code) {
-        final var currency = currencyStorage.findByCode(code)
+    public Currency addIsoCurrencySupport(final @NonNull Currency.Code code, final String description, final URI logoUri) {
+        var currency = currencyStorage.findByCode(code)
                 .or(() -> isoCurrencyService.get(code))
                 .orElseThrow(() -> notFound("Could not find ISO currency %s".formatted(code)));
 
+        currency = currency.withMetadata(new Currency.Metadata(
+                currency.name(),
+                Optional.ofNullable(description).or(currency::description).orElse(null),
+                Optional.ofNullable(logoUri).or(currency::logoUri).orElse(null)
+        ));
+        
         saveCurrency(currency);
         return currency;
     }

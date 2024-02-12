@@ -40,7 +40,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
             };
 
             case FIAT -> switch (Optional.ofNullable(request.getStandard()).orElse(CurrencyStandard.ISO4217)) {
-                case ISO4217 -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()));
+                case ISO4217 -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()), request.getDescription(), request.getLogoUrl());
                 default -> throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
             };
         };

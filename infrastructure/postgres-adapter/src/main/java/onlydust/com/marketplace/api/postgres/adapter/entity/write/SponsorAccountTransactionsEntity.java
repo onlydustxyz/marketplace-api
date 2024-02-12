@@ -8,7 +8,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.Netwo
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -22,8 +25,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class SponsorAccountTransactionsEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    @NonNull UUID id;
     @EqualsAndHashCode.Include
     @NonNull UUID accountId;
 
@@ -39,11 +41,18 @@ public class SponsorAccountTransactionsEntity {
     @NonNull String thirdPartyAccountNumber;
 
     public SponsorAccount.Transaction toTransaction() {
-        return new SponsorAccount.Transaction(network.toNetwork(), reference, Amount.of(amount), thirdPartyName, thirdPartyAccountNumber);
+        return new SponsorAccount.Transaction(
+                SponsorAccount.Transaction.Id.of(id),
+                network.toNetwork(),
+                reference,
+                Amount.of(amount),
+                thirdPartyName,
+                thirdPartyAccountNumber);
     }
 
     public static SponsorAccountTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction transaction) {
         return SponsorAccountTransactionsEntity.builder()
+                .id(transaction.id().value())
                 .accountId(sponsorAccountId.value())
                 .amount(transaction.amount().getValue())
                 .network(NetworkEnumEntity.of(transaction.network()))

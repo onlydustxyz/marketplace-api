@@ -15,7 +15,7 @@ public interface CurrencyFacadePort {
 
     Currency addNativeCryptocurrencySupport(Currency.Code code, Integer decimals);
 
-    Currency addIsoCurrencySupport(final @NonNull Currency.Code code);
+    Currency addIsoCurrencySupport(final @NonNull Currency.Code code, final String description, final URI logoUrl);
 
     void refreshQuotes();
 

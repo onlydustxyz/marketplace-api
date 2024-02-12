@@ -33,6 +33,7 @@ public interface BackOfficeMapper {
 
     static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
         return new TransactionReceipt()
+                .id(transaction.id().value())
                 .reference(transaction.reference())
                 .network(sponsorAccount.network().map(BackOfficeMapper::mapNetwork).orElse(null))
                 .amount(transaction.amount().getValue())

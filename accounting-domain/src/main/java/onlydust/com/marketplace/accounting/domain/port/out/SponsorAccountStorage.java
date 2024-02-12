@@ -8,7 +8,7 @@ import java.util.List;
 public interface SponsorAccountStorage extends SponsorAccountProvider {
     void save(SponsorAccount... sponsorAccounts);
 
-    void deleteTransaction(SponsorAccount.Id sponsorAccountId, String reference);
+    void delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id transactionId);
 
     List<SponsorAccount> getSponsorAccounts(SponsorId sponsorId);
 }

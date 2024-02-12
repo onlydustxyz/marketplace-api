@@ -127,6 +127,7 @@ public class SponsorAccount {
     @Getter
     public static class Transaction extends PaymentReference {
         private final @NonNull Amount amount;
+        private final @NonNull Id id;
 
         public Transaction(
                 final @NonNull PaymentReference paymentReference,
@@ -143,8 +144,34 @@ public class SponsorAccount {
                 final @NonNull String thirdPartyName,
                 final @NonNull String thirdPartyAccountNumber
         ) {
+            this(Id.random(), network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+        }
+
+        public Transaction(
+                final @NonNull Id id,
+                final @NonNull Network network,
+                final @NonNull String reference,
+                final @NonNull Amount amount,
+                final @NonNull String thirdPartyName,
+                final @NonNull String thirdPartyAccountNumber
+        ) {
             super(network, reference, thirdPartyName, thirdPartyAccountNumber);
             this.amount = amount;
+            this.id = id;
+        }
+
+
+        @NoArgsConstructor(staticName = "random")
+        @EqualsAndHashCode(callSuper = true)
+        @SuperBuilder
+        public static class Id extends UuidWrapper {
+            public static Id of(@NonNull final UUID uuid) {
+                return Id.builder().uuid(uuid).build();
+            }
+
+            public static Id of(@NonNull final String uuid) {
+                return Id.of(UUID.fromString(uuid));
+            }
         }
     }
 }

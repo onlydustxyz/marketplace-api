@@ -59,8 +59,10 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<AccountResponse> removeTransactionReceipt(UUID accountId, String reference) {
-        final var sponsorAccountStatement = accountingFacadePort.deleteTransaction(SponsorAccount.Id.of(accountId), reference);
+    public ResponseEntity<AccountResponse> removeTransactionReceipt(UUID accountId, UUID receiptId) {
+        final var sponsorAccountStatement = accountingFacadePort.delete(
+                SponsorAccount.Id.of(accountId),
+                SponsorAccount.Transaction.Id.of(receiptId));
         return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
