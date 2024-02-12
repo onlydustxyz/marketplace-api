@@ -67,14 +67,13 @@ public class RewardStatusService implements AccountingObserver, RewardStatusFaca
 
     @Override
     public BigDecimal usdEquivalent(RewardId rewardId) {
-        final var rewardUsdEquivalent = rewardUsdEquivalentStorage.get(rewardId)
-                .orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
         final var usd = currencyStorage.findByCode(Currency.Code.of(USD))
                 .orElseThrow(() -> internalServerError("Currency USD not found"));
 
-        return rewardUsdEquivalent.equivalenceSealingDate()
-                .flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
-                .map(quote -> quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount()))
+        return rewardUsdEquivalentStorage.get(rewardId).flatMap(
+                        rewardUsdEquivalent -> rewardUsdEquivalent.equivalenceSealingDate()
+                                .flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
+                                .map(quote -> quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount())))
                 .orElse(null);
     }
 

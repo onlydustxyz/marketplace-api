@@ -45,7 +45,6 @@ public class RewardV2Service implements RewardFacadePort {
                 command.getAmount(),
                 command.getCurrency(),
                 new Date(),
-                null,
                 command.getItems().stream().map(item -> Reward.Item.builder()
                         .id(item.getId())
                         .number(item.getNumber())

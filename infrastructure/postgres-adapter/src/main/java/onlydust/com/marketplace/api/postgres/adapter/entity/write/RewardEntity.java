@@ -34,7 +34,6 @@ public class RewardEntity {
 
     @NonNull BigDecimal amount;
     @NonNull Date requestedAt;
-    Date invoiceReceivedAt;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull List<RewardItemEntity> rewardItems;
@@ -48,7 +47,6 @@ public class RewardEntity {
                 .currency(CurrencyEnumEntity.of(reward.currency()))
                 .amount(reward.amount())
                 .requestedAt(reward.requestedAt())
-                .invoiceReceivedAt(reward.invoiceReceivedAt())
                 .rewardItems(RewardItemEntity.of(reward))
                 .build();
     }
@@ -62,7 +60,6 @@ public class RewardEntity {
                 amount,
                 currency.toDomain(),
                 requestedAt,
-                invoiceReceivedAt,
                 rewardItems.stream().map(RewardItemEntity::toRewardItem).toList());
     }
 }

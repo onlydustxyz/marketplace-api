@@ -18,7 +18,7 @@ public class RewardStatus {
 
     @NonNull Boolean sponsorHasEnoughFund = false;
     ZonedDateTime unlockDate;
-    ZonedDateTime paymentRequestedAt;
+    ZonedDateTime invoiceReceivedAt;
     ZonedDateTime paidAt;
     @NonNull
     final Set<Network> networks = new HashSet<>();
@@ -29,8 +29,8 @@ public class RewardStatus {
         return Optional.ofNullable(unlockDate);
     }
 
-    public Optional<ZonedDateTime> paymentRequestedAt() {
-        return Optional.ofNullable(paymentRequestedAt);
+    public Optional<ZonedDateTime> invoiceReceivedAt() {
+        return Optional.ofNullable(invoiceReceivedAt);
     }
 
     public Optional<ZonedDateTime> paidAt() {

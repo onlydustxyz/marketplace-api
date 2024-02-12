@@ -18,7 +18,6 @@ public record Reward(
         @NonNull BigDecimal amount,
         @NonNull Currency currency,
         @NonNull Date requestedAt,
-        Date invoiceReceivedAt,
         @NonNull List<Item> rewardItems) {
 
     @Builder

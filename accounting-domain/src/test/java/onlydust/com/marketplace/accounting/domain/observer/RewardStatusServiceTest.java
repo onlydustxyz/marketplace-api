@@ -54,7 +54,7 @@ public class RewardStatusServiceTest {
         rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
-        when(rewardStatusStorage.get(any())).then(invocation -> {
+        when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
             final var rewardId = invocation.getArgument(0, RewardId.class);
             return Optional.of(new RewardStatus(rewardId));
         });
@@ -92,7 +92,7 @@ public class RewardStatusServiceTest {
             final var rewardStatus = new RewardStatus(rewardId)
                     .sponsorHasEnoughFund(true)
                     .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
-                    .paymentRequestedAt(null)
+                    .invoiceReceivedAt(null)
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
@@ -233,6 +233,7 @@ public class RewardStatusServiceTest {
             @BeforeEach
             void setup() {
                 when(rewardUsdEquivalentStorage.get(rewardId)).thenReturn(Optional.empty());
+                when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.empty());
             }
 
             @Test

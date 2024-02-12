@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardUsdEquivalent;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -22,6 +23,7 @@ import static java.time.ZoneOffset.UTC;
 @Value
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
+@Table(name = "reward_usd_equivalent_data", schema = "accounting")
 public class RewardUsdEquivalentDataEntity {
     @Id
     @NonNull
