@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.HistoricalQuotesStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
@@ -33,7 +33,7 @@ public class RewardStatusServiceTest {
     private RewardStatusStorage rewardStatusStorage;
     private AccountBookFacade accountBookFacade;
     RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
-    HistoricalQuotesStorage historicalQuotesStorage;
+    QuoteStorage quoteStorage;
     CurrencyStorage currencyStorage;
     RewardStatusService rewardStatusService;
     final Faker faker = new Faker();
@@ -49,9 +49,9 @@ public class RewardStatusServiceTest {
         rewardStatusStorage = mock(RewardStatusStorage.class);
         accountBookFacade = mock(AccountBookFacade.class);
         rewardUsdEquivalentStorage = mock(RewardUsdEquivalentStorage.class);
-        historicalQuotesStorage = mock(HistoricalQuotesStorage.class);
+        quoteStorage = mock(QuoteStorage.class);
         currencyStorage = mock(CurrencyStorage.class);
-        rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, historicalQuotesStorage, currencyStorage);
+        rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
         when(rewardStatusStorage.get(any())).then(invocation -> {
@@ -62,7 +62,7 @@ public class RewardStatusServiceTest {
         when(rewardUsdEquivalent.rewardAmount()).thenReturn(rewardAmount);
         when(rewardUsdEquivalent.rewardCurrencyId()).thenReturn(currency.id());
         when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.of(equivalenceSealingDate));
-        when(historicalQuotesStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
+        when(quoteStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
                 .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
     }
 
@@ -277,7 +277,7 @@ public class RewardStatusServiceTest {
                 final var equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
                 final var price = BigDecimal.valueOf(123.25);
                 when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.of(equivalenceSealingDate));
-                when(historicalQuotesStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
+                when(quoteStorage.nearest(currency.id(), usd.id(), equivalenceSealingDate))
                         .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
 
                 // When

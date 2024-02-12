@@ -71,9 +71,9 @@ WITH selected_billing_profile AS
          (SELECT r.recipient_id,
                  SUM(rs.amount_usd_equivalent) as yearly_usd_total
           FROM public.rewards r
-                   JOIN accounting.reward_status_data rs ON r.id = rs.reward_id AND rs.payment_requested_at IS NOT NULL
-          WHERE rs.payment_requested_at >= date_trunc('year', now())
-            AND rs.payment_requested_at < date_trunc('year', now()) + interval '1 year'
+                   JOIN accounting.reward_status_data rs ON r.id = rs.reward_id AND rs.invoice_received_at IS NOT NULL
+          WHERE rs.invoice_received_at >= date_trunc('year', now())
+            AND rs.invoice_received_at < date_trunc('year', now()) + interval '1 year'
           GROUP BY r.recipient_id),
 
      aggregated_reward_status_data AS

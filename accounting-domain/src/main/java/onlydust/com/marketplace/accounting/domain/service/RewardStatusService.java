@@ -19,7 +19,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class RewardStatusService implements AccountingObserver {
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
-    private final HistoricalQuotesStorage historicalQuotesStorage;
+    private final QuoteStorage quoteStorage;
     private final CurrencyStorage currencyStorage;
 
     @Override
@@ -71,7 +71,7 @@ public class RewardStatusService implements AccountingObserver {
                 .orElseThrow(() -> internalServerError("Currency USD not found"));
 
         return rewardUsdEquivalent.equivalenceSealingDate()
-                .flatMap(date -> historicalQuotesStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
+                .flatMap(date -> quoteStorage.nearest(rewardUsdEquivalent.rewardCurrencyId(), usd.id(), date))
                 .map(quote -> quote.convertToBaseCurrency(rewardUsdEquivalent.rewardAmount()))
                 .orElse(null);
     }
