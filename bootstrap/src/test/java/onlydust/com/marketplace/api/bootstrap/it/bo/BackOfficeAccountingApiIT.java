@@ -337,6 +337,24 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectBody()
                 .jsonPath("$.lockedUntil").isEqualTo("2024-03-31T00:00:00Z")
         ;
+
+        // When
+        client.patch()
+                .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "lockedUntil": null
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.lockedUntil").isEqualTo(null)
+        ;
     }
 
     @Test
