@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.InvoicePreviewView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.GithubAccount;
@@ -49,6 +51,7 @@ public class MeRestApi implements MeApi {
     private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
+    private final InvoiceFacadePort invoiceFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -333,8 +336,23 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.noContent().build();
     }
 
+
     @Override
-    public ResponseEntity<UploadPdfResponse> uploadInvoice(Resource pdf) {
+    public ResponseEntity<Void> updateMyGithubProfileData() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        userFacadePort.updateGithubProfile(authenticatedUser);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<NewInvoiceResponse> previewNewInvoiceForRewardIds(List<UUID> rewardIds) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        InvoicePreviewView invoicePreviewView = invoiceFacadePort.generateNextInvoicePreviewForUserAndRewards(authenticatedUser.getId(), rewardIds);
+        return MeApi.super.previewNewInvoiceForRewardIds(rewardIds);
+    }
+
+    @Override
+    public ResponseEntity<Void> uploadInvoice(String filename, Resource pdf) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         InputStream pdfInputStream;
         try {
@@ -344,15 +362,8 @@ public class MeRestApi implements MeApi {
         }
 
         final URL pdfUrl = userFacadePort.saveInvoicePdfForGithubUserId(authenticatedUser.getGithubUserId(), pdfInputStream);
-        final UploadPdfResponse response = new UploadPdfResponse();
-        response.url(pdfUrl.toString());
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<Void> updateMyGithubProfileData() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        userFacadePort.updateGithubProfile(authenticatedUser);
+//        final UploadPdfResponse response = new UploadPdfResponse();
+//        response.url(pdfUrl.toString());
         return ResponseEntity.ok().build();
     }
 }

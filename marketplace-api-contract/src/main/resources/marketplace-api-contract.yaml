@@ -724,7 +724,10 @@ paths:
         - in: path
           name: rewardIds
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              format: uuid
       responses:
         "200":
           description: 'Invoice created'
