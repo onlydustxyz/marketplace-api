@@ -18,9 +18,10 @@ public class AccountingConfiguration {
     public AccountingFacadePort accountingFacadePort(final @NonNull AccountBookEventStorage accountBookEventStorage,
                                                      final @NonNull SponsorAccountStorage sponsorAccountStorage,
                                                      final @NonNull CurrencyStorage currencyStorage,
-                                                     final @NonNull RewardStatusService rewardStatusService
+                                                     final @NonNull RewardStatusService rewardStatusService,
+                                                     final @NonNull ProjectAccountingObserver projectAccountingObserver
     ) {
-        return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, rewardStatusService);
+        return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, rewardStatusService, projectAccountingObserver);
     }
 
     @Bean

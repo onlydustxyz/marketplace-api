@@ -1414,6 +1414,38 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/projects/{projectId}/budgets:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Get project budgets
+      operationId: getProjectBudgetsV2
+      description: |
+        Get the list of all budgets of this project. Only project leaders can access this information.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'List of budgets'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectBudgetsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/{projectId}/rewards:
     get:
       security:

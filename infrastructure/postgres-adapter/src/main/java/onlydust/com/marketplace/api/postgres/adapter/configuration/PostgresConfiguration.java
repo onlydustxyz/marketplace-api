@@ -340,4 +340,9 @@ public class PostgresConfiguration {
     PostgresRewardUsdEquivalentAdapter postgresRewardUsdEquivalentAdapter(final RewardUsdEquivalentDataRepository rewardUsdEquivalentDataRepository) {
         return new PostgresRewardUsdEquivalentAdapter(rewardUsdEquivalentDataRepository);
     }
+
+    @Bean
+    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository) {
+        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository);
+    }
 }

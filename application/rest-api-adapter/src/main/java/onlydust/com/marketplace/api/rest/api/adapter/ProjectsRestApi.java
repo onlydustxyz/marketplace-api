@@ -51,6 +51,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
     private final ProjectRewardFacadePort projectRewardFacadePort;
+    private final ProjectRewardFacadePort projectRewardFacadePortV2;
     private final AuthenticationService authenticationService;
     private final RewardFacadePort rewardFacadePort;
     private final RewardFacadePort rewardFacadePortV2;
@@ -197,6 +198,14 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         final ProjectBudgetsView projectBudgetsView = projectRewardFacadePort.getBudgets(projectId,
+                authenticatedUser.getId());
+        return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
+    }
+
+    @Override
+    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgetsV2(UUID projectId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
                 authenticatedUser.getId());
         return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
     }

@@ -18,12 +18,16 @@ public class RestApiConfiguration {
 
     @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
+                                          final ProjectRewardFacadePort projectRewardFacadePort,
+                                          final ProjectRewardFacadePort projectRewardFacadePortV2,
                                           final AuthenticationService authenticationService,
                                           final RewardService rewardService,
                                           final RewardV2Service rewardV2Service,
                                           final ContributionFacadePort contributionFacadePort) {
         return new ProjectsRestApi(
                 projectFacadePort,
+                projectRewardFacadePort,
+                projectRewardFacadePortV2,
                 authenticationService,
                 rewardService,
                 rewardV2Service,

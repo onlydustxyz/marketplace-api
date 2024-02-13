@@ -100,9 +100,11 @@ public class DomainConfiguration {
     }
 
     @Bean
-    public ProjectRewardFacadePort projectRewardFacadePortV2() {
-        // TODO
-        return null;
+    public ProjectRewardFacadePort projectRewardFacadePortV2(
+            final ProjectRewardStoragePort projectRewardStoragePortV2,
+            final PermissionService permissionService
+    ) {
+        return new ProjectRewardV2Service(projectRewardStoragePortV2, permissionService);
     }
 
 
