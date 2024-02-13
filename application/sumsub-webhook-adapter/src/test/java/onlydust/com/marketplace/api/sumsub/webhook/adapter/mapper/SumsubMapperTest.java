@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SumsubMapperTest {
@@ -59,8 +60,12 @@ public class SumsubMapperTest {
         sumsubWebhookEventDTO.setExternalUserId(externalId.toString());
         sumsubWebhookEventDTO.setType(type);
         sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
-        sumsubWebhookEventDTO.setReviewResult(isNull(reviewResult) ? null : finalDecision ?
-                Map.of("reviewAnswer", reviewResult, "reviewRejectType", "FINAL") : Map.of("reviewAnswer", reviewResult));
+        final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
+        reviewResultDTO.setReviewAnswer(reviewResult);
+        if (nonNull(finalDecision) && finalDecision){
+            reviewResultDTO.setReviewRejectType("FINAL");
+        }
+        sumsubWebhookEventDTO.setReviewResult(reviewResultDTO);
         return sumsubWebhookEventDTO;
     }
 

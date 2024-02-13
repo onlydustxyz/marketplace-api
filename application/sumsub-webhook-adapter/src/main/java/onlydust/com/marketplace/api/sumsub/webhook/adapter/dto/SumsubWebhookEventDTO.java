@@ -40,8 +40,25 @@ public class SumsubWebhookEventDTO extends Event {
     String externalApplicantActionId;
     @JsonProperty("clientId")
     String clientId;
-    @JsonProperty("reviewResult")
-    Object reviewResult;
     @JsonProperty("applicantMemberOf")
     List<Object> applicantMemberOf;
+    @JsonProperty("reviewResult")
+    ReviewResultDTO reviewResult;
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
+    public static class ReviewResultDTO {
+        @JsonProperty("moderationComment")
+        String moderationComment;
+        @JsonProperty("clientComment")
+        String clientComment;
+        @JsonProperty("reviewAnswer")
+        String reviewAnswer;
+        @JsonProperty("rejectLabels")
+        List<String> rejectLabels;
+        @JsonProperty("reviewRejectType")
+        String reviewRejectType;
+        @JsonProperty("buttonIds")
+        List<String> buttonIds;
+    }
 }

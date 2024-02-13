@@ -40,7 +40,10 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private void updateCompanyProfile(final BillingProfileUpdated billingProfileUpdated) {
         billingProfileStoragePort.saveCompanyProfile(
                 billingProfileStoragePort.findCompanyProfileById(billingProfileUpdated.getBillingProfileId())
-                        .map(companyBillingProfile -> companyBillingProfile.toBuilder().status(billingProfileUpdated.getVerificationStatus()).build())
+                        .map(companyBillingProfile -> companyBillingProfile.toBuilder()
+                                .status(billingProfileUpdated.getVerificationStatus())
+                                .reviewMessageForApplicant(billingProfileUpdated.getReviewMessageForApplicant())
+                                .build())
                         .map(userVerificationStoragePort::updateCompanyVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));
@@ -49,7 +52,9 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private void updateIndividualProfile(final BillingProfileUpdated billingProfileUpdated) {
         billingProfileStoragePort.saveIndividualProfile(
                 billingProfileStoragePort.findIndividualProfileById(billingProfileUpdated.getBillingProfileId())
-                        .map(individualBillingProfile -> individualBillingProfile.toBuilder().status(billingProfileUpdated.getVerificationStatus()).build())
+                        .map(individualBillingProfile -> individualBillingProfile.toBuilder()
+                                .reviewMessageForApplicant(billingProfileUpdated.getReviewMessageForApplicant())
+                                .status(billingProfileUpdated.getVerificationStatus()).build())
                         .map(userVerificationStoragePort::updateIndividualVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));

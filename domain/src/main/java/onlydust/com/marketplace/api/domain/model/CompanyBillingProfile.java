@@ -24,6 +24,7 @@ public class CompanyBillingProfile {
     Boolean usEntity;
     Boolean subjectToEuropeVAT;
     String euVATNumber;
+    String reviewMessageForApplicant;
 
     public static CompanyBillingProfile initForUser(final UUID userId) {
         return CompanyBillingProfile.builder()

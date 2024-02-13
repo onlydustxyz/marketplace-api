@@ -15,4 +15,5 @@ public class BillingProfileUpdated extends Event {
     UUID billingProfileId;
     BillingProfileType type;
     VerificationStatus verificationStatus;
+    String reviewMessageForApplicant;
 }

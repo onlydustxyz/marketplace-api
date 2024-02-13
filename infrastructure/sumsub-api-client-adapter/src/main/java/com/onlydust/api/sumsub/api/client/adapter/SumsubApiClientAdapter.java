@@ -76,5 +76,4 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for applicantId = %s", applicantId)));
     }
 
-
 }

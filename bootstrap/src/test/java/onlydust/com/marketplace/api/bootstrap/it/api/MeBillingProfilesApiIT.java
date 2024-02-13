@@ -153,6 +153,81 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
                 .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.usCitizen").isEqualTo(false);
+
+
+        final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
+                                     "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
+                                     "later or contact the company where you're verifying your profile tech@onlydust.xyz, if error persists.";
+        final byte[] sumsubPayloadRejection = String.format("""
+                {
+                  "type": "applicantPending",
+                  "clientId": "onlydust",
+                  "levelName": "basic-kyc-level",
+                  "applicantId": "65bd228a2a99e9196014ccc5",
+                  "createdAtMs": "2024-02-02 17:23:16.368",
+                  "sandboxMode": false,
+                  "inspectionId": "65bd228a2a99e9196014ccc6",
+                  "reviewResult": {
+                      "moderationComment": "%s",
+                      "clientComment": "User was misled/forced to create this account by a third party\\n\\nThe government database is currently unavailable. We couldn't verify user data with this method.",
+                      "reviewAnswer": "RED",
+                      "rejectLabels": [
+                        "FRAUDULENT_PATTERNS",
+                        "CHECK_UNAVAILABLE"
+                      ],
+                      "reviewRejectType": "FINAL",
+                      "buttonIds": [
+                        "videoIdentFinalRejection_forcedVerification",
+                        "ekycRetry",
+                        "videoIdentFinalRejection",
+                        "ekycRetry_checkUnavailable"
+                      ]
+                    },
+                  "reviewStatus": "pending",
+                  "applicantType": "individual",
+                  "correlationId": "0727edcd2fd452f64b7dd9f76516d815",
+                  "externalUserId": "%s",
+                  "applicantActionId": null,
+                  "applicantMemberOf": null,
+                  "previousLevelName": null,
+                  "videoIdentReviewStatus": null,
+                  "externalApplicantActionId": null
+                }""", reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestRejection = SumsubSignatureVerifier.hmac(sumsubPayloadRejection, sumsubWebhookProperties.getSecret());
+
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestRejection)
+                .bodyValue(sumsubPayloadRejection)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        client.get()
+                .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
+                .jsonPath("$.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
+                .jsonPath("$.firstName").isEqualTo("ALEXIS")
+                .jsonPath("$.lastName").isEqualTo("BENOLIEL")
+                .jsonPath("$.country").isEqualTo("France")
+                .jsonPath("$.birthdate").isEqualTo("1995-09-19T00:00:00Z")
+                .jsonPath("$.idDocumentNumber").isEqualTo("15AC05169")
+                .jsonPath("$.idDocumentType").isEqualTo("PASSPORT")
+                .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
+                .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
+                .jsonPath("$.reviewMessage").isEqualTo(reviewMessage.replace("\\n", "\n"))
+                .jsonPath("$.usCitizen").isEqualTo(false);
     }
 
     @Autowired
@@ -180,7 +255,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED");
 
         final UUID billingProfileId = companyBillingProfileRepository.findByUserId(userId).orElseThrow().getId();
-        System.out.println("IT - billingProfileId = " +billingProfileId );
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 billingProfileId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
@@ -194,7 +268,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_CHECKS_RESPONSE_JSON)));
-
 
 
         final byte[] sumsubPayload = String.format("""
@@ -248,6 +321,78 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.registrationNumber").isEqualTo("908233638")
                 .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.usEntity").isEqualTo(false);
+
+        final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
+                                     " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
+        final byte[] sumsubPayloadRejection = String.format("""
+                {
+                  "type": "applicantPending",
+                  "clientId": "onlydust",
+                  "levelName": "basic-kyb-level",
+                  "applicantId": "65bd228a2a99e9196014ccc5",
+                  "createdAtMs": "2024-02-02 17:23:16.368",
+                  "sandboxMode": false,
+                  "inspectionId": "65bd228a2a99e9196014ccc6",
+                  "reviewResult": {
+                      "moderationComment": "%s",
+                      "clientComment": "The date of birth on the profile does not match document data.\\n\\n - Incorrect tax number. A new tax number has been requested.\\n - Incorrect SSN. A new SSN has been requested.",
+                      "reviewAnswer": "RED",
+                      "rejectLabels": [
+                        "PROBLEMATIC_APPLICANT_DATA",
+                        "INCORRECT_SOCIAL_NUMBER"
+                      ],
+                      "reviewRejectType": "RETRY",
+                      "buttonIds": [
+                        "dbNetChecks_incorrectTin",
+                        "dbNetChecks_incorrectSsn",
+                        "dataMismatch",
+                        "dataMismatch_dateOfBirth",
+                        "dbNetChecks"
+                      ]
+                    },
+                  "reviewStatus": "pending",
+                  "applicantType": "company",
+                  "correlationId": "0727edcd2fd452f64b7dd9f76516d815",
+                  "externalUserId": "%s",
+                  "applicantActionId": null,
+                  "applicantMemberOf": null,
+                  "previousLevelName": null,
+                  "videoIdentReviewStatus": null,
+                  "externalApplicantActionId": null
+                }""", reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestRejection = SumsubSignatureVerifier.hmac(sumsubPayloadRejection, sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestRejection)
+                .bodyValue(sumsubPayloadRejection)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        waitAtLeastOneCycleOfOutboxEventProcessing();
+        client.get()
+                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("UNDER_REVIEW")
+                .jsonPath("$.address").isEqualTo("54 rue du Faubourg Montmartre, 75009 Paris")
+                .jsonPath("$.registrationDate").isEqualTo("2021-12-15T00:00:00Z")
+                .jsonPath("$.country").isEqualTo("France")
+                .jsonPath("$.registrationNumber").isEqualTo("908233638")
+                .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
+                .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
+                .jsonPath("$.reviewMessage").isEqualTo(reviewMessage.replace("\\n", "\n"))
                 .jsonPath("$.usEntity").isEqualTo(false);
     }
 
