@@ -141,3 +141,4 @@ infrastructure:
     app-token: ${SUMSUB_API_APP_TOKEN}
     secret-key: ${SUMSUB_API_SECRET_KEY}
     kyc-questionnaire-name: ${SUMSUB_KYC_QUESTIONNAIRE}
+    kyb-questionnaire-name: ${SUMSUB_KYB_QUESTIONNAIRE}
