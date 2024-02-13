@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -66,12 +67,19 @@ public class CurrencyService implements CurrencyFacadePort {
                 .or(() -> isoCurrencyService.get(code))
                 .orElseThrow(() -> notFound("Could not find ISO currency %s".formatted(code)));
 
+        final URI savedLogoUrl;
+        try {
+            savedLogoUrl = logoUri == null ? null : imageStoragePort.storeImage(logoUri).toURI();
+        } catch (URISyntaxException e) {
+            throw badRequest("Invalid logo URI: %s".formatted(logoUri));
+        }
+
         currency = currency.withMetadata(new Currency.Metadata(
                 currency.name(),
                 Optional.ofNullable(description).or(currency::description).orElse(null),
-                Optional.ofNullable(logoUri).or(currency::logoUri).orElse(null)
+                Optional.ofNullable(savedLogoUrl).or(currency::logoUri).orElse(null)
         ));
-        
+
         saveCurrency(currency);
         return currency;
     }
@@ -96,8 +104,10 @@ public class CurrencyService implements CurrencyFacadePort {
             currency = currency.withName(name);
         if (description != null)
             currency = currency.withMetadata(new Currency.Metadata(currency.name(), description, currency.logoUri().orElse(null)));
-        if (logoUrl != null)
-            currency = currency.withMetadata(new Currency.Metadata(currency.name(), currency.description().orElse(null), logoUrl));
+        if (logoUrl != null) {
+            final var savedLogoUrl = imageStoragePort.storeImage(logoUrl);
+            currency = currency.withMetadata(new Currency.Metadata(currency.name(), currency.description().orElse(null), URI.create(savedLogoUrl.toString())));
+        }
         if (decimals != null)
             currency = currency.withDecimals(decimals);
 

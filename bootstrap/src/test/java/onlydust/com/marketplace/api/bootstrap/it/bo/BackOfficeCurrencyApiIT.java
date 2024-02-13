@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -12,14 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URL;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private HistoricalQuoteRepository historicalQuoteRepository;
+
+    @Autowired
+    private ImageStoragePort imageStoragePort;
 
     @Test
     @Order(1)
@@ -175,6 +182,11 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     @Test
     @Order(6)
     void should_add_iso_currency_support() {
+        when(imageStoragePort.storeImage(any(URI.class))).then(invocation -> {
+            final var uri = invocation.getArgument(0, URI.class);
+            return new URL("%s://s3.%s%s".formatted(uri.getScheme(), uri.getHost(), uri.getPath()));
+        });
+
         final var response = client
                 .post()
                 .uri(getApiURI(POST_CURRENCIES))
@@ -199,7 +211,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         assertThat(response.getType()).isEqualTo(CurrencyType.FIAT);
         assertThat(response.getName()).isEqualTo("Euro");
         assertThat(response.getCode()).isEqualTo("EUR");
-        assertThat(response.getLogoUrl()).isEqualTo(URI.create("https://euro.io"));
+        assertThat(response.getLogoUrl()).isEqualTo(URI.create("https://s3.euro.io"));
         assertThat(response.getDecimals()).isEqualTo(2);
         assertThat(response.getDescription()).isEqualTo("Euro is the European currency");
 
@@ -214,7 +226,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         {
                             "name": "Euro2",
                             "description": "Euro is the official currency of the European Union",
-                            "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
+                            "logoUrl": "https://upload.wikimedia.org/Flag_of_Europe.svg.png",
                             "decimals": 3
                         }
                         """)
@@ -226,7 +238,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.type").isEqualTo("FIAT")
                 .jsonPath("$.name").isEqualTo("Euro2")
                 .jsonPath("$.code").isEqualTo("EUR")
-                .jsonPath("$.logoUrl").isEqualTo("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png")
+                .jsonPath("$.logoUrl").isEqualTo("https://s3.upload.wikimedia.org/Flag_of_Europe.svg.png")
                 .jsonPath("$.decimals").isEqualTo(3)
                 .jsonPath("$.description").isEqualTo("Euro is the official currency of the European Union")
         ;
@@ -284,7 +296,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             {
                               "code": "EUR",
                               "name": "Euro2",
-                              "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
+                              "logoUrl": "https://s3.upload.wikimedia.org/Flag_of_Europe.svg.png",
                               "type": "FIAT",
                               "tokens": [],
                               "decimals": 3,
@@ -349,7 +361,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
                             }
                           ]
-                        }                        
+                        }
                         """)
         ;
     }
