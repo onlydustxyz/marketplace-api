@@ -78,13 +78,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(100)
-                .jsonPath("$.allowance").isEqualTo(100)
-                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
-                .jsonPath("$.receipts[0].amount").isEqualTo(100)
-                .jsonPath("$.receipts[0].network").isEqualTo("ETHEREUM")
-                .jsonPath("$.receipts[0].thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.receipts[0].thirdPartyAccountNumber").isEqualTo("coca.cola.eth");
+                .jsonPath("$.reference").isEqualTo("0x01")
+                .jsonPath("$.amount").isEqualTo(100)
+                .jsonPath("$.network").isEqualTo("ETHEREUM")
+                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
         ;
 
         // When
@@ -141,20 +139,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.balance").isEqualTo(40)
-                .jsonPath("$.allowance").isEqualTo(60)
-                .jsonPath("$.receipts[0].reference").isEqualTo("0x01")
-                .jsonPath("$.receipts[0].amount").isEqualTo(100)
-                .jsonPath("$.receipts[0].network").isEqualTo("ETHEREUM")
-                .jsonPath("$.receipts[0].thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.receipts[0].thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
-                .jsonPath("$.receipts[1].reference").isEqualTo("0x02")
-                .jsonPath("$.receipts[1].amount").isEqualTo(-60)
-                .jsonPath("$.receipts[1].network").isEqualTo("ETHEREUM")
-                .jsonPath("$.receipts[1].thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.receipts[1].thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
+                .jsonPath("$.reference").isEqualTo("0x02")
+                .jsonPath("$.amount").isEqualTo(-60)
+                .jsonPath("$.network").isEqualTo("ETHEREUM")
+                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
+                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
         ;
-
 
         // When
         client.put()

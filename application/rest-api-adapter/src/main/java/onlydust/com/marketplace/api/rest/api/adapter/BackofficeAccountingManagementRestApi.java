@@ -52,10 +52,12 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<AccountResponse> registerTransactionReceipt(UUID accountId, RegisterTransactionReceiptRequest registerTransactionReceiptRequest) {
+    public ResponseEntity<TransactionReceipt> registerTransactionReceipt(UUID accountId, RegisterTransactionReceiptRequest registerTransactionReceiptRequest) {
         final var receipt = registerTransactionReceiptRequest.getReceipt();
         final var sponsorAccountStatement = accountingFacadePort.fund(SponsorAccount.Id.of(accountId), mapReceiptToTransaction(receipt));
-        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+        final var addedReceipt = sponsorAccountStatement.account().getTransactions().stream()
+                .filter(t -> t.reference().equals(receipt.getReference())).findFirst().orElseThrow();
+        return ResponseEntity.ok(mapTransactionToReceipt(sponsorAccountStatement.account(), addedReceipt));
     }
 
     @Override
