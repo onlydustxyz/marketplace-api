@@ -99,7 +99,7 @@ public class SponsorAccount {
     }
 
     public void lockUntil(ZonedDateTime lockedUntil) {
-        this.lockedUntil = lockedUntil.toInstant();
+        this.lockedUntil = lockedUntil != null ? lockedUntil.toInstant() : null;
     }
 
     @NoArgsConstructor(staticName = "random")
