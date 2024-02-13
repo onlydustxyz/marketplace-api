@@ -106,24 +106,24 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "initialDollarsEquivalent": 262399.1740409356983600,
-                          "remainingDollarsEquivalent": 262399.1740409356983600,
+                          "initialDollarsEquivalent": 264710.8337131964693400,
+                          "remainingDollarsEquivalent": 264710.8337131964693400,
                           "budgets": [
                             {
                               "currency": "ETH",
                               "initialAmount": 100,
                               "remaining": 100,
-                              "remainingDollarsEquivalent": 262199.158564635400,
-                              "initialDollarsEquivalent": 262199.158564635400,
-                              "dollarsConversionRate": 2621.991585646354
+                              "remainingDollarsEquivalent": 264510.769170899600,
+                              "initialDollarsEquivalent": 264510.769170899600,
+                              "dollarsConversionRate": 2645.107691708996
                             },
                             {
                               "currency": "USDC",
                               "initialAmount": 200,
                               "remaining": 200,
-                              "remainingDollarsEquivalent": 200.0154763002983600,
-                              "initialDollarsEquivalent": 200.0154763002983600,
-                              "dollarsConversionRate": 1.0000773815014918
+                              "remainingDollarsEquivalent": 200.0645422968693400,
+                              "initialDollarsEquivalent": 200.0645422968693400,
+                              "dollarsConversionRate": 1.0003227114843467
                             }
                           ]
                         }
