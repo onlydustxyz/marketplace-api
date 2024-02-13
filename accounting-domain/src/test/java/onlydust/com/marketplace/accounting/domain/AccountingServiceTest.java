@@ -192,6 +192,24 @@ public class AccountingServiceTest {
 
             assertThat(accountBookEventStorage.events).isEmpty();
         }
+
+        /*
+         * Given a newly created sponsor
+         * When I allocate money on it and provide a receipt on a network that is not supported for the currency
+         * Then The request is rejected
+         */
+        @Test
+        void should_reject_funding_on_unsupported_currency() {
+            // Given
+            final var amount = PositiveAmount.of(10L);
+            final var transaction = fakeTransaction(Network.STARKNET, amount);
+
+            // When
+            assertThatThrownBy(() -> accountingService.createSponsorAccount(sponsorId, currency.id(), amount, null, transaction))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Currency USDC is not supported on network STARKNET");
+        }
     }
 
     private PaymentReference fakePaymentReference(Network network) {
@@ -705,7 +723,7 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenSeveralSponsorAccounts {
-        final Currency currency = Currencies.USDC;
+        Currency currency;
         final SponsorId sponsorId = SponsorId.random();
         SponsorAccount unlockedSponsorSponsorAccount1;
         SponsorAccount unlockedSponsorSponsorAccount2;
@@ -717,6 +735,9 @@ public class AccountingServiceTest {
 
         @BeforeEach
         void setup() {
+            currency = Currency.of(ERC20Tokens.ETH_USDC); // build a copy of USDC currency to avoid side effects
+            currency.erc20().add(ERC20Tokens.OP_USDC);
+
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
             unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccount(sponsorId, currency.id(), PositiveAmount.of(100L), null).account();
@@ -970,7 +991,7 @@ public class AccountingServiceTest {
         void should_return_payable_rewards_on_multiple_currencies() {
             // Given
             accountingService.fund(unlockedSponsorAccountUsdc1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(150L)));
-            accountingService.fund(unlockedSponsorAccountOp.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(90L)));
+            accountingService.fund(unlockedSponsorAccountOp.id(), fakeTransaction(Network.OPTIMISM, PositiveAmount.of(90L)));
 
             // When
             final var payableRewards = accountingService.getPayableRewards();
@@ -979,7 +1000,7 @@ public class AccountingServiceTest {
             assertThat(payableRewards).containsExactlyInAnyOrder(
                     new PayableReward(rewardId1, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
                     new PayableReward(rewardId2, usdc.forNetwork(Network.ETHEREUM), PositiveAmount.of(75L)),
-                    new PayableReward(rewardId5, op.forNetwork(Network.ETHEREUM), PositiveAmount.of(90L))
+                    new PayableReward(rewardId5, op.forNetwork(Network.OPTIMISM), PositiveAmount.of(90L))
             );
         }
 

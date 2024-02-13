@@ -287,7 +287,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(2);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
-        assertThat(currency.standard()).contains(Currency.Standard.ISO4217);
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -332,7 +331,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -370,7 +368,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -394,7 +391,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -418,7 +414,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -442,7 +437,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }

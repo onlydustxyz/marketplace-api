@@ -39,7 +39,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "currencyId": "%s",
                             "allowance": 100
                         }
-                        """.formatted(BTC))
+                        """.formatted(STRK))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -51,7 +51,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var accountId = response.getId();
         assertThat(accountId).isNotNull();
         assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
-        assertThat(response.getCurrencyId()).isEqualTo(BTC.value());
+        assertThat(response.getCurrencyId()).isEqualTo(STRK.value());
         assertThat(response.getAllowance()).isEqualTo(BigDecimal.valueOf(100));
         assertThat(response.getBalance()).isEqualTo(BigDecimal.ZERO);
         assertThat(response.getLockedUntil()).isNull();
@@ -186,7 +186,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(BTC))
+                        """.formatted(STRK))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -221,7 +221,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                           "accounts": [
                             {
                               "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "currencyId": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                              "currencyId": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                               "balance": 100,
                               "allowance": 100,
                               "awaitingPaymentAmount": 0,
@@ -269,7 +269,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(BTC))
+                        """.formatted(STRK))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -311,7 +311,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                 "thirdPartyAccountNumber": "coca.cola.eth"
                             }
                         }
-                        """.formatted(BTC))
+                        """.formatted(STRK))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -440,7 +440,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.payments[0].currency.code").isEqualTo("STRK")
                 .jsonPath("$.payments[0].currency.name").isEqualTo("StarkNet Token")
                 .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
-                .jsonPath("$.payments[0].currency.standard").isEqualTo("ERC20")
                 .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
                 .jsonPath("$.payments[0].currency.address").isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766")
                 .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()

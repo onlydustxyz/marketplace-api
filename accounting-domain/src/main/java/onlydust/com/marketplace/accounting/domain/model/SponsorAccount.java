@@ -93,6 +93,8 @@ public class SponsorAccount {
         if (transactions.stream().map(Transaction::reference).anyMatch(transaction.reference()::equals))
             throw badRequest("Transaction with reference %s already exists".formatted(transaction.reference()));
 
+        currency.forNetwork(transaction.network());
+
         transactions.add(transaction);
     }
 
