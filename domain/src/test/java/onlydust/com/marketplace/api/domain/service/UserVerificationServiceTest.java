@@ -48,15 +48,19 @@ public class UserVerificationServiceTest {
     void should_update_existing_company_profile_with_verification_data() {
         // Given
         final UUID billingProfileId = UUID.randomUUID();
+        final String reviewMessageForApplicant = faker.rickAndMorty().location();
         final BillingProfileUpdated event = BillingProfileUpdated.builder()
                 .verificationStatus(VerificationStatus.REJECTED)
                 .type(BillingProfileType.COMPANY)
                 .billingProfileId(billingProfileId)
+                .reviewMessageForApplicant(reviewMessageForApplicant)
                 .build();
         final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
         final CompanyBillingProfile initialCompanyBillingProfile =
-                CompanyBillingProfile.builder().id(billingProfileId).userId(userId).status(VerificationStatus.STARTED).build();
+                CompanyBillingProfile.builder().id(billingProfileId).userId(userId)
+                        .reviewMessageForApplicant(reviewMessageForApplicant)
+                        .status(VerificationStatus.STARTED).build();
         final CompanyBillingProfile companyBillingProfileWithNewStatus = initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
         final CompanyBillingProfile updatedCompanyBillingProfile = initialCompanyBillingProfile.toBuilder()
                 .id(billingProfileId)
@@ -98,6 +102,7 @@ public class UserVerificationServiceTest {
                 .verificationStatus(VerificationStatus.REJECTED)
                 .type(BillingProfileType.COMPANY)
                 .billingProfileId(UUID.randomUUID())
+                .reviewMessageForApplicant(faker.rickAndMorty().location())
                 .build();
         final Event eventStub = mock(Event.class);
 
@@ -121,14 +126,18 @@ public class UserVerificationServiceTest {
     void should_update_existing_individual_profile_with_verification_data() {
         // Given
         final UUID billingProfileId = UUID.randomUUID();
+        final String reviewMessageForApplicant = faker.rickAndMorty().location();
         final BillingProfileUpdated event = BillingProfileUpdated.builder()
                 .verificationStatus(VerificationStatus.NOT_STARTED)
                 .type(BillingProfileType.INDIVIDUAL)
                 .billingProfileId(billingProfileId)
+                .reviewMessageForApplicant(reviewMessageForApplicant)
                 .build();
         final Event eventStub = mock(Event.class);
         final IndividualBillingProfile initialIndividualBillingProfile =
-                IndividualBillingProfile.builder().id(billingProfileId).userId(UUID.randomUUID()).status(VerificationStatus.INVALIDATED).build();
+                IndividualBillingProfile.builder().id(billingProfileId).userId(UUID.randomUUID())
+                        .reviewMessageForApplicant(reviewMessageForApplicant)
+                        .status(VerificationStatus.INVALIDATED).build();
         final IndividualBillingProfile individualBillingProfileWithStatus =
                 initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
         final IndividualBillingProfile updatedIndividualBillingProfile = individualBillingProfileWithStatus.toBuilder()
@@ -166,6 +175,7 @@ public class UserVerificationServiceTest {
                 .verificationStatus(VerificationStatus.REJECTED)
                 .type(BillingProfileType.INDIVIDUAL)
                 .billingProfileId(UUID.randomUUID())
+                .reviewMessageForApplicant(faker.rickAndMorty().location())
                 .build();
         final Event eventStub = mock(Event.class);
 

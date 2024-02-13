@@ -23,6 +23,7 @@ public interface BillingProfileMapper {
                 .usEntity(companyBillingProfile.getUsEntity())
                 .registrationNumber(companyBillingProfile.getRegistrationNumber())
                 .subjectToEuropeVAT(companyBillingProfile.getSubjectToEuropeVAT())
+                .reviewMessage(companyBillingProfile.getReviewMessageForApplicant())
                 .registrationDate(DateMapper.toZoneDateTime(companyBillingProfile.getRegistrationDate()));
     }
 
@@ -40,6 +41,7 @@ public interface BillingProfileMapper {
                 .validUntil(DateMapper.toZoneDateTime(individualBillingProfile.getValidUntil()))
                 .usCitizen(individualBillingProfile.getUsCitizen())
                 .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
+                .reviewMessage(individualBillingProfile.getReviewMessageForApplicant())
                 .idDocumentType(idDocumentTypeToResponse(individualBillingProfile.getIdDocumentType()));
     }
 

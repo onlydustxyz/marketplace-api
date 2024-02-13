@@ -8,10 +8,11 @@ import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+
+import static java.util.Objects.nonNull;
 
 public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
 
@@ -28,14 +29,14 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
     @Override
     public BillingProfileUpdated apply(Event event) {
         try {
-            if (event instanceof SumsubWebhookEventDTO) {
-                final SumsubWebhookEventDTO sumsubWebhookEventDTO = (SumsubWebhookEventDTO) event;
+            if (event instanceof SumsubWebhookEventDTO sumsubWebhookEventDTO) {
                 final UUID billingProfileId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
                 return BillingProfileUpdated.builder()
                         .billingProfileId(billingProfileId)
                         .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
                         .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
                                 sumsubWebhookEventDTO.getReviewResult()))
+                        .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                         .build();
             }
         } catch (Exception ignored) {
@@ -53,7 +54,15 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         };
     }
 
-    private VerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus, final Object reviewResult) {
+    private String reviewMessageForApplicantToDomain(final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
+        if (nonNull(reviewResult) && nonNull(reviewResult.getModerationComment())) {
+            return reviewResult.getModerationComment();
+        }
+        return null;
+    }
+
+    private VerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus,
+                                                           final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
         return switch (type) {
             case "applicantCreated" -> VerificationStatus.STARTED;
             case "applicantPending" -> VerificationStatus.UNDER_REVIEW;
@@ -79,21 +88,19 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         };
     }
 
-    private Optional<Answer> reviewResultToAnswer(final Object reviewResult) {
-        final Map<String, Object> stringObjectMap = (Map<String, Object>) reviewResult;
-        if (stringObjectMap.containsKey("reviewAnswer")) {
-            return switch ((String) stringObjectMap.get("reviewAnswer")) {
+    private Optional<Answer> reviewResultToAnswer(final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
+        if (nonNull(reviewResult) && nonNull(reviewResult.getReviewAnswer())) {
+            return switch (reviewResult.getReviewAnswer()) {
                 case "RED" -> Optional.of(Answer.RED);
                 case "GREEN" -> Optional.of(Answer.GREEN);
-                default -> throw OnlyDustException.internalServerError(String.format("Invalid Sumsub answer %s", stringObjectMap.get("reviewAnswer")));
+                default -> throw OnlyDustException.internalServerError(String.format("Invalid Sumsub answer %s", reviewResult.getReviewAnswer()));
             };
         }
         return Optional.empty();
     }
 
-    private Boolean isAFinalRejection(final Object reviewResult) {
-        final Map<String, Object> stringObjectMap = (Map<String, Object>) reviewResult;
-        return stringObjectMap.containsKey("reviewRejectType") && stringObjectMap.get("reviewRejectType").equals("FINAL");
+    private Boolean isAFinalRejection(final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
+        return nonNull(reviewResult) && nonNull(reviewResult.getReviewRejectType()) && reviewResult.getReviewRejectType().equals("FINAL");
     }
 
     private enum Answer {

@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,6 +50,8 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
         final String path = String.format("/resources/applicants/-;externalUserId=%s/one", billingProfileId.toString());
         final String digest = SumsubSignatureVerifier.hmac((now + method + path).getBytes(StandardCharsets.UTF_8),
                 sumsubClientProperties.getSecretKey());
+        System.out.println("Digest : %s".formatted(digest));
+        System.out.println("Now : %s".formatted(now));
         return sumsubHttpClient.send(path, HttpMethod.GET, null, SumsubIndividualApplicantsDataDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
                         X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for externalUserId = %s", billingProfileId)));
@@ -74,6 +77,23 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
         return sumsubHttpClient.send(path, HttpMethod.GET, null, SumsubCompanyChecksDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
                         X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for applicantId = %s", applicantId)));
+    }
+
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        final SumsubClientProperties sumsubClientProperties = new SumsubClientProperties();
+        sumsubClientProperties.setBaseUri("https://api.sumsub.com");
+        sumsubClientProperties.setAppToken("sbx:Upa6XtQQfssOEBAAskudiZGN.u8YLvdDJZPiSnnKECIvqOjCR6t9QQi0q");
+        sumsubClientProperties.setSecretKey("sU4tZo7AO3EAshbPcJKTiLRViU1a3lJG");
+        sumsubClientProperties.setKybQuestionnaireName("od-kyb-staging");
+        sumsubClientProperties.setKycQuestionnaireName("od-kyc-staging");
+        final SumsubHttpClient sumsubHttpClient = new SumsubHttpClient(sumsubClientProperties);
+        final SumsubApiClientAdapter sumsubApiClientAdapter = new SumsubApiClientAdapter(sumsubClientProperties, sumsubHttpClient);
+
+        final SumsubIndividualApplicantsDataDTO applicantsDataFromIndividualBillingProfileId =
+                sumsubApiClientAdapter.getApplicantsDataFromIndividualBillingProfileId(UUID.fromString("7182a960-3152-4888-9611-6a2d2d59d398"));
+
+        System.out.printf(applicantsDataFromIndividualBillingProfileId.toString());
     }
 
 

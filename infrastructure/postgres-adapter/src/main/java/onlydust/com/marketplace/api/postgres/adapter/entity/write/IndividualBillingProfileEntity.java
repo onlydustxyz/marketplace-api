@@ -44,6 +44,7 @@ public class IndividualBillingProfileEntity {
     String idDocumentNumber;
     String idDocumentCountryCode;
     Date validUntil;
+    String reviewMessage;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -94,6 +95,7 @@ public class IndividualBillingProfileEntity {
                 .usCitizen(this.usCitizen)
                 .birthdate(this.birthdate)
                 .userId(this.userId)
+                .reviewMessageForApplicant(this.reviewMessage)
                 .build();
     }
 
@@ -112,6 +114,7 @@ public class IndividualBillingProfileEntity {
                 .usCitizen(individualBillingProfile.getUsCitizen())
                 .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
                 .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
+                .reviewMessage(individualBillingProfile.getReviewMessageForApplicant())
                 .build();
     }
 }

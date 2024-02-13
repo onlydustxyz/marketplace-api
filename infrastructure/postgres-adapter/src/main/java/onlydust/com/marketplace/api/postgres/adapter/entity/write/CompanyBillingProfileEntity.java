@@ -40,7 +40,7 @@ public class CompanyBillingProfileEntity {
     Boolean subjectToEuVAT;
     @Column(name = "eu_vat_number")
     String euVATNumber;
-
+    String reviewMessage;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -63,6 +63,7 @@ public class CompanyBillingProfileEntity {
                 .registrationNumber(this.registrationNumber)
                 .country(this.country)
                 .userId(this.userId)
+                .reviewMessageForApplicant(this.reviewMessage)
                 .build();
     }
 
@@ -79,6 +80,7 @@ public class CompanyBillingProfileEntity {
                 .euVATNumber(companyBillingProfile.getEuVATNumber())
                 .registrationDate(companyBillingProfile.getRegistrationDate())
                 .registrationNumber(companyBillingProfile.getRegistrationNumber())
+                .reviewMessage(companyBillingProfile.getReviewMessageForApplicant())
                 .build();
     }
 }

@@ -99,3 +99,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000047_defer_fkey.sql
   - include:
       file: db/changelog/changelogs/00000048_transaction_id_is_uuid.sql
+  - include:
+      file: db/changelog/changelogs/00000050_add_verification_review_message.sql
+
