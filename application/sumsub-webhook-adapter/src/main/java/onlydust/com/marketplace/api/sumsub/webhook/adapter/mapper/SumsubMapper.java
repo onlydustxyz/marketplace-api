@@ -66,6 +66,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return switch (type) {
             case "applicantCreated" -> VerificationStatus.STARTED;
             case "applicantPending" -> VerificationStatus.UNDER_REVIEW;
+            case "applicantOnHold" -> VerificationStatus.UNDER_REVIEW;
             case "applicantReviewed" -> switch (reviewStatus) {
                 case "completed":
                     final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
@@ -84,7 +85,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                 default:
                     yield VerificationStatus.UNDER_REVIEW;
             };
-            default -> VerificationStatus.INVALIDATED;
+            default -> VerificationStatus.UNDER_REVIEW;
         };
     }
 
