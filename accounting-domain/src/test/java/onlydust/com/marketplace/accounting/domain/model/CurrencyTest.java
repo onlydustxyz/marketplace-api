@@ -102,9 +102,9 @@ class CurrencyTest {
     }
 
     @Test
-    void should_return_payable_currency_for_native_op() {
+    void should_return_payable_currency_for_op() {
         // Given
-        final var op = Currency.crypto("Optimism", Currency.Code.of("OP"), 9);
+        final var op = Currency.of(ERC20Tokens.OP);
 
         // When
         final var payableCurrency = op.forNetwork(Network.OPTIMISM);
@@ -114,9 +114,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(op.code());
         assertThat(payableCurrency.name()).isEqualTo(op.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(payableCurrency.standard()).isNotPresent();
+        assertThat(payableCurrency.standard()).contains(Currency.Standard.ERC20);
         assertThat(payableCurrency.blockchain()).contains(Blockchain.OPTIMISM);
-        assertThat(payableCurrency.address()).isNotPresent();
+        assertThat(payableCurrency.address()).contains(ERC20Tokens.OP.getAddress());
     }
 
     @Test
