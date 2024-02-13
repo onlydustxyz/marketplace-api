@@ -138,8 +138,6 @@ public class Currency implements Cloneable {
         return switch (code.toString()) {
             case Code.ETH -> Network.ETHEREUM;
             case Code.APT -> Network.APTOS;
-            case Code.STRK -> Network.STARKNET;
-            case Code.OP -> Network.OPTIMISM;
             default -> null;
         };
     }
