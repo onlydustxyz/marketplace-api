@@ -8,7 +8,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 class UserRewardViewTest {
     @ParameterizedTest
-    @EnumSource(value = Currency.class, names = {"Apt", "Usd", "Eth", "Usdc", "Lords"})
+    @EnumSource(value = Currency.class, names = {"APT", "USD", "ETH", "USDC", "LORDS"})
     void should_return_no_unlock_date_for_unlocked_tokens(Currency currency) {
         // Given
         final var view = UserRewardView.builder().amount(UserRewardView.RewardAmountView.builder().currency(currency).build()).build();
@@ -18,7 +18,7 @@ class UserRewardViewTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Currency.class, names = {"Strk"})
+    @EnumSource(value = Currency.class, names = {"STRK"})
     void should_return_no_unlock_date_for_indefinitely_locked_tokens(Currency currency) {
         // Given
         final var view = UserRewardView.builder().amount(UserRewardView.RewardAmountView.builder().currency(currency).build()).build();
@@ -28,7 +28,7 @@ class UserRewardViewTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Currency.class, names = {"Op"})
+    @EnumSource(value = Currency.class, names = {"OP"})
     void should_return_unlock_date_for_locked_tokens(Currency currency) {
         // Given
         final var view = UserRewardView.builder().amount(UserRewardView.RewardAmountView.builder().currency(currency).build()).build();

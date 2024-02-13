@@ -36,7 +36,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Eth)
+                List.of(Currency.ETH)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -44,7 +44,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Eth)
+                List.of(Currency.ETH)
         );
         assertIsFullValid(userPayoutInformation);
     }
@@ -54,7 +54,7 @@ public class UserPayoutSettingsTest {
         var userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Eth)
+                List.of(Currency.ETH)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
@@ -62,7 +62,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Usd)
+                List.of(Currency.USD)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingSepaAccount()).isTrue();
@@ -70,7 +70,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Strk)
+                List.of(Currency.STRK)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingStarknetWallet()).isTrue();
@@ -78,7 +78,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Lords)
+                List.of(Currency.LORDS)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
@@ -86,7 +86,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Op)
+                List.of(Currency.OP)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingOptimismWallet()).isTrue();
@@ -94,7 +94,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Apt)
+                List.of(Currency.APT)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingAptosWallet()).isTrue();
@@ -102,7 +102,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .build(),
-                List.of(Currency.Usdc)
+                List.of(Currency.USDC)
         );
         assertThat(userPayoutInformation.isValid()).isFalse();
         assertThat(userPayoutInformation.isMissingEthereumWallet()).isTrue();
@@ -132,7 +132,7 @@ public class UserPayoutSettingsTest {
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .build(),
-                List.of(Currency.Usd)
+                List.of(Currency.USD)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -140,7 +140,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Strk)
+                List.of(Currency.STRK)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -148,7 +148,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Eth)
+                List.of(Currency.ETH)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -156,7 +156,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
-                List.of(Currency.Eth)
+                List.of(Currency.ETH)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -164,7 +164,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Lords)
+                List.of(Currency.LORDS)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -172,7 +172,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
-                List.of(Currency.Lords)
+                List.of(Currency.LORDS)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -180,7 +180,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Usdc)
+                List.of(Currency.USDC)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -188,7 +188,7 @@ public class UserPayoutSettingsTest {
                 UserPayoutSettings.builder()
                         .ethWallet(Ethereum.wallet("vitalik.eth"))
                         .build(),
-                List.of(Currency.Usdc)
+                List.of(Currency.USDC)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -203,8 +203,8 @@ public class UserPayoutSettingsTest {
                         .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
-                        Currency.Usdc)
+                List.of(Currency.USD, Currency.STRK, Currency.ETH, Currency.OP, Currency.APT, Currency.LORDS,
+                        Currency.USDC)
         );
         assertIsFullValid(userPayoutInformation);
 
@@ -219,8 +219,8 @@ public class UserPayoutSettingsTest {
                         .optimismAddress(Optimism.accountAddress("0x1234567890123456789012345678901234567890"))
                         .ethWallet(Ethereum.wallet("0x1234567890123456789012345678901234567890"))
                         .build(),
-                List.of(Currency.Usd, Currency.Strk, Currency.Eth, Currency.Op, Currency.Apt, Currency.Lords,
-                        Currency.Usdc)
+                List.of(Currency.USD, Currency.STRK, Currency.ETH, Currency.OP, Currency.APT, Currency.LORDS,
+                        Currency.USDC)
         );
         assertIsFullValid(userPayoutInformation);
     }

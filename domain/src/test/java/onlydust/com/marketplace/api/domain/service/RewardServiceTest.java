@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.domain.service;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.BudgetView;
@@ -27,12 +27,12 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
@@ -40,7 +40,7 @@ public class RewardServiceTest {
                 RequestRewardCommand.builder()
                         .projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Strk)
+                        .currency(Currency.STRK)
                         .build();
         final var newRewardId = UUID.randomUUID();
 
@@ -49,10 +49,10 @@ public class RewardServiceTest {
                 .thenReturn(newRewardId);
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Strk)
+                                .currency(Currency.STRK)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -69,28 +69,28 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Strk)
+                        .currency(Currency.STRK)
                         .build();
 
         // When
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(false);
-        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Strk)
+                                .currency(Currency.STRK)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -113,28 +113,28 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(0L))
-                        .currency(Currency.Strk)
+                        .currency(Currency.STRK)
                         .build();
 
         // When
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Strk)
+                                .currency(Currency.STRK)
                                 .remaining(BigDecimal.valueOf(100L))
                                 .build()))
                         .build());
@@ -158,25 +158,25 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Strk)
+                        .currency(Currency.STRK)
                         .build();
 
         // When
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of())
                         .build());
@@ -201,28 +201,28 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
         final RequestRewardCommand requestRewardCommand =
                 RequestRewardCommand.builder().projectId(UUID.randomUUID())
                         .amount(BigDecimal.valueOf(10L))
-                        .currency(Currency.Strk)
+                        .currency(Currency.STRK)
                         .build();
 
         // When
         when(permissionService.isUserProjectLead(requestRewardCommand.getProjectId(), projectLeadId))
                 .thenReturn(true);
-        when(projectStoragePort.findBudgets(requestRewardCommand.getProjectId()))
+        when(projectRewardStoragePort.findBudgets(requestRewardCommand.getProjectId()))
                 .thenReturn(ProjectBudgetsView.builder()
                         .budgets(List.of(BudgetView.builder()
-                                .currency(Currency.Strk)
+                                .currency(Currency.STRK)
                                 .remaining(BigDecimal.valueOf(9L))
                                 .build()))
                         .build());
@@ -247,12 +247,12 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
@@ -273,12 +273,12 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
 
         final UUID projectLeadId = UUID.randomUUID();
@@ -306,12 +306,12 @@ public class RewardServiceTest {
         // Given
         final RewardServicePort rewardServicePort = mock(RewardServicePort.class);
         final PermissionService permissionService = mock(PermissionService.class);
-        final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+        final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final UserStoragePort userStoragePort = mock(UserStoragePort.class);
 
         final RewardService rewardService =
-                new RewardService(rewardServicePort, projectStoragePort, permissionService, indexerPort,
+                new RewardService(rewardServicePort, projectRewardStoragePort, permissionService, indexerPort,
                         userStoragePort);
         final var rewardIds = List.of(UUID.randomUUID(), UUID.randomUUID());
 

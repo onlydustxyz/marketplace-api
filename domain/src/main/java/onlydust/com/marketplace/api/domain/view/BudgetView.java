@@ -17,11 +17,11 @@ public class BudgetView {
     BigDecimal dollarsConversionRate;
 
     public BigDecimal getInitialDollarsEquivalent() {
-        return currency.equals(Currency.Usd) ? initialAmount : initialDollarsEquivalent;
+        return currency.equals(Currency.USD) ? initialAmount : initialDollarsEquivalent;
     }
 
     public BigDecimal getRemainingDollarsEquivalent() {
-        return currency.equals(Currency.Usd) ? remaining : remainingDollarsEquivalent;
+        return currency.equals(Currency.USD) ? remaining : remainingDollarsEquivalent;
     }
 
 }

@@ -86,6 +86,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_PR = "/api/v1/projects/%s/rewardable-items/other" +
                                                                       "-pull-requests";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
+    protected static final String PROJECTS_GET_BUDGETS_V2 = "/api/v2/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String PROJECTS_IGNORED_CONTRIBUTIONS_PUT = "/api/v1/projects/%s/ignored-contributions";

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -37,6 +38,8 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
         final var usd = currencyRepository.findByCode("USD").orElseThrow(() -> internalServerError("USD currency not found"));
 
         final var budgets = projectAllowanceRepository.findAllByProjectId(projectId).stream().map(projectAllowanceEntity -> {
+            final var currency = currencyRepository.findById(projectAllowanceEntity.getCurrencyId()).orElseThrow(() -> internalServerError("USD currency not " +
+                                                                                                                                           "found"));
             final var quote = historicalQuoteRepository.findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(
                             projectAllowanceEntity.getCurrencyId(),
                             usd.id(),
@@ -45,6 +48,8 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
                     .orElseThrow(() -> internalServerError("No quote found for currency %s and base %s"
                             .formatted(projectAllowanceEntity.getCurrencyId(), usd.id())));
             return BudgetView.builder()
+                    .currency(Currency.valueOf(currency.code()))
+                    .dollarsConversionRate(quote.price())
                     .remaining(projectAllowanceEntity.getCurrentAllowance())
                     .initialAmount(projectAllowanceEntity.getInitialAllowance())
                     .remainingDollarsEquivalent(quote.convertToBaseCurrency(projectAllowanceEntity.getCurrentAllowance()))

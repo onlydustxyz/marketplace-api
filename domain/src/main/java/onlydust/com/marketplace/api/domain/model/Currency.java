@@ -7,10 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public enum Currency {
-    Usd, Eth, Op, Apt, Strk, Lords, Usdc;
+    USD, ETH, OP, APT, STRK, LORDS, USDC;
 
     public Date unlockDate() {
-        return this == Currency.Op ? parseDate("2024-08-23") : null;
+        return this == Currency.OP ? parseDate("2024-08-23") : null;
     }
 
     private static Date parseDate(String date) {

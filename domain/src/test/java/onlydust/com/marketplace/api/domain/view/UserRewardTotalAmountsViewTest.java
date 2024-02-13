@@ -17,11 +17,11 @@ public class UserRewardTotalAmountsViewTest {
         final UserRewardTotalAmountsView userRewardTotalAmountsView =
                 UserRewardTotalAmountsView.builder().userTotalRewards(
                         List.of(
-                                getStub(10, 1000D, Currency.Eth),
-                                getStub(20, 2000D, Currency.Eth),
-                                getStub(500, 600D, Currency.Apt),
-                                getStub(5000, 5000D, Currency.Usd),
-                                getStub(1000, null, Currency.Strk)
+                                getStub(10, 1000D, Currency.ETH),
+                                getStub(20, 2000D, Currency.ETH),
+                                getStub(500, 600D, Currency.APT),
+                                getStub(5000, 5000D, Currency.USD),
+                                getStub(1000, null, Currency.STRK)
                         )
                 ).build();
 

@@ -11,13 +11,13 @@ public interface RewardMapper {
         return RequestRewardDTO.builder()
                 .amount(command.getAmount())
                 .currency(switch (command.getCurrency()) {
-                    case Eth -> "ETH";
-                    case Op -> "OP";
-                    case Apt -> "APT";
-                    case Usd -> "USD";
-                    case Strk -> "STRK";
-                    case Lords -> "LORDS";
-                    case Usdc -> "USDC";
+                    case ETH -> "ETH";
+                    case OP -> "OP";
+                    case APT -> "APT";
+                    case USD -> "USD";
+                    case STRK -> "STRK";
+                    case LORDS -> "LORDS";
+                    case USDC -> "USDC";
                 })
                 .projectId(command.getProjectId())
                 .recipientId(command.getRecipientId())

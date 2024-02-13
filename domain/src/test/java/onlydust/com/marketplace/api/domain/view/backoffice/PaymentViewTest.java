@@ -18,7 +18,7 @@ class PaymentViewTest {
     @Test
     void should_consider_payout_info_invalid_when_sepa_account_is_invalid() {
         final var paymentView = PaymentView.builder()
-                .currency(Currency.Usd);
+                .currency(Currency.USD);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().bic(faker.finance().bic()).build()).build().recipientPayoutInfoValid());
@@ -29,7 +29,7 @@ class PaymentViewTest {
     @Test
     void should_consider_payout_info_invalid_when_wallet_is_invalid() {
         final var paymentView = PaymentView.builder()
-                .currency(Currency.Usd);
+                .currency(Currency.USD);
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
     }
@@ -37,44 +37,44 @@ class PaymentViewTest {
     @Test
     void should_consider_payout_info_valid_when_all_data_are_valid() {
         assertTrue(PaymentView.builder()
-                .currency(Currency.Usd)
+                .currency(Currency.USD)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Usdc)
+                .currency(Currency.USDC)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Eth)
+                .currency(Currency.ETH)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Op)
+                .currency(Currency.OP)
                 .recipientOptimismWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Strk)
+                .currency(Currency.STRK)
                 .recipientStarkWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Apt)
+                .currency(Currency.APT)
                 .recipientAptosWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
 
         assertTrue(PaymentView.builder()
-                .currency(Currency.Lords)
+                .currency(Currency.LORDS)
                 .recipientEthWallet("vitalik.eth")
                 .build()
                 .recipientPayoutInfoValid());
@@ -83,43 +83,43 @@ class PaymentViewTest {
     @Test
     void should_return_formatted_payout_settings() {
         assertThat(PaymentView.builder()
-                .currency(Currency.Usd)
+                .currency(Currency.USD)
                 .recipientSepaAccount(validSepaAccount)
                 .build()
                 .recipientPayoutSettings()).isEqualTo(validSepaAccount.getAccountNumber().asString() + " / " + validSepaAccount.getBic());
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Usdc)
+                .currency(Currency.USDC)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Eth)
+                .currency(Currency.ETH)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Lords)
+                .currency(Currency.LORDS)
                 .recipientEthWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Op)
+                .currency(Currency.OP)
                 .recipientOptimismWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Strk)
+                .currency(Currency.STRK)
                 .recipientStarkWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");
 
         assertThat(PaymentView.builder()
-                .currency(Currency.Apt)
+                .currency(Currency.APT)
                 .recipientAptosWallet("wallet")
                 .build()
                 .recipientPayoutSettings()).isEqualTo("wallet");

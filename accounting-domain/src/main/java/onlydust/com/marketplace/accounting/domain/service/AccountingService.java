@@ -28,21 +28,25 @@ public class AccountingService implements AccountingFacadePort {
     private final ProjectAccountingObserver projectAccountingObserver;
 
     @Override
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId,
+                                                        Currency.@NonNull Id currencyId,
+                                                        @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
         sponsorAccountStorage.save(sponsorAccount);
 
-        increaseAllowance(sponsorAccount.id(), amountToMint);
+        increaseAllowance(sponsorAccount.id(), allowance);
         return sponsorAccountStatement(sponsorAccount, getAccountBook(currency));
     }
 
     @Override
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId,
+                                                        Currency.@NonNull Id currencyId,
+                                                        @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil,
                                                         @NonNull SponsorAccount.Transaction transaction) {
-        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, amountToMint, lockedUntil);
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil);
         return fund(sponsorAccount.account().id(), transaction);
     }
 
