@@ -62,7 +62,7 @@ public class SumsubMapperTest {
         sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
         final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
         reviewResultDTO.setReviewAnswer(reviewResult);
-        if (nonNull(finalDecision)){
+        if (nonNull(finalDecision) && finalDecision){
             reviewResultDTO.setReviewRejectType("FINAL");
         }
         sumsubWebhookEventDTO.setReviewResult(reviewResultDTO);
