@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
-import onlydust.com.backoffice.api.contract.model.CurrencyStandard;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import org.junit.jupiter.api.MethodOrderer;
@@ -44,7 +43,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
-                .jsonPath("$.standard").isEqualTo("ERC20")
                 .jsonPath("$.tokens[?(@.blockchain=='ETHEREUM')].address").isEqualTo("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
@@ -76,7 +74,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
-                .jsonPath("$.standard").isEqualTo("ERC20")
                 .jsonPath("$.tokens[?(@.blockchain=='OPTIMISM')].address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
@@ -132,7 +129,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
-                .jsonPath("$.standard").isEqualTo("ERC20")
                 .jsonPath("$.tokens[?(@.blockchain=='STARKNET')].address").isEqualTo("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
@@ -201,7 +197,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
         assertThat(response.getId()).isNotNull();
         assertThat(response.getType()).isEqualTo(CurrencyType.FIAT);
-        assertThat(response.getStandard()).isEqualTo(CurrencyStandard.ISO4217);
         assertThat(response.getName()).isEqualTo("Euro");
         assertThat(response.getCode()).isEqualTo("EUR");
         assertThat(response.getLogoUrl()).isEqualTo(URI.create("https://euro.io"));
@@ -229,7 +224,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectBody()
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("FIAT")
-                .jsonPath("$.standard").isEqualTo("ISO4217")
                 .jsonPath("$.name").isEqualTo("Euro2")
                 .jsonPath("$.code").isEqualTo("EUR")
                 .jsonPath("$.logoUrl").isEqualTo("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png")
@@ -274,7 +268,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "Bitcoin",
                               "logoUrl": null,
                               "type": "CRYPTO",
-                              "standard": null,
                               "tokens": [],
                               "decimals": 8,
                               "description": null
@@ -284,7 +277,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "Ethereum",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
                               "type": "CRYPTO",
-                              "standard": null,
                               "tokens": [],
                               "decimals": 18,
                               "description": "Ethereum (ETH) is a cryptocurrency"
@@ -294,7 +286,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "Euro2",
                               "logoUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/1200px-Flag_of_Europe.svg.png",
                               "type": "FIAT",
-                              "standard": "ISO4217",
                               "tokens": [],
                               "decimals": 3,
                               "description": "Euro is the official currency of the European Union"
@@ -304,7 +295,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "StarkNet Token",
                               "logoUrl": null,
                               "type": "CRYPTO",
-                              "standard": "ERC20",
                               "tokens": [
                                 {
                                   "blockchain": "ETHEREUM",
@@ -323,7 +313,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "US Dollar",
                               "logoUrl": null,
                               "type": "FIAT",
-                              "standard": "ISO4217",
                               "tokens": [],
                               "decimals": 2,
                               "description": null
@@ -333,7 +322,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "name": "USD Coin",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                               "type": "CRYPTO",
-                              "standard": "ERC20",
                               "tokens": [
                                 {
                                   "blockchain": "OPTIMISM",

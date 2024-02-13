@@ -1825,8 +1825,6 @@ components:
           properties:
             type:
               $ref: '#/components/schemas/CurrencyType'
-            standard:
-              $ref: '#/components/schemas/CurrencyStandard'
             tokens:
               type: array
               items:

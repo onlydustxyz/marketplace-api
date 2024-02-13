@@ -286,7 +286,6 @@ public interface BackOfficeMapper {
         return new CurrencyResponse()
                 .id(currency.id().value())
                 .type(mapCurrencyType(currency.type()))
-                .standard(currency.standard().map(BackOfficeMapper::mapCurrencyStandard).orElse(null))
                 .name(currency.name())
                 .code(currency.code().toString())
                 .logoUrl(currency.logoUri().orElse(null))

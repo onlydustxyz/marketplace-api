@@ -440,7 +440,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.payments[0].currency.code").isEqualTo("STRK")
                 .jsonPath("$.payments[0].currency.name").isEqualTo("StarkNet Token")
                 .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
-                .jsonPath("$.payments[0].currency.standard").isEqualTo("ERC20")
                 .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
                 .jsonPath("$.payments[0].currency.address").isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766")
                 .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()

@@ -19,7 +19,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("US Dollar");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("USD"));
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
-        assertThat(currency.standard()).contains(Currency.Standard.ISO4217);
         assertThat(currency.decimals()).isEqualTo(2);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
@@ -33,7 +32,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("Ether");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("ETH"));
         assertThat(currency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(currency.standard()).isEmpty();
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
@@ -47,7 +45,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("USD Coin");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("USDC"));
         assertThat(currency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(currency.standard()).contains(Currency.Standard.ERC20);
         assertThat(currency.decimals()).isEqualTo(6);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
