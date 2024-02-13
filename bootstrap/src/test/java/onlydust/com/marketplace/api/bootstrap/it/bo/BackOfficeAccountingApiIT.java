@@ -356,7 +356,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "receipt": {
                                 "reference": "0x01",
                                 "amount": 100,
-                                "network": "ETHEREUM",
+                                "network": "STARKNET",
                                 "thirdPartyName": "RedBull",
                                 "thirdPartyAccountNumber": "red-bull.eth"
                             }
@@ -440,8 +440,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.payments[0].currency.code").isEqualTo("STRK")
                 .jsonPath("$.payments[0].currency.name").isEqualTo("StarkNet Token")
                 .jsonPath("$.payments[0].currency.type").isEqualTo("CRYPTO")
-                .jsonPath("$.payments[0].currency.blockchain").isEqualTo("ETHEREUM")
-                .jsonPath("$.payments[0].currency.address").isEqualTo("0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766")
+                .jsonPath("$.payments[0].currency.blockchain").isEqualTo("STARKNET")
+                .jsonPath("$.payments[0].currency.address").doesNotExist()
                 .jsonPath("$.payments[0].recipientAccountNumber").doesNotExist()
                 .jsonPath("$.payments[0].rewardId").isEqualTo(rewardId.toString());
 
@@ -452,7 +452,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "network": "ETHEREUM",
+                            "network": "STARKNET",
                             "reference": "0x14",
                             "recipientAccount": "ofux.eth"
                         }
