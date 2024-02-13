@@ -25,7 +25,6 @@ public class Currency implements Cloneable {
     private final Code code;
     @NonNull
     private final Type type;
-    private final Standard standard;
     @NonNull
     private Integer decimals;
     private final Metadata metadata;
@@ -38,7 +37,6 @@ public class Currency implements Cloneable {
                 .name(token.getName())
                 .code(Code.of(token.getSymbol()))
                 .type(Type.CRYPTO)
-                .standard(Standard.ERC20)
                 .erc20(new HashSet<>(Set.of(token)))
                 .decimals(token.getDecimals())
                 .build();
@@ -50,7 +48,6 @@ public class Currency implements Cloneable {
                 .name(name)
                 .code(code)
                 .type(Type.FIAT)
-                .standard(Standard.ISO4217)
                 .decimals(decimals)
                 .build();
     }
@@ -93,10 +90,6 @@ public class Currency implements Cloneable {
         return type;
     }
 
-    public Optional<Standard> standard() {
-        return Optional.ofNullable(standard);
-    }
-
     public Integer decimals() {
         return decimals;
     }
@@ -130,7 +123,7 @@ public class Currency implements Cloneable {
             throw OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network));
 
         if (type == Type.FIAT)
-            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), standard, null, null);
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ISO4217, null, null);
 
         if (network.equals(nativeNetwork()))
             return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, nativeNetwork().blockchain(), null);
@@ -138,15 +131,13 @@ public class Currency implements Cloneable {
         final var erc20 = erc20().stream().filter(e -> e.getBlockchain().equals(network.blockchain()))
                 .findFirst().orElseThrow(() -> OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network)));
 
-        return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), standard, erc20.getBlockchain(), erc20.getAddress());
+        return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ERC20, erc20.getBlockchain(), erc20.getAddress());
     }
 
     private Network nativeNetwork() {
         return switch (code.toString()) {
             case Code.ETH -> Network.ETHEREUM;
             case Code.APT -> Network.APTOS;
-            case Code.STRK -> Network.STARKNET;
-            case Code.OP -> Network.OPTIMISM;
             default -> null;
         };
     }

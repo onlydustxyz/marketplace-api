@@ -4,7 +4,6 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.net.URI;
@@ -19,10 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@TypeDefs({
-        @TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class),
-        @TypeDef(name = "currency_standard", typeClass = PostgreSQLEnumType.class)
-})
+@TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class)
 public class CurrencyEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -30,9 +26,6 @@ public class CurrencyEntity {
     @org.hibernate.annotations.Type(type = "currency_type")
     @Enumerated(EnumType.STRING)
     private @NonNull Type type;
-    @org.hibernate.annotations.Type(type = "currency_standard")
-    @Enumerated(EnumType.STRING)
-    private Standard standard;
     private @NonNull String name;
     private @NonNull String code;
     private String logoUrl;
@@ -46,7 +39,6 @@ public class CurrencyEntity {
         return CurrencyEntity.builder()
                 .id(currency.id().value())
                 .type(Type.of(currency.type()))
-                .standard(currency.standard().map(Standard::of).orElse(null))
                 .name(currency.name())
                 .code(currency.code().toString())
                 .logoUrl(currency.logoUri().map(Objects::toString).orElse(null))
@@ -60,7 +52,6 @@ public class CurrencyEntity {
         return Currency.builder()
                 .id(Currency.Id.of(id))
                 .type(type.toDomain())
-                .standard(standard == null ? null : standard.toDomain())
                 .name(name)
                 .code(Currency.Code.of(code))
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
@@ -83,24 +74,6 @@ public class CurrencyEntity {
             return switch (this) {
                 case FIAT -> Currency.Type.FIAT;
                 case CRYPTO -> Currency.Type.CRYPTO;
-            };
-        }
-    }
-
-    public enum Standard {
-        ISO4217, ERC20;
-
-        public static Standard of(final @NonNull Currency.Standard standard) {
-            return switch (standard) {
-                case ISO4217 -> ISO4217;
-                case ERC20 -> ERC20;
-            };
-        }
-
-        public Currency.Standard toDomain() {
-            return switch (this) {
-                case ISO4217 -> Currency.Standard.ISO4217;
-                case ERC20 -> Currency.Standard.ERC20;
             };
         }
     }

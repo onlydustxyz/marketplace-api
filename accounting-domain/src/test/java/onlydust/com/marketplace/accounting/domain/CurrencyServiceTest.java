@@ -17,6 +17,7 @@ import org.mockito.invocation.InvocationOnMock;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -271,9 +272,10 @@ public class CurrencyServiceTest {
     }
 
     @Test
-    void should_add_iso_currency_support() {
+    void should_add_iso_currency_support() throws MalformedURLException {
         // Given
         when(isoCurrencyService.get(Currency.Code.of("EUR"))).thenReturn(Optional.of(Currency.fiat("Euro", Currency.Code.of("EUR"), 2)));
+        when(imageStoragePort.storeImage(URI.create("https://euro.io"))).thenReturn(new URL("https://s3.euro.io"));
 
         // When
         final var currency = currencyService.addIsoCurrencySupport(Currency.Code.of("EUR"), "European currency", URI.create("https://euro.io"));
@@ -283,11 +285,10 @@ public class CurrencyServiceTest {
         assertThat(currency.name()).isEqualTo("Euro");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("EUR"));
         assertThat(currency.description()).contains("European currency");
-        assertThat(currency.logoUri()).contains(URI.create("https://euro.io"));
+        assertThat(currency.logoUri()).contains(URI.create("https://s3.euro.io"));
         assertThat(currency.decimals()).isEqualTo(2);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
-        assertThat(currency.standard()).contains(Currency.Standard.ISO4217);
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -314,25 +315,27 @@ public class CurrencyServiceTest {
         assertThat(currency).isEqualTo(Currencies.USD);
     }
 
+    @SneakyThrows
     @Test
     void should_allow_to_update_a_currency() {
         // Given
         final var initialCurrency = Currencies.USD;
+        final var logoUrl = URI.create("https://usd.io");
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+        when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", URI.create("https://usd.io"), 3);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", logoUrl, 3);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
         assertThat(currency.name()).isEqualTo("United States Dollar");
         assertThat(currency.code()).isEqualTo(initialCurrency.code());
         assertThat(currency.description()).contains("US currency");
-        assertThat(currency.logoUri()).contains(URI.create("https://usd.io"));
+        assertThat(currency.logoUri()).contains(URI.create("https://s3.usd.io"));
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -370,7 +373,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -394,31 +396,32 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
 
 
+    @SneakyThrows
     @Test
     void should_allow_partial_update_of_logo_url() {
         // Given
         final var initialCurrency = Currencies.USD;
+        final var logoUrl = URI.create("https://usd.io");
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+        when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, URI.create("https://usd.io"), null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, logoUrl, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
         assertThat(currency.name()).isEqualTo(initialCurrency.name());
         assertThat(currency.code()).isEqualTo(initialCurrency.code());
         assertThat(currency.description()).isEqualTo(initialCurrency.description());
-        assertThat(currency.logoUri()).contains(URI.create("https://usd.io"));
+        assertThat(currency.logoUri()).contains(URI.create("https://s3.usd.io"));
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -442,7 +445,6 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
-        assertThat(currency.standard()).isEqualTo(initialCurrency.standard());
 
         verify(currencyStorage, times(1)).save(currency);
     }

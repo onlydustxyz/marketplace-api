@@ -34,15 +34,12 @@ public class PostgresQuoteAdapterIT extends AbstractPostgresIT {
         currencyRepository.saveAll(List.of(
                 new CurrencyEntity(currencyId1.value(),
                         CurrencyEntity.Type.CRYPTO,
-                        CurrencyEntity.Standard.ERC20,
                         "USD Coin", "USDC", "logo", 4, "foo", Set.of()),
                 new CurrencyEntity(currencyId2.value(),
                         CurrencyEntity.Type.CRYPTO,
-                        CurrencyEntity.Standard.ERC20,
                         "Starknet", "STRK", "logo", 4, "foo", Set.of()),
                 new CurrencyEntity(baseId.value(),
                         CurrencyEntity.Type.FIAT,
-                        CurrencyEntity.Standard.ISO4217,
                         "US Dollar", "USD", "logo", 4, "foo", Set.of())
         ));
         postgresQuoteAdapter.save(List.of(

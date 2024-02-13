@@ -19,7 +19,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("US Dollar");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("USD"));
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
-        assertThat(currency.standard()).contains(Currency.Standard.ISO4217);
         assertThat(currency.decimals()).isEqualTo(2);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
@@ -33,7 +32,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("Ether");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("ETH"));
         assertThat(currency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(currency.standard()).isEmpty();
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
@@ -47,7 +45,6 @@ class CurrencyTest {
         assertThat(currency.name()).isEqualTo("USD Coin");
         assertThat(currency.code()).isEqualTo(Currency.Code.of("USDC"));
         assertThat(currency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(currency.standard()).contains(Currency.Standard.ERC20);
         assertThat(currency.decimals()).isEqualTo(6);
         assertThat(currency.description()).isEmpty();
         assertThat(currency.logoUri()).isEmpty();
@@ -105,9 +102,9 @@ class CurrencyTest {
     }
 
     @Test
-    void should_return_payable_currency_for_native_op() {
+    void should_return_payable_currency_for_op() {
         // Given
-        final var op = Currency.crypto("Optimism", Currency.Code.of("OP"), 9);
+        final var op = Currency.of(ERC20Tokens.OP);
 
         // When
         final var payableCurrency = op.forNetwork(Network.OPTIMISM);
@@ -117,9 +114,9 @@ class CurrencyTest {
         assertThat(payableCurrency.code()).isEqualTo(op.code());
         assertThat(payableCurrency.name()).isEqualTo(op.name());
         assertThat(payableCurrency.type()).isEqualTo(Currency.Type.CRYPTO);
-        assertThat(payableCurrency.standard()).isNotPresent();
+        assertThat(payableCurrency.standard()).contains(Currency.Standard.ERC20);
         assertThat(payableCurrency.blockchain()).contains(Blockchain.OPTIMISM);
-        assertThat(payableCurrency.address()).isNotPresent();
+        assertThat(payableCurrency.address()).contains(ERC20Tokens.OP.getAddress());
     }
 
     @Test
