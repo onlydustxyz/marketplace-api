@@ -17,11 +17,14 @@ import javax.imageio.stream.ImageInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Iterator;
 
 import static java.lang.String.format;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @AllArgsConstructor
 @Slf4j
@@ -34,19 +37,32 @@ public class AwsS3Adapter implements ImageStoragePort, InvoiceStoragePort {
         ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes));
         Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(iis);
         if (!imageReaders.hasNext()) {
-            throw OnlyDustException.badRequest("Input stream is not an image", null);
+            throw badRequest("Input stream is not an image", null);
         }
         return imageReaders.next().getFormatName().toLowerCase();
     }
 
     @Override
-    public URL storeImage(InputStream imageInputStream) {
+    public URL storeImage(InputStream image) {
         try {
-            final byte[] imageBytes = imageInputStream.readAllBytes();
+            final byte[] imageBytes = image.readAllBytes();
             final String fileName = format("%s.%s", DigestUtils.md5Hex(imageBytes), getImageFileExtension(imageBytes));
             return uploadByteArrayToS3Bucket(imageBytes, amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
-            throw OnlyDustException.badRequest("Failed to read image input stream", e);
+            throw badRequest("Failed to read image input stream", e);
+        }
+    }
+
+    @Override
+    public URL storeImage(URI uri) {
+        try {
+            try (final var image = uri.toURL().openStream()) {
+                return storeImage(image);
+            }
+        } catch (MalformedURLException e) {
+            throw badRequest("Invalid image URL", e);
+        } catch (IOException e) {
+            throw badRequest("Failed to read image from URL", e);
         }
     }
 
@@ -56,7 +72,7 @@ public class AwsS3Adapter implements ImageStoragePort, InvoiceStoragePort {
             final byte[] bytes = inputStream.readAllBytes();
             return uploadByteArrayToS3Bucket(bytes, amazonS3Properties.getImageBucket(), name);
         } catch (IOException e) {
-            throw OnlyDustException.badRequest("Failed to read input stream", e);
+            throw badRequest("Failed to read input stream", e);
         }
     }
 
