@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.*;
 import onlydust.com.marketplace.api.domain.service.GithubAccountService;
 import onlydust.com.marketplace.api.domain.service.RewardService;
@@ -37,11 +38,11 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort,
-                               final RewardFacadePort rewardFacadePort,
+    public MeRestApi meRestApi(final AuthenticationService authenticationService,
+                               final UserFacadePort userFacadePort,
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService) {
-        return new MeRestApi(authenticationService, userFacadePort, rewardFacadePort, contributorFacadePort,
+        return new MeRestApi(authenticationService, userFacadePort, contributorFacadePort,
                 githubAccountService);
     }
 
@@ -65,6 +66,12 @@ public class RestApiConfiguration {
     @ConfigurationProperties("application.web.machine-to-machine")
     public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
         return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    public BillingProfileRestApi billingProfileRestApi(final AuthenticationService authenticationService,
+                                                       final BillingProfileFacadePort billingProfileFacadePort) {
+        return new BillingProfileRestApi(authenticationService, billingProfileFacadePort);
     }
 
 }

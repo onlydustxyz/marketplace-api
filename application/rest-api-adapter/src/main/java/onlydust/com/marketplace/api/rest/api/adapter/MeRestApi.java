@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -46,9 +45,9 @@ public class MeRestApi implements MeApi {
 
     private final AuthenticationService authenticationService;
     private final UserFacadePort userFacadePort;
-    private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
+
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -307,12 +306,6 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.ok(response);
     }
 
-    @Override
-    public ResponseEntity<Void> markInvoiceAsReceived() {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
-        return ResponseEntity.noContent().build();
-    }
 
     @Override
     public ResponseEntity<CompanyBillingProfileResponse> getMyCompanyBillingProfile() {
@@ -333,21 +326,6 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.noContent().build();
     }
 
-    @Override
-    public ResponseEntity<UploadPdfResponse> uploadInvoice(Resource pdf) {
-        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        InputStream pdfInputStream;
-        try {
-            pdfInputStream = pdf.getInputStream();
-        } catch (IOException e) {
-            throw OnlyDustException.badRequest("Error while reading image data", e);
-        }
-
-        final URL pdfUrl = userFacadePort.saveInvoicePdfForGithubUserId(authenticatedUser.getGithubUserId(), pdfInputStream);
-        final UploadPdfResponse response = new UploadPdfResponse();
-        response.url(pdfUrl.toString());
-        return ResponseEntity.ok(response);
-    }
 
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
