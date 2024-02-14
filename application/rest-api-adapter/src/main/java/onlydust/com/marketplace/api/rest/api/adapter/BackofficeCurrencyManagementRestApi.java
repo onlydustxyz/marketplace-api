@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,21 +32,43 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
 
     @Override
     public ResponseEntity<CurrencyResponse> createCurrency(CurrencyCreateRequest request) {
+        check(request);
         final var currency = switch (request.getType()) {
             case CRYPTO -> request.getStandard() == null
                     ? currencyFacadePort.addNativeCryptocurrencySupport(Currency.Code.of(request.getCode()), request.getDecimals())
-                    : switch (request.getStandard()) {
-                case ERC20 -> currencyFacadePort.addERC20Support(mapBlockchain(request.getBlockchain()), Ethereum.contractAddress(request.getAddress()));
-                default -> throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
-            };
+                    : currencyFacadePort.addERC20Support(mapBlockchain(request.getBlockchain()), Ethereum.contractAddress(request.getAddress()));
 
-            case FIAT -> switch (Optional.ofNullable(request.getStandard()).orElse(CurrencyStandard.ISO4217)) {
-                case ISO4217 -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()), request.getDescription(), request.getLogoUrl());
-                default -> throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
-            };
+            case FIAT -> currencyFacadePort.addIsoCurrencySupport(Currency.Code.of(request.getCode()), request.getDescription(), request.getLogoUrl());
         };
 
         return ResponseEntity.ok(mapCurrencyResponse(currency));
+    }
+
+    private void check(CurrencyCreateRequest request) {
+        required(request.getType(), "type");
+
+        switch (request.getType()) {
+            case CRYPTO -> {
+                if (request.getStandard() == null) {
+                    required(request.getDecimals(), "decimals");
+                } else if (Objects.requireNonNull(request.getStandard()) == CurrencyStandard.ERC20) {
+                    required(request.getAddress(), "address");
+                    required(request.getBlockchain(), "blockchain");
+                } else {
+                    throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+                }
+            }
+            case FIAT -> {
+                required(request.getCode(), "code");
+                if (Optional.ofNullable(request.getStandard()).orElse(CurrencyStandard.ISO4217) != CurrencyStandard.ISO4217) {
+                    throw badRequest("Standard %s is not supported for type %s".formatted(request.getStandard(), request.getType()));
+                }
+            }
+        }
+    }
+
+    private void required(Object value, String name) {
+        if (value == null) throw badRequest("'%s' is required".formatted(name));
     }
 
     @Override
