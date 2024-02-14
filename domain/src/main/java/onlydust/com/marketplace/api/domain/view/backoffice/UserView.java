@@ -19,8 +19,6 @@ public class UserView {
     String firstname;
     String lastname;
     String address;
-    String postCode;
-    String city;
     String country;
     String telegram;
     String twitter;

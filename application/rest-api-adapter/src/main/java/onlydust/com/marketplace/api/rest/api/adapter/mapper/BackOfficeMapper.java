@@ -165,8 +165,6 @@ public interface BackOfficeMapper {
                         .firstname(user.getFirstname())
                         .lastname(user.getLastname())
                         .address(user.getAddress())
-                        .postCode(user.getPostCode())
-                        .city(user.getCity())
                         .country(user.getCountry())
                         .telegram(user.getTelegram())
                         .twitter(user.getTwitter())
