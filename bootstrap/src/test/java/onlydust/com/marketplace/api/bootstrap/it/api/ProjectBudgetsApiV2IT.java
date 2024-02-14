@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.domain.service.RewardV2Service;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
@@ -66,8 +67,10 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         final var usd = currencyRepository.findByCode("USD").orElseThrow();
-        final var eth = currencyRepository.findByCode("ETH").orElseThrow();
-        final var usdc = currencyRepository.findByCode("USDC").orElseThrow();
+        final var eth = currencyRepository.save(new CurrencyEntity(UUID.randomUUID(),
+                CurrencyEntity.Type.CRYPTO, "ETH", "ETH", null, 18, null, null));
+        final var usdc = currencyRepository.save(new CurrencyEntity(UUID.randomUUID(),
+                CurrencyEntity.Type.CRYPTO, "USDC", "USDC", null, 18, null, null));
         historicalQuoteRepository.save(HistoricalQuoteEntity.builder()
                 .price(BigDecimal.valueOf(1.10))
                 .currencyId(eth.id())

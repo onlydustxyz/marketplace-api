@@ -190,7 +190,7 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency Strk for project %s to request a reward with an " +
+        Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
         verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
@@ -236,7 +236,7 @@ public class RewardServiceTest {
         // Then
         Assertions.assertNotNull(onlyDustException);
         Assertions.assertEquals(400, onlyDustException.getStatus());
-        Assertions.assertEquals(("Not enough budget of currency Strk for project %s to request a reward with an " +
+        Assertions.assertEquals(("Not enough budget of currency STRK for project %s to request a reward with an " +
                                  "amount of 10").formatted(requestRewardCommand.getProjectId()),
                 onlyDustException.getMessage());
         verify(indexerPort, never()).indexUser(requestRewardCommand.getRecipientId());
