@@ -5202,8 +5202,6 @@ components:
           type: boolean
         euVATNumber:
           type: string
-        reviewMessage:
-          type: string
 
     IndividualBillingProfileResponse:
       type: object
@@ -5242,8 +5240,6 @@ components:
           type: string
           format: date-time
         idDocumentCountryCode:
-          type: string
-        reviewMessage:
           type: string
     NewInvoiceResponse:
       type: object

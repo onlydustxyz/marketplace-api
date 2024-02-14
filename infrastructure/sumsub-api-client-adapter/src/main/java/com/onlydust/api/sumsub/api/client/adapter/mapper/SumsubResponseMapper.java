@@ -65,7 +65,7 @@ public class SumsubResponseMapper {
                                 .filter(idDocumentDTO -> List.of("PASSPORT",
                                         "ID_CARD",
                                         "RESIDENCE_PERMIT",
-                                        "DRIVER_LICENSE").contains(idDocumentDTO.getType()))
+                                        "DRIVERS").contains(idDocumentDTO.getType()))
                                 .findFirst();
                 if (optionalIdDocument.isPresent()) {
                     final SumsubIndividualApplicantsDataDTO.IdDocumentDTO idDocumentDTO = optionalIdDocument.get();
@@ -74,7 +74,7 @@ public class SumsubResponseMapper {
                                 case "PASSPORT" -> IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT;
                                 case "ID_CARD" -> IndividualBillingProfile.IdDocumentTypeEnum.ID_CARD;
                                 case "RESIDENCE_PERMIT" -> IndividualBillingProfile.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-                                case "DRIVER_LICENSE" -> IndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
+                                case "DRIVERS" -> IndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
                                 default -> null;
                             })
                             .idDocumentNumber(idDocumentDTO.getNumber())

@@ -226,7 +226,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.idDocumentType").isEqualTo("PASSPORT")
                 .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
                 .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
-                .jsonPath("$.reviewMessage").isEqualTo(reviewMessage.replace("\\n", "\n"))
                 .jsonPath("$.usCitizen").isEqualTo(false);
     }
 
@@ -392,7 +391,6 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.registrationNumber").isEqualTo("908233638")
                 .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
-                .jsonPath("$.reviewMessage").isEqualTo(reviewMessage.replace("\\n", "\n"))
                 .jsonPath("$.usEntity").isEqualTo(false);
     }
 

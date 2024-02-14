@@ -38,23 +38,24 @@ public class SumsubMapperTest {
     // - completed
     @Test
     void should_map_type_and_review_result_to_domain() {
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "init", null, false)), expectedStatus(VerificationStatus.STARTED));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "pending", null, false)), expectedStatus(VerificationStatus.STARTED));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "completed", null, false)), expectedStatus(VerificationStatus.STARTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "init", null, null)), expectedStatus(VerificationStatus.STARTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "pending", null, null)), expectedStatus(VerificationStatus.STARTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "completed", null, null)), expectedStatus(VerificationStatus.STARTED));
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "init", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "pending", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "completed", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "init", null, null)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "pending", null, null)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "completed", null, null)), expectedStatus(VerificationStatus.UNDER_REVIEW));
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "init", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "pending", null, false)), expectedStatus(VerificationStatus.UNDER_REVIEW));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "GREEN", false)), expectedStatus(VerificationStatus.VERIFIED));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", false)), expectedStatus(VerificationStatus.REJECTED));
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", true)), expectedStatus(VerificationStatus.CLOSED));
+
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "init", null, null)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "pending", null, null)), expectedStatus(VerificationStatus.UNDER_REVIEW));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "GREEN", null)), expectedStatus(VerificationStatus.VERIFIED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "RETRY")), expectedStatus(VerificationStatus.REJECTED));
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "FINAL")), expectedStatus(VerificationStatus.CLOSED));
     }
 
 
-    private SumsubWebhookEventDTO stubSumsubEvent(final String type, final String reviewStatus, final String reviewResult, final Boolean finalDecision) {
+    private SumsubWebhookEventDTO stubSumsubEvent(final String type, final String reviewStatus, final String reviewResult, final String decision) {
         final SumsubWebhookEventDTO sumsubWebhookEventDTO = new SumsubWebhookEventDTO();
         sumsubWebhookEventDTO.setApplicantType("individual");
         sumsubWebhookEventDTO.setExternalUserId(externalId.toString());
@@ -62,8 +63,8 @@ public class SumsubMapperTest {
         sumsubWebhookEventDTO.setReviewStatus(reviewStatus);
         final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
         reviewResultDTO.setReviewAnswer(reviewResult);
-        if (nonNull(finalDecision) && finalDecision){
-            reviewResultDTO.setReviewRejectType("FINAL");
+        if (nonNull(decision)){
+            reviewResultDTO.setReviewRejectType(decision);
         }
         sumsubWebhookEventDTO.setReviewResult(reviewResultDTO);
         return sumsubWebhookEventDTO;
