@@ -67,11 +67,8 @@ public class CustomUserRewardRepository {
                                (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
                                case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end
                     dollars_equivalent,
-                        
                                case
                                    when r.id is not null then 'COMPLETE'
-                                   when pr.currency = 'strk' THEN 'LOCKED'
-                                   when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                                    when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                                    when (case
                                              when pr.currency in ('eth', 'lords', 'usdc')
@@ -81,6 +78,8 @@ public class CustomUserRewardRepository {
                                              when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                              when pr.currency = 'usd' then not payout_checks.has_bank_account
                                        end) then 'MISSING_PAYOUT_INFO'
+                                   when pr.currency = 'strk' THEN 'LOCKED'
+                                   when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'                                
                                    when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
                                    else 'PROCESSING'
                                    end                                                                     status
@@ -150,8 +149,6 @@ public class CustomUserRewardRepository {
                 where pr.recipient_id = :recipientId
                   and (case
                            when r.id is not null then 'COMPLETE'
-                           when pr.currency = 'strk' THEN 'LOCKED'
-                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                            when not coalesce(bpc.billing_profile_verified, false) then 'PENDING_VERIFICATION'
                            when (case
                                              when pr.currency in ('eth', 'lords', 'usdc')
@@ -161,6 +158,8 @@ public class CustomUserRewardRepository {
                                              when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                              when pr.currency = 'usd' then not payout_checks.has_bank_account
                                        end) then 'MISSING_PAYOUT_INFO'
+                           when pr.currency = 'strk' THEN 'LOCKED'
+                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'               
                            when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                     end) = 'PENDING_INVOICE'
