@@ -3,10 +3,12 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
@@ -455,5 +458,102 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.login").isEqualTo(newLogin)
                 .jsonPath("$.avatarUrl").isEqualTo(newUrl)
                 .jsonPath("$.email").isEqualTo(newEmail);
+    }
+
+    @Autowired
+    PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    UserBillingProfileTypeRepository userBillingProfileTypeRepository;
+    @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
+    @Autowired
+    IndividualBillingProfileRepository individualBillingProfileRepository;
+
+    @Test
+    void should_return_has_valid_billing_profile() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().randomNumber() + faker.number().randomNumber(), faker.hacker().abbreviation(),
+                faker.internet().url(), false);
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
+
+        final UserEntity user = authenticatedUser.user();
+        paymentRequestRepository.save(new PaymentRequestEntity(UUID.randomUUID(), user.getId(), user.getGithubUserId(), new Date(), BigDecimal.ONE, null,
+                0, UUID.randomUUID(), CurrencyEnumEntity.usdc));
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
+
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                .userId(user.getId())
+                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
+                .build());
+        companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
+                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .id(UUID.randomUUID())
+                .userId(user.getId())
+                .build());
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
+
+        userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
+                .userId(user.getId())
+                .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
+                .build());
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
+
+        individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
+                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .userId(user.getId())
+                .id(UUID.randomUUID())
+                .build());
+
+        // When
+        client.get()
+                .uri(ME_GET)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hasValidBillingProfile").isEqualTo(true);
     }
 }

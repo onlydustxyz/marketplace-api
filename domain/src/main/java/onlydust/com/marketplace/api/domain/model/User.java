@@ -28,6 +28,8 @@ public class User {
     @Builder.Default
     List<UUID> projectsAppliedTo = new ArrayList<>();
     BillingProfileType billingProfileType;
+    @Builder.Default
+    Boolean hasValidBillingProfile = true;
 
     @Getter(AccessLevel.NONE)
     boolean hasAcceptedLatestTermsAndConditions;

@@ -251,6 +251,7 @@ public interface UserMapper {
         });
         getMeResponse.setFirstName(authenticatedUser.getFirstName());
         getMeResponse.setLastName(authenticatedUser.getLastName());
+        getMeResponse.setHasValidBillingProfile(authenticatedUser.getHasValidBillingProfile());
         return getMeResponse;
     }
 
