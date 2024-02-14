@@ -8,7 +8,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingPr
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -21,6 +24,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
@@ -29,6 +33,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     SumsubClientProperties sumsubClientProperties;
 
     @Test
+    @Order(1)
     void should_get_individual_billing_profile() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
@@ -47,6 +52,30 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
+    void should_list_individual_billing_profiles() {
+        // Given
+        final var pierre = userAuthHelper.authenticatePierre();
+
+        // When
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
+                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(0)
+        ;
+    }
+
+    @Test
+    @Order(3)
     void should_get_company_billing_profile() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
@@ -69,6 +98,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     IndividualBillingProfileRepository individualBillingProfileRepository;
 
     @Test
+    @Order(4)
     void should_get_individual_billing_profile_given_one() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
@@ -233,6 +263,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     CompanyBillingProfileRepository companyBillingProfileRepository;
 
     @Test
+    @Order(5)
     void should_get_company_billing_profile_given_one() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
@@ -396,6 +427,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
 
     @Test
+    @Order(6)
     void should_update_user_billing_profile_type() {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
@@ -440,6 +472,44 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.billingProfileType").isEqualTo("COMPANY");
+    }
+
+
+    @Test
+    @Order(7)
+    void should_list_company_billing_profiles() {
+        // Given
+        final var pierre = userAuthHelper.authenticatePierre();
+
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].type").isEqualTo("COMPANY")
+                .jsonPath("$.billingProfiles[0].name").isEqualTo("Test")
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(0)
+        ;
     }
 
     private static final String SUMSUB_INDIVIDUAL_RESPONSE_JSON = """

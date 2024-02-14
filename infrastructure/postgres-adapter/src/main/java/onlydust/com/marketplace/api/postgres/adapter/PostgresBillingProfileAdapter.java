@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
@@ -9,12 +10,16 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBilling
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
@@ -22,6 +27,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final UserBillingProfileTypeRepository userBillingProfileTypeRepository;
     private final CompanyBillingProfileRepository companyBillingProfileRepository;
     private final IndividualBillingProfileRepository individualBillingProfileRepository;
+    private final CustomUserRewardRepository userRewardRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -103,5 +109,21 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional
     public void saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BillingProfile> all(UUID userId, Long githubUserId) {
+        final var type = getBillingProfileTypeForUser(userId)
+                .orElseThrow(() -> notFound("Billing profile type not found for user " + userId));
+
+        final var billingProfile = (switch (type) {
+            case COMPANY -> findCompanyProfileForUser(userId).map(BillingProfile::of);
+            case INDIVIDUAL -> findIndividualBillingProfile(userId).map(BillingProfile::of);
+        }).orElseThrow(() -> notFound("Billing profile not found for user " + userId));
+
+        final var rewardCount = userRewardRepository.getPendingInvoicesViewEntities(githubUserId).size();
+
+        return List.of(billingProfile.rewardCount(rewardCount));
     }
 }
