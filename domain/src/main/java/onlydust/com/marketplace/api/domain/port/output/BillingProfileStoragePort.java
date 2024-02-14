@@ -33,4 +33,6 @@ public interface BillingProfileStoragePort {
     void saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
 
     List<BillingProfile> all(UUID userId, Long githubUserId);
+
+    Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType);
 }

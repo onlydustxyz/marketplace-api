@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.mocks.DeterministicDateProvider;
+import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
@@ -14,6 +15,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.AccountAddress;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -128,6 +130,81 @@ public class UserServiceTest {
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+    }
+
+    @Test
+    void should_update_user_with_has_valid_billing_profile_given_no_pending_payments() {
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder()
+                        .githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubLogin(faker.hacker().verb())
+                        .email(faker.internet().emailAddress())
+                        .build();
+
+        final User user = User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .githubEmail(githubUserIdentity.getEmail())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
+                .build();
+
+        // When
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
+        when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(UserPayoutSettings.builder()
+                .pendingPaymentsCurrencies(List.of())
+                .build());
+        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
+
+        // Then
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
+        assertEquals(user, userByGithubIdentity);
+        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
+        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+    }
+
+    @Test
+    void should_update_user_with_has_valid_billing_profile_given_pending_payments() {
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder()
+                        .githubUserId(faker.number().randomNumber())
+                        .githubAvatarUrl(faker.internet().avatar())
+                        .githubLogin(faker.hacker().verb())
+                        .email(faker.internet().emailAddress())
+                        .build();
+
+        final User user = User.builder()
+                .id(UUID.randomUUID())
+                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
+                .githubUserId(githubUserIdentity.getGithubUserId())
+                .githubLogin(githubUserIdentity.getGithubLogin())
+                .githubEmail(githubUserIdentity.getEmail())
+                .hasAcceptedLatestTermsAndConditions(true)
+                .hasSeenOnboardingWizard(true)
+                .build();
+
+        // When
+        when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
+        when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(UserPayoutSettings.builder()
+                .pendingPaymentsCurrencies(List.of(Currency.Strk))
+                .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
+                .build());
+        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
+
+        // Then
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
+        assertEquals(user, userByGithubIdentity);
+        assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
+        assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
         assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
     }
 

@@ -49,6 +49,9 @@ public class UserService implements UserFacadePort {
                     final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
                     user.setBillingProfileType(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(BillingProfileType.INDIVIDUAL));
+                    if (payoutInformationById.hasPendingPayments()){
+                        user.setHasValidBillingProfile(billingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),user.getBillingProfileType()));
+                    }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
 

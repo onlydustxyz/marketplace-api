@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomUserRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
@@ -125,5 +126,17 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var rewardCount = userRewardRepository.getPendingInvoicesViewEntities(githubUserId).size();
 
         return List.of(billingProfile.rewardCount(rewardCount));
+    }
+
+    @Override
+    public Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType) {
+        return switch (billingProfileType) {
+            case COMPANY -> companyBillingProfileRepository.findByUserId(userId)
+                    .map(e -> e.getVerificationStatus().equals(VerificationStatusEntity.VERIFIED))
+                    .orElse(false);
+            case INDIVIDUAL -> individualBillingProfileRepository.findByUserId(userId)
+                    .map(e -> e.getVerificationStatus().equals(VerificationStatusEntity.VERIFIED))
+                    .orElse(false);
+        };
     }
 }

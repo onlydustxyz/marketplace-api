@@ -23,7 +23,7 @@ application:
     active-user-profiles-refresh-period-in-days: 30
     refresh-active-user-profiles: 86400000 # 1 day
     tracking-job-delay: 60000 # 1 minute
-    billing-profile-verification-job: 60000 # 1 minute
+    billing-profile-verification-job: 5000 # 15 seconds
     update-projects-tags: 7200000 # 2 hours
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
   sumsub:

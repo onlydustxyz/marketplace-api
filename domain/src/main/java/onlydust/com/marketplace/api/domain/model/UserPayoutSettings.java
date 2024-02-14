@@ -19,7 +19,7 @@ public class UserPayoutSettings {
     @Builder.Default
     List<Currency> pendingPaymentsCurrencies = new ArrayList<>();
 
-    private boolean hasPendingPayments() {
+    public boolean hasPendingPayments() {
         return !pendingPaymentsCurrencies.isEmpty();
     }
 

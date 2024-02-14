@@ -73,7 +73,7 @@ public class JobScheduler {
 
     @Scheduled(fixedDelayString = "${application.cron.billing-profile-verification-job}")
     public void verifyBillingProfile() {
-        LOGGER.info("Verifying billing profiles");
+        LOGGER.debug("Verifying billing profiles");
         billingProfileOutboxJob.run();
     }
 
