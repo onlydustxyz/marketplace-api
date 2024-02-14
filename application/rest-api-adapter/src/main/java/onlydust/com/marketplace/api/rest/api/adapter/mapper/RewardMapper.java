@@ -4,8 +4,8 @@ import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.UUID;
 
@@ -74,7 +74,7 @@ public interface RewardMapper {
         };
     }
 
-     @NonNull
+    @NonNull
     private static RewardStatus mapRewardStatusToProject(UserRewardStatus rewardView) {
         return switch (rewardView) {
             case complete -> RewardStatus.COMPLETE;
@@ -84,7 +84,6 @@ public interface RewardMapper {
             default -> RewardStatus.PROCESSING;
         };
     }
-
 
 
     static RewardResponse rewardToResponse(ContributionRewardView rewardView) {

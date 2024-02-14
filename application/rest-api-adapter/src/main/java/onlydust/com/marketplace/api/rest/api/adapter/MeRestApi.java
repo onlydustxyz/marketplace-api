@@ -13,8 +13,8 @@ import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePo
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
@@ -332,7 +332,7 @@ public class MeRestApi implements MeApi {
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), BillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
     }
-    
+
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();

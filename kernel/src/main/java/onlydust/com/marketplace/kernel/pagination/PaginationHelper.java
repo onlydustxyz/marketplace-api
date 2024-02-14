@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.domain.view.pagination;
+package onlydust.com.marketplace.kernel.pagination;
 
 import lombok.extern.slf4j.Slf4j;
 
