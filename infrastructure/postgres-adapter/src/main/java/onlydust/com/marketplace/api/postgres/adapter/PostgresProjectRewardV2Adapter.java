@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
@@ -38,22 +39,22 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
         final var usd = currencyRepository.findByCode("USD").orElseThrow(() -> internalServerError("USD currency not found"));
 
         final var budgets = projectAllowanceRepository.findAllByProjectId(projectId).stream().map(projectAllowanceEntity -> {
-            final var currency = currencyRepository.findById(projectAllowanceEntity.getCurrencyId()).orElseThrow(() -> internalServerError("USD currency not " +
-                                                                                                                                           "found"));
+            final var currency = currencyRepository.findById(projectAllowanceEntity.getCurrencyId())
+                    .orElseThrow(() -> internalServerError("Currency %s not found".formatted(projectAllowanceEntity.getCurrencyId())));
+
             final var quote = historicalQuoteRepository.findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(
-                            projectAllowanceEntity.getCurrencyId(),
-                            usd.id(),
-                            Instant.now()
-                    ).map(HistoricalQuoteEntity::toDomain)
-                    .orElseThrow(() -> internalServerError("No quote found for currency %s and base %s"
-                            .formatted(projectAllowanceEntity.getCurrencyId(), usd.id())));
+                    projectAllowanceEntity.getCurrencyId(),
+                    usd.id(),
+                    Instant.now()
+            ).map(HistoricalQuoteEntity::toDomain);
+
             return BudgetView.builder()
                     .currency(Currency.valueOf(currency.code()))
-                    .dollarsConversionRate(quote.price())
+                    .dollarsConversionRate(quote.map(Quote::price).orElse(null))
                     .remaining(projectAllowanceEntity.getCurrentAllowance())
                     .initialAmount(projectAllowanceEntity.getInitialAllowance())
-                    .remainingDollarsEquivalent(quote.convertToBaseCurrency(projectAllowanceEntity.getCurrentAllowance()))
-                    .initialDollarsEquivalent(quote.convertToBaseCurrency(projectAllowanceEntity.getInitialAllowance()))
+                    .remainingDollarsEquivalent(quote.map(q -> q.convertToBaseCurrency(projectAllowanceEntity.getCurrentAllowance())).orElse(null))
+                    .initialDollarsEquivalent(quote.map(q -> q.convertToBaseCurrency(projectAllowanceEntity.getInitialAllowance())).orElse(null))
                     .build();
         }).toList();
 

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PostgresProjectAdapterIT extends AbstractPostgresIT {
 
     @Autowired
-    PostgresProjectAdapter postgresProjectAdapter;
+    PostgresProjectAdapter projectStoragePort;
     @Autowired
     UserRepository userRepository;
 
@@ -46,13 +46,13 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         final UUID projectId = UUID.randomUUID();
 
         // When
-        final String slug = postgresProjectAdapter.createProject(
+        final String slug = projectStoragePort.createProject(
                 projectId, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
                 moreInfoLinks, null, userId
                 , null, ProjectVisibility.PUBLIC, null,
                 ProjectRewardSettings.defaultSettings(new Date())
         );
-        final ProjectDetailsView project = postgresProjectAdapter.getBySlug(slug, null);
+        final ProjectDetailsView project = projectStoragePort.getBySlug(slug, null);
         assertEquals(moreInfoLinks.size(), project.getMoreInfos().size());
         assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(0)));
         assertTrue(project.getMoreInfos().contains(moreInfoLinks.get(1)));
@@ -68,12 +68,12 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                         .url(faker.cat().breed())
                         .build()
         );
-        postgresProjectAdapter.updateProject(
+        projectStoragePort.updateProject(
                 projectId, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
                 moreInfoLinksUpdated,
                 null, null, null, null, null
         );
-        final ProjectDetailsView projectUpdated = postgresProjectAdapter.getBySlug(slug, null);
+        final ProjectDetailsView projectUpdated = projectStoragePort.getBySlug(slug, null);
         assertEquals(moreInfoLinksUpdated.size(), projectUpdated.getMoreInfos().size());
         assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(0)));
         assertTrue(projectUpdated.getMoreInfos().contains(moreInfoLinksUpdated.get(1)));

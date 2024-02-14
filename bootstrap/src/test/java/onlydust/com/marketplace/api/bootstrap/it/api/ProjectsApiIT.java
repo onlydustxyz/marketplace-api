@@ -3982,13 +3982,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Autowired
-    PostgresProjectAdapter postgresProjectAdapter;
+    PostgresProjectAdapter projectStoragePort;
 
     @Test
     @Order(14)
     void should_update_projects_tags() throws ParseException {
         // Given
-        postgresProjectAdapter.updateProjectsTags(new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2000"));
+        projectStoragePort.updateProjectsTags(new SimpleDateFormat("dd-MM-yyyy").parse("01-01-2000"));
         final var auth = userAuthHelper.authenticatePierre();
 
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100")))

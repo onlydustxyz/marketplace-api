@@ -89,11 +89,11 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
                 .url("https://sponsor.com")
                 .build());
 
-        final var accountEur = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(eth.id()), PositiveAmount.of(1000L), null);
-        final var accountYen = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(usdc.id()), PositiveAmount.of(20000L), null);
+        final var accountEth = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(eth.id()), PositiveAmount.of(1000L), null);
+        final var accountUsdc = accountingFacadePort.createSponsorAccount(sponsorId, Currency.Id.of(usdc.id()), PositiveAmount.of(20000L), null);
 
-        accountingFacadePort.transfer(accountEur.account().id(), ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
-        accountingFacadePort.transfer(accountYen.account().id(), ProjectId.of(projectId), PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
+        accountingFacadePort.transfer(accountEth.account().id(), ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
+        accountingFacadePort.transfer(accountUsdc.account().id(), ProjectId.of(projectId), PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
 
         // When
         client.get()
@@ -106,24 +106,24 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "initialDollarsEquivalent": 264710.8337131964693400,
-                          "remainingDollarsEquivalent": 264710.8337131964693400,
+                          "initialDollarsEquivalent": 364.00,
+                          "remainingDollarsEquivalent": 364.00,
                           "budgets": [
                             {
                               "currency": "ETH",
                               "initialAmount": 100,
                               "remaining": 100,
-                              "remainingDollarsEquivalent": 264510.769170899600,
-                              "initialDollarsEquivalent": 264510.769170899600,
-                              "dollarsConversionRate": 2645.107691708996
+                              "remainingDollarsEquivalent": 110.0,
+                              "initialDollarsEquivalent": 110.0,
+                              "dollarsConversionRate": 1.1
                             },
                             {
                               "currency": "USDC",
                               "initialAmount": 200,
                               "remaining": 200,
-                              "remainingDollarsEquivalent": 200.0645422968693400,
-                              "initialDollarsEquivalent": 200.0645422968693400,
-                              "dollarsConversionRate": 1.0003227114843467
+                              "remainingDollarsEquivalent": 254.00,
+                              "initialDollarsEquivalent": 254.00,
+                              "dollarsConversionRate": 1.27
                             }
                           ]
                         }
