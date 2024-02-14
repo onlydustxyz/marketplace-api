@@ -2,9 +2,11 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
 import org.springframework.context.annotation.Bean;
@@ -35,5 +37,10 @@ public class AccountingConfiguration {
                                                    final @NonNull QuoteStorage quoteStorage,
                                                    final @NonNull CurrencyStorage currencyStorage) {
         return new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
+    }
+
+    @Bean
+    public BillingProfileFacadePort billingProfileFacadePort() {
+        return new BillingProfileService();
     }
 }

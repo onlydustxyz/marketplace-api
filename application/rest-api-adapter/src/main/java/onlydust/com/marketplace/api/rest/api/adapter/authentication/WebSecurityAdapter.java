@@ -29,6 +29,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/v1/me/**").hasAuthority(UserRole.USER.name())
+                .antMatchers("/api/v1/billing-profiles/**").hasAuthority(UserRole.USER.name())
                 .antMatchers("/api/v1/events/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
                 .antMatchers("/bo/v1/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/projects/**").hasAuthority(UserRole.USER.name())

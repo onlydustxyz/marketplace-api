@@ -1,4 +1,3 @@
-
 openapi: 3.0.3
 info:
   title: OnlyDust Marketplace API
@@ -710,66 +709,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/invoices/preview:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Preview new invoice from selected reward ids
-      operationId: previewNewInvoiceForRewardIds
-      description: |
-        Preview new invoice from selected reward ids
-      parameters:
-        - in: path
-          name: rewardIds
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-      responses:
-        "200":
-          description: 'Invoice created'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NewInvoiceResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-  /api/v1/me/invoices:
-    post:
-      security:
-        - { }
-      tags:
-        - Me
-      summary: Upload an invoice
-      operationId: uploadInvoice
-      requestBody:
-        content:
-          application/pdf:
-            schema:
-              type: string
-              format: binary
-      parameters:
-        - in: path
-          name: filename
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: 'Invoice uploaded'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/billing-profiles/individual:
     get:
       security:
@@ -823,6 +762,30 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/billing-profiles:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my billing profiles
+      operationId: getMyBillingProfiles
+      description: |
+        Get my billing profiles
+      responses:
+        "200":
+          description: 'User billing profiles'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyBillingProfilesResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     patch:
       security:
         - bearerAuth: [ ]
@@ -2491,6 +2454,140 @@ paths:
       responses:
         "204":
           description: 'Event processed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/invoices/preview:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Preview new invoice from selected reward ids and given a billing profile id
+      operationId: previewNewInvoiceForRewardIds
+      description: |
+        Preview new invoice from selected reward ids
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: rewardIds
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        "200":
+          description: 'Invoice created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewInvoiceResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/invoices:
+    post:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Upload an invoice linked to a given billing profile
+      operationId: uploadInvoice
+      requestBody:
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: filename
+          required: false
+          schema:
+            type: string
+      responses:
+        "204":
+          description: 'Invoice uploaded'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Get invoices linked to given billing profile
+      operationId: getInvoices
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Page of invoices linked to given billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileInvoicesPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/invoices/{invoiceId}:
+    get:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Download invoice by id linked to given billing profile
+      operationId: downloadInvoice
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Pdf as blob'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4306,6 +4403,30 @@ components:
       properties:
         type:
           $ref: '#/components/schemas/BillingProfileType'
+
+    MyBillingProfilesResponse:
+      type: object
+      properties:
+        billingProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortBillingProfileResponse'
+    ShortBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        name:
+          type: string
+        rewardCount:
+          type: integer
     ProjectLedShortResponse:
       type: object
       required:
@@ -5053,7 +5174,7 @@ components:
           type: string
           format: uuid
         status:
-          $ref : '#/components/schemas/VerificationStatus'
+          $ref: '#/components/schemas/VerificationStatus'
         name:
           type: string
         registrationNumber:
@@ -5121,7 +5242,6 @@ components:
         - generationDate
         - destinationAccounts
         - billingProfileType
-        - destinationAccounts
       properties:
         id:
           type: string
@@ -5168,7 +5288,7 @@ components:
           items:
             $ref: '#/components/schemas/FiatEquivalentResponse'
         vatRegulationState:
-          $ref : '#/components/schemas/VatRegulationState'
+          $ref: '#/components/schemas/VatRegulationState'
         euVATNumber:
           type: string
         rewards:
@@ -5233,3 +5353,50 @@ components:
         - VAT_NOT_APPLICABLE_NON_UE
         - VAT_NOT_APPLICABLE_FRENCH_NOT_SUBJECT
         - VAT_REVERSE_CHARGE
+
+    BillingProfileInvoicesPageResponse:
+      type: object
+      required:
+        - invoices
+        - hasMore
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+      properties:
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileInvoicesPageItemResponse'
+        hasMore:
+          type: boolean
+          example: true
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    BillingProfileInvoicesPageItemResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        generationDate:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        status:
+          $ref: '#/components/schemas/InvoiceStatus'
+
+    InvoiceStatus:
+      type: string
+      enum:
+        - PROCESSING
+        - REJECTED
+        - COMPLETE
