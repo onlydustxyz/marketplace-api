@@ -139,6 +139,11 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    public List<BillingProfile> getBillingProfiles(UUID id, Long githubUserId) {
+        return billingProfileStoragePort.all(id, githubUserId);
+    }
+
+    @Override
     public UserPayoutSettings updatePayoutSettings(UUID userId, UserPayoutSettings userPayoutSettings) {
         return userStoragePort.savePayoutSettingsForUserId(userId, userPayoutSettings);
     }

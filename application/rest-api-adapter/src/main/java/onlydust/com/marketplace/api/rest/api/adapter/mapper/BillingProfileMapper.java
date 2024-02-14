@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.contract.model.BillingProfileTypeRequest;
-import onlydust.com.marketplace.api.contract.model.CompanyBillingProfileResponse;
-import onlydust.com.marketplace.api.contract.model.IndividualBillingProfileResponse;
-import onlydust.com.marketplace.api.contract.model.VerificationStatus;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
@@ -69,6 +67,21 @@ public interface BillingProfileMapper {
         return switch (billingProfileTypeRequest.getType()) {
             case COMPANY -> BillingProfileType.COMPANY;
             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+        };
+    }
+
+    static ShortBillingProfileResponse map(BillingProfile billingProfile) {
+        return new ShortBillingProfileResponse()
+                .id(billingProfile.id())
+                .name(billingProfile.name())
+                .type(map(billingProfile.type()))
+                .rewardCount(billingProfile.rewardCount());
+    }
+
+    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {
+        return switch (type) {
+            case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
+            case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
         };
     }
 }

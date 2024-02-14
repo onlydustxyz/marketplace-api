@@ -339,4 +339,11 @@ public class MeRestApi implements MeApi {
         userFacadePort.updateGithubProfile(authenticatedUser);
         return ResponseEntity.ok().build();
     }
+
+    public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var billingProfiles = userFacadePort.getBillingProfiles(authenticatedUser.getId(), authenticatedUser.getGithubUserId());
+        return ResponseEntity.ok(new MyBillingProfilesResponse()
+                .billingProfiles(billingProfiles.stream().map(BillingProfileMapper::map).toList()));
+    }
 }

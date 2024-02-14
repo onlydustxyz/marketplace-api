@@ -272,8 +272,10 @@ public class PostgresConfiguration {
     @Bean
     public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                       final CompanyBillingProfileRepository companyBillingProfileRepository) {
-        return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository);
+                                                                       final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                       final CustomUserRewardRepository customUserRewardRepository) {
+        return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
+                customUserRewardRepository);
     }
 
     @Bean

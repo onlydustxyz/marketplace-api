@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
+import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,4 +31,6 @@ public interface BillingProfileStoragePort {
     void saveCompanyProfile(CompanyBillingProfile companyBillingProfile);
 
     void saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
+
+    List<BillingProfile> all(UUID userId, Long githubUserId);
 }
