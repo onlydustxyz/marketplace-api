@@ -2526,6 +2526,16 @@ paths:
           required: false
           schema:
             type: string
+        - in: query
+          name: totalAfterTax
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: currency
+          required: true
+          schema:
+            $ref: '#/components/schemas/CurrencyContract'
       responses:
         "204":
           description: 'Invoice uploaded'
@@ -5283,10 +5293,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DestinationAccountResponse'
-        fiatEquivalents:
-          type: array
-          items:
-            $ref: '#/components/schemas/FiatEquivalentResponse'
         vatRegulationState:
           $ref: '#/components/schemas/VatRegulationState'
         euVATNumber:
@@ -5295,17 +5301,58 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/InvoiceRewardItemResponse'
+        totalBeforeTax:
+          $ref: '#/components/schemas/NewMoney'
+        taxRate:
+          type: number
+          description: |
+            Tax rate in percentage.
+            If the vatRegulationState is VAT_APPLICABLE, the tax rate is 20%, otherwise 0.
+        totalTax:
+          type: number
+          description: totalBeforeTax * taxRate
+        totalAfterTax:
+          $ref: '#/components/schemas/NewMoney'
+
+    NewMoney: # TODO: rename when legacy 'Money' type is removed
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'
+
+    BaseMoney:
+      allOf:
+        - $ref: '#/components/schemas/NewMoney'
+        - type: object
+          required:
+            - conversionRate
+          properties:
+            conversionRate:
+              type: number
+
+    ConvertibleMoney:
+      allOf:
+        - $ref: '#/components/schemas/NewMoney'
+        - type: object
+          required:
+            - base
+          properties:
+            base:
+              $ref: '#/components/schemas/BaseMoney'
 
     InvoiceRewardItemResponse:
       type: object
       required:
-        - amount
         - id
         - date
         - projectName
+        - amount
       properties:
-        amount:
-          $ref: '#/components/schemas/RewardAmountResponse'
         id:
           type: string
           format: uuid
@@ -5314,16 +5361,26 @@ components:
           format: date-time
         projectName:
           type: string
+        amount:
+          $ref: '#/components/schemas/ConvertibleMoney'
 
     DestinationAccountResponse:
       type: object
       properties:
-        iban:
+        bankAccount:
+          $ref: '#/components/schemas/BankAccountResponse'
+        wallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletResponse'
+
+    BankAccountResponse:
+      type: object
+      properties:
+        accountNumber:
           type: string
         bic:
           type: string
-        wallet:
-          $ref: '#/components/schemas/WalletResponse'
 
     WalletResponse:
       type: object
@@ -5332,19 +5389,6 @@ components:
           type: string
         network:
           type: string
-
-    FiatEquivalentResponse:
-      type: object
-      properties:
-        fiat:
-          type: string
-          enum:
-            - USD
-            - EUR
-        currency:
-          $ref: '#/components/schemas/CurrencyContract'
-        value:
-          type: number
 
     VatRegulationState:
       type: string
@@ -5389,8 +5433,8 @@ components:
         generationDate:
           type: string
           format: date-time
-        amount:
-          type: number
+        totalAfterTax:
+          $ref: '#/components/schemas/NewMoney'
         status:
           $ref: '#/components/schemas/InvoiceStatus'
 
