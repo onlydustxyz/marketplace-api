@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
@@ -78,6 +81,42 @@ public interface BillingProfileMapper {
                 .name(billingProfile.name())
                 .type(map(billingProfile.type()))
                 .rewardCount(billingProfile.rewardCount());
+    }
+
+    static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
+        return new BillingProfileInvoicesPageResponse()
+                .invoices(page.getContent().stream().map(BillingProfileMapper::map).toList())
+                .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    static BillingProfileInvoicesPageItemResponse map(Invoice invoice) {
+        return new BillingProfileInvoicesPageItemResponse()
+                .id(invoice.id().value())
+                .name(invoice.name())
+                .generationDate(invoice.createdAt())
+                .totalAfterTax(map(invoice.totalAfterTax()))
+                .status(map(invoice.status()));
+    }
+
+    static NewMoney map(Money money) {
+        return new NewMoney()
+                .amount(money.getValue())
+                .currency(map(money.getCurrency()));
+    }
+
+    static CurrencyContract map(Currency currency) {
+        return CurrencyContract.fromValue(currency.code().toString());
+    }
+
+    static InvoiceStatus map(Invoice.Status status) {
+        return switch (status) {
+            case PROCESSING -> InvoiceStatus.PROCESSING;
+            case COMPLETE -> InvoiceStatus.COMPLETE;
+            case REJECTED -> InvoiceStatus.REJECTED;
+        };
     }
 
     static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {

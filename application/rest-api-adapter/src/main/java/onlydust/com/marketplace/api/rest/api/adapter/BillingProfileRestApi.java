@@ -3,10 +3,19 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
+import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Tags(@Tag(name = "BillingProfile"))
@@ -16,7 +25,12 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     private final AuthenticationService authenticationService;
     private final BillingProfileFacadePort billingProfileFacadePort;
 
-
+    @Override
+    public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId, Integer pageIndex, Integer pageSize) {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var page = billingProfileFacadePort.getInvoicesForBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfileId.of(billingProfileId));
+        return ok(BillingProfileMapper.map(page, pageIndex));
+    }
 
 //    @Override
 //    public ResponseEntity<NewInvoiceResponse> previewNewInvoiceForRewardIds(List<UUID> rewardIds) {

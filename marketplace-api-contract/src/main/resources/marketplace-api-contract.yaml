@@ -2611,6 +2611,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: 'Page of invoices linked to given billing profile'
