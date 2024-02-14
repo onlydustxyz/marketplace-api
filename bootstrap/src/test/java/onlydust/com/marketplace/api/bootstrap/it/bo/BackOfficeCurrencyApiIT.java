@@ -253,7 +253,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         historicalQuoteRepository.saveAll(quotes);
 
         // When
-        Thread.sleep(700);
+        currencyFacadePort.refreshQuotes();
 
         // Then
         assertThat(historicalQuoteRepository.findAll()).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);

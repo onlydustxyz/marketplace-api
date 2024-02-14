@@ -11,6 +11,7 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
@@ -48,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-@ActiveProfiles({"it", "bo", "jobs", "api"})
+@ActiveProfiles({"it", "bo", "api"})
 @AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers
@@ -96,6 +97,9 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
     protected UserAuthHelper userAuthHelper;
+
+    @Autowired
+    CurrencyFacadePort currencyFacadePort;
 
     @BeforeEach
     void setupUserAuthHelper() {

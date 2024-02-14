@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.bootstrap.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.domain.job.OutboxConsumerJob;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 
-@ActiveProfiles({"it", "api", "jobs"})
+@ActiveProfiles({"it", "api"})
 @AutoConfigureWebTestClient(timeout = "36000")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = MarketplaceApiApplicationIT.class)
 @Testcontainers
@@ -159,10 +160,15 @@ public class AbstractMarketplaceApiIT {
 
     protected UserAuthHelper userAuthHelper;
 
+    @Autowired
+    OutboxConsumerJob notificationOutboxJob;
+    @Autowired
+    OutboxConsumerJob indexerOutboxJob;
+    @Autowired
+    OutboxConsumerJob trackingOutboxJob;
+    @Autowired
+    OutboxConsumerJob billingProfileOutboxJob;
 
-    protected static void waitAtLeastOneCycleOfOutboxEventProcessing() throws InterruptedException {
-        Thread.sleep(1000);
-    }
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
