@@ -33,12 +33,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "shortDescription": "A project for people who love fruits",
               "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-              "moreInfos": [
-                {
-                  "url": "https://bretzel.club/",
-                  "value": null
-                }
-              ],
+              "moreInfos": [],
               "hiring": true,
               "visibility": "PUBLIC",
               "contributorCount": 4,
@@ -250,12 +245,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "shortDescription": "A project for people who love fruits",
               "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-              "moreInfos": [
-                {
-                  "url": "https://bretzel.club/",
-                  "value": null
-                }
-              ],
+              "moreInfos": [],
               "hiring": true,
               "visibility": "PUBLIC",
               "contributorCount": 4,
@@ -486,12 +476,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
               "longDescription": "Nous sommes **pure player** du financement et du management de l’innovation. Avec une présence physique à Paris nous adressons des entreprises **sur tout le territoire** jusque dans les départements d'outre mer.  \\nNotre équipe d’**ingénieurs pluridisciplinaire** (École des Mines, Arts et métiers, Centrale Nantes, École centrale d’Electronique, Polytech, Epitech, etc.) nous permet d’adresser **tous les secteurs de l’Innovation et de la recherche**. Nous avons également une parfaite maîtrise de la valorisation des sciences humaines et sociales.",
               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
-              "moreInfos": [
-                {
-                  "url": "https://www.bconseil.fr/",
-                  "value": null
-                }
-              ],
+              "moreInfos": [],
               "hiring": true,
               "visibility": "PRIVATE",
               "contributorCount": 3,
@@ -3065,7 +3050,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When user is authenticated
         client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(false).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(false)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
     }
 
     @Test
@@ -3130,7 +3122,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + userAuthHelper.authenticateOlivier().jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(true).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(true)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,

@@ -276,7 +276,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         if (nonNull(moreInfos)) {
             if (nonNull(project.getMoreInfos())) {
                 project.getMoreInfos().clear();
-                project.getMoreInfos().addAll(moreInfosToEntities(moreInfos, projectId));
+                if (!moreInfos.isEmpty()){
+                    project.getMoreInfos().addAll(moreInfosToEntities(moreInfos, projectId));
+                }
             } else {
                 project.setMoreInfos(moreInfosToEntities(moreInfos, projectId));
             }

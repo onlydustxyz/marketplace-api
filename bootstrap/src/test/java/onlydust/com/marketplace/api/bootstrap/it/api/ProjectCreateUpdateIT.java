@@ -500,6 +500,41 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.moreInfos[1].value").isEqualTo("foobar-updated")
                 .jsonPath("$.moreInfos[2].url").isEqualTo("https://yolo.croute")
                 .jsonPath("$.moreInfos[2].value").isEqualTo("yolo-croute");
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
+                          "moreInfos": [],
+                          "isLookingForContributors": false,
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.projectId").isEqualTo(projectId.toString())
+                .jsonPath("$.projectSlug").isEqualTo("updated-project");
+
+        // And Then
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.moreInfos").isEmpty();
     }
 
     @Test

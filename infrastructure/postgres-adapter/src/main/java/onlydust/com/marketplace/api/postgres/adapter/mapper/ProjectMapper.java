@@ -149,21 +149,13 @@ public interface ProjectMapper {
     }
 
     static List<MoreInfoLink> mapMoreInfosWithDefaultValue(final ProjectViewEntity projectViewEntity) {
-        if (isNull(projectViewEntity.getMoreInfos()) || projectViewEntity.getMoreInfos().isEmpty()) {
-            if (nonNull(projectViewEntity.getTelegramLink())) {
-                return List.of(MoreInfoLink.builder()
-                        .url(projectViewEntity.getTelegramLink())
-                        .build());
-            }
-        } else {
-            return projectViewEntity.getMoreInfos().stream()
-                    .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
-                    .map(projectMoreInfoEntity -> MoreInfoLink.builder()
-                            .value(projectMoreInfoEntity.getName())
-                            .url(projectMoreInfoEntity.getUrl()).build())
-                    .toList();
-        }
-        return List.of();
+        return projectViewEntity.getMoreInfos().stream()
+                .sorted(Comparator.comparing(ProjectMoreInfoEntity::getRank))
+                .map(projectMoreInfoEntity -> MoreInfoLink.builder()
+                        .value(projectMoreInfoEntity.getName())
+                        .url(projectMoreInfoEntity.getUrl()).build())
+                .toList();
+
     }
 
     static Set<ProjectMoreInfoEntity> moreInfosToEntities(final List<MoreInfoLink> moreInfos, final UUID projectId) {
