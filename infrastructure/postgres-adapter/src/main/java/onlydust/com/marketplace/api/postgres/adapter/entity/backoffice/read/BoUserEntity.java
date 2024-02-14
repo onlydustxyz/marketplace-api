@@ -31,8 +31,6 @@ public class BoUserEntity {
     String firstname;
     String lastname;
     String address;
-    String postCode;
-    String city;
     String country;
     String telegram;
     String twitter;
@@ -74,8 +72,6 @@ public class BoUserEntity {
                 .firstname(firstname)
                 .lastname(lastname)
                 .address(address)
-                .postCode(postCode)
-                .city(city)
                 .country(country)
                 .telegram(telegram)
                 .twitter(twitter)
