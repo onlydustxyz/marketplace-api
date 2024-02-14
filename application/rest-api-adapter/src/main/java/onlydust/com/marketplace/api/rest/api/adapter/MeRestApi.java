@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.GithubOrganizationFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -45,9 +46,9 @@ public class MeRestApi implements MeApi {
 
     private final AuthenticationService authenticationService;
     private final UserFacadePort userFacadePort;
+    private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
-
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -306,6 +307,12 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<Void> markInvoiceAsReceived() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        rewardFacadePort.markInvoiceAsReceived(authenticatedUser.getGithubUserId());
+        return ResponseEntity.noContent().build();
+    }
 
     @Override
     public ResponseEntity<CompanyBillingProfileResponse> getMyCompanyBillingProfile() {
@@ -325,8 +332,7 @@ public class MeRestApi implements MeApi {
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), BillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
     }
-
-
+    
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
