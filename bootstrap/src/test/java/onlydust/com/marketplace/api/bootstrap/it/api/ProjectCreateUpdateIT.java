@@ -169,8 +169,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertThat(event.getAggregateName()).isEqualTo("PROJECT");
         assertThat(event.getPayload()).isEqualTo("{\"Created\": {\"id\": \"%s\"}}".formatted(response.getProjectId()));
 
-
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        runJobs();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
@@ -226,9 +225,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 16590657L)).exists();
-
-
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        
+        runJobs();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("Project")))
@@ -331,7 +329,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And Then
         assertProjectWasUpdated();
 
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        runJobs();
         indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(equalToJson("""
@@ -373,6 +371,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.payload.id", equalTo(projectId.toString())))
                 .withRequestBody(matchingJsonPath("$.payload.github_user_id", equalTo("5160414")))
         );
+    }
+
+    private void runJobs() {
+        notificationOutboxJob.run();
+        indexerOutboxJob.run();
     }
 
     @Test

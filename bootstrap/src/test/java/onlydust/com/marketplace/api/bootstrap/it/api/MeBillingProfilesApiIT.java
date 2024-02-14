@@ -131,7 +131,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        billingProfileOutboxJob.run();
         client.get()
                 .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -205,7 +205,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        billingProfileOutboxJob.run();
         client.get()
                 .uri(ME_GET_INDIVIDUAL_BILLING_PROFILE)
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -302,7 +302,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        billingProfileOutboxJob.run();
         client.get()
                 .uri(ME_GET_COMPANY_BILLING_PROFILE)
                 .header("Authorization", BEARER_PREFIX + jwt)
@@ -373,7 +373,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        billingProfileOutboxJob.run();
         client.get()
                 .uri(ME_GET_COMPANY_BILLING_PROFILE)
                 .header("Authorization", BEARER_PREFIX + jwt)

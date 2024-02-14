@@ -89,7 +89,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // Then
         assertMe(me);
         assertUserEntity(me.getId());
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        runJobs();
         indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
@@ -122,7 +122,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         // Then
         assertMe(me);
         assertUserEntity(me.getId());
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        runJobs();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
 
         // ===============================================
@@ -143,8 +143,14 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertMe(me);
-        waitAtLeastOneCycleOfOutboxEventProcessing();
+        runJobs();
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
+    }
+
+    private void runJobs() {
+        indexerOutboxJob.run();
+        notificationOutboxJob.run();
+        trackingOutboxJob.run();
     }
 
     protected void assertUserEntity(UUID userId) {
