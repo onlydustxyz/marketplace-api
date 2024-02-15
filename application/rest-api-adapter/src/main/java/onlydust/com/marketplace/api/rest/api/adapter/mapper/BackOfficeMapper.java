@@ -127,13 +127,13 @@ public interface BackOfficeMapper {
 
     static CurrencyCode mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
         return switch (currency) {
-            case Strk -> CurrencyCode.STRK;
-            case Usd -> CurrencyCode.USD;
-            case Apt -> CurrencyCode.APT;
-            case Op -> CurrencyCode.OP;
-            case Eth -> CurrencyCode.ETH;
-            case Lords -> CurrencyCode.LORDS;
-            case Usdc -> CurrencyCode.USDC;
+            case STRK -> CurrencyCode.STRK;
+            case USD -> CurrencyCode.USD;
+            case APT -> CurrencyCode.APT;
+            case OP -> CurrencyCode.OP;
+            case ETH -> CurrencyCode.ETH;
+            case LORDS -> CurrencyCode.LORDS;
+            case USDC -> CurrencyCode.USDC;
         };
     }
 

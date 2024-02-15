@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.*;
+import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -36,7 +37,7 @@ import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
 
 @AllArgsConstructor
-public class PostgresProjectAdapter implements ProjectStoragePort {
+public class PostgresProjectAdapter implements ProjectStoragePort, ProjectRewardStoragePort {
     private static final int CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS = 10;
     private static final int CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS = 5;
     private static final int TOP_CONTRIBUTOR_COUNT = 3;

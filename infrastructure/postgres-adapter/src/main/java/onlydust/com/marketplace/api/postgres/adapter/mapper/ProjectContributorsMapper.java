@@ -46,43 +46,43 @@ public interface ProjectContributorsMapper {
                 .build();
         if (nonNull(contributorViewEntity.getOpAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Op)
+                    .currency(Currency.OP)
                     .totalAmount(contributorViewEntity.getOpAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getOpDollarsEquivalentAmount()).build());
         }
         if (nonNull(contributorViewEntity.getStarkAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Strk)
+                    .currency(Currency.STRK)
                     .totalAmount(contributorViewEntity.getStarkAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getStarkDollarsEquivalentAmount()).build());
         }
         if (nonNull(contributorViewEntity.getEthAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Eth)
+                    .currency(Currency.ETH)
                     .totalAmount(contributorViewEntity.getEthAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getEthDollarsEquivalentAmount()).build());
         }
         if (nonNull(contributorViewEntity.getAptAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Apt)
+                    .currency(Currency.APT)
                     .totalAmount(contributorViewEntity.getAptAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getAptDollarsEquivalentAmount()).build());
         }
         if (nonNull(contributorViewEntity.getUsdcAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Usdc)
+                    .currency(Currency.USDC)
                     .totalAmount(contributorViewEntity.getUsdcAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getUsdcDollarsEquivalentAmount()).build());
         }
         if (nonNull(contributorViewEntity.getUsdAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Usd)
+                    .currency(Currency.USD)
                     .totalAmount(contributorViewEntity.getUsdAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getUsdAmount()).build());
         }
         if (nonNull(contributorViewEntity.getLordsAmount())) {
             totalsEarned.addDetail(TotalEarnedPerCurrency.builder()
-                    .currency(Currency.Lords)
+                    .currency(Currency.LORDS)
                     .totalAmount(contributorViewEntity.getLordsAmount())
                     .totalDollarsEquivalent(contributorViewEntity.getLordsDollarsEquivalentAmount()).build());
         }

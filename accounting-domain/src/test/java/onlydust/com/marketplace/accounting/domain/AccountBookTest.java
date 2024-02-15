@@ -662,6 +662,67 @@ public class AccountBookTest {
         );
     }
 
+
+    @Test
+    void should_get_the_amount_received_by_an_account() {
+        // Given
+        final var sponsor = AccountId.of(SponsorAccount.Id.random());
+        final var sponsor2 = AccountId.of(SponsorAccount.Id.random());
+        final var project = AccountId.of(ProjectId.random());
+        final var reward = AccountId.of(RewardId.random());
+        final var accountBook = AccountBookAggregate.fromEvents(
+                new MintEvent(sponsor, PositiveAmount.of(100L)),
+                new MintEvent(sponsor2, PositiveAmount.of(100L))
+        );
+
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(0L));
+        }
+
+        accountBook.transfer(sponsor, project, PositiveAmount.of(50L));
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(50L));
+        }
+
+        accountBook.refund(project, sponsor, PositiveAmount.of(5L));
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(45L));
+        }
+
+        accountBook.transfer(project, reward, PositiveAmount.of(10L));
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(45L));
+        }
+
+        accountBook.refund(reward);
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(45L));
+        }
+
+        accountBook.transfer(sponsor2, project, PositiveAmount.of(100L));
+        {
+            // When
+            final var amount = accountBook.state().amountReceivedBy(project);
+            // Then
+            assertThat(amount).isEqualTo(PositiveAmount.of(145L));
+        }
+    }
+
     //@Test
     public void benchmark() {
         // Given

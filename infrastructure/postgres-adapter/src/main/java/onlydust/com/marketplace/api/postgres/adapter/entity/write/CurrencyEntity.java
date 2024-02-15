@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import org.hibernate.annotations.TypeDef;
 
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
+@Accessors(fluent = true)
 @TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class)
 public class CurrencyEntity {
     @Id

@@ -80,6 +80,11 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
     }
 
+    public @NonNull PositiveAmount amountReceivedBy(@NonNull final AccountId account) {
+        return accountVertices(account).stream()
+                .map(v -> incomingEdgeOf(v).amount).reduce(PositiveAmount.ZERO, PositiveAmount::add);
+    }
+
     public @NonNull PositiveAmount refundableBalance(@NonNull AccountId from, @NonNull AccountId to) {
         final var unspentVertices = unspentVerticesOf(from, to);
         return unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
