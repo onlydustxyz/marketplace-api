@@ -28,7 +28,7 @@ public class SlackApiAdapter implements NotificationPort {
                     .channel(slackProperties.getKycKybChannel())
                     .iconUrl(OD_LOGO_URL)
                     .username("[%s] - OnlyDust API".formatted(slackProperties.getEnvironment().toUpperCase()))
-                    .text("not empty text to avoid slack sdk warnings")
+                    .text("New KYC/KYB event")
                     .blocksAsString(UserVerificationEventMapper.billingProfileUpdatedToSlackNotification(billingProfileUpdated))
             );
             if (nonNull(chatPostMessageResponse.getError()) || nonNull(chatPostMessageResponse.getWarning())) {
