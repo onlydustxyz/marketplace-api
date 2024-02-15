@@ -7,13 +7,13 @@ public enum CurrencyEnumEntity {
 
     public static CurrencyEnumEntity of(Currency currency) {
         return switch (currency) {
-            case Eth -> CurrencyEnumEntity.eth;
-            case Apt -> CurrencyEnumEntity.apt;
-            case Op -> CurrencyEnumEntity.op;
-            case Usd -> CurrencyEnumEntity.usd;
-            case Strk -> CurrencyEnumEntity.strk;
-            case Lords -> CurrencyEnumEntity.lords;
-            case Usdc -> CurrencyEnumEntity.usdc;
+            case ETH -> CurrencyEnumEntity.eth;
+            case APT -> CurrencyEnumEntity.apt;
+            case OP -> CurrencyEnumEntity.op;
+            case USD -> CurrencyEnumEntity.usd;
+            case STRK -> CurrencyEnumEntity.strk;
+            case LORDS -> CurrencyEnumEntity.lords;
+            case USDC -> CurrencyEnumEntity.usdc;
         };
     }
 
@@ -23,13 +23,13 @@ public enum CurrencyEnumEntity {
 
     public Currency toDomain() {
         return switch (this) {
-            case op -> Currency.Op;
-            case apt -> Currency.Apt;
-            case usd -> Currency.Usd;
-            case eth -> Currency.Eth;
-            case strk -> Currency.Strk;
-            case lords -> Currency.Lords;
-            case usdc -> Currency.Usdc;
+            case op -> Currency.OP;
+            case apt -> Currency.APT;
+            case usd -> Currency.USD;
+            case eth -> Currency.ETH;
+            case strk -> Currency.STRK;
+            case lords -> Currency.LORDS;
+            case usdc -> Currency.USDC;
         };
     }
 }

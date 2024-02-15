@@ -54,7 +54,7 @@ public class RewardV2ServiceTest {
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
-                    .currency(Currency.Usdc)
+                    .currency(Currency.USDC)
                     .items(List.of())
                     .build();
 
@@ -74,7 +74,7 @@ public class RewardV2ServiceTest {
             assertThat(capturedReward.requestorId()).isEqualTo(projectLeadId);
             assertThat(capturedReward.recipientId()).isEqualTo(recipientId);
             assertThat(capturedReward.amount()).isEqualTo(BigDecimal.TEN);
-            assertThat(capturedReward.currency()).isEqualTo(Currency.Usdc);
+            assertThat(capturedReward.currency()).isEqualTo(Currency.USDC);
             assertThat(capturedReward.rewardItems()).isEmpty();
 
             verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, "USDC");
@@ -88,7 +88,7 @@ public class RewardV2ServiceTest {
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
-                    .currency(Currency.Usdc)
+                    .currency(Currency.USDC)
                     .build();
 
             // When
@@ -106,7 +106,7 @@ public class RewardV2ServiceTest {
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN.negate())
-                    .currency(Currency.Usdc)
+                    .currency(Currency.USDC)
                     .build();
 
             // When
@@ -124,7 +124,7 @@ public class RewardV2ServiceTest {
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.ZERO)
-                    .currency(Currency.Usdc)
+                    .currency(Currency.USDC)
                     .build();
 
             // When
@@ -159,7 +159,7 @@ public class RewardV2ServiceTest {
                 projectLeadId,
                 recipientId,
                 BigDecimal.TEN,
-                Currency.Usdc,
+                Currency.USDC,
                 new Date(),
                 List.of()
         );

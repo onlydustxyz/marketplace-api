@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.api.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -49,6 +50,8 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectReward
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
+    private final ProjectRewardFacadePort projectRewardFacadePort;
+    private final ProjectRewardFacadePort projectRewardFacadePortV2;
     private final AuthenticationService authenticationService;
     private final RewardFacadePort rewardFacadePort;
     private final RewardFacadePort rewardFacadePortV2;
@@ -170,7 +173,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
                 .build();
 
-        final var page = projectFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,
+        final var page = projectRewardFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,
                 sanitizedPageIndex, sanitizedPageSize,
                 sortBy, SortDirectionMapper.requestToDomain(direction));
 
@@ -182,9 +185,27 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
+    public ResponseEntity<RewardsPageResponse> getProjectRewardsV2(UUID projectId, Integer pageIndex, Integer pageSize,
+                                                                   List<CurrencyContract> currencies,
+                                                                   List<Long> contributors,
+                                                                   String fromDate, String toDate,
+                                                                   String sort, String direction) {
+        // TODO
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @Override
     public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final ProjectBudgetsView projectBudgetsView = projectFacadePort.getBudgets(projectId,
+        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePort.getBudgets(projectId,
+                authenticatedUser.getId());
+        return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
+    }
+
+    @Override
+    public ResponseEntity<ProjectBudgetsResponse> getProjectBudgetsV2(UUID projectId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
                 authenticatedUser.getId());
         return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
     }
@@ -226,9 +247,15 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final RewardView rewardView = projectFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
+        final RewardView rewardView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId());
         return ResponseEntity.ok(RewardMapper.rewardDetailsToResponse(rewardView));
+    }
+
+    @Override
+    public ResponseEntity<RewardDetailsResponse> getProjectRewardV2(UUID projectId, UUID rewardId) {
+        // TODO
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @Override
@@ -237,12 +264,18 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
-        final Page<RewardItemView> page = projectFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
+        final Page<RewardItemView> page = projectRewardFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
                 authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
                 ResponseEntity.ok(rewardItemsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<RewardItemsPageResponse> getProjectRewardItemsPageV2(UUID projectId, UUID rewardId, Integer pageIndex, Integer pageSize) {
+        // TODO
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 

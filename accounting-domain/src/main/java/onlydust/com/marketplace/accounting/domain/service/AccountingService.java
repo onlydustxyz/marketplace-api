@@ -5,6 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -24,23 +25,28 @@ public class AccountingService implements AccountingFacadePort {
     private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
     private final AccountingObserver accountingObserver;
+    private final ProjectAccountingObserver projectAccountingObserver;
 
     @Override
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId,
+                                                        Currency.@NonNull Id currencyId,
+                                                        @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil) {
         final var currency = getCurrency(currencyId);
         final var sponsorAccount = new SponsorAccount(sponsorId, currency, lockedUntil);
         sponsorAccountStorage.save(sponsorAccount);
 
-        increaseAllowance(sponsorAccount.id(), amountToMint);
+        increaseAllowance(sponsorAccount.id(), allowance);
         return sponsorAccountStatement(sponsorAccount, getAccountBook(currency));
     }
 
     @Override
-    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId, Currency.@NonNull Id currencyId, @NonNull PositiveAmount amountToMint,
+    public SponsorAccountStatement createSponsorAccount(@NonNull SponsorId sponsorId,
+                                                        Currency.@NonNull Id currencyId,
+                                                        @NonNull PositiveAmount allowance,
                                                         ZonedDateTime lockedUntil,
                                                         @NonNull SponsorAccount.Transaction transaction) {
-        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, amountToMint, lockedUntil);
+        final var sponsorAccount = createSponsorAccount(sponsorId, currencyId, allowance, lockedUntil);
         return fund(sponsorAccount.account().id(), transaction);
     }
 
@@ -55,6 +61,7 @@ public class AccountingService implements AccountingFacadePort {
             accountBook.burn(AccountId.of(sponsorAccountId), PositiveAmount.of(amount.negate()));
 
         accountBookEventStorage.save(sponsorAccount.currency(), accountBook.pendingEvents());
+        onAllowanceUpdated(sponsorAccount.id(), sponsorAccount.currency(), accountBook.state());
         return sponsorAccountStatement(sponsorAccount, accountBook);
     }
 
@@ -118,10 +125,13 @@ public class AccountingService implements AccountingFacadePort {
 
         accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+
         if (to instanceof RewardId rewardId)
             accountingObserver.onRewardCreated(rewardId, new AccountBookFacade(sponsorAccountStorage, accountBook));
-
+        onAllowanceUpdated(from, currency, accountBook.state());
+        onAllowanceUpdated(to, currency, accountBook.state());
     }
+
 
     @Override
     public <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
@@ -130,6 +140,8 @@ public class AccountingService implements AccountingFacadePort {
 
         accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        onAllowanceUpdated(from, currency, accountBook.state());
+        onAllowanceUpdated(to, currency, accountBook.state());
     }
 
     @Override
@@ -165,6 +177,16 @@ public class AccountingService implements AccountingFacadePort {
         return currencyStorage.all().stream()
                 .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards())
                 .toList();
+    }
+
+    private <ID> void onAllowanceUpdated(ID id, Currency currency, AccountBookState accountBook) {
+        if (id instanceof ProjectId projectId)
+            projectAccountingObserver.onAllowanceUpdated(
+                    projectId,
+                    currency.id(),
+                    accountBook.balanceOf(AccountId.of(projectId)),
+                    accountBook.amountReceivedBy(AccountId.of(projectId))
+            );
     }
 
     private SponsorAccountStatement registerSponsorAccountTransaction(AccountBookAggregate accountBook,

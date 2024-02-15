@@ -42,7 +42,8 @@ public class ProjectServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
-    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
+    private final ProjectRewardStoragePort projectRewardStoragePort = mock(ProjectRewardStoragePort.class);
+    private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort, projectRewardStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
             eventStoragePort, contributionStoragePort, dustyBotStoragePort,
@@ -328,7 +329,7 @@ public class ProjectServiceTest {
         projectService.getRewards(projectId, projectLeadId, filters, pageIndex, pageSize, sortBy, sortDirection);
 
         // Then
-        verify(projectStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
+        verify(projectRewardStoragePort, times(1)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
                 pageSize);
     }
 
@@ -352,7 +353,7 @@ public class ProjectServiceTest {
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
+        verify(projectRewardStoragePort, times(0)).findRewards(projectId, filters, sortBy, sortDirection, pageIndex,
                 pageSize);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
@@ -371,7 +372,7 @@ public class ProjectServiceTest {
         projectService.getBudgets(projectId, projectLeadId);
 
         // Then
-        verify(projectStoragePort, times(1)).findBudgets(projectId);
+        verify(projectRewardStoragePort, times(1)).findBudgets(projectId);
     }
 
     @Test
@@ -389,7 +390,7 @@ public class ProjectServiceTest {
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        verify(projectRewardStoragePort, times(0)).findBudgets(projectId);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read budgets on their projects", onlyDustException.getMessage());
@@ -403,18 +404,18 @@ public class ProjectServiceTest {
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
-        when(projectStoragePort.findBudgets(projectId))
+        when(projectRewardStoragePort.findBudgets(projectId))
                 .thenReturn(ProjectBudgetsView.builder().budgets(
                         List.of(
-                                BudgetView.builder().currency(Currency.Usd).remaining(BigDecimal.ONE).build(),
-                                BudgetView.builder().currency(Currency.Op).remaining(BigDecimal.ZERO).build()
+                                BudgetView.builder().currency(Currency.USD).remaining(BigDecimal.ONE).build(),
+                                BudgetView.builder().currency(Currency.OP).remaining(BigDecimal.ZERO).build()
                         )
                 ).build());
         final ProjectBudgetsView budgets = projectService.getBudgets(projectId, projectLeadId);
 
         // Then
         assertEquals(1, budgets.getBudgets().size());
-        assertEquals(Currency.Usd, budgets.getBudgets().get(0).getCurrency());
+        assertEquals(Currency.USD, budgets.getBudgets().get(0).getCurrency());
         assertEquals(BigDecimal.ONE, budgets.getBudgets().get(0).getRemaining());
     }
 
@@ -430,7 +431,7 @@ public class ProjectServiceTest {
         projectService.getRewardByIdForProjectLead(projectId, rewardId, projectLeadId);
 
         // Then
-        verify(projectStoragePort, times(1)).getProjectReward(rewardId);
+        verify(projectRewardStoragePort, times(1)).getProjectReward(rewardId);
     }
 
     @Test
@@ -449,7 +450,7 @@ public class ProjectServiceTest {
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        verify(projectRewardStoragePort, times(0)).findBudgets(projectId);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read reward on their projects", onlyDustException.getMessage());
@@ -467,7 +468,7 @@ public class ProjectServiceTest {
         projectService.getRewardItemsPageByIdForProjectLead(projectId, rewardId, projectLeadId, 0, 50);
 
         // Then
-        verify(projectStoragePort, times(1)).getProjectRewardItems(rewardId, 0, 50);
+        verify(projectRewardStoragePort, times(1)).getProjectRewardItems(rewardId, 0, 50);
     }
 
     @Test
@@ -487,7 +488,7 @@ public class ProjectServiceTest {
         }
 
         // Then
-        verify(projectStoragePort, times(0)).findBudgets(projectId);
+        verify(projectRewardStoragePort, times(0)).findBudgets(projectId);
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("Only project leads can read reward items on their projects", onlyDustException.getMessage());
@@ -694,7 +695,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),
@@ -767,7 +768,7 @@ public class ProjectServiceTest {
         final PermissionService permissionService = new PermissionService(projectStoragePort,
                 mock(ContributionStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
-        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
+        final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort, mock(ProjectRewardStoragePort.class),
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(EventStoragePort.class), mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class),

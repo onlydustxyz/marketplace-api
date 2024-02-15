@@ -25,35 +25,35 @@ public class UserPayoutSettings {
 
     public boolean hasValidPayoutSettings() {
         return nonNull(this) && pendingPaymentsCurrencies.stream().allMatch(currency -> switch (currency) {
-            case Usd -> nonNull(this.sepaAccount) && this.sepaAccount.valid();
-            case Eth, Lords, Usdc -> nonNull(this.ethWallet);
-            case Apt -> nonNull(this.aptosAddress);
-            case Op -> nonNull(this.optimismAddress);
-            case Strk -> nonNull(this.starknetAddress);
+            case USD -> nonNull(this.sepaAccount) && this.sepaAccount.valid();
+            case ETH, LORDS, USDC -> nonNull(this.ethWallet);
+            case APT -> nonNull(this.aptosAddress);
+            case OP -> nonNull(this.optimismAddress);
+            case STRK -> nonNull(this.starknetAddress);
         });
     }
 
     public boolean isMissingOptimismWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Op) && isNull(this.optimismAddress);
+        return pendingPaymentsCurrencies.contains(Currency.OP) && isNull(this.optimismAddress);
     }
 
     public boolean isMissingAptosWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Apt) && isNull(this.aptosAddress);
+        return pendingPaymentsCurrencies.contains(Currency.APT) && isNull(this.aptosAddress);
     }
 
     public boolean isMissingStarknetWallet() {
-        return pendingPaymentsCurrencies.contains(Currency.Strk) && isNull(this.starknetAddress);
+        return pendingPaymentsCurrencies.contains(Currency.STRK) && isNull(this.starknetAddress);
     }
 
     public boolean isMissingEthereumWallet() {
-        return (pendingPaymentsCurrencies.contains(Currency.Eth)
-                || pendingPaymentsCurrencies.contains(Currency.Lords)
-                || pendingPaymentsCurrencies.contains(Currency.Usdc))
+        return (pendingPaymentsCurrencies.contains(Currency.ETH)
+                || pendingPaymentsCurrencies.contains(Currency.LORDS)
+                || pendingPaymentsCurrencies.contains(Currency.USDC))
                && isNull(this.ethWallet);
     }
 
     public boolean isMissingSepaAccount() {
-        return pendingPaymentsCurrencies.contains(Currency.Usd) && (isNull(this.sepaAccount) || !this.sepaAccount.valid());
+        return pendingPaymentsCurrencies.contains(Currency.USD) && (isNull(this.sepaAccount) || !this.sepaAccount.valid());
     }
 
 

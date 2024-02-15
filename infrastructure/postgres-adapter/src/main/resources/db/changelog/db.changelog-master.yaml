@@ -103,4 +103,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000049_remove_currency_standard.sql
   - include:
       file: db/changelog/changelogs/00000050_add_verification_review_message.sql
-
+  - include:
+      file: db/changelog/changelogs/00000051_project_allowances.sql

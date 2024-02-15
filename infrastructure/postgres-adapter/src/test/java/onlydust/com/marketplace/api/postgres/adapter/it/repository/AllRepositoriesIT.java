@@ -373,7 +373,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 userId,
                 faker.number().randomNumber(),
                 BigDecimal.valueOf(faker.number().randomNumber()),
-                Currency.Usdc,
+                Currency.USDC,
                 new Date(),
                 List.of(Reward.Item.builder()
                         .id(faker.pokemon().name())

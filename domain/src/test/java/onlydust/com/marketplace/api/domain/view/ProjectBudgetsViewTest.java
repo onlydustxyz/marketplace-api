@@ -15,8 +15,8 @@ public class ProjectBudgetsViewTest {
     @Test
     void should_return_dollars_equivalents_given_only_dollars() {
         // Given
-        final BudgetView budget1 = budgetStub(Currency.Usd, 1000, 500, null, null);
-        final BudgetView budget2 = budgetStub(Currency.Usd, 3000, 1520, null, null);
+        final BudgetView budget1 = budgetStub(Currency.USD, 1000, 500, null, null);
+        final BudgetView budget2 = budgetStub(Currency.USD, 3000, 1520, null, null);
         final ProjectBudgetsView projectBudgetsView = ProjectBudgetsView.builder()
                 .budgets(List.of(
                         budget1,
@@ -32,8 +32,8 @@ public class ProjectBudgetsViewTest {
     @Test
     void should_return_dollars_equivalents_given_multiple_currencies() {
         // Given
-        final BudgetView budget1 = budgetStub(Currency.Usd, 1000, 500, null, null);
-        final BudgetView budget2 = budgetStub(Currency.Eth, 1000, 500, 15000D, 1500D);
+        final BudgetView budget1 = budgetStub(Currency.USD, 1000, 500, null, null);
+        final BudgetView budget2 = budgetStub(Currency.ETH, 1000, 500, 15000D, 1500D);
         final ProjectBudgetsView projectBudgetsView = ProjectBudgetsView.builder()
                 .budgets(List.of(
                         budget1,
@@ -49,8 +49,8 @@ public class ProjectBudgetsViewTest {
     @Test
     void should_return_null_dollars_equivalent_values_given_currencies_without_dollars_equivalent() {
         // Given
-        final BudgetView budget1 = budgetStub(Currency.Apt, 1000, 500, null, null);
-        final BudgetView budget2 = budgetStub(Currency.Strk, 1000, 500, null, null);
+        final BudgetView budget1 = budgetStub(Currency.APT, 1000, 500, null, null);
+        final BudgetView budget2 = budgetStub(Currency.STRK, 1000, 500, null, null);
         final ProjectBudgetsView projectBudgetsView = ProjectBudgetsView.builder()
                 .budgets(List.of(
                         budget1,

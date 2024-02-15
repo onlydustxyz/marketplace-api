@@ -15,7 +15,6 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
-import onlydust.com.marketplace.kernel.model.blockchain.starknet.AccountAddress;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -193,7 +192,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
         when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(UserPayoutSettings.builder()
-                .pendingPaymentsCurrencies(List.of(Currency.Strk))
+                .pendingPaymentsCurrencies(List.of(Currency.STRK))
                 .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                 .build());
         when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))

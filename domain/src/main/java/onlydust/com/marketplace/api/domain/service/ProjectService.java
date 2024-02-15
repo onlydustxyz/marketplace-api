@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.domain.gateway.DateProvider;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.api.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.pagination.Page;
@@ -25,7 +26,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
-public class ProjectService implements ProjectFacadePort {
+public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePort {
 
     private static final Pattern ISSUE_URL_REGEX = Pattern.compile(
             "https://github\\.com/([^/]+)/([^/]+)/issues/([0-9]+)/?");
@@ -35,6 +36,7 @@ public class ProjectService implements ProjectFacadePort {
 
     private final ProjectObserverPort projectObserverPort;
     private final ProjectStoragePort projectStoragePort;
+    private final ProjectRewardStoragePort projectRewardStoragePort;
     private final ImageStoragePort imageStoragePort;
     private final UUIDGeneratorPort uuidGeneratorPort;
     private final PermissionService permissionService;
@@ -238,7 +240,7 @@ public class ProjectService implements ProjectFacadePort {
                                              Integer pageIndex, Integer pageSize,
                                              ProjectRewardView.SortBy sortBy, SortDirection sortDirection) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
+            return projectRewardStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read rewards on their projects");
         }
@@ -247,7 +249,7 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findBudgets(projectId);
+            return projectRewardStoragePort.findBudgets(projectId);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read budgets on their projects");
         }
@@ -256,7 +258,7 @@ public class ProjectService implements ProjectFacadePort {
     @Override
     public RewardView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.getProjectReward(rewardId);
+            return projectRewardStoragePort.getProjectReward(rewardId);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read reward on their projects");
         }
@@ -266,7 +268,7 @@ public class ProjectService implements ProjectFacadePort {
     public Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId,
                                                                      UUID projectLeadId, int pageIndex, int pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
+            return projectRewardStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
         } else {
             throw OnlyDustException.forbidden("Only project leads can read reward items on their projects");
         }

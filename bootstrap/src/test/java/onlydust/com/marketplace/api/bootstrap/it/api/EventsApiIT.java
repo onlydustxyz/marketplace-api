@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
-import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
@@ -55,7 +54,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     @Autowired
-    PostgresProjectAdapter postgresProjectAdapter;
+    PostgresProjectAdapter projectStoragePort;
 
     @Test
     public void should_refresh_ignored_contributions_on_contributions_change_event() {
@@ -210,7 +209,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     private UUID createProject(ProjectRewardSettings rewardSettings) {
         final UUID projectId = UUID.randomUUID();
         final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
-        postgresProjectAdapter.createProject(projectId,
+        projectStoragePort.createProject(projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",

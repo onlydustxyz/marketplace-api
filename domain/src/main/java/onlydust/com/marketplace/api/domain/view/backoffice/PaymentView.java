@@ -53,22 +53,22 @@ public class PaymentView {
         // TODO : replace with KYC/KYB verification status
 
         return switch (currency) {
-            case Usd -> Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
-            case Eth, Lords, Usdc -> nonNull(recipientEthWallet);
-            case Op -> nonNull(recipientOptimismWallet);
-            case Apt -> nonNull(recipientAptosWallet);
-            case Strk -> nonNull(recipientStarkWallet);
+            case USD -> Optional.ofNullable(recipientSepaAccount).map(SepaAccount::valid).orElse(false);
+            case ETH, LORDS, USDC -> nonNull(recipientEthWallet);
+            case OP -> nonNull(recipientOptimismWallet);
+            case APT -> nonNull(recipientAptosWallet);
+            case STRK -> nonNull(recipientStarkWallet);
         };
     }
 
     public String recipientPayoutSettings() {
         return switch (currency) {
-            case Usd -> recipientSepaAccount == null ? "" :
+            case USD -> recipientSepaAccount == null ? "" :
                     "%s / %s".formatted(recipientSepaAccount.getAccountNumber().asString(), recipientSepaAccount.getBic());
-            case Eth, Lords, Usdc -> recipientEthWallet;
-            case Op -> recipientOptimismWallet;
-            case Apt -> recipientAptosWallet;
-            case Strk -> recipientStarkWallet;
+            case ETH, LORDS, USDC -> recipientEthWallet;
+            case OP -> recipientOptimismWallet;
+            case APT -> recipientAptosWallet;
+            case STRK -> recipientStarkWallet;
         };
     }
 }
