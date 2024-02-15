@@ -9,15 +9,20 @@ import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
-import onlydust.com.marketplace.api.contract.model.NewInvoiceResponse;
+import onlydust.com.marketplace.api.contract.model.CurrencyContract;
+import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.map;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -35,7 +40,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     }
 
     @Override
-    public ResponseEntity<NewInvoiceResponse> previewNewInvoiceForRewardIds(UUID billingProfileId, List<UUID> rewardIds) {
+    public ResponseEntity<InvoicePreviewResponse> previewNewInvoiceForRewardIds(UUID billingProfileId, List<UUID> rewardIds) {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
         final var preview = billingProfileFacadePort.previewInvoice(
                 UserId.of(authenticatedUser.getId()),
@@ -45,19 +50,16 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         return ok(map(preview));
     }
 
-//    @Override
-//    public ResponseEntity<Void> uploadInvoice(String filename, Resource pdf) {
-//        final User authenticatedUser = authenticationService.getAuthenticatedUser();
-//        InputStream pdfInputStream;
-//        try {
-//            pdfInputStream = pdf.getInputStream();
-//        } catch (IOException e) {
-//            throw OnlyDustException.badRequest("Error while reading image data", e);
-//        }
-//
-//        final URL pdfUrl = userFacadePort.saveInvoicePdfForGithubUserId(authenticatedUser.getGithubUserId(), pdfInputStream);
-//        final UploadPdfResponse response = new UploadPdfResponse();
-//        response.url(pdfUrl.toString());
-//        return ResponseEntity.ok().build();
-//    }
+    @Override
+    public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, BigDecimal totalAfterTax, CurrencyContract currency, String filename, Resource pdf) {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+
+        try {
+            billingProfileFacadePort.uploadInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pdf.getInputStream());
+        } catch (IOException e) {
+            throw badRequest("Error while reading invoice data", e);
+        }
+
+        return ResponseEntity.noContent().build();
+    }
 }

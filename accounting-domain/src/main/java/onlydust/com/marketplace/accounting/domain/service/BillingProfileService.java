@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStorage
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
@@ -35,5 +36,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .totalPageNumber(0)
                 .totalItemNumber(0)
                 .build();
+    }
+
+    @Override
+    public void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, InputStream inputStream) {
+
     }
 }

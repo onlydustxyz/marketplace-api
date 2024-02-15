@@ -123,6 +123,19 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 );
 
         // When
+        client.post()
+                .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                        "filename", "OD-BUISSET-ANTHONY-001.pdf",
+                        "totalAfterTax", "1784757.50",
+                        "currency", "USD"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
                         "pageIndex", "0",

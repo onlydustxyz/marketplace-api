@@ -2584,7 +2584,7 @@ paths:
           name: totalAfterTax
           required: true
           schema:
-            type: string
+            type: number
         - in: query
           name: currency
           required: true
@@ -5500,6 +5500,7 @@ components:
     InvoiceStatus:
       type: string
       enum:
+        - DRAFT
         - PROCESSING
         - REJECTED
-        - COMPLETE
+        - APPROVED
