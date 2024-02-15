@@ -10,7 +10,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
-    void should_list_invoices() {
+    void should_upload_and_list_invoices() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();
 
@@ -26,6 +26,21 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .getResponseBody();
 
         final var billingProfileId = myBillingProfiles.getBillingProfiles().get(0).getId();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICES_PREVIEW.formatted(billingProfileId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+        ;
 
         // When
         client.get()

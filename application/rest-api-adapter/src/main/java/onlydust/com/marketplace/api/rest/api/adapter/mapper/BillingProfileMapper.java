@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
+import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
@@ -10,6 +11,8 @@ import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+
+import java.math.RoundingMode;
 
 import static java.util.Objects.isNull;
 
@@ -83,6 +86,58 @@ public interface BillingProfileMapper {
                 .rewardCount(billingProfile.rewardCount());
     }
 
+    static NewInvoiceResponse map(InvoicePreview preview) {
+        return new NewInvoiceResponse()
+                .id(preview.id().value())
+                .createdAt(preview.createdAt())
+                .dueAt(preview.dueAt())
+                .billingProfileType(map(preview.billingProfileType()))
+                .individualBillingProfile(preview.personalInfo().map(BillingProfileMapper::map).orElse(null))
+                .companyBillingProfile(preview.companyInfo().map(BillingProfileMapper::map).orElse(null))
+                .destinationAccounts(null)
+                .rewards(preview.rewards().stream().map(BillingProfileMapper::map).toList())
+                .totalBeforeTax(map(preview.totalBeforeTax()))
+                .taxRate(preview.taxRate())
+                .totalTax(map(preview.totalTax()))
+                .totalAfterTax(map(preview.totalAfterTax()))
+                ;
+    }
+
+    static InvoiceRewardItemResponse map(InvoicePreview.Reward reward) {
+        return new InvoiceRewardItemResponse()
+                .id(reward.id().value())
+                .date(reward.createdAt())
+                .projectName(reward.projectName())
+                .amount(toConvertibleMoney(reward.amount(), reward.base()))
+                ;
+    }
+
+    static NewInvoiceResponseIndividualBillingProfile map(InvoicePreview.PersonalInfo personalInfo) {
+        return new NewInvoiceResponseIndividualBillingProfile()
+                .firstName(personalInfo.firstName())
+                .lastName(personalInfo.lastName())
+                .address(personalInfo.address());
+    }
+
+    static NewInvoiceResponseCompanyBillingProfile map(InvoicePreview.CompanyInfo companyInfo) {
+        return new NewInvoiceResponseCompanyBillingProfile()
+                .name(companyInfo.name())
+                .address(companyInfo.address())
+                .registrationNumber(companyInfo.registrationNumber())
+                .vatRegulationState(map(companyInfo.vatRegulationState()))
+                .euVATNumber(companyInfo.euVATNumber())
+                ;
+    }
+
+    static VatRegulationState map(InvoicePreview.VatRegulationState vatRegulationState) {
+        return switch (vatRegulationState) {
+            case APPLICABLE -> VatRegulationState.APPLICABLE;
+            case REVERSE_CHARGE -> VatRegulationState.REVERSE_CHARGE;
+            case NOT_APPLICABLE_NON_UE -> VatRegulationState.NOT_APPLICABLE_NON_UE;
+            case NOT_APPLICABLE_FRENCH_NOT_SUBJECT -> VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
+        };
+    }
+
     static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
         return new BillingProfileInvoicesPageResponse()
                 .invoices(page.getContent().stream().map(BillingProfileMapper::map).toList())
@@ -119,7 +174,25 @@ public interface BillingProfileMapper {
         };
     }
 
+    static ConvertibleMoney toConvertibleMoney(Money money, Money base) {
+        return new ConvertibleMoney()
+                .amount(money.getValue())
+                .currency(map(money.getCurrency()))
+                .base(new BaseMoney()
+                        .amount(base.getValue())
+                        .currency(map(base.getCurrency()))
+                        .conversionRate(money.getValue().divide(base.getValue(), RoundingMode.HALF_EVEN))
+                );
+    }
+
     static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {
+        return switch (type) {
+            case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
+            case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
+        };
+    }
+
+    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(onlydust.com.marketplace.accounting.domain.model.BillingProfile.Type type) {
         return switch (type) {
             case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
             case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
