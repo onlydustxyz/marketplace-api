@@ -67,6 +67,10 @@ spring:
     generate-ddl: false
     open-in-view: false
     show-sql: false
+  task:
+    scheduling:
+      pool:
+        size: 3
 server:
   port: ${PORT}
 
