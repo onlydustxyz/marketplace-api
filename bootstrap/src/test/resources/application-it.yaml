@@ -65,6 +65,10 @@ spring:
     allow-bean-definition-overriding: true
   liquibase:
     enabled: true
+  task:
+    scheduling:
+      pool:
+        size: 1
 #  jpa:
 #    properties:
 #      hibernate:
