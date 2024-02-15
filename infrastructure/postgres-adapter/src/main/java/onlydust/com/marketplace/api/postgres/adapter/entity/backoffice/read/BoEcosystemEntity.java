@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.backoffice.EcosystemView;
-import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

@@ -1,24 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
+import lombok.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -26,23 +15,23 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@Builder(toBuilder = true)
+@Table(name = "sponsors", schema = "public")
 public class BoSponsorEntity {
     @Id
-    UUID id;
-    String name;
+    @NonNull UUID id;
+    @NonNull String name;
     String url;
-    String logoUrl;
-    @Type(type = "jsonb")
-    List<UUID> projectIds;
+    @Column(name = "logo_url")
+    @NonNull String logoUrl;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "projects_sponsors", joinColumns = @JoinColumn(name = "sponsor_id"), inverseJoinColumns = @JoinColumn(name = "project_id"))
+    @Builder.Default
+    Set<ProjectIdEntity> projects = new HashSet<>();
 
     public SponsorView toView() {
-        return SponsorView.builder()
-                .id(id)
-                .name(name)
-                .url(url)
-                .logoUrl(logoUrl)
-                .projectIds(projectIds)
-                .build();
+        return SponsorView.builder().id(id).name(name).url(url).logoUrl(logoUrl).projectIds(projects != null ?
+                projects.stream().map(ProjectIdEntity::getId).toList() : List.of()).build();
     }
 }

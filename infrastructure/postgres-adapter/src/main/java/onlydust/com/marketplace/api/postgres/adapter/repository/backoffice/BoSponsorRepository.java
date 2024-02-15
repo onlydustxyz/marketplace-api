@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.backoffice;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoPaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.BoSponsorEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
@@ -15,27 +14,15 @@ public interface BoSponsorRepository extends JpaRepository<BoSponsorEntity, UUID
 
     @Query(value = """
             SELECT
-            	s.id,
-            	s.name,
-            	s.url,
-            	s.logo_url,
-            	projects.project_ids
+            	s
             FROM
-            	sponsors s
-            	JOIN (
-            	    SELECT 
-            	        sponsor_id,
-            	        jsonb_agg(project_id) as project_ids
-                    FROM
-                        projects_sponsors
-                    WHERE
-                        COALESCE(:projectIds) IS NULL OR project_id IN (:projectIds)
-                    GROUP BY 
-                        sponsor_id
-            	) projects on (projects.sponsor_id = s.id)
-             WHERE
-                COALESCE(:sponsorIds) IS NULL OR s.id IN (:sponsorIds)
-            """, nativeQuery = true)
+            	BoSponsorEntity s
+            	LEFT JOIN s.projects p
+            WHERE
+                (COALESCE(:sponsorIds) IS NULL OR s.id IN (:sponsorIds))
+                AND (COALESCE(:projectIds) IS NULL OR p.id IN (:projectIds))
+            GROUP BY s.id
+            """)
     @NotNull
     Page<BoSponsorEntity> findAll(final List<UUID> projectIds, final List<UUID> sponsorIds, final @NotNull Pageable pageable);
 }

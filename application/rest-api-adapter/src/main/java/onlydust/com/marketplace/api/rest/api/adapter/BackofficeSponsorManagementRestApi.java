@@ -5,9 +5,11 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
+import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +27,25 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 @AllArgsConstructor
 public class BackofficeSponsorManagementRestApi implements BackofficeSponsorManagementApi {
 
-    private final BackofficeFacadePort backofficeFacadePort;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
+    private final BackofficeFacadePort backofficeFacadePort;
+
+    @Override
+    public ResponseEntity<Void> createSponsor(SponsorRequest sponsorRequest) {
+        backofficeFacadePort.createSponsor(sponsorRequest.getName(),
+                sponsorRequest.getUrl(),
+                sponsorRequest.getLogoUrl());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
+        backofficeFacadePort.updateSponsor(sponsorId,
+                sponsorRequest.getName(),
+                sponsorRequest.getUrl(),
+                sponsorRequest.getLogoUrl());
+        return ResponseEntity.noContent().build();
+    }
 
     @Override
     public ResponseEntity<SponsorPage> getSponsorPage(Integer pageIndex, Integer pageSize,
@@ -50,6 +69,14 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
 
     @Override
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        final var sponsor = backofficeFacadePort.getSponsor(sponsorId)
+                .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
+        return ResponseEntity.ok(new SponsorResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl())
+                .projectIds(sponsor.projectIds())
+        );
     }
 }
