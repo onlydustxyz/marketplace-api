@@ -66,6 +66,15 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorPage.getTotalPageNumber()));
     }
 
+    static SponsorResponse mapSponsorToResponse(final SponsorView sponsor) {
+        return new SponsorResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl())
+                .projectIds(sponsor.projectIds());
+    }
+
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
         return new EcosystemPage()
                 .ecosystems(ecosystemViewPage.getContent().stream().map(ecosystemView -> new EcosystemPageItemResponse()

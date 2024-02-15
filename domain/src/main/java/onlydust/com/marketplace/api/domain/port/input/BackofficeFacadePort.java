@@ -27,9 +27,9 @@ public interface BackofficeFacadePort {
 
     Ecosystem createEcosystem(final Ecosystem ecosystem);
 
-    void createSponsor(String name, URI url, URI logoUrl);
+    SponsorView createSponsor(String name, URI url, URI logoUrl);
 
-    void updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl);
+    SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl);
 
     Optional<SponsorView> getSponsor(UUID sponsorId);
 

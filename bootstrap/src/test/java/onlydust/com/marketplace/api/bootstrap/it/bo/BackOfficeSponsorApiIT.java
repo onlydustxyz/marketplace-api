@@ -1,11 +1,45 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.http.MediaType;
 
 import java.util.Map;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
+
     @Test
+    @Order(1)
+    void should_get_sponsor() {
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                          "name": "AS Nancy Lorraine",
+                          "url": null,
+                          "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
+                          "projectIds": [
+                            "98873240-31df-431a-81dc-7d6fe01143a0",
+                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
+                          ]
+                        }
+                        """);
+    }
+
+
+    @Test
+    @Order(2)
     void should_get_sponsors() {
         // When
         client.get()
@@ -159,6 +193,71 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                  }
                                ]
                              }
+                        """);
+    }
+
+    @Test
+    @Order(3)
+    void should_create_sponsor() {
+        // When
+        client.post()
+                .uri(getApiURI(POST_SPONSORS))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Foobar",
+                          "url": "https://www.foobar.com",
+                          "logoUrl": "https://www.foobar.com/logo.png"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Foobar",
+                          "url": "https://www.foobar.com",
+                          "logoUrl": "https://www.foobar.com/logo.png",
+                          "projectIds": []
+                        }
+                        """)
+                .jsonPath("$.id").isNotEmpty();
+    }
+
+    @Test
+    @Order(4)
+    void should_update_sponsor() {
+        // When
+        client.put()
+                .uri(getApiURI(PUT_SPONSORS.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Foobaaaar",
+                          "url": "https://www.foobaaaar.com",
+                          "logoUrl": "https://www.foobaaaar.com/logo.png"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                          "name": "Foobaaaar",
+                          "url": "https://www.foobaaaar.com",
+                          "logoUrl": "https://www.foobaaaar.com/logo.png",
+                          "projectIds": [
+                            "98873240-31df-431a-81dc-7d6fe01143a0",
+                            "a0c91aee-9770-4000-a893-953ddcbd62a7"
+                          ]
+                        }
                         """);
     }
 }

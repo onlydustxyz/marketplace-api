@@ -21,6 +21,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapSponsorPageToContract;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapSponsorToResponse;
 
 @RestController
 @Tags(@Tag(name = "BackofficeSponsorManagement"))
@@ -31,20 +32,20 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     private final BackofficeFacadePort backofficeFacadePort;
 
     @Override
-    public ResponseEntity<Void> createSponsor(SponsorRequest sponsorRequest) {
-        backofficeFacadePort.createSponsor(sponsorRequest.getName(),
+    public ResponseEntity<SponsorResponse> createSponsor(SponsorRequest sponsorRequest) {
+        final var sponsor = backofficeFacadePort.createSponsor(sponsorRequest.getName(),
                 sponsorRequest.getUrl(),
                 sponsorRequest.getLogoUrl());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(mapSponsorToResponse(sponsor));
     }
 
     @Override
-    public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
-        backofficeFacadePort.updateSponsor(sponsorId,
+    public ResponseEntity<SponsorResponse> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
+        final var sponsor = backofficeFacadePort.updateSponsor(sponsorId,
                 sponsorRequest.getName(),
                 sponsorRequest.getUrl(),
                 sponsorRequest.getLogoUrl());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(mapSponsorToResponse(sponsor));
     }
 
     @Override
@@ -71,12 +72,6 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
         final var sponsor = backofficeFacadePort.getSponsor(sponsorId)
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
-        return ResponseEntity.ok(new SponsorResponse()
-                .id(sponsor.id())
-                .name(sponsor.name())
-                .url(sponsor.url())
-                .logoUrl(sponsor.logoUrl())
-                .projectIds(sponsor.projectIds())
-        );
+        return ResponseEntity.ok(mapSponsorToResponse(sponsor));
     }
 }

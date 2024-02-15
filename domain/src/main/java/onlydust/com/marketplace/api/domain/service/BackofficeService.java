@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+
 @AllArgsConstructor
 public class BackofficeService implements BackofficeFacadePort {
 
@@ -59,23 +61,28 @@ public class BackofficeService implements BackofficeFacadePort {
     }
 
     @Override
-    public void createSponsor(String name, URI url, URI logoUrl) {
-        backofficeStoragePort.saveSponsor(Sponsor.builder()
-                .id(UUID.randomUUID())
-                .name(name)
-                .url(url.toString())
-                .logoUrl(logoUrl.toString())
-                .build());
-    }
-
-    @Override
-    public void updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl) {
+    public SponsorView createSponsor(String name, URI url, URI logoUrl) {
+        final var sponsorId = UUID.randomUUID();
         backofficeStoragePort.saveSponsor(Sponsor.builder()
                 .id(sponsorId)
                 .name(name)
                 .url(url.toString())
                 .logoUrl(logoUrl.toString())
                 .build());
+        return getSponsor(sponsorId)
+                .orElseThrow(() -> internalServerError("Sponsor not properly created"));
+    }
+
+    @Override
+    public SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl) {
+        backofficeStoragePort.saveSponsor(Sponsor.builder()
+                .id(sponsorId)
+                .name(name)
+                .url(url.toString())
+                .logoUrl(logoUrl.toString())
+                .build());
+        return getSponsor(sponsorId)
+                .orElseThrow(() -> internalServerError("Sponsor not properly updated"));
     }
 
     @Override
