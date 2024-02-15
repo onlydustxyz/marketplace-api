@@ -94,7 +94,10 @@ public interface BillingProfileMapper {
                 .billingProfileType(map(preview.billingProfileType()))
                 .individualBillingProfile(preview.personalInfo().map(BillingProfileMapper::map).orElse(null))
                 .companyBillingProfile(preview.companyInfo().map(BillingProfileMapper::map).orElse(null))
-                .destinationAccounts(null)
+                .destinationAccounts(new DestinationAccountResponse()
+                        .bankAccount(preview.bankAccount().map(BillingProfileMapper::map).orElse(null))
+                        .wallets(preview.wallets().stream().map(BillingProfileMapper::map).toList())
+                )
                 .rewards(preview.rewards().stream().map(BillingProfileMapper::map).toList())
                 .totalBeforeTax(map(preview.totalBeforeTax()))
                 .taxRate(preview.taxRate())
@@ -110,6 +113,18 @@ public interface BillingProfileMapper {
                 .projectName(reward.projectName())
                 .amount(toConvertibleMoney(reward.amount(), reward.base()))
                 ;
+    }
+
+    static WalletResponse map(InvoicePreview.Wallet wallet) {
+        return new WalletResponse()
+                .network(wallet.network())
+                .address(wallet.address());
+    }
+
+    static BankAccountResponse map(InvoicePreview.BankAccount bankAccount) {
+        return new BankAccountResponse()
+                .bic(bankAccount.bic())
+                .accountNumber(bankAccount.accountNumber());
     }
 
     static NewInvoiceResponseIndividualBillingProfile map(InvoicePreview.PersonalInfo personalInfo) {

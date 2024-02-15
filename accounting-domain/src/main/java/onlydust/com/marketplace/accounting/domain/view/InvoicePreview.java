@@ -26,7 +26,7 @@ public class InvoicePreview {
     private @NonNull Integer sequenceNumber;
     private PersonalInfo personalInfo;
     private CompanyInfo companyInfo;
-    private @NonNull List<BankAccount> bankAccounts = new ArrayList<>();
+    private BankAccount bankAccount;
     private @NonNull List<Wallet> wallets = new ArrayList<>();
     private @NonNull List<Reward> rewards = new ArrayList<>();
 
@@ -79,6 +79,10 @@ public class InvoicePreview {
 
     public Optional<CompanyInfo> companyInfo() {
         return Optional.ofNullable(companyInfo);
+    }
+
+    public Optional<BankAccount> bankAccount() {
+        return Optional.ofNullable(bankAccount);
     }
 
     public enum VatRegulationState {

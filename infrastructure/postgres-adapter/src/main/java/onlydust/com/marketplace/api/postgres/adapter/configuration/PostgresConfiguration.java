@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStoragePort;
 import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
@@ -350,10 +351,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    InvoicePreviewStoragePort invoicePreviewStoragePort(final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                        final InvoiceRewardRepository invoiceRewardRepository) {
-        return new PostgresInvoicePreviewStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository);
+    InvoicePreviewStoragePort invoicePreviewStoragePort(final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                        final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                        final @NonNull InvoiceRewardRepository invoiceRewardRepository,
+                                                        final @NonNull WalletRepository walletRepository,
+                                                        final @NonNull BankAccountRepository bankAccountRepository) {
+        return new PostgresInvoicePreviewStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
+                walletRepository, bankAccountRepository);
     }
 
     @Bean

@@ -52,7 +52,15 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             "address": "771 chemin de la sine, 06140, Vence, France"
                           },
                           "companyBillingProfile": null,
-                          "destinationAccounts": null,
+                          "destinationAccounts": {
+                            "bankAccount": null,
+                            "wallets": [
+                              {
+                                "address": "abuisset.eth",
+                                "network": "ethereum"
+                              }
+                            ]
+                          },
                           "rewards": [
                             {
                               "id": "79209029-c488-4284-aa3f-bce8870d3a66",
