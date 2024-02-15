@@ -25,7 +25,7 @@ public class PostgresInvoicePreviewStorage implements InvoicePreviewStoragePort 
 
     @Override
     public InvoicePreview generate(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
-        int sequenceNumber = 1;
+        int sequenceNumber = 1; // TODO
         final var preview = companyBillingProfileRepository.findById(billingProfileId.value())
                 .map(CompanyBillingProfileEntity::forInvoicePreview)
                 .map(info -> InvoicePreview.of(sequenceNumber, info))
