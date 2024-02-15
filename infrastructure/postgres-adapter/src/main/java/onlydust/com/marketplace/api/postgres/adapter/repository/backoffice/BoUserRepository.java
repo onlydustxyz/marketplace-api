@@ -31,8 +31,8 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                     coalesce(ubpt.billing_profile_type = 'COMPANY',false)                                        AS is_company,
                     cbp.name                                                                                     AS company_name,
                     cbp.registration_number                                                                      AS company_num,
-                    ibp.first_name                                                                               AS firstname,
-                    ibp.last_name                                                                                AS lastname,
+                    coalesce(ibp.first_name, upi.first_name)                                                     AS firstname,
+                    coalesce(ibp.last_name, upi.last_name)                                                       AS lastname,
                     (case
                          when ubpt.billing_profile_type = 'COMPANY' then cbp.address
                          when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.address end)                     AS address,
