@@ -2513,7 +2513,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/billing-profiles/{billingProfileId}/invoices/preview:
+  /api/v1/billing-profiles/{billingProfileId}/invoice-preview:
     get:
       security:
         - bearerAuth: [ ]
@@ -5309,18 +5309,20 @@ components:
       type: object
       required:
         - id
-        - generationDate
+        - createdAt
+        - dueAt
         - destinationAccounts
         - billingProfileType
       properties:
         id:
           type: string
-        generationDate:
+        createdAt:
           type: string
           format: date-time
-        dueDate:
+        dueAt:
           type: string
           format: date-time
+          description: 10 days after creation date
         billingProfileType:
           $ref: '#/components/schemas/BillingProfileType'
         individualBillingProfile:
@@ -5342,6 +5344,7 @@ components:
             - registrationNumber
             - name
             - address
+            - vatRegulationState
           properties:
             registrationNumber:
               type: string
@@ -5349,14 +5352,12 @@ components:
               type: string
             address:
               type: string
+            vatRegulationState:
+              $ref: '#/components/schemas/VatRegulationState'
+            euVATNumber:
+              type: string
         destinationAccounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/DestinationAccountResponse'
-        vatRegulationState:
-          $ref: '#/components/schemas/VatRegulationState'
-        euVATNumber:
-          type: string
+          $ref: '#/components/schemas/DestinationAccountResponse'
         rewards:
           type: array
           items:
@@ -5369,8 +5370,7 @@ components:
             Tax rate in percentage.
             If the vatRegulationState is VAT_APPLICABLE, the tax rate is 20%, otherwise 0.
         totalTax:
-          type: number
-          description: totalBeforeTax * taxRate
+          $ref: '#/components/schemas/NewMoney'
         totalAfterTax:
           $ref: '#/components/schemas/NewMoney'
 
@@ -5487,7 +5487,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
         generationDate:
