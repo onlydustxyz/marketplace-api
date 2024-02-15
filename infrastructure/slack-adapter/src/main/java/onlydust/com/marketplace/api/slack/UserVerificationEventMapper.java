@@ -53,7 +53,7 @@ public interface UserVerificationEventMapper {
                 },
                 "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileUpdated.getExternalVerificationId()));
         if (List.of(VerificationStatus.REJECTED, VerificationStatus.CLOSED).contains(billingProfileUpdated.getVerificationStatus())) {
-            mainMessage = "@canal " + mainMessage;
+            mainMessage = "<!channel> " + mainMessage;
         }
         return SLACK_BLOCKS_TEMPLATE.formatted(
                 mainMessage,
