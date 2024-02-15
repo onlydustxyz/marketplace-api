@@ -181,7 +181,7 @@ public interface BillingProfileMapper {
                 .base(new BaseMoney()
                         .amount(base.getValue())
                         .currency(map(base.getCurrency()))
-                        .conversionRate(money.getValue().divide(base.getValue(), RoundingMode.HALF_EVEN))
+                        .conversionRate(base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN))
                 );
     }
 

@@ -59,6 +59,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getCompanyBillingProfile()).isNull();
         assertThat(response.getDestinationAccounts()).isNull();
         assertThat(response.getRewards()).hasSize(3);
+        assertThat(response.getRewards().stream().filter(r -> r.getAmount().getCurrency() == CurrencyContract.ETH)).hasSize(1);
+        assertThat(response.getRewards().stream().filter(r -> r.getAmount().getCurrency() == CurrencyContract.USDC)).hasSize(2);
         assertThat(response.getRewards()).allMatch(r -> r.getId() != null);
         assertThat(response.getRewards()).allMatch(r -> r.getDate() != null);
         assertThat(response.getRewards()).allMatch(r -> r.getProjectName() != null);
@@ -66,7 +68,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getRewards()).allMatch(r -> r.getAmount().getCurrency() != null);
         assertThat(response.getRewards()).allMatch(r -> r.getAmount().getBase().getAmount().compareTo(BigDecimal.ZERO) > 0);
         assertThat(response.getRewards()).allMatch(r -> r.getAmount().getBase().getCurrency() == CurrencyContract.USD);
-        assertThat(response.getRewards()).allMatch(r -> r.getAmount().getBase().getConversionRate().compareTo(BigDecimal.ZERO) >= 0);
+        assertThat(response.getRewards().stream().filter(r -> r.getAmount().getCurrency() == CurrencyContract.ETH))
+                .allMatch(r -> r.getAmount().getBase().getConversionRate().equals(BigDecimal.valueOf(1781.98)));
+        assertThat(response.getRewards().stream().filter(r -> r.getAmount().getCurrency() == CurrencyContract.USDC))
+                .allMatch(r -> r.getAmount().getBase().getConversionRate().equals(BigDecimal.valueOf(1.01)));
         assertThat(response.getTotalBeforeTax().getAmount().equals(BigDecimal.valueOf(1784757.5)));
         assertThat(response.getTotalBeforeTax().getCurrency()).isEqualTo(CurrencyContract.USD);
         assertThat(response.getTaxRate()).isEqualTo(BigDecimal.ZERO);
