@@ -132,17 +132,17 @@ public class SumsubResponseMapper {
                 if (nonNull(questionnaireDTO.getSections()) && !questionnaireDTO.getSections().isEmpty()
                     && questionnaireDTO.getSections().has("usAndEuropeanComplia") && questionnaireDTO.getSections().get("usAndEuropeanComplia").has("items")) {
                     final JsonNode items = questionnaireDTO.getSections().get("usAndEuropeanComplia").get("items");
-                    if (items.has("whatIsYourEuVatRegis")) {
+                    if (items.has("whatIsYourEuVatRegis") && items.get("whatIsYourEuVatRegis").has("value")) {
                         updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
                                 .euVATNumber(items.get("whatIsYourEuVatRegis").get("value").asText())
                                 .build();
                     }
-                    if (items.has("isYourEntityAUsPerso")) {
+                    if (items.has("isYourEntityAUsPerso") && items.get("isYourEntityAUsPerso").has("value")) {
                         updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
                                 .usEntity(mapBoolean(items.get("isYourEntityAUsPerso").get("value").asText()))
                                 .build();
                     }
-                    if (items.has("isYourCompanySubject")) {
+                    if (items.has("isYourCompanySubject") && items.get("isYourCompanySubject").has("value")) {
                         updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
                                 .subjectToEuropeVAT(mapBoolean(items.get("isYourCompanySubject").get("value").asText()))
                                 .build();
