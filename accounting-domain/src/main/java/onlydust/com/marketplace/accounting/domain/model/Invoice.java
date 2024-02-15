@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZonedDateTime;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Data
@@ -28,15 +29,17 @@ public class Invoice {
         private final @NonNull String value;
 
         public static Id of(Integer sequenceNumber, String... parts) {
-            return new Id("OD-" + String.join("-", normalize2(parts)) + "-" + String.format("%03d", sequenceNumber));
+            return new Id("OD-%s-%03d".formatted(normalize(parts), sequenceNumber));
         }
 
-        private static String[] normalize2(String... parts) {
-            return Stream.of(parts)
-                    .map(StringUtils::stripAccents)
-                    .map(s -> s.replaceAll("[^a-zA-Z0-9]", ""))
-                    .map(String::toUpperCase)
-                    .toArray(String[]::new);
+        private static String normalize(String... parts) {
+            return Stream.of(parts).map(Id::normalize).collect(Collectors.joining("-"));
+        }
+
+        private static String normalize(final @NonNull String part) {
+            return StringUtils.stripAccents(part)
+                    .replaceAll("[^a-zA-Z0-9]", "")
+                    .toUpperCase();
         }
     }
 }
