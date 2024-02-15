@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
 import java.util.UUID;
 

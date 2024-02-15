@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper.requestToDomain;

@@ -1,22 +1,17 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.Contributor;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.domain.view.UserProfileView.ProfileStats.ContributionStats;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
-import javax.validation.Valid;
 import java.net.URI;
-import java.net.URL;
 import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;
-import java.util.List;
 import java.util.stream.IntStream;
 
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 
 public interface ContributorMapper {
 

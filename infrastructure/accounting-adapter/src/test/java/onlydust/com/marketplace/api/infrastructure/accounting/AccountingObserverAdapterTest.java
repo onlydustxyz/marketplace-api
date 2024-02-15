@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.infrastructure.accounting;
 
-import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
@@ -25,7 +25,7 @@ class AccountingObserverAdapterTest {
     final RewardStatusStorage rewardStatusStorage = mock(RewardStatusStorage.class);
     final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
     final AccountingObserverAdapter accountingObserverAdapter = new AccountingObserverAdapter(rewardStatusStorage, rewardStatusFacadePort);
-    final BillingProfileId billingProfileId = BillingProfileId.random();
+    final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final RewardId rewardId = RewardId.random();
     final BigDecimal usdEquivalent = BigDecimal.TEN;
     final UUID userId = UUID.randomUUID();

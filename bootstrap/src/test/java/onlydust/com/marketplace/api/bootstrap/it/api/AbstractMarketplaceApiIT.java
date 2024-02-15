@@ -58,6 +58,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class AbstractMarketplaceApiIT {
 
     protected static final Faker faker = new Faker();
+    protected static final String BILLING_PROFILE_INVOICE_PREVIEW = "/api/v1/billing-profiles/%s/invoice-preview";
+    protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String PROJECTS_GET_CONTRIBUTION_BY_ID = "/api/v1/projects/%s/contributions/%s";
     protected static final String PROJECTS_GET_BY_ID = "/api/v1/projects";
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRewardRepository.FIND_PROJECT_REWARDS;

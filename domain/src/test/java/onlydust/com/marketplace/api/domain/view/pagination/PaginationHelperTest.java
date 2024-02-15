@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.domain.view.pagination;
 
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

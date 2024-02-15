@@ -1,10 +1,16 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreviewView;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface BillingProfileFacadePort {
-    InvoicePreviewView generateNextInvoicePreviewForUserAndRewards(UUID userId, List<UUID> rewardIds);
+    InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds);
+
+    Page<Invoice> getInvoicesForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 }

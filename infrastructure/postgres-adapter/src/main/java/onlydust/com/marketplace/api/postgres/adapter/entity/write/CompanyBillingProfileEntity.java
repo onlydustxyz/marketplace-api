@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -82,5 +83,15 @@ public class CompanyBillingProfileEntity {
                 .registrationNumber(companyBillingProfile.getRegistrationNumber())
                 .reviewMessage(companyBillingProfile.getReviewMessageForApplicant())
                 .build();
+    }
+
+    public InvoicePreview.CompanyInfo forInvoicePreview() {
+        return new InvoicePreview.CompanyInfo(
+                registrationNumber,
+                name,
+                address,
+                subjectToEuVAT,
+                euVATNumber
+        );
     }
 }

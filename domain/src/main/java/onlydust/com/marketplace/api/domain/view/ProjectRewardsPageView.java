@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 @Data
 @Builder

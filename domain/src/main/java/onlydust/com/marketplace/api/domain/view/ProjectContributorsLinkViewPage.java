@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.domain.view;
 
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)

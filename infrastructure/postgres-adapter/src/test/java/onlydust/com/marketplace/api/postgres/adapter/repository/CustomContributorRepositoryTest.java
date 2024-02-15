@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository.GET_CONTRIBUTORS_FOR_PROJECT;

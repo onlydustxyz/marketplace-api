@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.contract.model.ContributorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkViewPage;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import static java.util.Objects.isNull;
 

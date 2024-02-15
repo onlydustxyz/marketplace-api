@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStoragePort;
 import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
@@ -345,6 +348,22 @@ public class PostgresConfiguration {
     @Bean
     PostgresRewardUsdEquivalentAdapter postgresRewardUsdEquivalentAdapter(final RewardUsdEquivalentDataRepository rewardUsdEquivalentDataRepository) {
         return new PostgresRewardUsdEquivalentAdapter(rewardUsdEquivalentDataRepository);
+    }
+
+    @Bean
+    InvoicePreviewStoragePort invoicePreviewStoragePort(final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                        final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                        final @NonNull InvoiceRewardRepository invoiceRewardRepository,
+                                                        final @NonNull WalletRepository walletRepository,
+                                                        final @NonNull BankAccountRepository bankAccountRepository) {
+        return new PostgresInvoicePreviewStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
+                walletRepository, bankAccountRepository);
+    }
+
+    @Bean
+    public AccountingBillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository) {
+        return new PostgresAccountingBillingProfileStorage(companyBillingProfileRepository, individualBillingProfileRepository);
     }
 
     @Bean
