@@ -86,7 +86,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
                 .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
 
-        accountingFacadePort.transfer(SponsorAccount.Id.of(request.getSponsorAccountId()),
+        accountingFacadePort.allocate(SponsorAccount.Id.of(request.getSponsorAccountId()),
                 ProjectId.of(projectId),
                 PositiveAmount.of(request.getAmount()),
                 sponsorAccount.currency().id());
@@ -99,7 +99,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
                 .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
 
-        accountingFacadePort.refund(ProjectId.of(projectId),
+        accountingFacadePort.unallocate(ProjectId.of(projectId),
                 SponsorAccount.Id.of(request.getSponsorAccountId()),
                 PositiveAmount.of(request.getAmount()),
                 sponsorAccount.currency().id());

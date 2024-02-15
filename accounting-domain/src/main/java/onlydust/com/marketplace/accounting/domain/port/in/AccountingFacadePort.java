@@ -18,6 +18,8 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement fund(final @NonNull SponsorAccount.Id sponsorAccountId, final @NonNull SponsorAccount.Transaction transaction);
 
+    void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId);
+
     void pay(final @NonNull RewardId rewardId,
              final @NonNull Currency.Id currencyId,
              final @NonNull SponsorAccount.PaymentReference paymentReference);
@@ -30,9 +32,9 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement increaseAllowance(SponsorAccount.Id sponsorAccountId, Amount amount);
 
-    <From, To> void transfer(From from, To to, PositiveAmount amount, Currency.Id currencyId);
+    void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
 
-    <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId);
+    void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId);
 
     Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
 
