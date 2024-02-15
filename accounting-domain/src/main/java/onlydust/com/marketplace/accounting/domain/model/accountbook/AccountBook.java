@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.UUID;
 
 public interface AccountBook {
@@ -19,7 +20,7 @@ public interface AccountBook {
 
     void refund(AccountId from, AccountId to, PositiveAmount amount);
 
-    void refund(AccountId from);
+    Set<AccountId> refund(AccountId from);
 
     @EqualsAndHashCode
     @AllArgsConstructor(access = AccessLevel.PRIVATE)

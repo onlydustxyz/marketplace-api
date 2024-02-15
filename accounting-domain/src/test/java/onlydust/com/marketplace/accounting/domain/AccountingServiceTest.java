@@ -5,10 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentReference;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.BurnEvent;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.RefundEvent;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
@@ -551,6 +548,26 @@ public class AccountingServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Transaction with reference %s already exists".formatted(transaction.reference()));
         }
+
+        @Test
+        void should_cancel_a_reward() {
+            // Given
+            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
+            accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId1, currency.id(), PositiveAmount.of(60L), PositiveAmount.of(100L));
+            reset(projectAccountingObserver);
+
+            // When
+            accountingService.cancel(rewardId1, currency.id());
+
+            // Then
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId1, currency.id(), PositiveAmount.of(100L), PositiveAmount.of(100L));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new TransferEvent(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId1), AccountId.of(rewardId1), PositiveAmount.of(40L)),
+                    new FullRefundEvent(AccountId.of(rewardId1))
+            );
+        }
     }
 
     @Nested
@@ -899,6 +916,36 @@ public class AccountingServiceTest {
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount1.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
             assertThat(sponsorAccountStorage.get(unlockedSponsorSponsorAccount2.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
+
+        @Test
+        void should_cancel_a_reward() {
+            // Given
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
+            accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
+            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(200L), PositiveAmount.of(200L));
+            reset(projectAccountingObserver);
+
+            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(300L), PositiveAmount.of(300L));
+            reset(projectAccountingObserver);
+
+            accountingService.createReward(projectId, rewardId, PositiveAmount.of(250L), currency.id());
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(50L), PositiveAmount.of(300L));
+            reset(projectAccountingObserver);
+
+            // When
+            accountingService.cancel(rewardId, currency.id());
+
+            // Then
+            verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(300L), PositiveAmount.of(300L));
+            assertThat(accountBookEventStorage.events.get(currency)).contains(
+                    new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId), PositiveAmount.of(200L)),
+                    new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId), PositiveAmount.of(100L)),
+                    new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(250L)),
+                    new FullRefundEvent(AccountId.of(rewardId))
+            );
+        }
     }
 
     @Nested
@@ -1129,5 +1176,7 @@ public class AccountingServiceTest {
             // Then
             assertThat(payableRewards).containsExactly(new PayableReward(rewardId3, usdc.forNetwork(Network.OPTIMISM), PositiveAmount.of(25L)));
         }
+
+
     }
 }

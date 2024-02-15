@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccountBookAggregate implements AccountBook {
@@ -49,8 +50,8 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public void refund(AccountId from) {
-        emit(new FullRefundEvent(from));
+    public Set<AccountId> refund(AccountId from) {
+        return emit(new FullRefundEvent(from));
     }
 
     public AccountBookState state() {
@@ -97,11 +98,10 @@ public class AccountBookAggregate implements AccountBook {
         }
     }
 
-    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Void> {
+    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Set<AccountId>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.refund(from);
-            return null;
+        public Set<AccountId> visit(AccountBookState state) {
+            return state.refund(from);
         }
     }
 }

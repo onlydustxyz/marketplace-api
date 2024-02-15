@@ -73,7 +73,8 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     public void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId) {
-        refund(from, to, amount, currencyId);
+        final var accountBook = refund(from, to, amount, currencyId);
+        onAllowanceUpdated(from, currencyId, accountBook.state());
     }
 
     @Override
@@ -87,6 +88,7 @@ public class AccountingService implements AccountingFacadePort {
     public void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBook = transfer(from, to, amount, currencyId);
         accountingObserver.onRewardCreated(to, new AccountBookFacade(sponsorAccountStorage, accountBook));
+        onAllowanceUpdated(from, currencyId, accountBook.state());
     }
 
     @Override
@@ -117,9 +119,13 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.refund(AccountId.of(rewardId));
+        final var refundedAccounts = accountBook.refund(AccountId.of(rewardId));
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
         accountingObserver.onRewardCancelled(rewardId);
+        refundedAccounts.stream()
+                .filter(AccountId::isProject)
+                .map(AccountId::projectId)
+                .forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId, currencyId, accountBook.state()));
     }
 
     @Override
@@ -179,21 +185,22 @@ public class AccountingService implements AccountingFacadePort {
         return accountBook;
     }
 
-    private <From, To> void refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
+    private <From, To> AccountBookAggregate refund(From from, To to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
         accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
         accountBookEventStorage.save(currency, accountBook.pendingEvents());
+        return accountBook;
     }
 
     private void onAllowanceUpdated(ProjectId projectId, Currency.Id currencyId, AccountBookState accountBook) {
-            projectAccountingObserver.onAllowanceUpdated(
-                    projectId,
-                    currencyId,
-                    accountBook.balanceOf(AccountId.of(projectId)),
-                    accountBook.amountReceivedBy(AccountId.of(projectId))
-            );
+        projectAccountingObserver.onAllowanceUpdated(
+                projectId,
+                currencyId,
+                accountBook.balanceOf(AccountId.of(projectId)),
+                accountBook.amountReceivedBy(AccountId.of(projectId))
+        );
     }
 
     private SponsorAccountStatement registerSponsorAccountTransaction(AccountBookAggregate accountBook,
