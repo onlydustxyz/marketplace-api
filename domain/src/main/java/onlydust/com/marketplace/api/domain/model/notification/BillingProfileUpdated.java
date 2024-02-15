@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.domain.model.VerificationStatus;
 import java.util.UUID;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -16,4 +16,11 @@ public class BillingProfileUpdated extends Event {
     BillingProfileType type;
     VerificationStatus verificationStatus;
     String reviewMessageForApplicant;
+    UUID userId;
+    Long githubUserId;
+    String githubUserEmail;
+    String githubLogin;
+    String githubAvatarUrl;
+    String rawReviewDetails;
+    String externalVerificationId;
 }

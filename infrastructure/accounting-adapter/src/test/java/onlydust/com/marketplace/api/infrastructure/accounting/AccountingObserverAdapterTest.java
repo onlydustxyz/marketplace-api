@@ -42,7 +42,8 @@ class AccountingObserverAdapterTest {
     @Test
     void onBillingProfileUpdated() {
         // When
-        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileUpdated(billingProfileId.value(), BillingProfileType.INDIVIDUAL, null, null));
+        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileUpdated(billingProfileId.value(), BillingProfileType.INDIVIDUAL, null, null, null
+                , null, null, null, null, null, null));
 
         // Then
         final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);

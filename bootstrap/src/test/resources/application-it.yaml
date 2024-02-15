@@ -36,6 +36,9 @@ infrastructure:
     secret-key: sumsub-fake-secret-key
     kyc-questionnaire-name: odKycUsPersonDevelop
     kyb-questionnaire-name: odKybFormDevelop
+  slack:
+    environment: local-it
+    token: fake-slack-token
 application:
   web:
     machine-to-machine:

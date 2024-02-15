@@ -102,14 +102,15 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveCompanyProfile(CompanyBillingProfile companyBillingProfile) {
-        companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile));
+    public CompanyBillingProfile saveCompanyProfile(CompanyBillingProfile companyBillingProfile) {
+        return companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile))
+                .toDomain();
     }
 
     @Override
     @Transactional
-    public void saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
-        individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile));
+    public IndividualBillingProfile saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
+        return individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile)).toDomain();
     }
 
     @Override

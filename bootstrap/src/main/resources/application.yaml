@@ -142,3 +142,7 @@ infrastructure:
     secret-key: ${SUMSUB_API_SECRET_KEY}
     kyc-questionnaire-name: ${SUMSUB_KYC_QUESTIONNAIRE}
     kyb-questionnaire-name: ${SUMSUB_KYB_QUESTIONNAIRE}
+  slack:
+    environment: ${ENV}
+    token: ${SLACK_TOKEN}
+    kyc-kyb-channel: '#kyc-kyb'

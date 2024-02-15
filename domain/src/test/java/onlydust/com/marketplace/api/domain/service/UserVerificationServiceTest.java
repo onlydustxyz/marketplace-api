@@ -2,16 +2,11 @@ package onlydust.com.marketplace.api.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.domain.job.OutboxSkippingException;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
+import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.domain.model.notification.Event;
 import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
-import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.OutboxPort;
-import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +27,8 @@ public class UserVerificationServiceTest {
     private Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
     private AccountingUserObserverPort accountingUserObserverPort;
     private UserVerificationStoragePort userVerificationStoragePort;
+    private NotificationPort notificationPort;
+    private UserStoragePort userStoragePort;
     private final Faker faker = new Faker();
 
     @BeforeEach
@@ -41,7 +38,10 @@ public class UserVerificationServiceTest {
         billingProfileExternalMapper = mock(Function.class);
         accountingUserObserverPort = mock(AccountingUserObserverPort.class);
         userVerificationStoragePort = mock(UserVerificationStoragePort.class);
-        userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort, userVerificationStoragePort, accountingUserObserverPort);
+        notificationPort = mock(NotificationPort.class);
+        userStoragePort = mock(UserStoragePort.class);
+        userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort,
+                userVerificationStoragePort, accountingUserObserverPort, notificationPort, userStoragePort);
     }
 
     @Test
@@ -58,7 +58,76 @@ public class UserVerificationServiceTest {
         final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
         final CompanyBillingProfile initialCompanyBillingProfile =
-                CompanyBillingProfile.builder().id(billingProfileId).userId(userId)
+                CompanyBillingProfile.builder()
+                        .id(billingProfileId)
+                        .userId(userId)
+                        .reviewMessageForApplicant(reviewMessageForApplicant)
+                        .status(VerificationStatus.STARTED).build();
+        final CompanyBillingProfile companyBillingProfileWithNewStatus = initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
+        final CompanyBillingProfile updatedCompanyBillingProfile = initialCompanyBillingProfile.toBuilder()
+                .id(billingProfileId)
+                .userId(userId)
+                .status(VerificationStatus.REJECTED)
+                .address(faker.address().fullAddress())
+                .country(faker.address().country())
+                .name(faker.rickAndMorty().character())
+                .euVATNumber(faker.hacker().abbreviation())
+                .subjectToEuropeVAT(true)
+                .registrationDate(new Date())
+                .registrationNumber(faker.harryPotter().character())
+                .usEntity(false)
+                .build();
+        final User user = User.builder()
+                .id(userId)
+                .githubUserId(1L)
+                .githubLogin(faker.rickAndMorty().character())
+                .githubAvatarUrl(faker.internet().url())
+                .githubEmail(faker.internet().emailAddress())
+                .build();
+
+        // When
+        when(billingProfileExternalMapper.apply(eventStub))
+                .thenReturn(event);
+        when(billingProfileStoragePort.findCompanyProfileById(billingProfileId))
+                .thenReturn(Optional.of(initialCompanyBillingProfile));
+        when(userVerificationStoragePort.updateCompanyVerification(companyBillingProfileWithNewStatus))
+                .thenReturn(updatedCompanyBillingProfile);
+        when(userStoragePort.getUserById(userId))
+                .thenReturn(Optional.of(user));
+        when(billingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile))
+                .thenReturn(updatedCompanyBillingProfile);
+        userVerificationService.process(eventStub);
+
+        // Then
+        verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
+        verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
+        verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
+        assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
+        assertEquals(user.getGithubAvatarUrl(), billingProfileUpdatedArgumentCaptor.getValue().getGithubAvatarUrl());
+        assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
+        assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
+        assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
+    }
+
+    @Test
+    void should_update_existing_company_profile_with_verification_data_given_user_not_found() {
+        // Given
+        final UUID billingProfileId = UUID.randomUUID();
+        final String reviewMessageForApplicant = faker.rickAndMorty().location();
+        final BillingProfileUpdated event = BillingProfileUpdated.builder()
+                .verificationStatus(VerificationStatus.REJECTED)
+                .type(BillingProfileType.COMPANY)
+                .billingProfileId(billingProfileId)
+                .reviewMessageForApplicant(reviewMessageForApplicant)
+                .build();
+        final Event eventStub = mock(Event.class);
+        final UUID userId = UUID.randomUUID();
+        final CompanyBillingProfile initialCompanyBillingProfile =
+                CompanyBillingProfile.builder()
+                        .id(billingProfileId)
+                        .userId(userId)
                         .reviewMessageForApplicant(reviewMessageForApplicant)
                         .status(VerificationStatus.STARTED).build();
         final CompanyBillingProfile companyBillingProfileWithNewStatus = initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
@@ -83,15 +152,17 @@ public class UserVerificationServiceTest {
                 .thenReturn(Optional.of(initialCompanyBillingProfile));
         when(userVerificationStoragePort.updateCompanyVerification(companyBillingProfileWithNewStatus))
                 .thenReturn(updatedCompanyBillingProfile);
+        when(userStoragePort.getUserById(userId))
+                .thenReturn(Optional.empty());
+        when(billingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile))
+                .thenReturn(updatedCompanyBillingProfile);
         userVerificationService.process(eventStub);
 
         // Then
-        final ArgumentCaptor<CompanyBillingProfile> companyBillingProfileArgumentCaptor = ArgumentCaptor.forClass(CompanyBillingProfile.class);
-        verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileArgumentCaptor.capture());
-        verify(billingProfileStoragePort, times(1)).saveCompanyProfile(companyBillingProfileArgumentCaptor.capture());
-        assertEquals(companyBillingProfileWithNewStatus, companyBillingProfileArgumentCaptor.getAllValues().get(0));
-        assertEquals(updatedCompanyBillingProfile, companyBillingProfileArgumentCaptor.getAllValues().get(1));
+        verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
+        verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
         verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verifyNoInteractions(notificationPort);
     }
 
 
@@ -134,8 +205,71 @@ public class UserVerificationServiceTest {
                 .reviewMessageForApplicant(reviewMessageForApplicant)
                 .build();
         final Event eventStub = mock(Event.class);
+        final UUID userId = UUID.randomUUID();
         final IndividualBillingProfile initialIndividualBillingProfile =
-                IndividualBillingProfile.builder().id(billingProfileId).userId(UUID.randomUUID())
+                IndividualBillingProfile.builder().id(billingProfileId).userId(userId)
+                        .reviewMessageForApplicant(reviewMessageForApplicant)
+                        .status(VerificationStatus.INVALIDATED).build();
+        final IndividualBillingProfile individualBillingProfileWithStatus =
+                initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
+        final IndividualBillingProfile updatedIndividualBillingProfile = individualBillingProfileWithStatus.toBuilder()
+                .country(faker.address().country())
+                .address(faker.address().fullAddress())
+                .birthdate(new Date())
+                .idDocumentNumber(faker.idNumber().valid())
+                .idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                .usCitizen(false)
+                .validUntil(new Date())
+                .build();
+        final User user = User.builder()
+                .id(userId)
+                .githubUserId(1L)
+                .githubLogin(faker.rickAndMorty().character())
+                .githubAvatarUrl(faker.internet().url())
+                .githubEmail(faker.internet().emailAddress())
+                .build();
+
+        // When
+        when(billingProfileExternalMapper.apply(eventStub))
+                .thenReturn(event);
+        when(billingProfileStoragePort.findIndividualProfileById(billingProfileId))
+                .thenReturn(Optional.of(initialIndividualBillingProfile));
+        when(userVerificationStoragePort.updateIndividualVerification(individualBillingProfileWithStatus))
+                .thenReturn(updatedIndividualBillingProfile);
+        when(billingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile))
+                .thenReturn(updatedIndividualBillingProfile);
+        when(userStoragePort.getUserById(userId))
+                .thenReturn(Optional.of(user));
+        userVerificationService.process(eventStub);
+
+        // Then
+        verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
+        verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
+        verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
+        assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
+        assertEquals(user.getGithubAvatarUrl(), billingProfileUpdatedArgumentCaptor.getValue().getGithubAvatarUrl());
+        assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
+        assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
+        assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
+    }
+
+    @Test
+    void should_update_existing_individual_profile_with_verification_data_given_user_not_found() {
+        // Given
+        final UUID billingProfileId = UUID.randomUUID();
+        final String reviewMessageForApplicant = faker.rickAndMorty().location();
+        final BillingProfileUpdated event = BillingProfileUpdated.builder()
+                .verificationStatus(VerificationStatus.NOT_STARTED)
+                .type(BillingProfileType.INDIVIDUAL)
+                .billingProfileId(billingProfileId)
+                .reviewMessageForApplicant(reviewMessageForApplicant)
+                .build();
+        final Event eventStub = mock(Event.class);
+        final UUID userId = UUID.randomUUID();
+        final IndividualBillingProfile initialIndividualBillingProfile =
+                IndividualBillingProfile.builder().id(billingProfileId).userId(userId)
                         .reviewMessageForApplicant(reviewMessageForApplicant)
                         .status(VerificationStatus.INVALIDATED).build();
         final IndividualBillingProfile individualBillingProfileWithStatus =
@@ -157,16 +291,19 @@ public class UserVerificationServiceTest {
                 .thenReturn(Optional.of(initialIndividualBillingProfile));
         when(userVerificationStoragePort.updateIndividualVerification(individualBillingProfileWithStatus))
                 .thenReturn(updatedIndividualBillingProfile);
+        when(billingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile))
+                .thenReturn(updatedIndividualBillingProfile);
+        when(userStoragePort.getUserById(userId))
+                .thenReturn(Optional.empty());
         userVerificationService.process(eventStub);
 
         // Then
-        final ArgumentCaptor<IndividualBillingProfile> individualBillingProfileArgumentCaptor = ArgumentCaptor.forClass(IndividualBillingProfile.class);
-        verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileArgumentCaptor.capture());
-        verify(billingProfileStoragePort, times(1)).saveIndividualProfile(individualBillingProfileArgumentCaptor.capture());
-        assertEquals(individualBillingProfileWithStatus, individualBillingProfileArgumentCaptor.getAllValues().get(0));
-        assertEquals(updatedIndividualBillingProfile, individualBillingProfileArgumentCaptor.getAllValues().get(1));
+        verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
+        verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
         verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verifyNoInteractions(notificationPort);
     }
+
 
     @Test
     void should_raise_exception_to_skip_unknown_external_id_for_individual() {

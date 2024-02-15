@@ -3,7 +3,9 @@ package onlydust.com.marketplace.api.bootstrap;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,5 +40,11 @@ public class MarketplaceApiApplicationIT {
     @Primary
     public ImageStoragePort imageStoragePort() {
         return imageStoragePort;
+    }
+
+    @Bean
+    @Primary
+    public NotificationPort notificationPort() {
+        return new SlackNotificationStub();
     }
 }
