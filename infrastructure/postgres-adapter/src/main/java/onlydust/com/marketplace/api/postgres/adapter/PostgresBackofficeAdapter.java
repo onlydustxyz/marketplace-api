@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +19,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
@@ -166,24 +164,6 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
                         .build());
-        boSponsorRepository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public void linkSponsorToProject(UUID sponsorId, UUID projectId) {
-        final var entity = boSponsorRepository.findById(sponsorId)
-                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
-        entity.getProjects().add(new ProjectIdEntity(projectId));
-        boSponsorRepository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public void unlinkProjectFromSponsor(UUID sponsorId, UUID projectId) {
-        final var entity = boSponsorRepository.findById(sponsorId)
-                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
-        entity.getProjects().remove(new ProjectIdEntity(projectId));
         boSponsorRepository.save(entity);
     }
 

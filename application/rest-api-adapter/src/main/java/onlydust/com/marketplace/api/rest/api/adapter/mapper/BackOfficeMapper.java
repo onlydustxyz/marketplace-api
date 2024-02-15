@@ -58,7 +58,7 @@ public interface BackOfficeMapper {
                         .name(sponsor.name())
                         .url(sponsor.url())
                         .logoUrl(sponsor.logoUrl())
-                        .projectIds(sponsor.projectIds())
+                        .projectIds(sponsor.projectIds().stream().toList())
                 ).toList())
                 .totalPageNumber(sponsorPage.getTotalPageNumber())
                 .totalItemNumber(sponsorPage.getTotalItemNumber())
@@ -72,7 +72,7 @@ public interface BackOfficeMapper {
                 .name(sponsor.name())
                 .url(sponsor.url())
                 .logoUrl(sponsor.logoUrl())
-                .projectIds(sponsor.projectIds());
+                .projectIds(sponsor.projectIds().stream().toList());
     }
 
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {

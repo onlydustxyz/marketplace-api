@@ -1,15 +1,29 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.backoffice.api.contract.model.AccountResponse;
+import onlydust.com.backoffice.api.contract.model.SponsorResponse;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Map;
+
+import static onlydust.com.marketplace.api.bootstrap.it.bo.BackOfficeAccountingApiIT.BRETZEL;
+import static onlydust.com.marketplace.api.bootstrap.it.bo.BackOfficeAccountingApiIT.STRK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
+
+    @Autowired
+    ProjectSponsorRepository projectSponsorRepository;
 
     @Test
     @Order(1)
@@ -259,5 +273,172 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    @Order(5)
+    void should_link_sponsor_to_project_on_allocation() {
+        // Given
+        final var sponsor = client.post()
+                .uri(getApiURI(POST_SPONSORS))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Virgin sponsor",
+                          "url": "https://www.foobar.com",
+                          "logoUrl": "https://www.foobar.com/logo.png"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(SponsorResponse.class)
+                .returnResult().getResponseBody();
+
+        final var sponsorAccount = client.post()
+                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(sponsor.getId())))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "currencyId": "%s",
+                            "allowance": 1000
+                        }
+                        """.formatted(STRK))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        // Then
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Virgin sponsor",
+                          "projectIds": []
+                        }
+                        """);
+
+        // And when
+        client.post()
+                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(BRETZEL)))
+                .header("Api-Key", apiKey())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "sponsorAccountId": "%s",
+                            "amount": 400
+                        }
+                        """.formatted(sponsorAccount.getId()))
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Virgin sponsor",
+                          "projectIds": [
+                            "%s"
+                          ]
+                        }
+                        """.formatted(BRETZEL));
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "sponsorIds", sponsor.getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "sponsors": [
+                            {
+                              "id": "%s",
+                              "name": "Virgin sponsor",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png",
+                              "projectIds": [
+                                "7d04163c-4187-4313-8066-61504d34fc56"
+                              ]
+                            }
+                          ]
+                        }
+                        """.formatted(sponsor.getId()));
+
+        // And when
+        final var projectSponsorEntity = projectSponsorRepository.getById(new ProjectSponsorEntity.PrimaryKey(BRETZEL.value(), sponsorAccount.getSponsorId()));
+        projectSponsorRepository.save(projectSponsorEntity.toBuilder()
+                .lastAllocationDate(Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant()))
+                .build());
+
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "name": "Virgin sponsor",
+                          "projectIds": []
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(GET_SPONSORS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "sponsorIds", sponsor.getId().toString())))
+                .header("Api-Key", apiKey())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "sponsors": [
+                            {
+                              "id": "%s",
+                              "name": "Virgin sponsor",
+                              "url": "https://www.foobar.com",
+                              "logoUrl": "https://www.foobar.com/logo.png",
+                              "projectIds": []
+                            }
+                          ]
+                        }
+                        """.formatted(sponsor.getId()));
     }
 }

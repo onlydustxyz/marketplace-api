@@ -29,10 +29,6 @@ public interface BackofficeStoragePort {
 
     void saveSponsor(Sponsor sponsor);
 
-    void linkSponsorToProject(UUID sponsorId, UUID projectId);
-
-    void unlinkProjectFromSponsor(UUID sponsorId, UUID projectId);
-
     Optional<SponsorView> getSponsor(UUID sponsorId);
 
     Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);

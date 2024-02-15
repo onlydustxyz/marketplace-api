@@ -2,11 +2,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
 import lombok.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectIdEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 
 import javax.persistence.*;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,13 +26,13 @@ public class BoSponsorEntity {
     @Column(name = "logo_url")
     @NonNull String logoUrl;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "projects_sponsors", joinColumns = @JoinColumn(name = "sponsor_id"), inverseJoinColumns = @JoinColumn(name = "project_id"))
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sponsorId")
     @Builder.Default
-    Set<ProjectIdEntity> projects = new HashSet<>();
+    Set<ProjectSponsorEntity> projects = new HashSet<>();
 
     public SponsorView toView() {
-        return SponsorView.builder().id(id).name(name).url(url).logoUrl(logoUrl).projectIds(projects != null ?
-                projects.stream().map(ProjectIdEntity::getId).toList() : List.of()).build();
+        final var sponsorView = new SponsorView(id, name, url, logoUrl);
+        projects.forEach(p -> sponsorView.addProjectId(p.getProjectId(), ZonedDateTime.ofInstant(p.getLastAllocationDate().toInstant(), ZoneOffset.UTC)));
+        return sponsorView;
     }
 }

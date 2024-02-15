@@ -20,9 +20,10 @@ public interface BoSponsorRepository extends JpaRepository<BoSponsorEntity, UUID
             	LEFT JOIN s.projects p
             WHERE
                 (COALESCE(:sponsorIds) IS NULL OR s.id IN (:sponsorIds))
-                AND (COALESCE(:projectIds) IS NULL OR p.id IN (:projectIds))
+                AND (COALESCE(:projectIds) IS NULL OR p.projectId IN (:projectIds))
             GROUP BY s.id
             """)
     @NotNull
     Page<BoSponsorEntity> findAll(final List<UUID> projectIds, final List<UUID> sponsorIds, final @NotNull Pageable pageable);
+    
 }
