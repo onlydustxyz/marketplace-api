@@ -228,18 +228,22 @@ public class DomainConfiguration {
     public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
                                                                  final BillingProfileStoragePort billingProfileStoragePort,
                                                                  final UserVerificationStoragePort userVerificationStoragePort,
-                                                                 final AccountingUserObserverPort accountingUserObserverPort) {
+                                                                 final AccountingUserObserverPort accountingUserObserverPort,
+                                                                 final NotificationPort notificationPort,
+                                                                 final UserStoragePort userStoragePort) {
         return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort);
+                accountingUserObserverPort, notificationPort, userStoragePort);
     }
 
     @Bean
     public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
                                                          final BillingProfileStoragePort billingProfileStoragePort,
                                                          final UserVerificationStoragePort userVerificationStoragePort,
-                                                         final AccountingUserObserverPort accountingUserObserverPort) {
+                                                         final AccountingUserObserverPort accountingUserObserverPort,
+                                                         final NotificationPort notificationPort,
+                                                         final UserStoragePort userStoragePort) {
         return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort);
+                accountingUserObserverPort, notificationPort, userStoragePort);
     }
 
     @Bean

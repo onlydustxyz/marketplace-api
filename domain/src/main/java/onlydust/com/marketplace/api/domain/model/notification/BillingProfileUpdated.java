@@ -21,4 +21,6 @@ public class BillingProfileUpdated extends Event {
     String githubUserEmail;
     String githubLogin;
     String githubAvatarUrl;
+    String rawReviewDetails;
+    String externalVerificationId;
 }

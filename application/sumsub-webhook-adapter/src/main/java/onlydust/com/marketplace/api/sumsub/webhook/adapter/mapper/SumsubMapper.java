@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.domain.job.OutboxSkippingException;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
 import onlydust.com.marketplace.api.domain.model.VerificationStatus;
@@ -12,9 +15,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+@Slf4j
 public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     /*
     *   Unstarted - user hasn't started process
@@ -37,6 +44,8 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                         .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
                                 sumsubWebhookEventDTO.getReviewResult()))
                         .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
+                        .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
+                        .externalVerificationId(sumsubWebhookEventDTO.getApplicantId())
                         .build();
             }
         } catch (Exception ignored) {
@@ -106,5 +115,17 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
 
     private enum Answer {
         GREEN, RED;
+    }
+
+    private String rawReviewToString(final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO) {
+        if (isNull(reviewResultDTO)) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.writeValueAsString(reviewResultDTO);
+        } catch (JsonProcessingException e) {
+            LOGGER.warn("Failed to serialize reviewResultDTO %s into string".formatted(reviewResultDTO), e);
+            return null;
+        }
     }
 }

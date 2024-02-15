@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
+import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
@@ -23,6 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
@@ -31,6 +33,8 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
     SumsubWebhookProperties sumsubWebhookProperties;
     @Autowired
     SumsubClientProperties sumsubClientProperties;
+    @Autowired
+    SlackNotificationStub slackNotificationStub;
 
     @Test
     @Order(1)
@@ -99,7 +103,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(4)
-    void should_get_individual_billing_profile_given_one() throws InterruptedException {
+    void should_get_individual_billing_profile_given_one() {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
@@ -184,6 +188,8 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.usCitizen").isEqualTo(false);
 
+        assertEquals(1, slackNotificationStub.getNotifications().size());
+
 
         final String reviewMessage = "We could not verify your profile. If you have any questions, please contact the Company where you try to verify your " +
                                      "profile tech@onlydust.xyz\\n\\nTemporary we could not verify your profile via doc-free method. Please try again " +
@@ -257,6 +263,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.idDocumentCountryCode").isEqualTo("FRA")
                 .jsonPath("$.validUntil").isEqualTo("2025-04-19T00:00:00Z")
                 .jsonPath("$.usCitizen").isEqualTo(false);
+        assertEquals(2, slackNotificationStub.getNotifications().size());
     }
 
     @Autowired
@@ -352,6 +359,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.usEntity").isEqualTo(false);
+        assertEquals(3, slackNotificationStub.getNotifications().size());
 
         final String reviewMessage = "Enter your date of birth exactly as it is on your identity document.\\n\\n - Tax number is incorrect. Provide a correct" +
                                      " tax number.\\n - SSN is incorrect. Provide a correct SSN.";
@@ -423,6 +431,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.subjectToEuropeVAT").isEqualTo(true)
                 .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.usEntity").isEqualTo(false);
+        assertEquals(4, slackNotificationStub.getNotifications().size());
     }
 
 
