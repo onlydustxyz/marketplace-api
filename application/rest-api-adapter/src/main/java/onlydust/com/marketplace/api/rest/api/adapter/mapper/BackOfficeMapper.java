@@ -5,14 +5,14 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.time.ZoneOffset;
 
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 
 public interface BackOfficeMapper {

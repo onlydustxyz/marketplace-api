@@ -300,12 +300,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Given
         walletRepository.deleteAll();
         final WalletEntity expected = WalletEntity.builder()
-                .id(
-                        WalletIdEntity.builder()
-                                .network(NetworkEnumEntity.ethereum)
-                                .userId(UUID.randomUUID())
-                                .build()
-                )
+                .network(NetworkEnumEntity.ethereum)
+                .userId(UUID.randomUUID())
                 .address(faker.address().fullAddress())
                 .type(WalletTypeEnumEntity.address)
                 .build();

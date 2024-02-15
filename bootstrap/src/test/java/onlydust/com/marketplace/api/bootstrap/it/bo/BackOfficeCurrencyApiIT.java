@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CurrencyResponse;
 import onlydust.com.backoffice.api.contract.model.CurrencyType;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,6 +28,16 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @Autowired
     private ImageStoragePort imageStoragePort;
+
+    @Autowired
+    private CurrencyRepository currencyRepository;
+
+    @Test
+    @Order(0)
+    void cleanup() {
+        historicalQuoteRepository.deleteAll();
+        currencyRepository.deleteAll();
+    }
 
     @Test
     @Order(1)
@@ -275,16 +286,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         {
                           "currencies": [
                             {
-                              "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
-                              "code": "BTC",
-                              "name": "Bitcoin",
-                              "logoUrl": null,
-                              "type": "CRYPTO",
-                              "tokens": [],
-                              "decimals": 8,
-                              "description": null
-                            },
-                            {
                               "code": "ETH",
                               "name": "Ethereum",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
@@ -301,33 +302,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "tokens": [],
                               "decimals": 3,
                               "description": "Euro is the official currency of the European Union"
-                            },
-                            {
-                              "code": "STRK",
-                              "name": "StarkNet Token",
-                              "logoUrl": null,
-                              "type": "CRYPTO",
-                              "tokens": [
-                                {
-                                  "blockchain": "ETHEREUM",
-                                  "address": "0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766",
-                                  "decimals": 18,
-                                  "symbol": "STRK",
-                                  "name": "StarkNet Token"
-                                }
-                              ],
-                              "decimals": 18,
-                              "description": null
-                            },
-                            {
-                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                              "code": "USD",
-                              "name": "US Dollar",
-                              "logoUrl": null,
-                              "type": "FIAT",
-                              "tokens": [],
-                              "decimals": 2,
-                              "description": null
                             },
                             {
                               "code": "USDC",

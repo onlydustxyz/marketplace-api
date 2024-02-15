@@ -11,12 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor(staticName = "random")
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-public class BillingProfileId extends UuidWrapper {
-    public static BillingProfileId of(@NonNull final UUID uuid) {
-        return BillingProfileId.builder().uuid(uuid).build();
+public class UserId extends UuidWrapper {
+    public static UserId of(@NonNull final UUID uuid) {
+        return UserId.builder().uuid(uuid).build();
     }
 
-    public static BillingProfileId of(@NonNull final String uuid) {
-        return BillingProfileId.of(UUID.fromString(uuid));
+    public static UserId of(@NonNull final String uuid) {
+        return UserId.of(UUID.fromString(uuid));
     }
 }

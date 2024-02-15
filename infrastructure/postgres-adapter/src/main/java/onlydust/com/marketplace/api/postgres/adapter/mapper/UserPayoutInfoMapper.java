@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayout
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -51,22 +50,22 @@ public interface UserPayoutInfoMapper {
                                                          UserPayoutSettings payoutSettings) {
         if (!userPayoutInfoEntity.getWallets().isEmpty()) {
             for (WalletEntity wallet : userPayoutInfoEntity.getWallets()) {
-                if (wallet.getId().getNetwork().equals(NetworkEnumEntity.aptos)) {
+                if (wallet.getNetwork().equals(NetworkEnumEntity.aptos)) {
                     payoutSettings = payoutSettings.toBuilder()
                             .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
                             .build();
                 }
-                if (wallet.getId().getNetwork().equals(NetworkEnumEntity.starknet)) {
+                if (wallet.getNetwork().equals(NetworkEnumEntity.starknet)) {
                     payoutSettings = payoutSettings.toBuilder()
                             .starknetAddress(StarkNet.accountAddress(wallet.getAddress()))
                             .build();
                 }
-                if (wallet.getId().getNetwork().equals(NetworkEnumEntity.optimism)) {
+                if (wallet.getNetwork().equals(NetworkEnumEntity.optimism)) {
                     payoutSettings = payoutSettings.toBuilder()
                             .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
                             .build();
                 }
-                if (wallet.getId().getNetwork().equals(NetworkEnumEntity.ethereum)) {
+                if (wallet.getNetwork().equals(NetworkEnumEntity.ethereum)) {
                     payoutSettings = payoutSettings.toBuilder()
                             .ethWallet(Ethereum.wallet(wallet.getAddress()))
                             .build();
@@ -99,30 +98,24 @@ public interface UserPayoutInfoMapper {
             entity.addWallets(WalletEntity.builder()
                     .address(payoutSettings.getAptosAddress().toString())
                     .type(WalletTypeEnumEntity.address)
-                    .id(WalletIdEntity.builder()
-                            .userId(userId)
-                            .network(NetworkEnumEntity.aptos)
-                            .build())
+                    .userId(userId)
+                    .network(NetworkEnumEntity.aptos)
                     .build());
         }
         if (nonNull(payoutSettings.getOptimismAddress())) {
             entity.addWallets(WalletEntity.builder()
                     .address(payoutSettings.getOptimismAddress().toString())
                     .type(WalletTypeEnumEntity.address)
-                    .id(WalletIdEntity.builder()
-                            .userId(userId)
-                            .network(NetworkEnumEntity.optimism)
-                            .build())
+                    .userId(userId)
+                    .network(NetworkEnumEntity.optimism)
                     .build());
         }
         if (nonNull(payoutSettings.getStarknetAddress())) {
             entity.addWallets(WalletEntity.builder()
                     .address(payoutSettings.getStarknetAddress().toString())
                     .type(WalletTypeEnumEntity.address)
-                    .id(WalletIdEntity.builder()
-                            .userId(userId)
-                            .network(NetworkEnumEntity.starknet)
-                            .build())
+                    .userId(userId)
+                    .network(NetworkEnumEntity.starknet)
                     .build());
         }
         if (nonNull(payoutSettings.getEthWallet())) {
@@ -130,10 +123,8 @@ public interface UserPayoutInfoMapper {
                     .address(payoutSettings.getEthWallet().asString())
                     .type(payoutSettings.getEthWallet().accountAddress().isPresent() ?
                             WalletTypeEnumEntity.address : WalletTypeEnumEntity.name)
-                    .id(WalletIdEntity.builder()
-                            .userId(userId)
-                            .network(NetworkEnumEntity.ethereum)
-                            .build())
+                    .userId(userId)
+                    .network(NetworkEnumEntity.ethereum)
                     .build());
         }
     }

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfileId;
+import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 
@@ -17,5 +17,5 @@ public interface RewardStatusStorage {
 
     List<RewardStatus> notPaid();
 
-    List<RewardStatus> notPaid(BillingProfileId userId);
+    List<RewardStatus> notPaid(BillingProfile.Id userId);
 }

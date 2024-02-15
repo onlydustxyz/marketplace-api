@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.view.RewardableItemView;
-import onlydust.com.marketplace.api.domain.view.pagination.Page;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.List;
 

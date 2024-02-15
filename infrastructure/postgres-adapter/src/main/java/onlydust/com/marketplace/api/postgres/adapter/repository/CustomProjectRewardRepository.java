@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.api.domain.view.pagination.SortDirection;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import org.intellij.lang.annotations.Language;

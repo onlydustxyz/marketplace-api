@@ -5,12 +5,12 @@ import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.domain.view.UserRewardsPageView;
 import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
-import onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.List;
 import java.util.Objects;
 
-import static onlydust.com.marketplace.api.domain.view.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapCurrency;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapMoney;
 

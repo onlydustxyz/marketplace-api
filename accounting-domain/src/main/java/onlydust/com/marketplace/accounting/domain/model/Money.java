@@ -82,4 +82,7 @@ public class Money {
     }
 
 
+    public Money multiply(BigDecimal bigDecimal) {
+        return new Money(value.multiply(bigDecimal), currency);
+    }
 }
