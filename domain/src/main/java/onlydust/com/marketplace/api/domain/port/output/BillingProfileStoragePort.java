@@ -28,9 +28,9 @@ public interface BillingProfileStoragePort {
 
     Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId);
 
-    void saveCompanyProfile(CompanyBillingProfile companyBillingProfile);
+    CompanyBillingProfile saveCompanyProfile(CompanyBillingProfile companyBillingProfile);
 
-    void saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
+    IndividualBillingProfile saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
 
     List<BillingProfile> all(UUID userId, Long githubUserId);
 

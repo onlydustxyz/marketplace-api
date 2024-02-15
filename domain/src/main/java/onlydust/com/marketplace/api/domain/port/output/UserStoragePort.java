@@ -20,6 +20,8 @@ public interface UserStoragePort {
 
     Optional<User> getUserByGithubId(Long githubId);
 
+    Optional<User> getUserById(UUID userId);
+
     User createUser(User user);
 
     void updateUserLastSeenAt(UUID userId, Date lastSeenAt);

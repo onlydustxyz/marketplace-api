@@ -74,6 +74,23 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(UUID userId) {
+        final var settings =
+                globalSettingsRepository.findAll().stream().findFirst()
+                        .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
+        Optional<UserViewEntity> user = userViewRepository.findById(userId);
+        return user.map(u -> {
+            final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
+                    .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
+                    .toList();
+            final var applications = applicationRepository.findAllByApplicantId(u.getId());
+            return mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+                    projectLedIdsByUserId, applications);
+        });
+    }
+
+    @Override
     @Transactional
     public User createUser(User user) {
         return mapCreatedUserToDomain(userRepository.save(mapUserToEntity(user)));
