@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStoragePort;
 import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
@@ -345,6 +347,19 @@ public class PostgresConfiguration {
     @Bean
     PostgresRewardUsdEquivalentAdapter postgresRewardUsdEquivalentAdapter(final RewardUsdEquivalentDataRepository rewardUsdEquivalentDataRepository) {
         return new PostgresRewardUsdEquivalentAdapter(rewardUsdEquivalentDataRepository);
+    }
+
+    @Bean
+    InvoicePreviewStoragePort invoicePreviewStoragePort(final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                        final InvoiceRewardRepository invoiceRewardRepository) {
+        return new PostgresInvoicePreviewStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository);
+    }
+
+    @Bean
+    public AccountingBillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository) {
+        return new PostgresAccountingBillingProfileStorage(companyBillingProfileRepository, individualBillingProfileRepository);
     }
 
     @Bean
