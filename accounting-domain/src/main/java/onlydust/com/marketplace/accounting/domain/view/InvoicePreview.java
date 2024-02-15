@@ -55,7 +55,7 @@ public class InvoicePreview {
 
     public BigDecimal taxRate() {
         return companyInfo()
-                .filter(info -> info.vatRegulationState == VatRegulationState.APPLICABLE)
+                .filter(info -> info.vatRegulationState() == VatRegulationState.APPLICABLE)
                 .map(c -> BigDecimal.valueOf(0.2))
                 .orElse(BigDecimal.ZERO);
     }
@@ -97,9 +97,13 @@ public class InvoicePreview {
     public record CompanyInfo(@NonNull String registrationNumber,
                               @NonNull String name,
                               @NonNull String address,
-                              @NonNull VatRegulationState vatRegulationState,
+                              @NonNull Boolean subjectToEuVAT,
                               String euVATNumber
     ) {
+        public VatRegulationState vatRegulationState() {
+            // TODO
+            return subjectToEuVAT ? VatRegulationState.APPLICABLE : VatRegulationState.NOT_APPLICABLE_NON_UE;
+        }
     }
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName, @NonNull Money amount, @NonNull Money base) {

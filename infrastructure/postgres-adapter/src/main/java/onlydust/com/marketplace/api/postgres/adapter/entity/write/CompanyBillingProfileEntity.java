@@ -90,7 +90,7 @@ public class CompanyBillingProfileEntity {
                 registrationNumber,
                 name,
                 address,
-                subjectToEuVAT ? InvoicePreview.VatRegulationState.APPLICABLE : InvoicePreview.VatRegulationState.NOT_APPLICABLE_NON_UE,
+                subjectToEuVAT,
                 euVATNumber
         );
     }
