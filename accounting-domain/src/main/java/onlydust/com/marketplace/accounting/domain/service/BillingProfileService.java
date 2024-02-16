@@ -26,7 +26,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull PdfStoragePort pdfStoragePort;
 
     @Override
-    public InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) {
+    public InvoicePreview previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
+                                         final @NonNull List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
@@ -38,16 +39,17 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
-    public Page<Invoice> getInvoicesForBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
-        return Page.<Invoice>builder()
-                .content(List.of())
-                .totalPageNumber(0)
-                .totalItemNumber(0)
-                .build();
+    public Page<Invoice> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
+                                    final @NonNull Integer pageSize) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User is not allowed to view invoices for this billing profile");
+
+        return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize);
     }
 
     @Override
-    public void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, Invoice.Id invoiceId, InputStream data) {
+    public void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
+                              final @NonNull InputStream data) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to upload an invoice for this billing profile");
 

@@ -34,7 +34,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId, Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
-        final var page = billingProfileFacadePort.getInvoicesForBillingProfile(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
+        final var page = billingProfileFacadePort.invoicesOf(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pageIndex, pageSize);
         return ok(map(page, pageIndex));
     }
 

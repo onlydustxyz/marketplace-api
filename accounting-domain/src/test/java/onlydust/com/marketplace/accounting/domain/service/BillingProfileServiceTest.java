@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,6 +76,16 @@ class BillingProfileServiceTest {
 
             verify(invoiceStoragePort, never()).preview(any(), any());
         }
+
+        @Test
+        void should_prevent_listing_invoices() {
+            // When
+            assertThatThrownBy(() -> billingProfileService.invoicesOf(userId, billingProfileId, 1, 10))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User is not allowed to view invoices for this billing profile");
+        }
+
     }
 
     @Nested
@@ -149,6 +160,24 @@ class BillingProfileServiceTest {
             verify(pdfStoragePort).upload("OD-DOE-JOHN-012.pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
+        }
+
+        @SneakyThrows
+        @Test
+        void should_list_invoices() {
+            // Given
+            when(invoiceStoragePort.invoicesOf(billingProfileId, 1, 10))
+                    .thenReturn(Page.<Invoice>builder().content(List.of(Invoice.of(billingProfileId, invoicePreview))).totalItemNumber(1).totalPageNumber(1).build());
+
+            // When
+            final var invoices = billingProfileService.invoicesOf(userId, billingProfileId, 1, 10);
+
+            // Then
+            assertThat(invoices.getTotalItemNumber()).isEqualTo(1);
+            assertThat(invoices.getTotalPageNumber()).isEqualTo(1);
+            assertThat(invoices.getContent()).hasSize(1);
+            assertThat(invoices.getContent().get(0).id()).isEqualTo(invoicePreview.id());
+            assertThat(invoices.getContent().get(0).billingProfileId()).isEqualTo(billingProfileId);
         }
     }
 
