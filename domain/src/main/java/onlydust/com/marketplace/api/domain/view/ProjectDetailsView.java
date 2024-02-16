@@ -1,15 +1,13 @@
 package onlydust.com.marketplace.api.domain.view;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
 import onlydust.com.marketplace.api.domain.model.Project;
 import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -33,7 +31,8 @@ public class ProjectDetailsView {
     @Builder.Default
     Set<EcosystemView> ecosystems = new HashSet<>();
     @Builder.Default
-    Set<SponsorView> sponsors = new HashSet<>();
+    @Getter(AccessLevel.NONE)
+    Set<ProjectSponsorView> sponsors = new HashSet<>();
     @Builder.Default
     Set<ProjectLeaderLinkView> leaders = new HashSet<>();
     @Builder.Default
@@ -46,6 +45,10 @@ public class ProjectDetailsView {
     Me me;
     @Builder.Default
     Set<Project.Tag> tags = new HashSet<>();
+
+    public Set<ProjectSponsorView> getActiveSponsors() {
+        return sponsors.stream().filter(ProjectSponsorView::isActive).collect(Collectors.toSet());
+    }
 
     public record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor, Boolean hasApplied) {
         public Boolean isMember() {
@@ -69,4 +72,5 @@ public class ProjectDetailsView {
             }
         });
     }
+
 }

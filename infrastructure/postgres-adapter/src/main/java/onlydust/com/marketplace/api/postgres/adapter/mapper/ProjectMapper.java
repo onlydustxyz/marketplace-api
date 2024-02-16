@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 
 import java.sql.Date;
@@ -30,7 +29,6 @@ public interface ProjectMapper {
                                                       List<ContributorViewEntity> topContributors,
                                                       Integer contributorCount,
                                                       List<ProjectLeadViewEntity> leaders,
-                                                      List<SponsorEntity> sponsors,
                                                       List<EcosystemEntity> ecosystems,
                                                       final Boolean hasRemainingBudget,
                                                       ProjectDetailsView.Me me) {
@@ -89,7 +87,7 @@ public interface ProjectMapper {
                         .filter(leader -> Boolean.FALSE.equals(leader.getHasAcceptedInvitation()))
                         .map(UserMapper::mapToProjectLeaderLinkView)
                         .collect(Collectors.toSet()))
-                .sponsors(sponsors.stream().map(SponsorMapper::mapToDomain).collect(Collectors.toSet()))
+                .sponsors(projectEntity.getSponsors().stream().map(SponsorMapper::mapToSponsor).collect(Collectors.toSet()))
                 .ecosystems(ecosystems.stream().map(EcosystemMapper::mapToDomain).collect(Collectors.toSet()))
                 .hasRemainingBudget(hasRemainingBudget)
                 .me(me)

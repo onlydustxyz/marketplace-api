@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
+import onlydust.com.marketplace.api.domain.model.Sponsor;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -77,17 +79,6 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
                 .build();
     }
 
-
-    @Override
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
-        final var page = boSponsorRepository.findAll(filters.getProjects(), filters.getSponsors(),
-                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
-        return Page.<SponsorView>builder()
-                .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
-    }
 
     @Override
     public Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters) {
@@ -156,5 +147,41 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Transactional
     public Ecosystem createEcosystem(Ecosystem ecosystem) {
         return ecosystemRepository.save(EcosystemEntity.fromDomain(ecosystem)).toDomain();
+    }
+
+    @Override
+    @Transactional
+    public void saveSponsor(Sponsor sponsor) {
+        final var entity = boSponsorRepository.findById(sponsor.id())
+                .map(e -> e.toBuilder()
+                        .name(sponsor.name())
+                        .url(sponsor.url())
+                        .logoUrl(sponsor.logoUrl())
+                        .build())
+                .orElse(BoSponsorEntity.builder()
+                        .id(sponsor.id())
+                        .name(sponsor.name())
+                        .url(sponsor.url())
+                        .logoUrl(sponsor.logoUrl())
+                        .build());
+        boSponsorRepository.save(entity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<SponsorView> getSponsor(UUID sponsorId) {
+        return boSponsorRepository.findById(sponsorId).map(BoSponsorEntity::toView);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+        final var page = boSponsorRepository.findAll(filters.projects(), filters.sponsors(),
+                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
+        return Page.<SponsorView>builder()
+                .content(page.getContent().stream().map(BoSponsorEntity::toView).toList())
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .build();
     }
 }

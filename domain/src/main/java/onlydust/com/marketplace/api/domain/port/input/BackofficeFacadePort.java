@@ -4,7 +4,9 @@ import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BackofficeFacadePort {
@@ -18,11 +20,18 @@ public interface BackofficeFacadePort {
 
     Page<PaymentView> listPayments(int pageIndex, int pageSize, PaymentView.Filters filters);
 
-    Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
 
     Page<EcosystemView> listEcosystems(int pageIndex, int pageSize, EcosystemView.Filters filters);
 
     Page<ProjectView> listProjects(int pageIndex, int pageSize, List<UUID> projectIds);
 
     Ecosystem createEcosystem(final Ecosystem ecosystem);
+
+    SponsorView createSponsor(String name, URI url, URI logoUrl);
+
+    SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl);
+
+    Optional<SponsorView> getSponsor(UUID sponsorId);
+
+    Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters);
 }

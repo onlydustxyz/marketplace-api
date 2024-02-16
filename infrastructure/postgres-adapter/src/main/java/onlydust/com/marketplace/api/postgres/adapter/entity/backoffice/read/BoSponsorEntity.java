@@ -1,48 +1,37 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
+import lombok.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
 @Data
 @Entity
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@Builder(toBuilder = true)
+@Table(name = "sponsors", schema = "public")
 public class BoSponsorEntity {
     @Id
-    UUID id;
-    String name;
+    @NonNull UUID id;
+    @NonNull String name;
     String url;
-    String logoUrl;
-    @Type(type = "jsonb")
-    List<UUID> projectIds;
+    @Column(name = "logo_url")
+    @NonNull String logoUrl;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sponsorId")
+    @Builder.Default
+    Set<ProjectSponsorEntity> projects = new HashSet<>();
 
     public SponsorView toView() {
-        return SponsorView.builder()
-                .id(id)
-                .name(name)
-                .url(url)
-                .logoUrl(logoUrl)
-                .projectIds(projectIds)
-                .build();
+        return new SponsorView(id, name, url, logoUrl,
+                projects.stream().map(SponsorMapper::mapToSponsor).collect(Collectors.toSet()));
     }
 }

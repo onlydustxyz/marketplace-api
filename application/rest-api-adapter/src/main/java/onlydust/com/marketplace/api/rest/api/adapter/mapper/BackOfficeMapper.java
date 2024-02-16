@@ -54,16 +54,25 @@ public interface BackOfficeMapper {
     static SponsorPage mapSponsorPageToContract(final Page<SponsorView> sponsorPage, int pageIndex) {
         return new SponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new SponsorPageItemResponse()
-                        .id(sponsor.getId())
-                        .name(sponsor.getName())
-                        .url(sponsor.getUrl())
-                        .logoUrl(sponsor.getLogoUrl())
-                        .projectIds(sponsor.getProjectIds())
+                        .id(sponsor.id())
+                        .name(sponsor.name())
+                        .url(sponsor.url())
+                        .logoUrl(sponsor.logoUrl())
+                        .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList())
                 ).toList())
                 .totalPageNumber(sponsorPage.getTotalPageNumber())
                 .totalItemNumber(sponsorPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, sponsorPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, sponsorPage.getTotalPageNumber()));
+    }
+
+    static SponsorResponse mapSponsorToResponse(final SponsorView sponsor) {
+        return new SponsorResponse()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .url(sponsor.url())
+                .logoUrl(sponsor.logoUrl())
+                .projectIds(sponsor.projectIdsWhereSponsorIsActive().stream().toList());
     }
 
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {

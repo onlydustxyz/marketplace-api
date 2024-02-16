@@ -367,7 +367,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository) {
-        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository);
+    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
+                                                                                      final ProjectSponsorRepository projectSponsorRepository) {
+        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository, projectSponsorRepository);
     }
 }
