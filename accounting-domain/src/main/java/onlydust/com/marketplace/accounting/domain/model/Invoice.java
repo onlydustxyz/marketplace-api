@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 
 @Data
 @Accessors(chain = true, fluent = true)
+@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Invoice {
     private final @NonNull Id id;
     private final @NonNull BillingProfile.Id billingProfileId;
@@ -55,6 +57,10 @@ public class Invoice {
 
         public String toString() {
             return value;
+        }
+
+        public static Name fromString(final @NonNull String value) {
+            return new Name(value);
         }
 
         private static String normalize(String... parts) {
