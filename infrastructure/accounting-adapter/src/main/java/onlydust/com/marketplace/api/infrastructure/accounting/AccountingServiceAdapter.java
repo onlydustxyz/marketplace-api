@@ -21,7 +21,7 @@ public class AccountingServiceAdapter implements AccountingServicePort {
     @Override
     public void createReward(UUID projectId, UUID rewardId, BigDecimal amount, String currencyCode) {
         final var currency = getCurrency(currencyCode);
-        accountingFacadePort.transfer(ProjectId.of(projectId), RewardId.of(rewardId), PositiveAmount.of(amount), currency.id());
+        accountingFacadePort.createReward(ProjectId.of(projectId), RewardId.of(rewardId), PositiveAmount.of(amount), currency.id());
     }
 
     @Override

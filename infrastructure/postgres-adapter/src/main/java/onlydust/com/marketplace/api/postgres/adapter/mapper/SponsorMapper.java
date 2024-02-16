@@ -1,16 +1,24 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.domain.view.ProjectSponsorView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 public interface SponsorMapper {
 
-    static SponsorView mapToDomain(final SponsorEntity sponsorEntity) {
-        return SponsorView.builder()
-                .id(sponsorEntity.getId())
-                .url(sponsorEntity.getUrl())
-                .name(sponsorEntity.getName())
-                .logoUrl(sponsorEntity.getLogoUrl())
+    static ProjectSponsorView mapToSponsor(final ProjectSponsorEntity entity) {
+        final var sponsor = entity.sponsor();
+        return ProjectSponsorView.builder()
+                .projectId(entity.projectId())
+                .sponsorId(sponsor.getId())
+                .sponsorUrl(sponsor.getUrl())
+                .sponsorName(sponsor.getName())
+                .sponsorLogoUrl(sponsor.getLogoUrl())
+                .lastAllocationDate(entity.lastAllocationDate() != null ?
+                        ZonedDateTime.ofInstant(entity.lastAllocationDate().toInstant(), ZoneOffset.UTC) :
+                        null)
                 .build();
     }
 }

@@ -2,13 +2,18 @@ package onlydust.com.marketplace.api.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
+import onlydust.com.marketplace.api.domain.model.Sponsor;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class BackofficeService implements BackofficeFacadePort {
@@ -23,11 +28,6 @@ public class BackofficeService implements BackofficeFacadePort {
     @Override
     public Page<ProjectBudgetView> getBudgetPage(int pageIndex, int pageSize, List<UUID> projectIds) {
         return backofficeStoragePort.findProjectBudgetPage(pageIndex, pageSize, projectIds);
-    }
-
-    @Override
-    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
-        return backofficeStoragePort.listSponsors(pageIndex, pageSize, filters);
     }
 
     @Override
@@ -58,5 +58,40 @@ public class BackofficeService implements BackofficeFacadePort {
     @Override
     public Ecosystem createEcosystem(Ecosystem ecosystem) {
         return backofficeStoragePort.createEcosystem(ecosystem);
+    }
+
+    @Override
+    public SponsorView createSponsor(String name, URI url, URI logoUrl) {
+        final var sponsorId = UUID.randomUUID();
+        backofficeStoragePort.saveSponsor(Sponsor.builder()
+                .id(sponsorId)
+                .name(name)
+                .url(url.toString())
+                .logoUrl(logoUrl.toString())
+                .build());
+        return getSponsor(sponsorId)
+                .orElseThrow(() -> internalServerError("Sponsor not properly created"));
+    }
+
+    @Override
+    public SponsorView updateSponsor(UUID sponsorId, String name, URI url, URI logoUrl) {
+        backofficeStoragePort.saveSponsor(Sponsor.builder()
+                .id(sponsorId)
+                .name(name)
+                .url(url.toString())
+                .logoUrl(logoUrl.toString())
+                .build());
+        return getSponsor(sponsorId)
+                .orElseThrow(() -> internalServerError("Sponsor not properly updated"));
+    }
+
+    @Override
+    public Optional<SponsorView> getSponsor(UUID sponsorId) {
+        return backofficeStoragePort.getSponsor(sponsorId);
+    }
+
+    @Override
+    public Page<SponsorView> listSponsors(int pageIndex, int pageSize, SponsorView.Filters filters) {
+        return backofficeStoragePort.listSponsors(pageIndex, pageSize, filters);
     }
 }

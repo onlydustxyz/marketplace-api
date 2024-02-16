@@ -28,6 +28,12 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         accountVertices.put(ROOT, new ArrayList<>(List.of(root)));
     }
 
+    private static ArrayList<Transaction> mapAggregatedAmountsToTransactions(Map<FromTo, PositiveAmount> aggregatedAmounts) {
+        final var transactions = new ArrayList<Transaction>(aggregatedAmounts.size());
+        aggregatedAmounts.forEach((fromTo, amount) -> transactions.add(new Transaction(fromTo.from(), fromTo.to(), amount)));
+        return transactions;
+    }
+
     @Override
     public void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
         createTransaction(root, account, amount);
@@ -67,12 +73,16 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     }
 
     @Override
-    public void refund(@NonNull final AccountId from) {
+    public Set<AccountId> refund(@NonNull final AccountId from) {
         final var vertices = accountVertices(from);
         if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
         }
-        new ArrayList<>(vertices).forEach(this::removeTransaction);
+        return new ArrayList<>(vertices).stream().map(vertex -> {
+            final var refunded = incomingEdgeOf(vertex).source.accountId;
+            removeTransaction(vertex);
+            return refunded;
+        }).collect(Collectors.toUnmodifiableSet());
     }
 
     public @NonNull PositiveAmount balanceOf(@NonNull final AccountId account) {
@@ -194,7 +204,6 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         }
     }
 
-
     private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final AccountId accountId) {
         return accountVertices(accountId).stream()
                 .map(v -> new VertexWithBalance(v, balanceOf(v)))
@@ -305,12 +314,6 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
     private record FromTo(@NonNull AccountId from, @NonNull AccountId to) {
     }
 
-    private static ArrayList<Transaction> mapAggregatedAmountsToTransactions(Map<FromTo, PositiveAmount> aggregatedAmounts) {
-        final var transactions = new ArrayList<Transaction>(aggregatedAmounts.size());
-        aggregatedAmounts.forEach((fromTo, amount) -> transactions.add(new Transaction(fromTo.from(), fromTo.to(), amount)));
-        return transactions;
-    }
-
     public static class InsufficientFundsException extends Exception {
         public InsufficientFundsException(String message) {
             super(message);
@@ -322,15 +325,15 @@ public class AccountBookState implements AccountBook, Visitable<AccountBookState
         private final Vertex source;
         private PositiveAmount amount;
 
-        public void decreaseAmount(PositiveAmount amount) {
-            this.amount = PositiveAmount.of(this.amount.subtract(amount));
-        }
-
         public static PositiveAmount totalAmountOf(Collection<Edge> edges) {
             var acc = PositiveAmount.ZERO;
             for (Edge edge : edges)
                 acc = acc.add(edge.amount);
             return acc;
+        }
+
+        public void decreaseAmount(PositiveAmount amount) {
+            this.amount = PositiveAmount.of(this.amount.subtract(amount));
         }
     }
 

@@ -5,9 +5,6 @@ import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
@@ -19,6 +16,9 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectIdRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -134,7 +134,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
         final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
         final var ecosystems = customProjectRepository.getProjectEcosystems(projectView.getId());
-        final var sponsors = customProjectRepository.getProjectSponsors(projectView.getId());
         // TODO : migrate to multi-token
         final Boolean hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
         final var me = isNull(caller) ? null : new ProjectDetailsView.Me(
@@ -151,8 +150,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                         Pageable.ofSize(1)).isEmpty(),
                 applicationRepository.findByProjectIdAndApplicantId(projectView.getId(), caller.getId()).isPresent()
         );
-        return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders
-                , sponsors, ecosystems, hasRemainingBudget, me);
+        return ProjectMapper.mapToProjectDetailsView(projectView, topContributors, contributorCount, leaders, ecosystems, hasRemainingBudget, me);
     }
 
     @Override
@@ -277,7 +275,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
         if (nonNull(moreInfos)) {
             if (nonNull(project.getMoreInfos())) {
                 project.getMoreInfos().clear();
-                if (!moreInfos.isEmpty()){
+                if (!moreInfos.isEmpty()) {
                     project.getMoreInfos().addAll(moreInfosToEntities(moreInfos, projectId));
                 }
             } else {

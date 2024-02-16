@@ -408,7 +408,11 @@ paths:
               $ref: '#/components/schemas/SponsorRequest'
       responses:
         "201":
-          description: 'Sponsor is created'
+          description: 'Sponsor created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":
@@ -469,7 +473,11 @@ paths:
               $ref: '#/components/schemas/SponsorRequest'
       responses:
         "200":
-          description: 'Sponsor has been updated'
+          description: 'Sponsor updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":

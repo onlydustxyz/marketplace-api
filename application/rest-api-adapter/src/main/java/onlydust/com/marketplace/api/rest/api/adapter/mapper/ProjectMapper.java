@@ -65,7 +65,7 @@ public interface ProjectMapper {
                 .collect(Collectors.toList()));
         projectResponse.setTags(project.getTags().stream().map(ProjectMapper::mapTag).toList());
         projectResponse.setEcosystems(project.getEcosystems().stream().map(ProjectMapper::mapEcosystem).collect(Collectors.toList()));
-        projectResponse.setSponsors(project.getSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
+        projectResponse.setSponsors(project.getActiveSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
                 .sorted(Comparator.comparing(GithubOrganizationResponse::getGithubUserId))
@@ -238,12 +238,12 @@ public interface ProjectMapper {
         return ecosystemResponse;
     }
 
-    private static SponsorResponse mapSponsor(final SponsorView sponsorView) {
+    private static SponsorResponse mapSponsor(final ProjectSponsorView projectSponsorView) {
         final SponsorResponse sponsorResponse = new SponsorResponse();
-        sponsorResponse.setId(sponsorView.getId());
-        sponsorResponse.setName(sponsorView.getName());
-        sponsorResponse.setLogoUrl(sponsorView.getLogoUrl());
-        sponsorResponse.setUrl(sponsorView.getUrl());
+        sponsorResponse.setId(projectSponsorView.sponsorId());
+        sponsorResponse.setName(projectSponsorView.sponsorName());
+        sponsorResponse.setLogoUrl(projectSponsorView.sponsorLogoUrl());
+        sponsorResponse.setUrl(projectSponsorView.sponsorUrl());
         return sponsorResponse;
     }
 

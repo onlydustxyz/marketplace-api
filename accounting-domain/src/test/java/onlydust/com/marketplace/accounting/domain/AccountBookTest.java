@@ -271,11 +271,12 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
 
         // When
-        accountBook.refund(recipient);
+        final var refundedAccounts = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
     }
 
     @Test
@@ -297,12 +298,13 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount1.add(amount2));
 
         // When
-        accountBook.refund(recipient);
+        final var refundedAccounts = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender1)).isEqualTo(amount1);
         assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(amount2);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender1, sender2);
     }
 
     @Test
@@ -320,11 +322,12 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
 
         // When
-        accountBook.refund(recipient);
+        final var refundedAccounts = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
     }
 
     @Test
