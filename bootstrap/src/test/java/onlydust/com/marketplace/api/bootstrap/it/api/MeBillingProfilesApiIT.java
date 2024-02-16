@@ -271,7 +271,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(5)
-    void should_get_company_billing_profile_given_one() throws InterruptedException {
+    void should_get_company_billing_profile_given_one() {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();

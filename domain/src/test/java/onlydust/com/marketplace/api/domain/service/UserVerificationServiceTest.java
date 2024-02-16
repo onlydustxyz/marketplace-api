@@ -59,6 +59,7 @@ public class UserVerificationServiceTest {
                 .build();
         final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
+        final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
         final CompanyBillingProfile initialCompanyBillingProfile =
                 CompanyBillingProfile.builder()
                         .id(billingProfileId)
@@ -103,7 +104,7 @@ public class UserVerificationServiceTest {
         // Then
         verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
         verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
-        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(eventWithUserId);
         final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
         verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
         assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
@@ -111,7 +112,7 @@ public class UserVerificationServiceTest {
         assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
         assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
         assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
-        verify(webhookPort, times(1)).send(event);
+        verify(webhookPort, times(1)).send(eventWithUserId);
     }
 
     @Test
@@ -127,6 +128,7 @@ public class UserVerificationServiceTest {
                 .build();
         final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
+        final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
         final CompanyBillingProfile initialCompanyBillingProfile =
                 CompanyBillingProfile.builder()
                         .id(billingProfileId)
@@ -164,9 +166,9 @@ public class UserVerificationServiceTest {
         // Then
         verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
         verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
-        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(eventWithUserId);
         verifyNoInteractions(notificationPort);
-        verify(webhookPort, times(1)).send(event);
+        verify(webhookPort, times(1)).send(eventWithUserId);
     }
 
 
@@ -208,8 +210,9 @@ public class UserVerificationServiceTest {
                 .billingProfileId(billingProfileId)
                 .reviewMessageForApplicant(reviewMessageForApplicant)
                 .build();
-        final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
+        final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
+        final Event eventStub = mock(Event.class);
         final IndividualBillingProfile initialIndividualBillingProfile =
                 IndividualBillingProfile.builder().id(billingProfileId).userId(userId)
                         .reviewMessageForApplicant(reviewMessageForApplicant)
@@ -249,7 +252,7 @@ public class UserVerificationServiceTest {
         // Then
         verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
         verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
-        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(eventWithUserId);
         final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
         verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
         assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
@@ -257,7 +260,7 @@ public class UserVerificationServiceTest {
         assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
         assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
         assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
-        verify(webhookPort, times(1)).send(event);
+        verify(webhookPort, times(1)).send(eventWithUserId);
     }
 
     @Test
@@ -273,6 +276,7 @@ public class UserVerificationServiceTest {
                 .build();
         final Event eventStub = mock(Event.class);
         final UUID userId = UUID.randomUUID();
+        final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
         final IndividualBillingProfile initialIndividualBillingProfile =
                 IndividualBillingProfile.builder().id(billingProfileId).userId(userId)
                         .reviewMessageForApplicant(reviewMessageForApplicant)
@@ -305,9 +309,9 @@ public class UserVerificationServiceTest {
         // Then
         verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
         verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
-        verify(accountingUserObserverPort).onBillingProfileUpdated(event);
+        verify(accountingUserObserverPort).onBillingProfileUpdated(eventWithUserId);
         verifyNoInteractions(notificationPort);
-        verify(webhookPort, times(1)).send(event);
+        verify(webhookPort, times(1)).send(eventWithUserId);
     }
 
 

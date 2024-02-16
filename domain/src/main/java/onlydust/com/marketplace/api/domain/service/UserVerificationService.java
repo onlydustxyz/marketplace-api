@@ -35,11 +35,12 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
 
     @Override
     public void process(Event event) {
-        final BillingProfileUpdated billingProfileUpdated = billingProfileExternalMapper.apply(event);
+        BillingProfileUpdated billingProfileUpdated = billingProfileExternalMapper.apply(event);
         final UUID userId = switch (billingProfileUpdated.getType()) {
             case COMPANY -> updateCompanyProfile(billingProfileUpdated).getUserId();
             case INDIVIDUAL -> updateIndividualProfile(billingProfileUpdated).getUserId();
         };
+        billingProfileUpdated = billingProfileUpdated.toBuilder().userId(userId).build();
         userObserver.onBillingProfileUpdated(billingProfileUpdated);
         notifyNewVerificationEventProcessedForUser(userId, billingProfileUpdated);
         webhookPort.send(billingProfileUpdated);
@@ -71,7 +72,6 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private void notifyNewVerificationEventProcessedForUser(final UUID userId, final BillingProfileUpdated billingProfileUpdated) {
         userStoragePort.getUserById(userId)
                 .map(user -> billingProfileUpdated.toBuilder()
-                        .userId(userId)
                         .githubUserId(user.getGithubUserId())
                         .githubUserEmail(user.getGithubEmail())
                         .githubUserId(user.getGithubUserId())
