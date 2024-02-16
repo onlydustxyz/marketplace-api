@@ -392,10 +392,9 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """.formatted(sponsor.getId()));
 
         // And when
-        final var projectSponsorEntity = projectSponsorRepository.getById(new ProjectSponsorEntity.PrimaryKey(BRETZEL.value(), sponsorAccount.getSponsorId()));
-        projectSponsorRepository.save(projectSponsorEntity.toBuilder()
-                .lastAllocationDate(Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant()))
-                .build());
+        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
+                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+
 
         client.get()
                 .uri(getApiURI(GET_SPONSOR.formatted(sponsorAccount.getSponsorId())))

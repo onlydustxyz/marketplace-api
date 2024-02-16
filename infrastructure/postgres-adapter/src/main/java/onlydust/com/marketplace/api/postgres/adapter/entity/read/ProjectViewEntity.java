@@ -4,9 +4,9 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectMoreInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Type;
@@ -14,10 +14,7 @@ import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
 @Entity
@@ -73,14 +70,9 @@ public class ProjectViewEntity {
     )
     List<EcosystemEntity> ecosystems;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "projects_sponsors",
-            schema = "public",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "sponsor_id")
-    )
-    List<SponsorEntity> sponsors;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
+    @Builder.Default
+    Set<ProjectSponsorEntity> sponsors = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(

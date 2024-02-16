@@ -3,13 +3,13 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 import lombok.*;
 import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 
 import javax.persistence.*;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,8 +31,7 @@ public class BoSponsorEntity {
     Set<ProjectSponsorEntity> projects = new HashSet<>();
 
     public SponsorView toView() {
-        final var sponsorView = new SponsorView(id, name, url, logoUrl);
-        projects.forEach(p -> sponsorView.addProjectId(p.getProjectId(), ZonedDateTime.ofInstant(p.getLastAllocationDate().toInstant(), ZoneOffset.UTC)));
-        return sponsorView;
+        return new SponsorView(id, name, url, logoUrl,
+                projects.stream().map(SponsorMapper::mapToSponsor).collect(Collectors.toSet()));
     }
 }

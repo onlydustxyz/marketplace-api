@@ -1,40 +1,38 @@
 package onlydust.com.marketplace.api.domain.view.backoffice;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.domain.view.ProjectSponsorView;
 
-import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Value
 @EqualsAndHashCode
 @Accessors(fluent = true)
 public class SponsorView {
-    private static final int MONTHS_SINCE_LAST_ALLOCATION_TO_BE_A_SPONSOR = 6;
-
     UUID id;
     String name;
     String url;
     String logoUrl;
-    Set<UUID> projectIds;
 
-    public SponsorView(UUID id, String name, String url, String logoUrl) {
+    @Getter(AccessLevel.NONE)
+    Set<ProjectSponsorView> projects;
+
+    public SponsorView(UUID id, String name, String url, String logoUrl, Set<ProjectSponsorView> projects) {
         this.id = id;
         this.name = name;
         this.url = url;
         this.logoUrl = logoUrl;
-        this.projectIds = new HashSet<>();
+        this.projects = projects;
     }
 
-    public void addProjectId(UUID projectId, ZonedDateTime lastAllocationDate) {
-        if (lastAllocationDate == null || lastAllocationDate.isAfter(ZonedDateTime.now().minusMonths(MONTHS_SINCE_LAST_ALLOCATION_TO_BE_A_SPONSOR))) {
-            this.projectIds.add(projectId);
-        }
+    public Set<UUID> projectIdsWhereSponsorIsActive() {
+        return projects.stream()
+                .filter(ProjectSponsorView::isActive)
+                .map(ProjectSponsorView::projectId).collect(Collectors.toSet());
     }
 
     @Value
