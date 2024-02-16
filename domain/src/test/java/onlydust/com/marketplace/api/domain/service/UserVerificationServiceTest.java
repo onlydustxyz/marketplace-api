@@ -29,6 +29,7 @@ public class UserVerificationServiceTest {
     private UserVerificationStoragePort userVerificationStoragePort;
     private NotificationPort notificationPort;
     private UserStoragePort userStoragePort;
+    private WebhookPort webhookPort;
     private final Faker faker = new Faker();
 
     @BeforeEach
@@ -40,8 +41,9 @@ public class UserVerificationServiceTest {
         userVerificationStoragePort = mock(UserVerificationStoragePort.class);
         notificationPort = mock(NotificationPort.class);
         userStoragePort = mock(UserStoragePort.class);
+        webhookPort = mock(WebhookPort.class);
         userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort,
-                userVerificationStoragePort, accountingUserObserverPort, notificationPort, userStoragePort);
+                userVerificationStoragePort, accountingUserObserverPort, notificationPort, userStoragePort, webhookPort);
     }
 
     @Test
@@ -109,6 +111,7 @@ public class UserVerificationServiceTest {
         assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
         assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
         assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
+        verify(webhookPort, times(1)).send(event);
     }
 
     @Test
@@ -163,6 +166,7 @@ public class UserVerificationServiceTest {
         verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
         verify(accountingUserObserverPort).onBillingProfileUpdated(event);
         verifyNoInteractions(notificationPort);
+        verify(webhookPort, times(1)).send(event);
     }
 
 
@@ -253,6 +257,7 @@ public class UserVerificationServiceTest {
         assertEquals(user.getGithubLogin(), billingProfileUpdatedArgumentCaptor.getValue().getGithubLogin());
         assertEquals(user.getGithubEmail(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserEmail());
         assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
+        verify(webhookPort, times(1)).send(event);
     }
 
     @Test
@@ -302,6 +307,7 @@ public class UserVerificationServiceTest {
         verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
         verify(accountingUserObserverPort).onBillingProfileUpdated(event);
         verifyNoInteractions(notificationPort);
+        verify(webhookPort, times(1)).send(event);
     }
 
 
