@@ -73,8 +73,10 @@ class BillingProfileServiceTest {
 
         // Then
         assertThat(preview).isEqualTo(invoicePreview);
+        verify(invoiceStoragePort).deleteDraftsOf(billingProfileId);
+
         final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-        verify(invoiceStoragePort).save(invoiceCaptor.capture());
+        verify(invoiceStoragePort).save(eq(billingProfileId), invoiceCaptor.capture());
         final var invoice = invoiceCaptor.getValue();
         assertThat(invoice.id()).isEqualTo(preview.id());
         assertThat(invoice.name()).isEqualTo(preview.name());
