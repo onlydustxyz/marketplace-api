@@ -6,10 +6,10 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,8 +30,8 @@ class BillingProfileServiceTest {
     final Faker faker = new Faker();
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     final AccountingBillingProfileStorage billingProfileStorage = mock(AccountingBillingProfileStorage.class);
-    final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
-    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, imageStoragePort);
+    final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
+    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
     final UserId userId = UserId.random();
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;
@@ -44,7 +44,7 @@ class BillingProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(invoiceStoragePort, billingProfileStorage, imageStoragePort);
+        reset(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
     }
 
     @Nested
@@ -138,7 +138,7 @@ class BillingProfileServiceTest {
             // Given
             final var url = new URL("https://" + faker.internet().url());
             when(invoiceStoragePort.get(invoicePreview.id())).thenReturn(Optional.of(Invoice.of(billingProfileId, invoicePreview)));
-            when(imageStoragePort.storeImage(pdf)).thenReturn(url);
+            when(pdfStoragePort.upload("OD-DOE-JOHN-012.pdf", pdf)).thenReturn(url);
 
             // When
             billingProfileService.uploadInvoice(userId, billingProfileId, invoicePreview.id(), pdf);
@@ -146,6 +146,7 @@ class BillingProfileServiceTest {
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
             verify(invoiceStoragePort).save(invoiceCaptor.capture());
+            verify(pdfStoragePort).upload("OD-DOE-JOHN-012.pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
         }

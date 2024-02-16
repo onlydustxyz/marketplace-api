@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.api.domain.observer.UserObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
-import onlydust.com.marketplace.api.domain.port.output.InvoiceStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
@@ -133,14 +132,14 @@ public class DomainConfiguration {
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
                                          final BillingProfileStoragePort billingProfileStoragePort,
-                                         final InvoiceStoragePort invoiceStoragePort,
+                                         final PdfStoragePort pdfStoragePort,
                                          final AccountingUserObserverPort accountingUserObserverPort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
                 billingProfileStoragePort,
-                invoiceStoragePort,
+                pdfStoragePort,
                 accountingUserObserverPort);
     }
 

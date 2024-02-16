@@ -5,8 +5,9 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.port.output.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -28,7 +29,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 
 @AllArgsConstructor
 @Slf4j
-public class AwsS3Adapter implements ImageStoragePort, InvoiceStoragePort {
+public class AwsS3Adapter implements ImageStoragePort, PdfStoragePort {
 
     private final AmazonS3Properties amazonS3Properties;
     private final AmazonS3 amazonS3;
@@ -67,10 +68,9 @@ public class AwsS3Adapter implements ImageStoragePort, InvoiceStoragePort {
     }
 
     @Override
-    public URL storePdfForName(String name, InputStream inputStream) {
+    public URL upload(final @NonNull String fileName, final @NonNull InputStream data) {
         try {
-            final byte[] bytes = inputStream.readAllBytes();
-            return uploadByteArrayToS3Bucket(bytes, amazonS3Properties.getImageBucket(), name);
+            return uploadByteArrayToS3Bucket(data.readAllBytes(), amazonS3Properties.getImageBucket(), fileName);
         } catch (IOException e) {
             throw badRequest("Failed to read input stream", e);
         }

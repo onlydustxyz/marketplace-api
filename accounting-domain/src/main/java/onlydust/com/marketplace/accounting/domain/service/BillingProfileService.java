@@ -9,9 +9,9 @@ import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.util.List;
@@ -23,7 +23,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauth
 public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull AccountingBillingProfileStorage billingProfileStorage;
-    private final @NonNull ImageStoragePort imageStoragePort;
+    private final @NonNull PdfStoragePort pdfStoragePort;
 
     @Override
     public InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) {
@@ -55,7 +55,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
-        final var url = imageStoragePort.storeImage(data);
+        final var url = pdfStoragePort.upload(invoice.name() + ".pdf", data);
         invoiceStoragePort.save(invoice.url(url));
     }
 }

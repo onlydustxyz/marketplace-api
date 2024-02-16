@@ -46,12 +46,15 @@ public class Invoice {
     @EqualsAndHashCode
     @Getter
     @Accessors(fluent = true)
-    @ToString
     public static class Name {
         private final @NonNull String value;
 
         public static Name of(Integer sequenceNumber, String... parts) {
             return new Name("OD-%s-%03d".formatted(normalize(parts), sequenceNumber));
+        }
+
+        public String toString() {
+            return value;
         }
 
         private static String normalize(String... parts) {
