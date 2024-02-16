@@ -58,6 +58,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
         final var url = pdfStoragePort.upload(invoice.name() + ".pdf", data);
-        invoiceStoragePort.save(invoice.url(url));
+        invoiceStoragePort.save(invoice.status(Invoice.Status.PROCESSING).url(url));
     }
 }

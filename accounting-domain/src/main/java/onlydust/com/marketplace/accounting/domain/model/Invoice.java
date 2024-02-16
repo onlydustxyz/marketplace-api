@@ -24,7 +24,7 @@ public class Invoice {
     private final @NonNull Invoice.Name name;
     private final @NonNull ZonedDateTime createdAt;
     private final @NonNull Money totalAfterTax; // TODO: remove in new accounting as it will be fixed at reward level
-    private final @NonNull Status status;
+    private @NonNull Status status;
     private final @NonNull Set<RewardId> rewards;
     private URL url;
 

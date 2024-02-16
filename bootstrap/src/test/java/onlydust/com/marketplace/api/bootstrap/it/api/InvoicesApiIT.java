@@ -171,7 +171,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                 "amount": 1784757.50,
                                 "currency": "USD"
                               },
-                              "status": "DRAFT"
+                              "status": "PROCESSING"
                             }
                           ],
                           "hasMore": false,
