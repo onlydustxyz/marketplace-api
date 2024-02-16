@@ -723,6 +723,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "https://haydencleary.com/",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
+                              "verificationStatus": "NOT_STARTED",
                               "languages": [
                                 "TypeScript",
                                 "JavaScript",
@@ -771,6 +772,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "weeklyAllocatedTime": null,
                               "languages": null,
                               "tcAcceptedAt": "2023-09-27 12:04:21.032055",
+                              "verificationStatus": "NOT_STARTED",
                               "onboardingCompletedAt": "2023-09-27T12:04:17.551646Z"
                             },
                             {
@@ -807,6 +809,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "weeklyAllocatedTime": "none",
                               "languages": null,
                               "tcAcceptedAt": "2023-09-18 15:45:59.929954",
+                              "verificationStatus": "NOT_STARTED",
                               "onboardingCompletedAt": "2023-09-18T15:45:56.594259Z"
                             }
                           ]
@@ -867,6 +870,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "OnlyDust.xyz",
                               "lookingForAJob": null,
                               "weeklyAllocatedTime": null,
+                              "verificationStatus": "NOT_STARTED",
                               "languages": [
                                 "CSS",
                                 "HTML",
@@ -913,6 +917,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "website": "https://linktr.ee/abuisset",
                               "lookingForAJob": false,
                               "weeklyAllocatedTime": "none",
+                              "verificationStatus": "NOT_STARTED",
                               "languages": [
                                 "TypeScript",
                                 "Rust",

@@ -1608,6 +1608,19 @@ components:
         onboardingCompletedAt:
           type: string
           format: date-time
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'
+
+    VerificationStatus:
+      type: string
+      enum:
+        - NOT_STARTED
+        - STARTED
+        - UNDER_REVIEW
+        - VERIFIED
+        - REJECTED
+        - INVALIDATED
+        - CLOSED
     PaymentPage:
       type: object
       required:
