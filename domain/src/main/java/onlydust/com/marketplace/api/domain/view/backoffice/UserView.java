@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.domain.view.backoffice;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import onlydust.com.marketplace.api.domain.model.VerificationStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -48,6 +49,7 @@ public class UserView {
     List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
+    VerificationStatus verificationStatus;
 
     @Value
     @Builder

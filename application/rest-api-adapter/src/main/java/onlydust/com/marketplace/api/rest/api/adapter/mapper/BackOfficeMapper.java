@@ -5,15 +5,15 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
+import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZoneOffset;
 
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
-import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 
 public interface BackOfficeMapper {
 
@@ -194,6 +194,15 @@ public interface BackOfficeMapper {
                         .languages(user.getLanguages())
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
+                        .verificationStatus(switch (user.getVerificationStatus()) {
+                            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+                            case STARTED -> VerificationStatus.STARTED;
+                            case REJECTED -> VerificationStatus.REJECTED;
+                            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+                            case CLOSED -> VerificationStatus.CLOSED;
+                            case VERIFIED -> VerificationStatus.VERIFIED;
+                            case INVALIDATED -> VerificationStatus.INVALIDATED;
+                        })
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())
                 .totalItemNumber(userPage.getTotalItemNumber())
