@@ -277,9 +277,9 @@ public class DomainConfiguration {
                                                                  final UserVerificationStoragePort userVerificationStoragePort,
                                                                  final AccountingUserObserverPort accountingUserObserverPort,
                                                                  final NotificationPort notificationPort,
-                                                                 final UserStoragePort userStoragePort) {
+                                                                 final UserStoragePort userStoragePort, final WebhookPort webhookNotificationPort) {
         return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort, notificationPort, userStoragePort);
+                accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
     }
 
     @Bean
@@ -288,9 +288,10 @@ public class DomainConfiguration {
                                                          final UserVerificationStoragePort userVerificationStoragePort,
                                                          final AccountingUserObserverPort accountingUserObserverPort,
                                                          final NotificationPort notificationPort,
-                                                         final UserStoragePort userStoragePort) {
+                                                         final UserStoragePort userStoragePort,
+                                                         final WebhookPort webhookNotificationPort) {
         return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
-                accountingUserObserverPort, notificationPort, userStoragePort);
+                accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
     }
 
     @Bean

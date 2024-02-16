@@ -33,6 +33,8 @@ public class MakeWebhookAdapter implements WebhookPort {
                     config.getEnvironment()));
         } else if (event instanceof UserSignedUp userSignedUp) {
             makeWebhookHttpClient.post(UserSignedUpEventDTO.of(userSignedUp, config.getEnvironment()));
+        } else if (event instanceof BillingProfileUpdated billingProfileUpdated) {
+            makeWebhookHttpClient.post(UserBillingProfileVerificationStatusUpdatedEventDTO.of(billingProfileUpdated, config.getEnvironment()));
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }
