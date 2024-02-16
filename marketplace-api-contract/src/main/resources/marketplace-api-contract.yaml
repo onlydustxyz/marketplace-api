@@ -2544,7 +2544,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NewInvoiceResponse'
+                $ref: '#/components/schemas/InvoicePreviewResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -5305,16 +5305,20 @@ components:
           format: date-time
         idDocumentCountryCode:
           type: string
-    NewInvoiceResponse:
+    InvoicePreviewResponse:
       type: object
       required:
         - id
+        - name
         - createdAt
         - dueAt
         - destinationAccounts
         - billingProfileType
       properties:
         id:
+          type: string
+          format: uuid
+        name:
           type: string
         createdAt:
           type: string
@@ -5487,9 +5491,10 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         name:
           type: string
-        generationDate:
+        createdAt:
           type: string
           format: date-time
         totalAfterTax:

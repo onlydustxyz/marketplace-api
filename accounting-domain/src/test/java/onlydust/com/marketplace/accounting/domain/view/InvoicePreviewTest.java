@@ -32,7 +32,7 @@ class InvoicePreviewTest {
 
         @Test
         void should_compute_id() {
-            assertThat(preview.id().value()).isEqualTo("OD-DOE-JOHN-001");
+            assertThat(preview.name().value()).isEqualTo("OD-DOE-JOHN-001");
         }
 
         @Test
@@ -67,7 +67,7 @@ class InvoicePreviewTest {
 
         @Test
         void should_compute_id() {
-            assertThat(preview.id().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(preview.name().value()).isEqualTo("OD-ONLYDUST-001");
         }
 
         @Test
@@ -107,7 +107,7 @@ class InvoicePreviewTest {
 
         @Test
         void should_compute_id() {
-            assertThat(preview.id().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(preview.name().value()).isEqualTo("OD-ONLYDUST-001");
         }
 
 

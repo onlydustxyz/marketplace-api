@@ -22,8 +22,9 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @Accessors(chain = true, fluent = true)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class InvoicePreview {
-    private @NonNull ZonedDateTime createdAt = ZonedDateTime.now();
-    private @NonNull Integer sequenceNumber;
+    private final @NonNull Invoice.Id id = Invoice.Id.random();
+    private final @NonNull ZonedDateTime createdAt = ZonedDateTime.now();
+    private final @NonNull Integer sequenceNumber;
     private PersonalInfo personalInfo;
     private CompanyInfo companyInfo;
     private BankAccount bankAccount;
@@ -38,10 +39,10 @@ public class InvoicePreview {
         return new InvoicePreview(sequenceNumber).companyInfo(companyInfo);
     }
 
-    public Invoice.Id id() {
+    public Invoice.Name name() {
         return switch (billingProfileType()) {
-            case INDIVIDUAL -> Invoice.Id.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName);
-            case COMPANY -> Invoice.Id.of(sequenceNumber, companyInfo.name);
+            case INDIVIDUAL -> Invoice.Name.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName);
+            case COMPANY -> Invoice.Name.of(sequenceNumber, companyInfo.name);
         };
     }
 
@@ -62,7 +63,7 @@ public class InvoicePreview {
 
     public Money totalBeforeTax() {
         return rewards.stream().map(Reward::base).reduce(Money::add)
-                .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(id())));
+                .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(name())));
     }
 
     public Money totalTax() {

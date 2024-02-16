@@ -40,11 +40,12 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.createdAt").isNotEmpty()
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "id": "OD-BUISSET-ANTHONY-001",
+                          "name": "OD-BUISSET-ANTHONY-001",
                           "billingProfileType": "INDIVIDUAL",
                           "individualBillingProfile": {
                             "firstName": "Anthony",

@@ -86,9 +86,10 @@ public interface BillingProfileMapper {
                 .rewardCount(billingProfile.rewardCount());
     }
 
-    static NewInvoiceResponse map(InvoicePreview preview) {
-        return new NewInvoiceResponse()
+    static InvoicePreviewResponse map(InvoicePreview preview) {
+        return new InvoicePreviewResponse()
                 .id(preview.id().value())
+                .name(preview.name().value())
                 .createdAt(preview.createdAt())
                 .dueAt(preview.dueAt())
                 .billingProfileType(map(preview.billingProfileType()))
@@ -127,15 +128,15 @@ public interface BillingProfileMapper {
                 .accountNumber(bankAccount.accountNumber());
     }
 
-    static NewInvoiceResponseIndividualBillingProfile map(InvoicePreview.PersonalInfo personalInfo) {
-        return new NewInvoiceResponseIndividualBillingProfile()
+    static InvoicePreviewResponseIndividualBillingProfile map(InvoicePreview.PersonalInfo personalInfo) {
+        return new InvoicePreviewResponseIndividualBillingProfile()
                 .firstName(personalInfo.firstName())
                 .lastName(personalInfo.lastName())
                 .address(personalInfo.address());
     }
 
-    static NewInvoiceResponseCompanyBillingProfile map(InvoicePreview.CompanyInfo companyInfo) {
-        return new NewInvoiceResponseCompanyBillingProfile()
+    static InvoicePreviewResponseCompanyBillingProfile map(InvoicePreview.CompanyInfo companyInfo) {
+        return new InvoicePreviewResponseCompanyBillingProfile()
                 .name(companyInfo.name())
                 .address(companyInfo.address())
                 .registrationNumber(companyInfo.registrationNumber())
@@ -165,8 +166,8 @@ public interface BillingProfileMapper {
     static BillingProfileInvoicesPageItemResponse map(Invoice invoice) {
         return new BillingProfileInvoicesPageItemResponse()
                 .id(invoice.id().value())
-                .name(invoice.name())
-                .generationDate(invoice.createdAt())
+                .name(invoice.name().value())
+                .createdAt(invoice.createdAt())
                 .totalAfterTax(map(invoice.totalAfterTax()))
                 .status(map(invoice.status()));
     }
@@ -183,8 +184,9 @@ public interface BillingProfileMapper {
 
     static InvoiceStatus map(Invoice.Status status) {
         return switch (status) {
+            case DRAFT -> InvoiceStatus.DRAFT;
             case PROCESSING -> InvoiceStatus.PROCESSING;
-            case COMPLETE -> InvoiceStatus.COMPLETE;
+            case APPROVED -> InvoiceStatus.APPROVED;
             case REJECTED -> InvoiceStatus.REJECTED;
         };
     }
