@@ -107,3 +107,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000051_project_allowances.sql
   - include:
       file: db/changelog/changelogs/00000052_project_sponsor_allocation_date.sql
+  - include:
+      file: db/changelog/changelogs/00000053_create_invoices_table.sql
