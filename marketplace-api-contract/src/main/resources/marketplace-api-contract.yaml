@@ -306,28 +306,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/rewards/pending-invoice:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Get caller's rewards pending invoice
-      operationId: getMyRewardsPendingInvoice
-      description: |
-        Get the page of all rewards pending invoice where the recipient is the caller
-      responses:
-        "200":
-          description: 'Page of rewards'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MyRewardsListResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/rewards/amounts:
     get:
       security:
@@ -2487,7 +2465,8 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-    patch:
+  /api/v1/billing-profiles/{billingProfileId}/type:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
@@ -2519,7 +2498,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/billing-profiles/{billingProfileId}/payable-rewards:
+  /api/v1/billing-profiles/{billingProfileId}/invoiceable-rewards:
     get:
       security:
         - bearerAuth: [ ]
@@ -2541,7 +2520,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BillingProfilePayableRewardsResponse'
+                $ref: '#/components/schemas/BillingProfileInvoiceableRewardsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -2677,7 +2656,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}:
+  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}/invitation:
     put:
       security:
         - bearerAuth: [ ]
@@ -2714,6 +2693,8 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}:
     delete:
       security:
         - bearerAuth: [ ]
@@ -4064,15 +4045,6 @@ components:
         rewardingProjectsCount:
           type: integer
           description: Number of projects the user has been rewarded for
-    MyRewardsListResponse:
-      type: object
-      required:
-        - rewards
-      properties:
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/MyRewardPageItemResponse'
     RewardPageItemResponse:
       type: object
       required:
@@ -5579,15 +5551,13 @@ components:
         - id
         - type
         - name
-        - caller
+        - me
       properties:
         id:
           $ref: '#/components/schemas/BillingProfileId'
         type:
           $ref: '#/components/schemas/BillingProfileType'
         name:
-          type: string
-        description:
           type: string
         currentYearPaymentLimit:
           type: number
@@ -5598,7 +5568,7 @@ components:
         isSwitchableToSelfEmployed:
           type: boolean
           description: True if the billing profile can be switched from company to self-employed type (eg. no other coworkers)
-        caller:
+        me:
           type: object
           required:
             - canDelete
@@ -5739,6 +5709,9 @@ components:
             invitedAt:
               type: string
               format: date-time
+            removable:
+              type: boolean
+              description: True if the coworker can be removed from the billing profile
 
     PayoutPreferenceRequest:
       type: object
@@ -5766,7 +5739,7 @@ components:
         billingProfile:
           $ref: '#/components/schemas/ShortBillingProfileResponse'
 
-    BillingProfilePayableRewardsResponse:
+    BillingProfileInvoiceableRewardsResponse:
       type: object
       required:
         - rewards
@@ -5774,7 +5747,7 @@ components:
         rewards:
           type: array
           items:
-            $ref: '#/components/schemas/RewardResponse'
+            $ref: '#/components/schemas/MyRewardPageItemResponse'
 
     InvoicePreviewResponse:
       type: object
