@@ -29,6 +29,11 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                     GREATEST(ubpt.updated_at, ibp.updated_at, cbp.updated_at, upi.tech_updated_at, u.created_at) AS updated_at,
                     u.last_seen_at                                                                               AS last_seen_at,
                     coalesce(ubpt.billing_profile_type = 'COMPANY',false)                                        AS is_company,
+                    coalesce(case
+                                        when ubpt.billing_profile_type = 'COMPANY' then cbp.verification_status
+                                        when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.verification_status
+                                        end,
+                                    'NOT_STARTED')                                                               AS verification_status,
                     cbp.name                                                                                     AS company_name,
                     cbp.registration_number                                                                      AS company_num,
                     coalesce(ibp.first_name, upi.first_name)                                                     AS firstname,
