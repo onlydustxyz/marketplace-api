@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -17,13 +16,14 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "invoices", schema = "accounting")
 @TypeDef(name = "invoice_status", typeClass = PostgreSQLEnumType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Data
 @Accessors(chain = true, fluent = true)
 @NoArgsConstructor
@@ -32,26 +32,42 @@ public class InvoiceEntity {
     @NonNull UUID id;
     @NonNull UUID billingProfileId;
     @NonNull String name;
-    @ManyToOne
-    @NonNull CurrencyEntity currency;
-    @NonNull BigDecimal totalAmount;
     @NonNull ZonedDateTime createdAt;
+    @NonNull ZonedDateTime dueAt;
     @Enumerated(EnumType.STRING)
     @Type(type = "invoice_status")
     @NonNull Status status;
+    @NonNull BigDecimal taxRate;
+    URL url;
+    @Type(type = "jsonb")
+    Invoice.PersonalInfo personalInfo;
+    @Type(type = "jsonb")
+    Invoice.CompanyInfo companyInfo;
+    @Type(type = "jsonb")
+    Invoice.BankAccount bankAccount;
+    @Type(type = "jsonb")
+    @NonNull List<Invoice.Wallet> wallets;
+    @Type(type = "jsonb")
+    @Column(name = "rewards")
+    List<Invoice.Reward> rewardsData;
+
     @OneToMany(mappedBy = "invoice", fetch = FetchType.EAGER)
     @NonNull Set<PaymentRequestEntity> rewards;
-    URL url;
 
     public Invoice toDomain() {
         return new Invoice(
                 Invoice.Id.of(id),
                 BillingProfile.Id.of(billingProfileId),
-                Invoice.Name.fromString(name),
                 createdAt,
-                Money.of(totalAmount, currency.toDomain()),
+                dueAt,
+                Invoice.Name.fromString(name),
                 status.toDomain(),
-                rewards.stream().map(r -> RewardId.of(r.getId())).collect(Collectors.toUnmodifiableSet()),
+                taxRate,
+                personalInfo,
+                companyInfo,
+                bankAccount,
+                wallets,
+                rewardsData,
                 url
         );
     }
@@ -81,10 +97,17 @@ public class InvoiceEntity {
     public static InvoiceEntity of(final @NonNull Invoice invoice) {
         return new InvoiceEntity().id(invoice.id().value())
                 .billingProfileId(invoice.billingProfileId().value())
-                .name(invoice.name().value())
-                .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
-                .totalAmount(invoice.totalAfterTax().getValue())
+                .name(invoice.name().toString())
                 .createdAt(invoice.createdAt())
-                .status(Status.of(invoice.status()));
+                .dueAt(invoice.dueAt())
+                .status(Status.of(invoice.status()))
+                .taxRate(invoice.taxRate())
+                .url(invoice.url())
+                .personalInfo(invoice.personalInfo().orElse(null))
+                .companyInfo(invoice.companyInfo().orElse(null))
+                .bankAccount(invoice.bankAccount().orElse(null))
+                .wallets(invoice.wallets())
+                .rewardsData(invoice.rewards())
+                .rewards(Set.of());
     }
 }

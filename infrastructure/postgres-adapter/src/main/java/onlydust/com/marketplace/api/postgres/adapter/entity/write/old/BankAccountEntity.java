@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +26,7 @@ public class BankAccountEntity {
     @Column(name = "iban")
     String iban;
 
-    public InvoicePreview.BankAccount forInvoicePreview() {
-        return new InvoicePreview.BankAccount(bic, iban);
+    public Invoice.BankAccount forInvoice() {
+        return new Invoice.BankAccount(bic, iban);
     }
 }

@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.io.InputStream;
@@ -26,16 +25,16 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull PdfStoragePort pdfStoragePort;
 
     @Override
-    public InvoicePreview previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
-                                         final @NonNull List<RewardId> rewardIds) {
+    public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
+                                  final @NonNull List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
-        final var preview = invoiceStoragePort.preview(billingProfileId, rewardIds);
+        final var invoice = invoiceStoragePort.preview(billingProfileId, rewardIds);
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
-        invoiceStoragePort.save(Invoice.of(billingProfileId, preview));
+        invoiceStoragePort.save(invoice);
 
-        return preview;
+        return invoice;
     }
 
     @Override

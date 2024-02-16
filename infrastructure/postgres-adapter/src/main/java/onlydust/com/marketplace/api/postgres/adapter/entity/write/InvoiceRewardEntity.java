@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 
 import javax.persistence.Entity;
@@ -29,8 +29,8 @@ public class InvoiceRewardEntity {
     @NonNull CurrencyEntity base;
     @NonNull BigDecimal conversionRate;
 
-    public InvoicePreview.Reward forInvoicePreview() {
-        return new InvoicePreview.Reward(
+    public Invoice.Reward forInvoice() {
+        return new Invoice.Reward(
                 RewardId.of(id),
                 requestedAt,
                 project.getName(),

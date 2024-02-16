@@ -3,45 +3,99 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Data
 @Accessors(chain = true, fluent = true)
 @AllArgsConstructor
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Invoice {
+    public static final int DUE_DAY_COUNT_AFTER_CREATION = 30;
+
     private final @NonNull Id id;
     private final @NonNull BillingProfile.Id billingProfileId;
-    private final @NonNull Invoice.Name name;
     private final @NonNull ZonedDateTime createdAt;
-    private final @NonNull Money totalAfterTax; // TODO: remove in new accounting as it will be fixed at reward level
+    private final @NonNull ZonedDateTime dueAt;
+    private final @NonNull Invoice.Name name;
     private @NonNull Status status;
-    private final @NonNull Set<RewardId> rewards;
+    private final @NonNull BigDecimal taxRate;
+    private PersonalInfo personalInfo;
+    private CompanyInfo companyInfo;
+    private BankAccount bankAccount;
+    private @NonNull List<Wallet> wallets = new ArrayList<>();
+    private @NonNull List<Reward> rewards = new ArrayList<>();
     private URL url;
 
-    public static Invoice of(final @NonNull BillingProfile.Id billingProfileId, final @NonNull InvoicePreview preview) {
+    public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, PersonalInfo personalInfo) {
+        final var now = ZonedDateTime.now();
         return new Invoice(
-                preview.id(),
+                Id.random(),
                 billingProfileId,
-                preview.name(),
-                preview.createdAt(),
-                preview.totalAfterTax(),
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Name.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName),
                 Status.DRAFT,
-                preview.rewards().stream().map(InvoicePreview.Reward::id).collect(Collectors.toSet())
-        );
+                BigDecimal.ZERO
+        ).personalInfo(personalInfo);
+    }
+
+    public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, CompanyInfo companyInfo) {
+        final var now = ZonedDateTime.now();
+        return new Invoice(
+                Id.random(),
+                billingProfileId,
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Name.of(sequenceNumber, companyInfo.name),
+                Status.DRAFT,
+                companyInfo.vatRegulationState() == Invoice.VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO
+        ).companyInfo(companyInfo);
     }
 
     public enum Status {
         DRAFT, PROCESSING, REJECTED, APPROVED;
+    }
+
+    public BillingProfile.Type billingProfileType() {
+        return personalInfo != null ? BillingProfile.Type.INDIVIDUAL : BillingProfile.Type.COMPANY;
+    }
+
+    public Money totalBeforeTax() {
+        return rewards.stream().map(Invoice.Reward::base).reduce(Money::add)
+                .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(name())));
+    }
+
+    public Money totalTax() {
+        return totalBeforeTax().multiply(taxRate());
+    }
+
+    public Money totalAfterTax() {
+        return totalBeforeTax().add(totalTax());
+    }
+
+    public Optional<PersonalInfo> personalInfo() {
+        return Optional.ofNullable(personalInfo);
+    }
+
+    public Optional<CompanyInfo> companyInfo() {
+        return Optional.ofNullable(companyInfo);
+    }
+
+    public Optional<BankAccount> bankAccount() {
+        return Optional.ofNullable(bankAccount);
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -85,5 +139,33 @@ public class Invoice {
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }
+    }
+
+    public enum VatRegulationState {
+        APPLICABLE, NOT_APPLICABLE_NON_UE, NOT_APPLICABLE_FRENCH_NOT_SUBJECT, REVERSE_CHARGE
+    }
+
+    public record Wallet(@NonNull String network, @NonNull String address) {
+    }
+
+    public record BankAccount(@NonNull String bic, @NonNull String accountNumber) {
+    }
+
+    public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address) {
+    }
+
+    public record CompanyInfo(@NonNull String registrationNumber,
+                              @NonNull String name,
+                              @NonNull String address,
+                              @NonNull Boolean subjectToEuVAT,
+                              String euVATNumber
+    ) {
+        public VatRegulationState vatRegulationState() {
+            // TODO
+            return subjectToEuVAT ? VatRegulationState.APPLICABLE : VatRegulationState.NOT_APPLICABLE_NON_UE;
+        }
+    }
+
+    public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName, @NonNull Money amount, @NonNull Money base) {
     }
 }

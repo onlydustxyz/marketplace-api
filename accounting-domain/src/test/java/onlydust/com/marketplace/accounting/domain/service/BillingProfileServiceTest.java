@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProf
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +36,10 @@ class BillingProfileServiceTest {
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
-    final List<InvoicePreview.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
-    final List<RewardId> rewardIds = rewards.stream().map(InvoicePreview.Reward::id).toList();
-    final InvoicePreview invoicePreview = InvoicePreview.of(12,
-            new InvoicePreview.PersonalInfo("John", "Doe", "12 rue de la paix, Paris")).rewards(rewards);
+    final List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
+    final List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
+    final Invoice invoice = Invoice.of(billingProfileId, 12,
+            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris")).rewards(rewards);
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
     @BeforeEach
@@ -69,7 +68,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoicePreview.id(), pdf))
+            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User is not allowed to upload an invoice for this billing profile");
@@ -98,13 +97,13 @@ class BillingProfileServiceTest {
         @Test
         void should_generate_invoice_preview() {
             // Given
-            when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoicePreview);
+            when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
 
             // When
             final var preview = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds);
 
             // Then
-            assertThat(preview).isEqualTo(invoicePreview);
+            assertThat(preview).isEqualTo(invoice);
             verify(invoiceStoragePort).deleteDraftsOf(billingProfileId);
 
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
@@ -116,31 +115,33 @@ class BillingProfileServiceTest {
             assertThat(invoice.createdAt()).isEqualTo(preview.createdAt());
             assertThat(invoice.totalAfterTax()).isEqualTo(preview.totalAfterTax());
             assertThat(invoice.status()).isEqualTo(Invoice.Status.DRAFT);
-            assertThat(invoice.rewards()).containsOnlyElementsOf(rewardIds);
+            assertThat(invoice.rewards()).containsExactlyElementsOf(rewards);
         }
 
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(invoiceStoragePort.get(invoicePreview.id())).thenReturn(Optional.empty());
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoicePreview.id(), pdf))
+            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoicePreview.id(), billingProfileId));
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
         }
 
         @Test
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
-            when(invoiceStoragePort.get(invoicePreview.id())).thenReturn(Optional.of(Invoice.of(BillingProfile.Id.random(), invoicePreview)));
+            final var otherBillingProfileId = BillingProfile.Id.random();
+            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoicePreview.id(), pdf))
+            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, otherBillingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoicePreview.id(), billingProfileId));
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
         }
 
         @SneakyThrows
@@ -148,11 +149,11 @@ class BillingProfileServiceTest {
         void should_upload_invoice_and_save_url() {
             // Given
             final var url = new URL("https://" + faker.internet().url());
-            when(invoiceStoragePort.get(invoicePreview.id())).thenReturn(Optional.of(Invoice.of(billingProfileId, invoicePreview)));
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(pdfStoragePort.upload("OD-DOE-JOHN-012.pdf", pdf)).thenReturn(url);
 
             // When
-            billingProfileService.uploadInvoice(userId, billingProfileId, invoicePreview.id(), pdf);
+            billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf);
 
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
@@ -167,7 +168,7 @@ class BillingProfileServiceTest {
         void should_list_invoices() {
             // Given
             when(invoiceStoragePort.invoicesOf(billingProfileId, 1, 10))
-                    .thenReturn(Page.<Invoice>builder().content(List.of(Invoice.of(billingProfileId, invoicePreview))).totalItemNumber(1).totalPageNumber(1).build());
+                    .thenReturn(Page.<Invoice>builder().content(List.of(invoice)).totalItemNumber(1).totalPageNumber(1).build());
 
             // When
             final var invoices = billingProfileService.invoicesOf(userId, billingProfileId, 1, 10);
@@ -176,13 +177,13 @@ class BillingProfileServiceTest {
             assertThat(invoices.getTotalItemNumber()).isEqualTo(1);
             assertThat(invoices.getTotalPageNumber()).isEqualTo(1);
             assertThat(invoices.getContent()).hasSize(1);
-            assertThat(invoices.getContent().get(0).id()).isEqualTo(invoicePreview.id());
+            assertThat(invoices.getContent().get(0).id()).isEqualTo(invoice.id());
             assertThat(invoices.getContent().get(0).billingProfileId()).isEqualTo(billingProfileId);
         }
     }
 
-    private @NonNull InvoicePreview.Reward fakeReward() {
-        return new InvoicePreview.Reward(
+    private @NonNull Invoice.Reward fakeReward() {
+        return new Invoice.Reward(
                 RewardId.random(),
                 ZonedDateTime.now(),
                 faker.lordOfTheRings().character(),

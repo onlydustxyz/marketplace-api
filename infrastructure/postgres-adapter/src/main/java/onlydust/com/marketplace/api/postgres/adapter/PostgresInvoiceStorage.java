@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
@@ -37,19 +36,19 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull InvoiceRepository invoiceRepository;
 
     @Override
-    public InvoicePreview preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
+    public Invoice preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
         int sequenceNumber = 1; // TODO
         final var preview = companyBillingProfileRepository.findById(billingProfileId.value())
-                .map(CompanyBillingProfileEntity::forInvoicePreview)
-                .map(info -> InvoicePreview.of(sequenceNumber, info))
+                .map(CompanyBillingProfileEntity::forInvoice)
+                .map(info -> Invoice.of(billingProfileId, sequenceNumber, info))
                 .or(() -> individualBillingProfileRepository.findById(billingProfileId.value())
-                        .map(IndividualBillingProfileEntity::forInvoicePreview)
-                        .map(info -> InvoicePreview.of(sequenceNumber, info)))
+                        .map(IndividualBillingProfileEntity::forInvoice)
+                        .map(info -> Invoice.of(billingProfileId, sequenceNumber, info)))
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         final var rewards = invoiceRewardRepository.findAll(rewardIds.stream().map(RewardId::value).toList())
                 .stream()
-                .map(InvoiceRewardEntity::forInvoicePreview).toList();
+                .map(InvoiceRewardEntity::forInvoice).toList();
 
         final var userId = companyBillingProfileRepository.findById(billingProfileId.value())
                 .map(CompanyBillingProfileEntity::getUserId)
@@ -58,8 +57,8 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                 .orElseThrow();
 
         // TODO filter in domain using SponsorAccount network
-        preview.wallets(walletRepository.findAllByUserId(userId).stream().map(WalletEntity::forInvoicePreview).toList());
-        preview.bankAccount(bankAccountRepository.findById(userId).map(BankAccountEntity::forInvoicePreview).orElse(null));
+        preview.wallets(walletRepository.findAllByUserId(userId).stream().map(WalletEntity::forInvoice).toList());
+        preview.bankAccount(bankAccountRepository.findById(userId).map(BankAccountEntity::forInvoice).orElse(null));
 
         return preview.rewards(rewards);
     }
