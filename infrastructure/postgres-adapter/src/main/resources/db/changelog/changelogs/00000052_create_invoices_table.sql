@@ -10,6 +10,7 @@ CREATE TABLE accounting.invoices
     total_amount       NUMERIC          NOT NULL,
     created_at         TIMESTAMP        NOT NULL,
     status             invoice_status   NOT NULL,
+    url                TEXT,
     tech_created_at    TIMESTAMP        NOT NULL DEFAULT now(),
     tech_updated_at    TIMESTAMP        NOT NULL DEFAULT now(),
     UNIQUE (billing_profile_id, name)

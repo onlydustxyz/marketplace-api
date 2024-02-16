@@ -355,9 +355,10 @@ public class PostgresConfiguration {
                                                  final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository,
                                                  final @NonNull InvoiceRewardRepository invoiceRewardRepository,
                                                  final @NonNull WalletRepository walletRepository,
-                                                 final @NonNull BankAccountRepository bankAccountRepository) {
+                                                 final @NonNull BankAccountRepository bankAccountRepository,
+                                                 final @NonNull InvoiceRepository invoiceRepository) {
         return new PostgresInvoiceStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
-                walletRepository, bankAccountRepository);
+                walletRepository, bankAccountRepository, invoiceRepository);
     }
 
     @Bean

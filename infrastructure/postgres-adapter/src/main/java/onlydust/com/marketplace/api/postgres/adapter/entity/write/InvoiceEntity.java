@@ -39,7 +39,7 @@ public class InvoiceEntity {
     @Enumerated(EnumType.STRING)
     @Type(type = "invoice_status")
     @NonNull Status status;
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", fetch = FetchType.EAGER)
     @NonNull Set<PaymentRequestEntity> rewards;
     URL url;
 

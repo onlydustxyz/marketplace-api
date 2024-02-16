@@ -21,9 +21,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,7 +38,6 @@ public class UserService implements UserFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
     private final BillingProfileStoragePort billingProfileStoragePort;
-    private final PdfStoragePort pdfStoragePort;
     private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
@@ -281,6 +278,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    @Transactional
     public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
         billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
         if (billingProfileType.equals(BillingProfileType.COMPANY)) {
@@ -288,11 +286,5 @@ public class UserService implements UserFacadePort {
         } else {
             accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));
         }
-    }
-
-    @Override
-    public URL saveInvoicePdfForGithubUserId(Long githubUserId, InputStream pdfInputStream) {
-        final String invoiceName = githubUserId + "_" + new SimpleDateFormat("ddMMyyyy-hhmmss").format(new Date()) + ".pdf";
-        return pdfStoragePort.storePdfForName(invoiceName, pdfInputStream);
     }
 }

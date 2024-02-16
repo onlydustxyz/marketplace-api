@@ -1,14 +1,26 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 
+import java.net.URL;
 import java.util.Map;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 public class InvoicesApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    PdfStoragePort pdfStoragePort;
 
+    @SneakyThrows
     @Test
     void should_upload_and_list_invoices() {
         // Given
@@ -28,10 +40,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         final var billingProfileId = myBillingProfiles.getBillingProfiles().get(0).getId();
 
         // When
+        final var invoiceId = new MutableObject<String>();
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "10",
                         "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
@@ -40,7 +51,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.id").value(invoiceId::setValue)
                 .jsonPath("$.createdAt").isNotEmpty()
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
@@ -124,13 +135,15 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 );
 
         // When
+        when(pdfStoragePort.upload(any(), any())).then(invocation -> {
+            final var fileName = invocation.getArgument(0, String.class);
+            return new URL("https://s3.storage.com/%s".formatted(fileName));
+        });
+
         client.post()
-                .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
-                        "filename", "OD-BUISSET-ANTHONY-001.pdf",
-                        "totalAfterTax", "1784757.50",
-                        "currency", "USD"
-                )))
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/invoices/invoice-sample.pdf").getFile())))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -148,11 +161,25 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.invoices.length()").isEqualTo(0)
-                .jsonPath("$.hasMore").isEqualTo(false)
-                .jsonPath("$.totalPageNumber").isEqualTo(0)
-                .jsonPath("$.totalItemNumber").isEqualTo(0)
-                .jsonPath("$.nextPageIndex").isEqualTo(0)
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "id": "%s",
+                              "name": "OD-BUISSET-ANTHONY-001",
+                              "totalAfterTax": {
+                                "amount": 1784757.50,
+                                "currency": "USD"
+                              },
+                              "status": "DRAFT"
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "nextPageIndex": 0
+                        }
+                        """.formatted(invoiceId.getValue()))
         ;
     }
 }

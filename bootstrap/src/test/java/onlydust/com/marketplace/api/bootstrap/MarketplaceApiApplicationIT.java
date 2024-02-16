@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.bootstrap.helper.SlackNotificationStub;
@@ -22,6 +23,7 @@ public class MarketplaceApiApplicationIT {
     }
 
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
+    private final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
 
     @Bean
     @Primary
@@ -41,6 +43,13 @@ public class MarketplaceApiApplicationIT {
     public ImageStoragePort imageStoragePort() {
         return imageStoragePort;
     }
+
+    @Bean
+    @Primary
+    public PdfStoragePort pdfStoragePort() {
+        return pdfStoragePort;
+    }
+
 
     @Bean
     @Primary

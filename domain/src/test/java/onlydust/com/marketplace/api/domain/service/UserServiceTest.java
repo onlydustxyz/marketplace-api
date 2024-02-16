@@ -62,7 +62,7 @@ public class UserServiceTest {
         accountingUserObserverPort = mock(AccountingUserObserverPort.class);
 
         userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, mock(PdfStoragePort.class), accountingUserObserverPort);
+                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, accountingUserObserverPort);
     }
 
     @Test

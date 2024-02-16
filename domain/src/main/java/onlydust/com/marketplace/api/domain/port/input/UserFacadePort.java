@@ -60,8 +60,6 @@ public interface UserFacadePort {
 
     void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
 
-    URL saveInvoicePdfForGithubUserId(Long githubUserId, InputStream pdfInputStream);
-
     void updateGithubProfile(User authenticatedUser);
 
     List<BillingProfile> getBillingProfiles(UUID id, Long githubUserId);
