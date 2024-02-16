@@ -7,6 +7,6 @@ import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 
 import java.util.List;
 
-public interface InvoicePreviewStoragePort {
-    InvoicePreview generate(final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds);
+public interface InvoiceStoragePort {
+    InvoicePreview preview(final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds);
 }

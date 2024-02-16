@@ -8,7 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
@@ -19,14 +19,14 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauth
 
 @AllArgsConstructor
 public class BillingProfileService implements BillingProfileFacadePort {
-    private final @NonNull InvoicePreviewStoragePort invoicePreviewStoragePort;
+    private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull AccountingBillingProfileStorage billingProfileStorage;
 
     @Override
     public InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
-        return invoicePreviewStoragePort.generate(billingProfileId, rewardIds);
+        return invoiceStoragePort.preview(billingProfileId, rewardIds);
     }
 
     @Override

@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.domain.observer.ContributionObserver;
 import onlydust.com.marketplace.api.domain.observer.ProjectObserver;
 import onlydust.com.marketplace.api.domain.observer.UserObserver;
 import onlydust.com.marketplace.api.domain.port.input.*;
+import onlydust.com.marketplace.api.domain.port.output.InvoiceStoragePort;
 import onlydust.com.marketplace.api.domain.port.output.*;
 import onlydust.com.marketplace.api.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;

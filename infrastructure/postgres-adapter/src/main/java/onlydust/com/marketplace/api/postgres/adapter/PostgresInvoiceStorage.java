@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoicePreviewStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
@@ -22,7 +22,7 @@ import java.util.List;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresInvoicePreviewStorage implements InvoicePreviewStoragePort {
+public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository;
     private final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository;
     private final @NonNull InvoiceRewardRepository invoiceRewardRepository;
@@ -30,7 +30,7 @@ public class PostgresInvoicePreviewStorage implements InvoicePreviewStoragePort 
     private final @NonNull BankAccountRepository bankAccountRepository;
 
     @Override
-    public InvoicePreview generate(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
+    public InvoicePreview preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
         int sequenceNumber = 1; // TODO
         final var preview = companyBillingProfileRepository.findById(billingProfileId.value())
                 .map(CompanyBillingProfileEntity::forInvoicePreview)
