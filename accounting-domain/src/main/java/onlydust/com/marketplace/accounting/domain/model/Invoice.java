@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -17,15 +18,18 @@ import java.util.stream.Stream;
 @Accessors(chain = true, fluent = true)
 public class Invoice {
     private final @NonNull Id id;
+    private final @NonNull BillingProfile.Id billingProfileId;
     private final @NonNull Invoice.Name name;
     private final @NonNull ZonedDateTime createdAt;
     private final @NonNull Money totalAfterTax; // TODO: remove in new accounting as it will be fixed at reward level
     private final @NonNull Status status;
     private final @NonNull Set<RewardId> rewards;
+    private URL url;
 
-    public static Invoice of(InvoicePreview preview) {
+    public static Invoice of(final @NonNull BillingProfile.Id billingProfileId, final @NonNull InvoicePreview preview) {
         return new Invoice(
                 preview.id(),
+                billingProfileId,
                 preview.name(),
                 preview.createdAt(),
                 preview.totalAfterTax(),

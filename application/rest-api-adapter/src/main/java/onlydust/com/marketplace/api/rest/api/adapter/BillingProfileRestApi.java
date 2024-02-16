@@ -4,12 +4,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
-import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.core.io.Resource;
@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,11 +50,12 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     }
 
     @Override
-    public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, BigDecimal totalAfterTax, CurrencyContract currency, String filename, Resource pdf) {
+    public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, UUID invoiceId, Resource pdf) {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
 
         try {
-            billingProfileFacadePort.uploadInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pdf.getInputStream());
+            billingProfileFacadePort.uploadInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), Invoice.Id.of(invoiceId),
+                    pdf.getInputStream());
         } catch (IOException e) {
             throw badRequest("Error while reading invoice data", e);
         }

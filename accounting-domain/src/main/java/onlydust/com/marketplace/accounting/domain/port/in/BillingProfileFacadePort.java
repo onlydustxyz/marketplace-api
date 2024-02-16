@@ -15,5 +15,5 @@ public interface BillingProfileFacadePort {
 
     Page<Invoice> getInvoicesForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 
-    void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, InputStream inputStream);
+    void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, Invoice.Id invoiceId, InputStream inputStream);
 }

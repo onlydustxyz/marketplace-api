@@ -2555,48 +2555,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/billing-profiles/{billingProfileId}/invoices:
-    post:
-      security:
-        - { }
-      tags:
-        - BillingProfiles
-      summary: Upload an invoice linked to a given billing profile
-      operationId: uploadInvoice
-      requestBody:
-        content:
-          application/pdf:
-            schema:
-              type: string
-              format: binary
-      parameters:
-        - in: path
-          name: billingProfileId
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: filename
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: totalAfterTax
-          required: true
-          schema:
-            type: number
-        - in: query
-          name: currency
-          required: true
-          schema:
-            $ref: '#/components/schemas/CurrencyContract'
-      responses:
-        "204":
-          description: 'Invoice uploaded'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
     get:
       security:
         - { }
@@ -2634,6 +2592,39 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/billing-profiles/{billingProfileId}/invoices/{invoiceId}:
+    post:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Upload an invoice linked to a given billing profile
+      operationId: uploadInvoice
+      requestBody:
+        content:
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: 'Invoice uploaded'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     get:
       security:
         - { }

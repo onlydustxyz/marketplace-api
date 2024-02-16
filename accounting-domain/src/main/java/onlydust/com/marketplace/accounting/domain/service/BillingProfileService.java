@@ -11,24 +11,29 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProf
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.util.List;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 
 @AllArgsConstructor
 public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull AccountingBillingProfileStorage billingProfileStorage;
+    private final @NonNull ImageStoragePort imageStoragePort;
 
     @Override
     public InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
+
         final var preview = invoiceStoragePort.preview(billingProfileId, rewardIds);
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
-        invoiceStoragePort.save(billingProfileId, Invoice.of(preview));
+        invoiceStoragePort.save(Invoice.of(billingProfileId, preview));
+
         return preview;
     }
 
@@ -42,7 +47,15 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
-    public void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, InputStream inputStream) {
+    public void uploadInvoice(UserId userId, BillingProfile.Id billingProfileId, Invoice.Id invoiceId, InputStream data) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User is not allowed to upload an invoice for this billing profile");
 
+        final var invoice = invoiceStoragePort.get(invoiceId)
+                .filter(i -> i.billingProfileId().equals(billingProfileId))
+                .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+
+        final var url = imageStoragePort.storeImage(data);
+        invoiceStoragePort.save(invoice.url(url));
     }
 }
