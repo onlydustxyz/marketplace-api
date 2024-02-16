@@ -26,6 +26,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     private final AccountingUserObserverPort userObserver;
     private final NotificationPort notificationPort;
     private final UserStoragePort userStoragePort;
+    private final WebhookPort webhookPort;
 
     @Override
     public void consumeUserVerificationEvent(Event event) {
@@ -41,6 +42,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
         };
         userObserver.onBillingProfileUpdated(billingProfileUpdated);
         notifyNewVerificationEventProcessedForUser(userId, billingProfileUpdated);
+        webhookPort.send(billingProfileUpdated);
     }
 
     private CompanyBillingProfile updateCompanyProfile(final BillingProfileUpdated billingProfileUpdated) {
