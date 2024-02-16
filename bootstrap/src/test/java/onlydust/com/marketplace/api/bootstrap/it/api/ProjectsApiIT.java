@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectTagRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
@@ -16,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -3036,6 +3040,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(false).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
     }
 
+
     @Test
     @Order(2)
     public void should_get_a_project_by_id() {
@@ -3999,6 +4004,30 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECTS_AFTER_TAGS_UPDATE_JSON_RESPONSE);
+    }
+
+
+    @Autowired
+    ProjectSponsorRepository projectSponsorRepository;
+
+    @Test
+    @Order(15)
+    public void should_get_a_project_by_slug_with_active_sponsors_only() {
+        // Given
+        final String slug = "bretzel";
+        projectSponsorRepository.save(new ProjectSponsorEntity(
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                UUID.fromString("0980c5ab-befc-4314-acab-777fbf970cbb"),
+                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+
+        // When
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.sponsors").isArray()
+                .jsonPath("$.sponsors.length()").isEqualTo(1)
+                .jsonPath("$.sponsors[0].id").isEqualTo("c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f");
     }
 
     private static final String GET_PROJECTS_AFTER_TAGS_UPDATE_JSON_RESPONSE = """
