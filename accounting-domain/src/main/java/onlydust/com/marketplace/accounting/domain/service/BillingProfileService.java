@@ -26,7 +26,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public InvoicePreview previewInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
-        return invoiceStoragePort.preview(billingProfileId, rewardIds);
+        final var preview = invoiceStoragePort.preview(billingProfileId, rewardIds);
+        invoiceStoragePort.save(Invoice.of(preview));
+        return preview;
     }
 
     @Override

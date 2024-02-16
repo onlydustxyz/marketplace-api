@@ -42,6 +42,7 @@ public class Invoice {
     @EqualsAndHashCode
     @Getter
     @Accessors(fluent = true)
+    @ToString
     public static class Name {
         private final @NonNull String value;
 
