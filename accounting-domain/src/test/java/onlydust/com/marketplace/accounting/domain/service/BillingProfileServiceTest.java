@@ -1,10 +1,14 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -302,5 +306,144 @@ class BillingProfileServiceTest {
         verify(billingProfileStorage).save(billingProfile);
         verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
+
+    @Nested
+    class GivenIndividualBillingProfile {
+
+        final UserId userId = UserId.random();
+        IndividualBillingProfile billingProfile;
+
+        @BeforeEach
+        void setUp() {
+            billingProfile = billingProfileService.createIndividualBillingProfile(userId, "my profile", null);
+        }
+
+        @Test
+        void should_return_current_year_payment_limit_and_amount() {
+            // When
+            final var limit = billingProfile.currentYearPaymentLimit();
+            final var amount = billingProfile.currentYearPaymentAmount();
+
+            // Then
+            assertThat(limit).isEqualTo(PositiveAmount.of(5000L));
+            assertThat(amount).isEqualTo(PositiveAmount.ZERO);
+
+            //TODO: pay some rewards linked to the billing profile, and check the currentYearPaymentAmount is updated
+        }
+    }
+
+    @Nested
+    class GivenSelfEmployedBillingProfile {
+
+        final UserId userId = UserId.random();
+        SelfEmployedBillingProfile billingProfile;
+
+        @BeforeEach
+        void setUp() {
+            billingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "my profile", null);
+        }
+
+        @Test
+        void should_be_switchable_to_company() {
+            // When
+            final var isSwitchableToSelfEmployed = billingProfile.isSwitchableToCompany();
+
+            // Then
+            assertThat(isSwitchableToSelfEmployed).isTrue();
+        }
+    }
+
+    @Nested
+    class GivenCompanyBillingProfile {
+
+        final UserId userId = UserId.random();
+        CompanyBillingProfile billingProfile;
+
+        @BeforeEach
+        void setUp() {
+            billingProfile = billingProfileService.createCompanyBillingProfile(userId, "my profile", null);
+        }
+
+        @Test
+        void should_add_members() {
+            // Given
+            final var memberId = UserId.random();
+            final var adminId = UserId.random();
+
+            // When
+            billingProfile.addMember(memberId, BillingProfile.User.Role.MEMBER);
+            billingProfile.addMember(adminId, BillingProfile.User.Role.ADMIN);
+
+            // Then
+            assertThat(billingProfile.members()).containsExactlyInAnyOrder(
+                    new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN),
+                    new BillingProfile.User(memberId, BillingProfile.User.Role.MEMBER),
+                    new BillingProfile.User(adminId, BillingProfile.User.Role.ADMIN)
+            );
+        }
+
+        @Test
+        void should_remove_members() {
+            // Given
+            final var memberId = UserId.random();
+            final var adminId = UserId.random();
+            billingProfile.addMember(memberId, BillingProfile.User.Role.MEMBER);
+            billingProfile.addMember(adminId, BillingProfile.User.Role.ADMIN);
+
+            // When
+            billingProfile.removeMember(memberId);
+            billingProfile.removeMember(adminId);
+
+            // Then
+            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        }
+
+        @Test
+        void should_remove_last_member() {
+            // Given
+            final var memberId = UserId.random();
+            billingProfile.addMember(memberId, BillingProfile.User.Role.MEMBER);
+
+            // When
+            billingProfile.removeMember(memberId);
+
+            // Then
+            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        }
+
+
+        @Test
+        void should_not_remove_last_admin() {
+            // Given
+            final var memberId = UserId.random();
+            billingProfile.addMember(memberId, BillingProfile.User.Role.MEMBER);
+
+            // When
+            assertThatThrownBy(() -> billingProfile.removeMember(userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Cannot remove last admin %s from company billing profile".formatted(userId));
+        }
+
+        @Test
+        void should_be_switchable_to_self_employed_as_long_as_there_is_only_one_user() {
+            assertThat(billingProfile.isSwitchableToSelfEmployed()).isTrue();
+
+            final var memberId = UserId.random();
+            billingProfile.addMember(memberId, BillingProfile.User.Role.MEMBER);
+            assertThat(billingProfile.isSwitchableToSelfEmployed()).isFalse();
+
+            billingProfile.removeMember(memberId);
+            assertThat(billingProfile.isSwitchableToSelfEmployed()).isTrue();
+
+            final var adminId = UserId.random();
+            billingProfile.addMember(adminId, BillingProfile.User.Role.ADMIN);
+            assertThat(billingProfile.isSwitchableToSelfEmployed()).isFalse();
+
+            billingProfile.removeMember(adminId);
+            assertThat(billingProfile.isSwitchableToSelfEmployed()).isTrue();
+        }
+    }
+
 
 }

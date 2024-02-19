@@ -23,4 +23,8 @@ public class SelfEmployedBillingProfile extends BillingProfile {
     public Type type() {
         return Type.COMPANY;
     }
+
+    public boolean isSwitchableToCompany() {
+        return true;
+    }
 }
