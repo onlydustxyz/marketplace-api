@@ -161,6 +161,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void invoice_name_should_be_incremented_only_when_submitted() {
         // When
+        // TODO: Should reject as same rewards as above and an invoice is already uploaded
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
                         "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
