@@ -186,8 +186,10 @@ class BillingProfileServiceTest {
         return new Invoice.Reward(
                 RewardId.random(),
                 ZonedDateTime.now(),
+                ProjectId.random(),
                 faker.lordOfTheRings().character(),
                 Money.of(faker.number().randomNumber(1, true), ETH),
-                Money.of(faker.number().randomNumber(4, true), USD));
+                Money.of(faker.number().randomNumber(4, true), USD)
+        );
     }
 }

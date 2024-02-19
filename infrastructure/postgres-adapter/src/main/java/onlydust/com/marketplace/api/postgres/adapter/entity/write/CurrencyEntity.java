@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Getter
 @Accessors(fluent = true)
 @TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class CurrencyEntity {
     @Id
     @EqualsAndHashCode.Include

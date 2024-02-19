@@ -13,6 +13,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -40,16 +41,7 @@ public class InvoiceEntity {
     @NonNull BigDecimal taxRate;
     URL url;
     @Type(type = "jsonb")
-    Invoice.PersonalInfo personalInfo;
-    @Type(type = "jsonb")
-    Invoice.CompanyInfo companyInfo;
-    @Type(type = "jsonb")
-    Invoice.BankAccount bankAccount;
-    @Type(type = "jsonb")
-    @NonNull List<Invoice.Wallet> wallets;
-    @Type(type = "jsonb")
-    @Column(name = "rewards")
-    List<Invoice.Reward> rewardsData;
+    Data data;
 
     @OneToMany(mappedBy = "invoice", fetch = FetchType.EAGER)
     @NonNull Set<PaymentRequestEntity> rewards;
@@ -63,11 +55,11 @@ public class InvoiceEntity {
                 Invoice.Name.fromString(name),
                 status.toDomain(),
                 taxRate,
-                personalInfo,
-                companyInfo,
-                bankAccount,
-                wallets,
-                rewardsData,
+                data.personalInfo,
+                data.companyInfo,
+                data.bankAccount,
+                data.wallets,
+                data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                 url
         );
     }
@@ -103,11 +95,20 @@ public class InvoiceEntity {
                 .status(Status.of(invoice.status()))
                 .taxRate(invoice.taxRate())
                 .url(invoice.url())
-                .personalInfo(invoice.personalInfo().orElse(null))
-                .companyInfo(invoice.companyInfo().orElse(null))
-                .bankAccount(invoice.bankAccount().orElse(null))
-                .wallets(invoice.wallets())
-                .rewardsData(invoice.rewards())
-                .rewards(Set.of());
+                .data(Data.of(invoice));
+    }
+
+    public record Data(Invoice.PersonalInfo personalInfo, Invoice.CompanyInfo companyInfo, Invoice.BankAccount bankAccount,
+                       List<Invoice.Wallet> wallets, List<InvoiceRewardEntity> rewards) implements Serializable {
+
+        public static Data of(final @NonNull Invoice invoice) {
+            return new Data(
+                    invoice.personalInfo().orElse(null),
+                    invoice.companyInfo().orElse(null),
+                    invoice.bankAccount().orElse(null),
+                    invoice.wallets(),
+                    invoice.rewards().stream().map(InvoiceRewardEntity::of).toList()
+            );
+        }
     }
 }

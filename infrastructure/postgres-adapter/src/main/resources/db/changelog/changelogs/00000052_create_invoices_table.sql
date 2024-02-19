@@ -11,11 +11,7 @@ CREATE TABLE accounting.invoices
     status             invoice_status   NOT NULL,
     tax_rate           BIGINT           NOT NULL,
     url                TEXT,
-    personal_info      JSONB,
-    company_info       JSONB,
-    bank_account       JSONB,
-    wallets            JSONB,
-    rewards            JSONB,
+    data               JSONB            NOT NULL,
     tech_created_at    TIMESTAMP        NOT NULL DEFAULT now(),
     tech_updated_at    TIMESTAMP        NOT NULL DEFAULT now(),
     UNIQUE (billing_profile_id, name)

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @IdClass(ERC20Entity.PrimaryKey.class)
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ERC20Entity {
     @Id
     @EqualsAndHashCode.Include
