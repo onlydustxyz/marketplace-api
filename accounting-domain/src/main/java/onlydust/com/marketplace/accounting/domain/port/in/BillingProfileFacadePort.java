@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.io.InputStream;
@@ -18,4 +15,7 @@ public interface BillingProfileFacadePort {
 
     void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                        final @NonNull InputStream inputStream);
+
+    @NonNull InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
+                                             final @NonNull Invoice.Id invoiceId);
 }
