@@ -90,7 +90,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
                         .map(companyBillingProfile -> companyBillingProfile.updateStatusFromNewChildrenStatuses(
                                 billingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(companyBillingProfile.getExternalApplicantId()))
                         )
-                        .map(userVerificationStoragePort::updateCompanyVerification)
+                        .map(companyBillingProfile1 -> userVerificationStoragePort.updateCompanyVerification(companyBillingProfile1))
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));
     }

@@ -57,10 +57,12 @@ public class UserVerificationServiceTest {
             // Given
             final UUID billingProfileId = UUID.randomUUID();
             final String reviewMessageForApplicant = faker.rickAndMorty().location();
+            final String applicantId = faker.rickAndMorty().character();
             final BillingProfileUpdated event =
                     BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED)
                             .type(BillingProfileType.COMPANY)
                             .billingProfileId(billingProfileId)
+                            .externalApplicantId(applicantId)
                             .reviewMessageForApplicant(reviewMessageForApplicant).build();
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
@@ -69,7 +71,7 @@ public class UserVerificationServiceTest {
                             .id(billingProfileId)
                             .userId(userId)
                             .reviewMessageForApplicant(reviewMessageForApplicant)
-                            .externalApplicantId(faker.rickAndMorty().character())
+                            .externalApplicantId(applicantId)
                             .status(VerificationStatus.STARTED).build();
             final CompanyBillingProfile companyBillingProfileWithNewStatus =
                     initialCompanyBillingProfile.toBuilder()
