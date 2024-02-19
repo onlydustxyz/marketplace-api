@@ -11,12 +11,15 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 
+import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
@@ -185,7 +188,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         ;
 
         // When
-        when(pdfStoragePort.upload(any(), any())).then(invocation -> {
+        when(pdfStoragePort.upload(eq(invoiceId.getValue() + ".pdf"), any())).then(invocation -> {
             final var fileName = invocation.getArgument(0, String.class);
             return new URL("https://s3.storage.com/%s".formatted(fileName));
         });
@@ -213,6 +216,21 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").doesNotExist()
         ;
+
+        // When
+        final var pdfData = faker.lorem().paragraph().getBytes();
+        when(pdfStoragePort.download(eq(invoiceId.getValue() + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
+
+        final var data = client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().returnResult().getResponseBody();
+
+        assertThat(data).isEqualTo(pdfData);
     }
 
     @Test

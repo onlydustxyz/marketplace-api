@@ -85,6 +85,15 @@ class BillingProfileServiceTest {
                     .hasMessage("User is not allowed to view invoices for this billing profile");
         }
 
+        @Test
+        void should_prevent_invoice_download() {
+            // When
+            assertThatThrownBy(() -> billingProfileService.downloadInvoice(userId, billingProfileId, invoice.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoice.id(), billingProfileId));
+        }
+
     }
 
     @Nested
@@ -150,7 +159,7 @@ class BillingProfileServiceTest {
             // Given
             final var url = new URL("https://" + faker.internet().url());
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
-            when(pdfStoragePort.upload("OD-DOE-JOHN-012.pdf", pdf)).thenReturn(url);
+            when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
 
             // When
             billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf);
@@ -158,7 +167,7 @@ class BillingProfileServiceTest {
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
             verify(invoiceStoragePort).save(invoiceCaptor.capture());
-            verify(pdfStoragePort).upload("OD-DOE-JOHN-012.pdf", pdf);
+            verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
         }
@@ -179,6 +188,47 @@ class BillingProfileServiceTest {
             assertThat(invoices.getContent()).hasSize(1);
             assertThat(invoices.getContent().get(0).id()).isEqualTo(invoice.id());
             assertThat(invoices.getContent().get(0).billingProfileId()).isEqualTo(billingProfileId);
+        }
+
+        @Test
+        void should_prevent_invoice_download_if_not_found() {
+            // Given
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.downloadInvoice(userId, billingProfileId, invoice.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
+        }
+
+        @Test
+        void should_prevent_invoice_download_if_billing_profile_does_not_match() {
+            // Given
+            final var otherBillingProfileId = BillingProfile.Id.random();
+            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.downloadInvoice(userId, otherBillingProfileId, invoice.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
+        }
+
+        @SneakyThrows
+        @Test
+        void should_download_invoice() {
+            // Given
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(pdfStoragePort.download(invoice.id() + ".pdf")).thenReturn(pdf);
+
+            // When
+            final var invoiceDownload = billingProfileService.downloadInvoice(userId, billingProfileId, invoice.id());
+
+            // Then
+            assertThat(invoiceDownload.fileName()).isEqualTo(invoice.number() + ".pdf");
+            assertThat(invoiceDownload.data()).isEqualTo(pdf);
         }
     }
 

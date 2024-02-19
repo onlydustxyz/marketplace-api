@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -59,7 +56,28 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
-        final var url = pdfStoragePort.upload(invoice.number() + ".pdf", data);
+        final var url = pdfStoragePort.upload(invoiceInternalFileName(invoice), data);
         invoiceStoragePort.save(invoice.status(Invoice.Status.PROCESSING).url(url));
+    }
+
+    @Override
+    public @NonNull InvoiceDownload downloadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoiceId, billingProfileId));
+
+        final var invoice = invoiceStoragePort.get(invoiceId)
+                .filter(i -> i.billingProfileId().equals(billingProfileId))
+                .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+
+        final var pdf = pdfStoragePort.download(invoiceInternalFileName(invoice));
+        return new InvoiceDownload(pdf, invoiceExternalFileName(invoice));
+    }
+
+    private String invoiceExternalFileName(Invoice invoice) {
+        return "%s.pdf".formatted(invoice.number());
+    }
+
+    private static String invoiceInternalFileName(Invoice invoice) {
+        return "%s.pdf".formatted(invoice.id());
     }
 }
