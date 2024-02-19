@@ -29,7 +29,7 @@ public class Invoice {
     private final @NonNull BillingProfile.Id billingProfileId;
     private final @NonNull ZonedDateTime createdAt;
     private final @NonNull ZonedDateTime dueAt;
-    private final @NonNull Invoice.Name name;
+    private final @NonNull Invoice.Number number;
     private @NonNull Status status;
     private final @NonNull BigDecimal taxRate;
     private PersonalInfo personalInfo;
@@ -46,7 +46,7 @@ public class Invoice {
                 billingProfileId,
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Name.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName),
+                Number.of(sequenceNumber, personalInfo.lastName, personalInfo.firstName),
                 Status.DRAFT,
                 BigDecimal.ZERO
         ).personalInfo(personalInfo);
@@ -59,7 +59,7 @@ public class Invoice {
                 billingProfileId,
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                Name.of(sequenceNumber, companyInfo.name),
+                Number.of(sequenceNumber, companyInfo.name),
                 Status.DRAFT,
                 companyInfo.vatRegulationState() == Invoice.VatRegulationState.APPLICABLE ? BigDecimal.valueOf(0.2) : BigDecimal.ZERO
         ).companyInfo(companyInfo);
@@ -75,7 +75,7 @@ public class Invoice {
 
     public Money totalBeforeTax() {
         return rewards.stream().map(Invoice.Reward::base).reduce(Money::add)
-                .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(name())));
+                .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(number())));
     }
 
     public Money totalTax() {
@@ -102,23 +102,23 @@ public class Invoice {
     @EqualsAndHashCode
     @Getter
     @Accessors(fluent = true)
-    public static class Name {
+    public static class Number {
         private final @NonNull String value;
 
-        public static Name of(Integer sequenceNumber, String... parts) {
-            return new Name("OD-%s-%03d".formatted(normalize(parts), sequenceNumber));
+        public static Number of(Integer sequenceNumber, String... parts) {
+            return new Number("OD-%s-%03d".formatted(normalize(parts), sequenceNumber));
         }
 
         public String toString() {
             return value;
         }
 
-        public static Name fromString(final @NonNull String value) {
-            return new Name(value);
+        public static Number fromString(final @NonNull String value) {
+            return new Number(value);
         }
 
         private static String normalize(String... parts) {
-            return Stream.of(parts).map(Name::normalize).collect(Collectors.joining("-"));
+            return Stream.of(parts).map(Number::normalize).collect(Collectors.joining("-"));
         }
 
         private static String normalize(final @NonNull String part) {

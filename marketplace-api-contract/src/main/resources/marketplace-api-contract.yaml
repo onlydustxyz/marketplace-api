@@ -5300,7 +5300,7 @@ components:
       type: object
       required:
         - id
-        - name
+        - number
         - createdAt
         - dueAt
         - destinationAccounts
@@ -5309,7 +5309,7 @@ components:
         id:
           type: string
           format: uuid
-        name:
+        number:
           type: string
         createdAt:
           type: string
@@ -5483,7 +5483,7 @@ components:
         id:
           type: string
           format: uuid
-        name:
+        number:
           type: string
         createdAt:
           type: string

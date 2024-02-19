@@ -18,12 +18,12 @@ class InvoiceTest {
 
     @Test
     void should_compute_id() {
-        assertThat(Invoice.Name.of(1, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-001");
-        assertThat(Invoice.Name.of(2, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-002");
-        assertThat(Invoice.Name.of(1, "A peu près", "Jean-Michel").value()).isEqualTo("OD-APEUPRES-JEANMICHEL-001");
-        assertThat(Invoice.Name.of(1, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-001");
-        assertThat(Invoice.Name.of(123456, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-123456");
-        assertThat(Invoice.Name.of(1, "Caisse d'Épargne").value()).isEqualTo("OD-CAISSEDEPARGNE-001");
+        assertThat(Invoice.Number.of(1, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-001");
+        assertThat(Invoice.Number.of(2, "Doe", "John").value()).isEqualTo("OD-DOE-JOHN-002");
+        assertThat(Invoice.Number.of(1, "A peu près", "Jean-Michel").value()).isEqualTo("OD-APEUPRES-JEANMICHEL-001");
+        assertThat(Invoice.Number.of(1, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-001");
+        assertThat(Invoice.Number.of(123456, "OnlyDust").value()).isEqualTo("OD-ONLYDUST-123456");
+        assertThat(Invoice.Number.of(1, "Caisse d'Épargne").value()).isEqualTo("OD-CAISSEDEPARGNE-001");
     }
 
 
@@ -39,7 +39,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.name().value()).isEqualTo("OD-DOE-JOHN-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-DOE-JOHN-001");
         }
 
         @Test
@@ -74,7 +74,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.name().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
         }
 
         @Test
@@ -114,7 +114,7 @@ class InvoiceTest {
 
         @Test
         void should_compute_id() {
-            assertThat(invoice.name().value()).isEqualTo("OD-ONLYDUST-001");
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
         }
 
 

@@ -32,13 +32,14 @@ public class InvoiceEntity {
     @Id
     @NonNull UUID id;
     @NonNull UUID billingProfileId;
-    @NonNull String name;
+    @NonNull String number;
     @NonNull ZonedDateTime createdAt;
-    @NonNull ZonedDateTime dueAt;
     @Enumerated(EnumType.STRING)
     @Type(type = "invoice_status")
     @NonNull Status status;
-    @NonNull BigDecimal taxRate;
+    @NonNull BigDecimal amount;
+    @ManyToOne
+    @NonNull CurrencyEntity currency;
     URL url;
     @Type(type = "jsonb")
     Data data;
@@ -51,10 +52,10 @@ public class InvoiceEntity {
                 Invoice.Id.of(id),
                 BillingProfile.Id.of(billingProfileId),
                 createdAt,
-                dueAt,
-                Invoice.Name.fromString(name),
+                data.dueAt,
+                Invoice.Number.fromString(number),
                 status.toDomain(),
-                taxRate,
+                data.taxRate,
                 data.personalInfo,
                 data.companyInfo,
                 data.bankAccount,
@@ -89,20 +90,26 @@ public class InvoiceEntity {
     public static InvoiceEntity of(final @NonNull Invoice invoice) {
         return new InvoiceEntity().id(invoice.id().value())
                 .billingProfileId(invoice.billingProfileId().value())
-                .name(invoice.name().toString())
+                .number(invoice.number().toString())
                 .createdAt(invoice.createdAt())
-                .dueAt(invoice.dueAt())
                 .status(Status.of(invoice.status()))
-                .taxRate(invoice.taxRate())
                 .url(invoice.url())
+                .amount(invoice.totalAfterTax().getValue())
+                .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
                 .data(Data.of(invoice));
     }
 
-    public record Data(Invoice.PersonalInfo personalInfo, Invoice.CompanyInfo companyInfo, Invoice.BankAccount bankAccount,
-                       List<Invoice.Wallet> wallets, List<InvoiceRewardEntity> rewards) implements Serializable {
+    public record Data(@NonNull ZonedDateTime dueAt,
+                       @NonNull BigDecimal taxRate,
+                       Invoice.PersonalInfo personalInfo,
+                       Invoice.CompanyInfo companyInfo,
+                       Invoice.BankAccount bankAccount,
+                       @NonNull List<Invoice.Wallet> wallets, List<InvoiceRewardEntity> rewards) implements Serializable {
 
         public static Data of(final @NonNull Invoice invoice) {
             return new Data(
+                    invoice.dueAt(),
+                    invoice.taxRate(),
                     invoice.personalInfo().orElse(null),
                     invoice.companyInfo().orElse(null),
                     invoice.bankAccount().orElse(null),

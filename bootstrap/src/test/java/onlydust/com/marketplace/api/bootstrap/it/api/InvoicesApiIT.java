@@ -63,7 +63,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "name": "OD-BUISSET-ANTHONY-001",
+                          "number": "OD-BUISSET-ANTHONY-001",
                           "billingProfileType": "INDIVIDUAL",
                           "individualBillingProfile": {
                             "firstName": "Anthony",
@@ -172,7 +172,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("OD-BUISSET-ANTHONY-002");
+                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
@@ -184,7 +184,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("OD-BUISSET-ANTHONY-002");
+                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
     }
 
     @Test
@@ -206,7 +206,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                         {
                           "invoices": [
                             {
-                              "name": "OD-BUISSET-ANTHONY-001",
+                              "number": "OD-BUISSET-ANTHONY-001",
                               "totalAfterTax": {
                                 "amount": 1784757.50,
                                 "currency": "USD"

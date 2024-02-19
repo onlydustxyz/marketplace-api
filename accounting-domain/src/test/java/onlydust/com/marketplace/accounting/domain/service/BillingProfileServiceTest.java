@@ -111,7 +111,7 @@ class BillingProfileServiceTest {
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.id()).isEqualTo(preview.id());
             assertThat(invoice.billingProfileId()).isEqualTo(billingProfileId);
-            assertThat(invoice.name()).isEqualTo(preview.name());
+            assertThat(invoice.number()).isEqualTo(preview.number());
             assertThat(invoice.createdAt()).isEqualTo(preview.createdAt());
             assertThat(invoice.totalAfterTax()).isEqualTo(preview.totalAfterTax());
             assertThat(invoice.status()).isEqualTo(Invoice.Status.DRAFT);

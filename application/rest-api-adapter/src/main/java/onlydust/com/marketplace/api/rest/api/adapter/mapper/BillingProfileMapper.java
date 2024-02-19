@@ -88,7 +88,7 @@ public interface BillingProfileMapper {
     static InvoicePreviewResponse map(Invoice preview) {
         return new InvoicePreviewResponse()
                 .id(preview.id().value())
-                .name(preview.name().value())
+                .number(preview.number().value())
                 .createdAt(preview.createdAt())
                 .dueAt(preview.dueAt())
                 .billingProfileType(map(preview.billingProfileType()))
@@ -165,7 +165,7 @@ public interface BillingProfileMapper {
     static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(Invoice invoice) {
         return new BillingProfileInvoicesPageItemResponse()
                 .id(invoice.id().value())
-                .name(invoice.name().value())
+                .number(invoice.number().value())
                 .createdAt(invoice.createdAt())
                 .totalAfterTax(map(invoice.totalAfterTax()))
                 .status(map(invoice.status()));
