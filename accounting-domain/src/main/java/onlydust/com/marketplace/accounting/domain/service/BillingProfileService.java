@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull PdfStoragePort pdfStoragePort;
 
     @Override
+    @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
                                   final @NonNull List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
@@ -47,6 +49,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    @Transactional
     public void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                               final @NonNull InputStream data) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))

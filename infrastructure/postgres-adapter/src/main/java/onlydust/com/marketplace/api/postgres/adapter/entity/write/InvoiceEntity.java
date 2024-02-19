@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -18,7 +17,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -44,9 +42,6 @@ public class InvoiceEntity {
     @Type(type = "jsonb")
     Data data;
 
-    @OneToMany(mappedBy = "invoice", fetch = FetchType.EAGER)
-    @NonNull Set<PaymentRequestEntity> rewards;
-
     public Invoice toDomain() {
         return new Invoice(
                 Invoice.Id.of(id),
@@ -63,6 +58,18 @@ public class InvoiceEntity {
                 data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
                 url
         );
+    }
+
+    public void updateWith(Invoice invoice) {
+        this
+                .billingProfileId(invoice.billingProfileId().value())
+                .number(invoice.number().toString())
+                .createdAt(invoice.createdAt())
+                .status(Status.of(invoice.status()))
+                .url(invoice.url())
+                .amount(invoice.totalAfterTax().getValue())
+                .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
+                .data(Data.of(invoice));
     }
 
     public enum Status {
@@ -87,24 +94,14 @@ public class InvoiceEntity {
         }
     }
 
-    public static InvoiceEntity of(final @NonNull Invoice invoice) {
-        return new InvoiceEntity().id(invoice.id().value())
-                .billingProfileId(invoice.billingProfileId().value())
-                .number(invoice.number().toString())
-                .createdAt(invoice.createdAt())
-                .status(Status.of(invoice.status()))
-                .url(invoice.url())
-                .amount(invoice.totalAfterTax().getValue())
-                .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
-                .data(Data.of(invoice));
-    }
-
     public record Data(@NonNull ZonedDateTime dueAt,
                        @NonNull BigDecimal taxRate,
                        Invoice.PersonalInfo personalInfo,
                        Invoice.CompanyInfo companyInfo,
                        Invoice.BankAccount bankAccount,
-                       @NonNull List<Invoice.Wallet> wallets, List<InvoiceRewardEntity> rewards) implements Serializable {
+                       @NonNull List<Invoice.Wallet> wallets,
+                       List<InvoiceRewardEntity> rewards
+    ) implements Serializable {
 
         public static Data of(final @NonNull Invoice invoice) {
             return new Data(

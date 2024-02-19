@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -21,8 +22,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@Accessors(fluent = true)
 public class InvoiceRewardEntity {
     @Id
+    @Getter
     @NonNull UUID id;
     @ManyToOne
     @JoinColumn(referencedColumnName = "project_id", name = "project_id")

@@ -63,11 +63,10 @@ public class CustomUserRewardRepository {
                        pr.id,
                        pr.amount,
                        pr.currency,
-                       pr.invoice_received_at,
+                       coalesce(pr.invoice_received_at, i.created_at) as invoice_received_at,
                        (select count(id) from work_items wi where wi.payment_id = pr.id)           contribution_count,
                        case when pr.currency = 'usd' then pr.amount else cuq.price * pr.amount end
             dollars_equivalent,
-                
                        case
                            when r.id is not null then 'COMPLETE'
                            
@@ -81,7 +80,7 @@ public class CustomUserRewardRepository {
                                      when pr.currency = 'usd' then not payout_checks.has_bank_account
                                end) then 'MISSING_PAYOUT_INFO'
                                    when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
-                           when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
+                           when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                            end                                                                     status
                 from iam.users u
@@ -92,6 +91,7 @@ public class CustomUserRewardRepository {
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
+                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('APPROVED', 'PROCESSING')
                 where u.id = :userId
                   and (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies))
                   and (coalesce(:projectIds) is null or pr.project_id in (:projectIds))
@@ -147,6 +147,7 @@ public class CustomUserRewardRepository {
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
+                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('APPROVED', 'PROCESSING')
                 where pr.recipient_id = :recipientId
                   and (case
                            when r.id is not null then 'COMPLETE'
@@ -160,7 +161,7 @@ public class CustomUserRewardRepository {
                                              when pr.currency = 'usd' then not payout_checks.has_bank_account
                                        end) then 'MISSING_PAYOUT_INFO'
                            when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'               
-                           when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
+                           when coalesce(pr.invoice_received_at, i.created_at) is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
                     end) = 'PENDING_INVOICE'
                      """;
