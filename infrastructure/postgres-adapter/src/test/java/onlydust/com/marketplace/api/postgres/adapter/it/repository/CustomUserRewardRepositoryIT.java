@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.UserRole;
 import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -24,6 +23,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -278,7 +278,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
-                    "LOCKED"
+                    "PROCESSING"
             );
         }
 
