@@ -46,7 +46,7 @@ public class IndividualBillingProfileEntity {
     String idDocumentCountryCode;
     Date validUntil;
     String reviewMessage;
-
+    String applicantId;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -101,6 +101,7 @@ public class IndividualBillingProfileEntity {
                 .birthdate(this.birthdate)
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
+                .externalApplicantId(this.applicantId)
                 .build();
     }
 
@@ -120,6 +121,7 @@ public class IndividualBillingProfileEntity {
                 .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
                 .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
                 .reviewMessage(individualBillingProfile.getReviewMessageForApplicant())
+                .applicantId(individualBillingProfile.getExternalApplicantId())
                 .build();
     }
 }

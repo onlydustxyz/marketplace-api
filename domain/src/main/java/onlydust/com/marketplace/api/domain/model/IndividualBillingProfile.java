@@ -27,6 +27,7 @@ public class IndividualBillingProfile {
     String idDocumentCountryCode;
     Date validUntil;
     String reviewMessageForApplicant;
+    String externalApplicantId;
 
     public static IndividualBillingProfile initForUser(final UUID userId) {
         return IndividualBillingProfile.builder()

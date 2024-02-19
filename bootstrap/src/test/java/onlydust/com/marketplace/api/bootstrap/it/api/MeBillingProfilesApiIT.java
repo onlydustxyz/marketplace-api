@@ -278,6 +278,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String applicantId = "kyb-" + faker.number().randomNumber();
 
         // When
         client.get()
@@ -312,7 +313,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "type": "applicantPending",
                   "clientId": "onlydust",
                   "levelName": "basic-kyb-level",
-                  "applicantId": "65bd228a2a99e9196014ccc5",
+                  "applicantId": "%s",
                   "createdAtMs": "2024-02-02 17:23:16.368",
                   "sandboxMode": false,
                   "inspectionId": "65bd228a2a99e9196014ccc6",
@@ -326,7 +327,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, billingProfileId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
 
         // When
@@ -368,7 +369,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "type": "applicantPending",
                   "clientId": "onlydust",
                   "levelName": "basic-kyb-level",
-                  "applicantId": "65bd228a2a99e9196014ccc5",
+                  "applicantId": "%s",
                   "createdAtMs": "2024-02-02 17:23:16.368",
                   "sandboxMode": false,
                   "inspectionId": "65bd228a2a99e9196014ccc6",
@@ -398,7 +399,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                   "previousLevelName": null,
                   "videoIdentReviewStatus": null,
                   "externalApplicantActionId": null
-                }""", reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, reviewMessage, billingProfileId).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigestRejection = SumsubSignatureVerifier.hmac(sumsubPayloadRejection, sumsubWebhookProperties.getSecret());
 
         // When
@@ -432,6 +433,103 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.euVATNumber").isEqualTo("FR26908233638")
                 .jsonPath("$.usEntity").isEqualTo(false);
         assertEquals(4, slackNotificationStub.getNotifications().size());
+
+        final byte[] sumsubPayloadChildrenKycUnderReview = String.format("""
+                {
+                  "applicantId": "65d34febc2b0cd19e02aa971",
+                  "inspectionId": "65d34febc2b0cd19e02aa972",
+                  "applicantType": "individual",
+                  "applicantMemberOf": [
+                    {
+                      "applicantId": "%s"
+                    }
+                  ],
+                  "correlationId": "6a444c189bf5b6252e5dc486220f7bd8",
+                  "levelName": "od-kyc-production",
+                  "sandboxMode": false,
+                  "externalUserId": "beneficiary-random-92a161bd-56b9-4043-9c3c-9d24b94691c6",
+                  "type": "applicantPending",
+                  "reviewStatus": "pending",
+                  "createdAt": "2024-02-19 13:13:19+0000",
+                  "createdAtMs": "2024-02-19 13:13:19.411",
+                  "sourceKey": "production",
+                  "clientId": "onlydust"
+                }""", applicantId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestChildrenKycUnderReview = SumsubSignatureVerifier.hmac(sumsubPayloadChildrenKycUnderReview,
+                sumsubWebhookProperties.getSecret());
+
+        final byte[] sumsubPayloadChildrenKycRejection = String.format("""
+                {
+                  "applicantId": "75d34febc2b0cd19e02aa971",
+                  "inspectionId": "65d34febc2b0cd19e02aa972",
+                  "applicantType": "individual",
+                  "applicantMemberOf": [
+                    {
+                      "applicantId": "%s"
+                    }
+                  ],
+                  "correlationId": "6a444c189bf5b6252e5dc486220f7bd8",
+                  "levelName": "od-kyc-production",
+                  "sandboxMode": false,
+                  "externalUserId": "beneficiary-random-92a161bd-56b9-4043-9c3c-9d24b94691c6",
+                  "type": "applicantReviewed",
+                    "reviewResult": {
+                      "reviewAnswer": "RED",
+                      "rejectLabels": [
+                        "BAD_PROOF_OF_ADDRESS"
+                      ],
+                      "reviewRejectType": "RETRY",
+                      "buttonIds": [
+                        "proofOfAddress_issueDate",
+                        "proofOfAddress_listOfDocs",
+                        "proofOfAddress",
+                        "proofOfAddress_fullAddress"
+                      ]
+                    },
+                   "reviewStatus": "completed",
+                  "createdAt": "2024-02-19 13:13:19+0000",
+                  "createdAtMs": "2024-02-19 13:13:19.411",
+                  "sourceKey": "production",
+                  "clientId": "onlydust"
+                }""", applicantId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestChildrenKycRejection = SumsubSignatureVerifier.hmac(sumsubPayloadChildrenKycRejection,
+                sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestChildrenKycRejection)
+                .bodyValue(sumsubPayloadChildrenKycRejection)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestChildrenKycUnderReview)
+                .bodyValue(sumsubPayloadChildrenKycUnderReview)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        billingProfileOutboxJob.run();
+
+        client.get()
+                .uri(ME_GET_COMPANY_BILLING_PROFILE)
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.status").isEqualTo("REJECTED");
+        assertEquals(6, slackNotificationStub.getNotifications().size());
     }
 
 
