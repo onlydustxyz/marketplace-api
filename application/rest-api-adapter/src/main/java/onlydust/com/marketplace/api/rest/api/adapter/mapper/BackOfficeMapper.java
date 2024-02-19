@@ -210,7 +210,6 @@ public interface BackOfficeMapper {
                             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
                             case CLOSED -> VerificationStatus.CLOSED;
                             case VERIFIED -> VerificationStatus.VERIFIED;
-                            case INVALIDATED -> VerificationStatus.INVALIDATED;
                         })
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())

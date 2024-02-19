@@ -28,7 +28,7 @@ public class CompanyBillingProfileEntity {
     @Id
     UUID id;
     UUID userId;
-    @Type(type = "billing_profile_type")
+    @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
     VerificationStatusEntity verificationStatus;
     String name;
@@ -42,6 +42,7 @@ public class CompanyBillingProfileEntity {
     @Column(name = "eu_vat_number")
     String euVATNumber;
     String reviewMessage;
+    String applicantId;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -65,6 +66,7 @@ public class CompanyBillingProfileEntity {
                 .country(this.country)
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
+                .externalApplicantId(this.applicantId)
                 .build();
     }
 
@@ -82,6 +84,7 @@ public class CompanyBillingProfileEntity {
                 .registrationDate(companyBillingProfile.getRegistrationDate())
                 .registrationNumber(companyBillingProfile.getRegistrationNumber())
                 .reviewMessage(companyBillingProfile.getReviewMessageForApplicant())
+                .applicantId(companyBillingProfile.getExternalApplicantId())
                 .build();
     }
 

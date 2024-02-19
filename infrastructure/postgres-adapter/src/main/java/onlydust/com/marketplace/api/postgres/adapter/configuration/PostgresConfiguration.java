@@ -335,9 +335,10 @@ public class PostgresConfiguration {
     public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                       final CustomUserRewardRepository customUserRewardRepository) {
+                                                                       final CustomUserRewardRepository customUserRewardRepository,
+                                                                       final ChildrenKycRepository childrenKycRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
-                customUserRewardRepository);
+                customUserRewardRepository, childrenKycRepository);
     }
 
     @Bean

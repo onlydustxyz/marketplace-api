@@ -46,13 +46,15 @@ public interface UserVerificationEventMapper {
                     	]""";
 
 
-    static String billingProfileUpdatedToSlackNotification(final BillingProfileUpdated billingProfileUpdated) {
+    static String billingProfileUpdatedToSlackNotification(final BillingProfileUpdated billingProfileUpdated, final String environment) {
         String mainMessage = "*New %s event : <%s|Check on Sumsub>*".formatted(switch (billingProfileUpdated.getType()) {
                     case COMPANY -> "KYB";
                     case INDIVIDUAL -> "KYC";
                 },
-                "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileUpdated.getExternalVerificationId()));
-        if (List.of(VerificationStatus.REJECTED, VerificationStatus.CLOSED).contains(billingProfileUpdated.getVerificationStatus())) {
+                "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileUpdated.getExternalApplicantId()));
+        // Enabling notifications pinging all the channel only for closed KYC/KYB on production
+        // NB : even if statements on env are bad practices -_-
+        if (billingProfileUpdated.getVerificationStatus().equals(VerificationStatus.CLOSED) && environment.equals("production")) {
             mainMessage = "<!channel> " + mainMessage;
         }
         return SLACK_BLOCKS_TEMPLATE.formatted(

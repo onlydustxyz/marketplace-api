@@ -5226,7 +5226,6 @@ components:
         - UNDER_REVIEW
         - VERIFIED
         - REJECTED
-        - INVALIDATED
         - CLOSED
 
     CompanyBillingProfileResponse:

@@ -51,7 +51,6 @@ public interface BillingProfileMapper {
     static VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.api.domain.model.VerificationStatus verificationStatus) {
         return switch (verificationStatus) {
             case CLOSED -> VerificationStatus.CLOSED;
-            case INVALIDATED -> VerificationStatus.INVALIDATED;
             case REJECTED -> VerificationStatus.REJECTED;
             case STARTED -> VerificationStatus.STARTED;
             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;

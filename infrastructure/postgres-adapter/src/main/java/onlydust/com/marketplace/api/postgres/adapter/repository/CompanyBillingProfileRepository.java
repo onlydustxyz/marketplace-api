@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface CompanyBillingProfileRepository extends JpaRepository<CompanyBillingProfileEntity, UUID> {
 
     Optional<CompanyBillingProfileEntity> findByUserId(final UUID userId);
+
+    Optional<CompanyBillingProfileEntity> findByApplicantId(final String applicantId);
 }

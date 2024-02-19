@@ -1627,7 +1627,6 @@ components:
         - UNDER_REVIEW
         - VERIFIED
         - REJECTED
-        - INVALIDATED
         - CLOSED
     PaymentPage:
       type: object

@@ -32,26 +32,46 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         Invalidated - user got invalidated over time and need to take action (ID card is overdue)
         Closed - user is a terrorist babay
     * */
-
     @Override
     public BillingProfileUpdated apply(Event event) {
         try {
             if (event instanceof SumsubWebhookEventDTO sumsubWebhookEventDTO) {
-                final UUID billingProfileId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
-                return BillingProfileUpdated.builder()
-                        .billingProfileId(billingProfileId)
-                        .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                        .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
-                                sumsubWebhookEventDTO.getReviewResult()))
-                        .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
-                        .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
-                        .externalVerificationId(sumsubWebhookEventDTO.getApplicantId())
-                        .build();
+                if (nonNull(sumsubWebhookEventDTO.getApplicantMemberOf()) && sumsubWebhookEventDTO.getApplicantMemberOf().size() == 1 &&
+                    nonNull(sumsubWebhookEventDTO.getApplicantMemberOf().get(0).getApplicationId())) {
+                    return mapToChildrenBillingProfile(sumsubWebhookEventDTO);
+                } else {
+                    return mapToParentBillingProfile(sumsubWebhookEventDTO);
+                }
             }
         } catch (Exception ignored) {
 
         }
         throw new OutboxSkippingException(String.format("Invalid sumsub event format %s", event));
+    }
+
+    private BillingProfileUpdated mapToChildrenBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
+        return BillingProfileUpdated.builder()
+                .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
+                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                        sumsubWebhookEventDTO.getReviewResult()))
+                .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
+                .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
+                .parentExternalApplicantId(sumsubWebhookEventDTO.getApplicantMemberOf().get(0).getApplicationId())
+                .externalApplicantId(sumsubWebhookEventDTO.getApplicantId())
+                .build();
+    }
+
+    private BillingProfileUpdated mapToParentBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
+        final UUID billingProfileId = UUID.fromString(sumsubWebhookEventDTO.getExternalUserId());
+        return BillingProfileUpdated.builder()
+                .billingProfileId(billingProfileId)
+                .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
+                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                        sumsubWebhookEventDTO.getReviewResult()))
+                .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
+                .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
+                .externalApplicantId(sumsubWebhookEventDTO.getApplicantId())
+                .build();
     }
 
     private BillingProfileType applicationTypeToDomain(final String applicationType) {

@@ -8,7 +8,6 @@ public enum VerificationStatusEntity {
     UNDER_REVIEW,
     VERIFIED,
     REJECTED,
-    INVALIDATED,
     CLOSED;
 
     public VerificationStatus toDomain() {
@@ -17,7 +16,6 @@ public enum VerificationStatusEntity {
             case STARTED -> VerificationStatus.STARTED;
             case REJECTED -> VerificationStatus.REJECTED;
             case VERIFIED -> VerificationStatus.VERIFIED;
-            case INVALIDATED -> VerificationStatus.INVALIDATED;
             case NOT_STARTED -> VerificationStatus.NOT_STARTED;
             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
         };
@@ -26,7 +24,6 @@ public enum VerificationStatusEntity {
     public static VerificationStatusEntity fromDomain(final VerificationStatus verificationStatus) {
         return switch (verificationStatus) {
             case CLOSED -> CLOSED;
-            case INVALIDATED -> INVALIDATED;
             case NOT_STARTED -> NOT_STARTED;
             case REJECTED -> REJECTED;
             case STARTED -> STARTED;

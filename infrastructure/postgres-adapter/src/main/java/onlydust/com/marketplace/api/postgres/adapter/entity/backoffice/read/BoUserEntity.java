@@ -109,7 +109,6 @@ public class BoUserEntity {
                     case "UNDER_REVIEW" -> VerificationStatus.UNDER_REVIEW;
                     case "VERIFIED" -> VerificationStatus.VERIFIED;
                     case "REJECTED" -> VerificationStatus.REJECTED;
-                    case "INVALIDATED" -> VerificationStatus.INVALIDATED;
                     case "CLOSED" -> VerificationStatus.CLOSED;
                     default -> VerificationStatus.NOT_STARTED;
                 })
