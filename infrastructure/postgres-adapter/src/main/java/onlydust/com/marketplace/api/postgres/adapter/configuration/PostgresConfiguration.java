@@ -374,4 +374,9 @@ public class PostgresConfiguration {
                                                                                       final ProjectSponsorRepository projectSponsorRepository) {
         return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository, projectSponsorRepository);
     }
+
+    @Bean
+    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository){
+        return new PostgresEcosystemAdapter(ecosystemRepository);
+    }
 }
