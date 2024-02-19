@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -192,4 +194,113 @@ class BillingProfileServiceTest {
                 Money.of(faker.number().randomNumber(4, true), USD)
         );
     }
+    @Test
+    void should_create_individual_billing_profile() {
+        // Given
+        final var name = "John Doe";
+
+        // When
+        final var billingProfile = billingProfileService.createIndividualBillingProfile(userId, name, null);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.INDIVIDUAL);
+        assertThat(billingProfile.owner().id()).isEqualTo(userId);
+        assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+    }
+
+    @Test
+    void should_create_individual_billing_profile_with_select_for_projects() {
+        // Given
+        final var name = "John Doe";
+        final var selectForProjects = Set.of(ProjectId.random());
+
+        // When
+        final var billingProfile = billingProfileService.createIndividualBillingProfile(userId, name, selectForProjects);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.INDIVIDUAL);
+        assertThat(billingProfile.owner().id()).isEqualTo(userId);
+        assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+    }
+
+    @Test
+    void should_create_self_employed_billing_profile() {
+        // Given
+        final var name = "John Doe";
+
+        // When
+        final var billingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, name, null);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.owner().id()).isEqualTo(userId);
+        assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+    }
+
+    @Test
+    void should_create_self_employed_billing_profile_with_select_for_projects() {
+        // Given
+        final var name = "John Doe";
+        final var selectForProjects = Set.of(ProjectId.random());
+
+        // When
+        final var billingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, name, selectForProjects);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.owner().id()).isEqualTo(userId);
+        assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+    }
+
+    @Test
+    void should_create_company_billing_profile() {
+        // Given
+        final var name = "John Doe";
+
+        // When
+        final var billingProfile = billingProfileService.createCompanyBillingProfile(userId, name, null);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+    }
+
+    @Test
+    void should_create_company_billing_profile_with_select_for_projects() {
+        // Given
+        final var name = "John Doe";
+        final var selectForProjects = Set.of(ProjectId.random());
+
+        // When
+        final var billingProfile = billingProfileService.createCompanyBillingProfile(userId, name, selectForProjects);
+
+        // Then
+        assertThat(billingProfile.id()).isNotNull();
+        assertThat(billingProfile.name()).isEqualTo(name);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        verify(billingProfileStorage).save(billingProfile);
+        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+    }
+
 }
