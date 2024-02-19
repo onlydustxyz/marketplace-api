@@ -2,31 +2,35 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     PdfStoragePort pdfStoragePort;
 
-    @SneakyThrows
-    @Test
-    void should_upload_and_list_invoices() {
-        // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+    UserAuthHelper.AuthenticatedUser antho;
+    UUID billingProfileId;
 
-        final var myBillingProfiles = client.get()
+    @BeforeEach
+    void setUp() {
+        antho = userAuthHelper.authenticateAnthony();
+
+        billingProfileId = client.get()
                 .uri(ME_BILLING_PROFILES)
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
@@ -35,10 +39,13 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody(MyBillingProfilesResponse.class)
                 .returnResult()
-                .getResponseBody();
+                .getResponseBody().getBillingProfiles().get(0).getId();
+    }
 
-        final var billingProfileId = myBillingProfiles.getBillingProfiles().get(0).getId();
-
+    @SneakyThrows
+    @Test
+    @Order(1)
+    void preview_and_upload_invoice() {
         // When
         final var invoiceId = new MutableObject<String>();
         client.get()
@@ -148,7 +155,40 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .is2xxSuccessful();
+    }
 
+    @Test
+    @Order(2)
+    void invoice_name_should_be_incremented_only_when_submitted() {
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("OD-BUISSET-ANTHONY-002");
+
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("OD-BUISSET-ANTHONY-002");
+    }
+
+    @Test
+    @Order(99)
+    void list_invoice() {
         // When
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
@@ -165,7 +205,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                         {
                           "invoices": [
                             {
-                              "id": "%s",
                               "name": "OD-BUISSET-ANTHONY-001",
                               "totalAfterTax": {
                                 "amount": 1784757.50,
@@ -179,7 +218,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 1,
                           "nextPageIndex": 0
                         }
-                        """.formatted(invoiceId.getValue()))
+                        """)
         ;
     }
 }

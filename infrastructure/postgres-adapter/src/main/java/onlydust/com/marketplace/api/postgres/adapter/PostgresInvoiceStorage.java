@@ -21,6 +21,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.WalletReposi
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Invoice preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
-        int sequenceNumber = 1; // TODO
+        final var sequenceNumber = invoiceRepository.countByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT) + 1;
         final var preview = companyBillingProfileRepository.findById(billingProfileId.value())
                 .map(CompanyBillingProfileEntity::forInvoice)
                 .map(info -> Invoice.of(billingProfileId, sequenceNumber, info))
@@ -69,13 +70,15 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
+    @Transactional
     public void deleteDraftsOf(final BillingProfile.@NonNull Id billingProfileId) {
         invoiceRepository.deleteAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
     }
 
     @Override
     public Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize) {
-        final var page = invoiceRepository.findAllByBillingProfileId(billingProfileId.value(), PageRequest.of(pageNumber, pageSize));
+        final var page = invoiceRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
+                PageRequest.of(pageNumber, pageSize));
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
