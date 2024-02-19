@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;

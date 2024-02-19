@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import org.apache.commons.lang3.StringUtils;
 

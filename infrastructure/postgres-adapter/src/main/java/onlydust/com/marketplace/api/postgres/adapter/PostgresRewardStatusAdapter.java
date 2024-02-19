@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;

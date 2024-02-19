@@ -2,10 +2,10 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;

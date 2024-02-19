@@ -208,7 +208,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(onlydust.com.marketplace.accounting.domain.model.BillingProfile.Type type) {
+    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile.Type type) {
         return switch (type) {
             case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
             case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;

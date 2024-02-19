@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.infrastructure.accounting;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
