@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -56,8 +56,8 @@ public class IndividualBillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public InvoicePreview.PersonalInfo forInvoicePreview() {
-        return new InvoicePreview.PersonalInfo(firstName, lastName, address);
+    public Invoice.PersonalInfo forInvoice() {
+        return new Invoice.PersonalInfo(firstName, lastName, address);
     }
 
     public enum IdDocumentTypeEnumEntity {

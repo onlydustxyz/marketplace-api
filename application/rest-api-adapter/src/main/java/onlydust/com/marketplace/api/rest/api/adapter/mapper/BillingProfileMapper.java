@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
@@ -86,9 +85,10 @@ public interface BillingProfileMapper {
                 .rewardCount(billingProfile.rewardCount());
     }
 
-    static NewInvoiceResponse map(InvoicePreview preview) {
-        return new NewInvoiceResponse()
+    static InvoicePreviewResponse map(Invoice preview) {
+        return new InvoicePreviewResponse()
                 .id(preview.id().value())
+                .number(preview.number().value())
                 .createdAt(preview.createdAt())
                 .dueAt(preview.dueAt())
                 .billingProfileType(map(preview.billingProfileType()))
@@ -106,7 +106,7 @@ public interface BillingProfileMapper {
                 ;
     }
 
-    static InvoiceRewardItemResponse map(InvoicePreview.Reward reward) {
+    static InvoiceRewardItemResponse map(Invoice.Reward reward) {
         return new InvoiceRewardItemResponse()
                 .id(reward.id().value())
                 .date(reward.createdAt())
@@ -115,27 +115,27 @@ public interface BillingProfileMapper {
                 ;
     }
 
-    static WalletResponse map(InvoicePreview.Wallet wallet) {
+    static WalletResponse map(Invoice.Wallet wallet) {
         return new WalletResponse()
                 .network(wallet.network())
                 .address(wallet.address());
     }
 
-    static BankAccountResponse map(InvoicePreview.BankAccount bankAccount) {
+    static BankAccountResponse map(Invoice.BankAccount bankAccount) {
         return new BankAccountResponse()
                 .bic(bankAccount.bic())
                 .accountNumber(bankAccount.accountNumber());
     }
 
-    static NewInvoiceResponseIndividualBillingProfile map(InvoicePreview.PersonalInfo personalInfo) {
-        return new NewInvoiceResponseIndividualBillingProfile()
+    static InvoicePreviewResponseIndividualBillingProfile map(Invoice.PersonalInfo personalInfo) {
+        return new InvoicePreviewResponseIndividualBillingProfile()
                 .firstName(personalInfo.firstName())
                 .lastName(personalInfo.lastName())
                 .address(personalInfo.address());
     }
 
-    static NewInvoiceResponseCompanyBillingProfile map(InvoicePreview.CompanyInfo companyInfo) {
-        return new NewInvoiceResponseCompanyBillingProfile()
+    static InvoicePreviewResponseCompanyBillingProfile map(Invoice.CompanyInfo companyInfo) {
+        return new InvoicePreviewResponseCompanyBillingProfile()
                 .name(companyInfo.name())
                 .address(companyInfo.address())
                 .registrationNumber(companyInfo.registrationNumber())
@@ -144,7 +144,7 @@ public interface BillingProfileMapper {
                 ;
     }
 
-    static VatRegulationState map(InvoicePreview.VatRegulationState vatRegulationState) {
+    static VatRegulationState map(Invoice.VatRegulationState vatRegulationState) {
         return switch (vatRegulationState) {
             case APPLICABLE -> VatRegulationState.APPLICABLE;
             case REVERSE_CHARGE -> VatRegulationState.REVERSE_CHARGE;
@@ -155,18 +155,18 @@ public interface BillingProfileMapper {
 
     static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
         return new BillingProfileInvoicesPageResponse()
-                .invoices(page.getContent().stream().map(BillingProfileMapper::map).toList())
+                .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
                 .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
                 .totalPageNumber(page.getTotalPageNumber())
                 .totalItemNumber(page.getTotalItemNumber())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
     }
 
-    static BillingProfileInvoicesPageItemResponse map(Invoice invoice) {
+    static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(Invoice invoice) {
         return new BillingProfileInvoicesPageItemResponse()
                 .id(invoice.id().value())
-                .name(invoice.name())
-                .generationDate(invoice.createdAt())
+                .number(invoice.number().value())
+                .createdAt(invoice.createdAt())
                 .totalAfterTax(map(invoice.totalAfterTax()))
                 .status(map(invoice.status()));
     }
@@ -183,8 +183,9 @@ public interface BillingProfileMapper {
 
     static InvoiceStatus map(Invoice.Status status) {
         return switch (status) {
+            case DRAFT -> InvoiceStatus.DRAFT;
             case PROCESSING -> InvoiceStatus.PROCESSING;
-            case COMPLETE -> InvoiceStatus.COMPLETE;
+            case APPROVED -> InvoiceStatus.APPROVED;
             case REJECTED -> InvoiceStatus.REJECTED;
         };
     }

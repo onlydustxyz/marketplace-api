@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.view.InvoicePreview;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import org.hibernate.annotations.Type;
@@ -39,8 +39,8 @@ public class WalletEntity {
     @Enumerated(EnumType.STRING)
     WalletTypeEnumEntity type;
 
-    public InvoicePreview.Wallet forInvoicePreview() {
-        return new InvoicePreview.Wallet(network.toString(), address);
+    public Invoice.Wallet forInvoice() {
+        return new Invoice.Wallet(network.toString(), address);
     }
 
     @EqualsAndHashCode

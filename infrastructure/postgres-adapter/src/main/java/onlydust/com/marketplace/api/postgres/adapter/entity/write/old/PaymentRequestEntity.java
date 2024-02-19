@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -43,4 +44,11 @@ public class PaymentRequestEntity {
     @Type(type = "currency")
     @Column(name = "currency", nullable = false)
     CurrencyEnumEntity currency;
+    @ManyToOne
+    InvoiceEntity invoice;
+
+    public PaymentRequestEntity(UUID id, UUID requestorId, Long recipientId, Date requestedAt, BigDecimal amount, Date invoiceReceivedAt, Integer hoursWorked
+            , UUID projectId, CurrencyEnumEntity currency) {
+        this(id, requestorId, recipientId, requestedAt, amount, invoiceReceivedAt, hoursWorked, projectId, currency, null);
+    }
 }

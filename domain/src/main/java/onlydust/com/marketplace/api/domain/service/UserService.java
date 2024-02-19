@@ -8,19 +8,20 @@ import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort
 import onlydust.com.marketplace.api.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.api.domain.port.output.*;
+import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,7 +38,6 @@ public class UserService implements UserFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
     private final BillingProfileStoragePort billingProfileStoragePort;
-    private final InvoiceStoragePort invoiceStoragePort;
     private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
@@ -49,8 +49,9 @@ public class UserService implements UserFacadePort {
                     final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
                     user.setBillingProfileType(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(BillingProfileType.INDIVIDUAL));
-                    if (payoutInformationById.hasPendingPayments()){
-                        user.setHasValidBillingProfile(billingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),user.getBillingProfileType()));
+                    if (payoutInformationById.hasPendingPayments()) {
+                        user.setHasValidBillingProfile(billingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),
+                                user.getBillingProfileType()));
                     }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
@@ -277,6 +278,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    @Transactional
     public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
         billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
         if (billingProfileType.equals(BillingProfileType.COMPANY)) {
@@ -284,11 +286,5 @@ public class UserService implements UserFacadePort {
         } else {
             accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));
         }
-    }
-
-    @Override
-    public URL saveInvoicePdfForGithubUserId(Long githubUserId, InputStream pdfInputStream) {
-        final String invoiceName = githubUserId + "_" + new SimpleDateFormat("ddMMyyyy-hhmmss").format(new Date()) + ".pdf";
-        return invoiceStoragePort.storePdfForName(invoiceName, pdfInputStream);
     }
 }
