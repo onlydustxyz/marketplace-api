@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
@@ -61,7 +61,6 @@ public class CustomProjectRewardRepository {
                                     when pr.currency = 'usd' then not payout_checks.has_bank_account
                               end) then 'PENDING_CONTRIBUTOR'
                           when r.id is not null then 'COMPLETE'
-                          when pr.currency = 'strk' THEN 'LOCKED'
                           when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                           else 'PROCESSING'
                           end                                          status

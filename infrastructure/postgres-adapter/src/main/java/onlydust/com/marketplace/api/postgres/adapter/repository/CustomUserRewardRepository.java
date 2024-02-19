@@ -2,10 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.domain.view.UserRewardView;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
@@ -79,7 +79,7 @@ public class CustomUserRewardRepository {
                                      when pr.currency = 'op' then not payout_checks.wallets @> array [cast('optimism' as network)]
                                      when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                      when pr.currency = 'usd' then not payout_checks.has_bank_account
-                               end) then 'MISSING_PAYOUT_INFO'when pr.currency = 'strk' THEN 'LOCKED'
+                               end) then 'MISSING_PAYOUT_INFO'
                                    when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'
                            when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
@@ -159,7 +159,6 @@ public class CustomUserRewardRepository {
                                              when pr.currency = 'apt' then not payout_checks.wallets @> array [cast('aptos' as network)]
                                              when pr.currency = 'usd' then not payout_checks.has_bank_account
                                        end) then 'MISSING_PAYOUT_INFO'
-                           when pr.currency = 'strk' THEN 'LOCKED'
                            when pr.currency = 'op' and now() < to_date('2024-08-23', 'YYYY-MM-DD') THEN 'LOCKED'               
                            when bpc.type = 'COMPANY' and pr.invoice_received_at is null then 'PENDING_INVOICE'
                            else 'PROCESSING'
