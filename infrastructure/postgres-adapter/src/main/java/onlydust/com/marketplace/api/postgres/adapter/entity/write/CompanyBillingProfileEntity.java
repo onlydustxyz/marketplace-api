@@ -89,12 +89,15 @@ public class CompanyBillingProfileEntity {
                 .build();
     }
 
+    // TODO pass the CompanyBillingProfile (aka KYB) as param for building the invoice
     public Invoice.CompanyInfo forInvoice() {
         return new Invoice.CompanyInfo(
                 registrationNumber,
                 name,
                 address,
                 subjectToEuVAT,
+                Country.fromIso3(country).inEuropeanUnion(),
+                Country.fromIso3(country).isFrance(),
                 euVATNumber
         );
     }
