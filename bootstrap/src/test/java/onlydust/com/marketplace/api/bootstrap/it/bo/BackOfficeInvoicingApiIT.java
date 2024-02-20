@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentReque
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -38,6 +39,12 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 fakeInvoice(List.of(UUID.fromString("d506a05d-3739-452f-928d-45ea81d33079"), UUID.fromString("5083ac1f-4325-4d47-9760-cbc9ab82f25c"),
                         UUID.fromString("e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236")))
         );
+
+        invoices.forEach(invoice -> {
+            final var rewards = paymentRequestRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
+            rewards.forEach(reward -> reward.setInvoice(null));
+            paymentRequestRepository.saveAll(rewards);
+        });
 
         invoiceRepository.deleteAll();
         invoiceRepository.saveAll(invoices);
@@ -97,6 +104,116 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "d506a05d-3739-452f-928d-45ea81d33079",
                                 "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
                                 "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    void should_approve_invoices() {
+        client
+                .patch()
+                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "COMPLETE"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+        ;
+
+        client
+                .get()
+                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "status": "COMPLETE",
+                              "rewardIds": [
+                                "d067b24d-115a-45e9-92de-94dd1d01b184",
+                                "ee28315c-7a84-4052-9308-c2236eeafda1"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "rewardIds": [
+                                "d506a05d-3739-452f-928d-45ea81d33079",
+                                "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
+                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "rewardIds": [
+                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
+                              ]
+                            }
+                          ]
+                        }
+                        """)
+        ;
+    }
+
+    @Test
+    void should_reject_invoices() {
+        client
+                .patch()
+                .uri(getApiURI(INVOICE.formatted(invoices.get(1).id())))
+                .header("Api-Key", apiKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "REJECTED"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isNoContent()
+        ;
+
+        client
+                .get()
+                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Api-Key", apiKey())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "invoices": [
+                            {
+                              "status": "REJECTED",
+                              "rewardIds": [
+                                "d067b24d-115a-45e9-92de-94dd1d01b184",
+                                "ee28315c-7a84-4052-9308-c2236eeafda1"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "rewardIds": [
+                                "d506a05d-3739-452f-928d-45ea81d33079",
+                                "5083ac1f-4325-4d47-9760-cbc9ab82f25c",
+                                "e6ee79ae-b3f0-4f4e-b7e3-9e643bc27236"
+                              ]
+                            },
+                            {
+                              "status": "PROCESSING",
+                              "rewardIds": [
+                                "061e2c7e-bda4-49a8-9914-2e76926f70c2"
                               ]
                             }
                           ]

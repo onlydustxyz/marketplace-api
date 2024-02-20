@@ -279,6 +279,13 @@ public interface BackOfficeMapper {
         };
     }
 
+    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) throws OnlyDustException {
+        return switch (status) {
+            case COMPLETE -> Invoice.Status.APPROVED;
+            case REJECTED -> Invoice.Status.REJECTED;
+        };
+    }
+
     static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {
         return new ProjectPage()
                 .projects(projectViewPage.getContent().stream().map(project -> new ProjectPageItemResponse()

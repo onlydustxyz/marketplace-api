@@ -48,6 +48,38 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/invoices/{invoiceId}:
+    patch:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Update an invoice
+      operationId: updateInvoice
+      description: |
+        Update an invoice.
+        This will allow to update the invoice's status to COMPLETE or REJECTED.
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            $ref: '#/components/schemas/InvoiceId'
+      requestBody:
+        description: Invoice
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchInvoiceRequest'
+      responses:
+        "204":
+          description: 'The invoice has been approved'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeAccountingManagement ===============================================================
   /bo/v1/sponsors/{sponsorId}/accounts:
     post:
@@ -1210,6 +1242,22 @@ components:
         logoUrl:
           type: string
 
+    PatchInvoiceRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - COMPLETE
+            - REJECTED
+
+        paymentDate:
+          type: string
+          format: date-time
+        refundDate:
+          type: string
+          format: date-time
+
     SponsorRequest:
       type: object
       properties:
@@ -1728,6 +1776,68 @@ components:
         codeReviewsCount:
           type: integer
 
+    InvoicePage:
+      type: object
+      required:
+        - invoices
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoicePageItemResponse'
+    InvoicePageItemResponse:
+      type: object
+      required:
+        - id
+        - status
+        - createdAt
+        - dueAt
+        - downloadLink
+        - amount
+        - currency
+        - rewardIds
+      properties:
+        id:
+          $ref: '#/components/schemas/InvoiceId'
+        status:
+          $ref: '#/components/schemas/InvoiceStatus'
+        createdAt:
+          type: string
+          format: date-time
+        dueAt:
+          type: string
+          format: date-time
+        downloadLink:
+          type: string
+          format: uri
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+        rewardIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardId'
+
+    InvoiceStatus:
+      type: string
+      enum:
+        - PROCESSING
+        - COMPLETE
+        - REJECTED
 
     ProjectPage:
       type: object
@@ -1963,6 +2073,10 @@ components:
               $ref: '#/components/schemas/ContractAddress'
 
     SponsorId:
+      type: string
+      format: uuid
+
+    InvoiceId:
       type: string
       format: uuid
 
