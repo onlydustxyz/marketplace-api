@@ -155,6 +155,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String POST_CURRENCIES = "/bo/v1/currencies";
     protected static final String PUT_CURRENCIES = "/bo/v1/currencies/%s";
     protected static final String GET_CURRENCIES = "/bo/v1/currencies";
+    protected static final String INVOICES = "/bo/v1/invoices";
 
     protected String apiKey() {
         return config.getApiKey();

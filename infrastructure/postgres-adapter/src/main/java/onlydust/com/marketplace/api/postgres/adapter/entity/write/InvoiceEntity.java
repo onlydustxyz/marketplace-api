@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true, fluent = true)
 @NoArgsConstructor
+@AllArgsConstructor
 public class InvoiceEntity {
     @Id
     @NonNull UUID id;

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Accessors(fluent = true)
 @TypeDef(name = "currency_type", typeClass = PostgreSQLEnumType.class)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@ToString
 public class CurrencyEntity {
     @Id
     @EqualsAndHashCode.Include

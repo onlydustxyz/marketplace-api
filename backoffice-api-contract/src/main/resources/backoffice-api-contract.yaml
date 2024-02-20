@@ -14,8 +14,41 @@ servers:
     description: Production
 
 paths:
-  # BackofficeAccountingManagement ===============================================================
+  # BackofficeInvoicingManagement ===============================================================
+  /bo/v1/invoices:
+    get:
+      security:
+        - apiKey: [ ]
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Get invoice page
+      operationId: getInvoicePage
+      description: |
+        Get invoice page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Invoice page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoicePage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
+  # BackofficeAccountingManagement ===============================================================
   /bo/v1/sponsors/{sponsorId}/accounts:
     post:
       security:

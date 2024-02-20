@@ -2,15 +2,13 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.api.domain.service.BackofficeService;
 import onlydust.com.marketplace.api.domain.service.RewardV2Service;
-import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
-import onlydust.com.marketplace.api.rest.api.adapter.BackofficeCurrencyManagementRestApi;
-import onlydust.com.marketplace.api.rest.api.adapter.BackofficeRestApi;
-import onlydust.com.marketplace.api.rest.api.adapter.BackofficeSponsorManagementRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +32,11 @@ public class BackofficeConfiguration {
     @Bean
     public BackofficeSponsorManagementRestApi backofficeSponsorManagementRestApi(final BackofficeFacadePort backofficeFacadePort) {
         return new BackofficeSponsorManagementRestApi(backofficeFacadePort);
+    }
+
+    @Bean
+    public BackofficeInvoicingManagementRestApi backofficeInvoicingManagementRestApi(final InvoiceFacadePort invoiceFacadePort) {
+        return new BackofficeInvoicingManagementRestApi(invoiceFacadePort);
     }
 
     @Bean
