@@ -21,11 +21,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final IndividualBillingProfileRepository individualBillingProfileRepository;
     private final CustomUserRewardRepository userRewardRepository;
     private final ChildrenKycRepository childrenKycRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId) {
-        return companyBillingProfileRepository.findByUserId(userId).map(CompanyBillingProfileEntity::toDomain);
+        return companyBillingProfileRepository.findByUserId(userId).map(
+                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+        );
     }
 
     @Override
@@ -37,8 +40,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
-        return individualBillingProfileRepository.findByUserId(userId)
-                .map(IndividualBillingProfileEntity::toDomain);
+        return individualBillingProfileRepository.findByUserId(userId).map(
+                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+        );
     }
 
     @Override
@@ -83,26 +87,31 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<CompanyBillingProfile> findCompanyProfileById(UUID billingProfileId) {
-        return companyBillingProfileRepository.findById(billingProfileId).map(CompanyBillingProfileEntity::toDomain);
+        return companyBillingProfileRepository.findById(billingProfileId).map(
+                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+        );
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId) {
-        return individualBillingProfileRepository.findById(billingProfileId).map(IndividualBillingProfileEntity::toDomain);
+        return individualBillingProfileRepository.findById(billingProfileId).map(
+                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+        );
     }
 
     @Override
     @Transactional
     public CompanyBillingProfile saveCompanyProfile(CompanyBillingProfile companyBillingProfile) {
         return companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile))
-                .toDomain();
+                .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
     }
 
     @Override
     @Transactional
     public IndividualBillingProfile saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
-        return individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile)).toDomain();
+        return individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile))
+                .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
     }
 
     @Override
@@ -136,8 +145,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<CompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId) {
-        return companyBillingProfileRepository.findByApplicantId(billingProfileExternalVerificationId)
-                .map(CompanyBillingProfileEntity::toDomain);
+        return companyBillingProfileRepository.findByApplicantId(billingProfileExternalVerificationId).map(
+                entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
+        );
     }
 
     @Override

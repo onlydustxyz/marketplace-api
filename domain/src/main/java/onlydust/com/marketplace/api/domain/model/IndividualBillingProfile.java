@@ -28,6 +28,7 @@ public class IndividualBillingProfile {
     Date validUntil;
     String reviewMessageForApplicant;
     String externalApplicantId;
+    boolean invoiceMandateAccepted;
 
     public static IndividualBillingProfile initForUser(final UUID userId) {
         return IndividualBillingProfile.builder()

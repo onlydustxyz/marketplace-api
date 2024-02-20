@@ -10,6 +10,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
@@ -261,6 +262,57 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
+    }
+
+    @Test
+    @Order(3)
+    void should_accept_mandate() {
+        // Given
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
+                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(10)
+                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
+
+        // When
+        client.put()
+                .uri(getApiURI(BILLING_PROFILE_INVOICES_MANDATE.formatted(billingProfileId)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "hasAcceptedInvoiceMandate": true
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
+                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(10)
+                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(true);
     }
 
     @Test

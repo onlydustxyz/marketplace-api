@@ -2688,6 +2688,34 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/billing-profiles/{billingProfileId}/invoices/mandate:
+    put:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Accept or decline OnlyDust invoice mandate for billing profile
+      operationId: acceptOrDeclineInvoiceMandate
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceMandateRequest'
+      responses:
+        "204":
+          description: 'Invoice mandate accepted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -4512,6 +4540,7 @@ components:
         - id
         - name
         - type
+        - invoiceMandateAccepted
       properties:
         id:
           type: string
@@ -4522,6 +4551,8 @@ components:
           type: string
         rewardCount:
           type: integer
+        invoiceMandateAccepted:
+          type: boolean
     ProjectLedShortResponse:
       type: object
       required:
@@ -5573,3 +5604,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
+
+    InvoiceMandateRequest:
+      type: object
+      required:
+        - hasAcceptedInvoiceMandate
+      properties:
+        hasAcceptedInvoiceMandate:
+          type: boolean

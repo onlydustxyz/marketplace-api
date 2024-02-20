@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 
 import javax.transaction.Transactional;
 import java.io.InputStream;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -71,6 +72,14 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var pdf = pdfStoragePort.download(invoiceInternalFileName(invoice));
         return new InvoiceDownload(pdf, invoiceExternalFileName(invoice));
+    }
+
+    @Override
+    public void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
+
+        billingProfileStorage.updateInvoiceMandateAcceptanceDate(billingProfileId, ZonedDateTime.now());
     }
 
     private String invoiceExternalFileName(Invoice invoice) {

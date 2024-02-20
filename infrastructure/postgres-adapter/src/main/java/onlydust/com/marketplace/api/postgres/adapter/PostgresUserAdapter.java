@@ -5,9 +5,6 @@ import onlydust.com.marketplace.api.domain.model.Currency;
 import onlydust.com.marketplace.api.domain.model.*;
 import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -21,6 +18,9 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.UserRewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -59,16 +59,13 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserByGithubId(Long githubId) {
-        final var settings =
-                globalSettingsRepository.findAll().stream().findFirst()
-                        .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findByGithubUserId(githubId);
         return user.map(u -> {
             final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
                     .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                     .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
-            return mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+            return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
                     projectLedIdsByUserId, applications);
         });
     }
@@ -76,16 +73,13 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Optional<User> getUserById(UUID userId) {
-        final var settings =
-                globalSettingsRepository.findAll().stream().findFirst()
-                        .orElseThrow(() -> OnlyDustException.internalServerError("No global settings found", null));
         Optional<UserViewEntity> user = userViewRepository.findById(userId);
         return user.map(u -> {
             final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(u.getId()).stream()
                     .sorted(Comparator.comparing(ProjectLedIdViewEntity::getProjectSlug))
                     .toList();
             final var applications = applicationRepository.findAllByApplicantId(u.getId());
-            return mapUserToDomain(u, settings.getTermsAndConditionsLatestVersionDate(),
+            return mapUserToDomain(u, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
                     projectLedIdsByUserId, applications);
         });
     }

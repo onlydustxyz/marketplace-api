@@ -48,6 +48,7 @@ public class IndividualBillingProfileEntity {
     Date validUntil;
     String reviewMessage;
     String applicantId;
+    Date invoiceMandateAcceptedAt;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -86,7 +87,7 @@ public class IndividualBillingProfileEntity {
         }
     }
 
-    public IndividualBillingProfile toDomain() {
+    public IndividualBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
         return IndividualBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
@@ -103,6 +104,7 @@ public class IndividualBillingProfileEntity {
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
+                .invoiceMandateAccepted(this.invoiceMandateAcceptedAt != null && this.invoiceMandateAcceptedAt.after(invoiceMandateLatestVersionDate))
                 .build();
     }
 
