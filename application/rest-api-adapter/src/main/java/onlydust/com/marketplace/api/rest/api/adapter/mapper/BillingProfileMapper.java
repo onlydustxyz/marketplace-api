@@ -12,15 +12,22 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
 public interface BillingProfileMapper {
+    Map<String, String> COUNTRY_NAME_MAPPED_TO_ISO3_CODE = Arrays.stream(Locale.getISOCountries()).map(isoCountry -> new Locale("", isoCountry))
+            .collect(Collectors.toMap(Locale::getISO3Country, locale -> locale.getDisplayCountry(Locale.ENGLISH)));
 
     static CompanyBillingProfileResponse companyDomainToResponse(final CompanyBillingProfile companyBillingProfile) {
         return new CompanyBillingProfileResponse()
                 .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry())
+                .country(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(companyBillingProfile.getCountry()))
+                .countryCode(companyBillingProfile.getCountry())
                 .id(companyBillingProfile.getId())
                 .status(verificationStatusToResponse(companyBillingProfile.getStatus()))
                 .name(companyBillingProfile.getName())
@@ -37,7 +44,8 @@ public interface BillingProfileMapper {
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
                 .birthdate(DateMapper.toZoneDateTime(individualBillingProfile.getBirthdate()))
-                .country(individualBillingProfile.getCountry())
+                .country(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(individualBillingProfile.getCountry()))
+                .countryCode(individualBillingProfile.getCountry())
                 .address(individualBillingProfile.getAddress())
                 .idDocumentNumber(individualBillingProfile.getIdDocumentNumber())
                 .firstName(individualBillingProfile.getFirstName())
