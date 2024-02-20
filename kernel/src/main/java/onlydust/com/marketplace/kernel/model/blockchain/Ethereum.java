@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.kernel.model.blockchain;
 
 
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.TransactionHash;
@@ -24,7 +25,12 @@ public interface Ethereum {
     }
 
     static Wallet wallet(String wallet) {
-        return wallet.startsWith("0x") ? new Wallet(accountAddress(wallet)) : new Wallet(name(wallet));
+        // TODO implement proper ENS check with Infura
+        try {
+            return new Wallet(accountAddress(wallet));
+        } catch (OnlyDustException e) {
+            return new Wallet(name(wallet));
+        }
     }
 
     static ContractAddress contractAddress(String address) {

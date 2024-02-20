@@ -49,7 +49,7 @@ public class Auth0JwtService implements JwtService {
             LOGGER.error("Unable to deserialize Jwt token", e);
             return Optional.empty();
         } catch (Exception e) {
-            LOGGER.debug("Invalid Jwt token", e);
+            LOGGER.warn("Invalid Jwt token", e);
             return Optional.empty();
         }
     }
