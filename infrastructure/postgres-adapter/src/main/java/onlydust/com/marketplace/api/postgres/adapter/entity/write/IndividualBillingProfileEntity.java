@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.api.domain.model.Country;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -91,7 +92,7 @@ public class IndividualBillingProfileEntity {
                 .status(this.verificationStatus.toDomain())
                 .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
                 .address(this.address)
-                .country(this.country)
+                .country(this.country == null ? null : Country.fromIso3(this.country))
                 .firstName(this.firstName)
                 .lastName(this.lastName)
                 .validUntil(this.validUntil)
@@ -110,7 +111,7 @@ public class IndividualBillingProfileEntity {
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
                 .birthdate(individualBillingProfile.getBirthdate())
-                .country(individualBillingProfile.getCountry())
+                .country(individualBillingProfile.getCountry() == null ? null : individualBillingProfile.getCountry().iso3Code())
                 .firstName(individualBillingProfile.getFirstName())
                 .lastName(individualBillingProfile.getLastName())
                 .validUntil(individualBillingProfile.getValidUntil())

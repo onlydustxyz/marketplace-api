@@ -6,6 +6,7 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDat
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.Country;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -48,7 +49,7 @@ public class SumsubResponseMapper {
                 final String countryIso3 = sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().get(0).getCountry();
                 if (nonNull(countryIso3)) {
                     updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
-                            .country(countryIso3)
+                            .country(Country.fromIso3(countryIso3))
                             .build();
                 }
             }
@@ -109,7 +110,7 @@ public class SumsubResponseMapper {
             updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
                     .name(applicantsData.getInfo().getCompanyInfo().getName())
                     .registrationNumber(applicantsData.getInfo().getCompanyInfo().getRegistrationNumber())
-                    .country(applicantsData.getInfo().getCompanyInfo().getCountry())
+                    .country(Country.fromIso3(applicantsData.getInfo().getCompanyInfo().getCountry()))
                     .build();
         }
         if (nonNull(applicantsData.getQuestionnaires()) && !applicantsData.getQuestionnaires().isEmpty()) {

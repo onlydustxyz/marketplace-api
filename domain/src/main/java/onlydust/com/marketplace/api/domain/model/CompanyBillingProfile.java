@@ -22,7 +22,7 @@ public class CompanyBillingProfile {
     String registrationNumber;
     Date registrationDate;
     String address;
-    String country;
+    Country country;
     Boolean usEntity;
     Boolean subjectToEuropeVAT;
     String euVATNumber;
