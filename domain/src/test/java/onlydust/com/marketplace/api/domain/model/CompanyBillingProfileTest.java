@@ -20,11 +20,11 @@ public class CompanyBillingProfileTest {
     @Test
     void should_update_status_from_children_statuses_given_one_children() {
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.STARTED), VerificationStatus.STARTED);
-        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.UNDER_REVIEW);
+        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.VERIFIED), VerificationStatus.STARTED);
-        assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.STARTED), VerificationStatus.UNDER_REVIEW);
+        assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.STARTED), VerificationStatus.STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.UNDER_REVIEW), VerificationStatus.UNDER_REVIEW);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.REJECTED), VerificationStatus.REJECTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.CLOSED), VerificationStatus.CLOSED);
@@ -48,18 +48,18 @@ public class CompanyBillingProfileTest {
 
     @Test
     void should_update_status_from_children_statuses_given_two_children() {
-        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.STARTED, VerificationStatus.STARTED), VerificationStatus.STARTED);
+        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED), VerificationStatus.NOT_STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.STARTED),
-                VerificationStatus.UNDER_REVIEW);
+                VerificationStatus.STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),
                 VerificationStatus.REJECTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.CLOSED, VerificationStatus.REJECTED), VerificationStatus.CLOSED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.VERIFIED, VerificationStatus.UNDER_REVIEW),
-                VerificationStatus.UNDER_REVIEW);
+                VerificationStatus.STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.STARTED, VerificationStatus.STARTED),
-                VerificationStatus.UNDER_REVIEW);
-        assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.STARTED),
-                VerificationStatus.UNDER_REVIEW);
+                VerificationStatus.STARTED);
+        assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED),
+                VerificationStatus.NOT_STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),
                 VerificationStatus.REJECTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.UNDER_REVIEW, List.of(VerificationStatus.CLOSED, VerificationStatus.UNDER_REVIEW),
