@@ -336,9 +336,10 @@ public class PostgresConfiguration {
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository,
                                                                        final CustomUserRewardRepository customUserRewardRepository,
-                                                                       final ChildrenKycRepository childrenKycRepository) {
+                                                                       final ChildrenKycRepository childrenKycRepository,
+                                                                       final GlobalSettingsRepository globalSettingsRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
-                customUserRewardRepository, childrenKycRepository);
+                customUserRewardRepository, childrenKycRepository, globalSettingsRepository);
     }
 
     @Bean
@@ -376,7 +377,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository){
+    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository) {
         return new PostgresEcosystemAdapter(ecosystemRepository);
     }
 }

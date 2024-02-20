@@ -84,7 +84,8 @@ public interface BillingProfileMapper {
                 .id(billingProfile.id())
                 .name(billingProfile.name())
                 .type(map(billingProfile.type()))
-                .rewardCount(billingProfile.rewardCount());
+                .rewardCount(billingProfile.rewardCount())
+                .invoiceMandateAccepted(billingProfile.invoiceMandateAccepted());
     }
 
     static InvoicePreviewResponse map(Invoice preview) {

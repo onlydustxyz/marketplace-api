@@ -75,6 +75,7 @@ public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
                 .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
                 .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false)
         ;
     }
 

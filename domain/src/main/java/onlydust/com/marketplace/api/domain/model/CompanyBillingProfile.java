@@ -28,6 +28,7 @@ public class CompanyBillingProfile {
     String euVATNumber;
     String reviewMessageForApplicant;
     String externalApplicantId;
+    boolean invoiceMandateAccepted;
 
     public static CompanyBillingProfile initForUser(final UUID userId) {
         return CompanyBillingProfile.builder()

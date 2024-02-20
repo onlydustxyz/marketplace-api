@@ -22,4 +22,7 @@ public class GlobalSettingsEntity {
 
     @Column(name = "terms_and_conditions_latest_version_date", nullable = false)
     private Date termsAndConditionsLatestVersionDate;
+
+    @Column(name = "invoice_mandate_latest_version_date", nullable = false)
+    private Date invoiceMandateLatestVersionDate;
 }
