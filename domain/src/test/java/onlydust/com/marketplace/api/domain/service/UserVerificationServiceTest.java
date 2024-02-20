@@ -83,7 +83,7 @@ public class UserVerificationServiceTest {
                             .userId(userId)
                             .status(VerificationStatus.REJECTED)
                             .address(faker.address().fullAddress())
-                            .country(faker.address().country())
+                            .country(Country.fromIso3(faker.address().countryCode()))
                             .name(faker.rickAndMorty().character())
                             .euVATNumber(faker.hacker().abbreviation())
                             .subjectToEuropeVAT(true)
@@ -133,7 +133,14 @@ public class UserVerificationServiceTest {
             final CompanyBillingProfile companyBillingProfileWithNewStatus =
                     initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
             final CompanyBillingProfile updatedCompanyBillingProfile =
-                    initialCompanyBillingProfile.toBuilder().id(billingProfileId).userId(userId).status(VerificationStatus.REJECTED).address(faker.address().fullAddress()).country(faker.address().country()).name(faker.rickAndMorty().character()).euVATNumber(faker.hacker().abbreviation()).subjectToEuropeVAT(true).registrationDate(new Date()).registrationNumber(faker.harryPotter().character()).usEntity(false).build();
+                    initialCompanyBillingProfile.toBuilder().id(billingProfileId).userId(userId).status(VerificationStatus.REJECTED).address(faker.address().fullAddress()).country(Country.fromIso3(faker.address().country()))
+                .name(faker.rickAndMorty().character())
+                .euVATNumber(faker.hacker().abbreviation())
+                .subjectToEuropeVAT(true)
+                .registrationDate(new Date())
+                .registrationNumber(faker.harryPotter().character())
+                .usEntity(false)
+                .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
@@ -196,9 +203,21 @@ public class UserVerificationServiceTest {
             final IndividualBillingProfile individualBillingProfileWithStatus =
                     initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
             final IndividualBillingProfile updatedIndividualBillingProfile =
-                    individualBillingProfileWithStatus.toBuilder().country(faker.address().country()).address(faker.address().fullAddress()).birthdate(new Date()).idDocumentNumber(faker.idNumber().valid()).idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT).usCitizen(false).validUntil(new Date()).build();
-            final User user =
-                    User.builder().id(userId).githubUserId(1L).githubLogin(faker.rickAndMorty().character()).githubAvatarUrl(faker.internet().url()).githubEmail(faker.internet().emailAddress()).build();
+                    individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
+                .address(faker.address().fullAddress())
+                .birthdate(new Date())
+                .idDocumentNumber(faker.idNumber().valid())
+                .idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                .usCitizen(false)
+                .validUntil(new Date())
+                .build();
+        final User user = User.builder()
+                .id(userId)
+                .githubUserId(1L)
+                .githubLogin(faker.rickAndMorty().character())
+                .githubAvatarUrl(faker.internet().url())
+                .githubEmail(faker.internet().emailAddress())
+                .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
@@ -237,7 +256,14 @@ public class UserVerificationServiceTest {
             final IndividualBillingProfile individualBillingProfileWithStatus =
                     initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
             final IndividualBillingProfile updatedIndividualBillingProfile =
-                    individualBillingProfileWithStatus.toBuilder().country(faker.address().country()).address(faker.address().fullAddress()).birthdate(new Date()).idDocumentNumber(faker.idNumber().valid()).idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT).usCitizen(false).validUntil(new Date()).build();
+                    individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
+                .address(faker.address().fullAddress())
+                .birthdate(new Date())
+                .idDocumentNumber(faker.idNumber().valid())
+                .idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                .usCitizen(false)
+                .validUntil(new Date())
+                .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);

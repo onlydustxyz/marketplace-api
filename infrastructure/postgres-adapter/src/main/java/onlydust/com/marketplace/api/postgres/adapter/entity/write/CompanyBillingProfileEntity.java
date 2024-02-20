@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.Country;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -63,7 +64,7 @@ public class CompanyBillingProfileEntity {
                 .registrationDate(this.registrationDate)
                 .name(this.name)
                 .registrationNumber(this.registrationNumber)
-                .country(this.country)
+                .country(this.country == null ? null : Country.fromIso3(this.country))
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
@@ -76,7 +77,7 @@ public class CompanyBillingProfileEntity {
                 .userId(companyBillingProfile.getUserId())
                 .usEntity(companyBillingProfile.getUsEntity())
                 .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry())
+                .country(companyBillingProfile.getCountry() == null ? null : companyBillingProfile.getCountry().iso3Code())
                 .name(companyBillingProfile.getName())
                 .verificationStatus(VerificationStatusEntity.fromDomain(companyBillingProfile.getStatus()))
                 .subjectToEuVAT(companyBillingProfile.getSubjectToEuropeVAT())
@@ -88,12 +89,15 @@ public class CompanyBillingProfileEntity {
                 .build();
     }
 
+    // TODO pass the CompanyBillingProfile (aka KYB) as param for building the invoice
     public Invoice.CompanyInfo forInvoice() {
         return new Invoice.CompanyInfo(
                 registrationNumber,
                 name,
                 address,
                 subjectToEuVAT,
+                Country.fromIso3(country).inEuropeanUnion(),
+                Country.fromIso3(country).isFrance(),
                 euVATNumber
         );
     }

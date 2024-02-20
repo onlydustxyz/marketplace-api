@@ -6,25 +6,19 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDat
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
 import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.Country;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
 public class SumsubResponseMapper {
-
-    private static final Map<String, String> COUNTRY_NAME_MAPPED_TO_ISO3_CODE = new HashMap<>();
-
-    static {
-        for (String isoCountry : Locale.getISOCountries()) {
-            final Locale locale = new Locale("", isoCountry);
-            COUNTRY_NAME_MAPPED_TO_ISO3_CODE.put(locale.getISO3Country(), locale.getDisplayCountry(Locale.ENGLISH));
-        }
-    }
 
     private static Date mapDate(final String dateString) {
         try {
@@ -53,9 +47,9 @@ public class SumsubResponseMapper {
                         .address(sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().get(0).getFormattedAddress())
                         .build();
                 final String countryIso3 = sumsubIndividualApplicantsDataDTO.getInfo().getAddresses().get(0).getCountry();
-                if (nonNull(countryIso3) && COUNTRY_NAME_MAPPED_TO_ISO3_CODE.containsKey(countryIso3)) {
+                if (nonNull(countryIso3)) {
                     updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
-                            .country(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(countryIso3))
+                            .country(Country.fromIso3(countryIso3))
                             .build();
                 }
             }
@@ -116,12 +110,8 @@ public class SumsubResponseMapper {
             updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
                     .name(applicantsData.getInfo().getCompanyInfo().getName())
                     .registrationNumber(applicantsData.getInfo().getCompanyInfo().getRegistrationNumber())
+                    .country(Country.fromIso3(applicantsData.getInfo().getCompanyInfo().getCountry()))
                     .build();
-            if (COUNTRY_NAME_MAPPED_TO_ISO3_CODE.containsKey(applicantsData.getInfo().getCompanyInfo().getCountry())) {
-                updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
-                        .country(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(applicantsData.getInfo().getCompanyInfo().getCountry()))
-                        .build();
-            }
         }
         if (nonNull(applicantsData.getQuestionnaires()) && !applicantsData.getQuestionnaires().isEmpty()) {
             final Optional<SumsubCompanyApplicantsDataDTO.QuestionnaireDTO> optionalQuestionnaireDTO = applicantsData.getQuestionnaires().stream()

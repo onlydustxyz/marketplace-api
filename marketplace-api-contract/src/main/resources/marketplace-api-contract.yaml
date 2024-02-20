@@ -5249,7 +5249,11 @@ components:
         address:
           type: string
         country:
+          deprecated: true
           type: string
+        countryCode:
+          type: string
+          format: iso-country-code
         usEntity:
           type: boolean
         subjectToEuropeVAT:
@@ -5279,6 +5283,10 @@ components:
           type: string
         country:
           type: string
+          deprecated: true
+        countryCode:
+          type: string
+          format: iso-country-code
         usCitizen:
           type: boolean
         idDocumentType:

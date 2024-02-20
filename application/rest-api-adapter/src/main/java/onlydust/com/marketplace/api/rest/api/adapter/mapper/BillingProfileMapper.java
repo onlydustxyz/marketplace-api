@@ -16,11 +16,12 @@ import java.math.RoundingMode;
 import static java.util.Objects.isNull;
 
 public interface BillingProfileMapper {
-
     static CompanyBillingProfileResponse companyDomainToResponse(final CompanyBillingProfile companyBillingProfile) {
         return new CompanyBillingProfileResponse()
                 .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry())
+                .country(companyBillingProfile.getCountry() == null ? null :
+                        companyBillingProfile.getCountry().display().orElse(companyBillingProfile.getCountry().iso3Code()))
+                .countryCode(companyBillingProfile.getCountry() == null ? null : companyBillingProfile.getCountry().iso3Code())
                 .id(companyBillingProfile.getId())
                 .status(verificationStatusToResponse(companyBillingProfile.getStatus()))
                 .name(companyBillingProfile.getName())
@@ -37,7 +38,9 @@ public interface BillingProfileMapper {
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
                 .birthdate(DateMapper.toZoneDateTime(individualBillingProfile.getBirthdate()))
-                .country(individualBillingProfile.getCountry())
+                .country(individualBillingProfile.getCountry() == null ? null :
+                        individualBillingProfile.getCountry().display().orElse(individualBillingProfile.getCountry().iso3Code()))
+                .countryCode(individualBillingProfile.getCountry() == null ? null : individualBillingProfile.getCountry().iso3Code())
                 .address(individualBillingProfile.getAddress())
                 .idDocumentNumber(individualBillingProfile.getIdDocumentNumber())
                 .firstName(individualBillingProfile.getFirstName())
