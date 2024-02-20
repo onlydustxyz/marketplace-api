@@ -70,7 +70,7 @@ public class AwsS3Adapter implements ImageStoragePort, PdfStoragePort {
     @Override
     public URL upload(final @NonNull String fileName, final @NonNull InputStream data) {
         try {
-            return uploadByteArrayToS3Bucket(data.readAllBytes(), amazonS3Properties.getPdfBucket(), fileName);
+            return uploadByteArrayToS3Bucket(data.readAllBytes(), amazonS3Properties.getInvoiceBucket(), fileName);
         } catch (IOException e) {
             throw badRequest("Failed to read input stream", e);
         }
@@ -78,7 +78,7 @@ public class AwsS3Adapter implements ImageStoragePort, PdfStoragePort {
 
     @Override
     public InputStream download(@NonNull String fileName) {
-        final var s3Object = amazonS3.getObject(amazonS3Properties.getPdfBucket(), fileName);
+        final var s3Object = amazonS3.getObject(amazonS3Properties.getInvoiceBucket(), fileName);
         return s3Object.getObjectContent();
     }
 
