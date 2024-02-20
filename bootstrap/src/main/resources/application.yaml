@@ -80,7 +80,7 @@ infrastructure:
     region: ${AWS_REGION}
     access-key: ${AWS_ACCESS_KEY_ID}
     secret-key: ${AWS_SECRET_ACCESS_KEY}
-    pdf-bucket: ${PDF_BUCKET_NAME}
+    invoice-bucket: ${INVOICE_BUCKET_NAME}
   github:
     personal-access-token: ${GITHUB_PAT}
     base-uri: ${GITHUB_BASE_URL}
