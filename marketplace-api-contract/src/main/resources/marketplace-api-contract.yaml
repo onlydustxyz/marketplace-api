@@ -4666,6 +4666,15 @@ components:
             It is allowed to link a new repo directly through this list.
           items:
             $ref: '#/components/schemas/GithubRepoId'
+        ecosystemIds:
+          type: array
+          description: List of Ecosystem to link the project on.
+            All other ecosystem will be unlinked from the project.
+            If empty, all ecosystem will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new ecosystem directly through this list.
+          items:
+            $ref: '#/components/schemas/EcosystemId'
 
     ProjectRewardSettings:
       type: object

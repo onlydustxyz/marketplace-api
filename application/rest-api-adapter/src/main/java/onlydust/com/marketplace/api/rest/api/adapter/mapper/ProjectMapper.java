@@ -32,6 +32,7 @@ public interface ProjectMapper {
                         .map(moreInfo -> MoreInfoLink.builder()
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList() : null)
                 .imageUrl(createProjectRequest.getLogoUrl())
+                .ecosystemIds(createProjectRequest.getEcosystemIds())
                 .build();
     }
 
@@ -52,6 +53,7 @@ public interface ProjectMapper {
                                 .map(moreInfo -> MoreInfoLink.builder()
                                         .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
+                .ecosystemIds(updateProjectRequest.getEcosystemIds())
                 .build();
     }
 
