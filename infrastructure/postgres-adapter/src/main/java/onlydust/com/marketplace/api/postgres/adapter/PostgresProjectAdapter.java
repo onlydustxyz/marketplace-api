@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.*;
@@ -216,7 +217,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                                 Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                                 List<Long> githubRepoIds, UUID firstProjectLeaderId,
                                 List<Long> githubUserIdsAsProjectLeads,
-                                ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings) {
+                                ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -240,6 +241,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                                                 projectId, githubUserId))
                                         .collect(Collectors.toSet()))
+                        .ecosystems(ecosystemIds == null ? null :
+                                ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId)).collect(Collectors.toSet()))
                         .rank(0)
                         .build();
 
@@ -256,7 +259,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
                               Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                               List<UUID> projectLeadersToKeep, String imageUrl,
-                              ProjectRewardSettings rewardSettings) {
+                              ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound(format("Project %s not found", projectId)));
         project.setName(name);
@@ -321,6 +324,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort, ProjectReward
             } else {
                 project.setRepos(githubRepoIds.stream()
                         .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                        .collect(Collectors.toSet()));
+            }
+        }
+
+        if (nonNull(ecosystemIds)) {
+            if (nonNull(project.getEcosystems())) {
+                project.getEcosystems().clear();
+                project.getEcosystems().addAll(ecosystemIds.stream()
+                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
+                        .collect(Collectors.toSet()));
+            } else {
+                project.setEcosystems(ecosystemIds.stream()
+                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
                         .collect(Collectors.toSet()));
             }
         }

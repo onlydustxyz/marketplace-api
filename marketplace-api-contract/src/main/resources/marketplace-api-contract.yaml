@@ -2657,6 +2657,36 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/ecosystems:
+    get:
+      security:
+        - { }
+      tags:
+        - Ecosystems
+      summary: Get all ecosystems
+      operationId: getAllEcosystems
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Page of ecosystem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -4565,6 +4595,10 @@ components:
           type: string
           format: url
           description: Direct URL to project's logo image
+        ecosystemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemId'
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
@@ -4632,6 +4666,15 @@ components:
             It is allowed to link a new repo directly through this list.
           items:
             $ref: '#/components/schemas/GithubRepoId'
+        ecosystemIds:
+          type: array
+          description: List of Ecosystem to link the project on.
+            All other ecosystem will be unlinked from the project.
+            If empty, all ecosystem will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new ecosystem directly through this list.
+          items:
+            $ref: '#/components/schemas/EcosystemId'
 
     ProjectRewardSettings:
       type: object
@@ -5507,3 +5550,26 @@ components:
         - PROCESSING
         - REJECTED
         - APPROVED
+
+    EcosystemPage:
+      type: object
+      required:
+        - ecosystems
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemResponse'

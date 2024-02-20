@@ -20,4 +20,5 @@ public class UpdateProjectCommand {
     Boolean isLookingForContributors;
     String imageUrl;
     ProjectRewardSettings rewardSettings;
+    List<UUID> ecosystemIds;
 }

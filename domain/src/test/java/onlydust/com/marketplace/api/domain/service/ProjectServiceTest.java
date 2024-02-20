@@ -124,6 +124,7 @@ public class ProjectServiceTest {
         // Given
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
+        final List<UUID> ecosystemIds = List.of(UUID.randomUUID());
         final CreateProjectCommand command = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())
                 .shortDescription(faker.lorem().sentence())
@@ -134,6 +135,7 @@ public class ProjectServiceTest {
                 .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
+                .ecosystemIds(ecosystemIds)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
 
@@ -147,7 +149,7 @@ public class ProjectServiceTest {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 imageUrl,
-                ProjectRewardSettings.defaultSettings(dateProvider.now())
+                ProjectRewardSettings.defaultSettings(dateProvider.now()), ecosystemIds
         )).thenReturn("slug");
         final var projectIdentity = projectService.createProject(command);
 
@@ -207,7 +209,8 @@ public class ProjectServiceTest {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(),
                 imageUrl,
-                command.getRewardSettings()
+                command.getRewardSettings(),
+                command.getEcosystemIds()
         );
         verify(projectObserverPort).onProjectDetailsUpdated(projectId);
         verify(projectObserverPort).onLinkedReposChanged(projectId,

@@ -99,7 +99,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "githubRepoIds": [
                             498695724, 602953043
                           ],
-                          "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                          "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                          "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"]
                         }
                         """)
                 .exchange()
@@ -159,7 +160,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
-                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty();
+                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty()
+                .jsonPath("$.ecosystems.length()").isEqualTo(2)
+                .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
+                .jsonPath("$.ecosystems[1].name").isEqualTo("Zama");
 
         final var events = eventRepository.findAll();
         final var event = events.get(events.size() - 1);
@@ -315,7 +319,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             "ignoreIssues": true,
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
-                          }
+                          },
+                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"]
                         }
                         """)
                 .exchange()
@@ -746,6 +751,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(true)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(true)
-                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("2021-01-01T00:00:00Z");
+                .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("2021-01-01T00:00:00Z")
+
+                .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
+                .jsonPath("$.ecosystems[1].name").isEqualTo("Ethereum");
     }
 }
