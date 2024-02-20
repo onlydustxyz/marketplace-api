@@ -203,6 +203,7 @@ public interface BackOfficeMapper {
                         .languages(user.getLanguages())
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
+                        .usEntity(user.getUsEntity())
                         .verificationStatus(switch (user.getVerificationStatus()) {
                             case NOT_STARTED -> VerificationStatus.NOT_STARTED;
                             case STARTED -> VerificationStatus.STARTED;

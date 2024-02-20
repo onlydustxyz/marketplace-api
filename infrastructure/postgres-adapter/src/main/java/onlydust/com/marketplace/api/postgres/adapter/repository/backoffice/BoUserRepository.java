@@ -44,6 +44,12 @@ public interface BoUserRepository extends JpaRepository<BoUserEntity, UUID> {
                     (case
                          when ubpt.billing_profile_type = 'COMPANY' then cbp.country
                          when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.country end)                     AS country,
+                    (case
+                         when ubpt.billing_profile_type = 'COMPANY' then cbp.us_entity
+                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.us_citizen end)                  AS us_entity,
+                    (case
+                         when ubpt.billing_profile_type = 'COMPANY' then cbp.country
+                         when ubpt.billing_profile_type = 'INDIVIDUAL' then ibp.country end)                     AS country,
                     ba.bic                                                                                       AS bic,
                     ba.iban                                                                                      AS iban,
                     eth_name.address                                                                             AS ens,

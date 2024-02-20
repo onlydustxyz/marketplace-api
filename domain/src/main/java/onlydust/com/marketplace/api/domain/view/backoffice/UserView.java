@@ -50,6 +50,7 @@ public class UserView {
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
     VerificationStatus verificationStatus;
+    Boolean usEntity;
 
     @Value
     @Builder

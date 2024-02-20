@@ -64,6 +64,7 @@ public class BoUserEntity {
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
     String verificationStatus;
+    Boolean usEntity;
 
     public UserView toView() {
         return UserView.builder()
@@ -103,6 +104,7 @@ public class BoUserEntity {
                 .languages(languages)
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
+                .usEntity(usEntity)
                 .verificationStatus(switch (this.verificationStatus) {
                     case "NOT_STARTED" -> VerificationStatus.NOT_STARTED;
                     case "STARTED" -> VerificationStatus.STARTED;

@@ -1618,6 +1618,9 @@ components:
           format: date-time
         verificationStatus:
           $ref: '#/components/schemas/VerificationStatus'
+        usEntity:
+          type: boolean
+
 
     VerificationStatus:
       type: string
