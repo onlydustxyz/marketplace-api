@@ -11,7 +11,7 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
     @Query(value = """
             SELECT
                 pr.id                as id,
-                pr.project_id        as project_id,
+                p.name               as project_name,
                 pr.requested_at      as requested_at,
                 pr.amount            as amount,
                 c.id                 as currency_id,
@@ -21,6 +21,7 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 payment_requests pr
                 JOIN currencies c ON UPPER(CAST(pr.currency AS TEXT)) = c.code
                 JOIN currencies usd ON usd.code = 'USD'
+                JOIN project_details p ON pr.project_id = p.project_id
                 JOIN LATERAL (
                     SELECT * FROM accounting.historical_quotes
                     WHERE currency_id = c.id AND
