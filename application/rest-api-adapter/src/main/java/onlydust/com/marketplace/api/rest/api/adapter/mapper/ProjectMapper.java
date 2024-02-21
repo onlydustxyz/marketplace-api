@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
@@ -64,15 +65,24 @@ public interface ProjectMapper {
         projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
         projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream()
                 .map(ProjectMapper::mapRegisteredUser)
-                .sorted(Comparator.comparing(RegisteredUserResponse::getGithubUserId))
+                .sorted(comparing(RegisteredUserResponse::getGithubUserId))
                 .collect(Collectors.toList()));
-        projectResponse.setTags(project.getTags().stream().map(ProjectMapper::mapTag).toList());
-        projectResponse.setEcosystems(project.getEcosystems().stream().map(ProjectMapper::mapEcosystem).collect(Collectors.toList()));
-        projectResponse.setSponsors(project.getActiveSponsors().stream().map(ProjectMapper::mapSponsor).collect(Collectors.toList()));
+        projectResponse.setTags(project.getTags().stream()
+                .map(ProjectMapper::mapTag)
+                .sorted(comparing(ProjectTag::name))
+                .toList());
+        projectResponse.setEcosystems(project.getEcosystems().stream()
+                .map(ProjectMapper::mapEcosystem)
+                .sorted(comparing(EcosystemResponse::getName))
+                .toList());
+        projectResponse.setSponsors(project.getActiveSponsors().stream()
+                .map(ProjectMapper::mapSponsor)
+                .sorted(comparing(SponsorResponse::getName))
+                .toList());
         projectResponse.setOrganizations(project.getOrganizations().stream()
                 .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
-                .sorted(Comparator.comparing(GithubOrganizationResponse::getGithubUserId))
-                .collect(Collectors.toList()));
+                .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
+                .toList());
         projectResponse.setTechnologies(project.getTechnologies());
 
         final var reposIndexedTimes =
@@ -98,7 +108,7 @@ public interface ProjectMapper {
                     .map(ProjectMapper::mapRepo)
                     .toList());
         }
-        repos.sort(Comparator.comparing(GithubRepoResponse::getId));
+        repos.sort(comparing(GithubRepoResponse::getId));
         projectResponse.setRepos(repos);
 
         return projectResponse;
@@ -118,7 +128,7 @@ public interface ProjectMapper {
         organization.setRepos(projectOrganizationView.getRepos().stream()
                 .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
                 .map(ProjectMapper::mapOrganizationRepo)
-                .sorted(Comparator.comparing(GithubRepoResponse::getId))
+                .sorted(comparing(GithubRepoResponse::getId))
                 .toList());
         return organization;
     }
@@ -183,7 +193,7 @@ public interface ProjectMapper {
         }
         projectPageResponse.setProjects(projectPageItemResponses);
         projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
-        projectPageResponse.setEcosystems(ecosystems.stream().sorted(Comparator.comparing(EcosystemResponse::getName)).toList());
+        projectPageResponse.setEcosystems(ecosystems.stream().sorted(comparing(EcosystemResponse::getName)).toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
