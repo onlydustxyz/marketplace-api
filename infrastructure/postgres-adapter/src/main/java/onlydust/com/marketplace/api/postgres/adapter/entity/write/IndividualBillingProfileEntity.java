@@ -15,6 +15,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 
+import static java.time.ZoneOffset.UTC;
 import static java.util.Objects.isNull;
 
 @Entity
@@ -104,7 +105,8 @@ public class IndividualBillingProfileEntity {
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
-                .invoiceMandateAccepted(this.invoiceMandateAcceptedAt != null && this.invoiceMandateAcceptedAt.after(invoiceMandateLatestVersionDate))
+                .invoiceMandateAcceptedAt(this.invoiceMandateAcceptedAt != null ? this.invoiceMandateAcceptedAt.toInstant().atZone(UTC) : null)
+                .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate.toInstant().atZone(UTC))
                 .build();
     }
 

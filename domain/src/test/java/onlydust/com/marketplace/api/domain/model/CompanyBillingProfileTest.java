@@ -3,10 +3,41 @@ package onlydust.com.marketplace.api.domain.model;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CompanyBillingProfileTest {
+
+    @Test
+    void mandate_is_accepted() {
+        var companyBillingProfile = CompanyBillingProfile.builder()
+                .id(UUID.randomUUID())
+                .userId(UUID.randomUUID())
+                .status(VerificationStatus.NOT_STARTED)
+                .build();
+        assertThat(companyBillingProfile.isInvoiceMandateAccepted()).isFalse();
+
+        companyBillingProfile = CompanyBillingProfile.builder()
+                .id(UUID.randomUUID())
+                .userId(UUID.randomUUID())
+                .status(VerificationStatus.NOT_STARTED)
+                .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                .build();
+        assertThat(companyBillingProfile.isInvoiceMandateAccepted()).isTrue();
+
+        companyBillingProfile = CompanyBillingProfile.builder()
+                .id(UUID.randomUUID())
+                .userId(UUID.randomUUID())
+                .status(VerificationStatus.NOT_STARTED)
+                .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                .invoiceMandateLatestVersionDate(ZonedDateTime.now().plusDays(1))
+                .build();
+        assertThat(companyBillingProfile.isInvoiceMandateAccepted()).isFalse();
+    }
 
     @Test
     void should_update_status_given_no_children() {
@@ -48,7 +79,8 @@ public class CompanyBillingProfileTest {
 
     @Test
     void should_update_status_from_children_statuses_given_two_children() {
-        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED), VerificationStatus.NOT_STARTED);
+        assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.NOT_STARTED, VerificationStatus.STARTED),
+                VerificationStatus.NOT_STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.UNDER_REVIEW, VerificationStatus.STARTED),
                 VerificationStatus.STARTED);
         assertUpdatedStatusIsEqualsTo(VerificationStatus.STARTED, List.of(VerificationStatus.REJECTED, VerificationStatus.UNDER_REVIEW),

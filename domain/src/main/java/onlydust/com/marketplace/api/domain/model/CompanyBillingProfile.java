@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,17 @@ public class CompanyBillingProfile {
     String euVATNumber;
     String reviewMessageForApplicant;
     String externalApplicantId;
-    boolean invoiceMandateAccepted;
+
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateAcceptedAt;
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateLatestVersionDate;
+
+    public boolean isInvoiceMandateAccepted() {
+        return invoiceMandateAcceptedAt != null &&
+               invoiceMandateLatestVersionDate != null &&
+               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+    }
 
     public static CompanyBillingProfile initForUser(final UUID userId) {
         return CompanyBillingProfile.builder()
