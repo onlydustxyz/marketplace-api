@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -66,9 +67,18 @@ public interface UserPayoutInfoMapper {
                             .build();
                 }
                 if (wallet.getNetwork().equals(NetworkEnumEntity.ethereum)) {
-                    payoutSettings = payoutSettings.toBuilder()
-                            .ethWallet(Ethereum.wallet(wallet.getAddress()))
-                            .build();
+                    switch (wallet.getType()) {
+                        case address:
+                            payoutSettings = payoutSettings.toBuilder()
+                                    .ethWallet(new Wallet(Ethereum.accountAddress(wallet.getAddress())))
+                                    .build();
+                            break;
+                        case name:
+                            payoutSettings = payoutSettings.toBuilder()
+                                    .ethWallet(new Wallet(Ethereum.name(wallet.getAddress())))
+                                    .build();
+                            break;
+                    }
                 }
             }
         }

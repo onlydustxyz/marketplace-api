@@ -178,6 +178,54 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/payout-settings:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Caller payout settings
+      operationId: getMyPayoutSettings
+      description: |
+        Get payout settings of the caller
+      responses:
+        "200":
+          description: 'Payout settings'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPayoutSettingsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Update caller payout settings
+      operationId: putMyPayoutSettings
+      description: |
+        Set payout settings of the caller
+      requestBody:
+        description: 'Payout settings'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPayoutSettingsRequest'
+      responses:
+        "200":
+          description: 'Payout information'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPayoutSettingsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/project-leader-invitations/{projectId}:
     put:
       security:
@@ -269,12 +317,6 @@ paths:
             items:
               $ref: '#/components/schemas/ProjectId'
         - in: query
-          name: billingProfiles
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/BillingProfileId'
-        - in: query
           name: fromDate
           schema:
             type: string
@@ -301,6 +343,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MyRewardsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/rewards/pending-invoice:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get caller's rewards pending invoice
+      operationId: getMyRewardsPendingInvoice
+      description: |
+        Get the page of all rewards pending invoice where the recipient is the caller
+      responses:
+        "200":
+          description: 'Page of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyRewardsListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -645,6 +709,79 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/invoices:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Mark invoice as received
+      operationId: markInvoiceAsReceived
+      description: |
+        Mark invoice as received for all caller's pending-invoice rewards
+      responses:
+        "204":
+          description: 'Invoice marked as received'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/billing-profiles/individual:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my individual billing profile
+      operationId: getMyIndividualBillingProfile
+      description: |
+        Get my individual billing profile
+      responses:
+        "200":
+          description: 'My individual billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndividualBillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/billing-profiles/company:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my company billing profile
+      operationId: getMyCompanyBillingProfile
+      description: |
+        Get my company billing profile
+      responses:
+        "200":
+          description: 'My company billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyBillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/billing-profiles:
     get:
       security:
@@ -670,7 +807,31 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Update user billing profile type
+      operationId: updateBillingProfileType
+      description: |
+        Update user billing profile type
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileTypeRequest'
+      responses:
+        "204":
+          description: 'User billing profile type updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /api/v1/me/payout-preferences:
     get:
       security:
@@ -722,7 +883,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
 
   /api/v1/technologies:
     get:
@@ -2871,6 +3031,64 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/ecosystems:
+    get:
+      security:
+        - { }
+      tags:
+        - Ecosystems
+      summary: Get all ecosystems
+      operationId: getAllEcosystems
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Page of ecosystem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/invoices/mandate:
+    put:
+      security:
+        - { }
+      tags:
+        - BillingProfiles
+      summary: Accept or decline OnlyDust invoice mandate for billing profile
+      operationId: acceptOrDeclineInvoiceMandate
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceMandateRequest'
+      responses:
+        "204":
+          description: 'Invoice mandate accepted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -3142,6 +3360,43 @@ components:
         owner:
           $ref: '#/components/schemas/PersonIdentity'
 
+    UserPayoutSettingsResponse:
+      type: object
+      properties:
+        hasValidPayoutSettings:
+          type: boolean
+        sepaAccount:
+          type: object
+          properties:
+            bic:
+              type: string
+              example: DAAEFRPPCCT
+            iban:
+              type: string
+              example: FR5417569000301995586997O41
+        missingSepaAccount:
+          type: boolean
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        missingEthWallet:
+          type: boolean
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        missingOptimismWallet:
+          type: boolean
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        missingAptosWallet:
+          type: boolean
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+        missingStarknetWallet:
+          type: boolean
     BillingProfilePayoutInfoResponse:
       type: object
       properties:
@@ -3179,6 +3434,31 @@ components:
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
         missingStarknetWallet:
           type: boolean
+    UserPayoutSettingsRequest:
+      type: object
+      properties:
+        sepaAccount:
+          type: object
+          properties:
+            bic:
+              type: string
+              example: DAAEFRPPCCT
+            iban:
+              type: string
+              example: FR5417569000301995586997O41
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
     BillingProfilePayoutInfoRequest:
       type: object
@@ -3205,7 +3485,6 @@ components:
         starknetAddress:
           type: string
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
-
 
     UserProfileRequest:
       type: object
@@ -4045,6 +4324,15 @@ components:
         rewardingProjectsCount:
           type: integer
           description: Number of projects the user has been rewarded for
+    MyRewardsListResponse:
+      type: object
+      required:
+        - rewards
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyRewardPageItemResponse'
     RewardPageItemResponse:
       type: object
       required:
@@ -4106,8 +4394,6 @@ components:
         projectId:
           type: string
           format: uuid
-        billingProfileId:
-          $ref: '#/components/schemas/BillingProfileId'
         status:
           $ref: '#/components/schemas/RewardStatus'
         unlockDate:
@@ -4670,7 +4956,43 @@ components:
             lastName:
               type: string
 
+    BillingProfileType:
+      type: string
+      enum:
+        - INDIVIDUAL
+        - COMPANY
+    BillingProfileTypeRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
 
+    MyBillingProfilesResponse:
+      type: object
+      properties:
+        billingProfiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortBillingProfileResponse'
+    ShortBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - invoiceMandateAccepted
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        name:
+          type: string
+        rewardCount:
+          type: integer
+        invoiceMandateAccepted:
+          type: boolean
     ProjectLedShortResponse:
       type: object
       required:
@@ -4744,6 +5066,10 @@ components:
           type: string
           format: url
           description: Direct URL to project's logo image
+        ecosystemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemId'
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
@@ -4811,6 +5137,15 @@ components:
             It is allowed to link a new repo directly through this list.
           items:
             $ref: '#/components/schemas/GithubRepoId'
+        ecosystemIds:
+          type: array
+          description: List of Ecosystem to link the project on.
+            All other ecosystem will be unlinked from the project.
+            If empty, all ecosystem will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new ecosystem directly through this list.
+          items:
+            $ref: '#/components/schemas/EcosystemId'
 
     ProjectRewardSettings:
       type: object
@@ -5405,145 +5740,7 @@ components:
         - UNDER_REVIEW
         - VERIFIED
         - REJECTED
-        - INVALIDATED
         - CLOSED
-
-    NewMoney: # TODO: rename when legacy 'Money' type is removed
-      type: object
-      required:
-        - amount
-        - currency
-      properties:
-        amount:
-          type: number
-        currency:
-          $ref: '#/components/schemas/CurrencyContract'
-
-    BaseMoney:
-      allOf:
-        - $ref: '#/components/schemas/NewMoney'
-        - type: object
-          required:
-            - conversionRate
-          properties:
-            conversionRate:
-              type: number
-
-    ConvertibleMoney:
-      allOf:
-        - $ref: '#/components/schemas/NewMoney'
-        - type: object
-          required:
-            - base
-          properties:
-            base:
-              $ref: '#/components/schemas/BaseMoney'
-
-    InvoiceRewardItemResponse:
-      type: object
-      required:
-        - id
-        - date
-        - projectName
-        - amount
-      properties:
-        id:
-          type: string
-          format: uuid
-        date:
-          type: string
-          format: date-time
-        projectName:
-          type: string
-        amount:
-          $ref: '#/components/schemas/ConvertibleMoney'
-
-    DestinationAccountResponse:
-      type: object
-      properties:
-        bankAccount:
-          $ref: '#/components/schemas/BankAccountResponse'
-        wallets:
-          type: array
-          items:
-            $ref: '#/components/schemas/WalletResponse'
-
-    BankAccountResponse:
-      type: object
-      properties:
-        accountNumber:
-          type: string
-        bic:
-          type: string
-
-    WalletResponse:
-      type: object
-      properties:
-        address:
-          type: string
-        network:
-          type: string
-
-    VatRegulationState:
-      type: string
-      enum:
-        - VAT_APPLICABLE
-        - VAT_NOT_APPLICABLE_NON_UE
-        - VAT_NOT_APPLICABLE_FRENCH_NOT_SUBJECT
-        - VAT_REVERSE_CHARGE
-
-    BillingProfileType:
-      type: string
-      enum:
-        - INDIVIDUAL
-        - SELF_EMPLOYED
-        - COMPANY
-
-    BillingProfileTypeRequest:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/BillingProfileType'
-
-    MyBillingProfilesResponse:
-      type: object
-      properties:
-        billingProfiles:
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortBillingProfileResponse'
-
-    ShortBillingProfileResponse:
-      type: object
-      required:
-        - id
-        - name
-        - type
-      properties:
-        id:
-          $ref: '#/components/schemas/BillingProfileId'
-        type:
-          $ref: '#/components/schemas/BillingProfileType'
-        name:
-          type: string
-        rewardCount:
-          type: integer
-
-    BillingProfileRequest:
-      type: object
-      required:
-        - name
-        - type
-      properties:
-        name:
-          type: string
-        type:
-          $ref: '#/components/schemas/BillingProfileType'
-        selectForProjects:
-          type: array
-          description: List of project ids on which the billing profile will be selected for the caller
-          items:
-            $ref: '#/components/schemas/ProjectId'
 
     BillingProfileResponse:
       type: object
@@ -5589,11 +5786,15 @@ components:
         kyb:
           $ref: '#/components/schemas/KYBResponse'
 
-    KYBResponse:
+    CompanyBillingProfileResponse:
       type: object
       required:
+        - id
         - status
       properties:
+        id:
+          type: string
+          format: uuid
         status:
           $ref: '#/components/schemas/VerificationStatus'
         name:
@@ -5606,7 +5807,11 @@ components:
         address:
           type: string
         country:
+          deprecated: true
           type: string
+        countryCode:
+          type: string
+          format: iso-country-code
         usEntity:
           type: boolean
         subjectToEuropeVAT:
@@ -5614,6 +5819,48 @@ components:
         euVATNumber:
           type: string
 
+    IndividualBillingProfileResponse:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthdate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+          deprecated: true
+        countryCode:
+          type: string
+          format: iso-country-code
+        usCitizen:
+          type: boolean
+        idDocumentType:
+          type: string
+          enum:
+            - PASSPORT
+            - ID_CARD
+            - RESIDENCE_PERMIT
+            - DRIVER_LICENSE
+        idDocumentNumber:
+          type: string
+        validUntil:
+          type: string
+          format: date-time
+        idDocumentCountryCode:
+          type: string
     KYCResponse:
       type: object
       required:
@@ -5648,6 +5895,47 @@ components:
           format: date-time
         idDocumentCountryCode:
           type: string
+
+    KYBResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        name:
+          type: string
+        registrationNumber:
+          type: string
+        registrationDate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+        usEntity:
+          type: boolean
+        subjectToEuropeVAT:
+          type: boolean
+        euVATNumber:
+          type: string
+
+    BillingProfileRequest:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        selectForProjects:
+          type: array
+          description: List of project ids on which the billing profile will be selected for the caller
+          items:
+            $ref: '#/components/schemas/ProjectId'
 
     BillingProfileCoworkerRole:
       type: string
@@ -5822,6 +6110,90 @@ components:
         totalAfterTax:
           $ref: '#/components/schemas/NewMoney'
 
+    NewMoney: # TODO: rename when legacy 'Money' type is removed
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+        currency:
+          $ref: '#/components/schemas/CurrencyContract'
+
+    BaseMoney:
+      allOf:
+        - $ref: '#/components/schemas/NewMoney'
+        - type: object
+          required:
+            - conversionRate
+          properties:
+            conversionRate:
+              type: number
+
+    ConvertibleMoney:
+      allOf:
+        - $ref: '#/components/schemas/NewMoney'
+        - type: object
+          required:
+            - base
+          properties:
+            base:
+              $ref: '#/components/schemas/BaseMoney'
+
+    InvoiceRewardItemResponse:
+      type: object
+      required:
+        - id
+        - date
+        - projectName
+        - amount
+      properties:
+        id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date-time
+        projectName:
+          type: string
+        amount:
+          $ref: '#/components/schemas/ConvertibleMoney'
+
+    DestinationAccountResponse:
+      type: object
+      properties:
+        bankAccount:
+          $ref: '#/components/schemas/BankAccountResponse'
+        wallets:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletResponse'
+
+    BankAccountResponse:
+      type: object
+      properties:
+        accountNumber:
+          type: string
+        bic:
+          type: string
+
+    WalletResponse:
+      type: object
+      properties:
+        address:
+          type: string
+        network:
+          type: string
+
+    VatRegulationState:
+      type: string
+      enum:
+        - VAT_APPLICABLE
+        - VAT_NOT_APPLICABLE_NON_UE
+        - VAT_NOT_APPLICABLE_FRENCH_NOT_SUBJECT
+        - VAT_REVERSE_CHARGE
+
     BillingProfileInvoicesPageResponse:
       type: object
       required:
@@ -5869,3 +6241,34 @@ components:
         - PROCESSING
         - REJECTED
         - APPROVED
+
+    EcosystemPage:
+      type: object
+      required:
+        - ecosystems
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemResponse'
+
+    InvoiceMandateRequest:
+      type: object
+      required:
+        - hasAcceptedInvoiceMandate
+      properties:
+        hasAcceptedInvoiceMandate:
+          type: boolean

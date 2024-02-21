@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class AmazonS3Properties implements AWSCredentials {
     private String imageBucket;
+    private String invoiceBucket;
     private String region;
     private String accessKey;
     private String secretKey;

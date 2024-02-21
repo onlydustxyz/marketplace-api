@@ -25,12 +25,12 @@ public interface ProjectStoragePort {
                          Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                          List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                          ProjectVisibility visibility
-            , String imageUrl, ProjectRewardSettings rewardSettings);
+            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds);
 
     void updateProject(UUID id, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<MoreInfoLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings);
+                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds);
 
     ProjectContributorsLinkViewPage findContributors(UUID projectId, String login,
                                                      ProjectContributorsLinkView.SortBy sortBy,

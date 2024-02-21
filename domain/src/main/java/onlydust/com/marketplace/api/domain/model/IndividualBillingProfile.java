@@ -20,13 +20,15 @@ public class IndividualBillingProfile {
     String lastName;
     Date birthdate;
     String address;
-    String country;
+    Country country;
     Boolean usCitizen;
     IdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
     String idDocumentCountryCode;
     Date validUntil;
     String reviewMessageForApplicant;
+    String externalApplicantId;
+    boolean invoiceMandateAccepted;
 
     public static IndividualBillingProfile initForUser(final UUID userId) {
         return IndividualBillingProfile.builder()

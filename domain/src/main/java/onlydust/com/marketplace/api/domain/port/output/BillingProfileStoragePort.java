@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.BillingProfile;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,4 +32,10 @@ public interface BillingProfileStoragePort {
     List<BillingProfile> all(UUID userId, Long githubUserId);
 
     Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType);
+
+    Optional<CompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId);
+
+    List<VerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId);
+
+    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus);
 }

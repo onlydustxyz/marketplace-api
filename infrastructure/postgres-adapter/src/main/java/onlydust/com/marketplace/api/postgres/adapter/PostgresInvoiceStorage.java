@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillin
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BankAccountRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.WalletRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull WalletRepository walletRepository;
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
+    private final @NonNull PaymentRequestRepository paymentRequestRepository;
 
     @Override
     public Invoice preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
@@ -65,14 +67,30 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
-    public void save(@NonNull Invoice invoice) {
-        invoiceRepository.save(InvoiceEntity.of(invoice));
+    @Transactional
+    public void save(final @NonNull Invoice invoice) {
+        final var entity = invoiceRepository.findById(invoice.id().value()).orElse(new InvoiceEntity().id(invoice.id().value()));
+        entity.updateWith(invoice);
+        invoiceRepository.saveAndFlush(entity);
+
+        final var paymentRequests = paymentRequestRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
+        paymentRequests.forEach(pr -> pr.setInvoice(entity));
+        paymentRequestRepository.saveAll(paymentRequests);
     }
 
     @Override
     @Transactional
-    public void deleteDraftsOf(final BillingProfile.@NonNull Id billingProfileId) {
-        invoiceRepository.deleteAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
+    public void deleteDraftsOf(final @NonNull BillingProfile.Id billingProfileId) {
+        final var drafts = invoiceRepository.findAllByBillingProfileIdAndStatus(billingProfileId.value(), InvoiceEntity.Status.DRAFT);
+
+        drafts.forEach(invoice -> {
+            final var paymentRequests = paymentRequestRepository.findAllById(invoice.data().rewards().stream().map(InvoiceRewardEntity::id).toList());
+            paymentRequests.forEach(pr -> pr.setInvoice(null));
+            paymentRequestRepository.saveAll(paymentRequests);
+        });
+
+        invoiceRepository.deleteAll(drafts);
+        invoiceRepository.flush();
     }
 
     @Override

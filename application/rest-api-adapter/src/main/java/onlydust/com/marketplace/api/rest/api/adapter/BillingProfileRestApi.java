@@ -11,8 +11,11 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
+import onlydust.com.marketplace.api.contract.model.InvoiceMandateRequest;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
+import onlydust.com.marketplace.api.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +64,28 @@ public class BillingProfileRestApi implements BillingProfilesApi {
             throw badRequest("Error while reading invoice data", e);
         }
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadInvoice(UUID billingProfileId, UUID invoiceId) {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final var invoice = billingProfileFacadePort.downloadInvoice(
+                UserId.of(authenticatedUser.getId()),
+                BillingProfile.Id.of(billingProfileId),
+                Invoice.Id.of(invoiceId));
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + invoice.fileName())
+                .body(new InputStreamResource(invoice.data()));
+    }
+
+    @Override
+    public ResponseEntity<Void> acceptOrDeclineInvoiceMandate(UUID billingProfileId, InvoiceMandateRequest invoiceMandateRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        if (Boolean.TRUE.equals(invoiceMandateRequest.getHasAcceptedInvoiceMandate())) {
+            billingProfileFacadePort.updateInvoiceMandateAcceptanceDate(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
+        }
         return ResponseEntity.noContent().build();
     }
 }

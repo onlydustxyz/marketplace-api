@@ -1,11 +1,17 @@
 package onlydust.com.marketplace.api.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public enum VerificationStatus {
-    NOT_STARTED,
-    STARTED,
-    UNDER_REVIEW,
-    VERIFIED,
-    REJECTED,
-    INVALIDATED,
-    CLOSED
+    VERIFIED(-1),
+    UNDER_REVIEW(0),
+    STARTED(1),
+    NOT_STARTED(2),
+    REJECTED(3),
+    CLOSED(4);
+
+    final int priority;
 }

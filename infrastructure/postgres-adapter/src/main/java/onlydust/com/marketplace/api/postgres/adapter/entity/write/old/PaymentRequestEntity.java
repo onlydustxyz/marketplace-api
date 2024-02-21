@@ -5,6 +5,7 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Table(name = "payment_requests", schema = "public")
 @TypeDef(name = "currency", typeClass = PostgreSQLEnumType.class)
+@DynamicUpdate
 public class PaymentRequestEntity {
 
     @Id

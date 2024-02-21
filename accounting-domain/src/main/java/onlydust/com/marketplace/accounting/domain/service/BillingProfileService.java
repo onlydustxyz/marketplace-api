@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -17,7 +18,9 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.jetbrains.annotations.NotNull;
 
+import javax.transaction.Transactional;
 import java.io.InputStream;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -56,6 +59,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
                                   final @NonNull List<RewardId> rewardIds) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
@@ -78,6 +82,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     @Override
+    @Transactional
     public void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                               final @NonNull InputStream data) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
@@ -87,12 +92,41 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
-        final var url = pdfStoragePort.upload(invoice.number() + ".pdf", data);
+        final var url = pdfStoragePort.upload(invoiceInternalFileName(invoice), data);
         invoiceStoragePort.save(invoice.status(Invoice.Status.PROCESSING).url(url));
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {
         if (projectIds != null)
             projectIds.forEach(projectId -> billingProfileStorage.savePayoutPreference(billingProfileId, userId, projectId));
+    }
+
+    @Override
+    public @NonNull InvoiceDownload downloadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoiceId, billingProfileId));
+
+        final var invoice = invoiceStoragePort.get(invoiceId)
+                .filter(i -> i.billingProfileId().equals(billingProfileId))
+                .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+
+        final var pdf = pdfStoragePort.download(invoiceInternalFileName(invoice));
+        return new InvoiceDownload(pdf, invoiceExternalFileName(invoice));
+    }
+
+    @Override
+    public void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId) {
+        if (!billingProfileStorage.isAdmin(userId, billingProfileId))
+            throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
+
+        billingProfileStorage.updateInvoiceMandateAcceptanceDate(billingProfileId, ZonedDateTime.now());
+    }
+
+    private String invoiceExternalFileName(Invoice invoice) {
+        return "%s.pdf".formatted(invoice.number());
+    }
+
+    private static String invoiceInternalFileName(Invoice invoice) {
+        return "%s.pdf".formatted(invoice.id());
     }
 }

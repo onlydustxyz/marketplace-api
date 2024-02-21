@@ -297,4 +297,9 @@ public class DomainConfiguration {
                                               final OutboxConsumer userVerificationOutboxConsumer) {
         return new OutboxConsumerJob(userVerificationOutbox, userVerificationOutboxConsumer);
     }
+
+    @Bean
+    public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage) {
+        return new EcosystemService(ecosystemStorage);
+    }
 }

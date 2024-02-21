@@ -18,4 +18,5 @@ public class CreateProjectCommand {
     List<MoreInfoLink> moreInfos;
     Boolean isLookingForContributors;
     String imageUrl;
+    List<UUID> ecosystemIds;
 }

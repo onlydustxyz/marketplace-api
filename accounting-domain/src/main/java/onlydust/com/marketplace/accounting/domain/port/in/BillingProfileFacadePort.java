@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.io.InputStream;
@@ -30,4 +31,9 @@ public interface BillingProfileFacadePort {
 
     void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                        final @NonNull InputStream inputStream);
+
+    @NonNull InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
+                                             final @NonNull Invoice.Id invoiceId);
+
+    void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId);
 }

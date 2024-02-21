@@ -61,6 +61,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILE_INVOICE_PREVIEW = "/api/v1/billing-profiles/%s/invoice-preview";
     protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String BILLING_PROFILE_INVOICE = "/api/v1/billing-profiles/%s/invoices/%s";
+    protected static final String BILLING_PROFILE_INVOICES_MANDATE = "/api/v1/billing-profiles/%s/invoices/mandate";
     protected static final String PROJECTS_GET_CONTRIBUTION_BY_ID = "/api/v1/projects/%s/contributions/%s";
     protected static final String PROJECTS_GET_BY_ID = "/api/v1/projects";
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
@@ -124,6 +125,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
     protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
+    protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";
 
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
             .withDatabaseName("marketplace_db")

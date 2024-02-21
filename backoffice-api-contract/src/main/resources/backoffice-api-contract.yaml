@@ -1618,6 +1618,9 @@ components:
           format: date-time
         verificationStatus:
           $ref: '#/components/schemas/VerificationStatus'
+        usEntity:
+          type: boolean
+
 
     VerificationStatus:
       type: string
@@ -1627,7 +1630,6 @@ components:
         - UNDER_REVIEW
         - VERIFIED
         - REJECTED
-        - INVALIDATED
         - CLOSED
     PaymentPage:
       type: object

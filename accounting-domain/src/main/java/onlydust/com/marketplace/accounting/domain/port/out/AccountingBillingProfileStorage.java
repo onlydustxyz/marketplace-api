@@ -7,8 +7,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 
+import java.time.ZonedDateTime;
+
 public interface AccountingBillingProfileStorage {
     boolean isAdmin(UserId userId, BillingProfile.Id billingProfileId);
+
+    void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
 
     void save(IndividualBillingProfile billingProfile);
 

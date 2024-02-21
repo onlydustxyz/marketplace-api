@@ -50,7 +50,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
                 projectId, faker.name().lastName(), faker.name().name(), faker.harryPotter().location(), false,
                 moreInfoLinks, null, userId
                 , null, ProjectVisibility.PUBLIC, null,
-                ProjectRewardSettings.defaultSettings(new Date())
+                ProjectRewardSettings.defaultSettings(new Date()), null
         );
         final ProjectDetailsView project = projectStoragePort.getBySlug(slug, null);
         assertEquals(moreInfoLinks.size(), project.getMoreInfos().size());
@@ -71,7 +71,7 @@ public class PostgresProjectAdapterIT extends AbstractPostgresIT {
         projectStoragePort.updateProject(
                 projectId, project.getName(), project.getShortDescription(), project.getLongDescription(), false,
                 moreInfoLinksUpdated,
-                null, null, null, null, null
+                null, null, null, null, null, null
         );
         final ProjectDetailsView projectUpdated = projectStoragePort.getBySlug(slug, null);
         assertEquals(moreInfoLinksUpdated.size(), projectUpdated.getMoreInfos().size());

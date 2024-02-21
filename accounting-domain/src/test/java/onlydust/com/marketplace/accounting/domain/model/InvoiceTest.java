@@ -63,9 +63,9 @@ class InvoiceTest {
     }
 
     @Nested
-    class GivenACompanyNotApplicableToVatRegulation {
+    class GivenACompanyOutsideOfEurope {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, null))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, false, false, null))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
@@ -103,9 +103,9 @@ class InvoiceTest {
     }
 
     @Nested
-    class GivenAVatRegulatedCompany {
+    class GivenAFrenchCompanySubjectToVAT {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
-                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", true, "666"))
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", true, true, true, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
                                 Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
@@ -140,6 +140,88 @@ class InvoiceTest {
             assertThat(invoice.taxRate()).isEqualTo(BigDecimal.valueOf(0.2));
             assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.valueOf(1080.0), USD));
             assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(6480.0), USD));
+        }
+    }
+
+    @Nested
+    class GivenAFrenchCompanyNonSubjectToVAT {
+        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, true, "666"))
+                .rewards(List.of(
+                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                ));
+
+        @Test
+        void should_compute_id() {
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+        }
+
+
+        @Test
+        void should_compute_due_date() {
+            assertThat(invoice.dueAt()).isAfter(invoice.createdAt());
+        }
+
+        @Test
+        void should_compute_billing_profile_type() {
+            assertThat(invoice.billingProfileType()).isEqualTo(BillingProfile.Type.COMPANY);
+        }
+
+        @Test
+        void should_compute_vat_regulation_state() {
+            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT);
+        }
+
+        @Test
+        void should_compute_totals() {
+            assertThat(invoice.totalBeforeTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+            assertThat(invoice.taxRate()).isEqualTo(BigDecimal.valueOf(0));
+            assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
+            assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+        }
+    }
+
+    @Nested
+    class GivenANonFrenchEuropeanCompany {
+        final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
+                        new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, false, "666"))
+                .rewards(List.of(
+                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                        new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), ProjectId.random(), faker.lordOfTheRings().location(),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                ));
+
+        @Test
+        void should_compute_id() {
+            assertThat(invoice.number().value()).isEqualTo("OD-ONLYDUST-001");
+        }
+
+
+        @Test
+        void should_compute_due_date() {
+            assertThat(invoice.dueAt()).isAfter(invoice.createdAt());
+        }
+
+        @Test
+        void should_compute_billing_profile_type() {
+            assertThat(invoice.billingProfileType()).isEqualTo(BillingProfile.Type.COMPANY);
+        }
+
+        @Test
+        void should_compute_vat_regulation_state() {
+            assertThat(invoice.companyInfo().orElseThrow().vatRegulationState()).isEqualTo(Invoice.VatRegulationState.REVERSE_CHARGE);
+        }
+
+        @Test
+        void should_compute_totals() {
+            assertThat(invoice.totalBeforeTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
+            assertThat(invoice.taxRate()).isEqualTo(BigDecimal.ZERO);
+            assertThat(invoice.totalTax()).isEqualTo(Money.of(BigDecimal.ZERO, USD));
+            assertThat(invoice.totalAfterTax()).isEqualTo(Money.of(BigDecimal.valueOf(5400), USD));
         }
     }
 }

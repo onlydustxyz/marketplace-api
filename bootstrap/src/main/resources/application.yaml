@@ -80,6 +80,7 @@ infrastructure:
     region: ${AWS_REGION}
     access-key: ${AWS_ACCESS_KEY_ID}
     secret-key: ${AWS_SECRET_ACCESS_KEY}
+    invoice-bucket: ${INVOICE_BUCKET_NAME}
   github:
     personal-access-token: ${GITHUB_PAT}
     base-uri: ${GITHUB_BASE_URL}
@@ -150,3 +151,4 @@ infrastructure:
     environment: ${ENV}
     token: ${SLACK_TOKEN}
     kyc-kyb-channel: '#kyc-kyb'
+    tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}

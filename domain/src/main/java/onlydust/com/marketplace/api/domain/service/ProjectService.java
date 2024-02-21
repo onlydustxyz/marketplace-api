@@ -102,7 +102,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
-                ProjectRewardSettings.defaultSettings(dateProvider.now()));
+                ProjectRewardSettings.defaultSettings(dateProvider.now()),command.getEcosystemIds());
 
         eventStoragePort.saveEvent(new ProjectCreatedOldEvent(projectId));
 
@@ -145,7 +145,7 @@ public class ProjectService implements ProjectFacadePort, ProjectRewardFacadePor
                 command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
-                command.getRewardSettings());
+                command.getRewardSettings(),command.getEcosystemIds());
 
         projectObserverPort.onProjectDetailsUpdated(command.getId());
         invitedLeaderGithubIds.forEach(leaderId -> projectObserverPort.onLeaderInvited(command.getId(), leaderId));

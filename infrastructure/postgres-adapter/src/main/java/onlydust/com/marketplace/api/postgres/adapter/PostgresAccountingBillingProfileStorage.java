@@ -14,6 +14,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBill
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
+
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -28,6 +31,21 @@ public class PostgresAccountingBillingProfileStorage implements AccountingBillin
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         return admin.equals(userId.value());
+    }
+
+    @Override
+    public void updateInvoiceMandateAcceptanceDate(@NonNull final BillingProfile.Id billingProfileId, @NonNull final ZonedDateTime acceptanceDate) {
+        companyBillingProfileRepository.findById(billingProfileId.value())
+                .ifPresentOrElse(companyBillingProfileEntity -> {
+                    companyBillingProfileEntity.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
+                    companyBillingProfileRepository.save(companyBillingProfileEntity);
+                }, () -> individualBillingProfileRepository.findById(billingProfileId.value())
+                        .ifPresentOrElse(individualBillingProfileEntity -> {
+                            individualBillingProfileEntity.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
+                            individualBillingProfileRepository.save(individualBillingProfileEntity);
+                        }, () -> {
+                            throw notFound("Billing profile %s not found".formatted(billingProfileId));
+                        }));
     }
 
     @Override

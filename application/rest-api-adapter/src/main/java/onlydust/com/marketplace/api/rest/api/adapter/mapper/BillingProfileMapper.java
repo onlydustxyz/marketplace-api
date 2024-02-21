@@ -16,11 +16,12 @@ import java.math.RoundingMode;
 import static java.util.Objects.isNull;
 
 public interface BillingProfileMapper {
-
     static CompanyBillingProfileResponse companyDomainToResponse(final CompanyBillingProfile companyBillingProfile) {
         return new CompanyBillingProfileResponse()
                 .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry())
+                .country(companyBillingProfile.getCountry() == null ? null :
+                        companyBillingProfile.getCountry().display().orElse(companyBillingProfile.getCountry().iso3Code()))
+                .countryCode(companyBillingProfile.getCountry() == null ? null : companyBillingProfile.getCountry().iso3Code())
                 .id(companyBillingProfile.getId())
                 .status(verificationStatusToResponse(companyBillingProfile.getStatus()))
                 .name(companyBillingProfile.getName())
@@ -37,7 +38,9 @@ public interface BillingProfileMapper {
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
                 .birthdate(DateMapper.toZoneDateTime(individualBillingProfile.getBirthdate()))
-                .country(individualBillingProfile.getCountry())
+                .country(individualBillingProfile.getCountry() == null ? null :
+                        individualBillingProfile.getCountry().display().orElse(individualBillingProfile.getCountry().iso3Code()))
+                .countryCode(individualBillingProfile.getCountry() == null ? null : individualBillingProfile.getCountry().iso3Code())
                 .address(individualBillingProfile.getAddress())
                 .idDocumentNumber(individualBillingProfile.getIdDocumentNumber())
                 .firstName(individualBillingProfile.getFirstName())
@@ -51,7 +54,6 @@ public interface BillingProfileMapper {
     static VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.api.domain.model.VerificationStatus verificationStatus) {
         return switch (verificationStatus) {
             case CLOSED -> VerificationStatus.CLOSED;
-            case INVALIDATED -> VerificationStatus.INVALIDATED;
             case REJECTED -> VerificationStatus.REJECTED;
             case STARTED -> VerificationStatus.STARTED;
             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
@@ -82,7 +84,8 @@ public interface BillingProfileMapper {
                 .id(billingProfile.id())
                 .name(billingProfile.name())
                 .type(map(billingProfile.type()))
-                .rewardCount(billingProfile.rewardCount());
+                .rewardCount(billingProfile.rewardCount())
+                .invoiceMandateAccepted(billingProfile.invoiceMandateAccepted());
     }
 
     static InvoicePreviewResponse map(Invoice preview) {

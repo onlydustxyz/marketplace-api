@@ -335,9 +335,11 @@ public class PostgresConfiguration {
     public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
                                                                        final IndividualBillingProfileRepository individualBillingProfileRepository,
                                                                        final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                       final CustomUserRewardRepository customUserRewardRepository) {
+                                                                       final CustomUserRewardRepository customUserRewardRepository,
+                                                                       final ChildrenKycRepository childrenKycRepository,
+                                                                       final GlobalSettingsRepository globalSettingsRepository) {
         return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
-                customUserRewardRepository);
+                customUserRewardRepository, childrenKycRepository, globalSettingsRepository);
     }
 
     @Bean
@@ -356,9 +358,10 @@ public class PostgresConfiguration {
                                                  final @NonNull InvoiceRewardRepository invoiceRewardRepository,
                                                  final @NonNull WalletRepository walletRepository,
                                                  final @NonNull BankAccountRepository bankAccountRepository,
-                                                 final @NonNull InvoiceRepository invoiceRepository) {
+                                                 final @NonNull InvoiceRepository invoiceRepository,
+                                                 final @NonNull PaymentRequestRepository paymentRequestRepository) {
         return new PostgresInvoiceStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
-                walletRepository, bankAccountRepository, invoiceRepository);
+                walletRepository, bankAccountRepository, invoiceRepository, paymentRequestRepository);
     }
 
     @Bean
@@ -371,5 +374,10 @@ public class PostgresConfiguration {
     PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
                                                                                       final ProjectSponsorRepository projectSponsorRepository) {
         return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository, projectSponsorRepository);
+    }
+
+    @Bean
+    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository) {
+        return new PostgresEcosystemAdapter(ecosystemRepository);
     }
 }

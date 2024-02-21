@@ -155,15 +155,20 @@ public class Invoice {
     public record PersonalInfo(@NonNull String firstName, @NonNull String lastName, @NonNull String address) {
     }
 
+    // TODO, store the vatRegulationState
     public record CompanyInfo(@NonNull String registrationNumber,
                               @NonNull String name,
                               @NonNull String address,
                               @NonNull Boolean subjectToEuVAT,
+                              @NonNull Boolean inEuropeanUnion,
+                              @NonNull Boolean isFrance,
                               String euVATNumber
     ) {
         public VatRegulationState vatRegulationState() {
-            // TODO
-            return subjectToEuVAT ? VatRegulationState.APPLICABLE : VatRegulationState.NOT_APPLICABLE_NON_UE;
+            if (!inEuropeanUnion) return VatRegulationState.NOT_APPLICABLE_NON_UE;
+            if (!isFrance) return VatRegulationState.REVERSE_CHARGE;
+            if (!subjectToEuVAT) return VatRegulationState.NOT_APPLICABLE_FRENCH_NOT_SUBJECT;
+            return VatRegulationState.APPLICABLE;
         }
     }
 

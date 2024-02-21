@@ -217,7 +217,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                                 
                         """);
     }
-    
+
     @Test
     void should_get_ecosystems() {
         // When
@@ -891,7 +891,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "firstname": "Anthony",
                               "lastname": "BUISSET",
                               "address": "771 chemin de la sine, 06140, Vence, France",
-                              "country": "France",
+                              "country": "FRA",
                               "telegram": "https://t.me/abuisset",
                               "twitter": "https://twitter.com/abuisset",
                               "discord": "antho",

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.api.domain.model.Country;
 import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
@@ -46,7 +47,8 @@ public class IndividualBillingProfileEntity {
     String idDocumentCountryCode;
     Date validUntil;
     String reviewMessage;
-
+    String applicantId;
+    Date invoiceMandateAcceptedAt;
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -85,13 +87,13 @@ public class IndividualBillingProfileEntity {
         }
     }
 
-    public IndividualBillingProfile toDomain() {
+    public IndividualBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
         return IndividualBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
                 .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
                 .address(this.address)
-                .country(this.country)
+                .country(this.country == null ? null : Country.fromIso3(this.country))
                 .firstName(this.firstName)
                 .lastName(this.lastName)
                 .validUntil(this.validUntil)
@@ -101,6 +103,8 @@ public class IndividualBillingProfileEntity {
                 .birthdate(this.birthdate)
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
+                .externalApplicantId(this.applicantId)
+                .invoiceMandateAccepted(this.invoiceMandateAcceptedAt != null && this.invoiceMandateAcceptedAt.after(invoiceMandateLatestVersionDate))
                 .build();
     }
 
@@ -109,7 +113,7 @@ public class IndividualBillingProfileEntity {
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())
                 .birthdate(individualBillingProfile.getBirthdate())
-                .country(individualBillingProfile.getCountry())
+                .country(individualBillingProfile.getCountry() == null ? null : individualBillingProfile.getCountry().iso3Code())
                 .firstName(individualBillingProfile.getFirstName())
                 .lastName(individualBillingProfile.getLastName())
                 .validUntil(individualBillingProfile.getValidUntil())
@@ -120,6 +124,7 @@ public class IndividualBillingProfileEntity {
                 .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
                 .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
                 .reviewMessage(individualBillingProfile.getReviewMessageForApplicant())
+                .applicantId(individualBillingProfile.getExternalApplicantId())
                 .build();
     }
 }

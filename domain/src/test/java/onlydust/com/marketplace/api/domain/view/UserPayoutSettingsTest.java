@@ -186,7 +186,7 @@ public class UserPayoutSettingsTest {
 
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
-                        .ethWallet(Ethereum.wallet("vitalik.eth"))
+                        .ethWallet(Ethereum.wallet("0xvitalik.eth"))
                         .build(),
                 List.of(Currency.USDC)
         );

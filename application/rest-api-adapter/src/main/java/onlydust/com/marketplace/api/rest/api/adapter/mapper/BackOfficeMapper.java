@@ -203,6 +203,7 @@ public interface BackOfficeMapper {
                         .languages(user.getLanguages())
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
+                        .usEntity(user.getUsEntity())
                         .verificationStatus(switch (user.getVerificationStatus()) {
                             case NOT_STARTED -> VerificationStatus.NOT_STARTED;
                             case STARTED -> VerificationStatus.STARTED;
@@ -210,7 +211,6 @@ public interface BackOfficeMapper {
                             case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
                             case CLOSED -> VerificationStatus.CLOSED;
                             case VERIFIED -> VerificationStatus.VERIFIED;
-                            case INVALIDATED -> VerificationStatus.INVALIDATED;
                         })
                 ).toList())
                 .totalPageNumber(userPage.getTotalPageNumber())

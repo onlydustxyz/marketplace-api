@@ -78,4 +78,10 @@ public class RestApiConfiguration {
         return new ApiKeyAuthenticationService.Config();
     }
 
+
+    @Bean
+    public EcosystemsRestApi ecosystemsRestApi(final EcosystemFacadePort ecosystemFacadePort) {
+        return new EcosystemsRestApi(ecosystemFacadePort);
+    }
+
 }

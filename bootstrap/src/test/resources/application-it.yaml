@@ -39,6 +39,7 @@ infrastructure:
   slack:
     environment: local-it
     token: fake-slack-token
+    tag-all-channel: false
 application:
   web:
     machine-to-machine:

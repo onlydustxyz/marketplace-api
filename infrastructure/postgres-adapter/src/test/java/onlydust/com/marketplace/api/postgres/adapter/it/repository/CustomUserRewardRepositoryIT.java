@@ -278,7 +278,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
-                    "PROCESSING"
+                    "PENDING_INVOICE"
             );
         }
 
@@ -356,7 +356,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     "COMPLETE",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO",
-                    "PROCESSING",
+                    "PENDING_INVOICE",
                     "MISSING_PAYOUT_INFO",
                     "MISSING_PAYOUT_INFO"
             );
@@ -391,9 +391,9 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     "MISSING_PAYOUT_INFO",
                     "COMPLETE",
                     "MISSING_PAYOUT_INFO",
-                    "PROCESSING",
+                    "PENDING_INVOICE",
                     "MISSING_PAYOUT_INFO",
-                    "PROCESSING",
+                    "PENDING_INVOICE",
                     "MISSING_PAYOUT_INFO"
             );
         }
