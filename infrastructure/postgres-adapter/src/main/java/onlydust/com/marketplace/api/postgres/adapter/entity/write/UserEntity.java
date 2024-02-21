@@ -4,7 +4,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.array.EnumArrayType;
 import com.vladmihalcea.hibernate.type.array.internal.AbstractArrayType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.od.rust.api.client.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 
 import java.util.UUID;

@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.OldEvent;
-import onlydust.com.marketplace.api.domain.port.output.EventStoragePort;
+import onlydust.com.marketplace.project.domain.model.OldEvent;
+import onlydust.com.marketplace.project.domain.port.output.EventStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.EventRepository;
 

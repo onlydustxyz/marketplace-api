@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.job.OutboxSkippingException;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.api.domain.model.notification.Event;
+import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.project.domain.model.notification.Event;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -52,7 +52,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
     private BillingProfileUpdated mapToChildrenBillingProfile(SumsubWebhookEventDTO sumsubWebhookEventDTO) {
         return BillingProfileUpdated.builder()
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -66,7 +66,7 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return BillingProfileUpdated.builder()
                 .billingProfileId(billingProfileId)
                 .type(applicationTypeToDomain(sumsubWebhookEventDTO.getApplicantType()))
-                .verificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
+                .oldVerificationStatus(typeAndReviewResultToDomain(sumsubWebhookEventDTO.getType(), sumsubWebhookEventDTO.getReviewStatus(),
                         sumsubWebhookEventDTO.getReviewResult()))
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
@@ -74,10 +74,10 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                 .build();
     }
 
-    private BillingProfileType applicationTypeToDomain(final String applicationType) {
+    private OldBillingProfileType applicationTypeToDomain(final String applicationType) {
         return switch (applicationType) {
-            case "individual" -> BillingProfileType.INDIVIDUAL;
-            case "company" -> BillingProfileType.COMPANY;
+            case "individual" -> OldBillingProfileType.INDIVIDUAL;
+            case "company" -> OldBillingProfileType.COMPANY;
             default -> throw OnlyDustException.internalServerError(String.format("Invalid application type from sumsub : %s",
                     applicationType));
         };
@@ -90,12 +90,12 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
         return null;
     }
 
-    private VerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus,
-                                                           final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
+    private OldVerificationStatus typeAndReviewResultToDomain(final String type, final String reviewStatus,
+                                                              final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
         return switch (type) {
-            case "applicantCreated" -> VerificationStatus.STARTED;
-            case "applicantPending" -> VerificationStatus.UNDER_REVIEW;
-            case "applicantOnHold" -> VerificationStatus.UNDER_REVIEW;
+            case "applicantCreated" -> OldVerificationStatus.STARTED;
+            case "applicantPending" -> OldVerificationStatus.UNDER_REVIEW;
+            case "applicantOnHold" -> OldVerificationStatus.UNDER_REVIEW;
             case "applicantReviewed" -> switch (reviewStatus) {
                 case "completed":
                     final Optional<Answer> answer = reviewResultToAnswer(reviewResult);
@@ -103,18 +103,18 @@ public class SumsubMapper implements Function<Event, BillingProfileUpdated> {
                         yield switch (answer.get()) {
                             case RED -> {
                                 if (isAFinalRejection(reviewResult)) {
-                                    yield VerificationStatus.CLOSED;
+                                    yield OldVerificationStatus.CLOSED;
                                 } else {
-                                    yield VerificationStatus.REJECTED;
+                                    yield OldVerificationStatus.REJECTED;
                                 }
                             }
-                            case GREEN -> VerificationStatus.VERIFIED;
+                            case GREEN -> OldVerificationStatus.VERIFIED;
                         };
                     }
                 default:
-                    yield VerificationStatus.UNDER_REVIEW;
+                    yield OldVerificationStatus.UNDER_REVIEW;
             };
-            default -> VerificationStatus.UNDER_REVIEW;
+            default -> OldVerificationStatus.UNDER_REVIEW;
         };
     }
 

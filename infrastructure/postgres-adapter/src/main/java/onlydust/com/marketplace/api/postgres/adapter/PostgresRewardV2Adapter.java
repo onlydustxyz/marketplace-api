@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.model.Reward;
-import onlydust.com.marketplace.api.domain.port.output.RewardStoragePort;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;

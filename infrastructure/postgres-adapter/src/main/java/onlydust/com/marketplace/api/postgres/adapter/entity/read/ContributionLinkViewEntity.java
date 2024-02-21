@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.view.ContributionLinkView;
-import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
+import onlydust.com.marketplace.project.domain.view.ContributionLinkView;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 
 @EqualsAndHashCode
 public class ContributionLinkViewEntity {

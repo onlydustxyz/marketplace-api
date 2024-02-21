@@ -1,15 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Ecosystem;
-import onlydust.com.marketplace.api.domain.model.Sponsor;
-import onlydust.com.marketplace.api.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.api.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
+import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;

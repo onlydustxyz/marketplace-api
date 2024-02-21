@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
-import onlydust.com.marketplace.api.domain.view.TotalsEarned;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;
 
 import static java.util.Objects.nonNull;

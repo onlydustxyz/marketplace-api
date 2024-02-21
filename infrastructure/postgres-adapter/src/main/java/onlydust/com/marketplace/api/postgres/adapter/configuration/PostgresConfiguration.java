@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
@@ -332,13 +332,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
-                                                                       final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                       final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                       final CustomUserRewardRepository customUserRewardRepository,
-                                                                       final ChildrenKycRepository childrenKycRepository,
-                                                                       final GlobalSettingsRepository globalSettingsRepository) {
-        return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
+    public PostgresOldBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
+                                                                          final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                          final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                          final CustomUserRewardRepository customUserRewardRepository,
+                                                                          final ChildrenKycRepository childrenKycRepository,
+                                                                          final GlobalSettingsRepository globalSettingsRepository) {
+        return new PostgresOldBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
                 customUserRewardRepository, childrenKycRepository, globalSettingsRepository);
     }
 

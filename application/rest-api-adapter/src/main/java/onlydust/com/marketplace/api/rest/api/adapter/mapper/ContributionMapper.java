@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.ContributionStatus;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.ContributionStatus;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.Optional;
 
@@ -84,7 +85,7 @@ public interface ContributionMapper {
                 .isMine(link.getIsMine());
     }
 
-    static onlydust.com.marketplace.api.contract.model.ContributionStatus mapContributionStatusToResponse(onlydust.com.marketplace.api.domain.model.ContributionStatus status) {
+    static onlydust.com.marketplace.api.contract.model.ContributionStatus mapContributionStatusToResponse(ContributionStatus status) {
         return switch (status) {
             case COMPLETED -> onlydust.com.marketplace.api.contract.model.ContributionStatus.COMPLETED;
             case IN_PROGRESS -> onlydust.com.marketplace.api.contract.model.ContributionStatus.IN_PROGRESS;

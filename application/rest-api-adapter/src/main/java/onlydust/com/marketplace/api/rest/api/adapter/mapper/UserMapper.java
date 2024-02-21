@@ -4,10 +4,10 @@ import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.BillingProfileType;
 import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
-import onlydust.com.marketplace.api.domain.view.TotalsEarned;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.project.domain.view.TotalsEarned;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.springframework.beans.BeanUtils;
 
 import java.net.URI;
@@ -131,7 +131,7 @@ public interface UserMapper {
     static List<UserProfileProjects> userProjectsToResponse(final Set<UserProfileView.ProjectStats> projectStats,
                                                             boolean includePrivateProjects) {
         return projectStats.stream()
-                .filter(ps -> includePrivateProjects || ps.getVisibility() == onlydust.com.marketplace.api.domain.model.ProjectVisibility.PUBLIC)
+                .filter(ps -> includePrivateProjects || ps.getVisibility() == onlydust.com.marketplace.project.domain.model.ProjectVisibility.PUBLIC)
                 .map(ps -> {
                     final UserProfileProjects userProfileProjects = new UserProfileProjects();
                     userProfileProjects.setUserContributionCount(ps.getUserContributionCount());
@@ -245,7 +245,7 @@ public interface UserMapper {
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
         getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
-        getMeResponse.setBillingProfileType(switch (authenticatedUser.getBillingProfileType()) {
+        getMeResponse.setBillingProfileType(switch (authenticatedUser.getOldBillingProfileType()) {
             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
             case COMPANY -> BillingProfileType.COMPANY;
         });

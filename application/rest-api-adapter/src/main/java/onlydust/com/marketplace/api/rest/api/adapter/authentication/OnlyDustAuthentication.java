@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
-import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.security.core.Authentication;
 
 public interface OnlyDustAuthentication extends Authentication {

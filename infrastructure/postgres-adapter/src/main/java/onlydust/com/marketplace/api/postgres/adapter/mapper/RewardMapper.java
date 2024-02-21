@@ -3,16 +3,17 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardItemViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CryptoReceiptJsonEntity.Crypto;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.FiatReceiptJsonEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import static java.util.Objects.isNull;
 

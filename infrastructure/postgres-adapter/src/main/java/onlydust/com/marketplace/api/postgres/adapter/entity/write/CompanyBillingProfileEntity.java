@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.api.domain.model.Country;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldCountry;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -67,7 +67,7 @@ public class CompanyBillingProfileEntity {
                 .registrationDate(this.registrationDate)
                 .name(this.name)
                 .registrationNumber(this.registrationNumber)
-                .country(this.country == null ? null : Country.fromIso3(this.country))
+                .oldCountry(this.country == null ? null : OldCountry.fromIso3(this.country))
                 .userId(this.userId)
                 .reviewMessageForApplicant(this.reviewMessage)
                 .externalApplicantId(this.applicantId)
@@ -82,7 +82,7 @@ public class CompanyBillingProfileEntity {
                 .userId(companyBillingProfile.getUserId())
                 .usEntity(companyBillingProfile.getUsEntity())
                 .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry() == null ? null : companyBillingProfile.getCountry().iso3Code())
+                .country(companyBillingProfile.getOldCountry() == null ? null : companyBillingProfile.getOldCountry().iso3Code())
                 .name(companyBillingProfile.getName())
                 .verificationStatus(VerificationStatusEntity.fromDomain(companyBillingProfile.getStatus()))
                 .subjectToEuVAT(companyBillingProfile.getSubjectToEuropeVAT())
@@ -101,8 +101,8 @@ public class CompanyBillingProfileEntity {
                 name,
                 address,
                 subjectToEuVAT,
-                Country.fromIso3(country).inEuropeanUnion(),
-                Country.fromIso3(country).isFrance(),
+                OldCountry.fromIso3(country).inEuropeanUnion(),
+                OldCountry.fromIso3(country).isFrance(),
                 euVATNumber
         );
     }

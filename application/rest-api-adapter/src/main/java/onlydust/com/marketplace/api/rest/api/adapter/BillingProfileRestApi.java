@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.contract.model.InvoiceMandateRequest;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
-import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.ProjectSponsorView;
+import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 
 import java.time.ZoneOffset;

@@ -9,8 +9,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;

@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.view.backoffice.ProjectView;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

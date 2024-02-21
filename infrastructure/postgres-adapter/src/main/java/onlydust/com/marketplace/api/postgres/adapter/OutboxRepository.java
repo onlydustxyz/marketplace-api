@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
-import onlydust.com.marketplace.api.domain.model.notification.Event;
+import onlydust.com.marketplace.project.domain.model.notification.Event;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

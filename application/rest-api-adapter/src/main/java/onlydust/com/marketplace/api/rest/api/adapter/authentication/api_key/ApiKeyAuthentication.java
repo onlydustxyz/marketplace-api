@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key;
 
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustGrantedAuthority;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,15 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
-import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.api.domain.view.backoffice.PaymentView;
+import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.view.backoffice.PaymentView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
 import org.hibernate.annotations.Type;
@@ -24,8 +23,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 @NoArgsConstructor

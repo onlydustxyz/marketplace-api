@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
-import onlydust.com.marketplace.api.domain.model.Contributor;
+import onlydust.com.marketplace.project.domain.model.Contributor;
 
 import java.util.List;
 

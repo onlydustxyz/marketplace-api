@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Authentication;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

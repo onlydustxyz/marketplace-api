@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.BudgetResponse;
 import onlydust.com.marketplace.api.contract.model.CurrencyContract;
 import onlydust.com.marketplace.api.contract.model.ProjectBudgetsResponse;
-import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.view.BudgetView;
-import onlydust.com.marketplace.api.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.view.BudgetView;
+import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
 
 public interface ProjectBudgetMapper {
 

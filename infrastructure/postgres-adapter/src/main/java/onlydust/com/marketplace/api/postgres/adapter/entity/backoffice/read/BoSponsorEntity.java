@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.backoffice.read;
 
 import lombok.*;
-import onlydust.com.marketplace.api.domain.view.backoffice.SponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 

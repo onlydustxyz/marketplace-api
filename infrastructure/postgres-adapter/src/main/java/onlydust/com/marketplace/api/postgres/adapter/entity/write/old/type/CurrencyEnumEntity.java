@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
 
-import onlydust.com.marketplace.api.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.Currency;
 
 public enum CurrencyEnumEntity {
     usd, eth, op, apt, strk, lords, usdc;

@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
-import onlydust.com.marketplace.api.domain.view.UserRewardsPageView;
-import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
+import onlydust.com.marketplace.project.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
+import onlydust.com.marketplace.project.domain.view.UserRewardsPageView;
+import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.List;

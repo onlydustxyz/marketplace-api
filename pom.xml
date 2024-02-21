@@ -8,7 +8,7 @@
         <module>application</module>
         <module>infrastructure</module>
         <module>marketplace-api-contract</module>
-        <module>domain</module>
+        <module>project-domain</module>
         <module>coverage</module>
         <module>backoffice-api-contract</module>
         <module>accounting-domain</module>
@@ -58,7 +58,7 @@
             <!--  Sub modules     -->
             <dependency>
                 <groupId>onlydust.com.marketplace.api</groupId>
-                <artifactId>domain</artifactId>
+                <artifactId>project-domain</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>

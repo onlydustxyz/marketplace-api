@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import onlydust.com.marketplace.api.domain.view.PullRequestReviewState;
+import onlydust.com.marketplace.project.domain.view.PullRequestReviewState;
 
 public enum GithubPullRequestReviewState {
     PENDING_REVIEWER, UNDER_REVIEW, APPROVED, CHANGES_REQUESTED;

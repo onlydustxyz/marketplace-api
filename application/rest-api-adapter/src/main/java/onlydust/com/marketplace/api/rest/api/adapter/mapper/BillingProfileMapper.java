@@ -3,90 +3,14 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.BillingProfile;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.math.RoundingMode;
 
-import static java.util.Objects.isNull;
-
 public interface BillingProfileMapper {
-    static CompanyBillingProfileResponse companyDomainToResponse(final OldCompanyBillingProfile companyBillingProfile) {
-        return new CompanyBillingProfileResponse()
-                .address(companyBillingProfile.getAddress())
-                .country(companyBillingProfile.getCountry() == null ? null :
-                        companyBillingProfile.getCountry().display().orElse(companyBillingProfile.getCountry().iso3Code()))
-                .countryCode(companyBillingProfile.getCountry() == null ? null : companyBillingProfile.getCountry().iso3Code())
-                .id(companyBillingProfile.getId())
-                .status(verificationStatusToResponse(companyBillingProfile.getStatus()))
-                .name(companyBillingProfile.getName())
-                .euVATNumber(companyBillingProfile.getEuVATNumber())
-                .usEntity(companyBillingProfile.getUsEntity())
-                .registrationNumber(companyBillingProfile.getRegistrationNumber())
-                .subjectToEuropeVAT(companyBillingProfile.getSubjectToEuropeVAT())
-                .registrationDate(DateMapper.toZoneDateTime(companyBillingProfile.getRegistrationDate()));
-    }
-
-    static IndividualBillingProfileResponse individualDomainToResponse(final OldIndividualBillingProfile individualBillingProfile) {
-        return new IndividualBillingProfileResponse()
-                .status(verificationStatusToResponse(individualBillingProfile.getStatus()))
-                .id(individualBillingProfile.getId())
-                .address(individualBillingProfile.getAddress())
-                .birthdate(DateMapper.toZoneDateTime(individualBillingProfile.getBirthdate()))
-                .country(individualBillingProfile.getCountry() == null ? null :
-                        individualBillingProfile.getCountry().display().orElse(individualBillingProfile.getCountry().iso3Code()))
-                .countryCode(individualBillingProfile.getCountry() == null ? null : individualBillingProfile.getCountry().iso3Code())
-                .address(individualBillingProfile.getAddress())
-                .idDocumentNumber(individualBillingProfile.getIdDocumentNumber())
-                .firstName(individualBillingProfile.getFirstName())
-                .lastName(individualBillingProfile.getLastName())
-                .validUntil(DateMapper.toZoneDateTime(individualBillingProfile.getValidUntil()))
-                .usCitizen(individualBillingProfile.getUsCitizen())
-                .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
-                .idDocumentType(idDocumentTypeToResponse(individualBillingProfile.getIdDocumentType()));
-    }
-
-    static VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.api.domain.model.VerificationStatus verificationStatus) {
-        return switch (verificationStatus) {
-            case CLOSED -> VerificationStatus.CLOSED;
-            case REJECTED -> VerificationStatus.REJECTED;
-            case STARTED -> VerificationStatus.STARTED;
-            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-            case VERIFIED -> VerificationStatus.VERIFIED;
-        };
-    }
-
-    static IndividualBillingProfileResponse.IdDocumentTypeEnum idDocumentTypeToResponse(final OldIndividualBillingProfile.IdDocumentTypeEnum idDocumentTypeEnum) {
-        return isNull(idDocumentTypeEnum) ? null
-                : switch (idDocumentTypeEnum) {
-            case ID_CARD -> IndividualBillingProfileResponse.IdDocumentTypeEnum.ID_CARD;
-            case PASSPORT -> IndividualBillingProfileResponse.IdDocumentTypeEnum.PASSPORT;
-            case DRIVER_LICENSE -> IndividualBillingProfileResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
-            case RESIDENCE_PERMIT -> IndividualBillingProfileResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-        };
-    }
-
-    static BillingProfileType billingProfileToDomain(final BillingProfileTypeRequest billingProfileTypeRequest) {
-        return switch (billingProfileTypeRequest.getType()) {
-            case COMPANY -> BillingProfileType.COMPANY;
-            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-        };
-    }
-
-    static ShortBillingProfileResponse map(BillingProfile billingProfile) {
-        return new ShortBillingProfileResponse()
-                .id(billingProfile.id())
-                .name(billingProfile.name())
-                .type(map(billingProfile.type()))
-                .rewardCount(billingProfile.rewardCount())
-                .invoiceMandateAccepted(billingProfile.invoiceMandateAccepted());
-    }
 
     static InvoicePreviewResponse map(Invoice preview) {
         return new InvoicePreviewResponse()
@@ -156,25 +80,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
-        return new BillingProfileInvoicesPageResponse()
-                .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
-                .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
-                .totalPageNumber(page.getTotalPageNumber())
-                .totalItemNumber(page.getTotalItemNumber())
-                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
-    }
-
-    static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(Invoice invoice) {
-        return new BillingProfileInvoicesPageItemResponse()
-                .id(invoice.id().value())
-                .number(invoice.number().value())
-                .createdAt(invoice.createdAt())
-                .totalAfterTax(map(invoice.totalAfterTax()))
-                .status(map(invoice.status()));
-    }
-
-    static NewMoney map(Money money) {
+    static NewMoney map(onlydust.com.marketplace.accounting.domain.model.Money money) {
         return new NewMoney()
                 .amount(money.getValue())
                 .currency(map(money.getCurrency()));
@@ -193,7 +99,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static ConvertibleMoney toConvertibleMoney(Money money, Money base) {
+    static ConvertibleMoney toConvertibleMoney(onlydust.com.marketplace.accounting.domain.model.Money money, Money base) {
         return new ConvertibleMoney()
                 .amount(money.getValue())
                 .currency(map(money.getCurrency()))
@@ -204,17 +110,29 @@ public interface BillingProfileMapper {
                 );
     }
 
-    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {
+    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfile.Type type) {
         return switch (type) {
             case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
             case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
         };
     }
 
-    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile.Type type) {
-        return switch (type) {
-            case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
-            case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
-        };
+
+    static BillingProfileInvoicesPageResponse map(Page<Invoice> page, Integer pageIndex) {
+        return new BillingProfileInvoicesPageResponse()
+                .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
+                .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()))
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    static BillingProfileInvoicesPageItemResponse mapToBillingProfileInvoicesPageItemResponse(Invoice invoice) {
+        return new BillingProfileInvoicesPageItemResponse()
+                .id(invoice.id().value())
+                .number(invoice.number().value())
+                .createdAt(invoice.createdAt())
+                .totalAfterTax(map(invoice.totalAfterTax()))
+                .status(map(invoice.status()));
     }
 }

@@ -4,7 +4,7 @@ import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiClientAdapt
 import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiClientProperties;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiHttpClient;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.authentication.Auth0ApiAuthenticator;
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.linear.adapters;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.port.output.TrackingIssuePort;
+import onlydust.com.marketplace.project.domain.port.output.TrackingIssuePort;
 import onlydust.com.marketplace.api.linear.LinearGraphqlClient;
 
 import java.util.Map;

@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.notification.*;
-import onlydust.com.marketplace.api.domain.port.output.WebhookPort;
+import onlydust.com.marketplace.project.domain.model.notification.*;
+import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.dto.*;

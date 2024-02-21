@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.api.domain.port.input.*;
-import onlydust.com.marketplace.api.domain.service.GithubAccountService;
-import onlydust.com.marketplace.api.domain.service.RewardService;
-import onlydust.com.marketplace.api.domain.service.RewardV2Service;
+import onlydust.com.marketplace.project.domain.port.input.*;
+import onlydust.com.marketplace.project.domain.service.GithubAccountService;
+import onlydust.com.marketplace.project.domain.service.RewardService;
+import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;

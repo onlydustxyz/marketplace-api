@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
 
-import onlydust.com.marketplace.api.domain.model.UserProfileCover;
+import onlydust.com.marketplace.project.domain.model.UserProfileCover;
 
 public enum ProfileCoverEnumEntity {
     cyan,magenta,yellow,blue;

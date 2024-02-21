@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 
 @EqualsAndHashCode

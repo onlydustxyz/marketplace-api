@@ -4,7 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.handler.codec.http.HttpMethod;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 
 import java.util.concurrent.TimeUnit;
 

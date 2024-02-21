@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.od.rust.api.client.adapter;
 
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.MarkInvoiceAsReceivedDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardDTO;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.dto.RequestRewardResponseDTO;

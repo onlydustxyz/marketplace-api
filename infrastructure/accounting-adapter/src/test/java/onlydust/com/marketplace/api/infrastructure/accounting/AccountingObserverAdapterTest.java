@@ -5,11 +5,11 @@ import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,7 +42,7 @@ class AccountingObserverAdapterTest {
     @Test
     void onBillingProfileUpdated() {
         // When
-        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileUpdated(billingProfileId.value(), BillingProfileType.INDIVIDUAL, null, null, null
+        accountingObserverAdapter.onBillingProfileUpdated(new BillingProfileUpdated(billingProfileId.value(), OldBillingProfileType.INDIVIDUAL, null, null, null
                 , null, null, null, null, null, null, null));
 
         // Then
@@ -71,7 +71,7 @@ class AccountingObserverAdapterTest {
                 OldIndividualBillingProfile.builder()
                         .id(billingProfileId.value())
                         .userId(userId)
-                        .status(VerificationStatus.VERIFIED)
+                        .status(OldVerificationStatus.VERIFIED)
                         .build());
 
         // Then
@@ -88,7 +88,7 @@ class AccountingObserverAdapterTest {
                 OldCompanyBillingProfile.builder()
                         .id(billingProfileId.value())
                         .userId(userId)
-                        .status(VerificationStatus.VERIFIED)
+                        .status(OldVerificationStatus.VERIFIED)
                         .build());
 
         // Then

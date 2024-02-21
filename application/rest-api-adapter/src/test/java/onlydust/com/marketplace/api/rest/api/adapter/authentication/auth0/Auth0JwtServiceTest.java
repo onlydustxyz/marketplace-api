@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;

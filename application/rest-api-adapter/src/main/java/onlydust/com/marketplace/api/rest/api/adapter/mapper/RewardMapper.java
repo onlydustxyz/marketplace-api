@@ -2,10 +2,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import java.util.UUID;
 

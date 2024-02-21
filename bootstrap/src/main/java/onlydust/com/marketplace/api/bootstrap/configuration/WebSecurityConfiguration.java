@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import onlydust.com.marketplace.api.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;

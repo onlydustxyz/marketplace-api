@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0;
 
 import lombok.Builder;
 import lombok.Value;
-import onlydust.com.marketplace.api.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.OnlyDustAuthentication;
 import org.springframework.security.core.GrantedAuthority;
 
