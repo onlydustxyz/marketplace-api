@@ -3,13 +3,13 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
 import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
-import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.Optional;
 import java.util.UUID;

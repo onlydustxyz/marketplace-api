@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.project.domain.port.output;
+package onlydust.com.marketplace.kernel.port.output;
 
-import onlydust.com.marketplace.project.domain.model.notification.Event;
+import onlydust.com.marketplace.kernel.model.Event;
 
 import java.util.Optional;
 

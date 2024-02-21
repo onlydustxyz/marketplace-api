@@ -1,9 +1,10 @@
-package onlydust.com.marketplace.project.domain.job;
+package onlydust.com.marketplace.kernel.jobs;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
-import onlydust.com.marketplace.project.domain.port.output.OutboxPort;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.util.Optional;
 

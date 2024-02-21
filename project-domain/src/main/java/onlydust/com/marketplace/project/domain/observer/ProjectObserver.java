@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.observer;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.OutboxPort;
 
 import java.util.Date;
 import java.util.Set;

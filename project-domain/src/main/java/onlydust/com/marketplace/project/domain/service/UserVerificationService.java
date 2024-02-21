@@ -2,13 +2,14 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.job.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
 import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserVerificationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;

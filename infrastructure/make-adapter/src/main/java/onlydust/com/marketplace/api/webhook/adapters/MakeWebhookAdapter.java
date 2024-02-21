@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
 import onlydust.com.marketplace.api.webhook.Config;
