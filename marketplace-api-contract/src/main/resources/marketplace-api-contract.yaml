@@ -4966,6 +4966,7 @@ components:
       enum:
         - INDIVIDUAL
         - COMPANY
+        - SELF_EMPLOYED
     BillingProfileTypeRequest:
       type: object
       properties:

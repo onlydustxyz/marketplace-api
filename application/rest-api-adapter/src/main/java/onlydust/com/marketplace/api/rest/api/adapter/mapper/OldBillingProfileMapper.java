@@ -66,6 +66,7 @@ public interface OldBillingProfileMapper {
         return switch (billingProfileTypeRequest.getType()) {
             case COMPANY -> OldBillingProfileType.COMPANY;
             case INDIVIDUAL -> OldBillingProfileType.INDIVIDUAL;
+            case SELF_EMPLOYED -> OldBillingProfileType.COMPANY;
         };
     }
 

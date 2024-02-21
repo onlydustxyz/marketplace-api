@@ -6,10 +6,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
-public interface AccountingBillingProfileStorage {
+public interface BillingProfileStorage {
     boolean isAdmin(UserId userId, BillingProfile.Id billingProfileId);
 
     void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
@@ -23,4 +25,6 @@ public interface AccountingBillingProfileStorage {
     void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
     boolean isMandateAccepted(BillingProfile.Id billingProfileId);
+
+    Optional<BillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
 }

@@ -37,7 +37,8 @@ public class CompanyBillingProfile extends BillingProfile {
     }
 
     public void removeMember(UserId userId) {
-        if (members.stream().filter(user -> user.role() == User.Role.ADMIN).count() == 1 && members.stream().anyMatch(user -> user.id().equals(userId) && user.role() == User.Role.ADMIN))
+        if (members.stream().filter(user -> user.role() == User.Role.ADMIN).count() == 1
+            && members.stream().anyMatch(user -> user.id().equals(userId) && user.role() == User.Role.ADMIN))
             throw OnlyDustException.badRequest("Cannot remove last admin %s from company billing profile".formatted(userId));
         members.removeIf(user -> user.id().equals(userId));
     }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model.billingprofile;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 
 import java.util.Date;
@@ -14,26 +15,27 @@ public class Kyc {
     @NonNull
     UUID id;
     @NonNull
-    UserId userId;
+    UserId ownerId;
     @NonNull
     VerificationStatus status;
     String firstName;
     String lastName;
     Date birthdate;
     String address;
-    String country;
+    Country country;
     Boolean usCitizen;
     IdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
     String idDocumentCountryCode;
     Date validUntil;
     String reviewMessageForApplicant;
+    String externalApplicantId;
 
     public static Kyc initForUser(final UserId userId) {
         return Kyc.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
-                .userId(userId)
+                .ownerId(userId)
                 .build();
     }
 

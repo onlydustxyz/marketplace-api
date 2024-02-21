@@ -34,7 +34,7 @@ public class IndividualBillingProfileEntity {
     UUID userId;
     @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
-    VerificationStatusEntity verificationStatus;
+    OldVerificationStatusEntity verificationStatus;
     String firstName;
     String lastName;
     Date birthdate;
@@ -123,7 +123,7 @@ public class IndividualBillingProfileEntity {
                 .idDocumentType(IdDocumentTypeEnumEntity.fromDomain(individualBillingProfile.getIdDocumentType()))
                 .userId(individualBillingProfile.getUserId())
                 .usCitizen(individualBillingProfile.getUsCitizen())
-                .verificationStatus(VerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
+                .verificationStatus(OldVerificationStatusEntity.fromDomain(individualBillingProfile.getStatus()))
                 .idDocumentCountryCode(individualBillingProfile.getIdDocumentCountryCode())
                 .reviewMessage(individualBillingProfile.getReviewMessageForApplicant())
                 .applicantId(individualBillingProfile.getExternalApplicantId())

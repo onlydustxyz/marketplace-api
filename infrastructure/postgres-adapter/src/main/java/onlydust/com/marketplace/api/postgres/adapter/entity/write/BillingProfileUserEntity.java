@@ -9,7 +9,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -17,16 +19,25 @@ import java.util.Date;
 @EqualsAndHashCode
 @Data
 @Builder(toBuilder = true)
-@Table(name = "children_kyc", schema = "public")
+@Table(name = "billing_profiles_users", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
-@TypeDef(name = "verification_status", typeClass = PostgreSQLEnumType.class)
-public class ChildrenKycEntity {
+@IdClass(BillingProfileUserEntity.PrimaryKey.class)
+@TypeDef(name = "billing_profile_role", typeClass = PostgreSQLEnumType.class)
+public class BillingProfileUserEntity {
+
     @Id
-    String applicantId;
-    String parentApplicantId;
-    @Type(type = "verification_status")
+    @Column(name = "billing_profile_id", nullable = false, updatable = false)
+    UUID billingProfileId;
+
+    @Id
+    @Column(name = "user_id", nullable = false, updatable = false)
+    UUID userId;
+
+    @Column(name = "role", nullable = false)
+    @Type(type = "billing_profile_type")
     @Enumerated(EnumType.STRING)
-    OldVerificationStatusEntity verificationStatus;
+    Role role;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -35,4 +46,14 @@ public class ChildrenKycEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
+
+    public enum Role {
+        ADMIN, MEMBER
+    }
+
+    @EqualsAndHashCode
+    public static class PrimaryKey implements Serializable {
+        UUID userId;
+        UUID billingProfileId;
+    }
 }

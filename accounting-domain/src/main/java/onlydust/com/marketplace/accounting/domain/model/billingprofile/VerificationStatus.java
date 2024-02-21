@@ -6,6 +6,5 @@ public enum VerificationStatus {
     UNDER_REVIEW,
     VERIFIED,
     REJECTED,
-    INVALIDATED,
     CLOSED
 }

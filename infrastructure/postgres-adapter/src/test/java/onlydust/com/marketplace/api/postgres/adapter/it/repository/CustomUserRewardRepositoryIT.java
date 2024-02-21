@@ -158,7 +158,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
                 .id(billingProfileId)
                 .userId(userId)
-                .verificationStatus(VerificationStatusEntity.UNDER_REVIEW)
+                .verificationStatus(OldVerificationStatusEntity.UNDER_REVIEW)
                 .build());
 
         viewEntities = customUserRewardRepository.getViewEntities(userId,
@@ -179,7 +179,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
                 .id(billingProfileId)
                 .userId(userId)
-                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                 .build());
 
         viewEntities = customUserRewardRepository.getViewEntities(userId,
@@ -228,7 +228,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     .userId(individualUserId)
                     .build());
             individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                     .userId(individualUserId)
                     .id(UUID.randomUUID())
                     .build());
@@ -429,7 +429,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
                     .id(UUID.randomUUID())
                     .userId(companyUserId)
-                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                     .build());
             postgresUserAdapter.savePayoutSettingsForUserId(companyUserId,
                     UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth")).build());
@@ -683,7 +683,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
                     .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
                     .build());
             companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                     .id(UUID.randomUUID())
                     .userId(userId)
                     .build());

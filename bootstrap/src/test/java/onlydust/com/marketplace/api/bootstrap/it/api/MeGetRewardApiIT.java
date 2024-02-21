@@ -3,13 +3,11 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.CryptoUsdQuotesRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
@@ -67,7 +65,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
         final UUID rewardId = UUID.fromString("2ac80cc6-7e83-4eef-bc0c-932b58f683c0");
         final CompanyBillingProfileEntity companyBillingProfileEntity =
                 companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        companyBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
         companyBillingProfileRepository.save(companyBillingProfileEntity);
         // When
         client.get()

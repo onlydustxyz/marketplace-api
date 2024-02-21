@@ -9,7 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 class BillingProfileServiceTest {
     final Faker faker = new Faker();
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    final AccountingBillingProfileStorage billingProfileStorage = mock(AccountingBillingProfileStorage.class);
+    final BillingProfileStorage billingProfileStorage = mock(BillingProfileStorage.class);
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
     final UserId userId = UserId.random();

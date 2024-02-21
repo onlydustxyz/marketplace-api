@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CryptoUsdQuotesEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentRequestEntity;
@@ -356,7 +356,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
         userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
         final CompanyBillingProfileEntity companyBillingProfileEntity =
                 companyBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        companyBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        companyBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
         companyBillingProfileRepository.save(companyBillingProfileEntity);
         cryptoUsdQuotesRepository.save(CryptoUsdQuotesEntity.builder()
                 .currency(CurrencyEnumEntity.eth)
@@ -574,7 +574,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL)
                 .build());
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                 .userId(userId)
                 .id(UUID.randomUUID())
                 .build());

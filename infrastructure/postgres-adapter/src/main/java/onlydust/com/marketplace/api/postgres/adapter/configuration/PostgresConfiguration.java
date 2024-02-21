@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
@@ -13,6 +11,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserVerificati
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -365,10 +365,14 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public AccountingBillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                           final GlobalSettingsRepository globalSettingsRepository) {
-        return new PostgresAccountingBillingProfileStorage(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository);
+    public BillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                 final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                 final GlobalSettingsRepository globalSettingsRepository,
+                                                                 final KycRepository kycRepository,
+                                                                 final KybRepository kybRepository,
+                                                                 final BillingProfileRepository billingProfileRepository) {
+        return new PostgresBillingProfileAdapter(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository,
+                billingProfileRepository, kybRepository, kycRepository);
     }
 
     @Bean
