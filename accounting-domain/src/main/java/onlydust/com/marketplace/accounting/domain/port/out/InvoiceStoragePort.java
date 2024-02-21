@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.List;

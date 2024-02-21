@@ -3,16 +3,26 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
@@ -22,6 +32,31 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull AccountingBillingProfileStorage billingProfileStorage;
     private final @NonNull PdfStoragePort pdfStoragePort;
+
+
+    @Override
+    public IndividualBillingProfile createIndividualBillingProfile(@NotNull UserId ownerId, @NotNull String name, Set<ProjectId> selectForProjects) {
+        final var billingProfile = new IndividualBillingProfile(name, ownerId);
+        billingProfileStorage.save(billingProfile);
+        selectBillingProfileForUserAndProjects(billingProfile.id(), ownerId, selectForProjects);
+        return billingProfile;
+    }
+
+    @Override
+    public SelfEmployedBillingProfile createSelfEmployedBillingProfile(@NotNull UserId ownerId, @NotNull String name, Set<ProjectId> selectForProjects) {
+        final var billingProfile = new SelfEmployedBillingProfile(name, ownerId);
+        billingProfileStorage.save(billingProfile);
+        selectBillingProfileForUserAndProjects(billingProfile.id(), ownerId, selectForProjects);
+        return billingProfile;
+    }
+
+    @Override
+    public CompanyBillingProfile createCompanyBillingProfile(@NonNull UserId firstAdminId, @NonNull String name, Set<ProjectId> selectForProjects) {
+        final var billingProfile = new CompanyBillingProfile(name, firstAdminId);
+        billingProfileStorage.save(billingProfile);
+        selectBillingProfileForUserAndProjects(billingProfile.id(), firstAdminId, selectForProjects);
+        return billingProfile;
+    }
 
     @Override
     @Transactional
@@ -59,6 +94,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var url = pdfStoragePort.upload(invoiceInternalFileName(invoice), data);
         invoiceStoragePort.save(invoice.status(Invoice.Status.PROCESSING).url(url));
+    }
+
+    private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {
+        if (projectIds != null)
+            projectIds.forEach(projectId -> billingProfileStorage.savePayoutPreference(billingProfileId, userId, projectId));
     }
 
     @Override

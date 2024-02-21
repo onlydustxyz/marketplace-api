@@ -756,7 +756,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/billing-profiles/company:
     get:
       security:
@@ -814,7 +813,7 @@ paths:
       tags:
         - Me
       summary: Update user billing profile type
-      operationId: updateBillingProfileType
+      operationId: updateMyBillingProfileType
       description: |
         Update user billing profile type
       requestBody:
@@ -825,6 +824,57 @@ paths:
       responses:
         "204":
           description: 'User billing profile type updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/payout-preferences:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my payout preferences
+      operationId: getMyPayoutPreferences
+      description: |
+        Get my payout preferences
+      responses:
+        "200":
+          description: 'User payout preferences'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PayoutPreferencesPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Set my payout preference for a project
+      operationId: setMyPayoutPreferenceForProject
+      description: |
+        Set my payout preference for a project
+      requestBody:
+        description: 'Payout preference'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutPreferenceRequest'
+      responses:
+        "204":
+          description: 'Payout preference was set successfully.'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -2513,6 +2563,330 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/billing-profiles:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Create a new billing profile
+      operationId: createBillingProfile
+      description: |
+        Create a new billing profile.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileRequest'
+      responses:
+        "200":
+          description: 'Billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Get billing profile by id
+      operationId: getBillingProfile
+      description: |
+        Get billing profile by id
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "200":
+          description: 'Billing profile'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/billing-profiles/{billingProfileId}/type:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Update billing profile type
+      operationId: updateBillingProfileType
+      description: |
+        Update billing profile type (allows to switch between self-employed and company types)
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileTypeRequest'
+      responses:
+        "204":
+          description: 'User billing profile type updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/invoiceable-rewards:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Get payable rewards linked to given billing profile
+      operationId: getPayableRewards
+      description: |
+        Get payable rewards linked to given billing profile
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "200":
+          description: 'Payable rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileInvoiceableRewardsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/payout-info:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Get payout info of the given billing profile
+      operationId: getPayoutInfo
+      description: |
+        Get payout info of the given billing profile. Caller must be admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "200":
+          description: 'Coworkers'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfilePayoutInfoResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Set payout info of the given billing profile
+      operationId: setPayoutInfo
+      description: |
+        Set payout info of the given billing profile. Caller must be an admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfilePayoutInfoRequest'
+      responses:
+        "204":
+          description: 'Coworker invited'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/coworkers:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Get coworkers linked to given billing profile
+      operationId: getCoworkers
+      description: |
+        Get coworkers linked to given billing profile. Caller must be admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      responses:
+        "200":
+          description: 'Coworkers'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingProfileCoworkersPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Invite coworker to given billing profile
+      operationId: inviteCoworker
+      description: |
+        Invite coworker to given billing profile. Caller must be admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileCoworkerInvitationRequest'
+      responses:
+        "204":
+          description: 'Coworker invited'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}/invitation:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Accept or reject coworker invitation
+      operationId: acceptOrRejectCoworkerInvitation
+      description: |
+        Accept or reject coworker invitation. Caller must be the invited coworker.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+        - in: path
+          name: githubUserId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileCoworkerInvitationUpdateRequest'
+      responses:
+        "204":
+          description: 'Invitation accepted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/billing-profiles/{billingProfileId}/coworkers/{githubUserId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BillingProfiles
+      summary: Remove coworker from billing profile
+      operationId: removeCoworker
+      description: |
+        Remove a coworker (or cancel his invitation) from billing profile. Caller must be an admin of the billing profile.
+      parameters:
+        - in: path
+          name: billingProfileId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BillingProfileId'
+        - in: path
+          name: githubUserId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      responses:
+        "204":
+          description: 'Coworker removed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/billing-profiles/{billingProfileId}/invoice-preview:
     get:
       security:
@@ -2898,6 +3272,11 @@ components:
       format: uuid
       description: OnlyDust reward ID
 
+    BillingProfileId:
+      type: string
+      format: uuid
+      description: Billing profile ID
+
     GithubInstallationId:
       type: integer
       format: int64
@@ -3018,7 +3397,43 @@ components:
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
         missingStarknetWallet:
           type: boolean
-
+    BillingProfilePayoutInfoResponse:
+      type: object
+      properties:
+        hasValidPayoutSettings:
+          type: boolean
+        sepaAccount:
+          type: object
+          properties:
+            bic:
+              type: string
+              example: DAAEFRPPCCT
+            iban:
+              type: string
+              example: FR5417569000301995586997O41
+        missingSepaAccount:
+          type: boolean
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        missingEthWallet:
+          type: boolean
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        missingOptimismWallet:
+          type: boolean
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        missingAptosWallet:
+          type: boolean
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+        missingStarknetWallet:
+          type: boolean
     UserPayoutSettingsRequest:
       type: object
       properties:
@@ -3045,6 +3460,31 @@ components:
           type: string
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
+    BillingProfilePayoutInfoRequest:
+      type: object
+      properties:
+        sepaAccount:
+          type: object
+          properties:
+            bic:
+              type: string
+              example: DAAEFRPPCCT
+            iban:
+              type: string
+              example: FR5417569000301995586997O41
+        ethWallet:
+          type: string
+          description: ETH wallet address or ENS
+          example: vitalik.eth
+        optimismAddress:
+          type: string
+          example: 0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545
+        aptosAddress:
+          type: string
+          example: 0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5
+        starknetAddress:
+          type: string
+          example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
     UserProfileRequest:
       type: object
@@ -5302,6 +5742,50 @@ components:
         - REJECTED
         - CLOSED
 
+    BillingProfileResponse:
+      type: object
+      required:
+        - id
+        - type
+        - name
+        - me
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        name:
+          type: string
+        currentYearPaymentLimit:
+          type: number
+          description: The payment limit for the current year (typically, $5000 for self-employed)
+        currentYearPaymentAmount:
+          type: number
+          description: The total payments amount for the current year so far
+        isSwitchableToSelfEmployed:
+          type: boolean
+          description: True if the billing profile can be switched from company to self-employed type (eg. no other coworkers)
+        me:
+          type: object
+          required:
+            - canDelete
+            - canLeave
+          properties:
+            invitation:
+              $ref: '#/components/schemas/BillingProfileCoworkerInvitation'
+            role:
+              $ref: '#/components/schemas/BillingProfileCoworkerRole'
+            canDelete:
+              type: boolean
+              description: True if the billing profile can be deleted by the caller (eg. no payment using it so far and the caller is admin)
+            canLeave:
+              type: boolean
+              description: True if the caller can leave the billing profile (eg. no payment using it so far and caller is not the last admin)
+        kyc:
+          $ref: '#/components/schemas/KYCResponse'
+        kyb:
+          $ref: '#/components/schemas/KYBResponse'
+
     CompanyBillingProfileResponse:
       type: object
       required:
@@ -5377,6 +5861,182 @@ components:
           format: date-time
         idDocumentCountryCode:
           type: string
+    KYCResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthdate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+        usCitizen:
+          type: boolean
+        idDocumentType:
+          type: string
+          enum:
+            - PASSPORT
+            - ID_CARD
+            - RESIDENCE_PERMIT
+            - DRIVER_LICENSE
+        idDocumentNumber:
+          type: string
+        validUntil:
+          type: string
+          format: date-time
+        idDocumentCountryCode:
+          type: string
+
+    KYBResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        name:
+          type: string
+        registrationNumber:
+          type: string
+        registrationDate:
+          type: string
+          format: date-time
+        address:
+          type: string
+        country:
+          type: string
+        usEntity:
+          type: boolean
+        subjectToEuropeVAT:
+          type: boolean
+        euVATNumber:
+          type: string
+
+    BillingProfileRequest:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        selectForProjects:
+          type: array
+          description: List of project ids on which the billing profile will be selected for the caller
+          items:
+            $ref: '#/components/schemas/ProjectId'
+
+    BillingProfileCoworkerRole:
+      type: string
+      enum:
+        - ADMIN
+        - MEMBER
+
+    BillingProfileCoworkerInvitation:
+      type: object
+      properties:
+        invitedBy:
+          $ref: '#/components/schemas/ContributorResponse'
+        invitedAt:
+          type: string
+          format: date-time
+        role:
+          $ref: '#/components/schemas/BillingProfileCoworkerRole'
+
+    BillingProfileCoworkerInvitationRequest:
+      type: object
+      required:
+        - githubUserId
+        - role
+      properties:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        role:
+          $ref: '#/components/schemas/BillingProfileCoworkerRole'
+
+    BillingProfileCoworkerInvitationUpdateRequest:
+      type: object
+      required:
+        - accepted
+      properties:
+        accepted:
+          type: boolean
+          description: True if the invitation is accepted
+
+    BillingProfileCoworkersPageResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/BillingProfileCoworkersPageItemResponse'
+
+    BillingProfileCoworkersPageItemResponse:
+      type: object
+      required:
+        - role
+        - invitedAt
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          properties:
+            role:
+              $ref: '#/components/schemas/BillingProfileCoworkerRole'
+            joinedAt:
+              type: string
+              format: date-time
+              description: Date when the coworker joined the billing profile. Null if the coworker didn't accept the invitation yet.
+            invitedAt:
+              type: string
+              format: date-time
+            removable:
+              type: boolean
+              description: True if the coworker can be removed from the billing profile
+
+    PayoutPreferenceRequest:
+      type: object
+      required:
+        - projectId
+        - billingProfileId
+      properties:
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+
+    PayoutPreferencesPageResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/PayoutPreferencesPageItemResponse'
+
+    PayoutPreferencesPageItemResponse:
+      type: object
+      required:
+        - project
+      properties:
+        project:
+          $ref: '#/components/schemas/ShortProjectResponse'
+        billingProfile:
+          $ref: '#/components/schemas/ShortBillingProfileResponse'
+
+    BillingProfileInvoiceableRewardsResponse:
+      type: object
+      required:
+        - rewards
+      properties:
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyRewardPageItemResponse'
+
     InvoicePreviewResponse:
       type: object
       required:

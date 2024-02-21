@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

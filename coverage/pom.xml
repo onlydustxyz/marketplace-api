@@ -32,6 +32,11 @@
             <artifactId>cron-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>sumsub-webhook-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
         <!-- Bootstrap -->
         <dependency>
@@ -44,6 +49,11 @@
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>domain</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>accounting-domain</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
@@ -81,6 +91,46 @@
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>make-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>kernel</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <artifactId>accounting-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>auth0-api-client-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <artifactId>coinmarketcap-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <artifactId>infura-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>posthog-api-client-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>slack-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>sumsub-api-client-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

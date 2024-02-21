@@ -1,0 +1,44 @@
+package onlydust.com.marketplace.accounting.domain.model.billingprofile;
+
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Getter
+@Accessors(fluent = true)
+public class CompanyBillingProfile extends BillingProfile {
+    @NonNull
+    private final Set<User> members;
+    @NonNull
+    private final Kyb kyb;
+
+    public CompanyBillingProfile(@NonNull String name, @NonNull UserId firstAdmin) {
+        super(name);
+        this.members = new HashSet<>(Set.of(new User(firstAdmin, User.Role.ADMIN)));
+        this.kyb = Kyb.initForUser(firstAdmin);
+    }
+
+    @Override
+    public Type type() {
+        return Type.COMPANY;
+    }
+
+    public boolean isSwitchableToSelfEmployed() {
+        return members.size() == 1;
+    }
+
+    public void addMember(UserId userId, User.Role role) {
+        members.add(new User(userId, role));
+    }
+
+    public void removeMember(UserId userId) {
+        if (members.stream().filter(user -> user.role() == User.Role.ADMIN).count() == 1 && members.stream().anyMatch(user -> user.id().equals(userId) && user.role() == User.Role.ADMIN))
+            throw OnlyDustException.badRequest("Cannot remove last admin %s from company billing profile".formatted(userId));
+        members.removeIf(user -> user.id().equals(userId));
+    }
+}

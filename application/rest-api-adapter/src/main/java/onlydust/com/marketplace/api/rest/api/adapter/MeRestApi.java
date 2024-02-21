@@ -327,7 +327,7 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
+    public ResponseEntity<Void> updateMyBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), BillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
