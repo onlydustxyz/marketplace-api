@@ -1,7 +1,8 @@
 package onlydust.com.marketplace.project.domain.model.notification;
 
 import lombok.*;
-import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
 import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 

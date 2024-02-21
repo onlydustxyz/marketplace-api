@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.kernel.model.Event;
 
 import java.util.Set;
 import java.util.UUID;

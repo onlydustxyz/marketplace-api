@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -205,6 +206,18 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").doesNotExist()
         ;
 
+        notificationOutboxJob.run();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("BillingProfile")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("InvoiceUploaded")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.billing_profile_id", equalTo(billingProfileId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.invoice_id", equalTo(invoiceId.getValue())))
+                .withRequestBody(matchingJsonPath("$.payload.is_external", equalTo("true")))
+        );
+
+
         // When
         final var pdfData = faker.lorem().paragraph().getBytes();
         when(pdfStoragePort.download(eq(invoiceId.getValue() + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
@@ -376,6 +389,17 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").doesNotExist()
         ;
+
+        notificationOutboxJob.run();
+        webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.aggregate_name", equalTo("BillingProfile")))
+                .withRequestBody(matchingJsonPath("$.event_name", equalTo("InvoiceUploaded")))
+                .withRequestBody(matchingJsonPath("$.environment", equalTo("local-it")))
+                .withRequestBody(matchingJsonPath("$.payload.billing_profile_id", equalTo(billingProfileId.toString())))
+                .withRequestBody(matchingJsonPath("$.payload.invoice_id", equalTo(invoiceId.getValue())))
+                .withRequestBody(matchingJsonPath("$.payload.is_external", equalTo("false")))
+        );
 
         // When
         final var pdfData = faker.lorem().paragraph().getBytes();

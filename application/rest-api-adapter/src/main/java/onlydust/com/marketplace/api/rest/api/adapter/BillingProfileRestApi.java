@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper
 import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -86,6 +87,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=" + invoice.fileName())
+                .contentType(MediaType.APPLICATION_PDF)
                 .body(new InputStreamResource(invoice.data()));
     }
 

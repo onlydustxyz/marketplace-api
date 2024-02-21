@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.observers.NotificationOutbox;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.InvoiceService;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,8 +47,14 @@ public class AccountingConfiguration {
     @Bean
     public BillingProfileFacadePort billingProfileFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                              final @NonNull BillingProfileStorage billingProfileStorage,
-                                                             final @NonNull PdfStoragePort pdfStoragePort) {
-        return new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
+                                                             final @NonNull PdfStoragePort pdfStoragePort,
+                                                             final @NonNull BillingProfileObserver billingProfileObserver) {
+        return new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort, billingProfileObserver);
+    }
+
+    @Bean
+    public NotificationOutbox notificationOutboxObserver(final @NonNull OutboxPort notificationOutbox) {
+        return new NotificationOutbox(notificationOutbox);
     }
 
     @Bean

@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
@@ -29,6 +31,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
     private final @NonNull BillingProfileStorage billingProfileStorage;
     private final @NonNull PdfStoragePort pdfStoragePort;
+    private final @NonNull BillingProfileObserver billingProfileObserver;
 
 
     @Override
@@ -122,6 +125,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .status(Invoice.Status.PROCESSING)
                 .url(url)
                 .originalFileName(fileName));
+
+        billingProfileObserver.onInvoiceUploaded(billingProfileId, invoiceId, nonNull(fileName));
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {

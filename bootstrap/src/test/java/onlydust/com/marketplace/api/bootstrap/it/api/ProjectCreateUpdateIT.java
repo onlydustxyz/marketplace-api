@@ -229,7 +229,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 595505L)).exists()
                 .jsonPath(format("$.leaders[?(@.githubUserId==%d)]", 16590657L)).exists();
-        
+
         runJobs();
         webhookWireMockServer.verify(1, postRequestedFor(urlEqualTo("/"))
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -753,7 +753,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(true)
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("2021-01-01T00:00:00Z")
 
-                .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
-                .jsonPath("$.ecosystems[1].name").isEqualTo("Ethereum");
+                .jsonPath("$.ecosystems[0].name").isEqualTo("Ethereum")
+                .jsonPath("$.ecosystems[1].name").isEqualTo("Starknet");
     }
 }

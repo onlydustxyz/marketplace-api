@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
 import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.Assertions;

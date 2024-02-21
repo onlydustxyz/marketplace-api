@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
-import onlydust.com.marketplace.project.domain.job.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.context.annotation.Profile;

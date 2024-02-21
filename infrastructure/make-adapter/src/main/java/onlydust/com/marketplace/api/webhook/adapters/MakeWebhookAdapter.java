@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.webhook.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.notification.*;
-import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceUploaded;
 import onlydust.com.marketplace.api.webhook.Config;
 import onlydust.com.marketplace.api.webhook.MakeWebhookHttpClient;
 import onlydust.com.marketplace.api.webhook.dto.*;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.project.domain.model.notification.*;
+import onlydust.com.marketplace.project.domain.port.output.WebhookPort;
 
 @AllArgsConstructor
 public class MakeWebhookAdapter implements WebhookPort {
@@ -35,6 +37,8 @@ public class MakeWebhookAdapter implements WebhookPort {
             makeWebhookHttpClient.post(UserSignedUpEventDTO.of(userSignedUp, config.getEnvironment()));
         } else if (event instanceof BillingProfileUpdated billingProfileUpdated) {
             makeWebhookHttpClient.post(UserBillingProfileVerificationStatusUpdatedEventDTO.of(billingProfileUpdated, config.getEnvironment()));
+        } else if (event instanceof InvoiceUploaded invoiceUploaded) {
+            makeWebhookHttpClient.post(InvoiceUploadedEventDTO.of(invoiceUploaded, config.getEnvironment()));
         } else {
             throw new IllegalArgumentException("Unknown notification type %s".formatted(event));
         }
