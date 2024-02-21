@@ -813,7 +813,7 @@ paths:
       tags:
         - Me
       summary: Update user billing profile type
-      operationId: updateBillingProfileType
+      operationId: updateMyBillingProfileType
       description: |
         Update user billing profile type
       requestBody:
