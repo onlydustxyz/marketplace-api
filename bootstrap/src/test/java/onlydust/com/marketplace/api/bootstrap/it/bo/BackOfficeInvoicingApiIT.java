@@ -60,7 +60,10 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     void should_list_invoices() {
         client
                 .get()
-                .uri(getApiURI(INVOICES, Map.of("pageIndex", "0", "pageSize", "10")))
+                .uri(getApiURI(INVOICES, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "invoiceIds", invoices.stream().map(InvoiceEntity::id).map(UUID::toString).toList().toString())))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()

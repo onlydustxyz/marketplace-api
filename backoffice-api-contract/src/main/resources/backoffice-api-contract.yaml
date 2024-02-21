@@ -36,6 +36,14 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: invoiceIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/InvoiceId'
+          style: simple
       responses:
         "200":
           description: 'Invoice page'

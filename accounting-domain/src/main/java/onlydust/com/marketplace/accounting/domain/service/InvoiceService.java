@@ -8,6 +8,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
+import java.util.List;
+
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
 @AllArgsConstructor
@@ -15,8 +17,8 @@ public class InvoiceService implements InvoiceFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
 
     @Override
-    public Page<Invoice> findAllExceptDrafts(final @NonNull Integer pageIndex, final @NonNull Integer pageSize) {
-        return invoiceStoragePort.findAllExceptDrafts(pageIndex, pageSize);
+    public Page<Invoice> findAllExceptDrafts(final @NonNull List<Invoice.Id> invoiceIds, final @NonNull Integer pageIndex, final @NonNull Integer pageSize) {
+        return invoiceStoragePort.findAllExceptDrafts(invoiceIds, pageIndex, pageSize);
     }
 
     @Override
