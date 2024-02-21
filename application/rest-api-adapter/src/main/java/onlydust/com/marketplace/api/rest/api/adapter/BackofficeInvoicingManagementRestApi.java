@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapInvoicePageToContract;
@@ -27,10 +29,14 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
 
     @Override
-    public ResponseEntity<InvoicePage> getInvoicePage(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<InvoicePage> getInvoicePage(Integer pageIndex, Integer pageSize, List<UUID> invoiceIds) {
         final int sanitizedPageSize = sanitizePageSize(pageSize, MAX_PAGE_SIZE);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = invoiceFacadePort.findAllExceptDrafts(sanitizedPageIndex, sanitizedPageSize);
+        final var page = invoiceFacadePort.findAllExceptDrafts(
+                Optional.ofNullable(invoiceIds).orElse(List.of()).stream().map(Invoice.Id::of).toList(),
+                sanitizedPageIndex,
+                sanitizedPageSize
+        );
 
         final var response = mapInvoicePageToContract(page, pageIndex);
 
