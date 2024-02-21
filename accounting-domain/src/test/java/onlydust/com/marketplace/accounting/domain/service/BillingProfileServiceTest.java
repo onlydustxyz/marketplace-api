@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -10,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -38,7 +38,9 @@ class BillingProfileServiceTest {
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     final AccountingBillingProfileStorage billingProfileStorage = mock(AccountingBillingProfileStorage.class);
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
-    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
+    final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
+    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort,
+            billingProfileObserver);
     final UserId userId = UserId.random();
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
     final Currency ETH = Currencies.ETH;
@@ -51,7 +53,7 @@ class BillingProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(invoiceStoragePort, billingProfileStorage, pdfStoragePort);
+        reset(invoiceStoragePort, billingProfileStorage, pdfStoragePort, billingProfileObserver);
     }
 
     @Nested
@@ -209,6 +211,7 @@ class BillingProfileServiceTest {
             verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
+            verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), false);
         }
 
         @Test
@@ -268,6 +271,7 @@ class BillingProfileServiceTest {
             verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
+            verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), true);
         }
 
         @SneakyThrows
@@ -344,6 +348,7 @@ class BillingProfileServiceTest {
                 invoiceId
         );
     }
+
     @Test
     void should_create_individual_billing_profile() {
         // Given

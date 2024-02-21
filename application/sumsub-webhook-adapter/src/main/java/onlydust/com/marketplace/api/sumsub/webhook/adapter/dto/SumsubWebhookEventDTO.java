@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
+import onlydust.com.marketplace.kernel.model.Event;
 
 import java.util.List;
 

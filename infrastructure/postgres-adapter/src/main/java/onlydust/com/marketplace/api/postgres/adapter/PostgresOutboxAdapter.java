@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.notification.Event;
-import onlydust.com.marketplace.project.domain.port.output.OutboxPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.util.Optional;
 

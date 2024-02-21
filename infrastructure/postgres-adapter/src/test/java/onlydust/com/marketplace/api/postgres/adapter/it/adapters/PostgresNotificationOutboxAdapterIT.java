@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import onlydust.com.marketplace.project.domain.model.notification.Event;
+import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLeaderAssigned;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
