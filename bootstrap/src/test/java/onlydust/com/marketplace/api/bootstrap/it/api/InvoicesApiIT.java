@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,6 +32,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     PdfStoragePort pdfStoragePort;
     @Autowired
     IndividualBillingProfileRepository individualBillingProfileRepository;
+    @Autowired
+    GlobalSettingsRepository globalSettingsRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UUID billingProfileId;
@@ -334,6 +338,27 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
                 .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(8)
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(true);
+
+        // When
+        final var settings = globalSettingsRepository.get();
+        settings.setInvoiceMandateLatestVersionDate(new Date());
+        globalSettingsRepository.save(settings);
+        
+        // Then
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
+                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(10)
+                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
     }
 
     @Test
