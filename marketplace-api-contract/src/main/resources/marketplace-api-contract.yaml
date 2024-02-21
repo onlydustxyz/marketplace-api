@@ -2992,6 +2992,11 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: fileName
+          required: false
+          schema:
+            type: string
       responses:
         "204":
           description: 'Invoice uploaded'

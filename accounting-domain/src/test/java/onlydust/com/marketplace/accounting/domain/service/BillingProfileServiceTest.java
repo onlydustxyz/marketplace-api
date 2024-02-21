@@ -75,7 +75,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf))
+            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User is not allowed to upload an invoice for this billing profile");
@@ -151,10 +152,11 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
+            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf))
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
@@ -165,25 +167,100 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStorage.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
-            assertThatThrownBy(() -> billingProfileService.uploadInvoice(userId, otherBillingProfileId, invoice.id(), pdf))
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, otherBillingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
+        }
+
+        @Test
+        void should_prevent_invoice_upload_if_mandate_is_not_accepted() {
+            // Given
+            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(false);
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
         }
 
         @SneakyThrows
         @Test
         void should_upload_invoice_and_save_url() {
             // Given
+            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
             final var url = new URL("https://" + faker.internet().url());
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
 
             // When
-            billingProfileService.uploadInvoice(userId, billingProfileId, invoice.id(), pdf);
+            billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf);
+
+            // Then
+            final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
+            verify(invoiceStoragePort).save(invoiceCaptor.capture());
+            verify(pdfStoragePort).upload(invoice.id() + ".pdf", pdf);
+            final var invoice = invoiceCaptor.getValue();
+            assertThat(invoice.url()).isEqualTo(url);
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_if_not_found() {
+            // Given
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), billingProfileId));
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
+            // Given
+            final var otherBillingProfileId = BillingProfile.Id.random();
+            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Invoice %s not found for billing profile %s".formatted(invoice.id(), otherBillingProfileId));
+        }
+
+        @Test
+        void should_prevent_external_invoice_upload_if_mandate_is_accepted() {
+            // Given
+            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
+        }
+
+        @SneakyThrows
+        @Test
+        void should_upload_external_invoice_and_save_url() {
+            // Given
+            final var url = new URL("https://" + faker.internet().url());
+            when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
+
+            // When
+            billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf);
 
             // Then
             final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);

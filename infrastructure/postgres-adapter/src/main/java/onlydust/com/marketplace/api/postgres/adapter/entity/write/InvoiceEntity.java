@@ -41,6 +41,7 @@ public class InvoiceEntity {
     @ManyToOne
     @NonNull CurrencyEntity currency;
     URL url;
+    String originalFileName;
     @Type(type = "jsonb")
     Data data;
 
@@ -58,7 +59,8 @@ public class InvoiceEntity {
                 data.bankAccount,
                 data.wallets,
                 data.rewards.stream().map(InvoiceRewardEntity::forInvoice).toList(),
-                url
+                url,
+                originalFileName
         );
     }
 
@@ -71,6 +73,7 @@ public class InvoiceEntity {
                 .url(invoice.url())
                 .amount(invoice.totalAfterTax().getValue())
                 .currency(CurrencyEntity.of(invoice.totalAfterTax().getCurrency()))
+                .originalFileName(invoice.originalFileName())
                 .data(Data.of(invoice));
     }
 
