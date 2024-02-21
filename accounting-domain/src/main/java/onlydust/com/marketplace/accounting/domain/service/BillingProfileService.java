@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.Objects;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 public class BillingProfileService implements BillingProfileFacadePort {
@@ -65,8 +65,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
-        final var invoice = invoiceStoragePort.preview(billingProfileId, rewardIds);
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
+
+        final var invoice = invoiceStoragePort.preview(billingProfileId, rewardIds);
+
+        if (invoice.rewards().stream().map(Invoice.Reward::invoiceId).anyMatch(Objects::nonNull))
+            throw badRequest("Some rewards are already invoiced");
+
         invoiceStoragePort.save(invoice);
 
         return invoice;

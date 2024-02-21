@@ -33,6 +33,7 @@ public class InvoiceRewardEntity {
     @ManyToOne
     @NonNull CurrencyEntity baseCurrency;
     @NonNull BigDecimal baseAmount;
+    UUID invoiceId;
 
     public Invoice.Reward forInvoice() {
         return new Invoice.Reward(
@@ -40,7 +41,8 @@ public class InvoiceRewardEntity {
                 requestedAt,
                 projectName,
                 Money.of(amount, currency.toDomain()),
-                Money.of(baseAmount, baseCurrency.toDomain())
+                Money.of(baseAmount, baseCurrency.toDomain()),
+                invoiceId == null ? null : Invoice.Id.of(invoiceId)
         );
     }
 
@@ -53,6 +55,7 @@ public class InvoiceRewardEntity {
                 .currency(CurrencyEntity.of(reward.amount().getCurrency()))
                 .baseCurrency(CurrencyEntity.of(reward.base().getCurrency()))
                 .baseAmount(reward.base().getValue())
+                .invoiceId(reward.invoiceId() == null ? null : reward.invoiceId().value())
                 .build();
     }
 }

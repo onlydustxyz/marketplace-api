@@ -67,6 +67,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.rewards.size()").isEqualTo(11)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists()
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
@@ -238,10 +239,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void invoice_name_should_be_incremented_only_when_submitted() {
         // When
-        // TODO: Should reject as same rewards as above and an invoice is already uploaded
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
-                        "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
+                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
@@ -253,7 +253,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
-                        "rewardIds", "ee28315c-7a84-4052-9308-c2236eeafda1,79209029-c488-4284-aa3f-bce8870d3a66,966cd55c-7de8-45c4-8bba-b388c38ca15d"
+                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
@@ -262,6 +262,27 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
+    }
+
+    @Test
+    @Order(2)
+    void should_prevent_invoice_preview_on_invoiced_rewards() {
+        // Given
+        final var rewardAlreadyInvoiced = "966cd55c-7de8-45c4-8bba-b388c38ca15d";
+        final var otherReward = "dd7d445f-6915-4955-9bae-078173627b05";
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "%s,%s".formatted(rewardAlreadyInvoiced, otherReward)
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Some rewards are already invoiced");
     }
 
     @Test
@@ -280,7 +301,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].id").isNotEmpty()
                 .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
                 .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(10)
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(8)
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
 
         // When
@@ -311,7 +332,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].id").isNotEmpty()
                 .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
                 .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(10)
+                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(8)
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(true);
     }
 

@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -45,7 +46,7 @@ class BillingProfileServiceTest {
     final List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
     final List<RewardId> rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
     final Invoice invoice = Invoice.of(billingProfileId, 12,
-            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris")).rewards(rewards);
+            new Invoice.PersonalInfo("John", "Doe", "12 rue de la paix, Paris")).rewards(new ArrayList<>(rewards));
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
     @BeforeEach
@@ -131,6 +132,20 @@ class BillingProfileServiceTest {
             assertThat(invoice.totalAfterTax()).isEqualTo(preview.totalAfterTax());
             assertThat(invoice.status()).isEqualTo(Invoice.Status.DRAFT);
             assertThat(invoice.rewards()).containsExactlyElementsOf(rewards);
+        }
+
+        @Test
+        void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
+            // Given
+            final var reward = fakeReward(Invoice.Id.random());
+            invoice.rewards().add(reward);
+            when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
+
+            // When
+            assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Some rewards are already invoiced");
         }
 
         @Test
@@ -239,12 +254,17 @@ class BillingProfileServiceTest {
     }
 
     private @NonNull Invoice.Reward fakeReward() {
+        return fakeReward(null);
+    }
+
+    private @NonNull Invoice.Reward fakeReward(Invoice.Id invoiceId) {
         return new Invoice.Reward(
                 RewardId.random(),
                 ZonedDateTime.now(),
                 faker.lordOfTheRings().character(),
                 Money.of(faker.number().randomNumber(1, true), ETH),
-                Money.of(faker.number().randomNumber(4, true), USD)
+                Money.of(faker.number().randomNumber(4, true), USD),
+                invoiceId
         );
     }
     @Test

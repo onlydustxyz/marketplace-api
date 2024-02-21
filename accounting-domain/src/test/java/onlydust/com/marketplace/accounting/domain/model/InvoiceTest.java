@@ -33,9 +33,9 @@ class InvoiceTest {
         final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1, new Invoice.PersonalInfo("John", "Doe", "123 Main St"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
                 ));
 
         @Test
@@ -68,9 +68,9 @@ class InvoiceTest {
                         new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, false, false, null))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
                 ));
 
         @Test
@@ -108,9 +108,9 @@ class InvoiceTest {
                         new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", true, true, true, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
                 ));
 
         @Test
@@ -149,9 +149,9 @@ class InvoiceTest {
                         new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, true, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
                 ));
 
         @Test
@@ -190,9 +190,9 @@ class InvoiceTest {
                         new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, true, false, "666"))
                 .rewards(List.of(
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD)),
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null),
                         new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
-                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD))
+                                Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null)
                 ));
 
         @Test

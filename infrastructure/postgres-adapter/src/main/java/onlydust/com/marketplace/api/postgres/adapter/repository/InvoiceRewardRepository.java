@@ -16,7 +16,8 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 pr.amount            as amount,
                 c.id                 as currency_id,
                 usd.id               as base_currency_id,
-                hq.price * pr.amount as base_amount
+                hq.price * pr.amount as base_amount,
+                pr.invoice_id        as invoice_id
             FROM
                 payment_requests pr
                 JOIN currencies c ON UPPER(CAST(pr.currency AS TEXT)) = c.code
