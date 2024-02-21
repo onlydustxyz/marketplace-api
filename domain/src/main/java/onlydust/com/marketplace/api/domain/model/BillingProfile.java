@@ -16,14 +16,14 @@ public class BillingProfile {
     @NonNull Integer rewardCount = 0;
 
 
-    public static BillingProfile of(CompanyBillingProfile billingProfile) {
+    public static BillingProfile of(OldCompanyBillingProfile billingProfile) {
         return new BillingProfile(billingProfile.getId(),
                 BillingProfileType.COMPANY,
                 billingProfile.getName(),
                 billingProfile.isInvoiceMandateAccepted());
     }
 
-    public static BillingProfile of(IndividualBillingProfile billingProfile) {
+    public static BillingProfile of(OldIndividualBillingProfile billingProfile) {
         return new BillingProfile(billingProfile.getId(),
                 BillingProfileType.INDIVIDUAL,
                 "Personal",

@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.domain.port.output;
 
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 
 public interface UserVerificationStoragePort {
-    CompanyBillingProfile updateCompanyVerification(CompanyBillingProfile companyBillingProfile);
+    OldCompanyBillingProfile updateCompanyVerification(OldCompanyBillingProfile companyBillingProfile);
 
-    IndividualBillingProfile updateIndividualVerification(IndividualBillingProfile individualBillingProfile);
+    OldIndividualBillingProfile updateIndividualVerification(OldIndividualBillingProfile individualBillingProfile);
 }

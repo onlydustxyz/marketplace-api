@@ -9,6 +9,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
@@ -74,10 +76,10 @@ public class PostgresAccountingBillingProfileStorage implements AccountingBillin
     public boolean isMandateAccepted(BillingProfile.Id billingProfileId) {
         return companyBillingProfileRepository.findById(billingProfileId.value())
                 .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
-                .map(CompanyBillingProfile::isInvoiceMandateAccepted)
+                .map(OldCompanyBillingProfile::isInvoiceMandateAccepted)
                 .orElseGet(() -> individualBillingProfileRepository.findById(billingProfileId.value())
                         .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
-                        .map(IndividualBillingProfile::isInvoiceMandateAccepted)
+                        .map(OldIndividualBillingProfile::isInvoiceMandateAccepted)
                         .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId))));
     }
 }

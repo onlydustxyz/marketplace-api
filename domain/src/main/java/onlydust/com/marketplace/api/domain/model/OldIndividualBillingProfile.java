@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
-public class IndividualBillingProfile {
+public class OldIndividualBillingProfile {
     @NonNull
     UUID id;
     @NonNull
@@ -27,7 +27,7 @@ public class IndividualBillingProfile {
     Date validUntil;
     String reviewMessageForApplicant;
     String externalApplicantId;
-    
+
     @Getter(AccessLevel.NONE)
     ZonedDateTime invoiceMandateAcceptedAt;
     @Getter(AccessLevel.NONE)
@@ -39,8 +39,8 @@ public class IndividualBillingProfile {
                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
     }
 
-    public static IndividualBillingProfile initForUser(final UUID userId) {
-        return IndividualBillingProfile.builder()
+    public static OldIndividualBillingProfile initForUser(final UUID userId) {
+        return OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
                 .userId(userId)

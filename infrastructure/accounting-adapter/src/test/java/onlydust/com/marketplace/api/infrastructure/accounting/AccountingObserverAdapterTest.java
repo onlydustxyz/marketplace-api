@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.model.VerificationStatus;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +68,7 @@ class AccountingObserverAdapterTest {
     void onBillingProfileSelectedIndividual() {
         // When
         accountingObserverAdapter.onBillingProfileSelected(userId,
-                IndividualBillingProfile.builder()
+                OldIndividualBillingProfile.builder()
                         .id(billingProfileId.value())
                         .userId(userId)
                         .status(VerificationStatus.VERIFIED)
@@ -85,7 +85,7 @@ class AccountingObserverAdapterTest {
     void onBillingProfileSelectedCompany() {
         // When
         accountingObserverAdapter.onBillingProfileSelected(userId,
-                CompanyBillingProfile.builder()
+                OldCompanyBillingProfile.builder()
                         .id(billingProfileId.value())
                         .userId(userId)
                         .status(VerificationStatus.VERIFIED)

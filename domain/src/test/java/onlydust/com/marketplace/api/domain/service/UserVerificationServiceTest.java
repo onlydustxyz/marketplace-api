@@ -66,18 +66,18 @@ public class UserVerificationServiceTest {
                             .reviewMessageForApplicant(reviewMessageForApplicant).build();
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
-            final CompanyBillingProfile initialCompanyBillingProfile =
-                    CompanyBillingProfile.builder()
+            final OldCompanyBillingProfile initialCompanyBillingProfile =
+                    OldCompanyBillingProfile.builder()
                             .id(billingProfileId)
                             .userId(userId)
                             .reviewMessageForApplicant(reviewMessageForApplicant)
                             .externalApplicantId(applicantId)
                             .status(VerificationStatus.STARTED).build();
-            final CompanyBillingProfile companyBillingProfileWithNewStatus =
+            final OldCompanyBillingProfile companyBillingProfileWithNewStatus =
                     initialCompanyBillingProfile.toBuilder()
                             .status(VerificationStatus.REJECTED)
                             .build();
-            final CompanyBillingProfile updatedCompanyBillingProfile =
+            final OldCompanyBillingProfile updatedCompanyBillingProfile =
                     initialCompanyBillingProfile.toBuilder()
                             .id(billingProfileId)
                             .userId(userId)
@@ -128,19 +128,19 @@ public class UserVerificationServiceTest {
                     BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED).type(BillingProfileType.COMPANY).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
-            final CompanyBillingProfile initialCompanyBillingProfile =
-                    CompanyBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.STARTED).build();
-            final CompanyBillingProfile companyBillingProfileWithNewStatus =
+            final OldCompanyBillingProfile initialCompanyBillingProfile =
+                    OldCompanyBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.STARTED).build();
+            final OldCompanyBillingProfile companyBillingProfileWithNewStatus =
                     initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
-            final CompanyBillingProfile updatedCompanyBillingProfile =
+            final OldCompanyBillingProfile updatedCompanyBillingProfile =
                     initialCompanyBillingProfile.toBuilder().id(billingProfileId).userId(userId).status(VerificationStatus.REJECTED).address(faker.address().fullAddress()).country(Country.fromIso3(faker.address().country()))
-                .name(faker.rickAndMorty().character())
-                .euVATNumber(faker.hacker().abbreviation())
-                .subjectToEuropeVAT(true)
-                .registrationDate(new Date())
-                .registrationNumber(faker.harryPotter().character())
-                .usEntity(false)
-                .build();
+                            .name(faker.rickAndMorty().character())
+                            .euVATNumber(faker.hacker().abbreviation())
+                            .subjectToEuropeVAT(true)
+                            .registrationDate(new Date())
+                            .registrationNumber(faker.harryPotter().character())
+                            .usEntity(false)
+                            .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
@@ -198,26 +198,26 @@ public class UserVerificationServiceTest {
             final UUID userId = UUID.randomUUID();
             final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
             final Event eventStub = mock(Event.class);
-            final IndividualBillingProfile initialIndividualBillingProfile =
-                    IndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
-            final IndividualBillingProfile individualBillingProfileWithStatus =
+            final OldIndividualBillingProfile initialIndividualBillingProfile =
+                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
+            final OldIndividualBillingProfile individualBillingProfileWithStatus =
                     initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
-            final IndividualBillingProfile updatedIndividualBillingProfile =
+            final OldIndividualBillingProfile updatedIndividualBillingProfile =
                     individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
-                .address(faker.address().fullAddress())
-                .birthdate(new Date())
-                .idDocumentNumber(faker.idNumber().valid())
-                .idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
-                .usCitizen(false)
-                .validUntil(new Date())
-                .build();
-        final User user = User.builder()
-                .id(userId)
-                .githubUserId(1L)
-                .githubLogin(faker.rickAndMorty().character())
-                .githubAvatarUrl(faker.internet().url())
-                .githubEmail(faker.internet().emailAddress())
-                .build();
+                            .address(faker.address().fullAddress())
+                            .birthdate(new Date())
+                            .idDocumentNumber(faker.idNumber().valid())
+                            .idDocumentType(OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                            .usCitizen(false)
+                            .validUntil(new Date())
+                            .build();
+            final User user = User.builder()
+                    .id(userId)
+                    .githubUserId(1L)
+                    .githubLogin(faker.rickAndMorty().character())
+                    .githubAvatarUrl(faker.internet().url())
+                    .githubEmail(faker.internet().emailAddress())
+                    .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
@@ -251,19 +251,19 @@ public class UserVerificationServiceTest {
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
             final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
-            final IndividualBillingProfile initialIndividualBillingProfile =
-                    IndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
-            final IndividualBillingProfile individualBillingProfileWithStatus =
+            final OldIndividualBillingProfile initialIndividualBillingProfile =
+                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
+            final OldIndividualBillingProfile individualBillingProfileWithStatus =
                     initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
-            final IndividualBillingProfile updatedIndividualBillingProfile =
+            final OldIndividualBillingProfile updatedIndividualBillingProfile =
                     individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
-                .address(faker.address().fullAddress())
-                .birthdate(new Date())
-                .idDocumentNumber(faker.idNumber().valid())
-                .idDocumentType(IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
-                .usCitizen(false)
-                .validUntil(new Date())
-                .build();
+                            .address(faker.address().fullAddress())
+                            .birthdate(new Date())
+                            .idDocumentNumber(faker.idNumber().valid())
+                            .idDocumentType(OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                            .usCitizen(false)
+                            .validUntil(new Date())
+                            .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
@@ -395,9 +395,9 @@ public class UserVerificationServiceTest {
                     BillingProfileUpdated.builder().type(BillingProfileType.INDIVIDUAL).verificationStatus(VerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).rawReviewDetails(faker.rickAndMorty().location()).build();
             final Event event = mock(Event.class);
             final UUID userId = UUID.randomUUID();
-            final CompanyBillingProfile companyBillingProfile =
-                    CompanyBillingProfile.builder().status(VerificationStatus.STARTED).userId(userId).id(UUID.randomUUID()).build();
-            final CompanyBillingProfile updatedBillingProfile = companyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
+            final OldCompanyBillingProfile companyBillingProfile =
+                    OldCompanyBillingProfile.builder().status(VerificationStatus.STARTED).userId(userId).id(UUID.randomUUID()).build();
+            final OldCompanyBillingProfile updatedBillingProfile = companyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
             final User user =
                     User.builder().id(userId).githubUserId(1L).githubLogin(faker.rickAndMorty().character()).githubAvatarUrl(faker.internet().url()).githubEmail(faker.internet().emailAddress()).build();
 

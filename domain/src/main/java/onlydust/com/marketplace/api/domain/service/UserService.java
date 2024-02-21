@@ -255,10 +255,10 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public CompanyBillingProfile getCompanyBillingProfile(UUID userId) {
+    public OldCompanyBillingProfile getCompanyBillingProfile(UUID userId) {
         return billingProfileStoragePort.findCompanyProfileForUser(userId)
                 .orElseGet(() -> {
-                    CompanyBillingProfile newCompanyBillingProfile = CompanyBillingProfile.initForUser(userId);
+                    OldCompanyBillingProfile newCompanyBillingProfile = OldCompanyBillingProfile.initForUser(userId);
                     billingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
                     billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.COMPANY, userId);
                     return newCompanyBillingProfile;
@@ -267,10 +267,10 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public IndividualBillingProfile getIndividualBillingProfile(UUID userId) {
+    public OldIndividualBillingProfile getIndividualBillingProfile(UUID userId) {
         return billingProfileStoragePort.findIndividualBillingProfile(userId)
                 .orElseGet(() -> {
-                    IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.initForUser(userId);
+                    OldIndividualBillingProfile individualBillingProfile = OldIndividualBillingProfile.initForUser(userId);
                     billingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
                     billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.INDIVIDUAL, userId);
                     return individualBillingProfile;

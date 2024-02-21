@@ -9,18 +9,18 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CompanyBillingProfileTest {
+public class OldCompanyBillingProfileTest {
 
     @Test
     void mandate_is_accepted() {
-        var companyBillingProfile = CompanyBillingProfile.builder()
+        var companyBillingProfile = OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
                 .build();
         assertThat(companyBillingProfile.isInvoiceMandateAccepted()).isFalse();
 
-        companyBillingProfile = CompanyBillingProfile.builder()
+        companyBillingProfile = OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
@@ -29,7 +29,7 @@ public class CompanyBillingProfileTest {
                 .build();
         assertThat(companyBillingProfile.isInvoiceMandateAccepted()).isTrue();
 
-        companyBillingProfile = CompanyBillingProfile.builder()
+        companyBillingProfile = OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
@@ -128,7 +128,7 @@ public class CompanyBillingProfileTest {
 
     public void assertUpdatedStatusIsEqualsTo(final VerificationStatus parentStatus, final List<VerificationStatus> childrenStatuses,
                                               final VerificationStatus expectedVerificationStatus) {
-        Assertions.assertEquals(expectedVerificationStatus, CompanyBillingProfile.builder()
+        Assertions.assertEquals(expectedVerificationStatus, OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
                 .status(parentStatus)

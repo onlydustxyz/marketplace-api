@@ -6,8 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.domain.model.BillingProfile;
 import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
@@ -16,7 +16,7 @@ import java.math.RoundingMode;
 import static java.util.Objects.isNull;
 
 public interface BillingProfileMapper {
-    static CompanyBillingProfileResponse companyDomainToResponse(final CompanyBillingProfile companyBillingProfile) {
+    static CompanyBillingProfileResponse companyDomainToResponse(final OldCompanyBillingProfile companyBillingProfile) {
         return new CompanyBillingProfileResponse()
                 .address(companyBillingProfile.getAddress())
                 .country(companyBillingProfile.getCountry() == null ? null :
@@ -32,7 +32,7 @@ public interface BillingProfileMapper {
                 .registrationDate(DateMapper.toZoneDateTime(companyBillingProfile.getRegistrationDate()));
     }
 
-    static IndividualBillingProfileResponse individualDomainToResponse(final IndividualBillingProfile individualBillingProfile) {
+    static IndividualBillingProfileResponse individualDomainToResponse(final OldIndividualBillingProfile individualBillingProfile) {
         return new IndividualBillingProfileResponse()
                 .status(verificationStatusToResponse(individualBillingProfile.getStatus()))
                 .id(individualBillingProfile.getId())
@@ -62,7 +62,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static IndividualBillingProfileResponse.IdDocumentTypeEnum idDocumentTypeToResponse(final IndividualBillingProfile.IdDocumentTypeEnum idDocumentTypeEnum) {
+    static IndividualBillingProfileResponse.IdDocumentTypeEnum idDocumentTypeToResponse(final OldIndividualBillingProfile.IdDocumentTypeEnum idDocumentTypeEnum) {
         return isNull(idDocumentTypeEnum) ? null
                 : switch (idDocumentTypeEnum) {
             case ID_CARD -> IndividualBillingProfileResponse.IdDocumentTypeEnum.ID_CARD;

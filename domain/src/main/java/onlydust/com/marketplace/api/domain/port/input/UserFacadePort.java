@@ -54,9 +54,9 @@ public interface UserFacadePort {
 
     URL saveAvatarImage(InputStream imageInputStream);
 
-    CompanyBillingProfile getCompanyBillingProfile(UUID userId);
+    OldCompanyBillingProfile getCompanyBillingProfile(UUID userId);
 
-    IndividualBillingProfile getIndividualBillingProfile(UUID userId);
+    OldIndividualBillingProfile getIndividualBillingProfile(UUID userId);
 
     void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
 

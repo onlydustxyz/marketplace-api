@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.Country;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -56,8 +56,8 @@ public class CompanyBillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public CompanyBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
-        return CompanyBillingProfile.builder()
+    public OldCompanyBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
+        return OldCompanyBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
                 .usEntity(this.usEntity)
@@ -76,7 +76,7 @@ public class CompanyBillingProfileEntity {
                 .build();
     }
 
-    public static CompanyBillingProfileEntity fromDomain(final CompanyBillingProfile companyBillingProfile) {
+    public static CompanyBillingProfileEntity fromDomain(final OldCompanyBillingProfile companyBillingProfile) {
         return CompanyBillingProfileEntity.builder()
                 .id(companyBillingProfile.getId())
                 .userId(companyBillingProfile.getUserId())

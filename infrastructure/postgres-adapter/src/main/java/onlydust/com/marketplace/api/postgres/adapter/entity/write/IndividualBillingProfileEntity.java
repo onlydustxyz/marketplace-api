@@ -4,7 +4,7 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.domain.model.Country;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -69,16 +69,16 @@ public class IndividualBillingProfileEntity {
         RESIDENCE_PERMIT,
         DRIVER_LICENSE;
 
-        public IndividualBillingProfile.IdDocumentTypeEnum toDomain() {
+        public OldIndividualBillingProfile.IdDocumentTypeEnum toDomain() {
             return switch (this) {
-                case ID_CARD -> IndividualBillingProfile.IdDocumentTypeEnum.ID_CARD;
-                case PASSPORT -> IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT;
-                case RESIDENCE_PERMIT -> IndividualBillingProfile.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-                case DRIVER_LICENSE -> IndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
+                case ID_CARD -> OldIndividualBillingProfile.IdDocumentTypeEnum.ID_CARD;
+                case PASSPORT -> OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT;
+                case RESIDENCE_PERMIT -> OldIndividualBillingProfile.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                case DRIVER_LICENSE -> OldIndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
             };
         }
 
-        public static IdDocumentTypeEnumEntity fromDomain(IndividualBillingProfile.IdDocumentTypeEnum idDocumentTypeEnum) {
+        public static IdDocumentTypeEnumEntity fromDomain(OldIndividualBillingProfile.IdDocumentTypeEnum idDocumentTypeEnum) {
             return isNull(idDocumentTypeEnum) ? null : switch (idDocumentTypeEnum) {
                 case ID_CARD -> ID_CARD;
                 case PASSPORT -> PASSPORT;
@@ -88,8 +88,8 @@ public class IndividualBillingProfileEntity {
         }
     }
 
-    public IndividualBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
-        return IndividualBillingProfile.builder()
+    public OldIndividualBillingProfile toDomain(@NonNull Date invoiceMandateLatestVersionDate) {
+        return OldIndividualBillingProfile.builder()
                 .id(this.id)
                 .status(this.verificationStatus.toDomain())
                 .idDocumentType(isNull(this.idDocumentType) ? null : this.idDocumentType.toDomain())
@@ -110,7 +110,7 @@ public class IndividualBillingProfileEntity {
                 .build();
     }
 
-    public static IndividualBillingProfileEntity fromDomain(final IndividualBillingProfile individualBillingProfile) {
+    public static IndividualBillingProfileEntity fromDomain(final OldIndividualBillingProfile individualBillingProfile) {
         return IndividualBillingProfileEntity.builder()
                 .id(individualBillingProfile.getId())
                 .address(individualBillingProfile.getAddress())

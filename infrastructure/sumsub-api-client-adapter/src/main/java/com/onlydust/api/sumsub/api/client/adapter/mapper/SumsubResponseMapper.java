@@ -5,9 +5,9 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDataDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
 import onlydust.com.marketplace.api.domain.model.Country;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.text.ParseException;
@@ -31,11 +31,11 @@ public class SumsubResponseMapper {
         }
     }
 
-    public IndividualBillingProfile updateIndividualBillingProfile(final SumsubIndividualApplicantsDataDTO sumsubIndividualApplicantsDataDTO,
-                                                                   final IndividualBillingProfile individualBillingProfile,
-                                                                   final SumsubClientProperties sumsubClientProperties) {
+    public OldIndividualBillingProfile updateIndividualBillingProfile(final SumsubIndividualApplicantsDataDTO sumsubIndividualApplicantsDataDTO,
+                                                                      final OldIndividualBillingProfile individualBillingProfile,
+                                                                      final SumsubClientProperties sumsubClientProperties) {
 
-        IndividualBillingProfile updatedIndividualBillingProfile = individualBillingProfile;
+        OldIndividualBillingProfile updatedIndividualBillingProfile = individualBillingProfile;
         if (nonNull(sumsubIndividualApplicantsDataDTO.getInfo())) {
             updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
                     .firstName(sumsubIndividualApplicantsDataDTO.getInfo().getFirstName())
@@ -65,10 +65,10 @@ public class SumsubResponseMapper {
                     final SumsubIndividualApplicantsDataDTO.IdDocumentDTO idDocumentDTO = optionalIdDocument.get();
                     updatedIndividualBillingProfile = updatedIndividualBillingProfile.toBuilder()
                             .idDocumentType(switch (idDocumentDTO.getType()) {
-                                case "PASSPORT" -> IndividualBillingProfile.IdDocumentTypeEnum.PASSPORT;
-                                case "ID_CARD" -> IndividualBillingProfile.IdDocumentTypeEnum.ID_CARD;
-                                case "RESIDENCE_PERMIT" -> IndividualBillingProfile.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-                                case "DRIVERS" -> IndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
+                                case "PASSPORT" -> OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT;
+                                case "ID_CARD" -> OldIndividualBillingProfile.IdDocumentTypeEnum.ID_CARD;
+                                case "RESIDENCE_PERMIT" -> OldIndividualBillingProfile.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                                case "DRIVERS" -> OldIndividualBillingProfile.IdDocumentTypeEnum.DRIVER_LICENSE;
                                 default -> null;
                             })
                             .idDocumentNumber(idDocumentDTO.getNumber())
@@ -100,11 +100,11 @@ public class SumsubResponseMapper {
         return updatedIndividualBillingProfile;
     }
 
-    public CompanyBillingProfile updateCompanyBillingProfile(SumsubCompanyApplicantsDataDTO applicantsData,
-                                                             SumsubCompanyChecksDTO companyChecks,
-                                                             CompanyBillingProfile companyBillingProfile,
-                                                             SumsubClientProperties sumsubClientProperties) {
-        CompanyBillingProfile updatedCompanyBillingProfile = companyBillingProfile;
+    public OldCompanyBillingProfile updateCompanyBillingProfile(SumsubCompanyApplicantsDataDTO applicantsData,
+                                                                SumsubCompanyChecksDTO companyChecks,
+                                                                OldCompanyBillingProfile companyBillingProfile,
+                                                                SumsubClientProperties sumsubClientProperties) {
+        OldCompanyBillingProfile updatedCompanyBillingProfile = companyBillingProfile;
         if (nonNull(applicantsData.getInfo()) && nonNull(applicantsData.getInfo()
                 .getCompanyInfo())) {
             updatedCompanyBillingProfile = updatedCompanyBillingProfile.toBuilder()
