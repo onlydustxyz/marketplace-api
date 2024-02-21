@@ -273,16 +273,16 @@ public interface BackOfficeMapper {
 
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) throws OnlyDustException {
         return switch (status) {
-            case PROCESSING -> InvoiceStatus.PROCESSING;
-            case APPROVED -> InvoiceStatus.COMPLETE;
+            case DRAFT -> throw OnlyDustException.internalServerError("Unknown invoice status: %s".formatted(status));
+            case TO_REVIEW, APPROVED -> InvoiceStatus.PROCESSING;
+            case PAID -> InvoiceStatus.COMPLETE;
             case REJECTED -> InvoiceStatus.REJECTED;
-            default -> throw OnlyDustException.internalServerError("Unknown invoice status: %s".formatted(status));
         };
     }
 
     static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) throws OnlyDustException {
         return switch (status) {
-            case COMPLETE -> Invoice.Status.APPROVED;
+            case APPROVED -> Invoice.Status.APPROVED;
             case REJECTED -> Invoice.Status.REJECTED;
         };
     }

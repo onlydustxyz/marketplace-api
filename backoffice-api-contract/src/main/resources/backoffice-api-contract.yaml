@@ -92,7 +92,7 @@ paths:
       operationId: updateInvoice
       description: |
         Update an invoice.
-        This will allow to update the invoice's status to COMPLETE or REJECTED.
+        This will allow to update the invoice's status to APPROVED or REJECTED.
       parameters:
         - in: path
           name: invoiceId
@@ -1282,7 +1282,7 @@ components:
         status:
           type: string
           enum:
-            - COMPLETE
+            - APPROVED
             - REJECTED
 
         paymentDate:
