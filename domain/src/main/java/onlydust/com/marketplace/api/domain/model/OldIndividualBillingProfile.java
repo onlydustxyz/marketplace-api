@@ -1,15 +1,14 @@
 package onlydust.com.marketplace.api.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
-public class IndividualBillingProfile {
+public class OldIndividualBillingProfile {
     @NonNull
     UUID id;
     @NonNull
@@ -28,10 +27,20 @@ public class IndividualBillingProfile {
     Date validUntil;
     String reviewMessageForApplicant;
     String externalApplicantId;
-    boolean invoiceMandateAccepted;
 
-    public static IndividualBillingProfile initForUser(final UUID userId) {
-        return IndividualBillingProfile.builder()
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateAcceptedAt;
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateLatestVersionDate;
+
+    public boolean isInvoiceMandateAccepted() {
+        return invoiceMandateAcceptedAt != null &&
+               invoiceMandateLatestVersionDate != null &&
+               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+    }
+
+    public static OldIndividualBillingProfile initForUser(final UUID userId) {
+        return OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
                 .userId(userId)

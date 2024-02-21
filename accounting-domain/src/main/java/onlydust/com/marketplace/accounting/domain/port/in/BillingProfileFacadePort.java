@@ -29,8 +29,11 @@ public interface BillingProfileFacadePort {
     Page<Invoice> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
                              final @NonNull Integer pageSize);
 
-    void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
-                       final @NonNull InputStream inputStream);
+    void uploadGeneratedInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
+                                final @NonNull InputStream inputStream);
+
+    void uploadExternalInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
+                               final String fileName, final @NonNull InputStream inputStream);
 
     @NonNull InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
                                              final @NonNull Invoice.Id invoiceId);

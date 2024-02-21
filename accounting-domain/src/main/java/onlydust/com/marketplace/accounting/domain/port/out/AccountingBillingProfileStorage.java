@@ -21,4 +21,6 @@ public interface AccountingBillingProfileStorage {
     void save(CompanyBillingProfile billingProfile);
 
     void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
+
+    boolean isMandateAccepted(BillingProfile.Id billingProfileId);
 }

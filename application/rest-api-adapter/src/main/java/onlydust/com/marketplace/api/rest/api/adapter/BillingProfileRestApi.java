@@ -53,12 +53,19 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     }
 
     @Override
-    public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, UUID invoiceId, Resource pdf) {
+    public ResponseEntity<Void> uploadInvoice(UUID billingProfileId, UUID invoiceId, String fileName, Resource pdf) {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
 
         try {
-            billingProfileFacadePort.uploadInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), Invoice.Id.of(invoiceId),
-                    pdf.getInputStream());
+            if (fileName != null && !fileName.trim().isEmpty()) {
+                billingProfileFacadePort.uploadExternalInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId),
+                        Invoice.Id.of(invoiceId),
+                        fileName.trim(), pdf.getInputStream());
+            } else {
+                billingProfileFacadePort.uploadGeneratedInvoice(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId),
+                        Invoice.Id.of(invoiceId),
+                        pdf.getInputStream());
+            }
         } catch (IOException e) {
             throw badRequest("Error while reading invoice data", e);
         }

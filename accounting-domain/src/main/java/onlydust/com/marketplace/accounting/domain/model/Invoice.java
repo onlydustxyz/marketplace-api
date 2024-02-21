@@ -39,6 +39,7 @@ public class Invoice {
     private @NonNull List<Wallet> wallets = new ArrayList<>();
     private @NonNull List<Reward> rewards = new ArrayList<>();
     private URL url;
+    private String originalFileName;
 
     public static Invoice of(BillingProfile.Id billingProfileId, Integer sequenceNumber, PersonalInfo personalInfo) {
         final var now = ZonedDateTime.now();

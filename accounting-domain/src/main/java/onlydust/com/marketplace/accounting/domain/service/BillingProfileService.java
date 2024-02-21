@@ -88,8 +88,27 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     @Transactional
-    public void uploadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
-                              final @NonNull InputStream data) {
+    public void uploadGeneratedInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
+                                       final @NonNull InputStream data) {
+        if (!billingProfileStorage.isMandateAccepted(billingProfileId))
+            throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
+
+        uploadInvoice(userId, billingProfileId, invoiceId, null, data);
+    }
+
+    @Override
+    @Transactional
+    public void uploadExternalInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
+                                      @NonNull InputStream data) {
+        if (billingProfileStorage.isMandateAccepted(billingProfileId))
+            throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
+
+        uploadInvoice(userId, billingProfileId, invoiceId, fileName, data);
+    }
+
+    @Transactional
+    private void uploadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
+                               @NonNull InputStream data) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to upload an invoice for this billing profile");
 
@@ -98,7 +117,10 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
         final var url = pdfStoragePort.upload(invoiceInternalFileName(invoice), data);
-        invoiceStoragePort.save(invoice.status(Invoice.Status.PROCESSING).url(url));
+        invoiceStoragePort.save(invoice
+                .status(Invoice.Status.PROCESSING)
+                .url(url)
+                .originalFileName(fileName));
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {

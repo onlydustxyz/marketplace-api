@@ -5,15 +5,18 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,13 +33,17 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     PdfStoragePort pdfStoragePort;
     @Autowired
     IndividualBillingProfileRepository individualBillingProfileRepository;
+    @Autowired
+    GlobalSettingsRepository globalSettingsRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
+    UserAuthHelper.AuthenticatedUser olivier;
     UUID billingProfileId;
 
     @BeforeEach
     void setUp() {
         antho = userAuthHelper.authenticateAnthony();
+        olivier = userAuthHelper.authenticateOlivier();
 
         billingProfileId = client.get()
                 .uri(ME_BILLING_PROFILES)
@@ -78,12 +85,12 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @SneakyThrows
     @Test
     @Order(1)
-    void preview_and_upload_invoice() {
+    void preview_and_upload_external_invoice() {
         // When
         final var invoiceId = new MutableObject<String>();
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
-                        "rewardIds", "966cd55c-7de8-45c4-8bba-b388c38ca15d,79209029-c488-4284-aa3f-bce8870d3a66,d22f75ab-d9f5-4dc6-9a85-60dcd7452028"
+                        "rewardIds", "966cd55c-7de8-45c4-8bba-b388c38ca15d"
                 )))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
                 .exchange()
@@ -96,7 +103,148 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.dueAt").isNotEmpty()
                 .json("""
                         {
-                          "number": "OD-BUISSET-ANTHONY-001",
+                         "number": "OD-BUISSET-ANTHONY-001",
+                         "billingProfileType": "INDIVIDUAL",
+                         "individualBillingProfile": {
+                           "firstName": "Anthony",
+                           "lastName": "BUISSET",
+                           "address": "771 chemin de la sine, 06140, Vence, France"
+                         },
+                         "companyBillingProfile": null,
+                         "destinationAccounts": {
+                           "bankAccount": null,
+                           "wallets": [
+                             {
+                               "address": "abuisset.eth",
+                               "network": "ethereum"
+                             }
+                           ]
+                         },
+                         "rewards": [
+                           {
+                             "id": "966cd55c-7de8-45c4-8bba-b388c38ca15d",
+                             "date": "2023-06-02T08:48:04.697886Z",
+                             "projectName": "kaaper",
+                             "amount": {
+                               "amount": 1000,
+                               "currency": "ETH",
+                               "base": {
+                                 "amount": 1781980.00,
+                                 "currency": "USD",
+                                 "conversionRate": 1781.98
+                               }
+                             }
+                           }
+                         ],
+                         "totalBeforeTax": {
+                           "amount": 1781980.00,
+                           "currency": "USD"
+                         },
+                         "taxRate": 0,
+                         "totalTax": {
+                           "amount": 0.00,
+                           "currency": "USD"
+                         },
+                         "totalAfterTax": {
+                           "amount": 1781980.00,
+                           "currency": "USD"
+                         }
+
+                        }
+                        """
+                );
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards.size()").isEqualTo(11)
+                .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists();
+
+        // When
+        when(pdfStoragePort.upload(eq(invoiceId.getValue() + ".pdf"), any())).then(invocation -> {
+            final var fileName = invocation.getArgument(0, String.class);
+            return new URL("https://s3.storage.com/%s".formatted(fileName));
+        });
+
+        // Uploading a generated invoice is forbidden when the mandate has not been accepted
+        client.post()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/invoices/invoice-sample.pdf").getFile())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isForbidden();
+
+        // Uploading an external invoice is allowed when the mandate has not been accepted
+        client.post()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue()), "fileName", "invoice-sample.pdf"))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/invoices/invoice-sample.pdf").getFile())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_REWARDS_PENDING_INVOICE))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards.size()").isEqualTo(10)
+                .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").doesNotExist()
+        ;
+
+        // When
+        final var pdfData = faker.lorem().paragraph().getBytes();
+        when(pdfStoragePort.download(eq(invoiceId.getValue() + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
+
+        final var data = client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectHeader()
+                .contentDisposition(ContentDisposition.attachment().filename("OD-BUISSET-ANTHONY-001.pdf").build())
+                .expectBody().returnResult().getResponseBody();
+
+        assertThat(data).isEqualTo(pdfData);
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(2)
+    void preview_and_upload_generated_invoice() {
+        // When
+        final var invoiceId = new MutableObject<String>();
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "79209029-c488-4284-aa3f-bce8870d3a66,d22f75ab-d9f5-4dc6-9a85-60dcd7452028"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").value(invoiceId::setValue)
+                .jsonPath("$.createdAt").isNotEmpty()
+                .jsonPath("$.dueAt").isNotEmpty()
+                .json("""
+                        {
+                          "number": "OD-BUISSET-ANTHONY-002",
                           "billingProfileType": "INDIVIDUAL",
                           "individualBillingProfile": {
                             "firstName": "Anthony",
@@ -115,20 +263,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           },
                           "rewards": [
                             {
-                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
-                              "date": "2023-09-20T07:59:16.657487Z",
-                              "projectName": "kaaper",
-                              "amount": {
-                                "amount": 1000,
-                                "currency": "USDC",
-                                "base": {
-                                  "amount": 1010.00,
-                                  "currency": "USD",
-                                  "conversionRate": 1.01
-                                }
-                              }
-                            },
-                            {
                               "id": "79209029-c488-4284-aa3f-bce8870d3a66",
                               "date": "2023-06-02T08:49:08.444047Z",
                               "projectName": "kaaper",
@@ -143,22 +277,22 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "id": "966cd55c-7de8-45c4-8bba-b388c38ca15d",
-                              "date": "2023-06-02T08:48:04.697886Z",
+                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "date": "2023-09-20T07:59:16.657487Z",
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": "ETH",
+                                "currency": "USDC",
                                 "base": {
-                                  "amount": 1781980.00,
+                                  "amount": 1010.00,
                                   "currency": "USD",
-                                  "conversionRate": 1781.98
+                                  "conversionRate": 1.01
                                 }
                               }
                             }
                           ],
                           "totalBeforeTax": {
-                            "amount": 1784000.00,
+                            "amount": 2020.00,
                             "currency": "USD"
                           },
                           "taxRate": 0,
@@ -167,7 +301,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             "currency": "USD"
                           },
                           "totalAfterTax": {
-                            "amount": 1784000.00,
+                            "amount": 2020.00,
                             "currency": "USD"
                           }
                         }
@@ -183,8 +317,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.rewards.size()").isEqualTo(11)
-                .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists()
+                .jsonPath("$.rewards.size()").isEqualTo(10)
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
         ;
@@ -194,7 +327,33 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
             final var fileName = invocation.getArgument(0, String.class);
             return new URL("https://s3.storage.com/%s".formatted(fileName));
         });
+        // Accept the mandate
+        client.put()
+                .uri(getApiURI(BILLING_PROFILE_INVOICES_MANDATE.formatted(billingProfileId)))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "hasAcceptedInvoiceMandate": true
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
 
+
+        // Uploading an external invoice is forbidden when the mandate has been accepted
+        client.post()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue()), "fileName", "invoice-sample.pdf"))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .body(fromResource(new FileSystemResource(getClass().getResource("/invoices/invoice-sample.pdf").getFile())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isForbidden();
+
+        // Uploading a generated invoice is forbidden when the mandate has been accepted
         client.post()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE.formatted(billingProfileId, invoiceId.getValue())))
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
@@ -214,7 +373,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards.size()").isEqualTo(8)
-                .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").doesNotExist()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").doesNotExist()
         ;
@@ -230,13 +388,15 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
+                .expectHeader()
+                .contentDisposition(ContentDisposition.attachment().filename("OD-BUISSET-ANTHONY-002.pdf").build())
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void invoice_name_should_be_incremented_only_when_submitted() {
         // When
         client.get()
@@ -249,7 +409,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
+                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-003");
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
@@ -261,7 +421,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-002");
+                .jsonPath("$.number").isEqualTo("OD-BUISSET-ANTHONY-003");
     }
 
     @Test
@@ -286,28 +446,27 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void should_accept_mandate() {
         // Given
-        client.get()
+        final var billingProfiles = client.get()
                 .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
-                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(8)
-                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
+                .expectBody(MyBillingProfilesResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(billingProfiles.getBillingProfiles()).hasSize(1);
+        assertThat(billingProfiles.getBillingProfiles().get(0).getInvoiceMandateAccepted()).isFalse();
+        final var billingProfileId = billingProfiles.getBillingProfiles().get(0).getId();
 
         // When
         client.put()
                 .uri(getApiURI(BILLING_PROFILE_INVOICES_MANDATE.formatted(billingProfileId)))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -322,7 +481,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         // Then
         client.get()
                 .uri(ME_BILLING_PROFILES)
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -330,10 +489,25 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].id").isNotEmpty()
-                .jsonPath("$.billingProfiles[0].type").isEqualTo("INDIVIDUAL")
-                .jsonPath("$.billingProfiles[0].name").isEqualTo("Personal")
-                .jsonPath("$.billingProfiles[0].rewardCount").isEqualTo(8)
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(true);
+
+        // When
+        final var settings = globalSettingsRepository.get();
+        settings.setInvoiceMandateLatestVersionDate(new Date());
+        globalSettingsRepository.save(settings);
+
+        // Then
+        client.get()
+                .uri(ME_BILLING_PROFILES)
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].id").isNotEmpty()
+                .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
     }
 
     @Test
@@ -357,7 +531,15 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                             {
                               "number": "OD-BUISSET-ANTHONY-001",
                               "totalAfterTax": {
-                                "amount": 1784000.00,
+                                "amount": 1781980.00,
+                                "currency": "USD"
+                              },
+                              "status": "PROCESSING"
+                            },
+                            {
+                              "number": "OD-BUISSET-ANTHONY-002",
+                              "totalAfterTax": {
+                                "amount": 2020.00,
                                 "currency": "USD"
                               },
                               "status": "PROCESSING"
@@ -365,7 +547,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "hasMore": false,
                           "totalPageNumber": 1,
-                          "totalItemNumber": 1,
+                          "totalItemNumber": 2,
                           "nextPageIndex": 0
                         }
                         """)

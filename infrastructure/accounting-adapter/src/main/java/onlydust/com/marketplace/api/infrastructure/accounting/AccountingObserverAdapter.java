@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
@@ -29,12 +29,12 @@ public class AccountingObserverAdapter implements AccountingUserObserverPort {
     }
 
     @Override
-    public void onBillingProfileSelected(UUID userId, IndividualBillingProfile billingProfile) {
+    public void onBillingProfileSelected(UUID userId, OldIndividualBillingProfile billingProfile) {
         refreshRewardsUsdEquivalentOf(BillingProfile.Id.of(billingProfile.getId()));
     }
 
     @Override
-    public void onBillingProfileSelected(UUID userId, CompanyBillingProfile billingProfile) {
+    public void onBillingProfileSelected(UUID userId, OldCompanyBillingProfile billingProfile) {
         refreshRewardsUsdEquivalentOf(BillingProfile.Id.of(billingProfile.getId()));
     }
 

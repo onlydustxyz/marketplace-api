@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,7 @@ import static java.util.Objects.isNull;
 
 @Data
 @Builder(toBuilder = true)
-public class CompanyBillingProfile {
+public class OldCompanyBillingProfile {
     @NonNull
     UUID id;
     @NonNull
@@ -28,17 +27,27 @@ public class CompanyBillingProfile {
     String euVATNumber;
     String reviewMessageForApplicant;
     String externalApplicantId;
-    boolean invoiceMandateAccepted;
 
-    public static CompanyBillingProfile initForUser(final UUID userId) {
-        return CompanyBillingProfile.builder()
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateAcceptedAt;
+    @Getter(AccessLevel.NONE)
+    ZonedDateTime invoiceMandateLatestVersionDate;
+
+    public boolean isInvoiceMandateAccepted() {
+        return invoiceMandateAcceptedAt != null &&
+               invoiceMandateLatestVersionDate != null &&
+               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
+    }
+
+    public static OldCompanyBillingProfile initForUser(final UUID userId) {
+        return OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
                 .status(VerificationStatus.NOT_STARTED)
                 .build();
     }
 
-    public CompanyBillingProfile updateStatusFromNewChildrenStatuses(final List<VerificationStatus> childrenStatuses) {
+    public OldCompanyBillingProfile updateStatusFromNewChildrenStatuses(final List<VerificationStatus> childrenStatuses) {
         if (isNull(childrenStatuses) || childrenStatuses.isEmpty()) {
             return this;
         }
@@ -52,7 +61,7 @@ public class CompanyBillingProfile {
         return updateStatus(worstChildrenVerificationStatus);
     }
 
-    private CompanyBillingProfile updateStatus(final VerificationStatus newStatus) {
+    private OldCompanyBillingProfile updateStatus(final VerificationStatus newStatus) {
         return this.toBuilder().status(newStatus).build();
     }
 }

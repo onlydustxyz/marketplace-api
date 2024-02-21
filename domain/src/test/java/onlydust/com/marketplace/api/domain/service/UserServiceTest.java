@@ -747,7 +747,7 @@ public class UserServiceTest {
     void should_return_company_billing_profile() {
         // Given
         final UUID userId = UUID.randomUUID();
-        final CompanyBillingProfile expected = CompanyBillingProfile.builder()
+        final OldCompanyBillingProfile expected = OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.CLOSED)
                 .userId(userId)
@@ -756,7 +756,7 @@ public class UserServiceTest {
         // When
         when(billingProfileStoragePort.findCompanyProfileForUser(userId))
                 .thenReturn(Optional.of(expected));
-        final CompanyBillingProfile result = userService.getCompanyBillingProfile(userId);
+        final OldCompanyBillingProfile result = userService.getCompanyBillingProfile(userId);
 
         // Then
         assertThat(result).isEqualTo(expected);
@@ -773,7 +773,7 @@ public class UserServiceTest {
         userService.getCompanyBillingProfile(userId);
 
         // Then
-        ArgumentCaptor<CompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(CompanyBillingProfile.class);
+        ArgumentCaptor<OldCompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(OldCompanyBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
         verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(billingProfileArgumentCaptor.capture());
@@ -788,7 +788,7 @@ public class UserServiceTest {
     void should_return_individual_billing_profile() {
         // Given
         final UUID userId = UUID.randomUUID();
-        final IndividualBillingProfile expected = IndividualBillingProfile.builder()
+        final OldIndividualBillingProfile expected = OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .status(VerificationStatus.NOT_STARTED)
                 .userId(userId)
@@ -797,7 +797,7 @@ public class UserServiceTest {
         // When
         when(billingProfileStoragePort.findIndividualBillingProfile(userId))
                 .thenReturn(Optional.of(expected));
-        final IndividualBillingProfile result = userService.getIndividualBillingProfile(userId);
+        final OldIndividualBillingProfile result = userService.getIndividualBillingProfile(userId);
 
         // Then
         assertThat(result).isEqualTo(expected);
@@ -814,7 +814,7 @@ public class UserServiceTest {
         userService.getIndividualBillingProfile(userId);
 
         // Then
-        ArgumentCaptor<IndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(IndividualBillingProfile.class);
+        ArgumentCaptor<OldIndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(OldIndividualBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
         verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(billingProfileArgumentCaptor.capture());

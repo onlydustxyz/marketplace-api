@@ -6,9 +6,8 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicants
 import com.onlydust.api.sumsub.api.client.adapter.mapper.SumsubResponseMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.CompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.IndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -27,7 +26,7 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
     private final SumsubResponseMapper sumsubResponseMapper = new SumsubResponseMapper();
 
     @Override
-    public CompanyBillingProfile updateCompanyVerification(CompanyBillingProfile companyBillingProfile) {
+    public OldCompanyBillingProfile updateCompanyVerification(OldCompanyBillingProfile companyBillingProfile) {
         final SumsubCompanyApplicantsDataDTO applicantsDataFromCompanyBillingProfileId =
                 getApplicantsDataFromCompanyBillingProfileId(companyBillingProfile.getId());
         final SumsubCompanyChecksDTO companyChecksFromSumsubApplicantId =
@@ -37,7 +36,7 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
     }
 
     @Override
-    public IndividualBillingProfile updateIndividualVerification(IndividualBillingProfile individualBillingProfile) {
+    public OldIndividualBillingProfile updateIndividualVerification(OldIndividualBillingProfile individualBillingProfile) {
         final SumsubIndividualApplicantsDataDTO applicantsDataFromIndividualBillingProfileId =
                 getApplicantsDataFromIndividualBillingProfileId(individualBillingProfile.getId());
         return sumsubResponseMapper.updateIndividualBillingProfile(applicantsDataFromIndividualBillingProfileId, individualBillingProfile,
@@ -78,5 +77,5 @@ public class SumsubApiClientAdapter implements UserVerificationStoragePort {
                         X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for applicantId = %s", applicantId)));
     }
-    
+
 }

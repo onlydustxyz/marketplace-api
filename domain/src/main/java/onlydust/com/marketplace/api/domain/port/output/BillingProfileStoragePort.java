@@ -7,13 +7,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BillingProfileStoragePort {
-    Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId);
+    Optional<OldCompanyBillingProfile> findCompanyProfileForUser(UUID userId);
 
-    void saveCompanyProfileForUser(CompanyBillingProfile companyBillingProfile);
+    void saveCompanyProfileForUser(OldCompanyBillingProfile companyBillingProfile);
 
-    Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId);
+    Optional<OldIndividualBillingProfile> findIndividualBillingProfile(UUID userId);
 
-    void saveIndividualProfileForUser(IndividualBillingProfile individualBillingProfile);
+    void saveIndividualProfileForUser(OldIndividualBillingProfile individualBillingProfile);
 
     void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId);
 
@@ -21,19 +21,19 @@ public interface BillingProfileStoragePort {
 
     void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
 
-    Optional<CompanyBillingProfile> findCompanyProfileById(UUID billingProfileId);
+    Optional<OldCompanyBillingProfile> findCompanyProfileById(UUID billingProfileId);
 
-    Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId);
+    Optional<OldIndividualBillingProfile> findIndividualProfileById(UUID billingProfileId);
 
-    CompanyBillingProfile saveCompanyProfile(CompanyBillingProfile companyBillingProfile);
+    OldCompanyBillingProfile saveCompanyProfile(OldCompanyBillingProfile companyBillingProfile);
 
-    IndividualBillingProfile saveIndividualProfile(IndividualBillingProfile individualBillingProfile);
+    OldIndividualBillingProfile saveIndividualProfile(OldIndividualBillingProfile individualBillingProfile);
 
     List<BillingProfile> all(UUID userId, Long githubUserId);
 
     Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType);
 
-    Optional<CompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId);
+    Optional<OldCompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId);
 
     List<VerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId);
 

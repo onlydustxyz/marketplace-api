@@ -9,9 +9,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
+import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 
 import java.time.ZonedDateTime;
@@ -23,6 +26,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class PostgresAccountingBillingProfileStorage implements AccountingBillingProfileStorage {
     private final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository;
     private final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository;
+    private final @NonNull GlobalSettingsRepository globalSettingsRepository;
 
     @Override
     public boolean isAdmin(UserId userId, BillingProfile.Id billingProfileId) {
@@ -66,5 +70,16 @@ public class PostgresAccountingBillingProfileStorage implements AccountingBillin
     @Override
     public void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
 
+    }
+
+    @Override
+    public boolean isMandateAccepted(BillingProfile.Id billingProfileId) {
+        return companyBillingProfileRepository.findById(billingProfileId.value())
+                .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
+                .map(OldCompanyBillingProfile::isInvoiceMandateAccepted)
+                .orElseGet(() -> individualBillingProfileRepository.findById(billingProfileId.value())
+                        .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
+                        .map(OldIndividualBillingProfile::isInvoiceMandateAccepted)
+                        .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId))));
     }
 }

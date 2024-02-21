@@ -115,3 +115,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000055_migrate_country_to_iso_codes.sql
   - include:
       file: db/changelog/changelogs/00000056_invoice_mandate.sql
+  - include:
+      file: db/changelog/changelogs/00000057_invoice_filename.sql

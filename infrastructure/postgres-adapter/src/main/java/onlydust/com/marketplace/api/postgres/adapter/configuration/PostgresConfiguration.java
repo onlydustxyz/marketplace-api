@@ -366,8 +366,9 @@ public class PostgresConfiguration {
 
     @Bean
     public AccountingBillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository) {
-        return new PostgresAccountingBillingProfileStorage(companyBillingProfileRepository, individualBillingProfileRepository);
+                                                                           final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                           final GlobalSettingsRepository globalSettingsRepository) {
+        return new PostgresAccountingBillingProfileStorage(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository);
     }
 
     @Bean

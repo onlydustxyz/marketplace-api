@@ -25,7 +25,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CompanyBillingProfile> findCompanyProfileForUser(UUID userId) {
+    public Optional<OldCompanyBillingProfile> findCompanyProfileForUser(UUID userId) {
         return companyBillingProfileRepository.findByUserId(userId).map(
                 entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
         );
@@ -33,13 +33,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveCompanyProfileForUser(CompanyBillingProfile companyBillingProfile) {
+    public void saveCompanyProfileForUser(OldCompanyBillingProfile companyBillingProfile) {
         companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<IndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
+    public Optional<OldIndividualBillingProfile> findIndividualBillingProfile(UUID userId) {
         return individualBillingProfileRepository.findByUserId(userId).map(
                 entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
         );
@@ -47,7 +47,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveIndividualProfileForUser(IndividualBillingProfile individualBillingProfile) {
+    public void saveIndividualProfileForUser(OldIndividualBillingProfile individualBillingProfile) {
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile));
     }
 
@@ -86,7 +86,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CompanyBillingProfile> findCompanyProfileById(UUID billingProfileId) {
+    public Optional<OldCompanyBillingProfile> findCompanyProfileById(UUID billingProfileId) {
         return companyBillingProfileRepository.findById(billingProfileId).map(
                 entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
         );
@@ -94,7 +94,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<IndividualBillingProfile> findIndividualProfileById(UUID billingProfileId) {
+    public Optional<OldIndividualBillingProfile> findIndividualProfileById(UUID billingProfileId) {
         return individualBillingProfileRepository.findById(billingProfileId).map(
                 entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
         );
@@ -102,14 +102,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public CompanyBillingProfile saveCompanyProfile(CompanyBillingProfile companyBillingProfile) {
+    public OldCompanyBillingProfile saveCompanyProfile(OldCompanyBillingProfile companyBillingProfile) {
         return companyBillingProfileRepository.save(CompanyBillingProfileEntity.fromDomain(companyBillingProfile))
                 .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
     }
 
     @Override
     @Transactional
-    public IndividualBillingProfile saveIndividualProfile(IndividualBillingProfile individualBillingProfile) {
+    public OldIndividualBillingProfile saveIndividualProfile(OldIndividualBillingProfile individualBillingProfile) {
         return individualBillingProfileRepository.save(IndividualBillingProfileEntity.fromDomain(individualBillingProfile))
                 .toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate());
     }
@@ -144,7 +144,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<CompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId) {
+    public Optional<OldCompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId) {
         return companyBillingProfileRepository.findByApplicantId(billingProfileExternalVerificationId).map(
                 entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate())
         );
