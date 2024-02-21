@@ -14,14 +14,14 @@ public class OldIndividualBillingProfile {
     @NonNull
     UUID userId;
     @NonNull
-    VerificationStatus status;
+    OldVerificationStatus status;
     String firstName;
     String lastName;
     Date birthdate;
     String address;
-    Country country;
+    OldCountry oldCountry;
     Boolean usCitizen;
-    IdDocumentTypeEnum idDocumentType;
+    OldIdDocumentTypeEnum idDocumentType;
     String idDocumentNumber;
     String idDocumentCountryCode;
     Date validUntil;
@@ -42,12 +42,12 @@ public class OldIndividualBillingProfile {
     public static OldIndividualBillingProfile initForUser(final UUID userId) {
         return OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .userId(userId)
                 .build();
     }
 
-    public enum IdDocumentTypeEnum {
+    public enum OldIdDocumentTypeEnum {
         PASSPORT,
         ID_CARD,
         RESIDENCE_PERMIT,

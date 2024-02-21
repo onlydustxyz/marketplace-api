@@ -58,9 +58,9 @@ public interface UserFacadePort {
 
     OldIndividualBillingProfile getIndividualBillingProfile(UUID userId);
 
-    void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
+    void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType);
 
     void updateGithubProfile(User authenticatedUser);
 
-    List<BillingProfile> getBillingProfiles(UUID id, Long githubUserId);
+    List<OldBillingProfile> getBillingProfiles(UUID id, Long githubUserId);
 }

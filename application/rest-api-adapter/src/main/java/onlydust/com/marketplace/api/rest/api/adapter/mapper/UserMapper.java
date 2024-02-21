@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.contract.model.BillingProfileType;
 import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -246,7 +245,7 @@ public interface UserMapper {
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(UserRole.ADMIN));
         getMeResponse.setCreatedAt(DateMapper.toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
-        getMeResponse.setBillingProfileType(switch (authenticatedUser.getBillingProfileType()) {
+        getMeResponse.setBillingProfileType(switch (authenticatedUser.getOldBillingProfileType()) {
             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
             case COMPANY -> BillingProfileType.COMPANY;
         });

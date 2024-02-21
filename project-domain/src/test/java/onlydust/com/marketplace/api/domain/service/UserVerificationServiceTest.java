@@ -26,9 +26,9 @@ public class UserVerificationServiceTest {
 
 
     @Nested
-    class GivenAParentBillingProfile {
+    class GivenAParentOldBillingProfile {
         private UserVerificationService userVerificationService;
-        private BillingProfileStoragePort billingProfileStoragePort;
+        private OldBillingProfileStoragePort oldBillingProfileStoragePort;
         private OutboxPort outboxPort;
         private Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
         private AccountingUserObserverPort accountingUserObserverPort;
@@ -40,7 +40,7 @@ public class UserVerificationServiceTest {
 
         @BeforeEach
         void setUp() {
-            billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+            oldBillingProfileStoragePort = mock(OldBillingProfileStoragePort.class);
             outboxPort = mock(OutboxPort.class);
             billingProfileExternalMapper = mock(Function.class);
             accountingUserObserverPort = mock(AccountingUserObserverPort.class);
@@ -48,7 +48,7 @@ public class UserVerificationServiceTest {
             notificationPort = mock(NotificationPort.class);
             userStoragePort = mock(UserStoragePort.class);
             webhookPort = mock(WebhookPort.class);
-            userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort,
+            userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, oldBillingProfileStoragePort,
                     userVerificationStoragePort, accountingUserObserverPort, notificationPort, userStoragePort, webhookPort);
         }
 
@@ -59,8 +59,8 @@ public class UserVerificationServiceTest {
             final String reviewMessageForApplicant = faker.rickAndMorty().location();
             final String applicantId = faker.rickAndMorty().character();
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED)
-                            .type(BillingProfileType.COMPANY)
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.REJECTED)
+                            .type(OldBillingProfileType.COMPANY)
                             .billingProfileId(billingProfileId)
                             .externalApplicantId(applicantId)
                             .reviewMessageForApplicant(reviewMessageForApplicant).build();
@@ -72,18 +72,18 @@ public class UserVerificationServiceTest {
                             .userId(userId)
                             .reviewMessageForApplicant(reviewMessageForApplicant)
                             .externalApplicantId(applicantId)
-                            .status(VerificationStatus.STARTED).build();
+                            .status(OldVerificationStatus.STARTED).build();
             final OldCompanyBillingProfile companyBillingProfileWithNewStatus =
                     initialCompanyBillingProfile.toBuilder()
-                            .status(VerificationStatus.REJECTED)
+                            .status(OldVerificationStatus.REJECTED)
                             .build();
             final OldCompanyBillingProfile updatedCompanyBillingProfile =
                     initialCompanyBillingProfile.toBuilder()
                             .id(billingProfileId)
                             .userId(userId)
-                            .status(VerificationStatus.REJECTED)
+                            .status(OldVerificationStatus.REJECTED)
                             .address(faker.address().fullAddress())
-                            .country(Country.fromIso3(faker.address().countryCode()))
+                            .oldCountry(OldCountry.fromIso3(faker.address().countryCode()))
                             .name(faker.rickAndMorty().character())
                             .euVATNumber(faker.hacker().abbreviation())
                             .subjectToEuropeVAT(true)
@@ -96,17 +96,17 @@ public class UserVerificationServiceTest {
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findCompanyProfileById(billingProfileId)).thenReturn(Optional.of(initialCompanyBillingProfile));
+            when(oldBillingProfileStoragePort.findCompanyProfileById(billingProfileId)).thenReturn(Optional.of(initialCompanyBillingProfile));
             when(userVerificationStoragePort.updateCompanyVerification(companyBillingProfileWithNewStatus)).thenReturn(updatedCompanyBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.of(user));
-            when(billingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile)).thenReturn(updatedCompanyBillingProfile);
-            when(billingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(initialCompanyBillingProfile.getExternalApplicantId()))
-                    .thenReturn(List.of(VerificationStatus.NOT_STARTED));
+            when(oldBillingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile)).thenReturn(updatedCompanyBillingProfile);
+            when(oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(initialCompanyBillingProfile.getExternalApplicantId()))
+                    .thenReturn(List.of(OldVerificationStatus.NOT_STARTED));
             userVerificationService.process(eventStub);
 
             // Then
             verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
-            verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
+            verify(oldBillingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
             final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
             verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
             assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
@@ -116,7 +116,7 @@ public class UserVerificationServiceTest {
             assertEquals(user.getGithubUserId(), billingProfileUpdatedArgumentCaptor.getValue().getGithubUserId());
             verify(accountingUserObserverPort).onBillingProfileUpdated(billingProfileUpdatedArgumentCaptor.getValue());
             verify(webhookPort, times(1)).send(billingProfileUpdatedArgumentCaptor.getValue());
-            verify(billingProfileStoragePort).findKycStatusesFromParentKybExternalVerificationId(initialCompanyBillingProfile.getExternalApplicantId());
+            verify(oldBillingProfileStoragePort).findKycStatusesFromParentKybExternalVerificationId(initialCompanyBillingProfile.getExternalApplicantId());
         }
 
         @Test
@@ -125,15 +125,15 @@ public class UserVerificationServiceTest {
             final UUID billingProfileId = UUID.randomUUID();
             final String reviewMessageForApplicant = faker.rickAndMorty().location();
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED).type(BillingProfileType.COMPANY).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.REJECTED).type(OldBillingProfileType.COMPANY).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
             final OldCompanyBillingProfile initialCompanyBillingProfile =
-                    OldCompanyBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.STARTED).build();
+                    OldCompanyBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(OldVerificationStatus.STARTED).build();
             final OldCompanyBillingProfile companyBillingProfileWithNewStatus =
-                    initialCompanyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
+                    initialCompanyBillingProfile.toBuilder().status(OldVerificationStatus.REJECTED).build();
             final OldCompanyBillingProfile updatedCompanyBillingProfile =
-                    initialCompanyBillingProfile.toBuilder().id(billingProfileId).userId(userId).status(VerificationStatus.REJECTED).address(faker.address().fullAddress()).country(Country.fromIso3(faker.address().country()))
+                    initialCompanyBillingProfile.toBuilder().id(billingProfileId).userId(userId).status(OldVerificationStatus.REJECTED).address(faker.address().fullAddress()).oldCountry(OldCountry.fromIso3(faker.address().country()))
                             .name(faker.rickAndMorty().character())
                             .euVATNumber(faker.hacker().abbreviation())
                             .subjectToEuropeVAT(true)
@@ -144,10 +144,10 @@ public class UserVerificationServiceTest {
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findCompanyProfileById(billingProfileId)).thenReturn(Optional.of(initialCompanyBillingProfile));
+            when(oldBillingProfileStoragePort.findCompanyProfileById(billingProfileId)).thenReturn(Optional.of(initialCompanyBillingProfile));
             when(userVerificationStoragePort.updateCompanyVerification(companyBillingProfileWithNewStatus)).thenReturn(updatedCompanyBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.empty());
-            when(billingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile)).thenReturn(updatedCompanyBillingProfile);
+            when(oldBillingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile)).thenReturn(updatedCompanyBillingProfile);
             Exception exception = null;
             try {
                 userVerificationService.process(eventStub);
@@ -157,7 +157,7 @@ public class UserVerificationServiceTest {
 
             // Then
             verify(userVerificationStoragePort, times(1)).updateCompanyVerification(companyBillingProfileWithNewStatus);
-            verify(billingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
+            verify(oldBillingProfileStoragePort, times(1)).saveCompanyProfile(updatedCompanyBillingProfile);
             verifyNoInteractions(notificationPort);
             verifyNoInteractions(webhookPort);
             verifyNoInteractions(accountingUserObserverPort);
@@ -170,12 +170,12 @@ public class UserVerificationServiceTest {
         void should_raise_exception_to_skip_unknown_external_id_for_company() {
             // Given
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED).type(BillingProfileType.COMPANY).billingProfileId(UUID.randomUUID()).reviewMessageForApplicant(faker.rickAndMorty().location()).build();
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.REJECTED).type(OldBillingProfileType.COMPANY).billingProfileId(UUID.randomUUID()).reviewMessageForApplicant(faker.rickAndMorty().location()).build();
             final Event eventStub = mock(Event.class);
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findCompanyProfileById(UUID.randomUUID())).thenReturn(Optional.empty());
+            when(oldBillingProfileStoragePort.findCompanyProfileById(UUID.randomUUID())).thenReturn(Optional.empty());
             Exception exception = null;
             try {
                 userVerificationService.process(eventStub);
@@ -194,20 +194,20 @@ public class UserVerificationServiceTest {
             final UUID billingProfileId = UUID.randomUUID();
             final String reviewMessageForApplicant = faker.rickAndMorty().location();
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.NOT_STARTED).type(BillingProfileType.INDIVIDUAL).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.NOT_STARTED).type(OldBillingProfileType.INDIVIDUAL).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
             final UUID userId = UUID.randomUUID();
             final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
             final Event eventStub = mock(Event.class);
             final OldIndividualBillingProfile initialIndividualBillingProfile =
-                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
+                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(OldVerificationStatus.REJECTED).build();
             final OldIndividualBillingProfile individualBillingProfileWithStatus =
-                    initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
+                    initialIndividualBillingProfile.toBuilder().status(OldVerificationStatus.NOT_STARTED).build();
             final OldIndividualBillingProfile updatedIndividualBillingProfile =
-                    individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
+                    individualBillingProfileWithStatus.toBuilder().oldCountry(OldCountry.fromIso3(faker.address().country()))
                             .address(faker.address().fullAddress())
                             .birthdate(new Date())
                             .idDocumentNumber(faker.idNumber().valid())
-                            .idDocumentType(OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                            .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
                             .usCitizen(false)
                             .validUntil(new Date())
                             .build();
@@ -221,15 +221,15 @@ public class UserVerificationServiceTest {
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findIndividualProfileById(billingProfileId)).thenReturn(Optional.of(initialIndividualBillingProfile));
+            when(oldBillingProfileStoragePort.findIndividualProfileById(billingProfileId)).thenReturn(Optional.of(initialIndividualBillingProfile));
             when(userVerificationStoragePort.updateIndividualVerification(individualBillingProfileWithStatus)).thenReturn(updatedIndividualBillingProfile);
-            when(billingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile)).thenReturn(updatedIndividualBillingProfile);
+            when(oldBillingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile)).thenReturn(updatedIndividualBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.of(user));
             userVerificationService.process(eventStub);
 
             // Then
             verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
-            verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
+            verify(oldBillingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
             final ArgumentCaptor<BillingProfileUpdated> billingProfileUpdatedArgumentCaptor = ArgumentCaptor.forClass(BillingProfileUpdated.class);
             verify(notificationPort, times(1)).notifyNewVerificationEvent(billingProfileUpdatedArgumentCaptor.capture());
             assertEquals(user.getId(), billingProfileUpdatedArgumentCaptor.getValue().getUserId());
@@ -247,29 +247,29 @@ public class UserVerificationServiceTest {
             final UUID billingProfileId = UUID.randomUUID();
             final String reviewMessageForApplicant = faker.rickAndMorty().location();
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.NOT_STARTED).type(BillingProfileType.INDIVIDUAL).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.NOT_STARTED).type(OldBillingProfileType.INDIVIDUAL).billingProfileId(billingProfileId).reviewMessageForApplicant(reviewMessageForApplicant).build();
             final Event eventStub = mock(Event.class);
             final UUID userId = UUID.randomUUID();
             final BillingProfileUpdated eventWithUserId = event.toBuilder().userId(userId).build();
             final OldIndividualBillingProfile initialIndividualBillingProfile =
-                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(VerificationStatus.REJECTED).build();
+                    OldIndividualBillingProfile.builder().id(billingProfileId).userId(userId).reviewMessageForApplicant(reviewMessageForApplicant).status(OldVerificationStatus.REJECTED).build();
             final OldIndividualBillingProfile individualBillingProfileWithStatus =
-                    initialIndividualBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build();
+                    initialIndividualBillingProfile.toBuilder().status(OldVerificationStatus.NOT_STARTED).build();
             final OldIndividualBillingProfile updatedIndividualBillingProfile =
-                    individualBillingProfileWithStatus.toBuilder().country(Country.fromIso3(faker.address().country()))
+                    individualBillingProfileWithStatus.toBuilder().oldCountry(OldCountry.fromIso3(faker.address().country()))
                             .address(faker.address().fullAddress())
                             .birthdate(new Date())
                             .idDocumentNumber(faker.idNumber().valid())
-                            .idDocumentType(OldIndividualBillingProfile.IdDocumentTypeEnum.PASSPORT)
+                            .idDocumentType(OldIndividualBillingProfile.OldIdDocumentTypeEnum.PASSPORT)
                             .usCitizen(false)
                             .validUntil(new Date())
                             .build();
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findIndividualProfileById(billingProfileId)).thenReturn(Optional.of(initialIndividualBillingProfile));
+            when(oldBillingProfileStoragePort.findIndividualProfileById(billingProfileId)).thenReturn(Optional.of(initialIndividualBillingProfile));
             when(userVerificationStoragePort.updateIndividualVerification(individualBillingProfileWithStatus)).thenReturn(updatedIndividualBillingProfile);
-            when(billingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile)).thenReturn(updatedIndividualBillingProfile);
+            when(oldBillingProfileStoragePort.saveIndividualProfile(updatedIndividualBillingProfile)).thenReturn(updatedIndividualBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.empty());
             Exception exception = null;
             try {
@@ -280,7 +280,7 @@ public class UserVerificationServiceTest {
 
             // Then
             verify(userVerificationStoragePort, times(1)).updateIndividualVerification(individualBillingProfileWithStatus);
-            verify(billingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
+            verify(oldBillingProfileStoragePort, times(1)).saveIndividualProfile(updatedIndividualBillingProfile);
             verifyNoInteractions(notificationPort);
             verifyNoInteractions(notificationPort);
             verifyNoInteractions(webhookPort);
@@ -294,12 +294,12 @@ public class UserVerificationServiceTest {
         void should_raise_exception_to_skip_unknown_external_id_for_individual() {
             // Given
             final BillingProfileUpdated event =
-                    BillingProfileUpdated.builder().verificationStatus(VerificationStatus.REJECTED).type(BillingProfileType.INDIVIDUAL).billingProfileId(UUID.randomUUID()).reviewMessageForApplicant(faker.rickAndMorty().location()).build();
+                    BillingProfileUpdated.builder().oldVerificationStatus(OldVerificationStatus.REJECTED).type(OldBillingProfileType.INDIVIDUAL).billingProfileId(UUID.randomUUID()).reviewMessageForApplicant(faker.rickAndMorty().location()).build();
             final Event eventStub = mock(Event.class);
 
             // When
             when(billingProfileExternalMapper.apply(eventStub)).thenReturn(event);
-            when(billingProfileStoragePort.findIndividualProfileById(UUID.randomUUID())).thenReturn(Optional.empty());
+            when(oldBillingProfileStoragePort.findIndividualProfileById(UUID.randomUUID())).thenReturn(Optional.empty());
             Exception exception = null;
             try {
                 userVerificationService.process(eventStub);
@@ -314,9 +314,9 @@ public class UserVerificationServiceTest {
     }
 
     @Nested
-    class GivenAChildrenBillingProfile {
+    class GivenAChildrenOldBillingProfile {
         private UserVerificationService userVerificationService;
-        private BillingProfileStoragePort billingProfileStoragePort;
+        private OldBillingProfileStoragePort oldBillingProfileStoragePort;
         private OutboxPort outboxPort;
         private Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
         private AccountingUserObserverPort accountingUserObserverPort;
@@ -328,7 +328,7 @@ public class UserVerificationServiceTest {
 
         @BeforeEach
         void setUp() {
-            billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+            oldBillingProfileStoragePort = mock(OldBillingProfileStoragePort.class);
             outboxPort = mock(OutboxPort.class);
             billingProfileExternalMapper = mock(Function.class);
             accountingUserObserverPort = mock(AccountingUserObserverPort.class);
@@ -336,7 +336,7 @@ public class UserVerificationServiceTest {
             notificationPort = mock(NotificationPort.class);
             userStoragePort = mock(UserStoragePort.class);
             webhookPort = mock(WebhookPort.class);
-            userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, billingProfileStoragePort,
+            userVerificationService = new UserVerificationService(outboxPort, billingProfileExternalMapper, oldBillingProfileStoragePort,
                     userVerificationStoragePort, accountingUserObserverPort, notificationPort, userStoragePort, webhookPort);
         }
 
@@ -344,12 +344,12 @@ public class UserVerificationServiceTest {
         void should_skip_update_parent_billing_profile_given_parent_billing_profile_not_found() {
             // Given
             final BillingProfileUpdated mappedEvent =
-                    BillingProfileUpdated.builder().type(BillingProfileType.INDIVIDUAL).verificationStatus(VerificationStatus.STARTED).parentExternalApplicantId(faker.rickAndMorty().character()).externalApplicantId(faker.gameOfThrones().character()).build();
+                    BillingProfileUpdated.builder().type(OldBillingProfileType.INDIVIDUAL).oldVerificationStatus(OldVerificationStatus.STARTED).parentExternalApplicantId(faker.rickAndMorty().character()).externalApplicantId(faker.gameOfThrones().character()).build();
             final Event event = mock(Event.class);
 
             // When
             when(billingProfileExternalMapper.apply(event)).thenReturn(mappedEvent);
-            when(billingProfileStoragePort.findCompanyByExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(Optional.empty());
+            when(oldBillingProfileStoragePort.findCompanyByExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(Optional.empty());
             Exception e = null;
             try {
                 userVerificationService.process(event);
@@ -368,7 +368,7 @@ public class UserVerificationServiceTest {
             // Given
             final String parentBillingProfileExternalVerificationId = faker.rickAndMorty().character();
             final BillingProfileUpdated mappedEvent =
-                    BillingProfileUpdated.builder().type(BillingProfileType.COMPANY).verificationStatus(VerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).build();
+                    BillingProfileUpdated.builder().type(OldBillingProfileType.COMPANY).oldVerificationStatus(OldVerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).build();
             final Event event = mock(Event.class);
 
             // When
@@ -383,7 +383,7 @@ public class UserVerificationServiceTest {
             // Then
             assertNotNull(e);
             assertTrue(e instanceof OutboxSkippingException);
-            assertEquals("Invalid children billing profile for type %s and external parent id %s".formatted(BillingProfileType.COMPANY,
+            assertEquals("Invalid children billing profile for type %s and external parent id %s".formatted(OldBillingProfileType.COMPANY,
                     parentBillingProfileExternalVerificationId), e.getMessage());
         }
 
@@ -392,28 +392,28 @@ public class UserVerificationServiceTest {
             // Given
             final String parentBillingProfileExternalVerificationId = faker.rickAndMorty().character();
             final BillingProfileUpdated mappedEvent =
-                    BillingProfileUpdated.builder().type(BillingProfileType.INDIVIDUAL).verificationStatus(VerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).rawReviewDetails(faker.rickAndMorty().location()).build();
+                    BillingProfileUpdated.builder().type(OldBillingProfileType.INDIVIDUAL).oldVerificationStatus(OldVerificationStatus.STARTED).parentExternalApplicantId(parentBillingProfileExternalVerificationId).externalApplicantId(faker.gameOfThrones().character()).rawReviewDetails(faker.rickAndMorty().location()).build();
             final Event event = mock(Event.class);
             final UUID userId = UUID.randomUUID();
             final OldCompanyBillingProfile companyBillingProfile =
-                    OldCompanyBillingProfile.builder().status(VerificationStatus.STARTED).userId(userId).id(UUID.randomUUID()).build();
-            final OldCompanyBillingProfile updatedBillingProfile = companyBillingProfile.toBuilder().status(VerificationStatus.REJECTED).build();
+                    OldCompanyBillingProfile.builder().status(OldVerificationStatus.STARTED).userId(userId).id(UUID.randomUUID()).build();
+            final OldCompanyBillingProfile updatedBillingProfile = companyBillingProfile.toBuilder().status(OldVerificationStatus.REJECTED).build();
             final User user =
                     User.builder().id(userId).githubUserId(1L).githubLogin(faker.rickAndMorty().character()).githubAvatarUrl(faker.internet().url()).githubEmail(faker.internet().emailAddress()).build();
 
             // When
             when(billingProfileExternalMapper.apply(event)).thenReturn(mappedEvent);
-            when(billingProfileStoragePort.findCompanyByExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(Optional.of(companyBillingProfile));
-            when(billingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(List.of(VerificationStatus.REJECTED, VerificationStatus.VERIFIED));
-            when(billingProfileStoragePort.saveCompanyProfile(updatedBillingProfile)).thenReturn(updatedBillingProfile);
+            when(oldBillingProfileStoragePort.findCompanyByExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(Optional.of(companyBillingProfile));
+            when(oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(mappedEvent.getParentExternalApplicantId())).thenReturn(List.of(OldVerificationStatus.REJECTED, OldVerificationStatus.VERIFIED));
+            when(oldBillingProfileStoragePort.saveCompanyProfile(updatedBillingProfile)).thenReturn(updatedBillingProfile);
             when(userStoragePort.getUserById(userId)).thenReturn(Optional.of(user));
             userVerificationService.process(event);
 
             // Then
-            verify(billingProfileStoragePort).saveChildrenKyc(mappedEvent.getExternalApplicantId(), mappedEvent.getParentExternalApplicantId(),
-                    mappedEvent.getVerificationStatus());
+            verify(oldBillingProfileStoragePort).saveChildrenKyc(mappedEvent.getExternalApplicantId(), mappedEvent.getParentExternalApplicantId(),
+                    mappedEvent.getOldVerificationStatus());
             final BillingProfileUpdated billingProfileUpdated =
-                    BillingProfileUpdated.builder().billingProfileId(companyBillingProfile.getId()).externalApplicantId(companyBillingProfile.getExternalApplicantId()).type(BillingProfileType.COMPANY).verificationStatus(VerificationStatus.REJECTED).userId(userId).githubUserId(user.getGithubUserId()).githubLogin(user.getGithubLogin()).githubUserEmail(user.getGithubEmail()).githubAvatarUrl(user.getGithubAvatarUrl()).rawReviewDetails(mappedEvent.getRawReviewDetails()).build();
+                    BillingProfileUpdated.builder().billingProfileId(companyBillingProfile.getId()).externalApplicantId(companyBillingProfile.getExternalApplicantId()).type(OldBillingProfileType.COMPANY).oldVerificationStatus(OldVerificationStatus.REJECTED).userId(userId).githubUserId(user.getGithubUserId()).githubLogin(user.getGithubLogin()).githubUserEmail(user.getGithubEmail()).githubAvatarUrl(user.getGithubAvatarUrl()).rawReviewDetails(mappedEvent.getRawReviewDetails()).build();
             verify(notificationPort).notifyNewVerificationEvent(billingProfileUpdated);
             verify(webhookPort).send(billingProfileUpdated);
             verify(accountingUserObserverPort).onBillingProfileUpdated(billingProfileUpdated);

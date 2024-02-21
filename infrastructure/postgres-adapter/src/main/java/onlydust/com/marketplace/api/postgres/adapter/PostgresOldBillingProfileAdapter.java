@@ -2,8 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.BillingProfileStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +14,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
+public class PostgresOldBillingProfileAdapter implements OldBillingProfileStoragePort {
 
     private final UserBillingProfileTypeRepository userBillingProfileTypeRepository;
     private final CompanyBillingProfileRepository companyBillingProfileRepository;
@@ -54,10 +53,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
-    public void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId) {
+    public void saveProfileTypeForUser(OldBillingProfileType oldBillingProfileType, UUID userId) {
         userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
                 .userId(userId)
-                .billingProfileType(switch (billingProfileType) {
+                .billingProfileType(switch (oldBillingProfileType) {
                     case COMPANY -> UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY;
                     case INDIVIDUAL -> UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL;
                 })
@@ -66,19 +65,19 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId) {
+    public Optional<OldBillingProfileType> getBillingProfileTypeForUser(UUID userId) {
         return userBillingProfileTypeRepository.findById(userId).map(entity -> switch (entity.getBillingProfileType()) {
-            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
-            case COMPANY -> BillingProfileType.COMPANY;
+            case INDIVIDUAL -> OldBillingProfileType.INDIVIDUAL;
+            case COMPANY -> OldBillingProfileType.COMPANY;
         });
     }
 
     @Override
     @Transactional
-    public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
+    public void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType) {
         userBillingProfileTypeRepository.save(UserBillingProfileTypeEntity.builder()
                 .userId(userId)
-                .billingProfileType(switch (billingProfileType) {
+                .billingProfileType(switch (oldBillingProfileType) {
                     case COMPANY -> UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY;
                     case INDIVIDUAL -> UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL;
                 })
@@ -117,13 +116,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public List<BillingProfile> all(UUID userId, Long githubUserId) {
+    public List<OldBillingProfile> all(UUID userId, Long githubUserId) {
         final var type = getBillingProfileTypeForUser(userId)
                 .orElseThrow(() -> notFound("Billing profile type not found for user " + userId));
 
         final var billingProfile = (switch (type) {
-            case COMPANY -> findCompanyProfileForUser(userId).map(BillingProfile::of);
-            case INDIVIDUAL -> findIndividualBillingProfile(userId).map(BillingProfile::of);
+            case COMPANY -> findCompanyProfileForUser(userId).map(OldBillingProfile::of);
+            case INDIVIDUAL -> findIndividualBillingProfile(userId).map(OldBillingProfile::of);
         }).orElseThrow(() -> notFound("Billing profile not found for user " + userId));
 
         final var rewardCount = userRewardRepository.getPendingInvoicesViewEntities(githubUserId).size();
@@ -132,8 +131,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
-    public Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType) {
-        return switch (billingProfileType) {
+    public Boolean hasValidBillingProfileForUserAndType(UUID userId, OldBillingProfileType oldBillingProfileType) {
+        return switch (oldBillingProfileType) {
             case COMPANY -> companyBillingProfileRepository.findByUserId(userId)
                     .map(e -> e.getVerificationStatus().equals(VerificationStatusEntity.VERIFIED))
                     .orElse(false);
@@ -153,27 +152,27 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public List<VerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId) {
+    public List<OldVerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId) {
         return childrenKycRepository.findAllByParentApplicantId(billingProfileExternalVerificationId)
                 .stream()
                 .map(ChildrenKycEntity::getVerificationStatus)
                 .map(verificationStatusEntity -> switch (verificationStatusEntity) {
-                    case REJECTED -> VerificationStatus.REJECTED;
-                    case VERIFIED -> VerificationStatus.VERIFIED;
-                    case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-                    case CLOSED -> VerificationStatus.CLOSED;
-                    case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-                    case STARTED -> VerificationStatus.STARTED;
+                    case REJECTED -> OldVerificationStatus.REJECTED;
+                    case VERIFIED -> OldVerificationStatus.VERIFIED;
+                    case UNDER_REVIEW -> OldVerificationStatus.UNDER_REVIEW;
+                    case CLOSED -> OldVerificationStatus.CLOSED;
+                    case NOT_STARTED -> OldVerificationStatus.NOT_STARTED;
+                    case STARTED -> OldVerificationStatus.STARTED;
                 }).toList();
     }
 
     @Override
     @Transactional
-    public void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus) {
+    public void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, OldVerificationStatus oldVerificationStatus) {
         childrenKycRepository.save(ChildrenKycEntity.builder()
                 .applicantId(externalApplicantId)
                 .parentApplicantId(parentExternalApplicantId)
-                .verificationStatus(switch (verificationStatus) {
+                .verificationStatus(switch (oldVerificationStatus) {
                     case REJECTED -> VerificationStatusEntity.REJECTED;
                     case UNDER_REVIEW -> VerificationStatusEntity.UNDER_REVIEW;
                     case STARTED -> VerificationStatusEntity.STARTED;

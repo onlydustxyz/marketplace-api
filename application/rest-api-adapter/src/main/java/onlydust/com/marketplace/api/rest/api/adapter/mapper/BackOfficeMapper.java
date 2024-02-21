@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.time.ZoneOffset;
 
@@ -209,7 +208,7 @@ public interface BackOfficeMapper {
                         .tcAcceptedAt(user.getTcAcceptedAt())
                         .onboardingCompletedAt(user.getOnboardingCompletedAt())
                         .usEntity(user.getUsEntity())
-                        .verificationStatus(switch (user.getVerificationStatus()) {
+                        .verificationStatus(switch (user.getOldVerificationStatus()) {
                             case NOT_STARTED -> VerificationStatus.NOT_STARTED;
                             case STARTED -> VerificationStatus.STARTED;
                             case REJECTED -> VerificationStatus.REJECTED;

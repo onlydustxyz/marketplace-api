@@ -22,7 +22,6 @@ import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
-import onlydust.com.marketplace.project.domain.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -132,13 +131,13 @@ public class DomainConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final BillingProfileStoragePort billingProfileStoragePort,
+                                         final OldBillingProfileStoragePort oldBillingProfileStoragePort,
                                          final AccountingUserObserverPort accountingUserObserverPort) {
         return new UserService(projectObserverPort, userObserverPort, postgresUserAdapter, dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                billingProfileStoragePort,
+                oldBillingProfileStoragePort,
                 accountingUserObserverPort);
     }
 
@@ -272,24 +271,24 @@ public class DomainConfiguration {
 
     @Bean
     public UserVerificationFacadePort userVerificationFacadePort(final OutboxPort userVerificationOutbox,
-                                                                 final BillingProfileStoragePort billingProfileStoragePort,
+                                                                 final OldBillingProfileStoragePort oldBillingProfileStoragePort,
                                                                  final UserVerificationStoragePort userVerificationStoragePort,
                                                                  final AccountingUserObserverPort accountingUserObserverPort,
                                                                  final NotificationPort notificationPort,
                                                                  final UserStoragePort userStoragePort, final WebhookPort webhookNotificationPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), oldBillingProfileStoragePort, userVerificationStoragePort,
                 accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
     }
 
     @Bean
     public OutboxConsumer userVerificationOutboxConsumer(final OutboxPort userVerificationOutbox,
-                                                         final BillingProfileStoragePort billingProfileStoragePort,
+                                                         final OldBillingProfileStoragePort oldBillingProfileStoragePort,
                                                          final UserVerificationStoragePort userVerificationStoragePort,
                                                          final AccountingUserObserverPort accountingUserObserverPort,
                                                          final NotificationPort notificationPort,
                                                          final UserStoragePort userStoragePort,
                                                          final WebhookPort webhookNotificationPort) {
-        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), billingProfileStoragePort, userVerificationStoragePort,
+        return new UserVerificationService(userVerificationOutbox, new SumsubMapper(), oldBillingProfileStoragePort, userVerificationStoragePort,
                 accountingUserObserverPort, notificationPort, userStoragePort, webhookNotificationPort);
     }
 

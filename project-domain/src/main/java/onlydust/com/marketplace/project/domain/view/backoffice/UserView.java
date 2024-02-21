@@ -3,7 +3,7 @@ package onlydust.com.marketplace.project.domain.view.backoffice;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -49,7 +49,7 @@ public class UserView {
     List<String> languages;
     String tcAcceptedAt;
     ZonedDateTime onboardingCompletedAt;
-    VerificationStatus verificationStatus;
+    OldVerificationStatus oldVerificationStatus;
     Boolean usEntity;
 
     @Value

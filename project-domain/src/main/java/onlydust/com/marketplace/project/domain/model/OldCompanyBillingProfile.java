@@ -16,12 +16,12 @@ public class OldCompanyBillingProfile {
     @NonNull
     UUID userId;
     @NonNull
-    VerificationStatus status;
+    OldVerificationStatus status;
     String name;
     String registrationNumber;
     Date registrationDate;
     String address;
-    Country country;
+    OldCountry oldCountry;
     Boolean usEntity;
     Boolean subjectToEuropeVAT;
     String euVATNumber;
@@ -43,25 +43,25 @@ public class OldCompanyBillingProfile {
         return OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(userId)
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .build();
     }
 
-    public OldCompanyBillingProfile updateStatusFromNewChildrenStatuses(final List<VerificationStatus> childrenStatuses) {
+    public OldCompanyBillingProfile updateStatusFromNewChildrenStatuses(final List<OldVerificationStatus> childrenStatuses) {
         if (isNull(childrenStatuses) || childrenStatuses.isEmpty()) {
             return this;
         }
-        final List<VerificationStatus> childrenStatus =
-                childrenStatuses.stream().sorted(Comparator.comparingInt(VerificationStatus::getPriority)).collect(Collectors.toList());
+        final List<OldVerificationStatus> childrenStatus =
+                childrenStatuses.stream().sorted(Comparator.comparingInt(OldVerificationStatus::getPriority)).collect(Collectors.toList());
         Collections.reverse(childrenStatus);
-        final VerificationStatus worstChildrenVerificationStatus = childrenStatus.get(0);
-        if (this.status.getPriority() >= worstChildrenVerificationStatus.getPriority()) {
+        final OldVerificationStatus worstChildrenOldVerificationStatus = childrenStatus.get(0);
+        if (this.status.getPriority() >= worstChildrenOldVerificationStatus.getPriority()) {
             return this;
         }
-        return updateStatus(worstChildrenVerificationStatus);
+        return updateStatus(worstChildrenOldVerificationStatus);
     }
 
-    private OldCompanyBillingProfile updateStatus(final VerificationStatus newStatus) {
+    private OldCompanyBillingProfile updateStatus(final OldVerificationStatus newStatus) {
         return this.toBuilder().status(newStatus).build();
     }
 }

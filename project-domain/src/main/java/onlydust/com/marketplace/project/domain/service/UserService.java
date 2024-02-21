@@ -12,7 +12,7 @@ import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserver
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.BillingProfileStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -37,7 +37,7 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
-    private final BillingProfileStoragePort billingProfileStoragePort;
+    private final OldBillingProfileStoragePort oldBillingProfileStoragePort;
     private final AccountingUserObserverPort accountingUserObserverPort;
 
     @Override
@@ -48,10 +48,10 @@ public class UserService implements UserFacadePort {
                 .map(user -> {
                     final var payoutInformationById = userStoragePort.getPayoutSettingsById(user.getId());
                     user.setHasValidPayoutInfos(payoutInformationById.isValid());
-                    user.setBillingProfileType(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(BillingProfileType.INDIVIDUAL));
+                    user.setOldBillingProfileType(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()).orElse(OldBillingProfileType.INDIVIDUAL));
                     if (payoutInformationById.hasPendingPayments()) {
-                        user.setHasValidBillingProfile(billingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),
-                                user.getBillingProfileType()));
+                        user.setHasValidBillingProfile(oldBillingProfileStoragePort.hasValidBillingProfileForUserAndType(user.getId(),
+                                user.getOldBillingProfileType()));
                     }
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
@@ -69,7 +69,7 @@ public class UserService implements UserFacadePort {
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())
                             .githubEmail(githubUserIdentity.getEmail())
-                            .billingProfileType(BillingProfileType.INDIVIDUAL)
+                            .oldBillingProfileType(OldBillingProfileType.INDIVIDUAL)
                             .build();
                     final User createdUser = userStoragePort.createUser(user);
                     user = user.toBuilder()
@@ -143,8 +143,8 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public List<BillingProfile> getBillingProfiles(UUID id, Long githubUserId) {
-        return billingProfileStoragePort.all(id, githubUserId);
+    public List<OldBillingProfile> getBillingProfiles(UUID id, Long githubUserId) {
+        return oldBillingProfileStoragePort.all(id, githubUserId);
     }
 
     @Override
@@ -256,11 +256,11 @@ public class UserService implements UserFacadePort {
     @Override
     @Transactional
     public OldCompanyBillingProfile getCompanyBillingProfile(UUID userId) {
-        return billingProfileStoragePort.findCompanyProfileForUser(userId)
+        return oldBillingProfileStoragePort.findCompanyProfileForUser(userId)
                 .orElseGet(() -> {
                     OldCompanyBillingProfile newCompanyBillingProfile = OldCompanyBillingProfile.initForUser(userId);
-                    billingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
-                    billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.COMPANY, userId);
+                    oldBillingProfileStoragePort.saveCompanyProfileForUser(newCompanyBillingProfile);
+                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.COMPANY, userId);
                     return newCompanyBillingProfile;
                 });
     }
@@ -268,20 +268,20 @@ public class UserService implements UserFacadePort {
     @Override
     @Transactional
     public OldIndividualBillingProfile getIndividualBillingProfile(UUID userId) {
-        return billingProfileStoragePort.findIndividualBillingProfile(userId)
+        return oldBillingProfileStoragePort.findIndividualBillingProfile(userId)
                 .orElseGet(() -> {
                     OldIndividualBillingProfile individualBillingProfile = OldIndividualBillingProfile.initForUser(userId);
-                    billingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
-                    billingProfileStoragePort.saveProfileTypeForUser(BillingProfileType.INDIVIDUAL, userId);
+                    oldBillingProfileStoragePort.saveIndividualProfileForUser(individualBillingProfile);
+                    oldBillingProfileStoragePort.saveProfileTypeForUser(OldBillingProfileType.INDIVIDUAL, userId);
                     return individualBillingProfile;
                 });
     }
 
     @Override
     @Transactional
-    public void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType) {
-        billingProfileStoragePort.updateBillingProfileType(userId, billingProfileType);
-        if (billingProfileType.equals(BillingProfileType.COMPANY)) {
+    public void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType) {
+        oldBillingProfileStoragePort.updateBillingProfileType(userId, oldBillingProfileType);
+        if (oldBillingProfileType.equals(OldBillingProfileType.COMPANY)) {
             accountingUserObserverPort.onBillingProfileSelected(userId, getCompanyBillingProfile(userId));
         } else {
             accountingUserObserverPort.onBillingProfileSelected(userId, getIndividualBillingProfile(userId));

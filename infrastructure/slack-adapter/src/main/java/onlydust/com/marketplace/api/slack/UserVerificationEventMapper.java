@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.slack;
 
-import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 
 import static java.util.Objects.nonNull;
@@ -51,7 +51,7 @@ public interface UserVerificationEventMapper {
                 },
                 "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileUpdated.getExternalApplicantId()));
         // Enabling notifications pinging all the channel only for closed KYC/KYB
-        if (billingProfileUpdated.getVerificationStatus().equals(VerificationStatus.CLOSED) && tagAllChannel) {
+        if (billingProfileUpdated.getOldVerificationStatus().equals(OldVerificationStatus.CLOSED) && tagAllChannel) {
             mainMessage = "<!channel> " + mainMessage;
         }
         return SLACK_BLOCKS_TEMPLATE.formatted(
@@ -62,7 +62,7 @@ public interface UserVerificationEventMapper {
                 billingProfileUpdated.getGithubUserEmail(),
                 billingProfileUpdated.getGithubAvatarUrl(),
                 nonNull(billingProfileUpdated.getType()) ? billingProfileUpdated.getType().toString() : null,
-                nonNull(billingProfileUpdated.getVerificationStatus()) ? billingProfileUpdated.getVerificationStatus().toString() : null,
+                nonNull(billingProfileUpdated.getOldVerificationStatus()) ? billingProfileUpdated.getOldVerificationStatus().toString() : null,
                 nonNull(billingProfileUpdated.getBillingProfileId()) ? billingProfileUpdated.getBillingProfileId().toString() : null,
                 nonNull(billingProfileUpdated.getRawReviewDetails()) ? billingProfileUpdated.getRawReviewDetails().replace("\"", "\\\"") : null
         );

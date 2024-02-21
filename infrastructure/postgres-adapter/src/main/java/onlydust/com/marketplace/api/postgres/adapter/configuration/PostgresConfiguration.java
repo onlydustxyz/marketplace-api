@@ -332,13 +332,13 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
-                                                                       final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                       final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                       final CustomUserRewardRepository customUserRewardRepository,
-                                                                       final ChildrenKycRepository childrenKycRepository,
-                                                                       final GlobalSettingsRepository globalSettingsRepository) {
-        return new PostgresBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
+    public PostgresOldBillingProfileAdapter postgresBillingProfileAdapter(final UserBillingProfileTypeRepository userBillingProfileTypeRepository,
+                                                                          final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                          final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                          final CustomUserRewardRepository customUserRewardRepository,
+                                                                          final ChildrenKycRepository childrenKycRepository,
+                                                                          final GlobalSettingsRepository globalSettingsRepository) {
+        return new PostgresOldBillingProfileAdapter(userBillingProfileTypeRepository, companyBillingProfileRepository, individualBillingProfileRepository,
                 customUserRewardRepository, childrenKycRepository, globalSettingsRepository);
     }
 

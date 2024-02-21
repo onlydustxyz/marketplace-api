@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(staticName = "fromIso3")
 @Getter
 @Accessors(fluent = true)
-public class Country {
+public class OldCountry {
     private static final Map<String, String> COUNTRY_NAME_MAPPED_TO_ISO3_CODE = Arrays.stream(Locale.getISOCountries()).map(isoCountry -> new Locale("",
             isoCountry)).collect(Collectors.toMap(Locale::getISO3Country, locale -> locale.getDisplayCountry(Locale.ENGLISH)));
 

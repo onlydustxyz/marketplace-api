@@ -7,21 +7,21 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OldIndividualBillingProfileTest {
+class OldIndividualOldBillingProfileTest {
 
     @Test
     void mandate_is_accepted() {
         var individualBillingProfile = OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .build();
         assertThat(individualBillingProfile.isInvoiceMandateAccepted()).isFalse();
 
         individualBillingProfile = OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .invoiceMandateAcceptedAt(ZonedDateTime.now())
                 .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
                 .build();
@@ -30,7 +30,7 @@ class OldIndividualBillingProfileTest {
         individualBillingProfile = OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
                 .userId(UUID.randomUUID())
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .invoiceMandateAcceptedAt(ZonedDateTime.now())
                 .invoiceMandateLatestVersionDate(ZonedDateTime.now().plusDays(1))
                 .build();

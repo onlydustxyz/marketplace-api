@@ -43,7 +43,7 @@ public class UserBillingProfileVerificationStatusUpdatedEventDTO {
                 .environment(environment)
                 .payload(Payload.builder()
                         .userId(billingProfileUpdated.getUserId())
-                        .verificationStatus(billingProfileUpdated.getVerificationStatus().name())
+                        .verificationStatus(billingProfileUpdated.getOldVerificationStatus().name())
                         .build())
                 .build();
     }

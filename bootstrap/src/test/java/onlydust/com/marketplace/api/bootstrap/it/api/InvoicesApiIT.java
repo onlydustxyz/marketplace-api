@@ -104,7 +104,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                          "number": "OD-BUISSET-ANTHONY-001",
-                         "billingProfileType": "INDIVIDUAL",
+                         "oldBillingProfileType": "INDIVIDUAL",
                          "individualBillingProfile": {
                            "firstName": "Anthony",
                            "lastName": "BUISSET",
@@ -245,7 +245,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "number": "OD-BUISSET-ANTHONY-002",
-                          "billingProfileType": "INDIVIDUAL",
+                          "oldBillingProfileType": "INDIVIDUAL",
                           "individualBillingProfile": {
                             "firstName": "Anthony",
                             "lastName": "BUISSET",

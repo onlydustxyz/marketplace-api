@@ -14,7 +14,7 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.BillingProfileStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.OldBillingProfileStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -47,7 +47,7 @@ public class UserServiceTest {
     private UserService userService;
     private ProjectObserverPort projectObserverPort;
     private UserObserverPort userObserverPort;
-    private BillingProfileStoragePort billingProfileStoragePort;
+    private OldBillingProfileStoragePort oldBillingProfileStoragePort;
     private AccountingUserObserverPort accountingUserObserverPort;
 
     @BeforeEach
@@ -58,11 +58,11 @@ public class UserServiceTest {
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
-        billingProfileStoragePort = mock(BillingProfileStoragePort.class);
+        oldBillingProfileStoragePort = mock(OldBillingProfileStoragePort.class);
         accountingUserObserverPort = mock(AccountingUserObserverPort.class);
 
         userService = new UserService(projectObserverPort, userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, billingProfileStoragePort, accountingUserObserverPort);
+                projectStoragePort, githubSearchPort, imageStoragePort, oldBillingProfileStoragePort, accountingUserObserverPort);
     }
 
     @Test
@@ -89,7 +89,7 @@ public class UserServiceTest {
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
         when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
-        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+        when(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
                 .thenReturn(Optional.empty());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
@@ -97,7 +97,7 @@ public class UserServiceTest {
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(BillingProfileType.INDIVIDUAL, userByGithubIdentity.getBillingProfileType());
+        assertEquals(OldBillingProfileType.INDIVIDUAL, userByGithubIdentity.getOldBillingProfileType());
     }
 
     @Test
@@ -124,15 +124,15 @@ public class UserServiceTest {
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
         when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(fakeValidUserPayoutInformation());
-        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
-                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        when(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(OldBillingProfileType.COMPANY));
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(user.getId(), dateProvider.now());
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
-        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+        assertEquals(OldBillingProfileType.COMPANY, userByGithubIdentity.getOldBillingProfileType());
     }
 
     @Test
@@ -160,8 +160,8 @@ public class UserServiceTest {
         when(userStoragePort.getPayoutSettingsById(user.getId())).thenReturn(UserPayoutSettings.builder()
                 .pendingPaymentsCurrencies(List.of())
                 .build());
-        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
-                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        when(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(OldBillingProfileType.COMPANY));
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
@@ -169,7 +169,7 @@ public class UserServiceTest {
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
         assertEquals(true, userByGithubIdentity.getHasValidBillingProfile());
-        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+        assertEquals(OldBillingProfileType.COMPANY, userByGithubIdentity.getOldBillingProfileType());
     }
 
     @Test
@@ -198,8 +198,8 @@ public class UserServiceTest {
                 .pendingPaymentsCurrencies(List.of(Currency.STRK))
                 .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
                 .build());
-        when(billingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
-                .thenReturn(Optional.of(BillingProfileType.COMPANY));
+        when(oldBillingProfileStoragePort.getBillingProfileTypeForUser(user.getId()))
+                .thenReturn(Optional.of(OldBillingProfileType.COMPANY));
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
@@ -207,7 +207,7 @@ public class UserServiceTest {
         assertEquals(user, userByGithubIdentity);
         assertEquals(true, userByGithubIdentity.getHasValidPayoutInfos());
         assertEquals(false, userByGithubIdentity.getHasValidBillingProfile());
-        assertEquals(BillingProfileType.COMPANY, userByGithubIdentity.getBillingProfileType());
+        assertEquals(OldBillingProfileType.COMPANY, userByGithubIdentity.getOldBillingProfileType());
     }
 
 
@@ -254,7 +254,7 @@ public class UserServiceTest {
                 .hasAcceptedLatestTermsAndConditions(false)
                 .createdAt(createdAt)
                 .hasSeenOnboardingWizard(false)
-                .billingProfileType(BillingProfileType.INDIVIDUAL)
+                .oldBillingProfileType(OldBillingProfileType.INDIVIDUAL)
                 .build(), userByGithubIdentity);
     }
 
@@ -749,12 +749,12 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
         final OldCompanyBillingProfile expected = OldCompanyBillingProfile.builder()
                 .id(UUID.randomUUID())
-                .status(VerificationStatus.CLOSED)
+                .status(OldVerificationStatus.CLOSED)
                 .userId(userId)
                 .build();
 
         // When
-        when(billingProfileStoragePort.findCompanyProfileForUser(userId))
+        when(oldBillingProfileStoragePort.findCompanyProfileForUser(userId))
                 .thenReturn(Optional.of(expected));
         final OldCompanyBillingProfile result = userService.getCompanyBillingProfile(userId);
 
@@ -768,20 +768,20 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         // When
-        when(billingProfileStoragePort.findCompanyProfileForUser(userId))
+        when(oldBillingProfileStoragePort.findCompanyProfileForUser(userId))
                 .thenReturn(Optional.empty());
         userService.getCompanyBillingProfile(userId);
 
         // Then
         ArgumentCaptor<OldCompanyBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(OldCompanyBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
-        ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
-        verify(billingProfileStoragePort, times(1)).saveCompanyProfileForUser(billingProfileArgumentCaptor.capture());
-        verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
+        ArgumentCaptor<OldBillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(OldBillingProfileType.class);
+        verify(oldBillingProfileStoragePort, times(1)).saveCompanyProfileForUser(billingProfileArgumentCaptor.capture());
+        verify(oldBillingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
-        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
+        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(OldVerificationStatus.NOT_STARTED);
         assertThat(uuidCaptor.getValue()).isEqualTo(userId);
-        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.COMPANY);
+        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(OldBillingProfileType.COMPANY);
     }
 
     @Test
@@ -790,12 +790,12 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
         final OldIndividualBillingProfile expected = OldIndividualBillingProfile.builder()
                 .id(UUID.randomUUID())
-                .status(VerificationStatus.NOT_STARTED)
+                .status(OldVerificationStatus.NOT_STARTED)
                 .userId(userId)
                 .build();
 
         // When
-        when(billingProfileStoragePort.findIndividualBillingProfile(userId))
+        when(oldBillingProfileStoragePort.findIndividualBillingProfile(userId))
                 .thenReturn(Optional.of(expected));
         final OldIndividualBillingProfile result = userService.getIndividualBillingProfile(userId);
 
@@ -809,20 +809,20 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         // When
-        when(billingProfileStoragePort.findIndividualBillingProfile(userId))
+        when(oldBillingProfileStoragePort.findIndividualBillingProfile(userId))
                 .thenReturn(Optional.empty());
         userService.getIndividualBillingProfile(userId);
 
         // Then
         ArgumentCaptor<OldIndividualBillingProfile> billingProfileArgumentCaptor = ArgumentCaptor.forClass(OldIndividualBillingProfile.class);
         ArgumentCaptor<UUID> uuidCaptor = ArgumentCaptor.forClass(UUID.class);
-        ArgumentCaptor<BillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(BillingProfileType.class);
-        verify(billingProfileStoragePort, times(1)).saveIndividualProfileForUser(billingProfileArgumentCaptor.capture());
-        verify(billingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
+        ArgumentCaptor<OldBillingProfileType> billingProfileTypeArgumentCaptor = ArgumentCaptor.forClass(OldBillingProfileType.class);
+        verify(oldBillingProfileStoragePort, times(1)).saveIndividualProfileForUser(billingProfileArgumentCaptor.capture());
+        verify(oldBillingProfileStoragePort, times(1)).saveProfileTypeForUser(billingProfileTypeArgumentCaptor.capture(), uuidCaptor.capture());
         assertThat(billingProfileArgumentCaptor.getValue().getId()).isNotNull();
-        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(VerificationStatus.NOT_STARTED);
+        assertThat(billingProfileArgumentCaptor.getValue().getStatus()).isEqualTo(OldVerificationStatus.NOT_STARTED);
         assertThat(uuidCaptor.getValue()).isEqualTo(userId);
-        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(BillingProfileType.INDIVIDUAL);
+        assertThat(billingProfileTypeArgumentCaptor.getValue()).isEqualTo(OldBillingProfileType.INDIVIDUAL);
     }
 
     @Test

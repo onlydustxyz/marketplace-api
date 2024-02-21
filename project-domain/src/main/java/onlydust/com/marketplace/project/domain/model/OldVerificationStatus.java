@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum VerificationStatus {
+public enum OldVerificationStatus {
     VERIFIED(-1),
     UNDER_REVIEW(0),
     STARTED(1),

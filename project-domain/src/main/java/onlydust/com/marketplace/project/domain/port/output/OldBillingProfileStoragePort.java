@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BillingProfileStoragePort {
+public interface OldBillingProfileStoragePort {
     Optional<OldCompanyBillingProfile> findCompanyProfileForUser(UUID userId);
 
     void saveCompanyProfileForUser(OldCompanyBillingProfile companyBillingProfile);
@@ -15,11 +15,11 @@ public interface BillingProfileStoragePort {
 
     void saveIndividualProfileForUser(OldIndividualBillingProfile individualBillingProfile);
 
-    void saveProfileTypeForUser(BillingProfileType billingProfileType, UUID userId);
+    void saveProfileTypeForUser(OldBillingProfileType oldBillingProfileType, UUID userId);
 
-    Optional<BillingProfileType> getBillingProfileTypeForUser(UUID userId);
+    Optional<OldBillingProfileType> getBillingProfileTypeForUser(UUID userId);
 
-    void updateBillingProfileType(UUID userId, BillingProfileType billingProfileType);
+    void updateBillingProfileType(UUID userId, OldBillingProfileType oldBillingProfileType);
 
     Optional<OldCompanyBillingProfile> findCompanyProfileById(UUID billingProfileId);
 
@@ -29,13 +29,13 @@ public interface BillingProfileStoragePort {
 
     OldIndividualBillingProfile saveIndividualProfile(OldIndividualBillingProfile individualBillingProfile);
 
-    List<BillingProfile> all(UUID userId, Long githubUserId);
+    List<OldBillingProfile> all(UUID userId, Long githubUserId);
 
-    Boolean hasValidBillingProfileForUserAndType(UUID userId, BillingProfileType billingProfileType);
+    Boolean hasValidBillingProfileForUserAndType(UUID userId, OldBillingProfileType oldBillingProfileType);
 
     Optional<OldCompanyBillingProfile> findCompanyByExternalVerificationId(String billingProfileExternalVerificationId);
 
-    List<VerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId);
+    List<OldVerificationStatus> findKycStatusesFromParentKybExternalVerificationId(String billingProfileExternalVerificationId);
 
-    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, VerificationStatus verificationStatus);
+    void saveChildrenKyc(String externalApplicantId, String parentExternalApplicantId, OldVerificationStatus oldVerificationStatus);
 }

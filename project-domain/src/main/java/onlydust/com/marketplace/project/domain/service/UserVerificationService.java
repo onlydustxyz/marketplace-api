@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.job.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
-import onlydust.com.marketplace.project.domain.model.BillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
 import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
@@ -23,7 +23,7 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
 
     private final OutboxPort outboxPort;
     private final Function<Event, BillingProfileUpdated> billingProfileExternalMapper;
-    private final BillingProfileStoragePort billingProfileStoragePort;
+    private final OldBillingProfileStoragePort oldBillingProfileStoragePort;
     private final UserVerificationStoragePort userVerificationStoragePort;
     private final AccountingUserObserverPort userObserver;
     private final NotificationPort notificationPort;
@@ -61,34 +61,34 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
 
     private BillingProfileUpdated processChildrenBillingProfile(final BillingProfileUpdated childrendBillingProfileUpdated) {
         final OldCompanyBillingProfile parentCompanyBillingProfile =
-                billingProfileStoragePort.findCompanyByExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId())
+                oldBillingProfileStoragePort.findCompanyByExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId())
                         .orElseThrow(() -> new OutboxSkippingException("Parent billing profile not found for external parent id %s"
                                 .formatted(childrendBillingProfileUpdated.getParentExternalApplicantId())));
-        billingProfileStoragePort.saveChildrenKyc(childrendBillingProfileUpdated.getExternalApplicantId(),
+        oldBillingProfileStoragePort.saveChildrenKyc(childrendBillingProfileUpdated.getExternalApplicantId(),
                 childrendBillingProfileUpdated.getParentExternalApplicantId(),
-                childrendBillingProfileUpdated.getVerificationStatus());
+                childrendBillingProfileUpdated.getOldVerificationStatus());
         final OldCompanyBillingProfile updatedCompanyBillingProfile =
-                parentCompanyBillingProfile.updateStatusFromNewChildrenStatuses(billingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId()));
-        final OldCompanyBillingProfile companyBillingProfile = billingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile);
+                parentCompanyBillingProfile.updateStatusFromNewChildrenStatuses(oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(childrendBillingProfileUpdated.getParentExternalApplicantId()));
+        final OldCompanyBillingProfile companyBillingProfile = oldBillingProfileStoragePort.saveCompanyProfile(updatedCompanyBillingProfile);
         return BillingProfileUpdated.builder()
                 .billingProfileId(companyBillingProfile.getId())
-                .type(BillingProfileType.COMPANY)
+                .type(OldBillingProfileType.COMPANY)
                 .userId(companyBillingProfile.getUserId())
-                .verificationStatus(companyBillingProfile.getStatus())
+                .oldVerificationStatus(companyBillingProfile.getStatus())
                 .rawReviewDetails(childrendBillingProfileUpdated.getRawReviewDetails())
                 .build();
     }
 
     private OldCompanyBillingProfile updateCompanyProfile(final BillingProfileUpdated billingProfileUpdated) {
-        return billingProfileStoragePort.saveCompanyProfile(
-                billingProfileStoragePort.findCompanyProfileById(billingProfileUpdated.getBillingProfileId())
+        return oldBillingProfileStoragePort.saveCompanyProfile(
+                oldBillingProfileStoragePort.findCompanyProfileById(billingProfileUpdated.getBillingProfileId())
                         .map(companyBillingProfile -> companyBillingProfile.toBuilder()
-                                .status(billingProfileUpdated.getVerificationStatus())
+                                .status(billingProfileUpdated.getOldVerificationStatus())
                                 .reviewMessageForApplicant(billingProfileUpdated.getReviewMessageForApplicant())
                                 .externalApplicantId(billingProfileUpdated.getExternalApplicantId())
                                 .build())
                         .map(companyBillingProfile -> companyBillingProfile.updateStatusFromNewChildrenStatuses(
-                                billingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(companyBillingProfile.getExternalApplicantId()))
+                                oldBillingProfileStoragePort.findKycStatusesFromParentKybExternalVerificationId(companyBillingProfile.getExternalApplicantId()))
                         )
                         .map(companyBillingProfile1 -> userVerificationStoragePort.updateCompanyVerification(companyBillingProfile1))
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
@@ -96,12 +96,12 @@ public class UserVerificationService implements UserVerificationFacadePort, Outb
     }
 
     private OldIndividualBillingProfile updateIndividualProfile(final BillingProfileUpdated billingProfileUpdated) {
-        return billingProfileStoragePort.saveIndividualProfile(
-                billingProfileStoragePort.findIndividualProfileById(billingProfileUpdated.getBillingProfileId())
+        return oldBillingProfileStoragePort.saveIndividualProfile(
+                oldBillingProfileStoragePort.findIndividualProfileById(billingProfileUpdated.getBillingProfileId())
                         .map(individualBillingProfile -> individualBillingProfile.toBuilder()
                                 .reviewMessageForApplicant(billingProfileUpdated.getReviewMessageForApplicant())
                                 .externalApplicantId(billingProfileUpdated.getExternalApplicantId())
-                                .status(billingProfileUpdated.getVerificationStatus()).build())
+                                .status(billingProfileUpdated.getOldVerificationStatus()).build())
                         .map(userVerificationStoragePort::updateIndividualVerification)
                         .orElseThrow(() -> new OutboxSkippingException(String.format("Skipping unknown Sumsub external id %s",
                                 billingProfileUpdated.getBillingProfileId()))));

@@ -27,7 +27,7 @@ import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookA
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class MeBillingProfilesApiIT extends AbstractMarketplaceApiIT {
+public class MeOldBillingProfilesApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     SumsubWebhookProperties sumsubWebhookProperties;

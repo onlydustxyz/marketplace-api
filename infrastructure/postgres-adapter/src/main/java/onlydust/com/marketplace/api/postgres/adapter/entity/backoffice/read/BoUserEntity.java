@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -105,14 +105,14 @@ public class BoUserEntity {
                 .tcAcceptedAt(tcAcceptedAt)
                 .onboardingCompletedAt(onboardingCompletedAt)
                 .usEntity(usEntity)
-                .verificationStatus(switch (this.verificationStatus) {
-                    case "NOT_STARTED" -> VerificationStatus.NOT_STARTED;
-                    case "STARTED" -> VerificationStatus.STARTED;
-                    case "UNDER_REVIEW" -> VerificationStatus.UNDER_REVIEW;
-                    case "VERIFIED" -> VerificationStatus.VERIFIED;
-                    case "REJECTED" -> VerificationStatus.REJECTED;
-                    case "CLOSED" -> VerificationStatus.CLOSED;
-                    default -> VerificationStatus.NOT_STARTED;
+                .oldVerificationStatus(switch (this.verificationStatus) {
+                    case "NOT_STARTED" -> OldVerificationStatus.NOT_STARTED;
+                    case "STARTED" -> OldVerificationStatus.STARTED;
+                    case "UNDER_REVIEW" -> OldVerificationStatus.UNDER_REVIEW;
+                    case "VERIFIED" -> OldVerificationStatus.VERIFIED;
+                    case "REJECTED" -> OldVerificationStatus.REJECTED;
+                    case "CLOSED" -> OldVerificationStatus.CLOSED;
+                    default -> OldVerificationStatus.NOT_STARTED;
                 })
                 .build();
     }

@@ -2,8 +2,8 @@ package onlydust.com.marketplace.project.domain.model.notification;
 
 import lombok.*;
 import onlydust.com.marketplace.project.domain.job.OutboxSkippingException;
-import onlydust.com.marketplace.project.domain.model.BillingProfileType;
-import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
 import java.util.UUID;
 
@@ -16,8 +16,8 @@ import static java.util.Objects.nonNull;
 @EqualsAndHashCode(callSuper = true)
 public class BillingProfileUpdated extends Event {
     UUID billingProfileId;
-    BillingProfileType type;
-    VerificationStatus verificationStatus;
+    OldBillingProfileType type;
+    OldVerificationStatus oldVerificationStatus;
     String reviewMessageForApplicant;
     UUID userId;
     Long githubUserId;
@@ -30,7 +30,7 @@ public class BillingProfileUpdated extends Event {
 
     public boolean isLinkedToAParentBillingProfile() {
         if (nonNull(this.parentExternalApplicantId)) {
-            if (this.type.equals(BillingProfileType.INDIVIDUAL)) {
+            if (this.type.equals(OldBillingProfileType.INDIVIDUAL)) {
                 return true;
             } else {
                 throw new OutboxSkippingException("Invalid children billing profile for type %s and external parent id %s"

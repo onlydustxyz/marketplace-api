@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.OldBillingProfileMapper.map;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 

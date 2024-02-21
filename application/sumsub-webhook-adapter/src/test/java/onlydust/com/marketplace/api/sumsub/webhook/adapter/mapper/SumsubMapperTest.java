@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
-import onlydust.com.marketplace.project.domain.model.BillingProfileType;
-import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
+import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import org.junit.jupiter.api.Test;
@@ -36,31 +36,31 @@ public class SumsubMapperTest {
     // - completed
     @Test
     void should_map_type_and_review_result_to_domain() {
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "init", null, null)).getVerificationStatus(),
-                VerificationStatus.STARTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "pending", null, null)).getVerificationStatus(),
-                VerificationStatus.STARTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "completed", null, null)).getVerificationStatus(),
-                VerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "init", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "pending", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.STARTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantCreated", "completed", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.STARTED);
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "init", null, null)).getVerificationStatus(),
-                VerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "pending", null, null)).getVerificationStatus(),
-                VerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "completed", null, null)).getVerificationStatus(),
-                VerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "init", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "pending", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantPending", "completed", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.UNDER_REVIEW);
 
 
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "init", null, null)).getVerificationStatus(),
-                VerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "pending", null, null)).getVerificationStatus(),
-                VerificationStatus.UNDER_REVIEW);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "GREEN", null)).getVerificationStatus(),
-                VerificationStatus.VERIFIED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "RETRY")).getVerificationStatus(),
-                VerificationStatus.REJECTED);
-        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "FINAL")).getVerificationStatus(),
-                VerificationStatus.CLOSED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "init", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "pending", null, null)).getOldVerificationStatus(),
+                OldVerificationStatus.UNDER_REVIEW);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "GREEN", null)).getOldVerificationStatus(),
+                OldVerificationStatus.VERIFIED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "RETRY")).getOldVerificationStatus(),
+                OldVerificationStatus.REJECTED);
+        assertEquals(sumsubMapper.apply(stubSumsubEvent("applicantReviewed", "completed", "RED", "FINAL")).getOldVerificationStatus(),
+                OldVerificationStatus.CLOSED);
     }
 
 
@@ -79,8 +79,8 @@ public class SumsubMapperTest {
         return sumsubWebhookEventDTO;
     }
 
-    private BillingProfileUpdated expectedStatus(final VerificationStatus verificationStatus) {
+    private BillingProfileUpdated expectedStatus(final OldVerificationStatus oldVerificationStatus) {
         return BillingProfileUpdated.builder()
-                .billingProfileId(externalId).type(BillingProfileType.INDIVIDUAL).verificationStatus(verificationStatus).build();
+                .billingProfileId(externalId).type(OldBillingProfileType.INDIVIDUAL).oldVerificationStatus(oldVerificationStatus).build();
     }
 }
