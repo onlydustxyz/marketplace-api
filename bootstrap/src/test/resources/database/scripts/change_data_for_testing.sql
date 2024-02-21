@@ -22,3 +22,8 @@ SELECT now(), c.id, usd.id, cuq.price
 FROM crypto_usd_quotes cuq
          JOIN currencies c ON c.code = UPPER(cuq.currency::TEXT)
          JOIN currencies usd ON usd.code = 'USD';
+
+INSERT INTO accounting.historical_quotes(timestamp, currency_id, base_id, price)
+SELECT now(), usd.id, usd.id, 1
+FROM currencies usd
+WHERE usd.code = 'USD';

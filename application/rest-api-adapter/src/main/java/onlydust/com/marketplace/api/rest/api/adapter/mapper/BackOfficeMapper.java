@@ -1,10 +1,13 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.api.domain.model.Ecosystem;
 import onlydust.com.marketplace.api.domain.view.backoffice.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -243,6 +246,45 @@ public interface BackOfficeMapper {
                 .totalItemNumber(paymentPage.getTotalItemNumber())
                 .hasMore(hasMore(pageIndex, paymentPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, paymentPage.getTotalPageNumber()));
+    }
+
+
+    static InvoicePage mapInvoicePageToContract(final Page<Invoice> page, int pageIndex) {
+        return new InvoicePage()
+                .invoices(page.getContent().stream().map(BackOfficeMapper::mapInvoice).toList())
+                .totalPageNumber(page.getTotalPageNumber())
+                .totalItemNumber(page.getTotalItemNumber())
+                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
+    }
+
+    @SneakyThrows
+    static InvoicePageItemResponse mapInvoice(final Invoice invoice) {
+        return new InvoicePageItemResponse()
+                .id(invoice.id().value())
+                .status(mapInvoiceStatus(invoice.status()))
+                .createdAt(invoice.createdAt())
+                .dueAt(invoice.dueAt())
+                .downloadLink(invoice.url().toURI())
+                .amount(invoice.totalAfterTax().getValue())
+                .currencyId(invoice.totalAfterTax().getCurrency().id().value())
+                .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList());
+    }
+
+    static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) throws OnlyDustException {
+        return switch (status) {
+            case PROCESSING -> InvoiceStatus.PROCESSING;
+            case APPROVED -> InvoiceStatus.COMPLETE;
+            case REJECTED -> InvoiceStatus.REJECTED;
+            default -> throw OnlyDustException.internalServerError("Unknown invoice status: %s".formatted(status));
+        };
+    }
+
+    static Invoice.Status mapInvoiceStatus(final PatchInvoiceRequest.StatusEnum status) throws OnlyDustException {
+        return switch (status) {
+            case COMPLETE -> Invoice.Status.APPROVED;
+            case REJECTED -> Invoice.Status.REJECTED;
+        };
     }
 
     static ProjectPage mapProjectPageToContract(final Page<ProjectView> projectViewPage, int pageIndex) {

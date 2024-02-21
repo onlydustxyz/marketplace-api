@@ -15,5 +15,7 @@ public interface InvoiceRepository extends JpaRepository<InvoiceEntity, UUID> {
     Page<InvoiceEntity> findAllByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status exceptStatus,
                                                               final @NonNull Pageable pageable);
 
+    Page<InvoiceEntity> findAllByStatusNot(final @NonNull InvoiceEntity.Status exceptStatus, final @NonNull Pageable pageable);
+
     Integer countByBillingProfileIdAndStatusNot(final @NonNull UUID billingProfileId, final @NonNull InvoiceEntity.Status exceptStatus);
 }

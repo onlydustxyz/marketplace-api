@@ -5,13 +5,10 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -23,13 +20,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @Accessors(fluent = true)
+@Getter
 public class InvoiceRewardEntity {
     @Id
     @Getter
     @NonNull UUID id;
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "project_id", name = "project_id")
-    @NonNull ProjectEntity project;
+    @NonNull String projectName;
     @NonNull ZonedDateTime requestedAt;
     @NonNull BigDecimal amount;
     @ManyToOne
@@ -42,8 +38,7 @@ public class InvoiceRewardEntity {
         return new Invoice.Reward(
                 RewardId.of(id),
                 requestedAt,
-                ProjectId.of(project.getId()),
-                project.getName(),
+                projectName,
                 Money.of(amount, currency.toDomain()),
                 Money.of(baseAmount, baseCurrency.toDomain())
         );
@@ -52,7 +47,7 @@ public class InvoiceRewardEntity {
     public static InvoiceRewardEntity of(Invoice.Reward reward) {
         return InvoiceRewardEntity.builder()
                 .id(reward.id().value())
-                .project(ProjectEntity.builder().id(reward.projectId().value()).name(reward.projectName()).build())
+                .projectName(reward.projectName())
                 .requestedAt(reward.createdAt())
                 .amount(reward.amount().getValue())
                 .currency(CurrencyEntity.of(reward.amount().getCurrency()))

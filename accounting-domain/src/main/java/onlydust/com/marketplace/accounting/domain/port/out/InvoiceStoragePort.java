@@ -19,4 +19,6 @@ public interface InvoiceStoragePort {
     Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize);
 
     Optional<Invoice> get(final @NonNull Invoice.Id invoiceId);
+
+    Page<Invoice> findAllExceptDrafts(Integer pageIndex, Integer pageSize);
 }
