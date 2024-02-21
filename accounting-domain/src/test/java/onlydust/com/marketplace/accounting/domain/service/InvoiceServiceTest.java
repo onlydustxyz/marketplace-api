@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import onlydust.com.marketplace.accounting.domain.model.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
