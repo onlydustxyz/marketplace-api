@@ -173,6 +173,6 @@ public class Invoice {
     }
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
-                         @NonNull Money amount, @NonNull Money base) {
+                         @NonNull Money amount, @NonNull Money base, Invoice.Id invoiceId) {
     }
 }
