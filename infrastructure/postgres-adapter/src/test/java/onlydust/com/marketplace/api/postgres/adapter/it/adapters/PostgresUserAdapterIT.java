@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import onlydust.com.marketplace.api.domain.model.User;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;

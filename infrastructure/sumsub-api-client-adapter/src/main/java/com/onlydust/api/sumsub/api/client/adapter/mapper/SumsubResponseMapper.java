@@ -5,9 +5,9 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDataDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
 import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
-import onlydust.com.marketplace.api.domain.model.Country;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.model.Country;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.text.ParseException;

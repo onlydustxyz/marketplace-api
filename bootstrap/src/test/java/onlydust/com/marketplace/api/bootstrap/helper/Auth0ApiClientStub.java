@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.helper;
 
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.util.Map;

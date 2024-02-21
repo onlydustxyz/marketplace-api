@@ -2,22 +2,14 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.api.domain.model.UserProfileCover;
-import onlydust.com.marketplace.api.domain.view.ChurnedContributorView;
-import onlydust.com.marketplace.api.domain.view.ShortRepoView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
+import onlydust.com.marketplace.project.domain.view.ShortRepoView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProjectVisibilityEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.UUID;
 
 import static java.util.Objects.nonNull;
 

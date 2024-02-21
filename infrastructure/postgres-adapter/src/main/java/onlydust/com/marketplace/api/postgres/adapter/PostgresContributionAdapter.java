@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.api.domain.view.ContributionDetailsView;
-import onlydust.com.marketplace.api.domain.view.ContributionView;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardViewEntity;

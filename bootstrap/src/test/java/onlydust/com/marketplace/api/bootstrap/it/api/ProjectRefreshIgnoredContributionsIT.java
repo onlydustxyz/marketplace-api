@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.api.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;

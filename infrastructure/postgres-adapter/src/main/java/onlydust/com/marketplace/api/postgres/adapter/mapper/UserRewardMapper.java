@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.UserRewardTotalAmountsView;
-import onlydust.com.marketplace.api.domain.view.UserRewardView;
-import onlydust.com.marketplace.api.domain.view.UserTotalRewardView;
+import onlydust.com.marketplace.project.domain.view.UserRewardTotalAmountsView;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
+import onlydust.com.marketplace.project.domain.view.UserTotalRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 

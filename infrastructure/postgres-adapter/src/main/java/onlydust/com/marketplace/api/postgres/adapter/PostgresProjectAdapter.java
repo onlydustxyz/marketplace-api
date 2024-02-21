@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.api.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
@@ -20,6 +21,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

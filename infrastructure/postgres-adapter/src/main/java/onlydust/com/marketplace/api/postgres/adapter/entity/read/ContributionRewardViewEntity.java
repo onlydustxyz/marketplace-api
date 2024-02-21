@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.view.ContributionRewardView;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import org.hibernate.annotations.Type;

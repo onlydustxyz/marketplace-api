@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

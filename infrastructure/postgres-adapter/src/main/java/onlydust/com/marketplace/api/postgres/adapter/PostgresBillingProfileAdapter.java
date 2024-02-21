@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.output.BillingProfileStoragePort;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import org.springframework.transaction.annotation.Transactional;

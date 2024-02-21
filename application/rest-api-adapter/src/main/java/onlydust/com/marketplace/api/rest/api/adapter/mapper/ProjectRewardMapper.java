@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.api.domain.view.ProjectRewardsPageView;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
+import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import java.util.Objects;
@@ -12,7 +12,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudget
 
 public interface ProjectRewardMapper {
 
-    public static Money mapMoney(onlydust.com.marketplace.api.domain.view.Money money) {
+    public static Money mapMoney(onlydust.com.marketplace.project.domain.view.Money money) {
         return new Money().amount(money.getAmount())
                 .currency(nonNull(money.getCurrency()) ? mapCurrency(money.getCurrency()) : null)
                 .usdEquivalent(money.getUsdEquivalent());

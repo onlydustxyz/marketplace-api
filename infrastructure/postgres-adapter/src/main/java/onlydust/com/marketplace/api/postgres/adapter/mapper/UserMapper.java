@@ -1,9 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectLeaderLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectLedView;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdViewEntity;

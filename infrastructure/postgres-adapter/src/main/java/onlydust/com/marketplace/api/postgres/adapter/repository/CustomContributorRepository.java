@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectContributorViewEntity;

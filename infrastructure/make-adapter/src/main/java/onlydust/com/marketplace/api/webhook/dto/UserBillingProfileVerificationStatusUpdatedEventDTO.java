@@ -3,8 +3,7 @@ package onlydust.com.marketplace.api.webhook.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.api.domain.model.notification.UserSignedUp;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.BudgetView;
+import onlydust.com.marketplace.project.domain.view.BudgetView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetViewEntity;
 
 public interface BudgetMapper {

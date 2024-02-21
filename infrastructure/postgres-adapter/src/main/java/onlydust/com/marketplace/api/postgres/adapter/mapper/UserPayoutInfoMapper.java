@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.api.domain.model.bank.AccountNumber;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;

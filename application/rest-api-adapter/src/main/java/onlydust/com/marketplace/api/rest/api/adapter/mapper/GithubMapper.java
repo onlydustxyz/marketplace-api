@@ -3,8 +3,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.GithubOrganizationResponse;
 import onlydust.com.marketplace.api.contract.model.GithubRepoResponse;
 import onlydust.com.marketplace.api.contract.model.InstallationResponse;
-import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
-import onlydust.com.marketplace.api.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubAccount;
 
 import java.net.URI;
 import java.util.Comparator;

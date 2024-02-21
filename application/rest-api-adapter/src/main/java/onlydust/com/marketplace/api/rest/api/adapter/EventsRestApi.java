@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.EventsApi;
 import onlydust.com.marketplace.api.contract.model.OnContributionsChangeEvent;
-import onlydust.com.marketplace.api.domain.port.input.ContributionObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 

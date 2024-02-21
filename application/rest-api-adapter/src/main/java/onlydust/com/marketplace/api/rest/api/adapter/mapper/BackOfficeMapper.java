@@ -4,13 +4,15 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.api.domain.model.Ecosystem;
-import onlydust.com.marketplace.api.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.time.ZoneOffset;
 
@@ -137,7 +139,7 @@ public interface BackOfficeMapper {
         return budgetPage;
     }
 
-    static CurrencyCode mapCurrency(final onlydust.com.marketplace.api.domain.model.Currency currency) {
+    static CurrencyCode mapCurrency(final Currency currency) {
         return switch (currency) {
             case STRK -> CurrencyCode.STRK;
             case USD -> CurrencyCode.USD;
@@ -315,7 +317,7 @@ public interface BackOfficeMapper {
                 .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
     }
 
-    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.api.domain.model.ProjectVisibility visibility) {
+    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.project.domain.model.ProjectVisibility visibility) {
         return switch (visibility) {
             case PUBLIC -> ProjectVisibility.PUBLIC;
             case PRIVATE -> ProjectVisibility.PRIVATE;

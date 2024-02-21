@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.view.*;
-import onlydust.com.marketplace.api.domain.view.UserProfileView.ProfileStats.ContributionStats;
+import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
+import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.NewcomerView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView.ProfileStats.ContributionStats;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 

@@ -1,0 +1,35 @@
+package onlydust.com.marketplace.project.domain.job;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.project.domain.model.notification.Event;
+import onlydust.com.marketplace.project.domain.port.output.OutboxPort;
+
+import java.util.Optional;
+
+@Slf4j
+@AllArgsConstructor
+public class OutboxConsumerJob implements Runnable {
+
+    private final OutboxPort outbox;
+    private final OutboxConsumer consumer;
+
+    @Override
+    public void run() {
+        try {
+            Optional<Event> event;
+            while ((event = outbox.peek()).isPresent()) {
+                consumer.process(event.get());
+                outbox.ack();
+            }
+        } catch (Exception e) {
+            if (e instanceof OutboxSkippingException) {
+                LOGGER.warn("Skipping event", e);
+                outbox.skip(e.getMessage());
+            } else {
+                LOGGER.error("Error while processing event", e);
+                outbox.nack(e.getMessage());
+            }
+        }
+    }
+}

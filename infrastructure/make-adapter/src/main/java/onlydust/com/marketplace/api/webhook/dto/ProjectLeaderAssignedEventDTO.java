@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.notification.ProjectLeaderAssigned;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectLeaderAssigned;
 
 import java.util.Date;
 import java.util.UUID;

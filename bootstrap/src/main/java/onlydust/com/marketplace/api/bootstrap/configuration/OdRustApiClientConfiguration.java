@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.api.domain.port.output.RewardServicePort;
+import onlydust.com.marketplace.project.domain.port.output.RewardServicePort;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiClientAdapter;
 import onlydust.com.marketplace.api.od.rust.api.client.adapter.OdRustApiHttpClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;

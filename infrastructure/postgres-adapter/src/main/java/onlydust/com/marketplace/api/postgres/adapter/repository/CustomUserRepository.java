@@ -5,11 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.model.Contact;
-import onlydust.com.marketplace.api.domain.model.UserAllocatedTimeToContribute;
-import onlydust.com.marketplace.api.domain.view.TotalEarnedPerCurrency;
-import onlydust.com.marketplace.api.domain.view.TotalsEarned;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.project.domain.view.TotalEarnedPerCurrency;
+import onlydust.com.marketplace.project.domain.view.TotalsEarned;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileEntity;
 

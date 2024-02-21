@@ -1,15 +1,13 @@
 package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.BillingProfileType;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.project.domain.model.BillingProfileType;
+import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.UUID;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

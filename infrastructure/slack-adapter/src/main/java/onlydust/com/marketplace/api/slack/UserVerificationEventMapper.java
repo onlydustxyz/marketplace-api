@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.slack;
 
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
-
-import java.util.List;
+import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
 
 import static java.util.Objects.nonNull;
 

@@ -1,26 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import onlydust.com.marketplace.api.domain.view.ContributorActivityView;
-import onlydust.com.marketplace.api.domain.view.NewcomerView;
-import onlydust.com.marketplace.api.domain.view.UserProfileView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ProfileCoverEnumEntity;
+import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
-
-import static java.util.Objects.nonNull;
 
 @EqualsAndHashCode
 @Data

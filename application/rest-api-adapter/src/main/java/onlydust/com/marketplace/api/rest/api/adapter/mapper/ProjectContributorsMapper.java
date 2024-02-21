@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.ContributorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.api.domain.view.ProjectContributorsLinkViewPage;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkViewPage;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 
 import static java.util.Objects.isNull;

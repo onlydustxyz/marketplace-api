@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.UserVerificationFacadePort;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubWebhookSerdes;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.springframework.http.ResponseEntity;

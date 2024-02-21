@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.api.domain.port.input.AccountingUserObserverPort;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.project.domain.port.input.AccountingUserObserverPort;
 
 import java.util.UUID;
 

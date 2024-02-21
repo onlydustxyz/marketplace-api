@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

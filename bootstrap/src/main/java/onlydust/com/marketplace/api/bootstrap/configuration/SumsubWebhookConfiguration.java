@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.api.domain.port.input.UserVerificationFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.UserVerificationFacadePort;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

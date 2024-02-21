@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import liquibase.pro.packaged.V;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.domain.model.UserPayoutSettings;
+import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;

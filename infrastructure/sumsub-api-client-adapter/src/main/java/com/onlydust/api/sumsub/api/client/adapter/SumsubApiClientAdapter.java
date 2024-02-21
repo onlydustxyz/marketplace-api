@@ -6,9 +6,9 @@ import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicants
 import com.onlydust.api.sumsub.api.client.adapter.mapper.SumsubResponseMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.OldCompanyBillingProfile;
-import onlydust.com.marketplace.api.domain.model.OldIndividualBillingProfile;
-import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
+import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
+import onlydust.com.marketplace.project.domain.model.OldIndividualBillingProfile;
+import onlydust.com.marketplace.project.domain.port.output.UserVerificationStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.nio.charset.StandardCharsets;

@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
-import onlydust.com.marketplace.api.domain.view.backoffice.UserView;
+import onlydust.com.marketplace.project.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

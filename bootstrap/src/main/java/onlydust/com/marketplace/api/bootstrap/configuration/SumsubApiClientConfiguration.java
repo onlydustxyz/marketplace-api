@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubHttpClient;
-import onlydust.com.marketplace.api.domain.port.output.UserVerificationStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.UserVerificationStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

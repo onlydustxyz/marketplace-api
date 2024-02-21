@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.model.OldEvent;
+import onlydust.com.marketplace.project.domain.model.OldEvent;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

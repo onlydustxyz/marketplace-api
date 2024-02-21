@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.EcosystemPage;
 import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
-import onlydust.com.marketplace.api.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 

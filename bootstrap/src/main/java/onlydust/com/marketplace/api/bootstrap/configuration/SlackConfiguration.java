@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.port.output.NotificationPort;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;

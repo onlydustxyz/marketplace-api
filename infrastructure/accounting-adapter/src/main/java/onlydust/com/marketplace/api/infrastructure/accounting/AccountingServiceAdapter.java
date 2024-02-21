@@ -7,7 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.api.domain.port.output.AccountingServicePort;
+import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.math.BigDecimal;

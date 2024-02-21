@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.api.domain.model.MoreInfoLink;
-import onlydust.com.marketplace.api.domain.model.Project;
-import onlydust.com.marketplace.api.domain.model.UpdateProjectCommand;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.project.domain.model.MoreInfoLink;
+import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.view.*;
 
 import java.net.URI;
 import java.util.*;
@@ -142,7 +143,7 @@ public interface ProjectMapper {
         return project;
     }
 
-    static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.api.domain.model.ProjectRewardSettings rewardSettings) {
+    static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.project.domain.model.ProjectRewardSettings rewardSettings) {
         final var projectRewardSettings = new ProjectRewardSettings();
         projectRewardSettings.setIgnorePullRequests(rewardSettings.getIgnorePullRequests());
         projectRewardSettings.setIgnoreIssues(rewardSettings.getIgnoreIssues());
@@ -151,12 +152,12 @@ public interface ProjectMapper {
         return projectRewardSettings;
     }
 
-    static onlydust.com.marketplace.api.domain.model.ProjectRewardSettings mapRewardSettingsToDomain(ProjectRewardSettings rewardSettings) {
+    static onlydust.com.marketplace.project.domain.model.ProjectRewardSettings mapRewardSettingsToDomain(ProjectRewardSettings rewardSettings) {
         if (rewardSettings == null) {
             return null;
         }
 
-        return new onlydust.com.marketplace.api.domain.model.ProjectRewardSettings(
+        return new onlydust.com.marketplace.project.domain.model.ProjectRewardSettings(
                 rewardSettings.getIgnorePullRequests(),
                 rewardSettings.getIgnoreIssues(),
                 rewardSettings.getIgnoreCodeReviews(),
@@ -294,7 +295,7 @@ public interface ProjectMapper {
         return user;
     }
 
-    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.api.domain.model.ProjectVisibility visibility) {
+    static ProjectVisibility mapProjectVisibility(onlydust.com.marketplace.project.domain.model.ProjectVisibility visibility) {
         switch (visibility) {
             case PUBLIC -> {
                 return ProjectVisibility.PUBLIC;

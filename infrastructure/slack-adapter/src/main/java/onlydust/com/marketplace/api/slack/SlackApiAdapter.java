@@ -4,8 +4,8 @@ import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.model.notification.BillingProfileUpdated;
-import onlydust.com.marketplace.api.domain.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.model.notification.BillingProfileUpdated;
+import onlydust.com.marketplace.project.domain.port.output.NotificationPort;
 
 import static java.util.Objects.nonNull;
 

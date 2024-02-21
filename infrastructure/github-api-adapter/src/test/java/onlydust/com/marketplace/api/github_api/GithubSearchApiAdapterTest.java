@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.github_api;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.domain.model.GithubAccount;
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.github_api.dto.GithubOrgaSearchResponseDTO;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;

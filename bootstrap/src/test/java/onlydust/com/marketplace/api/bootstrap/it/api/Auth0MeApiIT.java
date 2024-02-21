@@ -6,7 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
-import onlydust.com.marketplace.api.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;

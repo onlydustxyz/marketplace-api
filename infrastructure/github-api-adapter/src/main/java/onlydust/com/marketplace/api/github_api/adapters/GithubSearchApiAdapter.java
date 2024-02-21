@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.github_api.adapters;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.domain.model.GithubAccount;
-import onlydust.com.marketplace.api.domain.model.GithubMembership;
-import onlydust.com.marketplace.api.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
-import onlydust.com.marketplace.api.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.*;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;

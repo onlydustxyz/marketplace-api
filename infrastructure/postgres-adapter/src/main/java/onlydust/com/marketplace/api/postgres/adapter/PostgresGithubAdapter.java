@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.GithubAccount;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.port.output.GithubStoragePort;
+import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
+import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubAccountMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class PostgresGithubAdapter implements GithubStoragePort {

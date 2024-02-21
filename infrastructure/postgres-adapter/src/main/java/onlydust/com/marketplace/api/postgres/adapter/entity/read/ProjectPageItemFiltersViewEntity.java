@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import onlydust.com.marketplace.api.domain.view.EcosystemView;
-import onlydust.com.marketplace.api.domain.view.ProjectCardView;
+import onlydust.com.marketplace.project.domain.view.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

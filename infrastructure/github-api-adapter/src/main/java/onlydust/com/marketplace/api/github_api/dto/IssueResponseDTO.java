@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.domain.view.RewardItemStatus;
-import onlydust.com.marketplace.api.domain.view.RewardableItemView;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.RewardItemStatus;
+import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 
 import java.util.Date;
 

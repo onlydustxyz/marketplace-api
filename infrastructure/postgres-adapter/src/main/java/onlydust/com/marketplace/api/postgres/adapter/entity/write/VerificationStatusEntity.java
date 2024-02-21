@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import onlydust.com.marketplace.api.domain.model.VerificationStatus;
+import onlydust.com.marketplace.project.domain.model.VerificationStatus;
 
 public enum VerificationStatusEntity {
     NOT_STARTED,

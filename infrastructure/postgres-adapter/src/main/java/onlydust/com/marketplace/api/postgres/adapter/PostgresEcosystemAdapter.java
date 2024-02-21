@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Ecosystem;
-import onlydust.com.marketplace.api.domain.port.output.EcosystemStorage;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.port.output.EcosystemStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;

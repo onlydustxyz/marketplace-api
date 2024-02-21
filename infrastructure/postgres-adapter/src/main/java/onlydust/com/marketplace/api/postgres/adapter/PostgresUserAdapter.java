@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.model.Currency;
-import onlydust.com.marketplace.api.domain.model.*;
-import onlydust.com.marketplace.api.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.api.domain.view.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -21,6 +22,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;

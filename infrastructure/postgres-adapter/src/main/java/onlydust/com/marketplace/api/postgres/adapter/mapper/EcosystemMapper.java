@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.view.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.EcosystemView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 
 public interface EcosystemMapper {

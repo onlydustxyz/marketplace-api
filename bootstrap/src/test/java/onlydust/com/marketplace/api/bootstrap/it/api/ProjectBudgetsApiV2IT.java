@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.api.domain.service.RewardV2Service;
+import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;

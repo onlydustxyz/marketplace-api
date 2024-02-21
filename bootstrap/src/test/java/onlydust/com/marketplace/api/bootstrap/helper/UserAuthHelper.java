@@ -4,8 +4,8 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.domain.model.UserRole;
-import onlydust.com.marketplace.api.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.model.UserRole;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 

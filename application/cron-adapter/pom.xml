@@ -23,7 +23,7 @@
     <dependencies>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>domain</artifactId>
+            <artifactId>project-domain</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

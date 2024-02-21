@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
-import onlydust.com.marketplace.api.domain.model.ContributionType;
-import onlydust.com.marketplace.api.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.api.domain.view.RewardableItemView;
+import onlydust.com.marketplace.project.domain.model.ContributionType;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardableItemViewEntity;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper.githubStatusToDomain;

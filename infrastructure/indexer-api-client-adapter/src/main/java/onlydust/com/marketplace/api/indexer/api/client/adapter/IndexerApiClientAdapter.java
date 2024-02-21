@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.indexer.api.client.adapter;
 
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.port.output.IndexerPort;
+import onlydust.com.marketplace.project.domain.port.output.IndexerPort;
 
 import java.util.List;
 import java.util.Set;

@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
-import onlydust.com.marketplace.api.domain.model.GithubRepo;
-import onlydust.com.marketplace.api.domain.view.ShortRepoView;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
+import onlydust.com.marketplace.project.domain.view.ShortRepoView;
 
 public interface GithubRepoMapper {
     static ShortGithubRepoResponse mapRepoToShortResponse(GithubRepo githubRepo) {

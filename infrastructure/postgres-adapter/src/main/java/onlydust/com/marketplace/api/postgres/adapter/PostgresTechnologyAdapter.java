@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.domain.port.input.TechnologyStoragePort;
+import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.TechnologyViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.TechnologyViewEntityRepository;
 
