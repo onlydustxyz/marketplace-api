@@ -239,6 +239,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
                 rewards.get(0).baseCurrency(),
                 new URL("https://s3.storage.com/invoice.pdf"),
+                null,
                 new InvoiceEntity.Data(
                         ZonedDateTime.now().plusDays(9),
                         BigDecimal.ZERO,
