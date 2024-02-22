@@ -6097,6 +6097,7 @@ components:
         - dueAt
         - destinationAccounts
         - billingProfileType
+        - usdToEurConversionRate
       properties:
         id:
           type: string
@@ -6160,6 +6161,9 @@ components:
           $ref: '#/components/schemas/NewMoney'
         totalAfterTax:
           $ref: '#/components/schemas/NewMoney'
+        usdToEurConversionRate:
+          type: number
+          description: The conversion rate from USD to EUR
 
     NewMoney: # TODO: rename when legacy 'Money' type is removed
       type: object

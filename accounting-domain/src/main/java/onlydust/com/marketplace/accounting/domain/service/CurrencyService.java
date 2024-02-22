@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
@@ -11,9 +12,11 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -124,6 +127,18 @@ public class CurrencyService implements CurrencyFacadePort {
     @Override
     public Collection<Currency> listCurrencies() {
         return currencyStorage.all().stream().sorted(Comparator.comparing(c -> c.code().toString())).toList();
+    }
+
+    @Override
+    public BigDecimal latestQuote(Currency.Code fromCode, Currency.Code toCode) {
+        final var from = currencyStorage.findByCode(fromCode).orElseThrow(() -> notFound("Currency %s not found".formatted(fromCode)));
+        final var to = currencyStorage.findByCode(toCode).orElseThrow(() -> notFound("Currency %s not found".formatted(toCode)));
+
+        return quoteStorage.nearest(from.id(), to.id(), ZonedDateTime.now())
+                .stream()
+                .findFirst()
+                .map(Quote::price)
+                .orElseThrow(() -> notFound("Could not find quote from %s to %s".formatted(from, to)));
     }
 
     private void saveQuotes(Set<Currency> currencies) {

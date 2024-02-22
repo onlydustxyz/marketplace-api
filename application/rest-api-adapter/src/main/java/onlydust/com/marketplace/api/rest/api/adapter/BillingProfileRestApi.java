@@ -3,13 +3,11 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
@@ -39,6 +37,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class BillingProfileRestApi implements BillingProfilesApi {
     private final AuthenticationService authenticationService;
     private final BillingProfileFacadePort billingProfileFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
 
     @Override
     public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId,
@@ -60,7 +59,8 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 BillingProfile.Id.of(billingProfileId),
                 rewardIds.stream().map(RewardId::of).toList());
 
-        return ok(map(preview));
+        final var usdToEurConversionRate = currencyFacadePort.latestQuote(Currency.Code.USD, Currency.Code.EUR);
+        return ok(map(preview).usdToEurConversionRate(usdToEurConversionRate));
     }
 
     @Override

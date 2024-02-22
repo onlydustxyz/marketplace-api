@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
@@ -64,8 +65,9 @@ public class RestApiConfiguration {
 
     @Bean
     BillingProfileRestApi billingProfileRestApi(final AuthenticationService authenticationService,
-                                                final BillingProfileFacadePort billingProfileFacadePort) {
-        return new BillingProfileRestApi(authenticationService, billingProfileFacadePort);
+                                                final BillingProfileFacadePort billingProfileFacadePort,
+                                                final CurrencyFacadePort currencyFacadePort) {
+        return new BillingProfileRestApi(authenticationService, billingProfileFacadePort, currencyFacadePort);
     }
 
     @Bean

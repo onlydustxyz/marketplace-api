@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
@@ -24,4 +25,6 @@ public interface CurrencyFacadePort {
     URL uploadLogo(InputStream imageInputStream);
 
     Collection<Currency> listCurrencies();
+
+    BigDecimal latestQuote(Currency.Code usd, Currency.Code eur);
 }

@@ -151,6 +151,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                              }
                            }
                          ],
+                         "usdToEurConversionRate": 0.92,
                          "totalBeforeTax": {
                            "amount": 1781980.00,
                            "currency": "USD"
@@ -317,6 +318,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               }
                             }
                           ],
+                          "usdToEurConversionRate": 0.92,
                           "totalBeforeTax": {
                             "amount": 2020.00,
                             "currency": "USD"

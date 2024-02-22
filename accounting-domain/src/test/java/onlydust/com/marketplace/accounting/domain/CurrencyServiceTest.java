@@ -463,4 +463,63 @@ public class CurrencyServiceTest {
         // Then
         assertThat(url.toString()).isEqualTo(imageUrl);
     }
+
+    @SneakyThrows
+    @Test
+    void should_fail_to_get_quote_if_from_currency_not_found() {
+        // Given
+        when(currencyStorage.findByCode(Currencies.USD.code())).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> currencyService.latestQuote(Currency.Code.USD, Currency.Code.EUR))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency USD not found");
+    }
+
+    @SneakyThrows
+    @Test
+    void should_fail_to_get_quote_if_to_currency_not_found() {
+        // Given
+        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        when(currencyStorage.findByCode(Currency.Code.EUR)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> currencyService.latestQuote(Currency.Code.USD, Currency.Code.EUR))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Currency EUR not found");
+    }
+
+    @SneakyThrows
+    @Test
+    void should_fail_to_get_quote_if_quote_not_found() {
+        // Given
+        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        when(currencyStorage.findByCode(Currency.Code.EUR)).thenReturn(Optional.of(Currencies.EUR));
+        when(quoteStorage.nearest(eq(Currencies.USD.id()), eq(Currencies.EUR.id()), any())).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> currencyService.latestQuote(Currency.Code.USD, Currency.Code.EUR))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Could not find quote from USD to EUR");
+    }
+
+
+    @SneakyThrows
+    @Test
+    void should_get_latest_quote() {
+        // Given
+        when(currencyStorage.findByCode(Currency.Code.USD)).thenReturn(Optional.of(Currencies.USD));
+        when(currencyStorage.findByCode(Currency.Code.EUR)).thenReturn(Optional.of(Currencies.EUR));
+        when(quoteStorage.nearest(eq(Currencies.USD.id()), eq(Currencies.EUR.id()), any()))
+                .thenReturn(Optional.of(new Quote(Currencies.USD.id(), Currencies.EUR.id(), BigDecimal.valueOf(0.85), TIMESTAMP)));
+
+        // When
+        final var conversionRate = currencyService.latestQuote(Currency.Code.USD, Currency.Code.EUR);
+
+        // Then
+        assertThat(conversionRate).isEqualTo(BigDecimal.valueOf(0.85));
+    }
 }

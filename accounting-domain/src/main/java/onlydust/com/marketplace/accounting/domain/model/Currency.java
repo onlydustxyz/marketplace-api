@@ -136,8 +136,8 @@ public class Currency implements Cloneable {
 
     private Network nativeNetwork() {
         return switch (code.toString()) {
-            case Code.ETH -> Network.ETHEREUM;
-            case Code.APT -> Network.APTOS;
+            case Code.ETH_STR -> Network.ETHEREUM;
+            case Code.APT_STR -> Network.APTOS;
             default -> null;
         };
     }
@@ -166,11 +166,13 @@ public class Currency implements Cloneable {
     @EqualsAndHashCode
     @AllArgsConstructor(staticName = "of")
     public static class Code {
-        public final static String USD = "USD";
-        public final static String ETH = "ETH";
-        public final static String APT = "APT";
-        public final static String STRK = "STRK";
-        public final static String OP = "OP";
+        public final static String EUR_STR = "EUR";
+        public final static String USD_STR = "USD";
+        public final static String ETH_STR = "ETH";
+        public final static String APT_STR = "APT";
+
+        public final static Code EUR = Code.of(EUR_STR);
+        public final static Code USD = Code.of(USD_STR);
 
         String inner;
 
