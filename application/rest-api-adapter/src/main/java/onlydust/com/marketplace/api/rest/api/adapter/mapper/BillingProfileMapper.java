@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -259,5 +260,15 @@ public interface BillingProfileMapper {
                         })).collect(Collectors.toList()));
         return myBillingProfilesResponse;
 
+    }
+
+    static BillingProfileResponse billingProfileViewToResponse(BillingProfileView billingProfileView) {
+        final BillingProfileResponse billingProfileResponse = new BillingProfileResponse();
+        billingProfileResponse.setId(billingProfileView.getId().value());
+        billingProfileResponse.setName(billingProfileView.getName());
+        billingProfileResponse.setType(map(billingProfileView.getType()));
+        billingProfileResponse.setKyb(isNull(billingProfileView.getKyb()) ? null : kybToResponse(billingProfileView.getKyb()));
+        billingProfileResponse.setKyc(isNull(billingProfileView.getKyc()) ? null : kycToResponse(billingProfileView.getKyc()));
+        return billingProfileResponse;
     }
 }

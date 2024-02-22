@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -118,5 +119,59 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
                         .map(entity -> entity.toDomain(globalSettingsRepository.get().getInvoiceMandateLatestVersionDate()))
                         .map(OldIndividualBillingProfile::isInvoiceMandateAccepted)
                         .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId))));
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId) {
+        return billingProfileRepository.findBillingProfilesForUserId(userId.value()).stream()
+                .anyMatch(billingProfileEntity -> billingProfileEntity.getId().equals(billingProfileId.value()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
+        return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
+            case INDIVIDUAL -> {
+                BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.INDIVIDUAL)
+                        .id(billingProfileId)
+                        .name(billingProfileEntity.getName())
+                        .build();
+                final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
+                if (optionalKycEntity.isPresent()) {
+                    billingProfileView = billingProfileView.toBuilder()
+                            .kyc(optionalKycEntity.get().toDomain())
+                            .build();
+                }
+                yield billingProfileView;
+            }
+            case COMPANY -> {
+                BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.COMPANY)
+                        .id(billingProfileId)
+                        .name(billingProfileEntity.getName())
+                        .build();
+                final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
+                if (optionalKybEntity.isPresent()) {
+                    billingProfileView = billingProfileView.toBuilder()
+                            .kyb(optionalKybEntity.get().toDomain())
+                            .build();
+                }
+                yield billingProfileView;
+            }
+            case SELF_EMPLOYED -> {
+                BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.SELF_EMPLOYED)
+                        .id(billingProfileId)
+                        .name(billingProfileEntity.getName())
+                        .build();
+                final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
+                if (optionalKybEntity.isPresent()) {
+                    billingProfileView = billingProfileView.toBuilder()
+                            .kyb(optionalKybEntity.get().toDomain())
+                            .build();
+                }
+                yield billingProfileView;
+            }
+        });
     }
 }

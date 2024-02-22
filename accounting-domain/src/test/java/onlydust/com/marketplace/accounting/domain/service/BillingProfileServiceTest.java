@@ -3,16 +3,18 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -25,13 +27,12 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -598,4 +599,65 @@ class BillingProfileServiceTest {
     }
 
 
+    @Test
+    void should_unauthorized_to_get_billing_profile_given_a_user_not_member_of_it() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdNotMember = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
+        Exception exception = null;
+        try {
+            billingProfileService.getBillingProfile(billingProfileId, userIdNotMember);
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(401, ((OnlyDustException) exception).getStatus());
+        assertEquals("User %s is not a member of billing profile %s".formatted(userIdNotMember.value(), billingProfileId.value()),
+                exception.getMessage());
+    }
+
+    @Test
+    void should_get_billing_profile_given_a_user_member_of_it() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdMember = UserId.of(UUID.randomUUID());
+        final BillingProfileView billingProfileView = BillingProfileView.builder().build();
+
+        // When
+        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
+        when(billingProfileStorage.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember);
+
+        // Then
+        verify(billingProfileStorage).findById(billingProfileId);
+        assertEquals(billingProfileView, billingProfile);
+    }
+
+    @Test
+    void should_get_billing_profile_by_id_throw_not_found_given_a_user_member_of_it() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdNotMember = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
+        when(billingProfileStorage.findById(billingProfileId)).thenReturn(Optional.empty());
+        Exception exception = null;
+        try {
+            billingProfileService.getBillingProfile(billingProfileId, userIdNotMember);
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(404, ((OnlyDustException) exception).getStatus());
+        assertEquals("Billing profile %s not found".formatted(billingProfileId.value()),
+                exception.getMessage());
+    }
 }

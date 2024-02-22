@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -34,10 +34,13 @@ public interface BillingProfileFacadePort {
     void uploadExternalInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                                final String fileName, final @NonNull InputStream inputStream);
 
-    @NonNull InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
-                                             final @NonNull Invoice.Id invoiceId);
+    @NonNull
+    InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
+                                    final @NonNull Invoice.Id invoiceId);
 
     void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId);
 
     List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId);
+
+    BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
 }

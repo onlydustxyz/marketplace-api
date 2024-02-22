@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 
 import java.time.ZonedDateTime;
@@ -30,4 +31,8 @@ public interface BillingProfileStorage {
     Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
 
     List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId);
+
+    boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
+
+    Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId);
 }
