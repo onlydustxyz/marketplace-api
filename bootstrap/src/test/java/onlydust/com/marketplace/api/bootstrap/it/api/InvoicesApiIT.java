@@ -3,10 +3,13 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     IndividualBillingProfileRepository individualBillingProfileRepository;
     @Autowired
     GlobalSettingsRepository globalSettingsRepository;
+    @Autowired
+    InvoiceRepository invoiceRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
@@ -150,7 +155,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                            "amount": 1781980.00,
                            "currency": "USD"
                          }
-
                         }
                         """
                 );
@@ -595,5 +599,196 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .consumeWith(System.out::println)
         ;
+    }
+
+    @Test
+    @Order(101)
+    void should_order_invoices_by_date() {
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "CREATED_AT",
+                            "direction", "ASC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(0).getCreatedAt()).isBefore(invoices.get(1).getCreatedAt());
+        }
+
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "CREATED_AT",
+                            "direction", "DESC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+            ;
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(1).getCreatedAt()).isBefore(invoices.get(0).getCreatedAt());
+        }
+    }
+
+    @Test
+    @Order(101)
+    void should_order_invoices_by_number() {
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "INVOICE_NUMBER",
+                            "direction", "ASC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(0).getNumber().compareTo(invoices.get(1).getNumber())).isLessThan(0);
+        }
+
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "INVOICE_NUMBER",
+                            "direction", "DESC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+            ;
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(1).getNumber().compareTo(invoices.get(0).getNumber())).isLessThan(0);
+        }
+    }
+
+    @Test
+    @Order(102)
+    void should_order_invoices_by_amount() {
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "AMOUNT",
+                            "direction", "ASC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(0).getTotalAfterTax().getAmount()).isLessThan(invoices.get(1).getTotalAfterTax().getAmount());
+        }
+
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "AMOUNT",
+                            "direction", "DESC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+            ;
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(1).getTotalAfterTax().getAmount()).isLessThan(invoices.get(0).getTotalAfterTax().getAmount());
+        }
+    }
+
+    @Test
+    @Order(103)
+    void should_order_invoices_by_status() {
+        final var invoice = invoiceRepository.findAll().stream().findFirst().orElseThrow();
+        invoiceRepository.save(invoice.status(InvoiceEntity.Status.APPROVED));
+
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "STATUS",
+                            "direction", "ASC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(0).getStatus()).isLessThan(invoices.get(1).getStatus());
+        }
+
+        {
+            // When
+            final var invoices = client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICES.formatted(billingProfileId), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "10",
+                            "sort", "STATUS",
+                            "direction", "DESC"
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BillingProfileInvoicesPageResponse.class)
+                    .returnResult().getResponseBody().getInvoices();
+            ;
+
+            assertThat(invoices).hasSize(2);
+            assertThat(invoices.get(1).getStatus()).isLessThan(invoices.get(0).getStatus());
+        }
     }
 }

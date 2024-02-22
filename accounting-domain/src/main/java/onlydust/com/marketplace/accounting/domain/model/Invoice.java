@@ -24,7 +24,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Invoice {
-    public static final int DUE_DAY_COUNT_AFTER_CREATION = 30;
+    public static final int DUE_DAY_COUNT_AFTER_CREATION = 10;
 
     private final @NonNull Id id;
     private final @NonNull BillingProfile.Id billingProfileId;
@@ -175,5 +175,9 @@ public class Invoice {
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
                          @NonNull Money amount, @NonNull Money base, Invoice.Id invoiceId) {
+    }
+
+    public enum Sort {
+        NUMBER, CREATED_AT, AMOUNT, STATUS
     }
 }

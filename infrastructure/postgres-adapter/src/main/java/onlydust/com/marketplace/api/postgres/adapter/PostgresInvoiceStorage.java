@@ -20,7 +20,9 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.BankAccountR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.WalletRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -94,9 +96,10 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     }
 
     @Override
-    public Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize) {
+    public Page<Invoice> invoicesOf(final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber, final @NonNull Integer pageSize,
+                                    final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
         final var page = invoiceRepository.findAllByBillingProfileIdAndStatusNot(billingProfileId.value(), InvoiceEntity.Status.DRAFT,
-                PageRequest.of(pageNumber, pageSize));
+                PageRequest.of(pageNumber, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC)));
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
@@ -111,13 +114,24 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
     @Override
     public Page<Invoice> findAllExceptDrafts(final @NonNull List<Invoice.Id> invoiceIds, Integer pageIndex, Integer pageSize) {
-        final var page = invoiceRepository.findAllByIdInAndStatusNot(invoiceIds.stream().map(Invoice.Id::value).toList(),
-                InvoiceEntity.Status.DRAFT,
-                PageRequest.of(pageIndex, pageSize));
+        final var pageRequest = PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        final var page = invoiceIds.isEmpty() ? invoiceRepository.findAllByStatusNot(InvoiceEntity.Status.DRAFT, pageRequest) :
+                invoiceRepository.findAllByIdInAndStatusNot(invoiceIds.stream().map(Invoice.Id::value).toList(), InvoiceEntity.Status.DRAFT, pageRequest);
+        
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    private Sort sortBy(Invoice.Sort sort, Sort.Direction direction) {
+        return switch (sort) {
+            case CREATED_AT -> Sort.by(direction, "createdAt");
+            case AMOUNT -> Sort.by(direction, "amount");
+            case NUMBER -> Sort.by(direction, "number");
+            case STATUS -> Sort.by(direction, "status");
+        };
     }
 }
