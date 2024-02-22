@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
@@ -37,6 +37,9 @@ public class RewardEntity {
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull List<RewardItemEntity> rewardItems;
+
+    @ManyToOne
+    InvoiceEntity invoice;
 
     public static RewardEntity of(Reward reward) {
         return RewardEntity.builder()

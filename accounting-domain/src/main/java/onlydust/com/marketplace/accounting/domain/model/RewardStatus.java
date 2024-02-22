@@ -49,4 +49,8 @@ public class RewardStatus {
     public Optional<BigDecimal> amountUsdEquivalent() {
         return Optional.ofNullable(amountUsdEquivalent);
     }
+
+    public boolean isPaid() {
+        return paidAt != null;
+    }
 }

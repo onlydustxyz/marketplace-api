@@ -4,7 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 
-public interface AccountingObserver {
+public interface AccountingObserverPort {
     void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount);
 
     void onSponsorAccountUpdated(SponsorAccountStatement sponsorAccount);

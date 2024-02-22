@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.PaymentRe
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectAccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
@@ -34,7 +34,7 @@ public class AccountingServiceTest {
     final AccountBookEventStorageStub accountBookEventStorage = new AccountBookEventStorageStub();
     final SponsorAccountStorageStub sponsorAccountStorage = new SponsorAccountStorageStub();
     final CurrencyStorage currencyStorage = mock(CurrencyStorage.class);
-    final AccountingObserver accountingObserver = mock(AccountingObserver.class);
+    final AccountingObserverPort accountingObserver = mock(AccountingObserverPort.class);
     final ProjectAccountingObserver projectAccountingObserver = mock(ProjectAccountingObserver.class);
     final AccountingService accountingService = new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver,
             projectAccountingObserver);

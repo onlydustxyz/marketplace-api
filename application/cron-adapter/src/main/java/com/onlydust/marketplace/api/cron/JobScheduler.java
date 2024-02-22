@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
-import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
+import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
@@ -27,7 +27,7 @@ public class JobScheduler {
     private final UserFacadePort userFacadePort;
     private final Properties cronProperties;
     private final OutboxConsumerJob billingProfileOutboxJob;
-    private final RewardStatusService rewardStatusService;
+    private final AccountingObserver accountingObserver;
 
     @Scheduled(fixedDelayString = "${application.cron.notification-job-delay}")
     public void processPendingNotifications() {
@@ -80,7 +80,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.refresh-reward-usd-equivalents-job-delay}")
     public void refreshRewardUsdEquivalents() {
         LOGGER.info("Refreshing reward USD equivalents");
-        rewardStatusService.refreshRewardsUsdEquivalents();
+        accountingObserver.refreshRewardsUsdEquivalents();
     }
 
     @Data

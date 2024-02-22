@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatus;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -17,11 +14,12 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class RewardStatusService implements AccountingObserver, RewardStatusFacadePort {
+public class AccountingObserver implements AccountingObserverPort, RewardStatusFacadePort {
     private final RewardStatusStorage rewardStatusStorage;
     private final RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     private final QuoteStorage quoteStorage;
     private final CurrencyStorage currencyStorage;
+    private final InvoiceStoragePort invoiceStorage;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -57,6 +55,13 @@ public class RewardStatusService implements AccountingObserver, RewardStatusFaca
         final var rewardStatus = rewardStatusStorage.get(rewardId)
                 .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
         rewardStatusStorage.save(rewardStatus.paidAt(ZonedDateTime.now()));
+
+        invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
+            if (invoice.rewards().stream().allMatch(reward -> rewardStatusStorage.get(reward.id()).map(RewardStatus::isPaid)
+                    .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId))))) {
+                invoiceStorage.save(invoice.status(Invoice.Status.PAID));
+            }
+        });
     }
 
     public void updateUsdEquivalent(RewardId rewardId) {

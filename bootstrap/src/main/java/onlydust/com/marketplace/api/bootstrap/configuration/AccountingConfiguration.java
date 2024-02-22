@@ -7,10 +7,10 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.InvoiceService;
-import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
@@ -22,10 +22,10 @@ public class AccountingConfiguration {
     public AccountingFacadePort accountingFacadePort(final @NonNull AccountBookEventStorage accountBookEventStorage,
                                                      final @NonNull SponsorAccountStorage sponsorAccountStorage,
                                                      final @NonNull CurrencyStorage currencyStorage,
-                                                     final @NonNull RewardStatusService rewardStatusService,
+                                                     final @NonNull AccountingObserver accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver
     ) {
-        return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, rewardStatusService, projectAccountingObserver);
+        return new AccountingService(accountBookEventStorage, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver);
     }
 
     @Bean
@@ -37,11 +37,12 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public RewardStatusService rewardStatusService(final @NonNull RewardStatusStorage rewardStatusStorage,
-                                                   final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
-                                                   final @NonNull QuoteStorage quoteStorage,
-                                                   final @NonNull CurrencyStorage currencyStorage) {
-        return new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
+    public AccountingObserver accountingObserver(final @NonNull RewardStatusStorage rewardStatusStorage,
+                                                 final @NonNull RewardUsdEquivalentStorage rewardUsdEquivalentStorage,
+                                                 final @NonNull QuoteStorage quoteStorage,
+                                                 final @NonNull CurrencyStorage currencyStorage,
+                                                 final @NonNull InvoiceStoragePort invoiceStorage) {
+        return new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage);
     }
 
     @Bean

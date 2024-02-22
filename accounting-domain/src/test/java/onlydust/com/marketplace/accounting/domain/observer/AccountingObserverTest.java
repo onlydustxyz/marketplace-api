@@ -4,13 +4,10 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
-import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
+import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,20 +22,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
+import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class RewardStatusServiceTest {
+public class AccountingObserverTest {
     private RewardStatusStorage rewardStatusStorage;
+    private InvoiceStoragePort invoiceStorage;
     private AccountBookFacade accountBookFacade;
     RewardUsdEquivalentStorage rewardUsdEquivalentStorage;
     QuoteStorage quoteStorage;
     CurrencyStorage currencyStorage;
-    RewardStatusService rewardStatusService;
+    AccountingObserver accountingObserver;
     final Faker faker = new Faker();
-    final Currency currency = Currencies.ETH;
-    final Currency usd = Currencies.USD;
+    final Currency currency = ETH;
+    final Currency usd = USD;
     final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
     final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
     final ZonedDateTime equivalenceSealingDate = ZonedDateTime.now().minusDays(1);
@@ -51,7 +51,8 @@ public class RewardStatusServiceTest {
         rewardUsdEquivalentStorage = mock(RewardUsdEquivalentStorage.class);
         quoteStorage = mock(QuoteStorage.class);
         currencyStorage = mock(CurrencyStorage.class);
-        rewardStatusService = new RewardStatusService(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage);
+        invoiceStorage = mock(InvoiceStoragePort.class);
+        accountingObserver = new AccountingObserver(rewardStatusStorage, rewardUsdEquivalentStorage, quoteStorage, currencyStorage, invoiceStorage);
         when(currencyStorage.findByCode(usd.code())).thenReturn(Optional.of(usd));
 
         when(rewardStatusStorage.get(any(RewardId.class))).then(invocation -> {
@@ -102,7 +103,7 @@ public class RewardStatusServiceTest {
             when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus));
 
             // When
-            rewardStatusService.onRewardCreated(rewardId, accountBookFacade);
+            accountingObserver.onRewardCreated(rewardId, accountBookFacade);
 
             // Then
             verify(rewardStatusStorage, times(2)).save(any());
@@ -117,10 +118,83 @@ public class RewardStatusServiceTest {
         @Test
         public void should_delete_status() {
             // When
-            rewardStatusService.onRewardCancelled(rewardId);
+            accountingObserver.onRewardCancelled(rewardId);
 
             // Then
             verify(rewardStatusStorage).delete(rewardId);
+        }
+    }
+
+    @Nested
+    class OnRewardPaid {
+        RewardId rewardId = RewardId.random();
+
+        @Test
+        public void should_update_reward_and_invoice_status() {
+            // Given
+            final var rewardStatus = new RewardStatus(rewardId)
+                    .sponsorHasEnoughFund(true)
+                    .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
+                    .invoiceReceivedAt(null)
+                    .paidAt(null)
+                    .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
+
+            final var rewardId2 = RewardId.random();
+            final var rewardStatus2 = new RewardStatus(rewardId2)
+                    .sponsorHasEnoughFund(true)
+                    .unlockDate(ZonedDateTime.now().toInstant().atZone(ZoneOffset.UTC))
+                    .invoiceReceivedAt(null)
+                    .paidAt(null)
+                    .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
+
+            Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
+                    new Invoice.CompanyInfo("0123456789", "OnlyDust", "123 Main St", false, false, false, null));
+            invoice = invoice.rewards(List.of(
+                    new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id()),
+                    new Invoice.Reward(rewardId2, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
+                            Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id())
+            ));
+
+            // When
+            reset(rewardStatusStorage, invoiceStorage);
+            when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus.paidAt(ZonedDateTime.now())));
+            when(rewardStatusStorage.get(rewardId2)).thenReturn(Optional.of(rewardStatus2));
+            when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
+            when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
+
+            accountingObserver.onRewardPaid(rewardId);
+
+            // Then
+            {
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
+                final var newRewardStatus = rewardStatusCaptor.getValue();
+                assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId);
+                assertThat(newRewardStatus.paidAt()).isNotNull();
+
+                verify(invoiceStorage, never()).save(invoice.status(Invoice.Status.PAID));
+            }
+
+            // When
+            reset(rewardStatusStorage, invoiceStorage);
+            when(rewardStatusStorage.get(rewardId)).thenReturn(Optional.of(rewardStatus.paidAt(ZonedDateTime.now())));
+            when(rewardStatusStorage.get(rewardId2)).thenReturn(Optional.of(rewardStatus2.paidAt(ZonedDateTime.now())));
+            when(invoiceStorage.invoiceOf(rewardId)).thenReturn(Optional.of(invoice));
+            when(invoiceStorage.invoiceOf(rewardId2)).thenReturn(Optional.of(invoice));
+
+            accountingObserver.onRewardPaid(rewardId2);
+
+            // Then
+            {
+                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
+                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
+                final var newRewardStatus = rewardStatusCaptor.getValue();
+                assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId2);
+                assertThat(newRewardStatus.paidAt()).isNotNull();
+
+                verify(invoiceStorage).save(invoice.status(Invoice.Status.PAID));
+            }
         }
     }
 
@@ -158,7 +232,7 @@ public class RewardStatusServiceTest {
             });
 
             // When
-            rewardStatusService.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+            accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
@@ -209,7 +283,7 @@ public class RewardStatusServiceTest {
             });
 
             // When
-            rewardStatusService.onSponsorAccountBalanceChanged(sponsorAccountStatement);
+            accountingObserver.onSponsorAccountBalanceChanged(sponsorAccountStatement);
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
@@ -238,7 +312,7 @@ public class RewardStatusServiceTest {
 
             @Test
             void should_fail_if_reward_does_not_exist() {
-                assertThatThrownBy(() -> rewardStatusService.updateUsdEquivalent(rewardId))
+                assertThatThrownBy(() -> accountingObserver.updateUsdEquivalent(rewardId))
                         .isInstanceOf(OnlyDustException.class)
                         .hasMessage("RewardStatus not found for reward %s".formatted(rewardId));
             }
@@ -263,7 +337,7 @@ public class RewardStatusServiceTest {
                 when(rewardUsdEquivalent.equivalenceSealingDate()).thenReturn(Optional.empty());
 
                 // When
-                rewardStatusService.updateUsdEquivalent(rewardId);
+                accountingObserver.updateUsdEquivalent(rewardId);
 
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
@@ -282,7 +356,7 @@ public class RewardStatusServiceTest {
                         .thenReturn(Optional.of(new Quote(currency.id(), usd.id(), price, equivalenceSealingDate.minusSeconds(30).toInstant())));
 
                 // When
-                rewardStatusService.updateUsdEquivalent(rewardId);
+                accountingObserver.updateUsdEquivalent(rewardId);
 
                 // Then
                 final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);
@@ -306,7 +380,7 @@ public class RewardStatusServiceTest {
             ));
 
             // When
-            rewardStatusService.refreshRewardsUsdEquivalents();
+            accountingObserver.refreshRewardsUsdEquivalents();
 
             // Then
             final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatus.class);

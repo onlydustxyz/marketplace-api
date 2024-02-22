@@ -12,10 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BankAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.WalletRepository;
@@ -39,6 +36,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
     private final @NonNull PaymentRequestRepository paymentRequestRepository;
+    private final @NonNull RewardRepository rewardRepository;
 
     @Override
     public Invoice preview(BillingProfile.@NonNull Id billingProfileId, @NonNull List<RewardId> rewardIds) {
@@ -78,6 +76,8 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
         final var paymentRequests = paymentRequestRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
         paymentRequests.forEach(pr -> pr.setInvoice(entity));
         paymentRequestRepository.saveAll(paymentRequests);
+
+        //TODO: save invoiceId in rewards
     }
 
     @Override
@@ -118,12 +118,18 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
         final var page = invoiceIds.isEmpty() ? invoiceRepository.findAllByStatusNot(InvoiceEntity.Status.DRAFT, pageRequest) :
                 invoiceRepository.findAllByIdInAndStatusNot(invoiceIds.stream().map(Invoice.Id::value).toList(), InvoiceEntity.Status.DRAFT, pageRequest);
-        
+
         return Page.<Invoice>builder()
                 .content(page.getContent().stream().map(InvoiceEntity::toDomain).toList())
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public Optional<Invoice> invoiceOf(RewardId rewardId) {
+        final var reward = rewardRepository.findById(rewardId.value()).orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+        return Optional.ofNullable(reward.getInvoice()).map(InvoiceEntity::toDomain);
     }
 
     private Sort sortBy(Invoice.Sort sort, Sort.Direction direction) {
