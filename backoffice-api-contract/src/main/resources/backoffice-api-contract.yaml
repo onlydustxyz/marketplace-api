@@ -1842,7 +1842,6 @@ components:
         - status
         - createdAt
         - dueAt
-        - downloadLink
         - amount
         - currency
         - rewardIds
@@ -1857,9 +1856,6 @@ components:
         dueAt:
           type: string
           format: date-time
-        downloadLink:
-          type: string
-          format: uri
         amount:
           type: number
         currencyId:

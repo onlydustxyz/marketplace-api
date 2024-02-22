@@ -4,14 +4,14 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.Ecosystem;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.view.backoffice.*;
 
 import java.time.ZoneOffset;
 
@@ -266,7 +266,6 @@ public interface BackOfficeMapper {
                 .status(mapInvoiceStatus(invoice.status()))
                 .createdAt(invoice.createdAt())
                 .dueAt(invoice.dueAt())
-                .downloadLink(invoice.url().toURI())
                 .amount(invoice.totalAfterTax().getValue())
                 .currencyId(invoice.totalAfterTax().getCurrency().id().value())
                 .rewardIds(invoice.rewards().stream().map(Invoice.Reward::id).map(UuidWrapper::value).toList());
