@@ -78,23 +78,25 @@ public class InvoiceEntity {
     }
 
     public enum Status {
-        DRAFT, PROCESSING, REJECTED, APPROVED;
+        DRAFT, TO_REVIEW, REJECTED, APPROVED, PAID;
 
         public static Status of(Invoice.Status status) {
             return switch (status) {
                 case DRAFT -> DRAFT;
-                case PROCESSING -> PROCESSING;
+                case TO_REVIEW -> TO_REVIEW;
                 case REJECTED -> REJECTED;
                 case APPROVED -> APPROVED;
+                case PAID -> PAID;
             };
         }
 
         public Invoice.Status toDomain() {
             return switch (this) {
                 case DRAFT -> Invoice.Status.DRAFT;
-                case PROCESSING -> Invoice.Status.PROCESSING;
+                case TO_REVIEW -> Invoice.Status.TO_REVIEW;
                 case REJECTED -> Invoice.Status.REJECTED;
                 case APPROVED -> Invoice.Status.APPROVED;
+                case PAID -> Invoice.Status.PAID;
             };
         }
     }

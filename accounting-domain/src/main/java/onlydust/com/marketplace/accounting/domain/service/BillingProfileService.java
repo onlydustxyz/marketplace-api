@@ -100,7 +100,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfileStorage.isMandateAccepted(billingProfileId))
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfileId, invoiceId, null, data);
+        uploadInvoice(userId, billingProfileId, invoiceId, null, Invoice.Status.APPROVED, data);
     }
 
     @Override
@@ -110,11 +110,12 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (billingProfileStorage.isMandateAccepted(billingProfileId))
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfileId, invoiceId, fileName, data);
+        uploadInvoice(userId, billingProfileId, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
     }
 
     @Transactional
     private void uploadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
+                               @NonNull Invoice.Status status,
                                @NonNull InputStream data) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to upload an invoice for this billing profile");
@@ -125,7 +126,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
         invoiceStoragePort.save(invoice
-                .status(Invoice.Status.PROCESSING)
+                .status(status)
                 .url(url)
                 .originalFileName(fileName));
 

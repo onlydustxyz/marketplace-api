@@ -6291,7 +6291,7 @@ components:
         - DRAFT
         - PROCESSING
         - REJECTED
-        - APPROVED
+        - COMPLETE
 
     EcosystemPage:
       type: object

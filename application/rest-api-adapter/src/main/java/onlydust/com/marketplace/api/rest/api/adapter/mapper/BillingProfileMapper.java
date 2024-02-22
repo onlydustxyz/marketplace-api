@@ -203,8 +203,8 @@ public interface BillingProfileMapper {
     static InvoiceStatus map(Invoice.Status status) {
         return switch (status) {
             case DRAFT -> InvoiceStatus.DRAFT;
-            case PROCESSING -> InvoiceStatus.PROCESSING;
-            case APPROVED -> InvoiceStatus.APPROVED;
+            case TO_REVIEW, APPROVED -> InvoiceStatus.PROCESSING;
+            case PAID -> InvoiceStatus.COMPLETE;
             case REJECTED -> InvoiceStatus.REJECTED;
         };
     }

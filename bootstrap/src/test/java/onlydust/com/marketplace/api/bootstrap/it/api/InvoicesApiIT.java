@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
@@ -7,9 +8,11 @@ import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageRes
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.MediaType;
 
+import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
@@ -40,7 +45,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     GlobalSettingsRepository globalSettingsRepository;
     @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
     InvoiceRepository invoiceRepository;
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     UserAuthHelper.AuthenticatedUser antho;
     UserAuthHelper.AuthenticatedUser olivier;
@@ -421,6 +430,55 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
+
+        testInvoiceStatus(UUID.fromString(invoiceId.getValue()));
+    }
+
+    protected void testInvoiceStatus(UUID invoiceId) {
+        {
+            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+
+            final var em = entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
+            em.persist(PaymentEntity.builder()
+                    .id(UUID.randomUUID())
+                    .amount(BigDecimal.valueOf(1000))
+                    .requestId(UUID.fromString("79209029-c488-4284-aa3f-bce8870d3a66"))
+                    .processedAt(new Date())
+                    .currencyCode("USDC")
+                    .receipt(JacksonUtil.toJsonNode("""
+                            {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
+                    .build());
+            em.flush();
+            em.getTransaction().commit();
+            em.close();
+        }
+
+        {
+            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.APPROVED);
+
+            final var em = entityManagerFactory.createEntityManager();
+            em.getTransaction().begin();
+            em.persist(PaymentEntity.builder()
+                    .id(UUID.randomUUID())
+                    .amount(BigDecimal.valueOf(1000))
+                    .requestId(UUID.fromString("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"))
+                    .processedAt(new Date())
+                    .currencyCode("USDC")
+                    .receipt(JacksonUtil.toJsonNode("""
+                            {"Sepa": {"recipient_iban": "FR7640618802650004034616521", "transaction_reference": "IBAN OK"}}"""))
+                    .build());
+            em.flush();
+            em.getTransaction().commit();
+            em.close();
+        }
+
+        {
+            final var invoice = entityManagerFactory.createEntityManager().find(InvoiceEntity.class, invoiceId);
+            assertThat(invoice.status()).isEqualTo(InvoiceEntity.Status.PAID);
+        }
     }
 
     @Test
@@ -570,7 +628,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                 "amount": 2020.00,
                                 "currency": "USD"
                               },
-                              "status": "PROCESSING"
+                              "status": "COMPLETE"
                             }
                           ],
                           "hasMore": false,

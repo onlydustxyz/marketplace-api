@@ -24,7 +24,7 @@ public class AccountingService implements AccountingFacadePort {
     private final AccountBookEventStorage accountBookEventStorage;
     private final SponsorAccountStorage sponsorAccountStorage;
     private final CurrencyStorage currencyStorage;
-    private final AccountingObserver accountingObserver;
+    private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
 
     @Override

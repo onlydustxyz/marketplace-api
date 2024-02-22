@@ -29,6 +29,8 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.APPROVED;
+import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -214,6 +216,8 @@ class BillingProfileServiceTest {
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
             verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), false);
+            assertThat(invoice.originalFileName()).isNull();
+            assertThat(invoice.status()).isEqualTo(APPROVED);
         }
 
         @Test
@@ -274,6 +278,8 @@ class BillingProfileServiceTest {
             final var invoice = invoiceCaptor.getValue();
             assertThat(invoice.url()).isEqualTo(url);
             verify(billingProfileObserver).onInvoiceUploaded(billingProfileId, invoice.id(), true);
+            assertThat(invoice.originalFileName()).isEqualTo("foo.pdf");
+            assertThat(invoice.status()).isEqualTo(TO_REVIEW);
         }
 
         @SneakyThrows

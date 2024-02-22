@@ -68,7 +68,7 @@ public class Invoice {
     }
 
     public enum Status {
-        DRAFT, PROCESSING, REJECTED, APPROVED;
+        DRAFT, TO_REVIEW, REJECTED, APPROVED, PAID
     }
 
     public BillingProfile.Type billingProfileType() {
