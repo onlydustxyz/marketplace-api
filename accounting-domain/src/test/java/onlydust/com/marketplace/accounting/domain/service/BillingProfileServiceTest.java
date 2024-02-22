@@ -397,7 +397,7 @@ class BillingProfileServiceTest {
         // Then
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
-        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.SELF_EMPLOYED);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStorage).save(billingProfile);
@@ -416,7 +416,7 @@ class BillingProfileServiceTest {
         // Then
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
-        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
+        assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.SELF_EMPLOYED);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
         verify(billingProfileStorage).save(billingProfile);

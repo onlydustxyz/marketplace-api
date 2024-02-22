@@ -143,7 +143,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public List<OldBillingProfile> getBillingProfiles(UUID id, Long githubUserId) {
+    public List<OldBillingProfile> oldGetBillingProfiles(UUID id, Long githubUserId) {
         return oldBillingProfileStoragePort.all(id, githubUserId);
     }
 

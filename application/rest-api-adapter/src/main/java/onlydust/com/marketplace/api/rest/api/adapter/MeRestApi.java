@@ -3,8 +3,16 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
@@ -12,12 +20,6 @@ import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.GithubOrganizationFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.project.domain.view.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -32,13 +34,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutSettingsToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserPayoutInfoMapper.userPayoutSettingsToResponse;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
 @Tags(@Tag(name = "Me"))
@@ -50,6 +52,7 @@ public class MeRestApi implements MeApi {
     private final RewardFacadePort rewardFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
+    private final BillingProfileFacadePort billingProfileFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -328,7 +331,7 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateMyBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
+    public ResponseEntity<Void> oldUpdateMyBillingProfileType(BillingProfileTypeRequest billingProfileTypeRequest) {
         final User authenticatedUser = authenticationService.getAuthenticatedUser();
         userFacadePort.updateBillingProfileType(authenticatedUser.getId(), OldBillingProfileMapper.billingProfileToDomain(billingProfileTypeRequest));
         return ResponseEntity.noContent().build();
@@ -341,10 +344,18 @@ public class MeRestApi implements MeApi {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
+    public ResponseEntity<MyBillingProfilesResponse> oldGetMyBillingProfiles() {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
-        final var billingProfiles = userFacadePort.getBillingProfiles(authenticatedUser.getId(), authenticatedUser.getGithubUserId());
+        final var billingProfiles = userFacadePort.oldGetBillingProfiles(authenticatedUser.getId(), authenticatedUser.getGithubUserId());
         return ResponseEntity.ok(new MyBillingProfilesResponse()
                 .billingProfiles(billingProfiles.stream().map(OldBillingProfileMapper::map).toList()));
+    }
+
+    @Override
+    public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
+        final var authenticatedUser = authenticationService.getAuthenticatedUser();
+        final List<ShortBillingProfileView> shortBillingProfileViews = billingProfileFacadePort.getBillingProfilesForUser(UserId.of(authenticatedUser.getId()));
+        final MyBillingProfilesResponse myBillingProfilesResponse = BillingProfileMapper.myBillingProfileToResponse(shortBillingProfileViews);
+        return ResponseEntity.ok(myBillingProfilesResponse);
     }
 }

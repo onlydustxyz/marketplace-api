@@ -16,4 +16,11 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
             where bp.type = 'INDIVIDUAL'
             """, nativeQuery = true)
     List<BillingProfileEntity> findIndividualProfilesForUserId(@Param("userId") UUID userId);
+
+    @Query(value = """
+            select bp.* from accounting.billing_profiles bp
+            join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
+            """, nativeQuery = true)
+    List<BillingProfileEntity> findBillingProfilesForUserId(@Param("userId") UUID userId);
+
 }

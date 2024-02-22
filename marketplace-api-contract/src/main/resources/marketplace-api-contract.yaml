@@ -789,7 +789,7 @@ paths:
       tags:
         - Me
       summary: Get my billing profiles
-      operationId: getMyBillingProfiles
+      operationId: oldGetMyBillingProfiles
       description: |
         Get my billing profiles
       responses:
@@ -813,7 +813,7 @@ paths:
       tags:
         - Me
       summary: Update user billing profile type
-      operationId: updateMyBillingProfileType
+      operationId: oldUpdateMyBillingProfileType
       description: |
         Update user billing profile type
       requestBody:
@@ -832,6 +832,32 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v2/me/billing-profiles:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Get my billing profiles
+      operationId: getMyBillingProfiles
+      description: |
+        Get my billing profiles
+      responses:
+        "200":
+          description: 'User billing profiles'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyBillingProfilesResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/payout-preferences:
     get:
       security:

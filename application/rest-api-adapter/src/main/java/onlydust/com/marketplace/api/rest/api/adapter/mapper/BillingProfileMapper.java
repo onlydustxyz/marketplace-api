@@ -4,6 +4,8 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
+import onlydust.com.marketplace.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -11,6 +13,8 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.RoundingMode;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -93,15 +97,15 @@ public interface BillingProfileMapper {
         return response;
     }
 
-    static onlydust.com.marketplace.api.contract.model.VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus verificationStatus) {
+    static VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus verificationStatus) {
         return isNull(verificationStatus) ? null :
                 switch (verificationStatus) {
-                    case CLOSED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.CLOSED;
-                    case REJECTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.REJECTED;
-                    case STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.STARTED;
-                    case UNDER_REVIEW -> onlydust.com.marketplace.api.contract.model.VerificationStatus.UNDER_REVIEW;
-                    case NOT_STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.NOT_STARTED;
-                    case VERIFIED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.VERIFIED;
+                    case CLOSED -> VerificationStatus.CLOSED;
+                    case REJECTED -> VerificationStatus.REJECTED;
+                    case STARTED -> VerificationStatus.STARTED;
+                    case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+                    case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+                    case VERIFIED -> VerificationStatus.VERIFIED;
                 };
     }
 
@@ -173,7 +177,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static NewMoney map(onlydust.com.marketplace.accounting.domain.model.Money money) {
+    static NewMoney map(Money money) {
         return new NewMoney()
                 .amount(money.getValue())
                 .currency(map(money.getCurrency()));
@@ -192,7 +196,7 @@ public interface BillingProfileMapper {
         };
     }
 
-    static ConvertibleMoney toConvertibleMoney(onlydust.com.marketplace.accounting.domain.model.Money money, Money base) {
+    static ConvertibleMoney toConvertibleMoney(Money money, Money base) {
         return new ConvertibleMoney()
                 .amount(money.getValue())
                 .currency(map(money.getCurrency()))
@@ -203,7 +207,7 @@ public interface BillingProfileMapper {
                 );
     }
 
-    static onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfile.Type type) {
+    static BillingProfileType map(BillingProfile.Type type) {
         return switch (type) {
             case COMPANY -> BillingProfileType.COMPANY;
             case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
@@ -228,5 +232,20 @@ public interface BillingProfileMapper {
                 .createdAt(invoice.createdAt())
                 .totalAfterTax(map(invoice.totalAfterTax()))
                 .status(map(invoice.status()));
+    }
+
+    static MyBillingProfilesResponse myBillingProfileToResponse(final List<ShortBillingProfileView> shortBillingProfileViews) {
+        final MyBillingProfilesResponse myBillingProfilesResponse = new MyBillingProfilesResponse();
+        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ? List.of() : shortBillingProfileViews.stream()
+                .map(view -> new ShortBillingProfileResponse()
+                        .name(view.getName())
+                        .id(view.getId().value())
+                        .type(switch (view.getType()) {
+                            case INDIVIDUAL -> BillingProfileType.INDIVIDUAL;
+                            case COMPANY -> BillingProfileType.COMPANY;
+                            case SELF_EMPLOYED -> BillingProfileType.SELF_EMPLOYED;
+                        })).collect(Collectors.toList()));
+        return myBillingProfilesResponse;
+
     }
 }

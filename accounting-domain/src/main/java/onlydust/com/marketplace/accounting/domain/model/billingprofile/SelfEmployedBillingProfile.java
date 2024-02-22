@@ -21,7 +21,7 @@ public class SelfEmployedBillingProfile extends BillingProfile {
 
     @Override
     public Type type() {
-        return Type.COMPANY;
+        return Type.SELF_EMPLOYED;
     }
 
     public boolean isSwitchableToCompany() {

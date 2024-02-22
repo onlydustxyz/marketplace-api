@@ -4,7 +4,7 @@ import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -72,9 +72,10 @@ public class BillingProfileEntity {
     }
 
 
-    public BillingProfileView toView() {
-        return BillingProfileView.builder()
+    public ShortBillingProfileView toView() {
+        return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
+                .name(this.name)
                 .type(switch (this.type) {
                     case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
                     case COMPANY -> BillingProfile.Type.COMPANY;
