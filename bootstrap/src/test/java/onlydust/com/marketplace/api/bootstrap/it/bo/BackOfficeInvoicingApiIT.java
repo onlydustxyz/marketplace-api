@@ -130,7 +130,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "status": "COMPLETE"
+                          "status": "APPROVED"
                         }
                         """)
                 .exchange()
@@ -150,7 +150,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         {
                           "invoices": [
                             {
-                              "status": "COMPLETE",
+                              "status": "PROCESSING",
                               "rewardIds": [
                                 "d067b24d-115a-45e9-92de-94dd1d01b184",
                                 "ee28315c-7a84-4052-9308-c2236eeafda1"
@@ -262,7 +262,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 UUID.randomUUID(),
                 Invoice.Number.of(12, lastName, firstName).toString(),
                 ZonedDateTime.now().minusDays(1),
-                InvoiceEntity.Status.PROCESSING,
+                InvoiceEntity.Status.TO_REVIEW,
                 rewards.stream().map(InvoiceRewardEntity::baseAmount).reduce(BigDecimal.ZERO, BigDecimal::add),
                 rewards.get(0).baseCurrency(),
                 new URL("https://s3.storage.com/invoice.pdf"),

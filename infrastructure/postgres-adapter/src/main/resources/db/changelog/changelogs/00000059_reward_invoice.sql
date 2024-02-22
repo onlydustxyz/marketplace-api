@@ -8,13 +8,13 @@ CREATE OR REPLACE FUNCTION public.update_invoice_status()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    UPDATE accounting.invoices i
-    SET i.status = 'PAID'
-    WHERE i.id = (select pr.invoice_id from payment_requests pr where pr.id = NEW.request_id)
+    UPDATE accounting.invoices
+    SET status = 'PAID'
+    WHERE id = (select pr.invoice_id from payment_requests pr where pr.id = NEW.request_id)
       AND NOT EXISTS (select 1
                       from payment_requests pr
-                               left join payments p on pr.id = p.id
-                      where pr.invoice_id = i.id
+                               left join payments p on pr.id = p.request_id
+                      where pr.invoice_id = accounting.invoices.id
                         and p is null);
 
     RETURN NEW;

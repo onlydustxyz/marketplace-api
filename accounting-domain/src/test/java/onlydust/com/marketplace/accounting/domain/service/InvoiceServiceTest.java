@@ -48,7 +48,7 @@ class InvoiceServiceTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = Invoice.Status.class, names = {"DRAFT", "PROCESSING"})
+    @EnumSource(value = Invoice.Status.class, names = {"DRAFT", "TO_REVIEW"})
     void should_reject_if_invalid_status(Invoice.Status status) {
         // Given
         when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));

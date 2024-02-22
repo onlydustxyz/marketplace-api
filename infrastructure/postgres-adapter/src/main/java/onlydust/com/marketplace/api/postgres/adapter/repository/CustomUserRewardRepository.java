@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardTotalAmountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import org.intellij.lang.annotations.Language;
 
 import javax.persistence.EntityManager;
@@ -91,7 +91,7 @@ public class CustomUserRewardRepository {
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
-                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('APPROVED', 'PROCESSING')
+                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('TO_REVIEW', 'APPROVED', 'PAID')
                 where u.id = :userId
                   and (coalesce(:currencies) is null or CAST(pr.currency AS TEXT) in (:currencies))
                   and (coalesce(:projectIds) is null or pr.project_id in (:projectIds))
@@ -147,7 +147,7 @@ public class CustomUserRewardRepository {
                          left join payments r on r.request_id = pr.id
                          LEFT JOIN payout_checks ON payout_checks.github_user_id = pr.recipient_id
                          LEFT JOIN billing_profile_check bpc on bpc.user_id = u.id
-                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('APPROVED', 'PROCESSING')
+                         LEFT JOIN accounting.invoices i on i.id = pr.invoice_id and i.status in ('TO_REVIEW', 'APPROVED', 'PAID')
                 where pr.recipient_id = :recipientId
                   and (case
                            when r.id is not null then 'COMPLETE'
