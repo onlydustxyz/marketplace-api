@@ -62,7 +62,7 @@ public abstract class EventEntity {
     @NoArgsConstructor
     public static class Payload implements Serializable {
 
-        @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "className")
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "$typeId")
         private Event event;
     }
 
