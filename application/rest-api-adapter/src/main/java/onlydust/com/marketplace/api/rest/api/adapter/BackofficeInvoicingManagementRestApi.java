@@ -8,7 +8,10 @@ import onlydust.com.backoffice.api.contract.model.InvoicePage;
 import onlydust.com.backoffice.api.contract.model.PatchInvoiceRequest;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,5 +52,15 @@ public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicing
     public ResponseEntity<Void> updateInvoice(UUID invoiceId, PatchInvoiceRequest request) {
         invoiceFacadePort.update(Invoice.Id.of(invoiceId), mapInvoiceStatus(request.getStatus()));
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadInvoice(UUID invoiceId) {
+        final var invoice = invoiceFacadePort.download(Invoice.Id.of(invoiceId));
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + invoice.fileName())
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new InputStreamResource(invoice.data()));
     }
 }

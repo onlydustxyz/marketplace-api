@@ -122,7 +122,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
-        final var url = pdfStoragePort.upload(invoiceInternalFileName(invoice), data);
+        final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
         invoiceStoragePort.save(invoice
                 .status(Invoice.Status.PROCESSING)
                 .url(url)
@@ -145,8 +145,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
-        final var pdf = pdfStoragePort.download(invoiceInternalFileName(invoice));
-        return new InvoiceDownload(pdf, invoiceExternalFileName(invoice));
+        final var pdf = pdfStoragePort.download(invoice.internalFileName());
+        return new InvoiceDownload(pdf, invoice.externalFileName());
     }
 
     @Override
@@ -160,13 +160,5 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId) {
         return billingProfileStorage.findAllBillingProfilesForUser(userId);
-    }
-
-    private String invoiceExternalFileName(Invoice invoice) {
-        return "%s.pdf".formatted(invoice.number());
-    }
-
-    private static String invoiceInternalFileName(Invoice invoice) {
-        return "%s.pdf".formatted(invoice.id());
     }
 }

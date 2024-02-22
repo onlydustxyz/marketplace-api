@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
@@ -22,6 +24,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
 public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     private InvoiceRepository invoiceRepository;
@@ -29,6 +35,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     private InvoiceRewardRepository invoiceRewardRepository;
     @Autowired
     private PaymentRequestRepository paymentRequestRepository;
+    @Autowired
+    PdfStoragePort pdfStoragePort;
     private final Faker faker = new Faker();
     private List<InvoiceEntity> invoices;
 
@@ -224,6 +232,24 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         }
                         """)
         ;
+    }
+
+    @Test
+    void should_download_invoices() {
+        final var invoiceId = invoices.get(1).id();
+        final var pdfData = faker.lorem().paragraph().getBytes();
+        when(pdfStoragePort.download(eq(invoiceId + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
+
+        final var data = client.get()
+                .uri(getApiURI(INVOICE.formatted(invoiceId)))
+                .header("Api-Key", apiKey())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody().returnResult().getResponseBody();
+
+        assertThat(data).isEqualTo(pdfData);
     }
 
     @SneakyThrows

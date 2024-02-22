@@ -57,6 +57,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/invoices/{invoiceId}:
+    get:
+      security:
+        - { }
+      tags:
+        - BackofficeInvoicingManagement
+      summary: Download invoice by id
+      operationId: downloadInvoice
+      parameters:
+        - in: path
+          name: invoiceId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Pdf as blob'
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     patch:
       security:
         - apiKey: [ ]
