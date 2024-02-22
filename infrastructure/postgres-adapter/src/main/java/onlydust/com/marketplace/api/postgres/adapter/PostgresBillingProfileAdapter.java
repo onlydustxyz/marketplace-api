@@ -9,7 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.project.domain.model.OldCompanyBillingProfile;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -59,9 +60,16 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
+    public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
         return billingProfileRepository.findIndividualProfilesForUserId(ownerId.value())
                 .stream().map(BillingProfileEntity::toView).findFirst();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
+        return billingProfileRepository.findBillingProfilesForUserId(userId.value())
+                .stream().map(BillingProfileEntity::toView).toList();
     }
 
     @Override
@@ -87,7 +95,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
     @Override
     @Transactional
     public void save(CompanyBillingProfile billingProfile) {
-        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile, null));
+        // TODO : manage add/remove members -> waiting to start the feature on coworkers
+        billingProfileRepository.save(BillingProfileEntity.fromDomain(billingProfile,
+                billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0)));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.save(KybEntity.fromDomain(billingProfile.kyb(), billingProfile.id()));

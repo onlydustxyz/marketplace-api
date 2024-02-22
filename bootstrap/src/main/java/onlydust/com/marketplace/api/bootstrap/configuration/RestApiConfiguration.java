@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.api.rest.api.adapter.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.project.domain.service.RewardV2Service;
-import onlydust.com.marketplace.api.rest.api.adapter.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,9 +45,10 @@ public class RestApiConfiguration {
     public MeRestApi meRestApi(final AuthenticationService authenticationService, final UserFacadePort userFacadePort,
                                final RewardFacadePort rewardFacadePort,
                                final ContributorFacadePort contributorFacadePort,
-                               final GithubAccountService githubAccountService) {
+                               final GithubAccountService githubAccountService,
+                               final BillingProfileFacadePort billingProfileFacadePort) {
         return new MeRestApi(authenticationService, userFacadePort, rewardFacadePort, contributorFacadePort,
-                githubAccountService);
+                githubAccountService, billingProfileFacadePort);
     }
 
     @Bean

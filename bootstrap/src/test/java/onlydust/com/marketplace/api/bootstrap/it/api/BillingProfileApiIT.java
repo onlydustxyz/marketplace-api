@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import net.minidev.json.JSONArray;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -135,6 +137,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.id").isNotEmpty();
 
+        // When
         client.post()
                 .uri(getApiURI(POST_BILLING_PROFILES))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -149,5 +152,21 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is4xxClientError();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES_V2))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles[?(@.type == 'SELF_EMPLOYED' && @.name == 'self_employed')]")
+                .value(jsonArray -> Assertions.assertEquals(2, ((JSONArray) jsonArray).toArray().length))
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY' && @.name == 'company')]")
+                .value(jsonArray -> Assertions.assertEquals(2, ((JSONArray) jsonArray).toArray().length))
+                .jsonPath("$.billingProfiles[?(@.type == 'INDIVIDUAL' && @.name == 'individual')]")
+                .value(jsonArray -> Assertions.assertEquals(1, ((JSONArray) jsonArray).toArray().length));
     }
 }

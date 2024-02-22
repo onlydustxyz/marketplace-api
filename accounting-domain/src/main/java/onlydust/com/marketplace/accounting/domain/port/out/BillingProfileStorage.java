@@ -6,9 +6,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface BillingProfileStorage {
@@ -26,5 +27,7 @@ public interface BillingProfileStorage {
 
     boolean isMandateAccepted(BillingProfile.Id billingProfileId);
 
-    Optional<BillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
+    Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
+
+    List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId);
 }

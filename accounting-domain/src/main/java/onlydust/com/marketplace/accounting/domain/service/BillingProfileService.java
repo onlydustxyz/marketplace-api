@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.jetbrains.annotations.NotNull;
@@ -153,6 +154,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
             throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
 
         billingProfileStorage.updateInvoiceMandateAcceptanceDate(billingProfileId, ZonedDateTime.now());
+    }
+
+    @Override
+    public List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId) {
+        return billingProfileStorage.findAllBillingProfilesForUser(userId);
     }
 
     private String invoiceExternalFileName(Invoice invoice) {
