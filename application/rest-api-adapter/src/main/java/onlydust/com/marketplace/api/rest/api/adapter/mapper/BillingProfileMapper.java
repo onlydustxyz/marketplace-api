@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 public interface BillingProfileMapper {
@@ -138,7 +137,7 @@ public interface BillingProfileMapper {
                 .id(reward.id().value())
                 .date(reward.createdAt())
                 .projectName(reward.projectName())
-                .amount(toConvertibleMoney(reward.amount(), reward.base()))
+                .amount(toConvertibleMoney(reward.amount(), reward.target()))
                 ;
     }
 
@@ -213,7 +212,7 @@ public interface BillingProfileMapper {
         return new ConvertibleMoney()
                 .amount(money.getValue())
                 .currency(map(money.getCurrency()))
-                .base(new BaseMoney()
+                .target(new BaseMoney()
                         .amount(base.getValue())
                         .currency(map(base.getCurrency()))
                         .conversionRate(base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN))

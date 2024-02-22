@@ -15,7 +15,7 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 pr.requested_at      as requested_at,
                 pr.amount            as amount,
                 c.id                 as currency_id,
-                usd.id               as base_currency_id,
+                usd.id               as target_currency_id,
                 hq.price * pr.amount as base_amount,
                 pr.invoice_id        as invoice_id
             FROM
@@ -25,8 +25,8 @@ public interface InvoiceRewardRepository extends JpaRepository<InvoiceRewardEnti
                 JOIN project_details p ON pr.project_id = p.project_id
                 JOIN LATERAL (
                     SELECT * FROM accounting.historical_quotes
-                    WHERE currency_id = c.id AND
-                    base_id = usd.id
+                    WHERE base_id = c.id AND
+                    target_id = usd.id
                     ORDER BY timestamp DESC
                     LIMIT 1
                 ) hq ON true

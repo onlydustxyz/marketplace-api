@@ -6191,9 +6191,9 @@ components:
         - $ref: '#/components/schemas/NewMoney'
         - type: object
           required:
-            - base
+            - target
           properties:
-            base:
+            target:
               $ref: '#/components/schemas/BaseMoney'
 
     InvoiceRewardItemResponse:

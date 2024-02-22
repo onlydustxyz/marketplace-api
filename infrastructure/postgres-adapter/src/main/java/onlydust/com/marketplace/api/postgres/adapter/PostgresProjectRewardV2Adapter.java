@@ -2,15 +2,14 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectAllowanceRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
 
 import javax.transaction.Transactional;
@@ -43,7 +42,7 @@ public class PostgresProjectRewardV2Adapter implements ProjectRewardStoragePort 
             final var currency = currencyRepository.findById(projectAllowanceEntity.getCurrencyId())
                     .orElseThrow(() -> internalServerError("Currency %s not found".formatted(projectAllowanceEntity.getCurrencyId())));
 
-            final var quote = historicalQuoteRepository.findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(
+            final var quote = historicalQuoteRepository.findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(
                     projectAllowanceEntity.getCurrencyId(),
                     usd.id(),
                     Instant.now()

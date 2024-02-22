@@ -121,3 +121,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000058_new_billing_profile_tables.sql
   - include:
       file: db/changelog/changelogs/00000059_reward_invoice.sql
+  - include:
+      file: db/changelog/changelogs/00000060_rename_quotes_columns.sql

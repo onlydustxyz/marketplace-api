@@ -76,7 +76,7 @@ public class Invoice {
     }
 
     public Money totalBeforeTax() {
-        return rewards.stream().map(Invoice.Reward::base).reduce(Money::add)
+        return rewards.stream().map(Invoice.Reward::target).reduce(Money::add)
                 .orElseThrow(() -> notFound("No reward found for invoice %s".formatted(number())));
     }
 
@@ -182,7 +182,7 @@ public class Invoice {
     }
 
     public record Reward(@NonNull RewardId id, @NonNull ZonedDateTime createdAt, @NonNull String projectName,
-                         @NonNull Money amount, @NonNull Money base, Invoice.Id invoiceId) {
+                         @NonNull Money amount, @NonNull Money target, Invoice.Id invoiceId) {
     }
 
     public enum Sort {

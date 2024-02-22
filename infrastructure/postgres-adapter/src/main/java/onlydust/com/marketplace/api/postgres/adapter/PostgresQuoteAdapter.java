@@ -21,10 +21,10 @@ public class PostgresQuoteAdapter implements QuoteStorage {
     }
 
     @Override
-    public Optional<Quote> nearest(Currency.Id currencyId, Currency.Id baseId, ZonedDateTime date) {
-        return repository.findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(
-                        currencyId.value(),
+    public Optional<Quote> nearest(Currency.Id baseId, Currency.Id targetId, ZonedDateTime date) {
+        return repository.findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(
                         baseId.value(),
+                        targetId.value(),
                         date.toInstant())
                 .map(HistoricalQuoteEntity::toDomain);
     }

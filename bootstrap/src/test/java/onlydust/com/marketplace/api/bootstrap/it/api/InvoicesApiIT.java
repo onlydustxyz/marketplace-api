@@ -143,7 +143,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                              "amount": {
                                "amount": 1000,
                                "currency": "ETH",
-                               "base": {
+                               "target": {
                                  "amount": 1781980.00,
                                  "currency": "USD",
                                  "conversionRate": 1781.98
@@ -296,7 +296,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "amount": {
                                 "amount": 1000,
                                 "currency": "USDC",
-                                "base": {
+                                "target": {
                                   "amount": 1010.00,
                                   "currency": "USD",
                                   "conversionRate": 1.01
@@ -310,7 +310,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "amount": {
                                 "amount": 1000,
                                 "currency": "USDC",
-                                "base": {
+                                "target": {
                                   "amount": 1010.00,
                                   "currency": "USD",
                                   "conversionRate": 1.01

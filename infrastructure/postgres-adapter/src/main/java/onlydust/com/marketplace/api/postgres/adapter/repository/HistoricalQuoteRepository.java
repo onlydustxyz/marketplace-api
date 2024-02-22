@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface HistoricalQuoteRepository extends JpaRepository<HistoricalQuoteEntity, HistoricalQuoteEntity.PrimaryKey> {
 
-    Optional<HistoricalQuoteEntity> findFirstByCurrencyIdAndBaseIdAndTimestampLessThanEqualOrderByTimestampDesc(UUID currencyId,
-                                                                                                                UUID baseId,
-                                                                                                                Instant timestamp);
+    Optional<HistoricalQuoteEntity> findFirstByBaseIdAndTargetIdAndTimestampLessThanEqualOrderByTimestampDesc(UUID currencyId,
+                                                                                                              UUID baseId,
+                                                                                                              Instant timestamp);
 }
