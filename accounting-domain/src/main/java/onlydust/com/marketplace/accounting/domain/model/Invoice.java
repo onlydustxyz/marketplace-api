@@ -100,6 +100,14 @@ public class Invoice {
         return Optional.ofNullable(bankAccount);
     }
 
+    public String externalFileName() {
+        return "%s.pdf".formatted(number);
+    }
+
+    public String internalFileName() {
+        return "%s.pdf".formatted(id);
+    }
+
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @EqualsAndHashCode
     @Getter

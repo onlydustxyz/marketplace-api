@@ -1,8 +1,11 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
+import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,14 +23,16 @@ import static org.mockito.Mockito.*;
 
 class InvoiceServiceTest {
     private final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort);
-
+    private final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
+    private final InvoiceService invoiceService = new InvoiceService(invoiceStoragePort, pdfStoragePort);
+    private final Faker faker = new Faker();
     final Invoice invoice = Invoice.of(BillingProfile.Id.random(), 1,
             new Invoice.PersonalInfo("John", "Doe", "123 Main St"));
+    final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
     @BeforeEach
     void setUp() {
-        reset(invoiceStoragePort);
+        reset(invoiceStoragePort, pdfStoragePort);
     }
 
     @Test
@@ -79,5 +86,20 @@ class InvoiceServiceTest {
 
         // Then
         verify(invoiceStoragePort, never()).save(any());
+    }
+
+    @SneakyThrows
+    @Test
+    void should_download_invoice() {
+        // Given
+        when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+        when(pdfStoragePort.download(invoice.id() + ".pdf")).thenReturn(pdf);
+
+        // When
+        final var invoiceDownload = invoiceService.download(invoice.id());
+
+        // Then
+        assertThat(invoiceDownload.fileName()).isEqualTo(invoice.number() + ".pdf");
+        assertThat(invoiceDownload.data()).isEqualTo(pdf);
     }
 }
