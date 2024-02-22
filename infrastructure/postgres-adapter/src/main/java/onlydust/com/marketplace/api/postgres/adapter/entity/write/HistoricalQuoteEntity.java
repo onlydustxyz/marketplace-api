@@ -27,17 +27,17 @@ public class HistoricalQuoteEntity {
     private @NonNull Instant timestamp;
     @Id
     @EqualsAndHashCode.Include
-    private @NonNull UUID currencyId;
+    private @NonNull UUID baseId;
     @Id
     @EqualsAndHashCode.Include
-    private @NonNull UUID baseId;
+    private @NonNull UUID targetId;
     @Getter
     private @NonNull BigDecimal price;
 
     public static HistoricalQuoteEntity of(Quote quote) {
         return HistoricalQuoteEntity.builder()
-                .currencyId(quote.currencyId().value())
                 .baseId(quote.base().value())
+                .targetId(quote.target().value())
                 .price(quote.price())
                 .timestamp(quote.timestamp())
                 .build();
@@ -45,8 +45,8 @@ public class HistoricalQuoteEntity {
 
     public Quote toDomain() {
         return new Quote(
-                Currency.Id.of(currencyId),
                 Currency.Id.of(baseId),
+                Currency.Id.of(targetId),
                 price,
                 timestamp);
     }
@@ -57,7 +57,7 @@ public class HistoricalQuoteEntity {
     @Data
     public static class PrimaryKey implements Serializable {
         private final @NonNull Instant timestamp;
-        private final @NonNull UUID currencyId;
         private final @NonNull UUID baseId;
+        private final @NonNull UUID targetId;
     }
 }

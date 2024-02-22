@@ -5,7 +5,6 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
@@ -13,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.HistoricalQuoteR
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectToBudgetIdRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BudgetRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.project.domain.service.RewardV2Service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,14 +72,14 @@ public class ProjectBudgetsApiV2IT extends AbstractMarketplaceApiIT {
         ;
         historicalQuoteRepository.save(HistoricalQuoteEntity.builder()
                 .price(BigDecimal.valueOf(1.10))
-                .currencyId(eth.id())
-                .baseId(usd.id())
+                .baseId(eth.id())
+                .targetId(usd.id())
                 .timestamp(Instant.EPOCH)
                 .build());
         historicalQuoteRepository.save(HistoricalQuoteEntity.builder()
                 .price(BigDecimal.valueOf(1.27))
-                .currencyId(usdc.id())
-                .baseId(usd.id())
+                .baseId(usdc.id())
+                .targetId(usd.id())
                 .timestamp(Instant.EPOCH)
                 .build());
 

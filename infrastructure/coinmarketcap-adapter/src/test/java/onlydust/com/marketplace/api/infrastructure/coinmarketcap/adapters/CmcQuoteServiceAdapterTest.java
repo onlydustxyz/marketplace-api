@@ -40,17 +40,17 @@ class CmcQuoteServiceAdapterTest {
 
         assertThat(quotes.get(0).price()).isGreaterThan(BigDecimal.valueOf(0.95));
         assertThat(quotes.get(0).price()).isLessThan(BigDecimal.valueOf(1.05));
-        assertThat(quotes.get(0).currencyId()).isEqualTo(USDC.id());
-        assertThat(quotes.get(0).base()).isEqualTo(USD.id());
+        assertThat(quotes.get(0).base()).isEqualTo(USDC.id());
+        assertThat(quotes.get(0).target()).isEqualTo(USD.id());
 
         assertThat(quotes.get(1).price()).isGreaterThan(BigDecimal.valueOf(2500));
         assertThat(quotes.get(1).price()).isLessThan(BigDecimal.valueOf(3000));
-        assertThat(quotes.get(1).currencyId()).isEqualTo(ETH.id());
-        assertThat(quotes.get(1).base()).isEqualTo(USD.id());
+        assertThat(quotes.get(1).base()).isEqualTo(ETH.id());
+        assertThat(quotes.get(1).target()).isEqualTo(USD.id());
 
         assertThat(quotes.get(2).price()).isGreaterThan(BigDecimal.valueOf(0.40));
         assertThat(quotes.get(2).price()).isLessThan(BigDecimal.valueOf(0.60));
-        assertThat(quotes.get(2).currencyId()).isEqualTo(LORDS.id());
-        assertThat(quotes.get(2).base()).isEqualTo(USD.id());
+        assertThat(quotes.get(2).base()).isEqualTo(LORDS.id());
+        assertThat(quotes.get(2).target()).isEqualTo(USD.id());
     }
 }

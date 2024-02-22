@@ -19,18 +19,18 @@ on conflict do nothing;
 insert into erc20(currency_id, blockchain, address, name, symbol, decimals, total_supply)
 values ('562bbf65-8a71-4d30-ad63-520c0d68ba27', 'ethereum', '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 'USD Coin', 'USDC', 6, 0);
 
-INSERT INTO accounting.historical_quotes(timestamp, currency_id, base_id, price)
+INSERT INTO accounting.historical_quotes(timestamp, base_id, target_id, price)
 SELECT now(), c.id, usd.id, cuq.price
 FROM crypto_usd_quotes cuq
          JOIN currencies c ON c.code = UPPER(cuq.currency::TEXT)
          JOIN currencies usd ON usd.code = 'USD';
 
-INSERT INTO accounting.historical_quotes(timestamp, currency_id, base_id, price)
+INSERT INTO accounting.historical_quotes(timestamp, base_id, target_id, price)
 SELECT now(), usd.id, usd.id, 1
 FROM currencies usd
 WHERE usd.code = 'USD';
 
-INSERT INTO accounting.historical_quotes(timestamp, currency_id, base_id, price)
+INSERT INTO accounting.historical_quotes(timestamp, base_id, target_id, price)
 SELECT now(), usd.id, eur.id, 0.92
 FROM currencies usd
          JOIN currencies eur ON eur.code = 'EUR'

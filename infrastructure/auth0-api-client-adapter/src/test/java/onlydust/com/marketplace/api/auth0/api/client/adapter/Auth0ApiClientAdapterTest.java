@@ -14,7 +14,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @EnableWireMock({
-        @ConfigureWireMock(name = "auth0", property = "infrastructure.auth0.api.client.domain-base-uri")
+        @ConfigureWireMock(name = "auth0", property = "infrastructure.auth0.api.client.domain-target-uri")
 })
 class Auth0ApiClientAdapterTest {
 
