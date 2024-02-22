@@ -128,6 +128,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
     protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";
     protected static final String POST_BILLING_PROFILES = "/api/v1/billing-profiles";
+    protected static final String GET_BILLING_PROFILES_BY_ID = "/api/v1/billing-profiles/%s";
 
     static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:14.3-alpine")
             .withDatabaseName("marketplace_db")

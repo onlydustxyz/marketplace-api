@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
@@ -121,5 +122,13 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                     projectIds);
         });
         return ResponseEntity.ok(billingProfileResponse);
+    }
+
+    @Override
+    public ResponseEntity<BillingProfileResponse> getBillingProfile(UUID billingProfileId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
+                UserId.of(authenticatedUser.getId()));
+        return ResponseEntity.ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
     }
 }

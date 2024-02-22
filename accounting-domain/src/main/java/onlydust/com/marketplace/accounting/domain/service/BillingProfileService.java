@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -161,4 +162,14 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId) {
         return billingProfileStorage.findAllBillingProfilesForUser(userId);
     }
+
+    @Override
+    public BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
+        if (!billingProfileStorage.isUserMemberOf(billingProfileId, userId)) {
+            throw unauthorized("User %s is not a member of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        }
+        return billingProfileStorage.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId.value())));
+    }
+
 }
