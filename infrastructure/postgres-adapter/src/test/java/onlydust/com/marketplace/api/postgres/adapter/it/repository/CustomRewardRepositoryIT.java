@@ -81,7 +81,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
             individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
                     .id(UUID.randomUUID())
                     .userId(userId)
-                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                     .build());
             projectRepository.save(
                     ProjectEntity.builder()
@@ -176,7 +176,7 @@ public class CustomRewardRepositoryIT extends AbstractPostgresIT {
                     .build());
             companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
                     .userId(userId)
-                    .verificationStatus(VerificationStatusEntity.VERIFIED)
+                    .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                     .id(UUID.randomUUID())
                     .build());
             projectRepository.save(

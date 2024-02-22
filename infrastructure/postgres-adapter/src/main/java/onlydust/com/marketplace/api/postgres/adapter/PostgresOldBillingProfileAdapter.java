@@ -134,10 +134,10 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
     public Boolean hasValidBillingProfileForUserAndType(UUID userId, OldBillingProfileType oldBillingProfileType) {
         return switch (oldBillingProfileType) {
             case COMPANY -> companyBillingProfileRepository.findByUserId(userId)
-                    .map(e -> e.getVerificationStatus().equals(VerificationStatusEntity.VERIFIED))
+                    .map(e -> e.getVerificationStatus().equals(OldVerificationStatusEntity.VERIFIED))
                     .orElse(false);
             case INDIVIDUAL -> individualBillingProfileRepository.findByUserId(userId)
-                    .map(e -> e.getVerificationStatus().equals(VerificationStatusEntity.VERIFIED))
+                    .map(e -> e.getVerificationStatus().equals(OldVerificationStatusEntity.VERIFIED))
                     .orElse(false);
         };
     }
@@ -173,12 +173,12 @@ public class PostgresOldBillingProfileAdapter implements OldBillingProfileStorag
                 .applicantId(externalApplicantId)
                 .parentApplicantId(parentExternalApplicantId)
                 .verificationStatus(switch (oldVerificationStatus) {
-                    case REJECTED -> VerificationStatusEntity.REJECTED;
-                    case UNDER_REVIEW -> VerificationStatusEntity.UNDER_REVIEW;
-                    case STARTED -> VerificationStatusEntity.STARTED;
-                    case CLOSED -> VerificationStatusEntity.CLOSED;
-                    case VERIFIED -> VerificationStatusEntity.VERIFIED;
-                    case NOT_STARTED -> VerificationStatusEntity.NOT_STARTED;
+                    case REJECTED -> OldVerificationStatusEntity.REJECTED;
+                    case UNDER_REVIEW -> OldVerificationStatusEntity.UNDER_REVIEW;
+                    case STARTED -> OldVerificationStatusEntity.STARTED;
+                    case CLOSED -> OldVerificationStatusEntity.CLOSED;
+                    case VERIFIED -> OldVerificationStatusEntity.VERIFIED;
+                    case NOT_STARTED -> OldVerificationStatusEntity.NOT_STARTED;
                 })
                 .build());
     }

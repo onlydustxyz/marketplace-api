@@ -4,16 +4,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
-import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
-import onlydust.com.marketplace.api.contract.model.InvoiceMandateRequest;
-import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
+import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
@@ -95,5 +98,22 @@ public class BillingProfileRestApi implements BillingProfilesApi {
             billingProfileFacadePort.updateInvoiceMandateAcceptanceDate(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<BillingProfileResponse> createBillingProfile(BillingProfileRequest billingProfileRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final Set<ProjectId> projectIds = isNull(billingProfileRequest.getSelectForProjects()) ? Set.of() :
+                billingProfileRequest.getSelectForProjects().stream().map(ProjectId::of).collect(Collectors.toSet());
+        final BillingProfileResponse billingProfileResponse = BillingProfileMapper.billingProfileToResponse(switch (billingProfileRequest.getType()) {
+            case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
+                    projectIds);
+            case SELF_EMPLOYED ->
+                    billingProfileFacadePort.createSelfEmployedBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
+                            projectIds);
+            case INDIVIDUAL -> billingProfileFacadePort.createIndividualBillingProfile(UserId.of(authenticatedUser.getId()), billingProfileRequest.getName(),
+                    projectIds);
+        });
+        return ResponseEntity.ok(billingProfileResponse);
     }
 }

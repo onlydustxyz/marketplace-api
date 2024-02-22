@@ -33,7 +33,7 @@ public class CompanyBillingProfileEntity {
     UUID userId;
     @Type(type = "verification_status")
     @Enumerated(EnumType.STRING)
-    VerificationStatusEntity verificationStatus;
+    OldVerificationStatusEntity verificationStatus;
     String name;
     String registrationNumber;
     Date registrationDate;
@@ -84,7 +84,7 @@ public class CompanyBillingProfileEntity {
                 .address(companyBillingProfile.getAddress())
                 .country(companyBillingProfile.getOldCountry() == null ? null : companyBillingProfile.getOldCountry().iso3Code())
                 .name(companyBillingProfile.getName())
-                .verificationStatus(VerificationStatusEntity.fromDomain(companyBillingProfile.getStatus()))
+                .verificationStatus(OldVerificationStatusEntity.fromDomain(companyBillingProfile.getStatus()))
                 .subjectToEuVAT(companyBillingProfile.getSubjectToEuropeVAT())
                 .euVATNumber(companyBillingProfile.getEuVATNumber())
                 .registrationDate(companyBillingProfile.getRegistrationDate())

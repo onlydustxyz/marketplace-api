@@ -3,13 +3,11 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserBillingProfileTypeEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserBillingProfileTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
@@ -67,7 +65,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         userBillingProfileTypeEntity.setBillingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.INDIVIDUAL);
         userBillingProfileTypeRepository.save(userBillingProfileTypeEntity);
         final IndividualBillingProfileEntity individualBillingProfileEntity = individualBillingProfileRepository.findByUserId(authenticatedUser.user().getId()).orElseThrow();
-        individualBillingProfileEntity.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        individualBillingProfileEntity.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
         individualBillingProfileRepository.save(individualBillingProfileEntity);
 
         // When

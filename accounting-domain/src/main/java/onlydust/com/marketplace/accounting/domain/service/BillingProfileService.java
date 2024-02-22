@@ -8,10 +8,11 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingBillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,13 +29,17 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 @AllArgsConstructor
 public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull InvoiceStoragePort invoiceStoragePort;
-    private final @NonNull AccountingBillingProfileStorage billingProfileStorage;
+    private final @NonNull BillingProfileStorage billingProfileStorage;
     private final @NonNull PdfStoragePort pdfStoragePort;
     private final @NonNull BillingProfileObserver billingProfileObserver;
 
 
     @Override
     public IndividualBillingProfile createIndividualBillingProfile(@NotNull UserId ownerId, @NotNull String name, Set<ProjectId> selectForProjects) {
+        billingProfileStorage.findIndividualBillingProfileForUser(ownerId)
+                .ifPresent(billingProfile -> {
+                    throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId.value()));
+                });
         final var billingProfile = new IndividualBillingProfile(name, ownerId);
         billingProfileStorage.save(billingProfile);
         selectBillingProfileForUserAndProjects(billingProfile.id(), ownerId, selectForProjects);

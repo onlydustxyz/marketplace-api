@@ -507,7 +507,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .billingProfileType(UserBillingProfileTypeEntity.BillingProfileTypeEntity.COMPANY)
                 .build());
         companyBillingProfileRepository.save(CompanyBillingProfileEntity.builder()
-                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                 .id(UUID.randomUUID())
                 .userId(user.getId())
                 .build());
@@ -540,7 +540,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hasValidBillingProfile").isEqualTo(false);
 
         individualBillingProfileRepository.save(IndividualBillingProfileEntity.builder()
-                .verificationStatus(VerificationStatusEntity.VERIFIED)
+                .verificationStatus(OldVerificationStatusEntity.VERIFIED)
                 .userId(user.getId())
                 .id(UUID.randomUUID())
                 .build());

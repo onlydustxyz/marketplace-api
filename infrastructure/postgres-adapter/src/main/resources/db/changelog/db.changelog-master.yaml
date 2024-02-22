@@ -117,3 +117,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000056_invoice_mandate.sql
   - include:
       file: db/changelog/changelogs/00000057_invoice_filename.sql
+  - include:
+      file: db/changelog/changelogs/00000058_new_billing_profile_tables.sql

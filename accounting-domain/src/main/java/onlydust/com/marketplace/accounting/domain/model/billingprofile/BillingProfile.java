@@ -41,7 +41,7 @@ public abstract class BillingProfile {
     }
 
     public enum Type {
-        INDIVIDUAL, COMPANY
+        INDIVIDUAL, COMPANY, SELF_EMPLOYED
     }
 
     public record User(@NonNull UserId id, @NonNull Role role) {

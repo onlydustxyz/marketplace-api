@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 
 public enum VerificationStatusEntity {
     NOT_STARTED,
@@ -10,19 +10,19 @@ public enum VerificationStatusEntity {
     REJECTED,
     CLOSED;
 
-    public OldVerificationStatus toDomain() {
+    public VerificationStatus toDomain() {
         return switch (this) {
-            case CLOSED -> OldVerificationStatus.CLOSED;
-            case STARTED -> OldVerificationStatus.STARTED;
-            case REJECTED -> OldVerificationStatus.REJECTED;
-            case VERIFIED -> OldVerificationStatus.VERIFIED;
-            case NOT_STARTED -> OldVerificationStatus.NOT_STARTED;
-            case UNDER_REVIEW -> OldVerificationStatus.UNDER_REVIEW;
+            case CLOSED -> VerificationStatus.CLOSED;
+            case STARTED -> VerificationStatus.STARTED;
+            case REJECTED -> VerificationStatus.REJECTED;
+            case VERIFIED -> VerificationStatus.VERIFIED;
+            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
         };
     }
 
-    public static VerificationStatusEntity fromDomain(final OldVerificationStatus oldVerificationStatus) {
-        return switch (oldVerificationStatus) {
+    public static VerificationStatusEntity fromDomain(final VerificationStatus verificationStatus) {
+        return switch (verificationStatus) {
             case CLOSED -> CLOSED;
             case NOT_STARTED -> NOT_STARTED;
             case REJECTED -> REJECTED;

@@ -46,7 +46,7 @@ public class AccountingConfiguration {
 
     @Bean
     public BillingProfileFacadePort billingProfileFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                             final @NonNull AccountingBillingProfileStorage billingProfileStorage,
+                                                             final @NonNull BillingProfileStorage billingProfileStorage,
                                                              final @NonNull PdfStoragePort pdfStoragePort,
                                                              final @NonNull BillingProfileObserver billingProfileObserver) {
         return new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort, billingProfileObserver);

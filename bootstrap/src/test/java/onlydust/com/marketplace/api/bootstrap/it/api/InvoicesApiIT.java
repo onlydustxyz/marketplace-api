@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.VerificationStatusEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -58,7 +58,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .getResponseBody().getBillingProfiles().get(0).getId();
 
         final var kyc = individualBillingProfileRepository.findById(billingProfileId).orElseThrow();
-        kyc.setVerificationStatus(VerificationStatusEntity.VERIFIED);
+        kyc.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
         individualBillingProfileRepository.save(kyc);
     }
 
