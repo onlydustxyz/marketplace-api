@@ -15,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.transaction.Transactional;
@@ -84,11 +85,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public Page<Invoice> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
-                                    final @NonNull Integer pageSize) {
+                                    final @NonNull Integer pageSize, final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
         if (!billingProfileStorage.isAdmin(userId, billingProfileId))
             throw unauthorized("User is not allowed to view invoices for this billing profile");
 
-        return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize);
+        return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize, sort, direction);
     }
 
     @Override

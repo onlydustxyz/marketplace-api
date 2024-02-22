@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+
 public interface BillingProfileMapper {
 
     static BillingProfileResponse billingProfileToResponse(final BillingProfile billingProfile) {
@@ -137,6 +139,16 @@ public interface BillingProfileMapper {
                 .projectName(reward.projectName())
                 .amount(toConvertibleMoney(reward.amount(), reward.base()))
                 ;
+    }
+
+    static Invoice.Sort map(String sort) {
+        return switch (sort) {
+            case "INVOICE_NUMBER" -> Invoice.Sort.NUMBER;
+            case "CREATED_AT" -> Invoice.Sort.CREATED_AT;
+            case "AMOUNT" -> Invoice.Sort.AMOUNT;
+            case "STATUS" -> Invoice.Sort.STATUS;
+            default -> throw badRequest("Invalid sort value: %s".formatted(sort));
+        };
     }
 
     static WalletResponse map(Invoice.Wallet wallet) {

@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -39,9 +40,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     private final BillingProfileFacadePort billingProfileFacadePort;
 
     @Override
-    public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<BillingProfileInvoicesPageResponse> getInvoices(UUID billingProfileId,
+                                                                          Integer pageIndex,
+                                                                          Integer pageSize,
+                                                                          String sort,
+                                                                          String direction) {
         final var authenticatedUser = authenticationService.getAuthenticatedUser();
-        final var page = billingProfileFacadePort.invoicesOf(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pageIndex, pageSize);
+        final var page = billingProfileFacadePort.invoicesOf(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId), pageIndex,
+                pageSize, map(sort), SortDirectionMapper.requestToDomain(direction));
         return ok(map(page, pageIndex));
     }
 

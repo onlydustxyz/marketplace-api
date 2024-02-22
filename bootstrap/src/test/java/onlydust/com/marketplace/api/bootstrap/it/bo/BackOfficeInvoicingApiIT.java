@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
@@ -63,7 +64,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .uri(getApiURI(INVOICES, Map.of(
                         "pageIndex", "0",
                         "pageSize", "10",
-                        "invoiceIds", invoices.stream().map(InvoiceEntity::id).map(UUID::toString).toList().toString())))
+                        "invoiceIds", invoices.stream().map(InvoiceEntity::id).map(UUID::toString).collect(Collectors.joining(",")))))
                 .header("Api-Key", apiKey())
                 .exchange()
                 .expectStatus()

@@ -15,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -89,7 +90,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_listing_invoices() {
             // When
-            assertThatThrownBy(() -> billingProfileService.invoicesOf(userId, billingProfileId, 1, 10))
+            assertThatThrownBy(() -> billingProfileService.invoicesOf(userId, billingProfileId, 1, 10, Invoice.Sort.STATUS, SortDirection.asc))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User is not allowed to view invoices for this billing profile");
@@ -278,11 +279,11 @@ class BillingProfileServiceTest {
         @Test
         void should_list_invoices() {
             // Given
-            when(invoiceStoragePort.invoicesOf(billingProfileId, 1, 10))
+            when(invoiceStoragePort.invoicesOf(billingProfileId, 1, 10, Invoice.Sort.STATUS, SortDirection.asc))
                     .thenReturn(Page.<Invoice>builder().content(List.of(invoice)).totalItemNumber(1).totalPageNumber(1).build());
 
             // When
-            final var invoices = billingProfileService.invoicesOf(userId, billingProfileId, 1, 10);
+            final var invoices = billingProfileService.invoicesOf(userId, billingProfileId, 1, 10, Invoice.Sort.STATUS, SortDirection.asc);
 
             // Then
             assertThat(invoices.getTotalItemNumber()).isEqualTo(1);

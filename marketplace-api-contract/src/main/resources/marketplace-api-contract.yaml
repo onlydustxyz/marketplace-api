@@ -2979,6 +2979,25 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            default: CREATED_AT
+            type: string
+            enum:
+              - INVOICE_NUMBER
+              - CREATED_AT
+              - AMOUNT
+              - STATUS
+        - in: query
+          name: direction
+          schema:
+            default: DESC
+            type: string
+            enum:
+              - ASC
+              - DESC
       responses:
         "200":
           description: 'Page of invoices linked to given billing profile'

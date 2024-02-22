@@ -22,7 +22,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
-@Tags(@Tag(name = "BackofficeCurrencyManagement"))
+@Tags(@Tag(name = "BackofficeInvoicingManagement"))
 @AllArgsConstructor
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
