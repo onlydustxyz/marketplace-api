@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
@@ -14,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +38,12 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
     @EqualsAndHashCode(callSuper = true)
     @EventType("GroupedTestEvent")
     public static class GroupedTestEvent extends Event {
-        String group;
+        @NonNull String group;
         UUID id;
 
         @Override
-        public String group() {
-            return group;
+        public Optional<String> group() {
+            return Optional.of(group);
         }
     }
 

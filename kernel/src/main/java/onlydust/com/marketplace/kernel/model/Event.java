@@ -2,11 +2,11 @@ package onlydust.com.marketplace.kernel.model;
 
 import lombok.EqualsAndHashCode;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 @EqualsAndHashCode
 public abstract class Event {
-    public @Nullable String group() {
-        return null;
+    public Optional<String> group() {
+        return Optional.empty();
     }
 }

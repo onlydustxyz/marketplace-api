@@ -57,7 +57,7 @@ public abstract class EventEntity {
     public EventEntity(Event event) {
         this.payload = new Payload(event);
         this.status = Status.PENDING;
-        this.group = event.group();
+        this.group = event.group().orElse(null);
     }
 
     public OutboxPort.IdentifiableEvent toIdentifiableEvent() {
