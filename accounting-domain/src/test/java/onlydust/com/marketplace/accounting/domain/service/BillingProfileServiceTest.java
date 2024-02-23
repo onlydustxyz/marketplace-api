@@ -143,7 +143,9 @@ class BillingProfileServiceTest {
             // Given
             final var reward = fakeReward(Invoice.Id.random());
             invoice.rewards().add(reward);
+            invoice.status(Invoice.Status.APPROVED);
             when(invoiceStoragePort.preview(billingProfileId, rewardIds)).thenReturn(invoice);
+            when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))

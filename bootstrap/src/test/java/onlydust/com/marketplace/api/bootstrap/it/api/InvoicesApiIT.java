@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.contract.model.MyBillingProfilesResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.OldVerificationStatusEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.PaymentEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CompanyBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndividualBillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
@@ -43,6 +44,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     IndividualBillingProfileRepository individualBillingProfileRepository;
     @Autowired
+    CompanyBillingProfileRepository companyBillingProfileRepository;
+    @Autowired
     GlobalSettingsRepository globalSettingsRepository;
     @Autowired
     PaymentRepository paymentRepository;
@@ -60,6 +63,20 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         antho = userAuthHelper.authenticateAnthony();
         olivier = userAuthHelper.authenticateOlivier();
 
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "type": "INDIVIDUAL"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
         billingProfileId = client.get()
                 .uri(ME_BILLING_PROFILES)
                 .header("Authorization", BEARER_PREFIX + antho.jwt())
@@ -70,6 +87,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody(MyBillingProfilesResponse.class)
                 .returnResult()
                 .getResponseBody().getBillingProfiles().get(0).getId();
+
 
         final var kyc = individualBillingProfileRepository.findById(billingProfileId).orElseThrow();
         kyc.setVerificationStatus(OldVerificationStatusEntity.VERIFIED);
@@ -89,11 +107,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards.size()").isEqualTo(11)
                 .jsonPath("$.rewards[?(@.id == '966cd55c-7de8-45c4-8bba-b388c38ca15d')]").exists()
                 .jsonPath("$.rewards[?(@.id == '79209029-c488-4284-aa3f-bce8870d3a66')]").exists()
                 .jsonPath("$.rewards[?(@.id == 'd22f75ab-d9f5-4dc6-9a85-60dcd7452028')]").exists()
+                .jsonPath("$.rewards[?(@.id == 'dd7d445f-6915-4955-9bae-078173627b05')]").exists()
         ;
     }
 
@@ -598,6 +616,58 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.billingProfiles[0].invoiceMandateAccepted").isEqualTo(false);
     }
 
+
+    @SneakyThrows
+    @Test
+    @Order(5)
+    void preview_with_both_billing_profile_types() {
+        // First, generate an invoice preview with the individual billing profile
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(billingProfileId), Map.of(
+                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Then switch billing profile type
+        client.patch()
+                .uri(getApiURI(ME_PATCH_BILLING_PROFILE_TYPE))
+                .header("Authorization", "Bearer " + antho.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        final var companyBillingProfile = companyBillingProfileRepository.findByUserId(antho.user().getId()).orElseThrow();
+        companyBillingProfile.setName("My company");
+        companyBillingProfile.setCountry("FRA");
+        companyBillingProfile.setAddress("My address");
+        companyBillingProfile.setRegistrationNumber("123456");
+        companyBillingProfile.setSubjectToEuVAT(true);
+        companyBillingProfileRepository.save(companyBillingProfile);
+
+        // Generate another preview for the same rewards
+        client.get()
+                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfile.getId()), Map.of(
+                        "rewardIds", "dd7d445f-6915-4955-9bae-078173627b05"
+                )))
+                .header("Authorization", BEARER_PREFIX + antho.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+    }
+
+
     @Test
     @Order(99)
     void list_invoice() {
@@ -805,8 +875,8 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(103)
     void should_order_invoices_by_status() {
-        final var invoice = invoiceRepository.findAll().stream().findFirst().orElseThrow();
-        invoiceRepository.save(invoice.status(InvoiceEntity.Status.APPROVED));
+        final var invoice = invoiceRepository.findAll().stream().filter(i -> i.billingProfileId().equals(billingProfileId)).findFirst().orElseThrow();
+        invoiceRepository.save(invoice.status(InvoiceEntity.Status.PAID));
 
         {
             // When

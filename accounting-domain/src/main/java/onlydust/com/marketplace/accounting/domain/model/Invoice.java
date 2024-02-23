@@ -68,7 +68,11 @@ public class Invoice {
     }
 
     public enum Status {
-        DRAFT, TO_REVIEW, REJECTED, APPROVED, PAID
+        DRAFT, TO_REVIEW, REJECTED, APPROVED, PAID;
+
+        public boolean isActive() {
+            return this != DRAFT && this != REJECTED;
+        }
     }
 
     public BillingProfile.Type billingProfileType() {
