@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model.notification;
 import lombok.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.EventType;
 import onlydust.com.marketplace.project.domain.model.OldBillingProfileType;
 import onlydust.com.marketplace.project.domain.model.OldVerificationStatus;
 
@@ -15,6 +16,7 @@ import static java.util.Objects.nonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@EventType("BillingProfileUpdated")
 public class BillingProfileUpdated extends Event {
     UUID billingProfileId;
     OldBillingProfileType type;
