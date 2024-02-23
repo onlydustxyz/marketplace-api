@@ -31,6 +31,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
     private final @NonNull KycRepository kycRepository;
     private final @NonNull PayoutInfoRepository payoutInfoRepository;
     private final @NonNull WalletRepository walletRepository;
+    private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -131,10 +132,9 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
     @Override
     @Transactional(readOnly = true)
     public boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId) {
-        return billingProfileRepository.findBillingProfilesForUserId(userId.value()).stream()
-                .anyMatch(billingProfileEntity -> billingProfileEntity.getId().equals(billingProfileId.value()) && billingProfileEntity.getUsers().stream()
-                        .anyMatch(billingProfileUserEntity -> billingProfileUserEntity.getUserId().equals(userId.value())
-                                                              && billingProfileUserEntity.getRole().equals(BillingProfileUserEntity.Role.ADMIN)));
+        return billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
+                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfileUserEntity.Role.ADMIN))
+                .orElse(false);
     }
 
     @Override

@@ -66,34 +66,26 @@ public class PayoutInfoEntity {
         }
         if (!this.getWallets().isEmpty()) {
             for (WalletEntity wallet : this.getWallets()) {
-                if (wallet.getNetwork().equals(NetworkEnumEntity.aptos)) {
-                    payoutInfo = payoutInfo.toBuilder()
-                            .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
-                            .build();
-                }
-                if (wallet.getNetwork().equals(NetworkEnumEntity.starknet)) {
-                    payoutInfo = payoutInfo.toBuilder()
-                            .starknetAddress(StarkNet.accountAddress(wallet.getAddress()))
-                            .build();
-                }
-                if (wallet.getNetwork().equals(NetworkEnumEntity.optimism)) {
-                    payoutInfo = payoutInfo.toBuilder()
-                            .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
-                            .build();
-                }
-                if (wallet.getNetwork().equals(NetworkEnumEntity.ethereum)) {
-                    switch (wallet.getType()) {
-                        case address:
-                            payoutInfo = payoutInfo.toBuilder()
+                switch (wallet.getNetwork()) {
+                    case ethereum -> {
+                        payoutInfo = switch (wallet.getType()) {
+                            case address -> payoutInfo.toBuilder()
                                     .ethWallet(new Wallet(Ethereum.accountAddress(wallet.getAddress())))
                                     .build();
-                            break;
-                        case name:
-                            payoutInfo = payoutInfo.toBuilder()
+                            case name -> payoutInfo.toBuilder()
                                     .ethWallet(new Wallet(Ethereum.name(wallet.getAddress())))
                                     .build();
-                            break;
+                        };
                     }
+                    case aptos -> payoutInfo = payoutInfo.toBuilder()
+                            .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
+                            .build();
+                    case starknet -> payoutInfo = payoutInfo.toBuilder()
+                            .starknetAddress(StarkNet.accountAddress(wallet.getAddress()))
+                            .build();
+                    case optimism -> payoutInfo = payoutInfo.toBuilder()
+                            .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
+                            .build();
                 }
             }
         }

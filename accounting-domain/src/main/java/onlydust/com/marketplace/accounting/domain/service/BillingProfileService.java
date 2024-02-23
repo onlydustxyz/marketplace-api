@@ -136,13 +136,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var invoice = invoiceStoragePort.get(invoiceId)
                 .filter(i -> i.billingProfileId().equals(billingProfileId))
-                .orElseThrow(() -> notFound(("Invoice" +
-                                             " " +
-                                             "%s not " +
-                                             "found " +
-                                             "for " +
-                                             "billing" +
-                                             " profile %s").formatted(invoiceId, billingProfileId)));
+                .orElseThrow(() -> notFound(("Invoice %s not found for billing profile %s").formatted(invoiceId, billingProfileId)));
 
         final var pdf = pdfStoragePort.download(invoice.internalFileName());
         return new InvoiceDownload(pdf, invoice.externalFileName());
