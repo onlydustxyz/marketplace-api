@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -43,4 +40,8 @@ public interface BillingProfileFacadePort {
     List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId);
 
     BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
+
+    PayoutInfo getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
+
+    void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo);
 }

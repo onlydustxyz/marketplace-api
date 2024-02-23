@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
 import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.project.domain.view.UserRewardView;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserRewardViewEntity;
@@ -527,7 +527,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             // Given
             postgresUserAdapter.savePayoutSettingsForUserId(companyUserId,
                     UserPayoutSettings.builder().sepaAccount(UserPayoutSettings.SepaAccount.builder().bic(faker.random().hex())
-                            .accountNumber(AccountNumber.of("FR1014508000702139488771C56")).build()).build());
+                            .accountNumber(OldAccountNumber.of("FR1014508000702139488771C56")).build()).build());
 
             // When
             final List<UserRewardViewEntity> viewEntities = customUserRewardRepository.getViewEntities(companyUserId,
@@ -674,7 +674,7 @@ public class CustomUserRewardRepositoryIT extends AbstractPostgresIT {
             postgresUserAdapter.savePayoutSettingsForUserId(userId,
                     UserPayoutSettings.builder().ethWallet(Ethereum.wallet("vitalik.eth"))
                             .sepaAccount(UserPayoutSettings.SepaAccount.builder()
-                                    .bic(faker.random().hex()).accountNumber(AccountNumber.of(
+                                    .bic(faker.random().hex()).accountNumber(OldAccountNumber.of(
                                             "ES6621000418401234567891")).build())
                             .build());
 

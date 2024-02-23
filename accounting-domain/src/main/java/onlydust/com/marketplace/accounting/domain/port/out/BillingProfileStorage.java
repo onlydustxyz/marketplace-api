@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 
@@ -14,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillingProfileStorage {
-    boolean isAdmin(UserId userId, BillingProfile.Id billingProfileId);
+    boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
 
     void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
 
@@ -34,5 +31,11 @@ public interface BillingProfileStorage {
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
+    boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId);
+
     Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId);
+
+    Optional<PayoutInfo> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
+
+    void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
 }

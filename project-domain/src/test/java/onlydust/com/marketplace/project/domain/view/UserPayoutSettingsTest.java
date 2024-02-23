@@ -5,8 +5,8 @@ import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -128,7 +128,7 @@ public class UserPayoutSettingsTest {
         var userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .sepaAccount(UserPayoutSettings.SepaAccount.builder()
-                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
+                                .accountNumber(OldAccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .build(),
@@ -195,7 +195,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .sepaAccount(UserPayoutSettings.SepaAccount.builder()
-                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
+                                .accountNumber(OldAccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))
@@ -211,7 +211,7 @@ public class UserPayoutSettingsTest {
         userPayoutInformation = fakeUserPayoutInformation(
                 UserPayoutSettings.builder()
                         .sepaAccount(UserPayoutSettings.SepaAccount.builder()
-                                .accountNumber(AccountNumber.of("ES6621000418401234567891"))
+                                .accountNumber(OldAccountNumber.of("ES6621000418401234567891"))
                                 .bic("CAIXESBBXXX")
                                 .build())
                         .starknetAddress(StarkNet.accountAddress("0x1234567890123456789012345678901234567890"))

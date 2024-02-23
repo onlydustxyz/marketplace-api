@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsRequest;
 import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsResponse;
 import onlydust.com.marketplace.api.contract.model.UserPayoutSettingsResponseSepaAccount;
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
@@ -55,7 +55,7 @@ public interface UserPayoutInfoMapper {
                         Ethereum.wallet(contract.getEthWallet()))
                 .build();
         if (nonNull(contract.getSepaAccount())) {
-            final var iban = AccountNumber.of(contract.getSepaAccount().getIban());
+            final var iban = OldAccountNumber.of(contract.getSepaAccount().getIban());
             userPayoutSettings = userPayoutSettings.toBuilder()
                     .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                             .bic(contract.getSepaAccount().getBic())

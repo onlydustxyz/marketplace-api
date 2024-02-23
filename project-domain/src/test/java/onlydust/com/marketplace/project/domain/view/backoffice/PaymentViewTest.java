@@ -2,8 +2,8 @@ package onlydust.com.marketplace.project.domain.view.backoffice;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.project.domain.model.Currency;
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings.SepaAccount;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PaymentViewTest {
     private final Faker faker = new Faker();
     private final SepaAccount validSepaAccount =
-            SepaAccount.builder().accountNumber(AccountNumber.of("FR1014508000702139488771C56")).bic(faker.finance().bic()).build();
+            SepaAccount.builder().accountNumber(OldAccountNumber.of("FR1014508000702139488771C56")).bic(faker.finance().bic()).build();
 
     @Test
     void should_consider_payout_info_invalid_when_sepa_account_is_invalid() {
@@ -22,7 +22,7 @@ class PaymentViewTest {
 
         assertFalse(paymentView.build().recipientPayoutInfoValid());
         assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().bic(faker.finance().bic()).build()).build().recipientPayoutInfoValid());
-        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().accountNumber(AccountNumber.of(
+        assertFalse(paymentView.recipientSepaAccount(SepaAccount.builder().accountNumber(OldAccountNumber.of(
                 "FR1014508000702139488771C56")).build()).build().recipientPayoutInfoValid());
     }
 

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
@@ -12,6 +13,7 @@ import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.PayoutInfoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.core.io.InputStreamResource;
@@ -130,5 +132,20 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
                 UserId.of(authenticatedUser.getId()));
         return ResponseEntity.ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
+    }
+
+    @Override
+    public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        PayoutInfo payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()));
+        return ResponseEntity.ok(PayoutInfoMapper.mapToResponse(payoutInfo));
+    }
+
+    @Override
+    public ResponseEntity<Void> setPayoutInfo(UUID billingProfileId, BillingProfilePayoutInfoRequest billingProfilePayoutInfoRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.getId()),
+                PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
+        return ResponseEntity.ok().build();
     }
 }

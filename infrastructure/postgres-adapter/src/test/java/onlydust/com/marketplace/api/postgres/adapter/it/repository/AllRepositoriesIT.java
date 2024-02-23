@@ -1,11 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
-import onlydust.com.marketplace.project.domain.model.Currency;
-import onlydust.com.marketplace.project.domain.model.Reward;
-import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.UserRole;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
@@ -58,7 +55,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     ContactInformationRepository contactInformationRepository;
     @Autowired
-    WalletRepository walletRepository;
+    OldWalletRepository oldWalletRepository;
     @Autowired
     BankAccountRepository bankAccountRepository;
     @Autowired
@@ -298,22 +295,22 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Test
     void should_create_wallet() {
         // Given
-        walletRepository.deleteAll();
-        final WalletEntity expected = WalletEntity.builder()
+        oldWalletRepository.deleteAll();
+        final OldWalletEntity expected = OldWalletEntity.builder()
                 .network(NetworkEnumEntity.ethereum)
                 .userId(UUID.randomUUID())
                 .address(faker.address().fullAddress())
                 .type(WalletTypeEnumEntity.address)
                 .build();
 
-        assertIsSaved(expected, walletRepository);
+        assertIsSaved(expected, oldWalletRepository);
     }
 
     @Test
     void should_create_bank_account() {
         // Given
         bankAccountRepository.deleteAll();
-        final BankAccountEntity expected = BankAccountEntity.builder()
+        final OldBankAccountEntity expected = OldBankAccountEntity.builder()
                 .bic(faker.pokemon().location())
                 .userId(UUID.randomUUID())
                 .iban("FR1014508000702139488771C56")
@@ -415,7 +412,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .optimismAddress(Optimism.accountAddress("0x04"))
                 .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                         .bic(faker.hacker().abbreviation())
-                        .accountNumber(AccountNumber.of("FR1014508000702139488771C56"))
+                        .accountNumber(OldAccountNumber.of("FR1014508000702139488771C56"))
                         .build())
                 .build();
 

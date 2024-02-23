@@ -179,7 +179,7 @@ public class PostgresConfiguration {
                                                    final ProjectIdRepository projectIdRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
                                                    final CustomUserRewardRepository customUserRewardRepository,
-                                                   final WalletRepository walletRepository,
+                                                   final OldWalletRepository oldWalletRepository,
                                                    final CustomUserPayoutInfoRepository customUserPayoutInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
@@ -198,7 +198,7 @@ public class PostgresConfiguration {
                 projectIdRepository,
                 userProfileInfoRepository,
                 customUserRewardRepository,
-                walletRepository,
+                oldWalletRepository,
                 customUserPayoutInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
@@ -356,13 +356,13 @@ public class PostgresConfiguration {
     InvoiceStoragePort invoicePreviewStoragePort(final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository,
                                                  final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository,
                                                  final @NonNull InvoiceRewardRepository invoiceRewardRepository,
-                                                 final @NonNull WalletRepository walletRepository,
+                                                 final @NonNull OldWalletRepository oldWalletRepository,
                                                  final @NonNull BankAccountRepository bankAccountRepository,
                                                  final @NonNull InvoiceRepository invoiceRepository,
                                                  final @NonNull PaymentRequestRepository paymentRequestRepository,
                                                  final @NonNull RewardRepository rewardRepository) {
         return new PostgresInvoiceStorage(companyBillingProfileRepository, individualBillingProfileRepository, invoiceRewardRepository,
-                walletRepository, bankAccountRepository, invoiceRepository, paymentRequestRepository, rewardRepository);
+                oldWalletRepository, bankAccountRepository, invoiceRepository, paymentRequestRepository, rewardRepository);
     }
 
     @Bean
@@ -371,9 +371,12 @@ public class PostgresConfiguration {
                                                                  final GlobalSettingsRepository globalSettingsRepository,
                                                                  final KycRepository kycRepository,
                                                                  final KybRepository kybRepository,
-                                                                 final BillingProfileRepository billingProfileRepository) {
+                                                                 final BillingProfileRepository billingProfileRepository,
+                                                                 final PayoutInfoRepository payoutInfoRepository,
+                                                                 final WalletRepository walletRepository,
+                                                                 final BillingProfileUserRepository billingProfileUserRepository) {
         return new PostgresBillingProfileAdapter(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository,
-                billingProfileRepository, kybRepository, kycRepository);
+                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository);
     }
 
     @Bean

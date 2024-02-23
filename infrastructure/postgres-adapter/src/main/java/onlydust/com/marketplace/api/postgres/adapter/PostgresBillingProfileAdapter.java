@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.UserId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -32,10 +29,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
     private final @NonNull BillingProfileRepository billingProfileRepository;
     private final @NonNull KybRepository kybRepository;
     private final @NonNull KycRepository kycRepository;
+    private final @NonNull PayoutInfoRepository payoutInfoRepository;
+    private final @NonNull WalletRepository walletRepository;
+    private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isAdmin(UserId userId, BillingProfile.Id billingProfileId) {
+    public boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId) {
         final var admin = companyBillingProfileRepository.findById(billingProfileId.value()).map(CompanyBillingProfileEntity::getUserId)
                 .or(() -> individualBillingProfileRepository.findById(billingProfileId.value()).map(IndividualBillingProfileEntity::getUserId))
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
@@ -131,6 +131,14 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
 
     @Override
     @Transactional(readOnly = true)
+    public boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId) {
+        return billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
+                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfileUserEntity.Role.ADMIN))
+                .orElse(false);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> switch (billingProfileEntity.getType()) {
             case INDIVIDUAL -> {
@@ -173,5 +181,19 @@ public class PostgresBillingProfileAdapter implements BillingProfileStorage {
                 yield billingProfileView;
             }
         });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<PayoutInfo> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
+        return payoutInfoRepository.findById(billingProfileId.value()).map(PayoutInfoEntity::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId) {
+        payoutInfoRepository.findById(billingProfileId.value())
+                .ifPresent(payoutInfoEntity -> walletRepository.deleteByBillingProfileId(billingProfileId.value()));
+        payoutInfoRepository.save(PayoutInfoEntity.toEntity(billingProfileId, payoutInfo));
     }
 }

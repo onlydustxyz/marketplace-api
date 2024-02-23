@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.kernel.model.blockchain;
 
 
-import onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ContractAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.TransactionHash;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.optimism.EtherScan;
@@ -13,8 +13,8 @@ public interface Optimism {
         return new TransactionHash(value);
     }
 
-    static AccountAddress accountAddress(String value) {
-        return new AccountAddress(value);
+    static EvmAccountAddress accountAddress(String value) {
+        return new EvmAccountAddress(value);
     }
 
     static ContractAddress contractAddress(String address) {

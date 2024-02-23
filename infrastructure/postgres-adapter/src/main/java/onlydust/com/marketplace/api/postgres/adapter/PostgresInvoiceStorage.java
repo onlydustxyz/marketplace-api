@@ -10,12 +10,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.CompanyBilling
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndividualBillingProfileEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldBankAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldWalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.BankAccountRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.PaymentRequestRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.WalletRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OldWalletRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +32,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     private final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository;
     private final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository;
     private final @NonNull InvoiceRewardRepository invoiceRewardRepository;
-    private final @NonNull WalletRepository walletRepository;
+    private final @NonNull OldWalletRepository oldWalletRepository;
     private final @NonNull BankAccountRepository bankAccountRepository;
     private final @NonNull InvoiceRepository invoiceRepository;
     private final @NonNull PaymentRequestRepository paymentRequestRepository;
@@ -60,8 +60,8 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
                 .orElseThrow();
 
         // TODO filter in domain using SponsorAccount network
-        preview.wallets(walletRepository.findAllByUserId(userId).stream().map(WalletEntity::forInvoice).toList());
-        preview.bankAccount(bankAccountRepository.findById(userId).map(BankAccountEntity::forInvoice).orElse(null));
+        preview.wallets(oldWalletRepository.findAllByUserId(userId).stream().map(OldWalletEntity::forInvoice).toList());
+        preview.bankAccount(bankAccountRepository.findById(userId).map(OldBankAccountEntity::forInvoice).orElse(null));
 
         return preview.rewards(rewards);
     }
