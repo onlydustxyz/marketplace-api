@@ -3,8 +3,12 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
+import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -53,6 +57,7 @@ public class MeRestApi implements MeApi {
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
     private final BillingProfileFacadePort billingProfileFacadePort;
+    private final PayoutPreferenceFacadePort payoutPreferenceFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -357,5 +362,24 @@ public class MeRestApi implements MeApi {
         final List<ShortBillingProfileView> shortBillingProfileViews = billingProfileFacadePort.getBillingProfilesForUser(UserId.of(authenticatedUser.getId()));
         final MyBillingProfilesResponse myBillingProfilesResponse = BillingProfileMapper.myBillingProfileToResponse(shortBillingProfileViews);
         return ResponseEntity.ok(myBillingProfilesResponse);
+    }
+
+
+    @Override
+    public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        final List<PayoutPreferenceView> payoutPreferences = payoutPreferenceFacadePort.getPayoutPreferences(UserId.of(authenticatedUser.getId()));
+        final List<PayoutPreferencesItemResponse> response = isNull(payoutPreferences) ? List.of() : payoutPreferences.stream()
+                .map(PayoutPreferenceMapper::mapToResponse)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> setMyPayoutPreferenceForProject(PayoutPreferenceRequest payoutPreferenceRequest) {
+        final User authenticatedUser = authenticationService.getAuthenticatedUser();
+        payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
+                BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.getId()));
+        return ResponseEntity.ok().build();
     }
 }

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
 import java.util.Date;
 import java.util.UUID;

@@ -6,8 +6,9 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -36,10 +37,10 @@ import static org.mockito.Mockito.*;
 class BillingProfileServiceTest {
     final Faker faker = new Faker();
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
-    final BillingProfileStorage billingProfileStorage = mock(BillingProfileStorage.class);
+    final BillingProfileStoragePort billingProfileStoragePort = mock(BillingProfileStoragePort.class);
     final PdfStoragePort pdfStoragePort = mock(PdfStoragePort.class);
     final BillingProfileObserver billingProfileObserver = mock(BillingProfileObserver.class);
-    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort,
+    final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
             billingProfileObserver);
     final UserId userId = UserId.random();
     final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
@@ -53,14 +54,14 @@ class BillingProfileServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(invoiceStoragePort, billingProfileStorage, pdfStoragePort, billingProfileObserver);
+        reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
     @Nested
     class GivenCallerIsNotTheBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(false);
         }
 
         @Test
@@ -77,7 +78,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // When
-            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
@@ -110,7 +111,7 @@ class BillingProfileServiceTest {
     class GivenUserIsBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
         }
 
         @Test
@@ -154,7 +155,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -168,8 +169,8 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
-            when(billingProfileStorage.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -182,8 +183,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_mandate_is_not_accepted() {
             // Given
-            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
-            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(false);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -197,7 +198,7 @@ class BillingProfileServiceTest {
         @Test
         void should_upload_invoice_and_save_url() {
             // Given
-            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             final var url = new URL("https://" + faker.internet().url());
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
@@ -232,7 +233,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -245,8 +246,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_if_mandate_is_accepted() {
             // Given
-            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
-            when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.isMandateAccepted(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -312,7 +313,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_download_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -367,8 +368,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.INDIVIDUAL);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
     }
 
     @Test
@@ -386,8 +387,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.INDIVIDUAL);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Test
@@ -404,8 +405,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.SELF_EMPLOYED);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
     }
 
     @Test
@@ -423,8 +424,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.SELF_EMPLOYED);
         assertThat(billingProfile.owner().id()).isEqualTo(userId);
         assertThat(billingProfile.owner().role()).isEqualTo(BillingProfile.User.Role.ADMIN);
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Test
@@ -440,8 +441,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
         assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
     }
 
     @Test
@@ -458,8 +459,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
         assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
-        verify(billingProfileStorage).save(billingProfile);
-        verify(billingProfileStorage).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
+        verify(billingProfileStoragePort).save(billingProfile);
+        verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
     }
 
     @Nested
@@ -608,7 +609,7 @@ class BillingProfileServiceTest {
         final UserId userIdNotMember = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
         Exception exception = null;
         try {
             billingProfileService.getBillingProfile(billingProfileId, userIdNotMember);
@@ -631,12 +632,12 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfileView = BillingProfileView.builder().build();
 
         // When
-        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStorage.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember);
 
         // Then
-        verify(billingProfileStorage).findById(billingProfileId);
+        verify(billingProfileStoragePort).findById(billingProfileId);
         assertEquals(billingProfileView, billingProfile);
     }
 
@@ -647,8 +648,8 @@ class BillingProfileServiceTest {
         final UserId userIdNotMember = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
-        when(billingProfileStorage.findById(billingProfileId)).thenReturn(Optional.empty());
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.empty());
         Exception exception = null;
         try {
             billingProfileService.getBillingProfile(billingProfileId, userIdNotMember);
@@ -671,7 +672,7 @@ class BillingProfileServiceTest {
         final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
         Exception exception = null;
         try {
             billingProfileService.updatePayoutInfo(billingProfileId, userIdNotAdmin, PayoutInfo.builder().build());
@@ -693,7 +694,7 @@ class BillingProfileServiceTest {
         final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
         Exception exception = null;
         try {
             billingProfileService.getPayoutInfo(billingProfileId, userIdNotAdmin);
@@ -716,11 +717,11 @@ class BillingProfileServiceTest {
         final PayoutInfo payoutInfo = PayoutInfo.builder().build();
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         billingProfileService.updatePayoutInfo(billingProfileId, userIAdmin, payoutInfo);
 
         // Then
-        verify(billingProfileStorage).savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
+        verify(billingProfileStoragePort).savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
     }
 
     @Test
@@ -731,14 +732,14 @@ class BillingProfileServiceTest {
         final PayoutInfo expectedPayoutInfo = PayoutInfo.builder().build();
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findPayoutInfoByBillingProfile(billingProfileId))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.of(expectedPayoutInfo));
         final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
 
         // Then
         assertEquals(expectedPayoutInfo, payoutInfo);
-        verify(billingProfileStorage).findPayoutInfoByBillingProfile(billingProfileId);
+        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
     }
 
     @Test
@@ -748,14 +749,14 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStorage.findPayoutInfoByBillingProfile(billingProfileId))
+        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.empty());
         final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
 
         // Then
         assertNotNull(payoutInfo);
-        verify(billingProfileStorage).findPayoutInfoByBillingProfile(billingProfileId);
+        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
     }
 
 

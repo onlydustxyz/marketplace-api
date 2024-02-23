@@ -2,15 +2,9 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.observers.NotificationOutbox;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.accounting.domain.service.AccountingObserver;
-import onlydust.com.marketplace.accounting.domain.service.AccountingService;
-import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
-import onlydust.com.marketplace.accounting.domain.service.InvoiceService;
+import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingObserverAdapter;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
@@ -47,10 +41,10 @@ public class AccountingConfiguration {
 
     @Bean
     public BillingProfileFacadePort billingProfileFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                             final @NonNull BillingProfileStorage billingProfileStorage,
+                                                             final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                              final @NonNull PdfStoragePort pdfStoragePort,
                                                              final @NonNull BillingProfileObserver billingProfileObserver) {
-        return new BillingProfileService(invoiceStoragePort, billingProfileStorage, pdfStoragePort, billingProfileObserver);
+        return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
     @Bean
@@ -61,5 +55,11 @@ public class AccountingConfiguration {
     @Bean
     public InvoiceFacadePort invoiceFacadePort(final @NonNull InvoiceStoragePort invoiceStoragePort, final @NonNull PdfStoragePort pdfStoragePort) {
         return new InvoiceService(invoiceStoragePort, pdfStoragePort);
+    }
+
+    @Bean
+    public PayoutPreferenceFacadePort payoutPreferenceFacadePort(final PayoutPreferenceStoragePort payoutPreferenceStoragePort,
+                                                                 final BillingProfileStoragePort billingProfileStoragePort) {
+        return new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort);
     }
 }

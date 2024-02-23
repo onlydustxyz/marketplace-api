@@ -6066,9 +6066,9 @@ components:
     PayoutPreferencesPageResponse:
       type: array
       items:
-        $ref: '#/components/schemas/PayoutPreferencesPageItemResponse'
+        $ref: '#/components/schemas/PayoutPreferencesItemResponse'
 
-    PayoutPreferencesPageItemResponse:
+    PayoutPreferencesItemResponse:
       type: object
       required:
         - project
