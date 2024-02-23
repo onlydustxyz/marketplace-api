@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.project.domain.model.notification;
 
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.EventType;
 
 import java.util.Date;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@JsonTypeName("ProjectCreated")
+@EventType("ProjectCreated")
 public class ProjectCreated extends Event {
     UUID projectId;
     Date createdAt;

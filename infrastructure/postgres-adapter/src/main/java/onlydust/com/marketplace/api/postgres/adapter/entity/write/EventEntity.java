@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -62,7 +64,8 @@ public abstract class EventEntity {
     @NoArgsConstructor
     public static class Payload implements Serializable {
 
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "$typeId")
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
+        @JsonTypeIdResolver(EventIdResolver.class)
         private Event event;
     }
 

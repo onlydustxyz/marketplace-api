@@ -195,6 +195,11 @@
                 <artifactId>slack-api-client</artifactId>
                 <version>${slack-api-client.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.10.2</version>
+            </dependency>
 
 
             <!-- Test -->
