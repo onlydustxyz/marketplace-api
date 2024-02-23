@@ -125,3 +125,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000060_rename_quotes_columns.sql
   - include:
       file: db/changelog/changelogs/00000061_new_payout_info_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000062_improve_outbox_events.sql
