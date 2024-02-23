@@ -2957,7 +2957,7 @@ paths:
   /api/v1/billing-profiles/{billingProfileId}/invoices:
     get:
       security:
-        - { }
+        - bearerAuth: [ ]
       tags:
         - BillingProfiles
       summary: Get invoices linked to given billing profile
@@ -3013,7 +3013,7 @@ paths:
   /api/v1/billing-profiles/{billingProfileId}/invoices/{invoiceId}:
     post:
       security:
-        - { }
+        - bearerAuth: [ ]
       tags:
         - BillingProfiles
       summary: Upload an invoice linked to a given billing profile
@@ -3051,7 +3051,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     get:
       security:
-        - { }
+        - bearerAuth: [ ]
       tags:
         - BillingProfiles
       summary: Download invoice by id linked to given billing profile

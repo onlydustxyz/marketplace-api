@@ -46,8 +46,9 @@ application:
       api-key: "some-api-key"
     back-office:
       api-key: "bo-api-key"
+    back-office-invoice-token:
       base-url: "https://local-bo-api.onlydust.com"
-      invoice-download-token: "BO_TOKEN"
+      token: "BO_TOKEN"
   cron:
     notification-job-delay: 500
     indexer-sync-job-delay: 500

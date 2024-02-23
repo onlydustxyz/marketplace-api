@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
@@ -36,7 +37,7 @@ public class BackofficeConfiguration {
 
     @Bean
     public BackofficeInvoicingManagementRestApi backofficeInvoicingManagementRestApi(final InvoiceFacadePort invoiceFacadePort,
-                                                                                     final ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig) {
+                                                                                     final QueryParamTokenAuthenticationService.Config apiKeyAuthenticationConfig) {
         return new BackofficeInvoicingManagementRestApi(invoiceFacadePort, apiKeyAuthenticationConfig);
     }
 
@@ -58,5 +59,11 @@ public class BackofficeConfiguration {
     @ConfigurationProperties("application.web.back-office")
     public ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig() {
         return new ApiKeyAuthenticationService.Config();
+    }
+
+    @Bean
+    @ConfigurationProperties("application.web.back-office-invoice-token")
+    public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
+        return new QueryParamTokenAuthenticationService.Config();
     }
 }

@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.UserRole;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
+import onlydust.com.marketplace.project.domain.model.UserRole;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
     private final AuthenticationFilter authenticationFilter;
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
+    private final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter;
     private final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint;
 
     @Override
@@ -31,6 +33,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/me/**").hasAuthority(UserRole.USER.name())
                 .antMatchers("/api/v1/billing-profiles/**").hasAuthority(UserRole.USER.name())
                 .antMatchers("/api/v1/events/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
+                .antMatchers("/bo/v1/external/**").hasAuthority(UserRole.UNSAFE_INTERNAL_SERVICE.name())
                 .antMatchers("/bo/v1/**").hasAuthority(UserRole.INTERNAL_SERVICE.name())
                 .antMatchers(HttpMethod.POST, "/api/v1/projects/**").hasAuthority(UserRole.USER.name())
                 .antMatchers(HttpMethod.GET, "/api/v1/users/search").hasAuthority(UserRole.USER.name())
@@ -49,6 +52,7 @@ public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)
                 .addFilterAfter(apiKeyAuthenticationFilter, AuthenticationFilter.class)
+                .addFilterAfter(queryParamTokenAuthenticationFilter, AuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(delegatedAuthenticationEntryPoint);
     }
 

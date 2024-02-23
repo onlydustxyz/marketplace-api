@@ -245,8 +245,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         when(pdfStoragePort.download(eq(invoiceId + ".pdf"))).then(invocation -> new ByteArrayInputStream(pdfData));
 
         final var data = client.get()
-                .uri(getApiURI(INVOICE.formatted(invoiceId)))
-                .header("Api-Key", apiKey())
+                .uri(getApiURI(EXTERNAL_INVOICE.formatted(invoiceId), Map.of("token", "BO_TOKEN")))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -254,6 +253,18 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody().returnResult().getResponseBody();
 
         assertThat(data).isEqualTo(pdfData);
+    }
+
+    @Test
+    void should_reject_invoice_download_if_wrong_token() {
+        final var invoiceId = invoices.get(1).id();
+
+        client.get()
+                .uri(getApiURI(EXTERNAL_INVOICE.formatted(invoiceId), Map.of("token", "INVALID_TOKEN")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isUnauthorized();
     }
 
     @SneakyThrows

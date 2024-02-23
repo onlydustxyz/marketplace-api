@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
@@ -11,6 +10,9 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0J
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
+import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +31,9 @@ public class WebSecurityConfiguration {
     @Bean
     public WebSecurityAdapter apiSecurityConfiguration(final AuthenticationFilter authenticationFilter,
                                                        final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                                       final QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter,
                                                        final DelegatedAuthenticationEntryPoint delegatedAuthenticationEntryPoint) {
-        return new WebSecurityAdapter(authenticationFilter, apiKeyAuthenticationFilter,
+        return new WebSecurityAdapter(authenticationFilter, apiKeyAuthenticationFilter, queryParamTokenAuthenticationFilter,
                 delegatedAuthenticationEntryPoint);
     }
 
@@ -77,6 +80,16 @@ public class WebSecurityConfiguration {
     @Bean
     public ApiKeyAuthenticationService apiKeyAuthenticationService(final ApiKeyAuthenticationService.Config apiKeyAuthenticationConfig) {
         return new ApiKeyAuthenticationService(apiKeyAuthenticationConfig);
+    }
+
+    @Bean
+    public QueryParamTokenAuthenticationFilter queryParamTokenAuthenticationFilter(final QueryParamTokenAuthenticationService queryParamTokenAuthenticationService) {
+        return new QueryParamTokenAuthenticationFilter(queryParamTokenAuthenticationService);
+    }
+
+    @Bean
+    public QueryParamTokenAuthenticationService queryParamTokenAuthenticationService(final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig) {
+        return new QueryParamTokenAuthenticationService(queryParamTokenAuthenticationConfig);
     }
 
     @Bean

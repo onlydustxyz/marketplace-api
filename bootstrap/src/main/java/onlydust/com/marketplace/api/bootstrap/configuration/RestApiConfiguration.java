@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
 import onlydust.com.marketplace.project.domain.service.RewardService;
@@ -81,6 +82,10 @@ public class RestApiConfiguration {
         return new ApiKeyAuthenticationService.Config();
     }
 
+    @Bean
+    public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
+        return new QueryParamTokenAuthenticationService.Config();
+    }
 
     @Bean
     public EcosystemsRestApi ecosystemsRestApi(final EcosystemFacadePort ecosystemFacadePort) {
