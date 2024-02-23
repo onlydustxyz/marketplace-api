@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.IndexerEventEntity;
@@ -366,15 +366,15 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public BillingProfileStorage accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
-                                                                 final IndividualBillingProfileRepository individualBillingProfileRepository,
-                                                                 final GlobalSettingsRepository globalSettingsRepository,
-                                                                 final KycRepository kycRepository,
-                                                                 final KybRepository kybRepository,
-                                                                 final BillingProfileRepository billingProfileRepository,
-                                                                 final PayoutInfoRepository payoutInfoRepository,
-                                                                 final WalletRepository walletRepository,
-                                                                 final BillingProfileUserRepository billingProfileUserRepository) {
+    public BillingProfileStoragePort accountingBillingProfileStorage(final CompanyBillingProfileRepository companyBillingProfileRepository,
+                                                                     final IndividualBillingProfileRepository individualBillingProfileRepository,
+                                                                     final GlobalSettingsRepository globalSettingsRepository,
+                                                                     final KycRepository kycRepository,
+                                                                     final KybRepository kybRepository,
+                                                                     final BillingProfileRepository billingProfileRepository,
+                                                                     final PayoutInfoRepository payoutInfoRepository,
+                                                                     final WalletRepository walletRepository,
+                                                                     final BillingProfileUserRepository billingProfileUserRepository) {
         return new PostgresBillingProfileAdapter(companyBillingProfileRepository, individualBillingProfileRepository, globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository, billingProfileUserRepository);
     }
@@ -388,5 +388,12 @@ public class PostgresConfiguration {
     @Bean
     public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository) {
         return new PostgresEcosystemAdapter(ecosystemRepository);
+    }
+
+    @Bean
+    public PostgresPayoutPreferenceAdapter postgresPayoutPreferenceAdapter(final PayoutPreferenceRepository payoutPreferenceRepository,
+                                                                           final PayoutPreferenceViewRepository payoutPreferenceViewRepository,
+                                                                           final RewardRepository rewardRepository) {
+        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository);
     }
 }

@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface BillingProfileStorage {
+public interface BillingProfileStoragePort {
     boolean oldIsAdmin(UserId userId, BillingProfile.Id billingProfileId);
 
     void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);

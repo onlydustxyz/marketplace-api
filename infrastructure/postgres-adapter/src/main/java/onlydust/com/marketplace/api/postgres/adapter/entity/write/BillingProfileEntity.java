@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TypeDef;
@@ -50,7 +50,15 @@ public class BillingProfileEntity {
     public enum Type {
         INDIVIDUAL,
         COMPANY,
-        SELF_EMPLOYED
+        SELF_EMPLOYED;
+
+        public BillingProfile.Type toDomain() {
+            return switch (this) {
+                case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
+                case COMPANY -> BillingProfile.Type.COMPANY;
+                case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
+            };
+        }
     }
 
     public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId) {
@@ -76,11 +84,7 @@ public class BillingProfileEntity {
         return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
                 .name(this.name)
-                .type(switch (this.type) {
-                    case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
-                    case COMPANY -> BillingProfile.Type.COMPANY;
-                    case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
-                })
+                .type(this.type.toDomain())
                 .build();
     }
 }

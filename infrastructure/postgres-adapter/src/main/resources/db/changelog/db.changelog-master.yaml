@@ -127,3 +127,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000061_new_payout_info_tables.sql
   - include:
       file: db/changelog/changelogs/00000062_improve_outbox_events.sql
+  - include:
+      file: db/changelog/changelogs/00000063_add_payout_preference_table.sql

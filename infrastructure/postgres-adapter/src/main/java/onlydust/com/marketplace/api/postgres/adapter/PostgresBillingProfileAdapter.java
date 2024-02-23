@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.UserId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
@@ -22,7 +22,7 @@ import java.util.Optional;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresBillingProfileAdapter implements BillingProfileStorage {
+public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
     private final @NonNull CompanyBillingProfileRepository companyBillingProfileRepository;
     private final @NonNull IndividualBillingProfileRepository individualBillingProfileRepository;
     private final @NonNull GlobalSettingsRepository globalSettingsRepository;

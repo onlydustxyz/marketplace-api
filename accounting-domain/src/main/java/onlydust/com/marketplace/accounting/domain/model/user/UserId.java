@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.accounting.domain.model;
+package onlydust.com.marketplace.accounting.domain.model.user;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
