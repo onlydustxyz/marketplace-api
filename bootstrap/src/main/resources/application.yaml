@@ -10,6 +10,8 @@ application:
       api-key: ${INTERNAL_API_KEY}
     back-office:
       api-key: ${BACKOFFICE_API_KEY}
+      invoice-download-token: ${BACKOFFICE_INVOICE_DOWNLOAD_TOKEN}
+      base-url: ${BACKOFFICE_API_BASE_URL}
   github:
     installation:
       retry:

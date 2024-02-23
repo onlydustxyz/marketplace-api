@@ -1845,6 +1845,7 @@ components:
         - amount
         - currency
         - rewardIds
+        - downloadUrl
       properties:
         id:
           $ref: '#/components/schemas/InvoiceId'
@@ -1864,6 +1865,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RewardId'
+        downloadUrl:
+          type: string
+          format: uri
 
     InvoiceStatus:
       type: string
