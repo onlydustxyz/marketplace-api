@@ -71,7 +71,7 @@ class InvoiceServiceTest {
 
         // Then
         final var invoiceCaptor = ArgumentCaptor.forClass(Invoice.class);
-        verify(invoiceStoragePort).save(invoiceCaptor.capture());
+        verify(invoiceStoragePort).update(invoiceCaptor.capture());
         final var updatedInvoice = invoiceCaptor.getValue();
         assertThat(updatedInvoice.status()).isEqualTo(status);
     }
@@ -85,7 +85,7 @@ class InvoiceServiceTest {
         invoiceService.update(invoice.id(), null);
 
         // Then
-        verify(invoiceStoragePort, never()).save(any());
+        verify(invoiceStoragePort, never()).update(any());
     }
 
     @SneakyThrows

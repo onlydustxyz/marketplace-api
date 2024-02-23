@@ -34,7 +34,7 @@ public class InvoiceService implements InvoiceFacadePort {
         if (status != Invoice.Status.APPROVED && status != Invoice.Status.REJECTED)
             throw forbidden("Cannot update invoice to status %s".formatted(status));
 
-        invoiceStoragePort.save(invoice.status(status));
+        invoiceStoragePort.update(invoice.status(status));
     }
 
     @Override

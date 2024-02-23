@@ -13,7 +13,9 @@ import java.util.Optional;
 public interface InvoiceStoragePort {
     Invoice preview(final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds);
 
-    void save(final @NonNull Invoice invoice);
+    void create(final @NonNull Invoice invoice);
+
+    void update(final @NonNull Invoice invoice);
 
     void deleteDraftsOf(final @NonNull BillingProfile.Id billingProfileId);
 

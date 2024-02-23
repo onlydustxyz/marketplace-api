@@ -78,7 +78,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .anyMatch(i -> invoiceStoragePort.get(i).orElseThrow().status().isActive()))
             throw badRequest("Some rewards are already invoiced");
 
-        invoiceStoragePort.save(invoice);
+        invoiceStoragePort.create(invoice);
 
         return invoice;
     }
@@ -123,7 +123,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
 
         final var url = pdfStoragePort.upload(invoice.internalFileName(), data);
-        invoiceStoragePort.save(invoice
+        invoiceStoragePort.update(invoice
                 .status(status)
                 .url(url)
                 .originalFileName(fileName));

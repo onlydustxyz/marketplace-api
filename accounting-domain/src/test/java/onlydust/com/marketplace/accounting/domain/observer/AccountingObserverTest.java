@@ -173,7 +173,7 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId);
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
-                verify(invoiceStorage, never()).save(invoice.status(Invoice.Status.PAID));
+                verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
             }
 
             // When
@@ -193,7 +193,7 @@ public class AccountingObserverTest {
                 assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId2);
                 assertThat(newRewardStatus.paidAt()).isNotNull();
 
-                verify(invoiceStorage).save(invoice.status(Invoice.Status.PAID));
+                verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
             }
         }
     }
