@@ -12,8 +12,8 @@ import java.util.Objects;
 
 public class EventIdResolver extends TypeIdResolverBase {
 
-    private JavaType baseType;
     private final Map<String, Class<?>> typeMap = new HashMap<>();
+    private JavaType baseType;
 
     @Override
     public void init(JavaType baseType) {
@@ -26,7 +26,13 @@ public class EventIdResolver extends TypeIdResolverBase {
         reflections.getSubTypesOf(baseType.getRawClass()).stream()
                 .map(aClass -> new EventAnnotatedClass(aClass, aClass.getAnnotation(EventType.class)))
                 .filter(annotatedClass -> Objects.nonNull(annotatedClass.eventType()))
-                .forEach(annotatedClass -> typeMap.put(annotatedClass.eventType().value(), annotatedClass.aClass()));
+                .forEach(annotatedClass -> {
+                    final var eventType = annotatedClass.eventType().value();
+                    if (typeMap.containsKey(eventType)) {
+                        throw new IllegalArgumentException("Duplicate EventType value: @EventType(\"%s\")".formatted(eventType));
+                    }
+                    typeMap.put(eventType, annotatedClass.aClass());
+                });
     }
 
     @Override
