@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
-import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectLeaderAssigned;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationEventRepository;
+import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.project.domain.model.notification.ProjectLeaderAssigned;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,8 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
     }
 
     @Test
@@ -59,34 +60,38 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event1);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event1);
 
         // When
-        postgresOutboxAdapter.ack();
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event2);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event2);
 
         // When
-        postgresOutboxAdapter.nack("Some error");
+        postgresOutboxAdapter.nack(notificationPeeked.get().id(), "Some error");
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event2);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event2);
 
         // When
-        postgresOutboxAdapter.ack();
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event3);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event3);
 
         // When
-        postgresOutboxAdapter.ack();
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         notificationPeeked = postgresOutboxAdapter.peek();
 
         // Then
@@ -114,10 +119,11 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         // And when
-        postgresOutboxAdapter.ack();
+        postgresOutboxAdapter.ack(notificationPeeked.get().id());
         assertThat(postgresOutboxAdapter.peek()).isNotPresent();
 
         final var entity = notificationEventRepository.findAll().get(0);
@@ -137,12 +143,14 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
 
         // Then
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         // And when
-        postgresOutboxAdapter.nack("Some error");
+        postgresOutboxAdapter.nack(notificationPeeked.get().id(), "Some error");
         assertThat(notificationPeeked).isPresent();
-        assertThat(notificationPeeked.get()).isEqualTo(event);
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
 
         final var entity = notificationEventRepository.findAll().get(0);
         assertThat(entity.getStatus()).isEqualTo(NotificationEventEntity.Status.FAILED);
@@ -158,7 +166,11 @@ class PostgresNotificationOutboxAdapterIT extends AbstractPostgresIT {
         // When
         postgresOutboxAdapter.push(event);
         final var notificationPeeked = postgresOutboxAdapter.peek();
-        postgresOutboxAdapter.skip("Some reason to skip");
+        assertThat(notificationPeeked).isPresent();
+        assertThat(notificationPeeked.get().id()).isNotNull();
+        assertThat(notificationPeeked.get().event()).isEqualTo(event);
+
+        postgresOutboxAdapter.skip(notificationPeeked.get().id(), "Some reason to skip");
 
         // Then
         final var entity = notificationEventRepository.findAll().get(0);

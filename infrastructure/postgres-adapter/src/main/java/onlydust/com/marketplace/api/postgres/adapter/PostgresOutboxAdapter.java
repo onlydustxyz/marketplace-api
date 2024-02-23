@@ -7,6 +7,8 @@ import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import java.util.Optional;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+
 @AllArgsConstructor
 public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort {
 
@@ -18,34 +20,37 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
     }
 
     @Override
-    public Optional<Event> peek() {
-        return outboxRepository.findNextToProcess().map(EventEntity::getEvent);
+    public Optional<IdentifiableEvent> peek() {
+        return outboxRepository.findNextToProcess().map(EventEntity::toIdentifiableEvent);
     }
 
     @Override
-    public void ack() {
-        outboxRepository.findNextToProcess().ifPresent(entity -> {
-            entity.setStatus(EventEntity.Status.PROCESSED);
-            entity.setError(null);
-            outboxRepository.save(entity);
-        });
+    public void ack(Long eventId) {
+        final var entity = outboxRepository.findById(eventId)
+                .orElseThrow(() -> internalServerError("Event %d not found".formatted(eventId)));
+
+        entity.setStatus(EventEntity.Status.PROCESSED);
+        entity.setError(null);
+        outboxRepository.save(entity);
     }
 
     @Override
-    public void nack(String message) {
-        outboxRepository.findNextToProcess().ifPresent(entity -> {
-            entity.setStatus(EventEntity.Status.FAILED);
-            entity.setError(message);
-            outboxRepository.save(entity);
-        });
+    public void nack(Long eventId, String message) {
+        final var entity = outboxRepository.findById(eventId)
+                .orElseThrow(() -> internalServerError("Event %d not found".formatted(eventId)));
+
+        entity.setStatus(EventEntity.Status.FAILED);
+        entity.setError(message);
+        outboxRepository.save(entity);
     }
 
     @Override
-    public void skip(String message) {
-        outboxRepository.findNextToProcess().ifPresent(entity -> {
-            entity.setStatus(EventEntity.Status.SKIPPED);
-            entity.setError(message);
-            outboxRepository.save(entity);
-        });
+    public void skip(Long eventId, String message) {
+        final var entity = outboxRepository.findById(eventId)
+                .orElseThrow(() -> internalServerError("Event %d not found".formatted(eventId)));
+
+        entity.setStatus(EventEntity.Status.SKIPPED);
+        entity.setError(message);
+        outboxRepository.save(entity);
     }
 }

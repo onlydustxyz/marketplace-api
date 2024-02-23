@@ -7,11 +7,14 @@ import java.util.Optional;
 public interface OutboxPort {
     void push(Event event);
 
-    Optional<Event> peek();
+    Optional<IdentifiableEvent> peek();
 
-    void ack();
+    void ack(Long eventId);
 
-    void nack(String message);
+    void nack(Long eventId, String message);
 
-    void skip(String someReasonToSkip);
+    void skip(Long eventId, String someReasonToSkip);
+
+    record IdentifiableEvent(Long id, Event event) {
+    }
 }

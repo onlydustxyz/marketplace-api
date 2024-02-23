@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -38,6 +39,9 @@ public abstract class EventEntity {
     @Type(type = "outbox_event_status")
     Status status;
 
+    @Column(name = "group_key")
+    String group;
+
     String error;
 
     @EqualsAndHashCode.Exclude
@@ -53,10 +57,11 @@ public abstract class EventEntity {
     public EventEntity(Event event) {
         this.payload = new Payload(event);
         this.status = Status.PENDING;
+        this.group = event.group();
     }
 
-    public Event getEvent() {
-        return payload.getEvent();
+    public OutboxPort.IdentifiableEvent toIdentifiableEvent() {
+        return new OutboxPort.IdentifiableEvent(id, payload.getEvent());
     }
 
     @Data

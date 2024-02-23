@@ -2,7 +2,6 @@ package onlydust.com.marketplace.kernel.jobs;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
@@ -17,19 +16,20 @@ public class OutboxConsumerJob implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Optional<Event> event;
-            while ((event = outbox.peek()).isPresent()) {
-                consumer.process(event.get());
-                outbox.ack();
-            }
-        } catch (Exception e) {
-            if (e instanceof OutboxSkippingException) {
-                LOGGER.warn("Skipping event", e);
-                outbox.skip(e.getMessage());
-            } else {
-                LOGGER.error("Error while processing event", e);
-                outbox.nack(e.getMessage());
+        Optional<OutboxPort.IdentifiableEvent> identifiableEvent;
+        while ((identifiableEvent = outbox.peek()).isPresent()) {
+            final var eventId = identifiableEvent.get().id();
+            try {
+                consumer.process(identifiableEvent.get().event());
+                outbox.ack(eventId);
+            } catch (Exception e) {
+                if (e instanceof OutboxSkippingException) {
+                    LOGGER.warn("Skipping event %d".formatted(eventId), e);
+                    outbox.skip(eventId, e.getMessage());
+                } else {
+                    LOGGER.error("Error while processing event %d".formatted(eventId), e);
+                    outbox.nack(eventId, e.getMessage());
+                }
             }
         }
     }
