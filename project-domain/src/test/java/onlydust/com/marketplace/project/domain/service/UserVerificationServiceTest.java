@@ -414,7 +414,18 @@ public class UserVerificationServiceTest {
             verify(oldBillingProfileStoragePort).saveChildrenKyc(mappedEvent.getExternalApplicantId(), mappedEvent.getParentExternalApplicantId(),
                     mappedEvent.getOldVerificationStatus());
             final BillingProfileUpdated billingProfileUpdated =
-                    BillingProfileUpdated.builder().billingProfileId(companyBillingProfile.getId()).externalApplicantId(companyBillingProfile.getExternalApplicantId()).type(OldBillingProfileType.COMPANY).oldVerificationStatus(OldVerificationStatus.REJECTED).userId(userId).githubUserId(user.getGithubUserId()).githubLogin(user.getGithubLogin()).githubUserEmail(user.getGithubEmail()).githubAvatarUrl(user.getGithubAvatarUrl()).rawReviewDetails(mappedEvent.getRawReviewDetails()).build();
+                    BillingProfileUpdated.builder().billingProfileId(companyBillingProfile.getId())
+                            .externalApplicantId(companyBillingProfile.getExternalApplicantId())
+                            .type(OldBillingProfileType.COMPANY)
+                            .oldVerificationStatus(OldVerificationStatus.REJECTED)
+                            .userId(userId)
+                            .githubUserId(user.getGithubUserId())
+                            .githubLogin(user.getGithubLogin())
+                            .githubUserEmail(user.getGithubEmail())
+                            .githubAvatarUrl(user.getGithubAvatarUrl())
+                            .externalApplicantId(mappedEvent.getExternalApplicantId())
+                            .parentExternalApplicantId(mappedEvent.getParentExternalApplicantId())
+                            .rawReviewDetails(mappedEvent.getRawReviewDetails()).build();
             verify(notificationPort).notifyNewVerificationEvent(billingProfileUpdated);
             verify(webhookPort).send(billingProfileUpdated);
             verify(accountingUserObserverPort).onBillingProfileUpdated(billingProfileUpdated);
