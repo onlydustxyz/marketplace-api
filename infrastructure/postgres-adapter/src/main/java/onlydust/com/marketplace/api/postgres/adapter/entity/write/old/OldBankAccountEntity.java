@@ -16,7 +16,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Table(name = "bank_accounts", schema = "public")
-public class BankAccountEntity {
+public class OldBankAccountEntity {
 
     @Id
     @Column(name = "user_id")

@@ -2,16 +2,16 @@ package onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 
 import java.util.Optional;
 
 @EqualsAndHashCode
 public class Wallet {
-    private final AccountAddress address;
+    private final EvmAccountAddress address;
     private final Name ens;
 
-    public Wallet(@NonNull AccountAddress address) {
+    public Wallet(@NonNull EvmAccountAddress address) {
         this.address = address;
         this.ens = null;
     }
@@ -30,7 +30,7 @@ public class Wallet {
         }
     }
 
-    public Optional<AccountAddress> accountAddress() {
+    public Optional<EvmAccountAddress> accountAddress() {
         return Optional.ofNullable(address);
     }
 

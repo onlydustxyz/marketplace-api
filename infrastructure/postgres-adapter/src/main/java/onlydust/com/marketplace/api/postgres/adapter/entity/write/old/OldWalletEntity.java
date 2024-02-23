@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -21,8 +21,8 @@ import java.util.UUID;
 @Table(name = "wallets", schema = "public")
 @TypeDef(name = "wallet_type", typeClass = PostgreSQLEnumType.class)
 @TypeDef(name = "network", typeClass = PostgreSQLEnumType.class)
-@IdClass(WalletEntity.PrimaryKey.class)
-public class WalletEntity {
+@IdClass(OldWalletEntity.PrimaryKey.class)
+public class OldWalletEntity {
     @Id
     @Column(name = "user_id")
     UUID userId;

@@ -4,7 +4,6 @@ import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 

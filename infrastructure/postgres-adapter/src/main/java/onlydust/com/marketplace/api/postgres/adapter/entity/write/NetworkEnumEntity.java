@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type;
+package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;

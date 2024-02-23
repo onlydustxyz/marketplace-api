@@ -5,10 +5,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserver;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -33,8 +30,7 @@ import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.AP
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.TO_REVIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -64,7 +60,7 @@ class BillingProfileServiceTest {
     class GivenCallerIsNotTheBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(false);
+            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(false);
         }
 
         @Test
@@ -114,7 +110,7 @@ class BillingProfileServiceTest {
     class GivenUserIsBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
         }
 
         @Test
@@ -172,7 +168,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
             when(billingProfileStorage.isMandateAccepted(otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -186,7 +182,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_mandate_is_not_accepted() {
             // Given
-            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
             when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(false);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -236,7 +232,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -249,7 +245,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_if_mandate_is_accepted() {
             // Given
-            when(billingProfileStorage.isAdmin(userId, billingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, billingProfileId)).thenReturn(true);
             when(billingProfileStorage.isMandateAccepted(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -316,7 +312,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_download_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStorage.isAdmin(userId, otherBillingProfileId)).thenReturn(true);
+            when(billingProfileStorage.oldIsAdmin(userId, otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -666,4 +662,101 @@ class BillingProfileServiceTest {
         assertEquals("Billing profile %s not found".formatted(billingProfileId.value()),
                 exception.getMessage());
     }
+
+
+    @Test
+    void should_not_authorized_to_modify_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
+        Exception exception = null;
+        try {
+            billingProfileService.updatePayoutInfo(billingProfileId, userIdNotAdmin, PayoutInfo.builder().build());
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(401, ((OnlyDustException) exception).getStatus());
+        assertEquals("User %s must be admin to edit payout info of billing profile %s".formatted(userIdNotAdmin.value(), billingProfileId.value()),
+                exception.getMessage());
+    }
+
+    @Test
+    void should_not_authorized_to_read_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
+        Exception exception = null;
+        try {
+            billingProfileService.getPayoutInfo(billingProfileId, userIdNotAdmin);
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        // Then
+        assertTrue(exception instanceof OnlyDustException);
+        assertEquals(401, ((OnlyDustException) exception).getStatus());
+        assertEquals("User %s must be admin to read payout info of billing profile %s".formatted(userIdNotAdmin.value(), billingProfileId.value()),
+                exception.getMessage());
+    }
+
+    @Test
+    void should_update_payout_info_given_a_user_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final PayoutInfo payoutInfo = PayoutInfo.builder().build();
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        billingProfileService.updatePayoutInfo(billingProfileId, userIAdmin, payoutInfo);
+
+        // Then
+        verify(billingProfileStorage).savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
+    }
+
+    @Test
+    void should_get_payout_info_given_a_user_admin() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final PayoutInfo expectedPayoutInfo = PayoutInfo.builder().build();
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findPayoutInfoByBillingProfile(billingProfileId))
+                .thenReturn(Optional.of(expectedPayoutInfo));
+        final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+
+        // Then
+        assertEquals(expectedPayoutInfo, payoutInfo);
+        verify(billingProfileStorage).findPayoutInfoByBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_get_empty_payout_info_given_a_user_admin_and_no_payout_info() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+
+        // When
+        when(billingProfileStorage.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+        when(billingProfileStorage.findPayoutInfoByBillingProfile(billingProfileId))
+                .thenReturn(Optional.empty());
+        final PayoutInfo payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+
+        // Then
+        assertNotNull(payoutInfo);
+        verify(billingProfileStorage).findPayoutInfoByBillingProfile(billingProfileId);
+    }
+
+
 }

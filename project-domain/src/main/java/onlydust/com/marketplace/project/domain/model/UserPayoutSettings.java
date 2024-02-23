@@ -2,9 +2,10 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Wallet;
-import onlydust.com.marketplace.kernel.model.blockchain.starknet.AccountAddress;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,16 +67,16 @@ public class UserPayoutSettings {
 
 
     Wallet ethWallet;
-    onlydust.com.marketplace.kernel.model.blockchain.evm.AccountAddress optimismAddress;
-    onlydust.com.marketplace.kernel.model.blockchain.aptos.AccountAddress aptosAddress;
-    AccountAddress starknetAddress;
+    EvmAccountAddress optimismAddress;
+    AptosAccountAddress aptosAddress;
+    StarknetAccountAddress starknetAddress;
     SepaAccount sepaAccount;
 
     @Data
     @Builder
     public static class SepaAccount {
         String bic;
-        AccountNumber accountNumber;
+        OldAccountNumber accountNumber;
 
         public boolean valid() {
             return nonNull(bic) && nonNull(accountNumber);

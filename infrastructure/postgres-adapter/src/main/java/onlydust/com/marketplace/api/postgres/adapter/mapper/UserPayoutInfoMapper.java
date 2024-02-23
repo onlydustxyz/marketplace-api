@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
+import onlydust.com.marketplace.project.domain.model.OldAccountNumber;
 import onlydust.com.marketplace.project.domain.model.UserPayoutSettings;
-import onlydust.com.marketplace.project.domain.model.bank.AccountNumber;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserPayoutInfoValidationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.BankAccountEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldBankAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserPayoutInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.WalletEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OldWalletEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.CurrencyEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.NetworkEnumEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.WalletTypeEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -40,7 +40,7 @@ public interface UserPayoutInfoMapper {
             payoutSettings = payoutSettings.toBuilder()
                     .sepaAccount(UserPayoutSettings.SepaAccount.builder()
                             .bic(userPayoutInfoEntity.getBankAccount().getBic())
-                            .accountNumber(AccountNumber.of(userPayoutInfoEntity.getBankAccount().getIban()))
+                            .accountNumber(OldAccountNumber.of(userPayoutInfoEntity.getBankAccount().getIban()))
                             .build())
                     .build();
         }
@@ -50,7 +50,7 @@ public interface UserPayoutInfoMapper {
     private static UserPayoutSettings mapWalletsToDomain(UserPayoutInfoEntity userPayoutInfoEntity,
                                                          UserPayoutSettings payoutSettings) {
         if (!userPayoutInfoEntity.getWallets().isEmpty()) {
-            for (WalletEntity wallet : userPayoutInfoEntity.getWallets()) {
+            for (OldWalletEntity wallet : userPayoutInfoEntity.getWallets()) {
                 if (wallet.getNetwork().equals(NetworkEnumEntity.aptos)) {
                     payoutSettings = payoutSettings.toBuilder()
                             .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
@@ -91,7 +91,7 @@ public interface UserPayoutInfoMapper {
                 .build();
         if (nonNull(userPayoutSettings.getSepaAccount())) {
             entity = entity.toBuilder()
-                    .bankAccount(BankAccountEntity.builder()
+                    .bankAccount(OldBankAccountEntity.builder()
                             .bic(userPayoutSettings.getSepaAccount().getBic())
                             .iban(userPayoutSettings.getSepaAccount().getAccountNumber().asString())
                             .userId(userId)
@@ -105,7 +105,7 @@ public interface UserPayoutInfoMapper {
     private static void mapWalletsToEntity(UUID userId, UserPayoutSettings payoutSettings,
                                            UserPayoutInfoEntity entity) {
         if (nonNull(payoutSettings.getAptosAddress())) {
-            entity.addWallets(WalletEntity.builder()
+            entity.addWallets(OldWalletEntity.builder()
                     .address(payoutSettings.getAptosAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .userId(userId)
@@ -113,7 +113,7 @@ public interface UserPayoutInfoMapper {
                     .build());
         }
         if (nonNull(payoutSettings.getOptimismAddress())) {
-            entity.addWallets(WalletEntity.builder()
+            entity.addWallets(OldWalletEntity.builder()
                     .address(payoutSettings.getOptimismAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .userId(userId)
@@ -121,7 +121,7 @@ public interface UserPayoutInfoMapper {
                     .build());
         }
         if (nonNull(payoutSettings.getStarknetAddress())) {
-            entity.addWallets(WalletEntity.builder()
+            entity.addWallets(OldWalletEntity.builder()
                     .address(payoutSettings.getStarknetAddress().toString())
                     .type(WalletTypeEnumEntity.address)
                     .userId(userId)
@@ -129,7 +129,7 @@ public interface UserPayoutInfoMapper {
                     .build());
         }
         if (nonNull(payoutSettings.getEthWallet())) {
-            entity.addWallets(WalletEntity.builder()
+            entity.addWallets(OldWalletEntity.builder()
                     .address(payoutSettings.getEthWallet().asString())
                     .type(payoutSettings.getEthWallet().accountAddress().isPresent() ?
                             WalletTypeEnumEntity.address : WalletTypeEnumEntity.name)

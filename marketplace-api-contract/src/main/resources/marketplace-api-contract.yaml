@@ -3452,16 +3452,16 @@ components:
       properties:
         hasValidPayoutSettings:
           type: boolean
-        sepaAccount:
+        bankAccount:
           type: object
           properties:
             bic:
               type: string
               example: DAAEFRPPCCT
-            iban:
+            number:
               type: string
               example: FR5417569000301995586997O41
-        missingSepaAccount:
+        missingBankAccount:
           type: boolean
         ethWallet:
           type: string
@@ -3513,13 +3513,13 @@ components:
     BillingProfilePayoutInfoRequest:
       type: object
       properties:
-        sepaAccount:
+        bankAccount:
           type: object
           properties:
             bic:
               type: string
               example: DAAEFRPPCCT
-            iban:
+            number:
               type: string
               example: FR5417569000301995586997O41
         ethWallet:

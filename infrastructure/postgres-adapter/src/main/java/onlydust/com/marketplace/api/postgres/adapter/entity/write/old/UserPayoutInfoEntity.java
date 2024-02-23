@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -26,12 +24,12 @@ public class UserPayoutInfoEntity {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @Builder.Default
-    Set<WalletEntity> wallets = new HashSet<>();
+    Set<OldWalletEntity> wallets = new HashSet<>();
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    BankAccountEntity bankAccount;
+    OldBankAccountEntity bankAccount;
 
-    public void addWallets(final WalletEntity walletEntity) {
-        this.wallets.add(walletEntity);
+    public void addWallets(final OldWalletEntity oldWalletEntity) {
+        this.wallets.add(oldWalletEntity);
     }
 }

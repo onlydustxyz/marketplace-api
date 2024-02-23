@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.model.Currency;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -22,7 +21,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -52,7 +50,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectIdRepository projectIdRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomUserRewardRepository customUserRewardRepository;
-    private final WalletRepository walletRepository;
+    private final OldWalletRepository oldWalletRepository;
     private final CustomUserPayoutInfoRepository customUserPayoutInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
@@ -241,7 +239,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                                                           UserPayoutSettings userPayoutSettings) {
         final UserPayoutInfoEntity userPayoutInfoEntity = UserPayoutInfoMapper.mapDomainToEntity(userId,
                 userPayoutSettings);
-        userPayoutInfoRepository.findById(userId).ifPresent(entity -> walletRepository.deleteByUserId(userId));
+        userPayoutInfoRepository.findById(userId).ifPresent(entity -> oldWalletRepository.deleteByUserId(userId));
         final UserPayoutInfoEntity saved = userPayoutInfoRepository.save(userPayoutInfoEntity);
         final UserPayoutInfoValidationEntity userPayoutInfoValidationEntity =
                 customUserPayoutInfoRepository.getUserPayoutInfoValidationEntity(userId);

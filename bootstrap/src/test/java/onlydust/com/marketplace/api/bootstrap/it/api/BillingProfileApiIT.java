@@ -20,7 +20,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     void should_be_authenticated() {
         // When
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .bodyValue("""
                         {
                           "name": "test",
@@ -41,7 +41,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         /// When
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -61,7 +61,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -83,7 +83,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         /// When
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
                 .bodyValue("""
@@ -103,7 +103,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty();
 
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
                 .bodyValue("""
@@ -125,7 +125,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         /// When
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
                 .bodyValue("""
@@ -146,7 +146,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(POST_BILLING_PROFILES))
+                .uri(getApiURI(BILLING_PROFILES_POST))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
                 .bodyValue("""
@@ -197,7 +197,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(GET_BILLING_PROFILES_BY_ID.formatted(companyBillingProfile.id().value().toString())))
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
@@ -212,7 +212,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(GET_BILLING_PROFILES_BY_ID.formatted(selfEmployedBillingProfile.id().value().toString())))
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(selfEmployedBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
@@ -227,7 +227,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(GET_BILLING_PROFILES_BY_ID.formatted(individualBillingProfile.id().value().toString())))
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
@@ -239,5 +239,130 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo(individualBillingProfile.type().name())
                 .jsonPath("$.kyc.status").isEqualTo(individualBillingProfile.kyc().getStatus().name())
                 .jsonPath("$.kyb").isEmpty();
+    }
+
+    @Test
+    void should_put_and_get_billing_profile_payout_infos() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
+                faker.internet().url(), false);
+        final SelfEmployedBillingProfile selfEmployedBillingProfile =
+                billingProfileService.createSelfEmployedBillingProfile(UserId.of(authenticatedUser.user().getId()),
+                        faker.rickAndMorty().character(), null);
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "hasValidPayoutSettings": null,
+                          "bankAccount": null,
+                          "missingBankAccount": null,
+                          "ethWallet": null,
+                          "missingEthWallet": null,
+                          "optimismAddress": null,
+                          "missingOptimismWallet": null,
+                          "aptosAddress": null,
+                          "missingAptosWallet": null,
+                          "starknetAddress": null,
+                          "missingStarknetWallet": null
+                        }""");
+
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_PUT_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
+                          "ethWallet": "vitalik.eth",
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "bankAccount": {
+                            "bic": "DAAEFRPPCCT",
+                            "number": "FR5417569000301995586997O41"
+                          },
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "hasValidPayoutSettings": null,
+                          "bankAccount": {
+                            "bic": "DAAEFRPPCCT",
+                            "number": "FR5417569000301995586997O41"
+                          },
+                          "missingBankAccount": null,
+                          "ethWallet": "vitalik.eth",
+                          "missingEthWallet": null,
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "missingOptimismWallet": null,
+                          "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
+                          "missingAptosWallet": null,
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
+                          "missingStarknetWallet": null
+                        }""");
+
+        client.put()
+                .uri(getApiURI(BILLING_PROFILES_PUT_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "aptosAddress": null,
+                          "ethWallet": null,
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "bankAccount": null,
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "hasValidPayoutSettings": null,
+                          "bankAccount": null,
+                          "missingBankAccount": null,
+                          "ethWallet": null,
+                          "missingEthWallet": null,
+                          "optimismAddress": "0x72c30fcd1e7bd691ce206cd36bbd87c4c7099545",
+                          "missingOptimismWallet": null,
+                          "aptosAddress": null,
+                          "missingAptosWallet": null,
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
+                          "missingStarknetWallet": null
+                        }""");
     }
 }
